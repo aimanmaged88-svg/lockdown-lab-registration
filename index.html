@@ -193,26 +193,18 @@
     btn.textContent = 'Saving...';
 
     try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
+      const response = await fetch('https://script.google.com/macros/s/AKfycbzWAmwOOEJ7V5ySswXs8eHc2XUUAI_kJjHnqaMr4J4tLkpP1z8YmkVFOIOy3Y0huR36/exec', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-6',
-          max_tokens: 1000,
-          mcp_servers: [{ type: 'url', url: 'https://drivemcp.googleapis.com/mcp/v1', name: 'google-drive-mcp' }],
-          messages: [{
-            role: 'user',
-            content: `Append a new row to Google Spreadsheet ID "1rD7kGvu6rEJB3iDgGXfCv4mx2Fd97nf_H_FSuHqBIls". Add this data as a new row after the header:
-- Timestamp: ${new Date().toLocaleString('en-AU', { timeZone: 'Australia/Sydney' })}
-- Full Name: ${name}
-- Email Address: ${email}
-- Age: ${age}
-- Instagram Handle: ${instagram || 'N/A'}
-- Guardian Name: ${guardian || 'N/A'}
-- Guardian Email: ${guardianEmail || 'N/A'}
-- How Did You Hear: ${source || 'N/A'}
-- Questions: ${questions || 'N/A'}`
-          }]
+          timestamp: new Date().toLocaleString('en-AU', { timeZone: 'Australia/Sydney' }),
+          name,
+          email,
+          age,
+          instagram,
+          guardian,
+          guardianEmail,
+          source,
+          questions
         })
       });
 
