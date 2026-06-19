@@ -108,25 +108,27 @@
       <div class="section-label">Secure Your Spot</div>
       <h2>Join the Waitlist</h2>
       <p>Date and time TBA — register now and you'll be the first to know.</p>
-      <div class="field"><label>Full Name *</label><input type="text" id="name" placeholder="Your full name" /></div>
-      <div class="field"><label>Email Address *</label><input type="email" id="email" placeholder="your@email.com" /></div>
-      <div class="field"><label>Age *</label><input type="number" id="age" placeholder="e.g. 15" /></div>
-      <div class="field"><label>Instagram Handle</label><input type="text" id="instagram" placeholder="@yourhandle" /></div>
-      <div class="field"><label>Parent / Guardian Name (if under 18)</label><input type="text" id="guardian" placeholder="Guardian's name" /></div>
-      <div class="field"><label>Parent / Guardian Email (if under 18)</label><input type="email" id="guardianEmail" placeholder="guardian@email.com" /></div>
-      <div class="field">
-        <label>How Did You Hear About Us?</label>
-        <select id="source">
-          <option value="">Select an option</option>
-          <option value="instagram">Instagram (@lockdownlab3)</option>
-          <option value="friend">Friend / teammate</option>
-          <option value="coach">My coach</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
-      <div class="field"><label>Any Questions?</label><textarea id="questions" rows="3" placeholder="Anything you want to know before signing up..."></textarea></div>
-      <div class="error-box" id="errorBox"></div>
-      <button class="submit-btn" id="submitBtn" onclick="handleSubmit()">Register My Spot →</button>
+      <form name="registration" method="POST" data-netlify="true" action="/success.html" style="margin:0">
+        <input type="hidden" name="form-name" value="registration" />
+        <div class="field"><label>Full Name *</label><input type="text" name="name" placeholder="Your full name" required /></div>
+        <div class="field"><label>Email Address *</label><input type="email" name="email" placeholder="your@email.com" required /></div>
+        <div class="field"><label>Age *</label><input type="number" name="age" placeholder="e.g. 15" required /></div>
+        <div class="field"><label>Instagram Handle</label><input type="text" name="instagram" placeholder="@yourhandle" /></div>
+        <div class="field"><label>Parent / Guardian Name (if under 18)</label><input type="text" name="guardian" placeholder="Guardian's name" /></div>
+        <div class="field"><label>Parent / Guardian Email (if under 18)</label><input type="email" name="guardianEmail" placeholder="guardian@email.com" /></div>
+        <div class="field">
+          <label>How Did You Hear About Us?</label>
+          <select name="source">
+            <option value="">Select an option</option>
+            <option value="instagram">Instagram (@lockdownlab3)</option>
+            <option value="friend">Friend / teammate</option>
+            <option value="coach">My coach</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <div class="field"><label>Any Questions?</label><textarea name="questions" rows="3" placeholder="Anything you want to know before signing up..."></textarea></div>
+        <button class="submit-btn" type="submit">Register My Spot →</button>
+      </form>
     </div>
     <div class="success" id="successView">
       <div class="success-emoji">🏀</div>
