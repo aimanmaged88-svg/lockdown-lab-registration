@@ -8,11 +8,9 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { background: #0A0A0A; color: #fff; font-family: Arial, sans-serif; }
     a { text-decoration: none; }
-
     .header { background: #0A0A0A; border-bottom: 2px solid #D4AF37; padding: 16px 32px; display: flex; align-items: center; gap: 16px; }
     .header-text .brand { font-size: 13px; letter-spacing: 4px; color: #fff; font-weight: 900; text-transform: uppercase; }
     .header-text .handle { font-size: 11px; color: #D4AF37; margin-top: 3px; letter-spacing: 2px; font-weight: 700; }
-
     .hero { background: linear-gradient(180deg, #1a1a1a 0%, #0A0A0A 100%); padding: 64px 32px 48px; text-align: center; border-bottom: 1px solid #222; }
     .badge { display: inline-block; background: #D4AF37; color: #0A0A0A; font-size: 10px; font-weight: 800; letter-spacing: 4px; padding: 6px 16px; border-radius: 2px; margin-bottom: 24px; text-transform: uppercase; }
     .hero h1 { font-size: clamp(28px, 6vw, 52px); font-weight: 900; letter-spacing: -1px; margin-bottom: 8px; line-height: 1.1; text-transform: uppercase; }
@@ -21,13 +19,11 @@
     .stats { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; }
     .stat-number { font-size: 28px; font-weight: 900; color: #D4AF37; }
     .stat-label { font-size: 11px; color: #666; letter-spacing: 2px; text-transform: uppercase; margin-top: 4px; }
-
     .section { padding: 48px 32px; max-width: 680px; margin: 0 auto; }
     .section-label { font-size: 11px; letter-spacing: 4px; color: #D4AF37; font-weight: 700; text-transform: uppercase; margin-bottom: 20px; }
     .learn-item { display: flex; align-items: flex-start; gap: 14px; padding: 14px 16px; background: #1a1a1a; border-left: 3px solid #D4AF37; border-radius: 0 4px 4px 0; margin-bottom: 12px; }
     .learn-num { width: 22px; height: 22px; min-width: 22px; border-radius: 50%; background: #D4AF37; color: #0A0A0A; font-size: 11px; font-weight: 900; display: flex; align-items: center; justify-content: center; }
     .learn-text { font-size: 14px; line-height: 1.5; color: #ddd; }
-
     .weeks { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 48px; }
     .week-card { padding: 16px; background: #1a1a1a; border: 1px solid #333; border-radius: 4px; }
     .week-card.active { background: rgba(212,175,55,0.1); border-color: #D4AF37; }
@@ -36,7 +32,6 @@
     .week-title { font-size: 13px; color: #666; font-weight: 600; margin-top: 6px; line-height: 1.4; }
     .week-card.active .week-title { color: #fff; }
     .week-tag { font-size: 10px; color: #D4AF37; margin-top: 8px; font-weight: 700; }
-
     .form-section { background: #1a1a1a; border-top: 1px solid #222; border-bottom: 1px solid #222; padding: 48px 32px; }
     .form-inner { max-width: 540px; margin: 0 auto; }
     .form-section h2 { font-size: 26px; font-weight: 900; margin: 0 0 8px; text-transform: uppercase; }
@@ -49,7 +44,6 @@
     .error-box { color: #ff6b6b; font-size: 13px; padding: 10px 14px; background: #2a0f0f; border: 1px solid #5a2a2a; border-radius: 4px; margin-bottom: 16px; display: none; }
     .submit-btn { background: #D4AF37; color: #0A0A0A; border: none; padding: 16px 32px; font-size: 13px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; border-radius: 4px; cursor: pointer; margin-top: 8px; width: 100%; }
     .submit-btn:disabled { background: #a08020; cursor: not-allowed; }
-
     .success { text-align: center; padding: 32px 0; display: none; }
     .success-emoji { font-size: 48px; margin-bottom: 16px; }
     .success-label { font-size: 11px; letter-spacing: 4px; color: #D4AF37; font-weight: 700; text-transform: uppercase; margin-bottom: 12px; }
@@ -59,14 +53,12 @@
     .follow-box { padding: 16px; background: #2a2a2a; border-radius: 4px; border: 1px solid rgba(212,175,55,0.2); }
     .follow-label { font-size: 11px; color: #D4AF37; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
     .follow-handle { font-size: 15px; font-weight: 700; }
-
     footer { padding: 32px; text-align: center; color: #444; font-size: 12px; }
     footer .brand { color: #D4AF37; font-weight: 700; font-size: 13px; margin-bottom: 6px; letter-spacing: 3px; text-transform: uppercase; }
   </style>
 </head>
 <body>
 
-<!-- Header -->
 <div class="header">
   <svg width="56" height="62" viewBox="0 0 100 110" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 0 8px rgba(212,175,55,0.5))">
     <path d="M30 10 L30 42 L8 78 Q4 86 8 92 Q12 98 20 98 L80 98 Q88 98 92 92 Q96 86 92 78 L70 42 L70 10 Z" fill="none" stroke="white" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
@@ -81,7 +73,6 @@
   </div>
 </div>
 
-<!-- Hero -->
 <div class="hero">
   <div class="badge">WAITLIST NOW OPEN</div>
   <h1>Basketball IQ Academy</h1>
@@ -95,7 +86,6 @@
   </div>
 </div>
 
-<!-- What You'll Learn -->
 <div class="section">
   <div class="section-label">In This Session</div>
   <div class="learn-item"><div class="learn-num">1</div><div class="learn-text">What Basketball IQ really means — and why it wins games</div></div>
@@ -103,7 +93,6 @@
   <div class="learn-item"><div class="learn-num">3</div><div class="learn-text">Live NBA film breakdown with Jalen Brunson and Steph Curry</div></div>
   <div class="learn-item"><div class="learn-num">4</div><div class="learn-text">Advantage Hunter game and live leaderboard with the group</div></div>
   <div class="learn-item"><div class="learn-num">5</div><div class="learn-text">Printable workbook + weekly homework to apply on court</div></div>
-
   <div class="section-label" style="margin-top:48px">The 4-Week Programme</div>
   <div class="weeks">
     <div class="week-card active"><div class="week-num">WEEK 01</div><div class="week-title">See the Game Differently</div><div class="week-tag">← THIS SESSION</div></div>
@@ -113,14 +102,12 @@
   </div>
 </div>
 
-<!-- Form -->
 <div class="form-section">
   <div class="form-inner">
     <div id="formView">
       <div class="section-label">Secure Your Spot</div>
       <h2>Join the Waitlist</h2>
       <p>Date and time TBA — register now and you'll be the first to know.</p>
-
       <div class="field"><label>Full Name *</label><input type="text" id="name" placeholder="Your full name" /></div>
       <div class="field"><label>Email Address *</label><input type="email" id="email" placeholder="your@email.com" /></div>
       <div class="field"><label>Age *</label><input type="number" id="age" placeholder="e.g. 15" /></div>
@@ -138,11 +125,9 @@
         </select>
       </div>
       <div class="field"><label>Any Questions?</label><textarea id="questions" rows="3" placeholder="Anything you want to know before signing up..."></textarea></div>
-
       <div class="error-box" id="errorBox"></div>
       <button class="submit-btn" id="submitBtn" onclick="handleSubmit()">Register My Spot →</button>
     </div>
-
     <div class="success" id="successView">
       <div class="success-emoji">🏀</div>
       <div class="success-label">You're In</div>
@@ -157,7 +142,6 @@
   </div>
 </div>
 
-<!-- Footer -->
 <footer>
   <svg width="36" height="40" viewBox="0 0 100 110" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-bottom:12px">
     <path d="M30 10 L30 42 L8 78 Q4 86 8 92 Q12 98 20 98 L80 98 Q88 98 92 92 Q96 86 92 78 L70 42 L70 10 Z" fill="none" stroke="#444" stroke-width="6" stroke-linejoin="round" stroke-linecap="round"/>
@@ -171,6 +155,8 @@
 </footer>
 
 <script>
+  const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzWAmwOOEJ7V5ySswXs8eHc2XUUAI_kJjHnqaMr4J4tLkpP1z8YmkVFOIOy3Y0huR36/exec';
+
   async function handleSubmit() {
     const name = document.getElementById('name').value.trim();
     const email = document.getElementById('email').value.trim();
@@ -193,24 +179,20 @@
     btn.textContent = 'Saving...';
 
     try {
-      const formData = new FormData();
-      formData.append('timestamp', new Date().toLocaleString('en-AU', { timeZone: 'Australia/Sydney' }));
-      formData.append('name', name);
-      formData.append('email', email);
-      formData.append('age', age);
-      formData.append('instagram', instagram || 'N/A');
-      formData.append('guardian', guardian || 'N/A');
-      formData.append('guardianEmail', guardianEmail || 'N/A');
-      formData.append('source', source || 'N/A');
-      formData.append('questions', questions || 'N/A');
-
-      const response = await fetch('https://script.google.com/macros/s/AKfycbzWAmwOOEJ7V5ySswXs8eHc2XUUAI_kJjHnqaMr4J4tLkpP1z8YmkVFOIOy3Y0huR36/exec', {
-        method: 'POST',
-        mode: 'no-cors',
-        body: formData
+      const params = new URLSearchParams({
+        timestamp: new Date().toLocaleString('en-AU', { timeZone: 'Australia/Sydney' }),
+        name, email, age,
+        instagram: instagram || 'N/A',
+        guardian: guardian || 'N/A',
+        guardianEmail: guardianEmail || 'N/A',
+        source: source || 'N/A',
+        questions: questions || 'N/A'
       });
 
-      if (!response.ok) throw new Error('Failed');
+      await fetch(SCRIPT_URL + '?' + params.toString(), {
+        method: 'GET',
+        mode: 'no-cors'
+      });
 
       document.getElementById('successName').textContent = 'Spot Locked In, ' + name.split(' ')[0] + '!';
       document.getElementById('successEmail').textContent = email;
