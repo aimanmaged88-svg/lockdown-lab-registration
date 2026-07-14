@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>LOTG – Wednesday Night Basketball</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%23f97316'/><text x='16' y='22' text-anchor='middle' font-size='11' font-weight='900' fill='black'>LOTG</text></svg>"/>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
+<style>
+  body{font-family:'Inter',sans-serif;margin:0;background:#0a0a0f;color:#e7e7ee}
+  input[type=number]::-webkit-inner-spin-button,input[type=number]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+  input[type=number]{-moz-appearance:textfield}
+  .card{background:#14141c;border:1px solid #23232f;border-radius:14px}
+  .chip{font-size:10px;font-weight:800;letter-spacing:.08em;padding:2px 8px;border-radius:9999px;text-transform:uppercase}
+  .chip-up{background:#23232f;color:#9ca3af}
+  .chip-live{background:#7f1d1d;color:#fecaca;animation:pulse 1.6s infinite}
+  .chip-final{background:#14532d;color:#bbf7d0}
+  .btn{font-weight:700;border-radius:10px;padding:8px 14px;font-size:13px;transition:.15s}
+  .btn-orange{background:#f97316;color:#0a0a0f}.btn-orange:hover{background:#fb923c}
+  .btn-ghost{background:#1d1d28;color:#cbd5e1;border:1px solid #2c2c3a}.btn-ghost:hover{background:#26263200}
+  .btn-red{background:#3f1d1d;color:#fca5a5;border:1px solid #5f2b2b}
+  .inp{background:#0f0f16;border:1px solid #2c2c3a;border-radius:10px;padding:8px 10px;color:#e7e7ee;font-size:14px;width:100%}
+  .inp:focus{outline:none;border-color:#f97316}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
+  .scorebox{width:52px;text-align:center;font-weight:900;font-size:20px;background:#0f0f16;border:1px solid #2c2c3a;border-radius:10px;padding:6px 2px;color:#fff}
+  .logo-dot{width:34px;height:34px;border-radius:9999px;background:#23232f;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;color:#f97316;overflow:hidden;flex-shrink:0}
+  .logo-dot img{width:100%;height:100%;object-fit:cover}
+  table{border-collapse:collapse}
+</style>
+</head>
+<body>
+<div id="app" class="max-w-5xl mx-auto px-3 pb-24"></div>
+
+<script>
+/* ================= CONFIG ================= */
+const SB_URL = "https://ymuwuhvqqftgpxwhzoub.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltdXd1aHZxcWZ0Z3B4d2h6b3ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NjUyMzgsImV4cCI6MjA5OTI0MTIzOH0.sOkWQpulWj_ZSqMNSV7YP55T70UFSm2mP5e5xapQyQo";
+const TIMES = ["7:10 PM","7:23 PM","7:36 PM","7:49 PM","8:02 PM","8:15 PM"];
+const RR4 = [[0,1],[2,3],[0,2],[1,3],[0,3],[1,2]]; // 4-team round robin, one game per slot
+
+/* ================= STATE ================= */
+let teams = [], games = [], admin = sessionStorage.getItem("lotg_admin") || null;
+let loading = true, errMsg = null, tab = "board";
+
+/* ================= API ================= */
+function headers(extra){
+  const h = {"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json",...extra};
+  if(admin) h["x-lotg-admin"] = admin;
+  return h;
+}
+async function api(path, opts={}){
+  const method = (opts.method||"GET").toUpperCase();
+  const extra = {...(opts.headers||{})};
+  if(method!=="GET" && !path.startsWith("rpc/")) extra["Prefer"]="return=representation";
+  const r = await fetch(SB_URL+"/rest/v1/"+path,{...opts,headers:headers(extra)});
+  if(!r.ok){ const t = await r.text(); throw new Error(t||r.status); }
+  const txt = await r.text();
+  const data = txt ? JSON.parse(txt) : null;
+  // RLS silently matches 0 rows when the admin header is wrong — surface it
+  if((method==="PATCH") && Array.isArray(data) && data.length===0) throw new Error("row-level security: no rows updated");
+  return data;
+}
+async function fetchAll(){
+  try{
+    const [t,g] = await Promise.all([
+      api("lotg_teams?select=*&order=sort_order,created_at"),
+      api("lotg_games?select=*&order=slot_index,court")
+    ]);
+    teams=t; games=g; errMsg=null;
+  }catch(e){ errMsg = "Couldn't load data — check connection."; console.error(e); }
+  loading=false; render();
+}
+async function write(fn){
+  try{ await fn(); }
+  catch(e){
+    console.error(e);
+    if((e.message||"").includes("row-level security")){ alert("Not authorised — your admin session may have expired. Log in again."); doLogout(); }
+    else alert("Save failed: "+e.message);
+  }
+  await fetchAll();
+}
+
+/* ================= HELPERS ================= */
+const $ = s=>document.querySelector(s);
+const esc = s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const teamById = id=>teams.find(t=>t.id===id);
+function logoHtml(t,size){
+  const initials = (t?.name||"?").trim().split(/\s+/).map(w=>w[0]).join("").slice(0,3).toUpperCase();
+  return `<div class="logo-dot" style="${size?`width:${size}px;height:${size}px`:""}">${t?.logo?`<img src="${t.logo}" alt="">`:esc(initials)}</div>`;
+}
+function standings(){
+  const rows = teams.map(t=>({t,p:0,w:0,l:0,pf:0,pa:0}));
+  const by = Object.fromEntries(rows.map(r=>[r.t.id,r]));
+  for(const g of games){
+    if(g.status!=="final"||g.score1==null||g.score2==null) continue;
+    const a=by[g.team1_id], b=by[g.team2_id]; if(!a||!b) continue;
+    a.p++;b.p++; a.pf+=g.score1;a.pa+=g.score2; b.pf+=g.score2;b.pa+=g.score1;
+    if(g.score1>g.score2){a.w++;b.l++} else if(g.score2>g.score1){b.w++;a.l++}
+  }
+  return rows.sort((x,y)=>y.w-x.w || (y.pf-y.pa)-(x.pf-x.pa) || y.pf-x.pf || x.t.sort_order-y.t.sort_order);
+}
+
+/* ================= RENDER ================= */
+function render(){
+  const el = $("#app");
+  if(loading){ el.innerHTML = `<div class="text-center pt-32 text-gray-500 font-bold">Loading…</div>`; return; }
+  el.innerHTML = `
+    ${headerHtml()}
+    ${errMsg?`<div class="card p-4 mb-4 text-red-300 text-sm font-semibold">${esc(errMsg)}</div>`:""}
+    ${admin? adminBar() : ""}
+    ${tab==="board" ? boardHtml() : teamsAdminHtml()}
+    <div id="modal"></div>`;
+}
+function headerHtml(){
+  return `
+  <header class="flex items-center justify-between py-5">
+    <div class="flex items-center gap-3">
+      <div class="w-11 h-11 rounded-xl bg-orange-500 flex items-center justify-center font-black text-black text-sm">LOTG</div>
+      <div>
+        <h1 class="text-lg sm:text-2xl font-black tracking-tight leading-tight">Wednesday Night Basketball</h1>
+        <p class="text-[11px] sm:text-xs text-gray-400 font-semibold">10-Min Games&nbsp;|&nbsp;3-Min Break&nbsp;|&nbsp;2 Courts</p>
+      </div>
+    </div>
+    ${admin
+      ? `<button class="btn btn-ghost" onclick="doLogout()">Log out</button>`
+      : `<button class="btn btn-ghost" onclick="openLogin()">Admin</button>`}
+  </header>`;
+}
+function adminBar(){
+  return `
+  <div class="card p-3 mb-5 flex flex-wrap items-center gap-2">
+    <span class="chip chip-live" style="animation:none;background:#4a2506;color:#fdba74">ADMIN MODE</span>
+    <button class="btn ${tab==='board'?'btn-orange':'btn-ghost'}" onclick="tab='board';render()">Scoreboard</button>
+    <button class="btn ${tab==='teams'?'btn-orange':'btn-ghost'}" onclick="tab='teams';render()">Teams</button>
+    <button class="btn btn-ghost" onclick="genFixtures()">⚡ Generate Fixtures</button>
+    <button class="btn btn-ghost" onclick="clearScores()">Clear Scores</button>
+    <button class="btn btn-ghost" onclick="changePw()">Password</button>
+  </div>`;
+}
+function boardHtml(){
+  return standingsHtml() + courtHtml(1) + courtHtml(2);
+}
+function standingsHtml(){
+  const rows = standings();
+  return `
+  <section class="card p-4 sm:p-5 mb-5">
+    <h2 class="font-black text-base mb-3 tracking-wide">🏆 LADDER</h2>
+    <div class="overflow-x-auto"><table class="w-full text-sm">
+      <thead><tr class="text-gray-500 text-[11px] uppercase tracking-wider">
+        <th class="text-left py-1 pr-2">#</th><th class="text-left py-1">Team</th>
+        <th class="py-1 px-2">P</th><th class="py-1 px-2">W</th><th class="py-1 px-2">L</th>
+        <th class="py-1 px-2">PF</th><th class="py-1 px-2">PA</th><th class="py-1 pl-2">+/-</th></tr></thead>
+      <tbody>${rows.map((r,i)=>`
+        <tr class="border-t border-[#23232f]">
+          <td class="py-2 pr-2 font-black text-gray-500">${i+1}</td>
+          <td class="py-2"><div class="flex items-center gap-2">${logoHtml(r.t,26)}<span class="font-bold">${esc(r.t.name)}</span>
+            <span class="text-[10px] text-gray-600 font-bold">C${r.t.court_group}</span></div></td>
+          <td class="text-center px-2 text-gray-400">${r.p}</td>
+          <td class="text-center px-2 font-black text-green-400">${r.w}</td>
+          <td class="text-center px-2 font-black text-red-400">${r.l}</td>
+          <td class="text-center px-2 text-gray-300">${r.pf}</td>
+          <td class="text-center px-2 text-gray-300">${r.pa}</td>
+          <td class="text-center pl-2 font-black ${r.pf-r.pa>=0?'text-green-400':'text-red-400'}">${r.pf-r.pa>0?'+':''}${r.pf-r.pa}</td>
+        </tr>`).join("")}</tbody>
+    </table></div>
+  </section>`;
+}
+function courtHtml(court){
+  const list = games.filter(g=>g.court===court);
+  return `
+  <section class="card p-4 sm:p-5 mb-5">
+    <h2 class="font-black text-base mb-3 tracking-wide">🏀 COURT ${court}</h2>
+    ${list.length? list.map(gameHtml).join("") : `<p class="text-gray-500 text-sm">No games scheduled.</p>`}
+  </section>`;
+}
+function gameHtml(g){
+  const t1=teamById(g.team1_id), t2=teamById(g.team2_id);
+  const chip = g.status==="live" ? `<span class="chip chip-live">● Live</span>`
+    : g.status==="final" ? `<span class="chip chip-final">Final${g.forfeit_team_id?' · FF':''}</span>`
+    : `<span class="chip chip-up">Upcoming</span>`;
+  const score = v=>v==null?"–":v;
+  const win1 = g.status==="final"&&g.score1>g.score2, win2 = g.status==="final"&&g.score2>g.score1;
+  return `
+  <div class="border-t border-[#23232f] py-3 first:border-t-0">
+    <div class="flex items-center justify-between mb-2">
+      <div class="flex items-center gap-2">
+        ${admin
+          ? `<input class="inp" style="width:86px;padding:4px 8px;font-size:12px;font-weight:700" value="${esc(g.game_time)}" onchange="setTime('${g.id}',this.value)">`
+          : `<span class="text-xs font-black text-orange-400">${esc(g.game_time)}</span>`}
+        ${chip}
+      </div>
+      ${admin? gameAdminBtns(g):""}
+    </div>
+    <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+      <div class="flex items-center gap-2 min-w-0">${logoHtml(t1)}<span class="font-bold truncate ${win1?'text-green-300':''}">${esc(t1?.name||"TBD")}</span></div>
+      <div class="flex items-center gap-1">
+        ${admin && g.status!=="upcoming"
+          ? `<input type="number" class="scorebox" value="${g.score1??0}" onchange="setScore('${g.id}','score1',this.value)">
+             <span class="font-black text-gray-600">–</span>
+             <input type="number" class="scorebox" value="${g.score2??0}" onchange="setScore('${g.id}','score2',this.value)">`
+          : `<span class="scorebox ${win1?'text-green-300':''}" style="border:none;background:none">${score(g.score1)}</span>
+             <span class="font-black text-gray-600">–</span>
+             <span class="scorebox ${win2?'text-green-300':''}" style="border:none;background:none">${score(g.score2)}</span>`}
+      </div>
+      <div class="flex items-center gap-2 justify-end min-w-0"><span class="font-bold truncate text-right ${win2?'text-green-300':''}">${esc(t2?.name||"TBD")}</span>${logoHtml(t2)}</div>
+    </div>
+  </div>`;
+}
+function gameAdminBtns(g){
+  if(g.status==="upcoming") return `<button class="btn btn-orange" style="padding:4px 10px;font-size:11px" onclick="startGame('${g.id}')">Start</button>`;
+  if(g.status==="live") return `
+    <div class="flex gap-1">
+      <button class="btn btn-orange" style="padding:4px 10px;font-size:11px" onclick="endGame('${g.id}')">Final</button>
+      <button class="btn btn-red" style="padding:4px 10px;font-size:11px" onclick="forfeit('${g.id}')">FF</button>
+    </div>`;
+  return `<button class="btn btn-ghost" style="padding:4px 10px;font-size:11px" onclick="reopen('${g.id}')">Reopen</button>`;
+}
+
+/* ---------- teams admin ---------- */
+function teamsAdminHtml(){
+  return `
+  <section class="card p-4 sm:p-5 mb-5">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="font-black text-base tracking-wide">TEAMS</h2>
+      <button class="btn btn-orange" onclick="addTeam()">+ Add Team</button>
+    </div>
+    <p class="text-xs text-gray-500 mb-4">Rename teams, upload a logo (optional), and pick which court group they play in. Then hit <b>⚡ Generate Fixtures</b> to rebuild the round-robin (4 teams per court, 6 games each court).</p>
+    ${teams.map(t=>`
+      <div class="border-t border-[#23232f] py-3 flex items-center gap-3 flex-wrap">
+        <label class="cursor-pointer" title="Upload logo">
+          ${logoHtml(t,40)}
+          <input type="file" accept="image/*" class="hidden" onchange="uploadLogo('${t.id}',this)">
+        </label>
+        <input class="inp" style="max-width:220px" value="${esc(t.name)}" onchange="renameTeam('${t.id}',this.value)">
+        <select class="inp" style="max-width:110px" onchange="setGroup('${t.id}',this.value)">
+          <option value="1" ${t.court_group===1?"selected":""}>Court 1</option>
+          <option value="2" ${t.court_group===2?"selected":""}>Court 2</option>
+        </select>
+        ${t.logo?`<button class="btn btn-ghost" style="padding:4px 10px;font-size:11px" onclick="clearLogo('${t.id}')">Remove logo</button>`:`<span class="text-[11px] text-gray-600 font-semibold">tap circle to add logo</span>`}
+        <button class="btn btn-red" style="padding:4px 10px;font-size:11px;margin-left:auto" onclick="delTeam('${t.id}','${esc(t.name)}')">Delete</button>
+      </div>`).join("")}
+  </section>`;
+}
+
+/* ================= ADMIN ACTIONS ================= */
+function openLogin(){
+  $("#modal").innerHTML = `
+  <div class="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50" onclick="if(event.target===this)this.remove()">
+    <div class="card p-6 w-full max-w-sm">
+      <h3 class="font-black mb-1">Admin login</h3>
+      <p class="text-xs text-gray-500 mb-4">For Aiman &amp; SJ — enter the admin password.</p>
+      <input id="pw" type="password" class="inp mb-3" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()">
+      <p id="pwErr" class="text-xs text-red-400 font-semibold mb-2 hidden">Wrong password.</p>
+      <button class="btn btn-orange w-full" onclick="doLogin()">Log in</button>
+    </div>
+  </div>`;
+  setTimeout(()=>$("#pw")?.focus(),50);
+}
+async function doLogin(){
+  const pw = $("#pw").value.trim(); if(!pw) return;
+  try{
+    const ok = await api("rpc/lotg_verify_admin",{method:"POST",body:JSON.stringify({p_token:pw})});
+    if(ok===true){ admin=pw; sessionStorage.setItem("lotg_admin",pw); $("#modal").innerHTML=""; render(); }
+    else $("#pwErr").classList.remove("hidden");
+  }catch(e){ $("#pwErr").textContent="Login failed — try again."; $("#pwErr").classList.remove("hidden"); }
+}
+function doLogout(){ admin=null; tab="board"; sessionStorage.removeItem("lotg_admin"); render(); }
+async function changePw(){
+  const oldPw = prompt("Current password:"); if(oldPw==null) return;
+  const newPw = prompt("New password (min 4 chars):"); if(newPw==null) return;
+  const ok = await api("rpc/lotg_change_password",{method:"POST",body:JSON.stringify({p_old:oldPw,p_new:newPw})}).catch(()=>false);
+  if(ok===true){ admin=newPw; sessionStorage.setItem("lotg_admin",newPw); alert("Password changed. Tell SJ!"); }
+  else alert("Password not changed — current password wrong or new one too short.");
+}
+
+const patchGame = (id,body)=>write(()=>api(`lotg_games?id=eq.${id}`,{method:"PATCH",body:JSON.stringify(body)}));
+const patchTeam = (id,body)=>write(()=>api(`lotg_teams?id=eq.${id}`,{method:"PATCH",body:JSON.stringify(body)}));
+function setScore(id,field,val){ const v=Math.max(0,parseInt(val)||0); patchGame(id,{[field]:v}); }
+function setTime(id,val){ patchGame(id,{game_time:val.trim()}); }
+function startGame(id){ patchGame(id,{status:"live",score1:0,score2:0}); }
+function endGame(id){ patchGame(id,{status:"final"}); }
+function reopen(id){ patchGame(id,{status:"live",forfeit_team_id:null}); }
+function forfeit(id){
+  const g = games.find(x=>x.id===id); if(!g) return;
+  const t1=teamById(g.team1_id), t2=teamById(g.team2_id);
+  const pick = prompt(`Who is forfeiting?\n1 = ${t1?.name}\n2 = ${t2?.name}`);
+  if(pick!=="1"&&pick!=="2") return;
+  const ff = pick==="1"?g.team1_id:g.team2_id;
+  patchGame(id,{status:"final",forfeit_team_id:ff,score1:pick==="1"?0:20,score2:pick==="2"?0:20});
+}
+function renameTeam(id,name){ if(name.trim()) patchTeam(id,{name:name.trim()}); }
+function setGroup(id,grp){ patchTeam(id,{court_group:parseInt(grp)}); }
+function clearLogo(id){ patchTeam(id,{logo:null}); }
+function addTeam(){
+  const name = prompt("Team name:"); if(!name||!name.trim()) return;
+  const grp = teams.filter(t=>t.court_group===1).length<=teams.filter(t=>t.court_group===2).length?1:2;
+  write(()=>api("lotg_teams",{method:"POST",body:JSON.stringify({name:name.trim(),court_group:grp,sort_order:teams.length+1})}));
+}
+function delTeam(id,name){
+  if(!confirm(`Delete ${name}? Their games are removed too.`)) return;
+  write(()=>api(`lotg_teams?id=eq.${id}`,{method:"DELETE"}));
+}
+function uploadLogo(id,input){
+  const f = input.files?.[0]; if(!f) return;
+  const img = new Image();
+  img.onload = ()=>{
+    const S=96, c=document.createElement("canvas"); c.width=S;c.height=S;
+    const ctx=c.getContext("2d");
+    const r=Math.max(S/img.width,S/img.height), w=img.width*r, h=img.height*r;
+    ctx.drawImage(img,(S-w)/2,(S-h)/2,w,h);
+    patchTeam(id,{logo:c.toDataURL("image/png")});
+    URL.revokeObjectURL(img.src);
+  };
+  img.src = URL.createObjectURL(f);
+}
+async function genFixtures(){
+  const g1 = teams.filter(t=>t.court_group===1), g2 = teams.filter(t=>t.court_group===2);
+  if(g1.length!==4||g2.length!==4){ alert(`Fixtures need exactly 4 teams per court.\nCourt 1 has ${g1.length}, Court 2 has ${g2.length}. Fix the groups in the Teams tab first.`); return; }
+  if(!confirm("Generate a fresh round-robin for both courts? This deletes ALL current games and scores.")) return;
+  const rows = [];
+  for(const [court,grp] of [[1,g1],[2,g2]])
+    RR4.forEach((p,slot)=>rows.push({court,slot_index:slot,game_time:TIMES[slot],team1_id:grp[p[0]].id,team2_id:grp[p[1]].id}));
+  await write(async()=>{
+    await api("lotg_games?id=not.is.null",{method:"DELETE"});
+    await api("lotg_games",{method:"POST",body:JSON.stringify(rows)});
+  });
+}
+function clearScores(){
+  if(!confirm("Clear all scores and set every game back to upcoming?")) return;
+  write(()=>api("lotg_games?id=not.is.null",{method:"PATCH",body:JSON.stringify({score1:null,score2:null,status:"upcoming",forfeit_team_id:null})}));
+}
+
+/* ================= BOOT ================= */
+fetchAll();
+setInterval(()=>{ if(document.visibilityState==="visible" && !admin) fetchAll(); }, 30000);
+document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") fetchAll(); });
+</script>
+</body>
+</html>
