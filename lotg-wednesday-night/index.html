@@ -215,7 +215,25 @@ function courtHtml(court){
   <section class="card p-4 sm:p-5 mb-5">
     <h2 class="font-black text-base mb-3 tracking-wide">🏀 COURT ${court}</h2>
     ${list.length? list.map(gameHtml).join("") : `<p class="text-gray-500 text-sm">No games scheduled.</p>`}
+    ${admin? addGameHtml(court):""}
   </section>`;
+}
+function teamOptions(court){
+  const inGroup = teams.filter(t=>t.court_group===court);
+  const rest = teams.filter(t=>t.court_group!==court);
+  const opt = t=>`<option value="${t.id}">${esc(t.name)}</option>`;
+  return inGroup.map(opt).join("") + (rest.length?`<option disabled>──────</option>`+rest.map(opt).join(""):"");
+}
+function addGameHtml(court){
+  return `
+  <div class="border-t border-[#23232f] pt-3 mt-1 flex flex-wrap items-center gap-2">
+    <span class="text-[11px] text-gray-500 font-bold uppercase tracking-wider">Add game:</span>
+    <input class="inp" id="addtime-${court}" style="width:96px;padding:6px 8px;font-size:12px;font-weight:700" placeholder="8:20 PM">
+    <select class="inp" id="addt1-${court}" style="width:auto;max-width:140px;padding:6px 8px;font-size:12px"><option value="">Team 1…</option>${teamOptions(court)}</select>
+    <span class="font-black text-gray-600 text-xs">vs</span>
+    <select class="inp" id="addt2-${court}" style="width:auto;max-width:140px;padding:6px 8px;font-size:12px"><option value="">Team 2…</option>${teamOptions(court)}</select>
+    <button class="btn btn-orange" style="padding:6px 12px;font-size:12px" onclick="addGame(${court})">+ Add</button>
+  </div>`;
 }
 function gameHtml(g){
   const t1=teamById(g.team1_id), t2=teamById(g.team2_id);
@@ -233,7 +251,7 @@ function gameHtml(g){
           : `<span class="text-xs font-black text-orange-400">${esc(g.game_time)}</span>`}
         ${chip}
       </div>
-      ${admin? gameAdminBtns(g):""}
+      ${admin? `<div class="flex items-center gap-2">${gameAdminBtns(g)}<button class="btn btn-red" style="padding:4px 8px;font-size:11px" onclick="delGame('${g.id}')" title="Remove game">✕</button></div>`:""}
     </div>
     <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
       <div class="flex items-center gap-2 min-w-0">${logoHtml(t1)}<span class="font-bold truncate ${win1?'text-green-300':''}">${esc(t1?.name||"TBD")}</span></div>
@@ -331,6 +349,20 @@ function forfeit(id){
   if(pick!=="1"&&pick!=="2") return;
   const ff = pick==="1"?g.team1_id:g.team2_id;
   patchGame(id,{status:"final",forfeit_team_id:ff,score1:pick==="1"?0:20,score2:pick==="2"?0:20});
+}
+function addGame(court){
+  const time = document.getElementById("addtime-"+court).value.trim();
+  const t1 = document.getElementById("addt1-"+court).value;
+  const t2 = document.getElementById("addt2-"+court).value;
+  if(!time){ alert("Type a time first, e.g. 8:20 PM"); return; }
+  if(!t1||!t2){ alert("Pick both teams."); return; }
+  if(t1===t2){ alert("Pick two different teams."); return; }
+  const maxSlot = games.filter(g=>g.court===court).reduce((m,g)=>Math.max(m,g.slot_index),-1);
+  write(()=>api("lotg_games",{method:"POST",body:JSON.stringify({court,slot_index:maxSlot+1,game_time:time,team1_id:t1,team2_id:t2})}));
+}
+function delGame(id){
+  if(!confirm("Remove this game?")) return;
+  write(()=>api(`lotg_games?id=eq.${id}`,{method:"DELETE"}));
 }
 function renameTeam(id,name){ if(name.trim()) patchTeam(id,{name:name.trim()}); }
 function setGroup(id,grp){ patchTeam(id,{court_group:parseInt(grp)}); }
