@@ -138,6 +138,8 @@
 
   .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
   @media(max-width:920px){.hero-grid{grid-template-columns:1fr;gap:30px}}
+  .hero-single{max-width:900px}
+  .hero-single .hero-sub{max-width:600px}
 
   /* video / film placeholder */
   .film{position:relative;border-radius:calc(var(--r) + 6px);overflow:hidden;border:1px solid var(--line);
@@ -364,7 +366,7 @@
       <a href="#problem">The Edge</a>
       <a href="#framework">The Framework</a>
       <a href="#program">Program</a>
-      <a href="#leaderboard">The Lab</a>
+      <a href="#register">Register</a>
     </div>
     <a href="#register" class="btn btn-primary nav-cta">Join the Academy</a>
   </div>
@@ -373,32 +375,19 @@
 <a id="top"></a>
 <!-- ============ HERO ============ -->
 <header>
-  <div class="wrap hero-grid">
+  <div class="wrap hero-single">
     <div>
       <span class="hero-badge"><span class="dot"></span>4-Week Program · Ages 13–18 · Live on Zoom</span>
       <h1 class="hero display">You Don't Need<br>The Ball To<br><span class="l2">Dominate.</span></h1>
       <p class="hero-sub">Develop <b>Basketball IQ</b> in just 4 weeks. Learn how elite players read defenders, make smarter decisions faster, and take over the game — even without the ball in their hands.</p>
       <div class="hero-cta">
         <a href="#register" class="btn btn-primary">Join the Academy →</a>
-        <button class="btn btn-ghost" onclick="document.getElementById('film').scrollIntoView({behavior:'smooth'})">▶ Watch the Film</button>
       </div>
       <div class="trust" style="justify-content:flex-start;margin-top:26px">
-        <span><span class="g">●</span> Live coaching</span>
-        <span>Film study every week</span>
+        <span><span class="g">●</span> Live coaching on Zoom</span>
+        <span>Small group</span>
         <span>Personal playbook</span>
       </div>
-    </div>
-
-    <div class="film" id="film">
-      <span class="tag"><span class="rec">● REC</span> · FILM STUDY · JALEN BRUNSON</span>
-      <div class="court"></div>
-      <span class="mk e">Eyes</span>
-      <span class="mk h">Hips</span>
-      <span class="mk s">Shoulders</span>
-      <div class="play" title="Preview reel">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="#0a0500"><path d="M6 4l14 8-14 8z"/></svg>
-      </div>
-      <div class="cap"><small>BREAKDOWN #1 · READING THE DEFENCE</small>What is the defender giving away?</div>
     </div>
   </div>
 
@@ -540,34 +529,11 @@
     <div class="sec-head">
       <span class="eyebrow">Every Week · Course Extras</span>
       <h2 class="display grad">Learning Should<br>Feel Like Hooping.</h2>
-      <p>Three recurring segments keep every session competitive, fun and unmistakably Lockdown Lab.</p>
+      <p>Recurring segments keep every session competitive, fun and unmistakably Lockdown Lab.</p>
     </div>
     <div class="segs">
       <div class="seg"><div class="emoji">🎯</div><div class="freq">Every Week</div><h3>Trickshot of the Week</h3><p>Film your best trickshot. The lab votes. Winners climb the board.</p></div>
-      <div class="seg"><div class="emoji">🐴</div><div class="freq">Every Week</div><h3>Horse Comp</h3><p>A live, bracket-style game of HORSE that rewards creativity and nerve.</p></div>
       <div class="seg"><div class="emoji">🎬</div><div class="freq">Every Week</div><h3>Clip of the Week</h3><p>The smartest play caught on film — broken down by the group.</p></div>
-    </div>
-  </div>
-</section>
-
-<!-- ============ LEADERBOARD ============ -->
-<section id="leaderboard" style="background:linear-gradient(180deg,transparent,var(--bg-2),transparent)">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="eyebrow">Gamified · The Lab</span>
-      <h2 class="display grad">Earn Your Spot<br>At The Top Of The Class.</h2>
-      <p>Every read, challenge and correct decision earns IQ points. Climb the live leaderboard, unlock badges and build a streak across all four weeks.</p>
-    </div>
-    <div class="lb-wrap">
-      <div class="lb-head">
-        <h3>Basketball IQ Leaderboard</h3>
-        <span class="live"><span class="dot"></span>Live · Week 1</span>
-      </div>
-      <div class="lb-row top"><div class="lb-rank">1</div><div class="lb-name">Marcus</div><span class="lb-badge">Elite IQ</span><div class="lb-pts">120<u>PTS</u></div></div>
-      <div class="lb-row"><div class="lb-rank">2</div><div class="lb-name">Jordan</div><span class="lb-badge">Sharp</span><div class="lb-pts">95<u>PTS</u></div></div>
-      <div class="lb-row"><div class="lb-rank">3</div><div class="lb-name">Tyrese</div><span class="lb-badge">Locked In</span><div class="lb-pts">80<u>PTS</u></div></div>
-      <div class="lb-row"><div class="lb-rank">4</div><div class="lb-name">Alex</div><span class="lb-badge">Rising</span><div class="lb-pts">65<u>PTS</u></div></div>
-      <div class="lb-row"><div class="lb-rank">5</div><div class="lb-name">Sam</div><span class="lb-badge">Rookie</span><div class="lb-pts">50<u>PTS</u></div></div>
     </div>
   </div>
 </section>
@@ -606,9 +572,9 @@
 <section id="register">
   <div class="wrap" style="max-width:720px">
     <div class="sec-head" style="text-align:center;margin:0 auto 34px">
-      <span class="eyebrow" style="justify-content:center">Academy Selection</span>
+      <span class="eyebrow" style="justify-content:center">Registration · Straight Talk</span>
       <h2 class="display grad">Claim Your Seat.</h2>
-      <p style="margin-left:auto;margin-right:auto">This isn't paperwork — it's your first read. Six quick steps and you're in the Lab. Takes about two minutes.</p>
+      <p style="margin-left:auto;margin-right:auto">Real talk: this is a small, live cohort — a handful of players, four weeks on Zoom, coached in real time. No pre-recorded fluff, no fake countdown pressure. Answer these honestly and we'll build the sessions around what you actually need. Takes about two minutes.</p>
     </div>
 
     <div class="wiz">
