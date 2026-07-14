@@ -1,0 +1,839 @@
+<title>Lockdown Lab · Basketball IQ Academy</title>
+<style>
+  :root{
+    --bg:#060606;
+    --bg-2:#0b0b0c;
+    --glass:rgba(255,255,255,.045);
+    --glass-2:rgba(255,255,255,.03);
+    --line:rgba(255,255,255,.09);
+    --line-2:rgba(255,255,255,.06);
+    --text:#f5f3f0;
+    --muted:#9b968f;
+    --dim:#6a655e;
+    --accent:#ff6b00;
+    --accent-hi:#ff8a2b;
+    --accent-soft:rgba(255,107,0,.14);
+    --accent-glow:rgba(255,107,0,.35);
+    --good:#22c55e;
+    --good-soft:rgba(34,197,94,.14);
+    --r:18px;
+    --fd:"Arial Narrow","Helvetica Neue Condensed",Helvetica,Arial,system-ui,sans-serif;
+    --fb:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --fm:ui-monospace,"SF Mono","Roboto Mono",Menlo,monospace;
+    color-scheme:dark;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);color:var(--text);font-family:var(--fb);line-height:1.6;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+    background-image:
+      radial-gradient(120% 80% at 50% -10%, rgba(255,107,0,.10), transparent 55%),
+      radial-gradient(90% 60% at 100% 0%, rgba(255,107,0,.05), transparent 50%);
+    background-attachment:fixed;
+  }
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
+  ::selection{background:var(--accent);color:#000}
+  .wrap{max-width:1140px;margin:0 auto;padding:0 22px}
+
+  /* ---------- shared display type ---------- */
+  .display{font-family:var(--fd);text-transform:uppercase;font-weight:700;letter-spacing:.5px;line-height:.94;text-wrap:balance}
+  .eyebrow{font-family:var(--fd);text-transform:uppercase;font-weight:700;letter-spacing:3.5px;font-size:12px;color:var(--accent);display:inline-flex;align-items:center;gap:9px}
+  .eyebrow::before{content:"";width:22px;height:1.5px;background:var(--accent);display:inline-block}
+  .mono{font-family:var(--fm);font-variant-numeric:tabular-nums}
+  .grad{background:linear-gradient(180deg,#fff, #b9b4ad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .amber{color:var(--accent)}
+
+  /* ---------- buttons ---------- */
+  .btn{
+    font-family:var(--fd);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;font-size:15px;
+    display:inline-flex;align-items:center;justify-content:center;gap:10px;
+    padding:15px 26px;border-radius:999px;border:1px solid transparent;cursor:pointer;
+    transition:transform .18s cubic-bezier(.2,.7,.2,1),box-shadow .25s,background .2s,border-color .2s;
+    will-change:transform;user-select:none;
+  }
+  .btn:active{transform:scale(.97)}
+  .btn-primary{background:var(--accent);color:#0a0500;box-shadow:0 10px 34px -8px var(--accent-glow)}
+  .btn-primary:hover{background:var(--accent-hi);transform:translateY(-2px);box-shadow:0 16px 44px -8px var(--accent-glow)}
+  .btn-ghost{background:var(--glass);color:var(--text);border-color:var(--line);backdrop-filter:blur(8px)}
+  .btn-ghost:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .btn-block{width:100%}
+
+  /* ---------- nav ---------- */
+  nav{position:sticky;top:0;z-index:50;border-bottom:1px solid var(--line-2);
+    background:rgba(6,6,6,.6);backdrop-filter:blur(18px) saturate(120%)}
+  nav .row{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{display:flex;align-items:center;gap:11px}
+  .brand .mark{width:30px;height:30px;border-radius:9px;background:var(--accent);position:relative;box-shadow:0 6px 20px -6px var(--accent-glow);flex:0 0 auto}
+  .brand .mark::before,.brand .mark::after{content:"";position:absolute;background:#0a0500}
+  .brand .mark::before{left:50%;top:4px;bottom:4px;width:2px;transform:translateX(-50%)}
+  .brand .mark::after{top:50%;left:4px;right:4px;height:2px;transform:translateY(-50%)}
+  .brand b{font-family:var(--fd);text-transform:uppercase;letter-spacing:2.5px;font-weight:700;font-size:16px}
+  .brand small{color:var(--accent);font-size:10px;letter-spacing:2px;font-family:var(--fm);display:block;margin-top:-2px}
+  .navlinks{display:flex;gap:26px;align-items:center}
+  .navlinks a{font-size:13px;color:var(--muted);letter-spacing:.4px;transition:color .18s}
+  .navlinks a:hover{color:var(--text)}
+  .nav-cta{padding:10px 20px;font-size:13px}
+  @media(max-width:820px){.navlinks{display:none}}
+
+  /* ---------- hero ---------- */
+  header{padding:74px 0 40px;position:relative}
+  .hero-badge{display:inline-flex;align-items:center;gap:12px;padding:8px 15px;border:1px solid var(--line);border-radius:999px;background:var(--glass);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-family:var(--fm)}
+  .hero-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--good);box-shadow:0 0 0 0 var(--good-soft);animation:pulse 2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}70%{box-shadow:0 0 0 8px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+  h1.hero{font-size:clamp(46px,9.2vw,116px);margin:26px 0 0;letter-spacing:-1px}
+  h1.hero .l2{color:var(--accent)}
+  .hero-sub{max-width:560px;color:var(--muted);font-size:clamp(15px,2vw,18px);margin-top:24px}
+  .hero-sub b{color:var(--text);font-weight:600}
+  .hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:34px}
+
+  .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+  @media(max-width:920px){.hero-grid{grid-template-columns:1fr;gap:30px}}
+
+  /* video / film placeholder */
+  .film{position:relative;border-radius:calc(var(--r) + 6px);overflow:hidden;border:1px solid var(--line);
+    background:linear-gradient(160deg,#141414,#0a0a0a);aspect-ratio:4/3;min-height:300px;
+    box-shadow:0 40px 90px -40px rgba(0,0,0,.9)}
+  .film::before{content:"";position:absolute;inset:0;background:
+    repeating-linear-gradient(0deg,transparent 0 38px,rgba(255,255,255,.02) 38px 39px),
+    repeating-linear-gradient(90deg,transparent 0 38px,rgba(255,255,255,.02) 38px 39px);}
+  .film .court{position:absolute;inset:22px;border:1.5px solid var(--line);border-radius:10px}
+  .film .court::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:1.5px;background:var(--line);transform:translateX(-50%)}
+  .film .court::after{content:"";position:absolute;left:50%;top:50%;width:78px;height:78px;border:1.5px solid var(--line);border-radius:50%;transform:translate(-50%,-50%)}
+  .film .play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:74px;height:74px;border-radius:50%;
+    background:var(--accent);display:grid;place-items:center;box-shadow:0 12px 40px -8px var(--accent-glow);cursor:pointer;
+    transition:transform .2s;z-index:2}
+  .film .play:hover{transform:translate(-50%,-50%) scale(1.08)}
+  .film .play svg{margin-left:4px}
+  .film .tag{position:absolute;left:18px;top:16px;font-family:var(--fm);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);z-index:2}
+  .film .tag .rec{color:#ff4444}
+  .film .cap{position:absolute;left:18px;right:18px;bottom:16px;z-index:2;font-family:var(--fd);text-transform:uppercase;letter-spacing:1px;font-size:15px}
+  .film .cap small{display:block;font-family:var(--fm);letter-spacing:1.5px;font-size:10px;color:var(--accent);margin-bottom:3px}
+  /* defender read markers floating */
+  .mk{position:absolute;z-index:3;font-family:var(--fm);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#000;background:var(--accent);
+    padding:3px 7px;border-radius:5px;white-space:nowrap;box-shadow:0 6px 18px -6px var(--accent-glow);animation:float 4s ease-in-out infinite}
+  .mk.e{top:30%;left:20%;animation-delay:0s}
+  .mk.h{top:58%;right:16%;animation-delay:.8s;background:#fff}
+  .mk.s{top:42%;right:26%;animation-delay:1.6s}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+
+  /* ---------- stat strip ---------- */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:44px}
+  @media(max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}}
+  .stat{padding:20px 18px;border:1px solid var(--line);border-radius:var(--r);background:var(--glass);backdrop-filter:blur(8px);position:relative;overflow:hidden}
+  .stat .n{font-family:var(--fd);font-size:38px;font-weight:700;letter-spacing:.5px;line-height:1;color:var(--text);font-variant-numeric:tabular-nums}
+  .stat .n .u{color:var(--accent);font-size:24px}
+  .stat .l{font-family:var(--fm);font-size:10px;letter-spacing:1.6px;text-transform:uppercase;color:var(--dim);margin-top:9px}
+  .stat.live .n{color:var(--good)}
+  .stat.live .n .u{color:var(--good)}
+
+  /* ---------- section scaffolding ---------- */
+  section{padding:78px 0;position:relative}
+  .sec-head{max-width:720px;margin-bottom:44px}
+  .sec-head h2{font-size:clamp(32px,5vw,56px);margin-top:16px}
+  .sec-head p{color:var(--muted);margin-top:16px;font-size:17px;max-width:600px}
+  .rule{height:1px;background:linear-gradient(90deg,var(--line),transparent);margin:0}
+
+  /* problem split */
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:720px){.split{grid-template-columns:1fr}}
+  .col{padding:30px;border:1px solid var(--line);border-radius:var(--r);background:var(--glass-2)}
+  .col.hot{border-color:rgba(255,107,0,.4);background:linear-gradient(180deg,var(--accent-soft),transparent)}
+  .col h4{font-family:var(--fm);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:18px}
+  .col.hot h4{color:var(--accent)}
+  .col ul{list-style:none;display:flex;flex-direction:column;gap:14px}
+  .col li{display:flex;align-items:center;gap:13px;font-family:var(--fd);text-transform:uppercase;letter-spacing:1px;font-size:24px}
+  .col li .ico{width:26px;height:26px;border-radius:8px;flex:0 0 auto;display:grid;place-items:center;font-size:14px;border:1px solid var(--line-2)}
+  .col.hot li .ico{background:var(--accent);color:#000;border-color:transparent}
+  .gap-note{text-align:center;margin-top:34px;font-family:var(--fd);text-transform:uppercase;font-size:clamp(22px,3.5vw,34px);letter-spacing:1px}
+  .gap-note .amber{display:block}
+
+  /* reads framework */
+  .reads{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:860px){.reads{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:460px){.reads{grid-template-columns:1fr}}
+  .read{padding:26px 22px;border:1px solid var(--line);border-radius:var(--r);background:var(--glass-2);position:relative;overflow:hidden;transition:transform .25s,border-color .25s,background .25s}
+  .read:hover{transform:translateY(-5px);border-color:var(--accent);background:var(--glass)}
+  .read .num{font-family:var(--fm);font-size:11px;letter-spacing:2px;color:var(--accent)}
+  .read h3{font-family:var(--fd);text-transform:uppercase;font-size:32px;margin:16px 0 8px;letter-spacing:.5px}
+  .read p{color:var(--muted);font-size:14px}
+  .read .big{position:absolute;right:-6px;bottom:-18px;font-family:var(--fd);font-weight:700;font-size:90px;color:rgba(255,255,255,.03);pointer-events:none}
+
+  /* week roadmap */
+  .weeks{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  @media(max-width:720px){.weeks{grid-template-columns:1fr}}
+  .week{padding:30px;border:1px solid var(--line);border-radius:var(--r);background:var(--glass-2);position:relative;overflow:hidden;transition:transform .25s,border-color .25s}
+  .week:hover{transform:translateY(-4px);border-color:var(--accent)}
+  .week .wtag{display:inline-flex;align-items:center;gap:9px;font-family:var(--fm);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:16px}
+  .week .wtag i{width:30px;height:30px;border-radius:8px;border:1px solid var(--accent);display:grid;place-items:center;font-style:normal;font-family:var(--fd);font-size:15px;color:var(--accent)}
+  .week h3{font-family:var(--fd);text-transform:uppercase;font-size:clamp(26px,3.6vw,38px);letter-spacing:.5px;margin-bottom:12px}
+  .week p{color:var(--muted);font-size:15px}
+  .week .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+  .chip{font-family:var(--fm);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);padding:6px 11px;border-radius:999px}
+
+  /* skills grid */
+  .skills{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+  @media(max-width:900px){.skills{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:520px){.skills{grid-template-columns:repeat(2,1fr)}}
+  .skill{padding:22px 16px;border:1px solid var(--line-2);border-radius:14px;background:var(--glass-2);transition:transform .2s,color .2s,border-color .2s;text-align:center}
+  .skill:hover{transform:translateY(-4px);border-color:var(--accent);color:var(--accent)}
+  .skill .si{font-family:var(--fm);font-size:11px;color:var(--dim);margin-bottom:12px}
+  .skill .sn{font-family:var(--fd);text-transform:uppercase;font-size:19px;letter-spacing:.5px;line-height:1.05}
+
+  /* segments */
+  .segs{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:720px){.segs{grid-template-columns:1fr}}
+  .seg{padding:28px;border:1px solid var(--line);border-radius:var(--r);background:var(--glass-2);transition:transform .25s,border-color .25s}
+  .seg:hover{transform:translateY(-4px);border-color:var(--accent)}
+  .seg .emoji{font-size:30px;margin-bottom:16px}
+  .seg h3{font-family:var(--fd);text-transform:uppercase;font-size:26px;letter-spacing:.5px;margin-bottom:8px}
+  .seg .freq{font-family:var(--fm);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+  .seg p{color:var(--muted);font-size:14px}
+
+  /* leaderboard */
+  .lb-wrap{border:1px solid var(--line);border-radius:calc(var(--r) + 4px);overflow:hidden;background:var(--glass-2)}
+  .lb-head{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--line);background:var(--glass)}
+  .lb-head h3{font-family:var(--fd);text-transform:uppercase;letter-spacing:1px;font-size:22px}
+  .lb-head .live{font-family:var(--fm);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--good);display:flex;align-items:center;gap:8px}
+  .lb-head .live .dot{width:6px;height:6px;border-radius:50%;background:var(--good);animation:pulse 2s infinite}
+  .lb-row{display:grid;grid-template-columns:56px 1fr auto auto;gap:16px;align-items:center;padding:16px 24px;border-bottom:1px solid var(--line-2);transition:background .2s}
+  .lb-row:last-child{border-bottom:none}
+  .lb-row:hover{background:var(--glass)}
+  .lb-rank{font-family:var(--fd);font-size:26px;color:var(--dim);width:36px}
+  .lb-row.top .lb-rank{color:var(--accent)}
+  .lb-name{font-family:var(--fd);text-transform:uppercase;font-size:22px;letter-spacing:.5px}
+  .lb-badge{font-family:var(--fm);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;padding:5px 11px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+  .lb-row.top .lb-badge{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+  .lb-pts{font-family:var(--fm);font-variant-numeric:tabular-nums;font-size:16px;color:var(--text)}
+  .lb-pts u{color:var(--dim);text-decoration:none;font-size:11px;margin-left:3px}
+  @media(max-width:600px){.lb-badge{display:none}.lb-row{grid-template-columns:44px 1fr auto}}
+
+  /* testimonials */
+  .quotes{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:820px){.quotes{grid-template-columns:1fr}}
+  .quote{padding:28px;border:1px solid var(--line);border-radius:var(--r);background:var(--glass-2)}
+  .quote .stars{color:var(--accent);letter-spacing:3px;font-size:13px;margin-bottom:14px}
+  .quote p{font-size:16px;line-height:1.55}
+  .quote .who{display:flex;align-items:center;gap:12px;margin-top:20px}
+  .quote .av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#7a3400);display:grid;place-items:center;font-family:var(--fd);font-weight:700;color:#000;flex:0 0 auto}
+  .quote .who b{font-size:14px;display:block}
+  .quote .who span{font-family:var(--fm);font-size:11px;color:var(--dim)}
+
+  /* ---------- wizard ---------- */
+  #register{padding-top:40px}
+  .wiz{border:1px solid var(--line);border-radius:calc(var(--r) + 8px);background:linear-gradient(180deg,var(--glass),var(--glass-2));backdrop-filter:blur(12px);overflow:hidden;box-shadow:0 50px 120px -50px rgba(0,0,0,.9)}
+  .wiz-top{padding:26px 30px 0}
+  .wiz-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  .wiz-step{font-family:var(--fm);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+  .wiz-step b{color:var(--accent)}
+  .wiz-pct{font-family:var(--fd);font-size:26px;color:var(--accent);font-variant-numeric:tabular-nums}
+  .bar{height:5px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+  .bar>i{display:block;height:100%;width:16%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent-hi));transition:width .5s cubic-bezier(.2,.7,.2,1);box-shadow:0 0 18px var(--accent-glow)}
+  .dots{display:flex;gap:7px;margin-top:16px;flex-wrap:wrap}
+  .dots .d{flex:1;min-width:20px;height:3px;border-radius:2px;background:rgba(255,255,255,.09);transition:background .3s}
+  .dots .d.on{background:var(--accent)}
+  .wiz-body{padding:34px 30px 30px;min-height:360px;position:relative}
+  .panel{position:absolute;inset:34px 30px 30px;opacity:0;transform:translateX(24px);pointer-events:none;transition:opacity .4s,transform .4s}
+  .panel.active{opacity:1;transform:none;pointer-events:auto;position:relative;inset:auto}
+  .panel .p-eye{font-family:var(--fm);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+  .panel h3{font-family:var(--fd);text-transform:uppercase;font-size:clamp(28px,4vw,40px);letter-spacing:.5px;margin-bottom:8px}
+  .panel .p-sub{color:var(--muted);margin-bottom:26px;font-size:15px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:560px){.grid2{grid-template-columns:1fr}}
+  .fld{margin-bottom:16px}
+  .fld.full{grid-column:1/-1}
+  .fld label{display:block;font-family:var(--fm);font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
+  .fld input,.fld select,.fld textarea{width:100%;background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:12px;padding:14px 15px;color:var(--text);font-size:15px;font-family:var(--fb);outline:none;transition:border-color .18s,box-shadow .18s}
+  .fld textarea{min-height:92px;resize:vertical}
+  .fld input::placeholder,.fld textarea::placeholder{color:#57534d}
+  .fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+  .fld select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' stroke='%23ff6b00' stroke-width='2' fill='none' stroke-linecap='round'/></svg>");background-repeat:no-repeat;background-position:right 15px center;padding-right:40px}
+  /* choice pills */
+  .pills{display:flex;flex-wrap:wrap;gap:10px}
+  .pill{font-family:var(--fd);text-transform:uppercase;letter-spacing:1px;font-size:16px;padding:11px 18px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.3);cursor:pointer;transition:all .18s;user-select:none}
+  .pill:hover{border-color:var(--accent)}
+  .pill.sel{background:var(--accent);color:#000;border-color:var(--accent)}
+  /* consent rows */
+  .consent{display:flex;gap:14px;align-items:flex-start;padding:16px;border:1px solid var(--line);border-radius:12px;background:rgba(0,0,0,.25);margin-bottom:12px;cursor:pointer;transition:border-color .18s}
+  .consent:hover{border-color:var(--accent)}
+  .consent .box{width:22px;height:22px;border-radius:7px;border:1.5px solid var(--dim);flex:0 0 auto;display:grid;place-items:center;transition:all .18s;margin-top:2px}
+  .consent.on .box{background:var(--accent);border-color:var(--accent)}
+  .consent .box svg{opacity:0;transition:opacity .18s}
+  .consent.on .box svg{opacity:1}
+  .consent .ct b{font-size:14px;display:block;margin-bottom:3px}
+  .consent .ct span{color:var(--muted);font-size:13px}
+  .wiz-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:22px 30px;border-top:1px solid var(--line);background:rgba(0,0,0,.2)}
+  .wiz-foot .btn{padding:13px 24px}
+  .link-back{font-family:var(--fd);text-transform:uppercase;letter-spacing:1.5px;font-size:14px;color:var(--muted);background:none;border:none;cursor:pointer;padding:10px 4px;transition:color .18s}
+  .link-back:hover{color:var(--text)}
+  .link-back:disabled{opacity:.3;cursor:not-allowed}
+  .trust{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:20px;font-family:var(--fm);font-size:11px;letter-spacing:1px;color:var(--dim)}
+  .trust span{display:inline-flex;align-items:center;gap:7px}
+  .trust .g{color:var(--good)}
+
+  /* ---------- success overlay ---------- */
+  .success{position:fixed;inset:0;z-index:100;background:rgba(4,4,4,.86);backdrop-filter:blur(14px);display:none;align-items:center;justify-content:center;padding:22px;overflow:auto}
+  .success.show{display:flex;animation:fade .4s}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .success-card{max-width:560px;width:100%;text-align:center;border:1px solid var(--line);border-radius:24px;padding:48px 34px;
+    background:radial-gradient(120% 90% at 50% 0%, rgba(255,107,0,.16), var(--bg-2) 62%);position:relative;animation:pop .5s cubic-bezier(.2,.8,.2,1)}
+  @keyframes pop{from{transform:scale(.9) translateY(20px);opacity:0}to{transform:none;opacity:1}}
+  .success .crest{width:82px;height:82px;border-radius:22px;background:var(--accent);display:grid;place-items:center;margin:0 auto 26px;box-shadow:0 20px 60px -14px var(--accent-glow);animation:float 4s ease-in-out infinite}
+  .success .crest svg{width:42px;height:42px}
+  .success .eyebrow{justify-content:center;margin-bottom:14px}
+  .success h2{font-family:var(--fd);text-transform:uppercase;font-size:clamp(34px,7vw,56px);letter-spacing:.5px;line-height:.95}
+  .success .who{color:var(--accent);font-family:var(--fd);text-transform:uppercase;font-size:20px;margin-top:6px}
+  .success p{color:var(--muted);margin-top:18px;font-size:15px}
+  .checklist{text-align:left;margin:26px 0;display:flex;flex-direction:column;gap:10px}
+  .checklist .ci{display:flex;gap:13px;align-items:flex-start;padding:14px 16px;border:1px solid var(--line-2);border-radius:12px;background:var(--glass-2)}
+  .checklist .n{width:24px;height:24px;border-radius:7px;background:var(--accent-soft);color:var(--accent);font-family:var(--fm);font-size:12px;display:grid;place-items:center;flex:0 0 auto;margin-top:1px}
+  .checklist b{font-size:14px;display:block}
+  .checklist span{color:var(--muted);font-size:13px}
+  .success .btn{margin-top:6px}
+  canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:101;display:none}
+  canvas#confetti.show{display:block}
+
+  /* footer */
+  footer{border-top:1px solid var(--line-2);padding:44px 0;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;color:var(--dim);font-size:13px}
+  .foot .fm{font-family:var(--fm);letter-spacing:1px}
+
+  .skeleton-note{position:fixed;left:14px;bottom:14px;z-index:60;font-family:var(--fm);font-size:11px;letter-spacing:1px;color:var(--dim);background:rgba(6,6,6,.7);border:1px solid var(--line);padding:8px 12px;border-radius:999px;backdrop-filter:blur(8px)}
+  .skeleton-note b{color:var(--accent)}
+
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+
+<!-- ============ NAV ============ -->
+<nav>
+  <div class="wrap row">
+    <a class="brand" href="#top">
+      <span class="mark"></span>
+      <span><b>Lockdown Lab</b><small>@lockdownlab3</small></span>
+    </a>
+    <div class="navlinks">
+      <a href="#problem">The Edge</a>
+      <a href="#framework">The Framework</a>
+      <a href="#program">Program</a>
+      <a href="#leaderboard">The Lab</a>
+    </div>
+    <a href="#register" class="btn btn-primary nav-cta">Join the Academy</a>
+  </div>
+</nav>
+
+<a id="top"></a>
+<!-- ============ HERO ============ -->
+<header>
+  <div class="wrap hero-grid">
+    <div>
+      <span class="hero-badge"><span class="dot"></span>4-Week Program · Ages 13–18 · Live on Zoom</span>
+      <h1 class="hero display">You Don't Need<br>The Ball To<br><span class="l2">Dominate.</span></h1>
+      <p class="hero-sub">Develop <b>Basketball IQ</b> in just 4 weeks. Learn how elite players read defenders, make smarter decisions faster, and take over the game — even without the ball in their hands.</p>
+      <div class="hero-cta">
+        <a href="#register" class="btn btn-primary">Join the Academy →</a>
+        <button class="btn btn-ghost" onclick="document.getElementById('film').scrollIntoView({behavior:'smooth'})">▶ Watch the Film</button>
+      </div>
+      <div class="trust" style="justify-content:flex-start;margin-top:26px">
+        <span><span class="g">●</span> Live coaching</span>
+        <span>Film study every week</span>
+        <span>Personal playbook</span>
+      </div>
+    </div>
+
+    <div class="film" id="film">
+      <span class="tag"><span class="rec">● REC</span> · FILM STUDY · JALEN BRUNSON</span>
+      <div class="court"></div>
+      <span class="mk e">Eyes</span>
+      <span class="mk h">Hips</span>
+      <span class="mk s">Shoulders</span>
+      <div class="play" title="Preview reel">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="#0a0500"><path d="M6 4l14 8-14 8z"/></svg>
+      </div>
+      <div class="cap"><small>BREAKDOWN #1 · READING THE DEFENCE</small>What is the defender giving away?</div>
+    </div>
+  </div>
+
+  <!-- animated stats -->
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat">
+        <div class="n"><span data-count="14" data-suffix="">0</span></div>
+        <div class="l">Days to next intake</div>
+      </div>
+      <div class="stat live">
+        <div class="n"><span id="enrolCount" data-count="127">0</span><span class="u"></span></div>
+        <div class="l">Players enrolled · live</div>
+      </div>
+      <div class="stat">
+        <div class="n"><span id="seatsLeft" data-count="8">0</span><span class="u">/15</span></div>
+        <div class="l">Seats remaining · next cohort</div>
+      </div>
+      <div class="stat">
+        <div class="n"><span data-count="4">0</span><span class="u">wks</span></div>
+        <div class="l">To a smarter player</div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:18px" class="mono" id="countdown">Next intake in — : — : — : —</div>
+  </div>
+</header>
+
+<div class="wrap"><div class="rule"></div></div>
+
+<!-- ============ PROBLEM ============ -->
+<section id="problem">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">The Opportunity</span>
+      <h2 class="display grad">The Gap Isn't Physical.<br>It's Mental.</h2>
+      <p>Most players spend every hour training their hands and their legs. The players who separate themselves train something almost nobody does — the six inches between the ears.</p>
+    </div>
+    <div class="split">
+      <div class="col">
+        <h4>What Most Players Train</h4>
+        <ul>
+          <li><span class="ico">↗</span> Shooting</li>
+          <li><span class="ico">↗</span> Ball Handling</li>
+          <li><span class="ico">↗</span> Finishing</li>
+        </ul>
+      </div>
+      <div class="col hot">
+        <h4>What Elite Players Train</h4>
+        <ul>
+          <li><span class="ico">◆</span> Basketball IQ</li>
+          <li><span class="ico">◆</span> Decision Making</li>
+          <li><span class="ico">◆</span> Court Awareness</li>
+        </ul>
+      </div>
+    </div>
+    <p class="gap-note">Basketball is not about moves.<span class="amber">It's about solving problems.</span></p>
+  </div>
+</section>
+
+<!-- ============ FRAMEWORK ============ -->
+<section id="framework" style="background:linear-gradient(180deg,transparent,var(--bg-2),transparent)">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">The Foundation</span>
+      <h2 class="display grad">Four Reads.<br>One Faster Decision.</h2>
+      <p>Basketball IQ is the ability to recognise patterns and make better decisions, faster. Before every play, elite players scan four things in a fraction of a second.</p>
+    </div>
+    <div class="reads">
+      <div class="read"><span class="num">READ 01</span><h3>Eyes</h3><p>Where are they looking? Focus reveals intent.</p><span class="big">01</span></div>
+      <div class="read"><span class="num">READ 02</span><h3>Hips</h3><p>Which way are they turned? Hips point to the drive.</p><span class="big">02</span></div>
+      <div class="read"><span class="num">READ 03</span><h3>Shoulders</h3><p>Where is the lean? Shoulders reveal balance.</p><span class="big">03</span></div>
+      <div class="read"><span class="num">READ 04</span><h3>Tendencies</h3><p>What do they always do? Habits expose the read.</p><span class="big">04</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ PROGRAM ============ -->
+<section id="program">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">The Journey</span>
+      <h2 class="display grad">Four Weeks.<br>One Smarter Player.</h2>
+      <p>A live, guided path through the mental game — one focused session each week, with film study, games and a challenge to take back to the court.</p>
+    </div>
+    <div class="weeks">
+      <div class="week">
+        <span class="wtag"><i>01</i> Week One</span>
+        <h3>See The Game Differently</h3>
+        <p>Learn how elite players read information before they ever make a decision. The whole framework, applied to live film.</p>
+        <div class="chips"><span class="chip">NBA Detective</span><span class="chip">Read the Defender</span><span class="chip">Film Study</span></div>
+      </div>
+      <div class="week">
+        <span class="wtag"><i>02</i> Week Two</span>
+        <h3>You Don't Need The Ball To Dominate</h3>
+        <p>Spacing, timing, movement and screening. Discover how to change every possession without touching the ball.</p>
+        <div class="chips"><span class="chip">Off-ball Movement</span><span class="chip">Cutting</span><span class="chip">Screening</span></div>
+      </div>
+      <div class="week">
+        <span class="wtag"><i>03</i> Week Three</span>
+        <h3>Defensive IQ</h3>
+        <p>Read the offence before it happens. Anticipate cuts, kill advantages and become the hardest player to score on.</p>
+        <div class="chips"><span class="chip">Escape Room</span><span class="chip">Anticipation</span><span class="chip">Positioning</span></div>
+      </div>
+      <div class="week">
+        <span class="wtag"><i>04</i> Week Four</span>
+        <h3>Build Your Personal Playbook</h3>
+        <p>Turn four weeks of reads into your own decision system — a playbook built around your game and your strengths.</p>
+        <div class="chips"><span class="chip">Self-Scouting</span><span class="chip">Playbook</span><span class="chip">Graduation</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SKILLS ============ -->
+<section style="background:linear-gradient(180deg,transparent,var(--bg-2),transparent)">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">What You'll Master</span>
+      <h2 class="display grad">Ten Things You Can't Coach<br>With A Shooting Machine.</h2>
+    </div>
+    <div class="skills">
+      <div class="skill"><div class="si">01</div><div class="sn">Basketball IQ</div></div>
+      <div class="skill"><div class="si">02</div><div class="sn">Decision Making</div></div>
+      <div class="skill"><div class="si">03</div><div class="sn">Pattern Recognition</div></div>
+      <div class="skill"><div class="si">04</div><div class="sn">Court Awareness</div></div>
+      <div class="skill"><div class="si">05</div><div class="sn">Communication</div></div>
+      <div class="skill"><div class="si">06</div><div class="sn">Leadership</div></div>
+      <div class="skill"><div class="si">07</div><div class="sn">Confidence</div></div>
+      <div class="skill"><div class="si">08</div><div class="sn">Film Study</div></div>
+      <div class="skill"><div class="si">09</div><div class="sn">Reading Defenders</div></div>
+      <div class="skill"><div class="si">10</div><div class="sn">Off-ball Movement</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SEGMENTS ============ -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Every Week · Course Extras</span>
+      <h2 class="display grad">Learning Should<br>Feel Like Hooping.</h2>
+      <p>Three recurring segments keep every session competitive, fun and unmistakably Lockdown Lab.</p>
+    </div>
+    <div class="segs">
+      <div class="seg"><div class="emoji">🎯</div><div class="freq">Every Week</div><h3>Trickshot of the Week</h3><p>Film your best trickshot. The lab votes. Winners climb the board.</p></div>
+      <div class="seg"><div class="emoji">🐴</div><div class="freq">Every Week</div><h3>Horse Comp</h3><p>A live, bracket-style game of HORSE that rewards creativity and nerve.</p></div>
+      <div class="seg"><div class="emoji">🎬</div><div class="freq">Every Week</div><h3>Clip of the Week</h3><p>The smartest play caught on film — broken down by the group.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ LEADERBOARD ============ -->
+<section id="leaderboard" style="background:linear-gradient(180deg,transparent,var(--bg-2),transparent)">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Gamified · The Lab</span>
+      <h2 class="display grad">Earn Your Spot<br>At The Top Of The Class.</h2>
+      <p>Every read, challenge and correct decision earns IQ points. Climb the live leaderboard, unlock badges and build a streak across all four weeks.</p>
+    </div>
+    <div class="lb-wrap">
+      <div class="lb-head">
+        <h3>Basketball IQ Leaderboard</h3>
+        <span class="live"><span class="dot"></span>Live · Week 1</span>
+      </div>
+      <div class="lb-row top"><div class="lb-rank">1</div><div class="lb-name">Marcus</div><span class="lb-badge">Elite IQ</span><div class="lb-pts">120<u>PTS</u></div></div>
+      <div class="lb-row"><div class="lb-rank">2</div><div class="lb-name">Jordan</div><span class="lb-badge">Sharp</span><div class="lb-pts">95<u>PTS</u></div></div>
+      <div class="lb-row"><div class="lb-rank">3</div><div class="lb-name">Tyrese</div><span class="lb-badge">Locked In</span><div class="lb-pts">80<u>PTS</u></div></div>
+      <div class="lb-row"><div class="lb-rank">4</div><div class="lb-name">Alex</div><span class="lb-badge">Rising</span><div class="lb-pts">65<u>PTS</u></div></div>
+      <div class="lb-row"><div class="lb-rank">5</div><div class="lb-name">Sam</div><span class="lb-badge">Rookie</span><div class="lb-pts">50<u>PTS</u></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TESTIMONIALS ============ -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">From The Lab</span>
+      <h2 class="display grad">Players See It.<br>Parents Feel It.</h2>
+      <p>Testimonial placeholders — swap for real reviews once the first cohort graduates.</p>
+    </div>
+    <div class="quotes">
+      <div class="quote">
+        <div class="stars">★★★★★</div>
+        <p>"He came back from one session talking about reading hips and shoulders. His coach asked what changed. This is different."</p>
+        <div class="who"><span class="av">DP</span><div><b>Danielle P.</b><span>Parent of a U16 guard</span></div></div>
+      </div>
+      <div class="quote">
+        <div class="stars">★★★★★</div>
+        <p>"I used to just run around. Now I actually see the play before it happens. I get open without the ball now."</p>
+        <div class="who"><span class="av">MT</span><div><b>Marcus T.</b><span>Player · Age 15</span></div></div>
+      </div>
+      <div class="quote">
+        <div class="stars">★★★★★</div>
+        <p>"The film study is next level. It feels like MasterClass but for basketball IQ. Worth every session."</p>
+        <div class="who"><span class="av">JR</span><div><b>James R.</b><span>Parent · AAU coach</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="rule"></div></div>
+
+<!-- ============ REGISTRATION WIZARD ============ -->
+<section id="register">
+  <div class="wrap" style="max-width:720px">
+    <div class="sec-head" style="text-align:center;margin:0 auto 34px">
+      <span class="eyebrow" style="justify-content:center">Academy Selection</span>
+      <h2 class="display grad">Claim Your Seat.</h2>
+      <p style="margin-left:auto;margin-right:auto">This isn't paperwork — it's your first read. Six quick steps and you're in the Lab. Takes about two minutes.</p>
+    </div>
+
+    <div class="wiz">
+      <div class="wiz-top">
+        <div class="wiz-meta">
+          <span class="wiz-step">Step <b id="stepNum">1</b> of 6 · <span id="stepName">The Player</span></span>
+          <span class="wiz-pct"><span id="pct">16</span>%</span>
+        </div>
+        <div class="bar"><i id="barFill"></i></div>
+        <div class="dots" id="dots"></div>
+      </div>
+
+      <div class="wiz-body">
+        <!-- STEP 1 -->
+        <div class="panel active" data-step="1">
+          <div class="p-eye">Read 01 · Who's Stepping On The Court</div>
+          <h3>The Player</h3>
+          <p class="p-sub">Let's start with the athlete we're about to level up.</p>
+          <div class="grid2">
+            <div class="fld full"><label>Player Full Name</label><input type="text" placeholder="e.g. Marcus Thompson"></div>
+            <div class="fld"><label>Age</label><input type="number" min="13" max="18" placeholder="13–18"></div>
+            <div class="fld"><label>Gender</label><select><option value="">Select</option><option>Male</option><option>Female</option><option>Prefer not to say</option></select></div>
+          </div>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="panel" data-step="2">
+          <div class="p-eye">Read 02 · The Support Team</div>
+          <h3>Parent &amp; Contact</h3>
+          <p class="p-sub">So we can send Zoom links, updates and coach feedback.</p>
+          <div class="grid2">
+            <div class="fld full"><label>Parent / Guardian Name</label><input type="text" placeholder="Full name"></div>
+            <div class="fld"><label>Email</label><input type="email" placeholder="you@email.com"></div>
+            <div class="fld"><label>Phone</label><input type="tel" placeholder="+1 (555) 000-0000"></div>
+            <div class="fld full"><label>Emergency Contact</label><input type="text" placeholder="Name & phone"></div>
+          </div>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="panel" data-step="3">
+          <div class="p-eye">Read 03 · Scouting Report</div>
+          <h3>Basketball Experience</h3>
+          <p class="p-sub">Help us tailor the film and the reads to your game.</p>
+          <div class="grid2">
+            <div class="fld"><label>Years Playing</label><select><option value="">Select</option><option>Just starting</option><option>1–2 years</option><option>3–5 years</option><option>5+ years</option></select></div>
+            <div class="fld"><label>Current Team</label><input type="text" placeholder="School / club / AAU"></div>
+            <div class="fld"><label>Favourite Player</label><input type="text" placeholder="Who do you study?"></div>
+            <div class="fld full"><label>Primary Position</label>
+              <div class="pills" data-single>
+                <span class="pill">Point Guard</span><span class="pill">Shooting Guard</span><span class="pill">Small Forward</span><span class="pill">Power Forward</span><span class="pill">Center</span>
+              </div>
+            </div>
+            <div class="fld"><label>Biggest Strength</label><input type="text" placeholder="e.g. Handles"></div>
+            <div class="fld"><label>Biggest Weakness</label><input type="text" placeholder="e.g. Decision making"></div>
+          </div>
+        </div>
+
+        <!-- STEP 4 -->
+        <div class="panel" data-step="4">
+          <div class="p-eye">Read 04 · The Mission</div>
+          <h3>Your Goals</h3>
+          <p class="p-sub">The clearer the target, the faster we get you there.</p>
+          <div class="fld full"><label>What do you most want to improve?</label><textarea placeholder="e.g. Reading defenders and making faster decisions"></textarea></div>
+          <div class="fld full"><label>What frustrates you most about your game right now?</label><textarea placeholder="Be honest — this is where the growth is"></textarea></div>
+          <div class="fld full"><label>What do you hope to walk away with?</label><textarea placeholder="e.g. A personal playbook and real court confidence"></textarea></div>
+        </div>
+
+        <!-- STEP 5 -->
+        <div class="panel" data-step="5">
+          <div class="p-eye">Read 05 · Game Time</div>
+          <h3>Availability</h3>
+          <p class="p-sub">Live sessions run on Zoom. Pick what fits.</p>
+          <div class="fld full"><label>Preferred Session</label>
+            <div class="pills" data-single>
+              <span class="pill">Weeknights</span><span class="pill">Saturday AM</span><span class="pill">Saturday PM</span><span class="pill">Sunday</span>
+            </div>
+          </div>
+          <div class="fld full"><label>Timezone</label><select><option value="">Select your timezone</option><option>PT · Pacific</option><option>MT · Mountain</option><option>CT · Central</option><option>ET · Eastern</option><option>GMT · UK</option><option>CET · Europe</option><option>Other</option></select></div>
+        </div>
+
+        <!-- STEP 6 -->
+        <div class="panel" data-step="6">
+          <div class="p-eye">Final Read · Lock It In</div>
+          <h3>Agreement</h3>
+          <p class="p-sub">A few confirmations and you're officially in the Lab.</p>
+          <label class="consent" data-consent><span class="box"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg></span><span class="ct"><b>Terms &amp; Conditions</b><span>I agree to the Lockdown Lab program terms and code of conduct.</span></span></label>
+          <label class="consent" data-consent><span class="box"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg></span><span class="ct"><b>Photo &amp; Film Consent</b><span>Sessions may be recorded for film study and highlights.</span></span></label>
+          <label class="consent" data-consent><span class="box"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg></span><span class="ct"><b>Parent / Guardian Approval</b><span>I confirm I am the parent or guardian, or have their approval to register.</span></span></label>
+        </div>
+      </div>
+
+      <div class="wiz-foot">
+        <button class="link-back" id="backBtn" disabled>← Back</button>
+        <button class="btn btn-primary" id="nextBtn">Continue →</button>
+      </div>
+    </div>
+
+    <div class="trust">
+      <span><span class="g">🔒</span> Secure &amp; encrypted</span>
+      <span>No spam — ever</span>
+      <span>Powered by Supabase &amp; Stripe</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap foot">
+    <div class="brand"><span class="mark"></span><span><b>Lockdown Lab</b><small>Basketball IQ Academy</small></span></div>
+    <div class="fm">© 2026 Lockdown Lab · @lockdownlab3 · Live on Zoom</div>
+  </div>
+</footer>
+
+<!-- ============ SUCCESS OVERLAY ============ -->
+<canvas id="confetti"></canvas>
+<div class="success" id="success">
+  <div class="success-card">
+    <div class="crest">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#0a0500" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <span class="eyebrow">Registration Confirmed</span>
+    <h2>Welcome To<br>Lockdown Lab</h2>
+    <div class="who" id="successName">You're officially registered.</div>
+    <p>Your seat in the next cohort is locked in. Here's exactly what happens next.</p>
+    <div class="checklist">
+      <div class="ci"><span class="n">1</span><div><b>Check your email</b><span>Confirmation + your Zoom link are on the way.</span></div></div>
+      <div class="ci"><span class="n">2</span><div><b>Grab your Welcome Pack</b><span>Framework cheat-sheet &amp; Week 1 prep checklist.</span></div></div>
+      <div class="ci"><span class="n">3</span><div><b>Watch one quarter of hoops</b><span>Find one smart read before your first session.</span></div></div>
+    </div>
+    <button class="btn btn-primary btn-block" onclick="closeSuccess()">Download Welcome Pack</button>
+    <button class="link-back" style="margin-top:14px" onclick="closeSuccess()">Back to site</button>
+  </div>
+</div>
+
+<div class="skeleton-note">SKELETON PREVIEW · <b>front-end only</b> · backend next</div>
+
+<script>
+(function(){
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- count-up stats ---------- */
+  function countUp(el){
+    const target = +el.dataset.count; const dur = 1200; const start = performance.now();
+    if(reduce){el.textContent = target; return;}
+    function tick(now){
+      const p = Math.min((now-start)/dur,1);
+      const eased = 1-Math.pow(1-p,3);
+      el.textContent = Math.round(target*eased);
+      if(p<1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+  const io = new IntersectionObserver((es)=>{
+    es.forEach(e=>{ if(e.isIntersecting){ e.target.querySelectorAll('[data-count]').forEach(countUp); io.unobserve(e.target);} });
+  },{threshold:.4});
+  document.querySelectorAll('.stats').forEach(s=>io.observe(s));
+
+  /* ---------- live enrolments ticking ---------- */
+  let enrolled = 127, seats = 8;
+  setInterval(()=>{
+    if(Math.random()>.6 && seats>1){
+      enrolled++; document.getElementById('enrolCount').textContent = enrolled;
+      if(Math.random()>.5){ seats--; document.getElementById('seatsLeft').textContent = seats; }
+    }
+  }, 6000);
+
+  /* ---------- countdown ---------- */
+  const intake = new Date('2026-07-28T18:00:00Z').getTime();
+  const cd = document.getElementById('countdown');
+  function pad(n){return String(n).padStart(2,'0');}
+  function updateCd(){
+    let diff = intake - Date.now();
+    if(diff<0) diff=0;
+    const d=Math.floor(diff/864e5), h=Math.floor(diff/36e5)%24, m=Math.floor(diff/6e4)%60, s=Math.floor(diff/1e3)%60;
+    cd.innerHTML = 'Next intake in <b class="amber">'+pad(d)+'</b>d <b class="amber">'+pad(h)+'</b>h <b class="amber">'+pad(m)+'</b>m <b class="amber">'+pad(s)+'</b>s';
+  }
+  updateCd(); setInterval(updateCd,1000);
+
+  /* ---------- choice pills ---------- */
+  document.querySelectorAll('.pills[data-single]').forEach(group=>{
+    group.addEventListener('click',e=>{
+      const pill = e.target.closest('.pill'); if(!pill) return;
+      group.querySelectorAll('.pill').forEach(p=>p.classList.remove('sel'));
+      pill.classList.add('sel');
+    });
+  });
+  /* ---------- consent toggles ---------- */
+  document.querySelectorAll('[data-consent]').forEach(c=>{
+    c.addEventListener('click',e=>{e.preventDefault(); c.classList.toggle('on'); validateStep();});
+  });
+
+  /* ---------- wizard engine ---------- */
+  const names = ['The Player','Parent & Contact','Basketball Experience','Your Goals','Availability','Agreement'];
+  const total = 6; let step = 1;
+  const panels = [...document.querySelectorAll('.panel')];
+  const barFill = document.getElementById('barFill');
+  const dots = document.getElementById('dots');
+  panels.forEach((_,i)=>{ const d=document.createElement('span'); d.className='d'+(i===0?' on':''); dots.appendChild(d); });
+  const dEls = [...dots.children];
+  const nextBtn = document.getElementById('nextBtn');
+  const backBtn = document.getElementById('backBtn');
+
+  function render(){
+    panels.forEach(p=>p.classList.toggle('active', +p.dataset.step===step));
+    const pct = Math.round(step/total*100);
+    document.getElementById('stepNum').textContent = step;
+    document.getElementById('stepName').textContent = names[step-1];
+    document.getElementById('pct').textContent = pct;
+    barFill.style.width = pct+'%';
+    dEls.forEach((d,i)=>d.classList.toggle('on', i<step));
+    backBtn.disabled = step===1;
+    nextBtn.textContent = step===total ? 'Complete Registration ✓' : 'Continue →';
+    validateStep();
+  }
+  function validateStep(){
+    if(step===total){
+      const all = [...document.querySelectorAll('[data-consent]')].every(c=>c.classList.contains('on'));
+      nextBtn.style.opacity = all?1:.5;
+      nextBtn.dataset.ok = all?'1':'0';
+    } else { nextBtn.style.opacity=1; nextBtn.dataset.ok='1'; }
+  }
+  nextBtn.addEventListener('click',()=>{
+    if(nextBtn.dataset.ok==='0'){
+      document.querySelectorAll('[data-consent]:not(.on) .box').forEach(b=>{b.animate([{transform:'translateX(0)'},{transform:'translateX(-4px)'},{transform:'translateX(4px)'},{transform:'translateX(0)'}],{duration:250});});
+      return;
+    }
+    if(step<total){ step++; render(); document.getElementById('register').scrollIntoView({behavior: reduce?'auto':'smooth', block:'start'}); }
+    else { openSuccess(); }
+  });
+  backBtn.addEventListener('click',()=>{ if(step>1){ step--; render(); } });
+  render();
+
+  /* ---------- success + confetti ---------- */
+  const successEl = document.getElementById('success');
+  window.closeSuccess = ()=>{ successEl.classList.remove('show'); document.getElementById('confetti').classList.remove('show'); stopConfetti(); };
+  function openSuccess(){
+    const nameInput = document.querySelector('.panel[data-step="1"] input[type="text"]');
+    const nm = nameInput && nameInput.value.trim();
+    document.getElementById('successName').textContent = nm ? nm+' — you’re officially registered.' : 'You’re officially registered.';
+    successEl.classList.add('show');
+    fireConfetti();
+  }
+
+  /* confetti */
+  const canvas = document.getElementById('confetti'); const ctx = canvas.getContext('2d');
+  let parts=[], raf=null;
+  function size(){ canvas.width=innerWidth; canvas.height=innerHeight; }
+  addEventListener('resize',size); size();
+  function fireConfetti(){
+    if(reduce) return;
+    canvas.classList.add('show');
+    const colors=['#ff6b00','#ff8a2b','#ffffff','#ffb37a'];
+    parts = Array.from({length:160},()=>({
+      x:innerWidth/2+(Math.random()-.5)*140, y:innerHeight/2,
+      vx:(Math.random()-.5)*14, vy:Math.random()*-16-4,
+      g:.38+Math.random()*.2, s:5+Math.random()*7,
+      rot:Math.random()*6, vr:(Math.random()-.5)*.4,
+      c:colors[Math.random()*colors.length|0], life:0
+    }));
+    cancelAnimationFrame(raf); loop();
+  }
+  function stopConfetti(){ cancelAnimationFrame(raf); ctx.clearRect(0,0,canvas.width,canvas.height); }
+  function loop(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    let alive=false;
+    parts.forEach(p=>{
+      p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr; p.life++;
+      if(p.y<canvas.height+40) alive=true;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot); ctx.fillStyle=p.c;
+      ctx.globalAlpha=Math.max(0,1-p.life/160);
+      ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6); ctx.restore();
+    });
+    if(alive) raf=requestAnimationFrame(loop); else stopConfetti();
+  }
+})();
+</script>
