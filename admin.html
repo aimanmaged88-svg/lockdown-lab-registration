@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex,nofollow" />
+<title>Lockdown Lab · Admin</title>
+<style>
+  :root{
+    --bg:#070707; --panel:rgba(255,255,255,.04); --panel2:rgba(255,255,255,.02);
+    --line:rgba(255,255,255,.10); --line2:rgba(255,255,255,.06);
+    --text:#f4f2ef; --muted:#9b968f; --dim:#6a655e;
+    --accent:#ff6b00; --accent-hi:#ff8a2b; --accent-soft:rgba(255,107,0,.14);
+    --good:#22c55e; --good-soft:rgba(34,197,94,.14);
+    --fd:"Arial Narrow",Helvetica,Arial,system-ui,sans-serif;
+    --fb:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --fm:ui-monospace,"SF Mono","Roboto Mono",Menlo,monospace;
+    color-scheme:dark;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:var(--fb);-webkit-font-smoothing:antialiased;
+    background-image:radial-gradient(110% 60% at 50% -10%, rgba(255,107,0,.08), transparent 55%);min-height:100vh}
+  a{color:inherit}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+  .mono{font-family:var(--fm);font-variant-numeric:tabular-nums}
+
+  /* login */
+  .login{min-height:100vh;display:grid;place-items:center;padding:22px}
+  .login-card{width:100%;max-width:380px;border:1px solid var(--line);border-radius:20px;background:var(--panel);
+    backdrop-filter:blur(12px);padding:34px 28px;text-align:center}
+  .brand{display:inline-flex;align-items:center;gap:11px;margin-bottom:22px}
+  .brand b{font-family:var(--fd);text-transform:uppercase;letter-spacing:2.5px;font-weight:700;font-size:18px}
+  .login-card h1{font-family:var(--fd);text-transform:uppercase;letter-spacing:1px;font-size:26px;margin-bottom:6px}
+  .login-card p{color:var(--muted);font-size:13px;margin-bottom:22px}
+  input,select{width:100%;background:rgba(0,0,0,.4);border:1px solid var(--line);border-radius:11px;padding:12px 14px;
+    color:var(--text);font-size:15px;font-family:var(--fb);outline:none;transition:border-color .15s,box-shadow .15s}
+  input:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .btn{font-family:var(--fd);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;font-size:14px;cursor:pointer;
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:999px;border:1px solid transparent;
+    transition:transform .15s,background .15s,border-color .15s}
+  .btn:active{transform:scale(.97)}
+  .btn-primary{background:var(--accent);color:#0a0500}
+  .btn-primary:hover{background:var(--accent-hi)}
+  .btn-ghost{background:var(--panel);border-color:var(--line);color:var(--text)}
+  .btn-ghost:hover{border-color:var(--accent)}
+  .btn-block{width:100%;margin-top:14px}
+  .err{display:none;margin-top:14px;color:#ff9a9a;font-size:13px;background:rgba(255,82,82,.12);border:1px solid #ff5252;border-radius:10px;padding:10px 12px}
+
+  /* dashboard */
+  #dash{display:none}
+  header.top{position:sticky;top:0;z-index:10;border-bottom:1px solid var(--line2);
+    background:rgba(7,7,7,.7);backdrop-filter:blur(14px)}
+  header.top .row{display:flex;align-items:center;gap:16px;height:62px}
+  header.top .brand{margin:0}
+  header.top .spacer{flex:1}
+  .pill{font-family:var(--fm);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);
+    border:1px solid var(--line);border-radius:999px;padding:6px 12px}
+  .pill b{color:var(--accent)}
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:26px 0 18px}
+  @media(max-width:760px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpi{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:16px}
+  .kpi .n{font-family:var(--fd);font-size:30px;line-height:1;font-variant-numeric:tabular-nums}
+  .kpi .l{font-family:var(--fm);font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--dim);margin-top:8px}
+  .kpi.accent .n{color:var(--accent)}
+
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+  .toolbar input{max-width:280px}
+  .toolbar select{max-width:180px}
+  .toolbar .spacer{flex:1}
+
+  .tablewrap{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--panel2)}
+  .scroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;min-width:820px}
+  thead th{font-family:var(--fm);font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--dim);
+    text-align:left;padding:13px 14px;border-bottom:1px solid var(--line);white-space:nowrap;background:var(--panel)}
+  tbody td{padding:12px 14px;border-bottom:1px solid var(--line2);font-size:14px;vertical-align:top}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr:hover{background:rgba(255,255,255,.02)}
+  .player{font-family:var(--fd);text-transform:uppercase;letter-spacing:.5px;font-size:17px}
+  .sub{color:var(--muted);font-size:12px}
+  .em{color:var(--text)}
+  a.mail{color:var(--accent-hi);text-decoration:none}
+  a.mail:hover{text-decoration:underline}
+  .stsel{padding:6px 8px;font-size:12px;border-radius:8px}
+  .badge{display:inline-block;font-family:var(--fm);font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:3px 9px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+  .badge.new{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+  .badge.confirmed,.badge.paid{border-color:var(--good);color:var(--good);background:var(--good-soft)}
+  .empty{padding:60px 20px;text-align:center;color:var(--muted)}
+  .empty b{display:block;font-family:var(--fd);text-transform:uppercase;font-size:22px;color:var(--text);margin-bottom:8px}
+  .details{color:var(--muted);font-size:12.5px;line-height:1.5}
+  .details b{color:var(--text);font-weight:600}
+  .foot{color:var(--dim);font-size:12px;text-align:center;padding:26px 0 40px;font-family:var(--fm)}
+  .ll{width:30px;height:30px;color:#fff;flex:0 0 auto}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--accent);color:#0a0500;
+    font-family:var(--fd);text-transform:uppercase;letter-spacing:1px;font-size:13px;padding:11px 18px;border-radius:999px;
+    opacity:0;transition:opacity .25s;pointer-events:none;z-index:50}
+  .toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="ll-mark" viewBox="0 0 120 128" fill="none" stroke="currentColor" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"><path d="M49 33 V25 a11 11 0 0 1 22 0 V33"/><path d="M39 33 H49"/><path d="M71 33 H81"/><path d="M49 33 V53 L28 91 a12 12 0 0 0 11 18 H81 a12 12 0 0 0 11 -18 L71 53 V33"/><path d="M55 47 L46 85 H60"/><path d="M69 47 L60 85 H74"/></symbol></svg>
+
+<!-- LOGIN -->
+<div class="login" id="login">
+  <div class="login-card">
+    <div class="brand"><svg class="ll" aria-hidden="true"><use href="#ll-mark"/></svg><b>Lockdown Lab</b></div>
+    <h1>Admin Access</h1>
+    <p>Enter your admin token to view founding registrations.</p>
+    <input type="password" id="token" placeholder="Admin token" autocomplete="off" />
+    <button class="btn btn-primary btn-block" id="loginBtn">Enter the Lab →</button>
+    <div class="err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dash">
+  <header class="top">
+    <div class="wrap row">
+      <div class="brand"><svg class="ll" aria-hidden="true"><use href="#ll-mark"/></svg><b>Lockdown Lab</b></div>
+      <span class="pill">Admin · <b>Registrations</b></span>
+      <div class="spacer"></div>
+      <button class="btn btn-ghost" id="exportBtn">Export CSV</button>
+      <button class="btn btn-ghost" id="logoutBtn">Log out</button>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="kpis" id="kpis"></div>
+
+    <div class="toolbar">
+      <input type="search" id="search" placeholder="Search name, email, team…" />
+      <select id="statusFilter">
+        <option value="">All statuses</option>
+        <option value="new">New</option>
+        <option value="contacted">Contacted</option>
+        <option value="confirmed">Confirmed</option>
+        <option value="paid">Paid</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+      <div class="spacer"></div>
+      <button class="btn btn-ghost" id="refreshBtn">Refresh</button>
+    </div>
+
+    <div class="tablewrap">
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Player</th><th>Age</th><th>Contact</th><th>Position</th>
+              <th>Session</th><th>Status</th><th>Registered</th><th>Detail</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="empty" style="display:none"><b>No registrations yet</b>Founding sign-ups will appear here the moment they come in.</div>
+    </div>
+
+    <div class="foot" id="foot"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const FN = 'https://ymuwuhvqqftgpxwhzoub.supabase.co/functions/v1/admin';
+  const ANON = 'sb_publishable_-j-P1TcLeGZ6lGspru2YwA_3RxAlucJ';
+  let TOKEN = sessionStorage.getItem('ll_admin_token') || '';
+  let ROWS = [];
+
+  const $ = s => document.querySelector(s);
+  const toast = (m)=>{ const t=$('#toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1800); };
+
+  async function api(payload){
+    const res = await fetch(FN, {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json', 'x-admin-token':TOKEN, apikey:ANON, Authorization:'Bearer '+ANON },
+      body: JSON.stringify(payload)
+    });
+    if(res.status===401) throw new Error('unauthorized');
+    if(!res.ok) throw new Error('HTTP '+res.status);
+    return res.json();
+  }
+
+  /* ---- login ---- */
+  function showDash(){ $('#login').style.display='none'; $('#dash').style.display='block'; }
+  function showLogin(){ $('#dash').style.display='none'; $('#login').style.display='grid'; }
+
+  $('#loginBtn').addEventListener('click', doLogin);
+  $('#token').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+  async function doLogin(){
+    const t = $('#token').value.trim();
+    if(!t){ return; }
+    TOKEN = t;
+    try{
+      await load();
+      sessionStorage.setItem('ll_admin_token', TOKEN);
+      showDash();
+    }catch(e){
+      const err = $('#loginErr'); err.style.display='block';
+      err.textContent = e.message==='unauthorized' ? 'That token was not accepted. Check and try again.' : 'Could not connect. Try again.';
+    }
+  }
+  $('#logoutBtn').addEventListener('click', ()=>{ sessionStorage.removeItem('ll_admin_token'); TOKEN=''; $('#token').value=''; showLogin(); });
+
+  /* ---- data ---- */
+  async function load(){
+    const { rows } = await api({ action:'list' });
+    ROWS = rows || [];
+    render();
+  }
+  $('#refreshBtn').addEventListener('click', ()=> load().then(()=>toast('Refreshed')));
+  $('#search').addEventListener('input', render);
+  $('#statusFilter').addEventListener('change', render);
+
+  function esc(s){ return (s==null?'':String(s)).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  function fmtDate(s){ try{ const d=new Date(s); return d.toLocaleDateString(undefined,{month:'short',day:'numeric'})+' '+d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'}); }catch(e){ return s; } }
+
+  function filtered(){
+    const q = $('#search').value.trim().toLowerCase();
+    const sf = $('#statusFilter').value;
+    return ROWS.filter(r=>{
+      if(sf && r.status!==sf) return false;
+      if(!q) return true;
+      return [r.player_name,r.email,r.parent_name,r.current_team,r.favourite_player].some(v=> (v||'').toLowerCase().includes(q));
+    });
+  }
+
+  function render(){
+    const rows = filtered();
+    // KPIs
+    const by = s => ROWS.filter(r=>r.status===s).length;
+    $('#kpis').innerHTML = [
+      ['Total', ROWS.length, 'accent'],
+      ['New', by('new'), ''],
+      ['Contacted', by('contacted'), ''],
+      ['Confirmed', by('confirmed'), ''],
+      ['Paid', by('paid'), '']
+    ].map(([l,n,c])=>`<div class="kpi ${c}"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
+
+    const tb = $('#tbody');
+    $('#empty').style.display = rows.length ? 'none' : 'block';
+    tb.innerHTML = rows.map(r=>{
+      const st = r.status||'new';
+      const opts = ['new','contacted','confirmed','paid','cancelled']
+        .map(o=>`<option value="${o}" ${o===st?'selected':''}>${o[0].toUpperCase()+o.slice(1)}</option>`).join('');
+      const detail = [
+        r.years_playing && `<b>Exp:</b> ${esc(r.years_playing)}`,
+        r.strength && `<b>Str:</b> ${esc(r.strength)}`,
+        r.weakness && `<b>Weak:</b> ${esc(r.weakness)}`,
+        r.goal_improve && `<b>Goal:</b> ${esc(r.goal_improve)}`,
+        r.timezone && `<b>TZ:</b> ${esc(r.timezone)}`
+      ].filter(Boolean).join(' · ') || '<span class="sub">—</span>';
+      return `<tr>
+        <td><div class="player">${esc(r.player_name)}</div><div class="sub">${esc(r.gender||'')}</div></td>
+        <td class="mono">${esc(r.age??'—')}</td>
+        <td><a class="mail" href="mailto:${esc(r.email)}">${esc(r.email)}</a><div class="sub">${esc(r.phone||'')}${r.parent_name?' · '+esc(r.parent_name):''}</div></td>
+        <td>${esc(r.position||'—')}</td>
+        <td>${esc(r.preferred_session||'—')}</td>
+        <td><select class="stsel" data-id="${r.id}">${opts}</select></td>
+        <td class="mono sub">${fmtDate(r.created_at)}</td>
+        <td class="details">${detail}</td>
+      </tr>`;
+    }).join('');
+
+    tb.querySelectorAll('.stsel').forEach(sel=>{
+      sel.addEventListener('change', async ()=>{
+        const id = sel.dataset.id, status = sel.value;
+        sel.disabled = true;
+        try{
+          await api({ action:'update_status', id, status });
+          const row = ROWS.find(r=>r.id===id); if(row) row.status = status;
+          render(); toast('Status updated');
+        }catch(e){ toast('Update failed'); }
+        finally{ sel.disabled=false; }
+      });
+    });
+
+    $('#foot').textContent = `Showing ${rows.length} of ${ROWS.length} registration${ROWS.length===1?'':'s'} · Lockdown Lab`;
+  }
+
+  /* ---- CSV export ---- */
+  $('#exportBtn').addEventListener('click', ()=>{
+    if(!ROWS.length){ toast('Nothing to export'); return; }
+    const cols = ['created_at','status','player_name','age','gender','parent_name','email','phone','emergency_contact','years_playing','current_team','favourite_player','position','strength','weakness','goal_improve','frustrations','hopes','preferred_session','timezone','consent_terms','consent_photo','consent_parent','source'];
+    const csv = [cols.join(',')].concat(ROWS.map(r=>cols.map(c=>{
+      let v = r[c]; if(v==null) v='';
+      v = String(v).replace(/"/g,'""');
+      return /[",\n]/.test(v) ? `"${v}"` : v;
+    }).join(','))).join('\n');
+    const blob = new Blob([csv],{type:'text/csv'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'lockdown-lab-registrations.csv';
+    a.click(); URL.revokeObjectURL(a.href);
+    toast('CSV exported');
+  });
+
+  /* ---- auto-login if token stored ---- */
+  if(TOKEN){ load().then(showDash).catch(()=>{ sessionStorage.removeItem('ll_admin_token'); TOKEN=''; showLogin(); }); }
+})();
+</script>
+</body>
+</html>

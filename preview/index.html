@@ -550,11 +550,11 @@
         <div class="l">Days left to lock in</div>
       </div>
       <div class="stat live">
-        <div class="n"><span id="enrolCount" data-count="127">0</span><span class="u"></span></div>
+        <div class="n"><span id="enrolCount">—</span><span class="u"></span></div>
         <div class="l">Early sign-ups · live</div>
       </div>
       <div class="stat">
-        <div class="n"><span id="seatsLeft" data-count="8">0</span><span class="u">/15</span></div>
+        <div class="n"><span id="seatsLeft">—</span><span class="u" id="seatCap">/30</span></div>
         <div class="l">Founding seats left</div>
       </div>
       <div class="stat">
@@ -884,6 +884,11 @@
 (function(){
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
+  /* ---------- Supabase config (public keys — RLS protects data) ---------- */
+  const SUPABASE_URL = 'https://ymuwuhvqqftgpxwhzoub.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_-j-P1TcLeGZ6lGspru2YwA_3RxAlucJ';
+  const FOUNDING_CAP = 30; // total founding seats — change to taste
+
   /* ---------- count-up stats ---------- */
   function countUp(el){
     const target = +el.dataset.count; const dur = 1200; const start = performance.now();
@@ -901,14 +906,28 @@
   },{threshold:.4});
   document.querySelectorAll('.stats').forEach(s=>io.observe(s));
 
-  /* ---------- live enrolments ticking ---------- */
-  let enrolled = 127, seats = 8;
-  setInterval(()=>{
-    if(Math.random()>.6 && seats>1){
-      enrolled++; document.getElementById('enrolCount').textContent = enrolled;
-      if(Math.random()>.5){ seats--; document.getElementById('seatsLeft').textContent = seats; }
+  /* ---------- real seat counter (from Supabase) ---------- */
+  async function loadRealStats(){
+    const capEl = document.getElementById('seatCap');
+    if(capEl) capEl.textContent = '/'+FOUNDING_CAP;
+    try{
+      const r = await fetch(SUPABASE_URL+'/rest/v1/rpc/registration_count', {
+        method:'POST',
+        headers:{ apikey:SUPABASE_KEY, Authorization:'Bearer '+SUPABASE_KEY, 'Content-Type':'application/json' },
+        body:'{}',
+        signal: AbortSignal.timeout(6000)
+      });
+      if(!r.ok) throw new Error('count');
+      const n = await r.json();
+      const count = Number.isFinite(n) ? n : 0;
+      document.getElementById('enrolCount').textContent = count;
+      document.getElementById('seatsLeft').textContent = Math.max(0, FOUNDING_CAP - count);
+    }catch(e){
+      document.getElementById('enrolCount').textContent = '0';
+      document.getElementById('seatsLeft').textContent = FOUNDING_CAP;
     }
-  }, 6000);
+  }
+  loadRealStats();
 
   /* ---------- countdown ---------- */
   const intake = new Date('2026-07-28T18:00:00Z').getTime();
@@ -965,9 +984,7 @@
       nextBtn.dataset.ok = all?'1':'0';
     } else { nextBtn.style.opacity=1; nextBtn.dataset.ok='1'; }
   }
-  /* ---------- Supabase registration capture ---------- */
-  const SUPABASE_URL = 'https://ymuwuhvqqftgpxwhzoub.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_-j-P1TcLeGZ6lGspru2YwA_3RxAlucJ';
+  /* ---------- Supabase registration capture (config defined at top) ---------- */
   const errBox = document.createElement('div');
   errBox.style.cssText = 'display:none;margin:14px 30px 0;padding:12px 15px;border:1px solid #ff5252;background:rgba(255,82,82,.12);color:#ff9a9a;border-radius:10px;font-size:13px;font-family:var(--fb)';
   document.querySelector('.wiz-foot').insertAdjacentElement('beforebegin', errBox);
