@@ -374,12 +374,52 @@
   .phone .notch{position:absolute;top:13px;left:50%;transform:translateX(-50%);width:98px;height:22px;background:#000;border-radius:0 0 15px 15px;z-index:4}
   .phone .ribbon{position:absolute;top:26px;right:-9px;z-index:5;background:var(--accent);color:#150a00;font-family:var(--fm);font-weight:800;
     font-size:10px;letter-spacing:1.5px;text-transform:uppercase;padding:6px 11px;border-radius:6px;box-shadow:0 10px 26px -8px var(--accent-glow)}
-  .screen{height:100%;border-radius:34px;overflow:hidden;border:1px solid var(--line-2);padding:30px 15px 14px;display:flex;flex-direction:column;gap:12px;
+  .screen{height:100%;border-radius:34px;overflow:hidden;border:1px solid var(--line-2);padding:26px 14px 14px;display:flex;flex-direction:column;gap:9px;position:relative;
     background:radial-gradient(120% 55% at 50% 0%, rgba(255,107,0,.16), #0a0a0a 62%)}
   .app-top{display:flex;align-items:center;gap:7px}
   .app-top .mk2{width:18px;height:18px;border-radius:6px;background:var(--accent);flex:0 0 auto}
   .app-top b{font-family:var(--fd);letter-spacing:1.2px;font-size:13px}
-  .app-top .live2{margin-left:auto;font-family:var(--fm);font-size:8px;letter-spacing:1.5px;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:2px 6px}
+  .app-top .live2{margin-left:auto;display:flex;align-items:center;gap:4px;font-family:var(--fm);font-size:8px;letter-spacing:1.5px;color:var(--good);border:1px solid var(--good);border-radius:999px;padding:2px 7px}
+  .app-top .live2 .ld{width:5px;height:5px;border-radius:50%;background:var(--good);animation:pulse 2s infinite}
+  /* player profile */
+  .prof{display:flex;flex-direction:column;align-items:center;text-align:center}
+  .prof-av{position:relative;width:78px;height:78px;margin-top:2px}
+  .av-ring{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,var(--accent),#ffd0a3,var(--accent-hi),#ff5e00,var(--accent));animation:spin 4.5s linear infinite;box-shadow:0 0 20px -2px var(--accent-glow)}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .av-img{position:absolute;inset:4px;border-radius:50%;background:linear-gradient(140deg,#ff9a3d,#8a3a00);border:3px solid #0c0c0c;display:grid;place-items:center;font-family:var(--fd);font-size:27px;letter-spacing:1px;color:#150a00;z-index:2}
+  .av-badge{position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);z-index:3;white-space:nowrap;background:var(--accent);color:#150a00;font-family:var(--fm);font-weight:700;font-size:7px;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:999px;border:2px solid #0c0c0c}
+  .prof-name{font-family:var(--fd);text-transform:uppercase;font-size:23px;letter-spacing:.5px;margin-top:11px;line-height:1}
+  .prof-meta{font-family:var(--fm);font-size:8px;letter-spacing:1.3px;text-transform:uppercase;color:var(--muted);margin-top:5px}
+  .prof-rank{margin-top:9px;display:inline-flex;align-items:center;gap:5px;font-family:var(--fm);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:3px 10px;background:var(--accent-soft)}
+  .prof-rank .rk-arrow{color:var(--good);animation:bob 1.5s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+  .prof-stats{display:flex;gap:6px}
+  .ps{flex:1;text-align:center;border:1px solid var(--line-2);border-radius:12px;padding:9px 3px;background:var(--glass-2)}
+  .ps b{font-family:var(--fd);font-size:18px;display:block;line-height:1;letter-spacing:.5px}
+  .ps span{font-family:var(--fm);font-size:7px;letter-spacing:.7px;text-transform:uppercase;color:var(--muted);margin-top:4px;display:block}
+  .ps.hot{border-color:var(--accent);background:var(--accent-soft)}
+  .ps.hot b{color:var(--accent)}
+  .app-bar i{position:relative;overflow:hidden}
+  .app-bar i::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);transform:translateX(-100%);animation:sweep 2.6s ease-in-out infinite}
+  @keyframes sweep{0%{transform:translateX(-120%)}55%,100%{transform:translateX(320%)}}
+  .app-card{border:1px solid var(--line);border-radius:12px;padding:10px 11px;background:var(--glass);display:flex;flex-direction:column;gap:7px}
+  .ac-top{display:flex;justify-content:space-between;align-items:center;font-family:var(--fm);font-size:8.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted)}
+  .ac-top b{font-family:var(--fd);font-size:14px;color:var(--accent);letter-spacing:.5px}
+  .app-bar.sm{height:5px}
+  .mini-lb{border:1px solid var(--line-2);border-radius:12px;overflow:hidden;background:var(--glass-2)}
+  .mlb-h{font-family:var(--fm);font-size:7.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:8px 11px 5px}
+  .mlb-r{display:grid;grid-template-columns:14px 1fr auto;gap:8px;align-items:center;padding:6px 11px;border-top:1px solid var(--line-2);font-family:var(--fm);font-size:10px}
+  .mlb-r span{font-family:var(--fd);color:var(--dim)}
+  .mlb-r b{font-weight:500;color:var(--text)}
+  .mlb-r u{text-decoration:none;color:var(--muted);font-variant-numeric:tabular-nums;font-size:9px}
+  .mlb-r.me{background:var(--accent-soft)}
+  .mlb-r.me span,.mlb-r.me b,.mlb-r.me u{color:var(--accent)}
+  .prof-badges{display:flex;gap:6px;justify-content:center;margin-top:auto}
+  .pb{width:31px;height:31px;border-radius:10px;display:grid;place-items:center;font-size:14px;border:1px solid var(--line-2);background:var(--glass-2)}
+  .pb.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 14px -4px var(--accent-glow)}
+  .pb.locked{opacity:.35;filter:grayscale(1)}
+  .xp-pop{position:absolute;top:118px;right:20px;z-index:5;pointer-events:none;font-family:var(--fd);font-size:16px;letter-spacing:.5px;color:var(--good);text-shadow:0 2px 12px rgba(0,0,0,.7);animation:xppop 3.4s ease-in-out infinite}
+  @keyframes xppop{0%{opacity:0;transform:translateY(10px) scale(.9)}12%{opacity:1;transform:translateY(0) scale(1)}38%{opacity:1;transform:translateY(-8px)}58%,100%{opacity:0;transform:translateY(-22px)}}
   .app-hi{font-family:var(--fd);text-transform:uppercase;line-height:1;font-size:22px;margin-top:4px}
   .app-hi span{color:var(--muted);font-size:10px;font-family:var(--fm);letter-spacing:1.5px;display:block;margin-bottom:5px;text-transform:uppercase}
   .app-xp{border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--glass)}
@@ -460,18 +500,40 @@
         <div class="notch"></div>
         <div class="ribbon">Early Access</div>
         <div class="screen">
-          <div class="app-top"><span class="mk2"></span><b>LOCKDOWN LAB</b><span class="live2">APP</span></div>
-          <div class="app-hi"><span>Welcome back,</span>Founding Member</div>
+          <div class="app-top"><span class="mk2"></span><b>LOCKDOWN LAB</b><span class="live2"><i class="ld"></i>Live</span></div>
+          <div class="prof">
+            <div class="prof-av">
+              <span class="av-ring"></span>
+              <span class="av-img">MT</span>
+              <span class="av-badge">★ Founder</span>
+            </div>
+            <div class="prof-name">Marcus T.</div>
+            <div class="prof-meta">Point Guard · Age 15</div>
+            <div class="prof-rank"><span class="rk-arrow">▲</span> Rank #2 · Top 3%</div>
+          </div>
+          <div class="prof-stats">
+            <div class="ps hot"><b>842</b><span>IQ Score</span></div>
+            <div class="ps"><b>🔥7</b><span>Streak</span></div>
+            <div class="ps"><b>18</b><span>Badges</span></div>
+          </div>
           <div class="app-xp">
             <div class="app-xp-top"><span>Level 3 · <b>Sharp</b></span><span>620 / 1000 XP</span></div>
             <div class="app-bar"><i style="width:62%"></i></div>
           </div>
-          <div class="app-road">
-            <div class="app-step done"><span class="rc">✓</span> Week 1 · See The Game</div>
-            <div class="app-step now"><span class="rc">▶</span> Week 2 · Off-Ball Impact</div>
-            <div class="app-step"><span class="rc">3</span> Week 3 · Defensive IQ</div>
+          <div class="app-card">
+            <div class="ac-top"><span>🎯 Week 2 Challenge</span><b>7/10</b></div>
+            <div class="app-bar sm"><i style="width:70%"></i></div>
           </div>
-          <div class="app-badges"><span>🔥 7</span><span>🏅 IQ</span><span>⚡ 620</span></div>
+          <div class="mini-lb">
+            <div class="mlb-h">IQ Leaderboard</div>
+            <div class="mlb-r"><span>1</span><b>Jalen</b><u>901</u></div>
+            <div class="mlb-r me"><span>2</span><b>You</b><u>842</u></div>
+            <div class="mlb-r"><span>3</span><b>Tyrese</b><u>815</u></div>
+          </div>
+          <div class="prof-badges">
+            <span class="pb on">🏆</span><span class="pb on">🎯</span><span class="pb on">🧠</span><span class="pb on">⚡</span><span class="pb locked">🔒</span>
+          </div>
+          <div class="xp-pop">+120 XP</div>
         </div>
       </div>
     </div>
