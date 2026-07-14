@@ -352,8 +352,69 @@
   .skeleton-note{position:fixed;left:14px;bottom:14px;z-index:60;font-family:var(--fm);font-size:11px;letter-spacing:1px;color:var(--dim);background:rgba(6,6,6,.7);border:1px solid var(--line);padding:8px 12px;border-radius:999px;backdrop-filter:blur(8px)}
   .skeleton-note b{color:var(--accent)}
 
+  /* ---------- launch announcement bar ---------- */
+  .announce{display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;text-align:center;
+    padding:10px 16px;background:linear-gradient(90deg,#5c2700,var(--accent) 45%,var(--accent-hi) 55%,#5c2700);
+    color:#150a00;font-family:var(--fm);font-size:11px;letter-spacing:1.6px;text-transform:uppercase;font-weight:600}
+  .announce b{font-weight:800}
+  .announce .tagpill{background:#150a00;color:var(--accent);padding:3px 9px;border-radius:999px;font-size:10px;letter-spacing:1.5px}
+  @media(max-width:560px){.announce{font-size:10px;gap:8px}}
+
+  /* ---------- hero two-col with phone ---------- */
+  .hero-two{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center}
+  @media(max-width:960px){.hero-two{grid-template-columns:1fr;gap:40px}.phone{transform:none!important}}
+  .kicker{display:inline-flex;align-items:center;gap:9px;font-family:var(--fm);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+  .kicker b{color:var(--accent)}
+
+  .phone-wrap{display:flex;justify-content:center;position:relative}
+  .phone{position:relative;width:300px;aspect-ratio:9/19.2;border-radius:44px;border:1px solid var(--line);
+    background:linear-gradient(160deg,#1a1a1a,#080808);padding:11px;transform:rotate(3deg);transition:transform .5s cubic-bezier(.2,.7,.2,1);
+    box-shadow:0 60px 130px -45px rgba(0,0,0,.95), 0 0 0 9px rgba(255,255,255,.02), 0 0 60px -20px var(--accent-glow)}
+  .phone:hover{transform:rotate(0)}
+  .phone .notch{position:absolute;top:13px;left:50%;transform:translateX(-50%);width:98px;height:22px;background:#000;border-radius:0 0 15px 15px;z-index:4}
+  .phone .ribbon{position:absolute;top:26px;right:-9px;z-index:5;background:var(--accent);color:#150a00;font-family:var(--fm);font-weight:800;
+    font-size:10px;letter-spacing:1.5px;text-transform:uppercase;padding:6px 11px;border-radius:6px;box-shadow:0 10px 26px -8px var(--accent-glow)}
+  .screen{height:100%;border-radius:34px;overflow:hidden;border:1px solid var(--line-2);padding:30px 15px 14px;display:flex;flex-direction:column;gap:12px;
+    background:radial-gradient(120% 55% at 50% 0%, rgba(255,107,0,.16), #0a0a0a 62%)}
+  .app-top{display:flex;align-items:center;gap:7px}
+  .app-top .mk2{width:18px;height:18px;border-radius:6px;background:var(--accent);flex:0 0 auto}
+  .app-top b{font-family:var(--fd);letter-spacing:1.2px;font-size:13px}
+  .app-top .live2{margin-left:auto;font-family:var(--fm);font-size:8px;letter-spacing:1.5px;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:2px 6px}
+  .app-hi{font-family:var(--fd);text-transform:uppercase;line-height:1;font-size:22px;margin-top:4px}
+  .app-hi span{color:var(--muted);font-size:10px;font-family:var(--fm);letter-spacing:1.5px;display:block;margin-bottom:5px;text-transform:uppercase}
+  .app-xp{border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--glass)}
+  .app-xp-top{display:flex;justify-content:space-between;font-family:var(--fm);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .app-xp-top b{color:var(--accent)}
+  .app-bar{height:6px;border-radius:999px;background:rgba(255,255,255,.09);overflow:hidden}
+  .app-bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent-hi));box-shadow:0 0 12px var(--accent-glow)}
+  .app-road{display:flex;flex-direction:column;gap:7px}
+  .app-step{display:flex;align-items:center;gap:9px;border:1px solid var(--line-2);border-radius:11px;padding:9px 11px;font-family:var(--fm);font-size:10px;letter-spacing:.5px;color:var(--muted)}
+  .app-step .rc{width:19px;height:19px;border-radius:6px;display:grid;place-items:center;font-size:10px;flex:0 0 auto;background:rgba(255,255,255,.06)}
+  .app-step.done{color:var(--text)}.app-step.done .rc{background:var(--good);color:#000}
+  .app-step.now{color:#150a00;background:var(--accent);border-color:var(--accent);font-weight:700}.app-step.now .rc{background:#150a00;color:var(--accent)}
+  .app-badges{display:flex;gap:7px;margin-top:auto}
+  .app-badges span{flex:1;text-align:center;border:1px solid var(--line-2);border-radius:11px;padding:9px 4px;font-family:var(--fm);font-size:11px;background:var(--glass-2)}
+
+  /* ---------- founding perks ---------- */
+  .perks{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:860px){.perks{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:460px){.perks{grid-template-columns:1fr}}
+  .perk{padding:24px 20px;border:1px solid var(--line);border-radius:var(--r);background:var(--glass-2);transition:transform .25s,border-color .25s;position:relative}
+  .perk:hover{transform:translateY(-5px);border-color:var(--accent)}
+  .perk .pk-ico{width:40px;height:40px;border-radius:11px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-size:19px;margin-bottom:16px}
+  .perk h3{font-family:var(--fd);text-transform:uppercase;font-size:22px;letter-spacing:.5px;margin-bottom:7px;line-height:1}
+  .perk p{color:var(--muted);font-size:13px}
+  .perk .tagpill{position:absolute;top:16px;right:16px;font-family:var(--fm);font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:2px 7px}
+
   @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 </style>
+
+<!-- ============ LAUNCH ANNOUNCEMENT ============ -->
+<div class="announce">
+  <span class="tagpill">New</span>
+  <span><b>Early registration is now OPEN</b> — the Lockdown Lab app + academy · founding cohort only</span>
+  <span class="tagpill">Limited seats</span>
+</div>
 
 <!-- ============ NAV ============ -->
 <nav>
@@ -375,18 +436,41 @@
 <a id="top"></a>
 <!-- ============ HERO ============ -->
 <header>
-  <div class="wrap hero-single">
+  <div class="wrap hero-two">
     <div>
-      <span class="hero-badge"><span class="dot"></span>4-Week Program · All Ages · Live on Zoom</span>
+      <span class="kicker"><span class="dot" style="width:7px;height:7px;border-radius:50%;background:var(--good);display:inline-block"></span>Coming soon · <b>The Lockdown Lab App</b></span>
+      <span class="hero-badge"><span class="dot"></span>Early Access · Founding Cohort · All Ages</span>
       <h1 class="hero display">You Don't Need<br>The Ball To<br><span class="l2">Dominate.</span></h1>
-      <p class="hero-sub">Develop <b>Basketball IQ</b> in just 4 weeks. Learn how elite players read defenders, make smarter decisions faster, and take over the game — even without the ball in their hands.</p>
+      <p class="hero-sub">The <b>Basketball IQ app + live academy</b> is about to drop. Learn how elite players read defenders, make smarter decisions faster, and dominate the game — even without the ball. <b>Register early and get first dibs.</b></p>
       <div class="hero-cta">
-        <a href="#register" class="btn btn-primary">Join the Academy →</a>
+        <a href="#register" class="btn btn-primary">Claim Early Access →</a>
+        <a href="#program" class="btn btn-ghost">See what's inside</a>
       </div>
       <div class="trust" style="justify-content:flex-start;margin-top:26px">
-        <span><span class="g">●</span> Live coaching on Zoom</span>
-        <span>Small group</span>
-        <span>Personal playbook</span>
+        <span><span class="g">●</span> Founding-member status</span>
+        <span>First to play</span>
+        <span>Locked-in early price</span>
+      </div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="ribbon">Early Access</div>
+        <div class="screen">
+          <div class="app-top"><span class="mk2"></span><b>LOCKDOWN LAB</b><span class="live2">APP</span></div>
+          <div class="app-hi"><span>Welcome back,</span>Founding Member</div>
+          <div class="app-xp">
+            <div class="app-xp-top"><span>Level 3 · <b>Sharp</b></span><span>620 / 1000 XP</span></div>
+            <div class="app-bar"><i style="width:62%"></i></div>
+          </div>
+          <div class="app-road">
+            <div class="app-step done"><span class="rc">✓</span> Week 1 · See The Game</div>
+            <div class="app-step now"><span class="rc">▶</span> Week 2 · Off-Ball Impact</div>
+            <div class="app-step"><span class="rc">3</span> Week 3 · Defensive IQ</div>
+          </div>
+          <div class="app-badges"><span>🔥 7</span><span>🏅 IQ</span><span>⚡ 620</span></div>
+        </div>
       </div>
     </div>
   </div>
@@ -396,22 +480,22 @@
     <div class="stats">
       <div class="stat">
         <div class="n"><span data-count="14" data-suffix="">0</span></div>
-        <div class="l">Days to next intake</div>
+        <div class="l">Days left to lock in</div>
       </div>
       <div class="stat live">
         <div class="n"><span id="enrolCount" data-count="127">0</span><span class="u"></span></div>
-        <div class="l">Players enrolled · live</div>
+        <div class="l">Early sign-ups · live</div>
       </div>
       <div class="stat">
         <div class="n"><span id="seatsLeft" data-count="8">0</span><span class="u">/15</span></div>
-        <div class="l">Seats remaining · next cohort</div>
+        <div class="l">Founding seats left</div>
       </div>
       <div class="stat">
         <div class="n"><span data-count="4">0</span><span class="u">wks</span></div>
         <div class="l">To a smarter player</div>
       </div>
     </div>
-    <div style="text-align:center;margin-top:18px" class="mono" id="countdown">Next intake in — : — : — : —</div>
+    <div style="text-align:center;margin-top:18px" class="mono" id="countdown">Early access closes in — : — : — : —</div>
   </div>
 </header>
 
@@ -568,13 +652,32 @@
 
 <div class="wrap"><div class="rule"></div></div>
 
+<!-- ============ FOUNDING ACCESS ============ -->
+<section id="founding">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Why Register Early</span>
+      <h2 class="display grad">Founders Get In<br>Before Anyone Else.</h2>
+      <p>The app and the academy launch together — and only the first cohort gets founding status. Once these seats are gone, early access closes. This is your one shot to be first.</p>
+    </div>
+    <div class="perks">
+      <div class="perk"><span class="tagpill">Rare</span><div class="pk-ico">🏆</div><h3>Founding Member</h3><p>A permanent Founder badge on your profile. Everyone who comes after sees you were here first.</p></div>
+      <div class="perk"><span class="tagpill">First</span><div class="pk-ico">📱</div><h3>First Access</h3><p>Get the Lockdown Lab app before public launch — features, drops and updates land on your phone first.</p></div>
+      <div class="perk"><span class="tagpill">Locked</span><div class="pk-ico">💸</div><h3>Founding Price</h3><p>Lock in the early-access rate for life. When prices rise at launch, yours never moves.</p></div>
+      <div class="perk"><span class="tagpill">Only 15</span><div class="pk-ico">🎟️</div><h3>Limited Seats</h3><p>The founding cohort is capped so coaching stays personal. When it's full, it's full — no exceptions.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="rule"></div></div>
+
 <!-- ============ REGISTRATION WIZARD ============ -->
 <section id="register">
   <div class="wrap" style="max-width:720px">
     <div class="sec-head" style="text-align:center;margin:0 auto 34px">
-      <span class="eyebrow" style="justify-content:center">Registration · Straight Talk</span>
-      <h2 class="display grad">Claim Your Seat.</h2>
-      <p style="margin-left:auto;margin-right:auto">Real talk: this is a small, live cohort — a handful of players, four weeks on Zoom, coached in real time. No pre-recorded fluff, no fake countdown pressure. Answer these honestly and we'll build the sessions around what you actually need. Takes about two minutes.</p>
+      <span class="eyebrow" style="justify-content:center">Early Registration</span>
+      <h2 class="display grad">Claim Your Founding Seat.</h2>
+      <p style="margin-left:auto;margin-right:auto">This is the real deal: a small, live founding cohort — a handful of players, four weeks on Zoom, coached in real time, plus first access to the app. No pre-recorded fluff and no fake pressure — the seats are genuinely limited so the coaching stays personal. Answer these honestly and we'll build the sessions around what you actually need. Two minutes, and you're a founder.</p>
     </div>
 
     <div class="wiz">
@@ -695,14 +798,14 @@
     <div class="crest">
       <svg viewBox="0 0 24 24" fill="none" stroke="#0a0500" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
     </div>
-    <span class="eyebrow">Registration Confirmed</span>
+    <span class="eyebrow">You're In · Founding Member</span>
     <h2>Welcome To<br>Lockdown Lab</h2>
-    <div class="who" id="successName">You're officially registered.</div>
-    <p>Your seat in the next cohort is locked in. Here's exactly what happens next.</p>
+    <div class="who" id="successName">You're officially a founding member.</div>
+    <p>You got in early — that founding status is yours for good. Here's exactly what happens next.</p>
     <div class="checklist">
-      <div class="ci"><span class="n">1</span><div><b>Check your email</b><span>Confirmation + your Zoom link are on the way.</span></div></div>
-      <div class="ci"><span class="n">2</span><div><b>Grab your Welcome Pack</b><span>Framework cheat-sheet &amp; Week 1 prep checklist.</span></div></div>
-      <div class="ci"><span class="n">3</span><div><b>Watch one quarter of hoops</b><span>Find one smart read before your first session.</span></div></div>
+      <div class="ci"><span class="n">1</span><div><b>Check your email</b><span>Confirmation, your founder badge &amp; Zoom link are on the way.</span></div></div>
+      <div class="ci"><span class="n">2</span><div><b>Get first dibs on the app</b><span>You'll be first in line when the Lockdown Lab app drops.</span></div></div>
+      <div class="ci"><span class="n">3</span><div><b>Grab your Welcome Pack</b><span>Framework cheat-sheet &amp; Week 1 prep checklist.</span></div></div>
     </div>
     <button class="btn btn-primary btn-block" onclick="closeSuccess()">Download Welcome Pack</button>
     <button class="link-back" style="margin-top:14px" onclick="closeSuccess()">Back to site</button>
@@ -749,7 +852,7 @@
     let diff = intake - Date.now();
     if(diff<0) diff=0;
     const d=Math.floor(diff/864e5), h=Math.floor(diff/36e5)%24, m=Math.floor(diff/6e4)%60, s=Math.floor(diff/1e3)%60;
-    cd.innerHTML = 'Next intake in <b class="amber">'+pad(d)+'</b>d <b class="amber">'+pad(h)+'</b>h <b class="amber">'+pad(m)+'</b>m <b class="amber">'+pad(s)+'</b>s';
+    cd.innerHTML = 'Early access closes in <b class="amber">'+pad(d)+'</b>d <b class="amber">'+pad(h)+'</b>h <b class="amber">'+pad(m)+'</b>m <b class="amber">'+pad(s)+'</b>s';
   }
   updateCd(); setInterval(updateCd,1000);
 
@@ -813,7 +916,7 @@
   function openSuccess(){
     const nameInput = document.querySelector('.panel[data-step="1"] input[type="text"]');
     const nm = nameInput && nameInput.value.trim();
-    document.getElementById('successName').textContent = nm ? nm+' — you’re officially registered.' : 'You’re officially registered.';
+    document.getElementById('successName').textContent = nm ? nm+' — you’re a founding member.' : 'You’re officially a founding member.';
     successEl.classList.add('show');
     fireConfetti();
   }
