@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PokéTrade — App skeleton</title>
+<style>
+  :root {
+    --bg: #0f1226; --panel: #181c3a; --panel-2: #21264d; --ink: #eef0ff;
+    --muted: #9aa0cf; --accent: #ffcb05; --accent-2: #3d7dff; --danger: #ee1515;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; min-height: 100vh; display: grid; place-items: center;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: #05060f; color: var(--ink); padding: 24px; }
+
+  /* ---- Phone frame ---- */
+  .phone { width: 380px; max-width: 100%; height: 760px; background: var(--bg);
+    border-radius: 44px; border: 10px solid #0b0d1c; box-shadow: 0 30px 80px rgba(0,0,0,.6);
+    overflow: hidden; display: flex; flex-direction: column; position: relative; }
+  .notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+    width: 140px; height: 26px; background: #0b0d1c; border-radius: 0 0 16px 16px; z-index: 5; }
+
+  .appbar { padding: 34px 18px 12px; display: flex; align-items: center; justify-content: space-between; }
+  .appbar .brand { display: flex; align-items: center; gap: 8px; font-weight: 800; }
+  .poke { width: 20px; height: 20px; border-radius: 50%;
+    background: linear-gradient(var(--danger) 0 50%, #fff 50% 100%);
+    border: 2px solid #1a1a1a; position: relative; }
+  .poke::after { content: ""; position: absolute; inset: 0; margin: auto; width: 6px; height: 6px;
+    background: #fff; border: 2px solid #1a1a1a; border-radius: 50%; }
+  .appbar .status { font-size: 12px; color: var(--muted); }
+
+  .screen { flex: 1; overflow-y: auto; padding: 4px 16px 16px; }
+  .screen::-webkit-scrollbar { display: none; }
+  h2.title { font-size: 20px; margin: 6px 2px 12px; }
+
+  /* ---- Map screen ---- */
+  .map { position: relative; height: 300px; border-radius: 18px; overflow: hidden;
+    background:
+      linear-gradient(rgba(61,125,255,.06) 1px, transparent 1px) 0 0/24px 24px,
+      linear-gradient(90deg, rgba(61,125,255,.06) 1px, transparent 1px) 0 0/24px 24px,
+      radial-gradient(400px 200px at 40% 30%, rgba(61,125,255,.18), transparent 60%),
+      var(--panel-2); border: 1px solid var(--panel-2); margin-bottom: 14px; }
+  .pin { position: absolute; transform: translate(-50%, -100%); cursor: pointer; text-align: center; }
+  .pin .dot { width: 14px; height: 14px; border-radius: 50% 50% 50% 0; background: var(--accent);
+    transform: rotate(-45deg); margin: 0 auto; border: 2px solid #1a1a1a; }
+  .pin.me .dot { background: var(--accent-2); }
+  .pin .tag { font-size: 10px; margin-top: 5px; background: #000a; padding: 1px 5px; border-radius: 5px;
+    white-space: nowrap; }
+
+  .list .item { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--panel);
+    border: 1px solid var(--panel-2); border-radius: 14px; margin-bottom: 10px; }
+  .avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--panel-2);
+    display: grid; place-items: center; font-size: 20px; flex: none; }
+  .item .meta { flex: 1; min-width: 0; }
+  .item .name { font-weight: 700; }
+  .item .desc { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .item .go { background: var(--accent); color: #1a1a1a; border: 0; font-weight: 800;
+    border-radius: 999px; padding: 8px 14px; font-size: 13px; cursor: pointer; }
+
+  /* ---- Profile screen ---- */
+  .profile { text-align: center; padding-top: 12px; }
+  .profile .big { width: 84px; height: 84px; border-radius: 50%; background: var(--panel-2);
+    display: grid; place-items: center; font-size: 40px; margin: 0 auto 10px; }
+  .stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin: 18px 0; }
+  .stat { background: var(--panel); border: 1px solid var(--panel-2); border-radius: 14px; padding: 12px 6px; }
+  .stat b { display: block; font-size: 20px; }
+  .stat span { font-size: 11px; color: var(--muted); }
+  .field { text-align: left; background: var(--panel); border: 1px solid var(--panel-2);
+    border-radius: 12px; padding: 10px 14px; margin-bottom: 10px; }
+  .field .k { font-size: 11px; color: var(--muted); }
+  .field .v { font-weight: 600; }
+
+  .hidden { display: none; }
+
+  /* ---- Bottom nav ---- */
+  .tabbar { display: flex; border-top: 1px solid var(--panel-2); background: #10132b; }
+  .tab { flex: 1; background: none; border: 0; color: var(--muted); padding: 12px 0 16px;
+    font-size: 11px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  .tab .ico { font-size: 20px; }
+  .tab.active { color: var(--accent); }
+
+  .back { display: inline-block; margin: 16px 0 0; color: var(--muted); font-size: 13px; text-decoration: none; }
+</style>
+</head>
+<body>
+  <div class="phone">
+    <div class="notch"></div>
+
+    <div class="appbar">
+      <div class="brand"><span class="poke"></span> PokéTrade</div>
+      <div class="status" id="status">📍 Locating…</div>
+    </div>
+
+    <div class="screen">
+      <!-- MAP TAB -->
+      <div data-screen="map">
+        <h2 class="title">Trainers near you</h2>
+        <div class="map" id="mapArea"></div>
+        <div class="list" id="nearList"></div>
+      </div>
+
+      <!-- TRADES TAB -->
+      <div data-screen="trades" class="hidden">
+        <h2 class="title">Open trades</h2>
+        <div class="list" id="tradeList"></div>
+      </div>
+
+      <!-- PROFILE TAB -->
+      <div data-screen="profile" class="hidden">
+        <h2 class="title">Profile</h2>
+        <div class="profile">
+          <div class="big">🧑‍🚀</div>
+          <div style="font-weight:800; font-size:18px;">You</div>
+          <div style="color:var(--muted); font-size:13px;">Trainer since 2026</div>
+          <div class="stats">
+            <div class="stat"><b>12</b><span>Trades</span></div>
+            <div class="stat"><b>34</b><span>Caught</span></div>
+            <div class="stat"><b>4.9★</b><span>Rating</span></div>
+          </div>
+          <div class="field"><div class="k">Sharing location</div><div class="v">On · approximate</div></div>
+          <div class="field"><div class="k">Looking for</div><div class="v">Squirtle, Ditto</div></div>
+          <div class="field"><div class="k">Offering</div><div class="v">Charmander, Pidgey ×3</div></div>
+        </div>
+        <a class="back" href="index.html">← Back to website</a>
+      </div>
+    </div>
+
+    <nav class="tabbar">
+      <button class="tab active" data-tab="map"><span class="ico">🗺️</span>Map</button>
+      <button class="tab" data-tab="trades"><span class="ico">🔁</span>Trades</button>
+      <button class="tab" data-tab="profile"><span class="ico">👤</span>Profile</button>
+    </nav>
+  </div>
+
+  <script src="data.js"></script>
+  <script>
+    // ---- Map pins + nearby list ----
+    const mapArea = document.getElementById('mapArea');
+    const nearList = document.getElementById('nearList');
+    const tradeList = document.getElementById('tradeList');
+
+    TRAINERS.forEach(t => {
+      const pin = document.createElement('div');
+      pin.className = 'pin' + (t.me ? ' me' : '');
+      pin.style.left = t.x + '%';
+      pin.style.top = t.y + '%';
+      pin.innerHTML = `<div class="dot"></div><div class="tag">${t.me ? 'You' : t.name}</div>`;
+      mapArea.appendChild(pin);
+    });
+
+    TRAINERS.filter(t => !t.me).forEach(t => {
+      const row = (subtitle, action) => `
+        <div class="item">
+          <div class="avatar">${t.emoji}</div>
+          <div class="meta"><div class="name">${t.name}</div><div class="desc">${subtitle}</div></div>
+          <button class="go" onclick="alert('Skeleton: ${action} ${t.name}.')">Trade</button>
+        </div>`;
+      nearList.insertAdjacentHTML('beforeend', row(`${t.dist} away · offers ${t.offers}`, 'Open chat with'));
+      tradeList.insertAdjacentHTML('beforeend', row(`Offers ${t.offers} · wants ${t.wants}`, 'Propose trade to'));
+    });
+
+    document.getElementById('status').textContent =
+      '📍 ' + TRAINERS.filter(t => !t.me).length + ' nearby';
+
+    // ---- Tab switching ----
+    document.querySelectorAll('.tab').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const target = btn.dataset.tab;
+        document.querySelectorAll('[data-screen]').forEach(s =>
+          s.classList.toggle('hidden', s.dataset.screen !== target));
+      });
+    });
+  </script>
+</body>
+</html>
