@@ -2,40 +2,41 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>PokéTrade — App skeleton</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0f1226" />
+<title>PokéTrade</title>
 <style>
   :root {
     --bg: #0f1226; --panel: #181c3a; --panel-2: #21264d; --ink: #eef0ff;
     --muted: #9aa0cf; --accent: #ffcb05; --accent-2: #3d7dff; --danger: #ee1515;
   }
   * { box-sizing: border-box; }
-  body { margin: 0; min-height: 100vh; display: grid; place-items: center;
+  html, body { height: 100%; }
+  body { margin: 0;
     font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    background: #05060f; color: var(--ink); padding: 24px; }
+    background: var(--bg); color: var(--ink);
+    display: flex; flex-direction: column; min-height: 100dvh; }
 
-  /* ---- Phone frame ---- */
-  .phone { width: 380px; max-width: 100%; height: 760px; background: var(--bg);
-    border-radius: 44px; border: 10px solid #0b0d1c; box-shadow: 0 30px 80px rgba(0,0,0,.6);
-    overflow: hidden; display: flex; flex-direction: column; position: relative; }
-  .notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-    width: 140px; height: 26px; background: #0b0d1c; border-radius: 0 0 16px 16px; z-index: 5; }
+  /* On large screens, keep a comfortable app-like column */
+  .app { flex: 1; display: flex; flex-direction: column; width: 100%;
+    max-width: 560px; margin: 0 auto; min-height: 100dvh; }
 
-  .appbar { padding: 34px 18px 12px; display: flex; align-items: center; justify-content: space-between; }
-  .appbar .brand { display: flex; align-items: center; gap: 8px; font-weight: 800; }
+  .appbar { padding: calc(env(safe-area-inset-top, 0px) + 14px) 18px 10px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0; background: var(--bg); z-index: 10; }
+  .appbar .brand { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 17px; }
   .poke { width: 20px; height: 20px; border-radius: 50%;
     background: linear-gradient(var(--danger) 0 50%, #fff 50% 100%);
-    border: 2px solid #1a1a1a; position: relative; }
+    border: 2px solid #1a1a1a; position: relative; flex: none; }
   .poke::after { content: ""; position: absolute; inset: 0; margin: auto; width: 6px; height: 6px;
     background: #fff; border: 2px solid #1a1a1a; border-radius: 50%; }
   .appbar .status { font-size: 12px; color: var(--muted); }
 
-  .screen { flex: 1; overflow-y: auto; padding: 4px 16px 16px; }
-  .screen::-webkit-scrollbar { display: none; }
+  .screen { flex: 1; overflow-y: auto; padding: 4px 16px 90px; -webkit-overflow-scrolling: touch; }
   h2.title { font-size: 20px; margin: 6px 2px 12px; }
 
-  /* ---- Map screen ---- */
-  .map { position: relative; height: 300px; border-radius: 18px; overflow: hidden;
+  /* ---- Map ---- */
+  .map { position: relative; height: min(46vh, 340px); border-radius: 18px; overflow: hidden;
     background:
       linear-gradient(rgba(61,125,255,.06) 1px, transparent 1px) 0 0/24px 24px,
       linear-gradient(90deg, rgba(61,125,255,.06) 1px, transparent 1px) 0 0/24px 24px,
@@ -48,6 +49,7 @@
   .pin .tag { font-size: 10px; margin-top: 5px; background: #000a; padding: 1px 5px; border-radius: 5px;
     white-space: nowrap; }
 
+  /* ---- Lists ---- */
   .list .item { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--panel);
     border: 1px solid var(--panel-2); border-radius: 14px; margin-bottom: 10px; }
   .avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--panel-2);
@@ -56,9 +58,9 @@
   .item .name { font-weight: 700; }
   .item .desc { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .item .go { background: var(--accent); color: #1a1a1a; border: 0; font-weight: 800;
-    border-radius: 999px; padding: 8px 14px; font-size: 13px; cursor: pointer; }
+    border-radius: 999px; padding: 10px 16px; font-size: 13px; cursor: pointer; flex: none; }
 
-  /* ---- Profile screen ---- */
+  /* ---- Profile ---- */
   .profile { text-align: center; padding-top: 12px; }
   .profile .big { width: 84px; height: 84px; border-radius: 50%; background: var(--panel-2);
     display: grid; place-items: center; font-size: 40px; margin: 0 auto 10px; }
@@ -70,23 +72,23 @@
     border-radius: 12px; padding: 10px 14px; margin-bottom: 10px; }
   .field .k { font-size: 11px; color: var(--muted); }
   .field .v { font-weight: 600; }
+  .back { display: inline-block; margin: 16px 0 0; color: var(--muted); font-size: 13px; text-decoration: none; }
 
   .hidden { display: none; }
 
-  /* ---- Bottom nav ---- */
-  .tabbar { display: flex; border-top: 1px solid var(--panel-2); background: #10132b; }
-  .tab { flex: 1; background: none; border: 0; color: var(--muted); padding: 12px 0 16px;
+  /* ---- Bottom nav (fixed, thumb-reachable) ---- */
+  .tabbar { position: fixed; left: 0; right: 0; bottom: 0; display: flex; z-index: 20;
+    border-top: 1px solid var(--panel-2); background: #10132bee; backdrop-filter: blur(8px);
+    padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .tabbar .inner { display: flex; width: 100%; max-width: 560px; margin: 0 auto; }
+  .tab { flex: 1; background: none; border: 0; color: var(--muted); padding: 10px 0 12px;
     font-size: 11px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; }
   .tab .ico { font-size: 20px; }
   .tab.active { color: var(--accent); }
-
-  .back { display: inline-block; margin: 16px 0 0; color: var(--muted); font-size: 13px; text-decoration: none; }
 </style>
 </head>
 <body>
-  <div class="phone">
-    <div class="notch"></div>
-
+  <div class="app">
     <div class="appbar">
       <div class="brand"><span class="poke"></span> PokéTrade</div>
       <div class="status" id="status">📍 Locating…</div>
@@ -122,16 +124,16 @@
           <div class="field"><div class="k">Looking for</div><div class="v">Squirtle, Ditto</div></div>
           <div class="field"><div class="k">Offering</div><div class="v">Charmander, Pidgey ×3</div></div>
         </div>
-        <a class="back" href="index.html">← Back to website</a>
+        <a class="back" href="index.html">← About PokéTrade</a>
       </div>
     </div>
-
-    <nav class="tabbar">
-      <button class="tab active" data-tab="map"><span class="ico">🗺️</span>Map</button>
-      <button class="tab" data-tab="trades"><span class="ico">🔁</span>Trades</button>
-      <button class="tab" data-tab="profile"><span class="ico">👤</span>Profile</button>
-    </nav>
   </div>
+
+  <nav class="tabbar"><div class="inner">
+    <button class="tab active" data-tab="map"><span class="ico">🗺️</span>Map</button>
+    <button class="tab" data-tab="trades"><span class="ico">🔁</span>Trades</button>
+    <button class="tab" data-tab="profile"><span class="ico">👤</span>Profile</button>
+  </div></nav>
 
   <script src="data.js"></script>
   <script>
