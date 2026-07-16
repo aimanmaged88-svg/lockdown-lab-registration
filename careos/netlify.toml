@@ -1,0 +1,4 @@
+# CareOS demo — static export deployment
+[build]
+  command = "npm run build"
+  publish = "out"
