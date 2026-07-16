@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PokéTrade — Player's Guide</title>
+<style>
+  :root {
+    --bg: #0f1226; --panel: #181c3a; --panel-2: #21264d; --ink: #eef0ff;
+    --muted: #9aa0cf; --accent: #ffcb05; --accent-2: #3d7dff; --danger: #ee1515;
+    --ok: #2ecc71;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: radial-gradient(1000px 500px at 80% -10%, #2a2f66 0, var(--bg) 55%);
+    color: var(--ink); line-height: 1.65; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 30px 20px 80px; }
+
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; margin-bottom: 22px; }
+  .poke { width: 22px; height: 22px; border-radius: 50%;
+    background: linear-gradient(var(--danger) 0 50%, #fff 50% 100%);
+    border: 2px solid #1a1a1a; position: relative; flex: none; }
+  .poke::after { content: ""; position: absolute; inset: 0; margin: auto; width: 7px; height: 7px;
+    background: #fff; border: 2px solid #1a1a1a; border-radius: 50%; }
+
+  h1 { font-size: clamp(26px, 6vw, 38px); line-height: 1.12; margin: 0 0 8px; }
+  .sub { color: var(--muted); font-size: 16px; margin: 0 0 24px; }
+  .btn { display: inline-block; background: var(--accent); color: #1a1a1a; font-weight: 800;
+    padding: 14px 24px; border-radius: 999px; text-decoration: none; font-size: 16px;
+    border: 0; cursor: pointer; }
+  .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--panel-2); }
+  .cta { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 38px; }
+
+  h2 { font-size: 21px; margin: 38px 0 12px; padding-top: 20px; border-top: 1px solid var(--panel-2); }
+  h2:first-of-type { border-top: 0; padding-top: 0; }
+
+  .step { display: flex; gap: 14px; margin: 14px 0; }
+  .step .n { width: 34px; height: 34px; flex: none; border-radius: 50%; background: var(--accent);
+    color: #1a1a1a; font-weight: 800; display: grid; place-items: center; }
+  .step b { display: block; }
+  .step span { color: var(--muted); font-size: 14px; }
+
+  details { background: var(--panel); border: 1px solid var(--panel-2); border-radius: 12px;
+    padding: 0 16px; margin: 10px 0; }
+  summary { cursor: pointer; font-weight: 700; padding: 13px 0; font-size: 15px; }
+  details p { color: var(--muted); font-size: 14px; margin: 0 0 14px; }
+
+  .brainstorm { background: linear-gradient(160deg, #1c2140, #181c3a); border: 2px solid var(--accent);
+    border-radius: 18px; padding: 20px 18px; box-shadow: 0 0 50px rgba(255,203,5,.08); }
+  .brainstorm h2 { border: 0; padding: 0; margin: 0 0 6px; }
+  .brainstorm .hint { background: #10132b; border: 1px dashed var(--panel-2); border-radius: 12px;
+    padding: 12px 14px; font-size: 14px; color: var(--muted); margin: 12px 0 16px; }
+  .brainstorm .hint b { color: var(--ink); }
+  input[type=text], textarea { width: 100%; padding: 13px 14px; border-radius: 12px;
+    border: 1px solid var(--panel-2); background: var(--bg); color: var(--ink);
+    font-size: 16px; outline: none; font-family: inherit; }
+  textarea { min-height: 140px; resize: vertical; }
+  input:focus, textarea:focus { border-color: var(--accent-2); }
+  label { display: block; font-size: 12px; color: var(--muted); margin: 12px 0 6px; }
+  .err { color: #ff8080; font-size: 13px; min-height: 18px; margin-top: 8px; }
+  .sent { text-align: center; padding: 26px 10px; }
+  .sent .big { font-size: 46px; }
+
+  footer { margin-top: 46px; color: var(--muted); font-size: 13px;
+    border-top: 1px solid var(--panel-2); padding-top: 16px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><span class="poke"></span> PokéTrade</div>
+
+  <h1>Player's Guide</h1>
+  <p class="sub">Everything you need to get trading — and a box at the bottom for your ideas.</p>
+
+  <div class="cta">
+    <a class="btn" href="app.html">👉 Open the app</a>
+    <a class="btn ghost" href="brief.html">Project &amp; security brief</a>
+  </div>
+
+  <h2>🚀 How to use the app</h2>
+  <div class="step"><div class="n">1</div><div><b>Sign in with your email</b>
+    <span>No password. Tap the link in the email (or type the 6-digit code) and you're in.</span></div></div>
+  <div class="step"><div class="n">2</div><div><b>Set up your trainer card</b>
+    <span>Pick a name and emoji, list what you're offering and what you're hunting for.</span></div></div>
+  <div class="step"><div class="n">3</div><div><b>Check the map</b>
+    <span>Trainers near you show as pins — including the resident Gym Leaders (Ash, Misty, Brock and friends). Distances are approximate areas, never exact spots.</span></div></div>
+  <div class="step"><div class="n">4</div><div><b>Propose a trade</b>
+    <span>Tap <b>Trade</b> on any trainer, fill in "you give / you get", send. Gym Leaders answer within a minute — great for practice.</span></div></div>
+  <div class="step"><div class="n">5</div><div><b>Chat &amp; complete</b>
+    <span>Once accepted, a chat opens to sort out the meetup. After the swap, hit <b>Mark completed</b>.</span></div></div>
+  <div class="step"><div class="n">6</div><div><b>Browse the Pokédex</b>
+    <span>The classic Kanto 151 with stats. Tap any Pokémon to add it to your offers or wants in one tap.</span></div></div>
+
+  <h2>❓ FAQs</h2>
+  <details><summary>Does the app show my exact location?</summary>
+    <p>Never. Your phone rounds your position to roughly a 500-metre area <em>before</em> it's sent, and the server rounds it again. There's no location history either — only your latest approximate area. Turn "Show me on the map" off and you're completely invisible.</p></details>
+  <details><summary>Who are Ash, Misty and the other trainers already on the map?</summary>
+    <p>They're our resident Gym Leaders — practice partners so you can try the whole trade flow end-to-end today. They accept proposals and chat back within a minute. Real trainers appear as more people join.</p></details>
+  <details><summary>Does anything cost money?</summary>
+    <p>No. There are no payments anywhere in the app — it's propose, chat, meet, swap.</p></details>
+  <details><summary>I didn't get the sign-in email.</summary>
+    <p>Give it a minute and check spam/junk. Still nothing? Tap "Use a different email" and try again. Each link works once — if you tapped an old one, just request a fresh email.</p></details>
+  <details><summary>What phones does it work on?</summary>
+    <p>Any phone (or computer) with a browser — it's a link, nothing to install. iPhone, Android, whatever you've got.</p></details>
+  <details><summary>Can other people see my email or contact details?</summary>
+    <p>No. Other trainers only ever see your trainer name, emoji, your offers/wants, and your approximate area if you share it. Contact happens in the in-app chat only.</p></details>
+  <details><summary>How do I meet up safely?</summary>
+    <p>Agree on a public spot in the chat — shopping centres, parks, the local courts. Daylight, public, easy. The trade isn't done until you both mark it completed.</p></details>
+
+  <h2 style="border:0; padding:0"></h2>
+  <div class="brainstorm" id="brainstorm">
+    <h2>💡 The Brainstorm Box</h2>
+    <p class="muted" style="margin:0 0 4px; color:var(--muted); font-size:14px">
+      Spotted a bug? Want a feature? This box goes straight to the developer.</p>
+    <div class="hint">🎙️ <b>Easiest way:</b> tap the box, hit the little <b>microphone on your keyboard</b>,
+      and just talk — describe what you want changed or added in as much detail as you can.
+      What were you doing? What did you expect? What would make it better?
+      Every word lands on Aiman's desk.</div>
+    <form id="ideaForm">
+      <label>Your name (optional)</label>
+      <input type="text" id="ideaName" maxlength="60" placeholder="Trainer name" />
+      <label>Your idea, edit, or question</label>
+      <textarea id="ideaBody" maxlength="4000" placeholder="e.g. When I open the map it should…"></textarea>
+      <div class="err" id="ideaErr"></div>
+      <button class="btn" type="submit" style="width:100%; margin-top:6px">Send it in 📮</button>
+    </form>
+    <div class="sent" id="ideaSent" style="display:none">
+      <div class="big">🎉</div>
+      <b>Got it — thank you, trainer!</b>
+      <p class="muted" style="color:var(--muted)">Your idea is in the box. Send as many as you like.</p>
+      <button class="btn ghost" id="ideaAgain">Send another one</button>
+    </div>
+  </div>
+
+  <footer>PokéTrade · fan project, not affiliated with Nintendo / The Pokémon Company / Niantic.
+    Questions: aimanmaged88@gmail.com</footer>
+</div>
+
+<script>
+  // Publishable key — safe to expose; this table is INSERT-only for the public.
+  const U = 'https://ymuwuhvqqftgpxwhzoub.supabase.co';
+  const K = 'sb_publishable_-j-P1TcLeGZ6lGspru2YwA_3RxAlucJ';
+  const $ = id => document.getElementById(id);
+  $('ideaForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const body = $('ideaBody').value.trim();
+    if (body.length < 3) { $('ideaErr').textContent = 'Tell us a little more first 🙂'; return; }
+    $('ideaErr').textContent = '';
+    try {
+      const r = await fetch(U + '/rest/v1/pt_feedback', {
+        method: 'POST',
+        headers: { apikey: K, Authorization: 'Bearer ' + K, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ author: $('ideaName').value.trim() || null, body }),
+      });
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      $('ideaForm').style.display = 'none';
+      $('ideaSent').style.display = 'block';
+    } catch (err) {
+      $('ideaErr').textContent = "Couldn't send — check your signal and try again.";
+    }
+  });
+  $('ideaAgain').onclick = () => {
+    $('ideaBody').value = '';
+    $('ideaSent').style.display = 'none';
+    $('ideaForm').style.display = 'block';
+  };
+</script>
+</body>
+</html>
