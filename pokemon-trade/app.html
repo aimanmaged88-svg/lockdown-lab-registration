@@ -127,6 +127,59 @@
   .chatrow input { flex: 1; }
   .chatrow .btn { width: auto; }
 
+  /* ---- pokédex ---- */
+  .dexdevice { background: linear-gradient(160deg, #e3350d, #b1250b); border-radius: 18px;
+    padding: 14px; margin-bottom: 14px; box-shadow: 0 10px 30px rgba(227,53,13,.25); }
+  .dexlens { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .dexlens .glass { width: 34px; height: 34px; border-radius: 50%; flex: none;
+    background: radial-gradient(circle at 35% 35%, #bfe8ff, #3d7dff 60%, #1b3d99);
+    border: 3px solid #fff; box-shadow: 0 0 12px #3d7dffaa; }
+  .dexlens .dots { display: flex; gap: 6px; }
+  .dexlens .dots i { width: 8px; height: 8px; border-radius: 50%; display: block; }
+  .dexlens .dots i:nth-child(1){ background:#ff5959; } .dexlens .dots i:nth-child(2){ background:#ffe45c; }
+  .dexlens .dots i:nth-child(3){ background:#59ff7a; }
+  .dexlens .dexname { color: #fff; font-weight: 800; letter-spacing: 1px; margin-left: auto; font-size: 13px; }
+  .dexdevice input { border: 0; }
+  .dexgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 10px; }
+  .dexcell { background: var(--panel); border: 1px solid var(--panel-2); border-radius: 14px;
+    padding: 8px 6px 10px; text-align: center; cursor: pointer; }
+  .dexcell img { width: 68px; height: 68px; image-rendering: auto; }
+  .dexcell .no { font-size: 10px; color: var(--muted); }
+  .dexcell .nm { font-size: 12px; font-weight: 700; text-transform: capitalize; }
+  .typechip { display: inline-block; font-size: 11px; font-weight: 700; color: #fff;
+    padding: 3px 10px; border-radius: 999px; text-transform: capitalize; margin: 2px 3px 2px 0; }
+  .statrow { display: flex; align-items: center; gap: 8px; margin: 5px 0; font-size: 12px; }
+  .statrow .sn { width: 70px; color: var(--muted); text-transform: capitalize; flex: none; }
+  .statrow .bar { flex: 1; height: 8px; background: var(--panel-2); border-radius: 99px; overflow: hidden; }
+  .statrow .bar i { display: block; height: 100%; background: var(--accent); border-radius: 99px; }
+  .statrow .sv { width: 30px; text-align: right; font-weight: 700; }
+  #dexDetailBody { overflow-y: auto; }
+  .dexhero { text-align: center; }
+  .dexhero img { width: 150px; height: 150px; }
+  .dexhero .nm { font-size: 22px; font-weight: 800; text-transform: capitalize; }
+  .dexhero .no { color: var(--muted); font-size: 13px; }
+
+  /* ---- pokéball spinner ---- */
+  .pokespin { width: 44px; height: 44px; margin: 30px auto; border-radius: 50%;
+    background: linear-gradient(#ee1515 0 46%, #1a1a1a 46% 54%, #fff 54% 100%);
+    border: 3px solid #1a1a1a; position: relative; animation: spin 1s linear infinite; }
+  .pokespin::after { content: ""; position: absolute; inset: 0; margin: auto; width: 12px; height: 12px;
+    background: #fff; border: 3px solid #1a1a1a; border-radius: 50%; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ---- guided tour ---- */
+  .tour { position: fixed; inset: 0; background: #000c; z-index: 950;
+    display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .tourcard { background: var(--bg); border: 2px solid var(--accent); border-radius: 20px;
+    max-width: 380px; width: 100%; padding: 24px 22px; text-align: center;
+    box-shadow: 0 0 60px rgba(255,203,5,.15); }
+  .tourcard .big { font-size: 44px; margin-bottom: 8px; }
+  .tourcard h3 { margin: 0 0 8px; font-size: 20px; }
+  .tourcard p { color: var(--muted); font-size: 14px; margin: 0 0 18px; line-height: 1.6; }
+  .tourdots { display: flex; gap: 6px; justify-content: center; margin-bottom: 16px; }
+  .tourdots i { width: 8px; height: 8px; border-radius: 50%; background: var(--panel-2); }
+  .tourdots i.on { background: var(--accent); }
+
   /* ---- tabs ---- */
   .tabbar { position: fixed; left: 0; right: 0; bottom: 0; display: flex; z-index: 800;
     border-top: 1px solid var(--panel-2); background: #10132bee; backdrop-filter: blur(8px);
@@ -212,6 +265,18 @@
         <div id="tradeList"></div>
       </div>
 
+      <!-- POKÉDEX TAB -->
+      <div data-screen="dex" class="hidden">
+        <div class="dexdevice">
+          <div class="dexlens"><span class="glass"></span>
+            <span class="dots"><i></i><i></i><i></i></span>
+            <span class="dexname">POKÉDEX · KANTO 151</span></div>
+          <input type="text" id="dexSearch" placeholder="Search Pokémon…" />
+        </div>
+        <div id="dexStatus"></div>
+        <div class="dexgrid" id="dexGrid"></div>
+      </div>
+
       <!-- PROFILE TAB -->
       <div data-screen="profile" class="hidden">
         <h2 class="title">Profile</h2>
@@ -240,8 +305,29 @@
   <nav class="tabbar hidden" id="tabbar"><div class="inner">
     <button class="tab active" data-tab="map"><span class="ico">🗺️</span>Map</button>
     <button class="tab" data-tab="trades"><span class="ico">🔁</span>Trades<span class="badge hidden" id="tradeBadge"></span></button>
+    <button class="tab" data-tab="dex"><span class="ico">📕</span>Pokédex</button>
     <button class="tab" data-tab="profile"><span class="ico">👤</span>Profile</button>
   </div></nav>
+
+  <!-- pokédex detail sheet -->
+  <div class="modal hidden" id="dexModal">
+    <div class="sheet">
+      <button class="x" onclick="document.getElementById('dexModal').classList.add('hidden')">✕</button>
+      <div id="dexDetailBody"><div class="pokespin"></div></div>
+    </div>
+  </div>
+
+  <!-- guided tour -->
+  <div class="tour hidden" id="tour">
+    <div class="tourcard">
+      <div class="big" id="tourEmoji">👋</div>
+      <h3 id="tourTitle"></h3>
+      <p id="tourText"></p>
+      <div class="tourdots" id="tourDots"></div>
+      <button class="btn" id="tourNext">Next</button>
+      <button class="btn ghost" id="tourSkip" style="margin-top:8px">Skip tour</button>
+    </div>
+  </div>
 
   <!-- propose-trade sheet -->
   <div class="modal hidden" id="proposeModal">
@@ -325,6 +411,7 @@
       await refreshTrades();
       clearInterval(tradeTimer);
       if (!demo) tradeTimer = setInterval(refreshTrades, 15000);
+      startTour();
     }
 
     // ---------- auth ----------
@@ -631,6 +718,120 @@
       if (!error) { Object.assign(me, upd); $('pfErr').textContent = ''; fillProfileForm(); refreshMap(); }
     };
 
+    // ---------- pokédex ----------
+    const TYPE_COLORS = { normal:'#A8A878', fire:'#F08030', water:'#6890F0', electric:'#F8D030',
+      grass:'#78C850', ice:'#98D8D8', fighting:'#C03028', poison:'#A040A0', ground:'#E0C068',
+      flying:'#A890F0', psychic:'#F85888', bug:'#A8B820', rock:'#B8A038', ghost:'#705898',
+      dragon:'#7038F8', dark:'#705848', steel:'#B8B8D0', fairy:'#EE99AC' };
+    const SPRITE = id => `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`;
+    const ART = id => `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${id}.png`;
+    let dexList = null;
+
+    async function initDex() {
+      if (dexList) return;
+      $('dexStatus').innerHTML = '<div class="pokespin"></div>';
+      try {
+        const r = await fetch('https://pokeapi.co/api/v2/pokemon?limit=151');
+        if (!r.ok) throw new Error('PokéAPI ' + r.status);
+        dexList = (await r.json()).results.map((p, i) => ({ id: i + 1, name: p.name }));
+        $('dexStatus').innerHTML = '';
+        renderDex();
+      } catch (e) {
+        $('dexStatus').innerHTML = `<div class="empty">Couldn't reach the Pokédex network 📡<br>
+          <button class="btn small" style="margin-top:10px" onclick="window.retryDex()">Try again</button></div>`;
+      }
+    }
+    window.retryDex = () => { dexList = null; initDex(); };
+    function renderDex() {
+      const q = $('dexSearch').value.trim().toLowerCase();
+      const grid = $('dexGrid'); grid.innerHTML = '';
+      if (!dexList) return;
+      for (const p of dexList) {
+        if (q && !p.name.includes(q) && String(p.id) !== q) continue;
+        const c = document.createElement('div'); c.className = 'dexcell';
+        c.innerHTML = `<img loading="lazy" src="${SPRITE(p.id)}" alt="${p.name}" />
+          <div class="no">#${String(p.id).padStart(3, '0')}</div><div class="nm">${p.name}</div>`;
+        c.onclick = () => openDexDetail(p);
+        grid.appendChild(c);
+      }
+      if (!grid.children.length)
+        grid.innerHTML = '<div class="empty" style="grid-column:1/-1">No Pokémon match — try another name.</div>';
+    }
+    $('dexSearch').addEventListener('input', renderDex);
+
+    async function openDexDetail(p) {
+      show('dexModal');
+      const body = $('dexDetailBody');
+      body.innerHTML = '<div class="pokespin"></div>';
+      try {
+        const d = await (await fetch('https://pokeapi.co/api/v2/pokemon/' + p.id)).json();
+        const nice = p.name[0].toUpperCase() + p.name.slice(1);
+        body.innerHTML = `
+          <div class="dexhero">
+            <img src="${ART(p.id)}" alt="${p.name}" />
+            <div class="no">#${String(p.id).padStart(3, '0')}</div>
+            <div class="nm">${p.name}</div>
+            <div>${d.types.map(t => `<span class="typechip" style="background:${TYPE_COLORS[t.type.name] || '#777'}">${t.type.name}</span>`).join('')}</div>
+            <p class="muted" style="font-size:12px">height ${d.height / 10} m · weight ${d.weight / 10} kg</p>
+          </div>
+          <div>${d.stats.map(s => `
+            <div class="statrow"><span class="sn">${s.stat.name.replace('special-', 'sp. ')}</span>
+              <span class="bar"><i style="width:${Math.min(100, s.base_stat / 1.6)}%"></i></span>
+              <span class="sv">${s.base_stat}</span></div>`).join('')}</div>
+          <div class="actions" style="margin-top:12px">
+            <button class="btn" id="dexAddOffer">➕ I'll offer ${nice}</button>
+            <button class="btn ghost" id="dexAddWant">🎯 I want ${nice}</button>
+          </div>`;
+        $('dexAddOffer').onclick = () => addToProfile('offering', nice);
+        $('dexAddWant').onclick = () => addToProfile('wanting', nice);
+      } catch (e) {
+        body.innerHTML = '<div class="empty">Couldn\'t load this Pokémon — check your signal 📡</div>';
+      }
+    }
+    async function addToProfile(kind, name) {
+      if (demo) { alert('Demo mode — sign in to build your trade list!'); return; }
+      const list = [...(me[kind] || [])];
+      if (list.includes(name)) { show('dexModal', false); switchTab('profile'); return; }
+      list.push(name);
+      const { error } = await sb.from('pt_profiles').update({ [kind]: list.slice(0, 12) }).eq('id', me.id);
+      if (error) { alert(error.message); return; }
+      me[kind] = list.slice(0, 12);
+      show('dexModal', false);
+      switchTab('profile');
+    }
+
+    // ---------- guided tour ----------
+    const TOUR = [
+      { e: '👋', t: 'Welcome to PokéTrade!', x: 'Quick tour of what happens on each page — 20 seconds, promise.' },
+      { e: '🗺️', t: 'The Map', x: 'Trainers near you — including our resident Gym Leaders like Ash, Misty and Brock. Tap <b>Trade</b> on anyone to propose a swap. Locations are approximate areas, never exact spots.' },
+      { e: '🔁', t: 'Trades', x: 'Your proposals live here. Gym Leaders answer <b>within a minute</b> — when a trade is accepted, a chat opens to arrange the meetup. Try it!' },
+      { e: '📕', t: 'The Pokédex', x: 'The classic Kanto 151, live from the Pokédex network. Tap any Pokémon for its stats — then add it to your <b>offers</b> or your <b>wants</b> in one tap.' },
+      { e: '👤', t: 'Your trainer card', x: 'Edit what you offer, what you\'re hunting for, and whether you appear on the map. You\'re in control — sharing off means invisible.' },
+    ];
+    let tourStep = 0;
+    function startTour() {
+      if (localStorage.getItem('pt_tour_v1')) return;
+      tourStep = 0; renderTour(); show('tour');
+    }
+    function renderTour() {
+      const s = TOUR[tourStep];
+      $('tourEmoji').textContent = s.e; $('tourTitle').textContent = s.t;
+      $('tourText').innerHTML = s.x;
+      $('tourDots').innerHTML = TOUR.map((_, i) => `<i class="${i === tourStep ? 'on' : ''}"></i>`).join('');
+      $('tourNext').textContent = tourStep === TOUR.length - 1 ? "Let's go! 🚀" : 'Next';
+      const tab = ['map', 'map', 'trades', 'dex', 'profile'][tourStep];
+      switchTab(tab);
+    }
+    $('tourNext').onclick = () => {
+      if (tourStep >= TOUR.length - 1) { endTour(); return; }
+      tourStep++; renderTour();
+    };
+    $('tourSkip').onclick = endTour;
+    function endTour() {
+      localStorage.setItem('pt_tour_v1', 'done');
+      show('tour', false); switchTab('map');
+    }
+
     // ---------- tabs ----------
     function switchTab(name) {
       document.querySelectorAll('.tab').forEach(b =>
@@ -639,6 +840,7 @@
         s.classList.toggle('hidden', s.dataset.screen !== name));
       if (name === 'map') { initMap(); refreshMap(); }
       if (name === 'trades') refreshTrades();
+      if (name === 'dex') initDex();
       if (name === 'profile') fillProfileForm();
     }
     document.querySelectorAll('.tab').forEach(b => b.onclick = () => switchTab(b.dataset.tab));
