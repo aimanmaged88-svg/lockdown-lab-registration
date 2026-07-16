@@ -1,38 +1,46 @@
-# PokéTrade — skeleton
+# PokéTrade
 
-A lightweight skeleton for a Pokémon trading app that shows nearby trainers on a
-map and lets you propose trades. **No frameworks, no build step, no external
-libraries or network calls** — just open the files in a browser.
+A location-aware Pokémon trading app: see trainers near you on a map, see what
+they're offering, propose trades, and chat — running live on Supabase.
 
 ## Files
 
 | File | What it is |
 |------|-----------|
-| `index.html` | **Skeleton website** — hero, a map of nearby trainers, and a trade board. |
-| `app.html`   | **Skeleton mobile app** — phone-framed UI with a bottom nav (Map / Trades / Profile). |
-| `data.js`    | **Sample data** — the trainers, their locations, and what they offer/want. Shared by both. |
+| `index.html` | Marketing/landing page. |
+| `app.html`   | **The app** — email-code sign-in, live map (Leaflet/OSM), trade proposals, chat, profile. Mobile-first, works from a link. |
+| `brief.html` | Shareable project & security brief. |
+| `data.js`    | Sample trainers used by the landing page and the app's signed-out demo mode. |
 
-## Try it
+## Backend
 
-Open `pokemon-trade/index.html` (or `app.html`) directly in a browser. Everything
-runs client-side.
+Supabase project `lockdown-lab` (`ymuwuhvqqftgpxwhzoub`) — the same project that
+runs the registration site. PokéTrade tables are namespaced with a `pt_` prefix:
 
-## What's fake (on purpose)
+- **`pt_profiles`** — trainer profile (username, emoji, offering/wanting lists,
+  approximate location). A `security definer` trigger snaps any coordinates to a
+  ~500 m grid and nulls them when `share_location` is off, so exact coordinates
+  are never stored even if a client sends them. The client also rounds before
+  sending, so exact coordinates never leave the phone.
+- **`pt_trades`** — proposals with a status machine (`proposed → accepted/declined/
+  cancelled → completed/cancelled`). A trigger freezes trade terms after creation
+  and enforces who may make each transition (only the receiver can accept, etc.).
+- **`pt_messages`** — chat per trade, only while the trade is open.
 
-This is a skeleton, so the heavy parts are stubbed:
+**RLS on everything** (verified by test):
+- signed-out (anon key): sees zero rows in all three tables
+- signed-in: can browse profiles; sees **only their own** trades and messages
+- impersonating another proposer, self-accepting, or rewriting trade terms: blocked
 
-- **The map** is drawn with plain CSS/SVG and percentage coordinates — no map
-  tiles, no location library. Swap in Leaflet/Mapbox + real `lat/lng` when ready.
-- **Locations & trainers** are static sample data in `data.js`.
-- **No accounts, no backend.** "Propose trade" / "Trade" buttons just show an alert.
+Auth is Supabase email OTP (6-digit code, no passwords). The browser holds only
+the publishable key; RLS does the protecting.
 
-## Where to plug in real pieces later
+## Notes
 
-1. **Real location** — `navigator.geolocation.getCurrentPosition(...)` for the
-   user, a map library for tiles, and real coordinates on each trainer.
-2. **Real data** — replace `data.js` with a `fetch()` to your API. (This repo
-   already uses Supabase for the existing site — an easy backend to reuse.)
-3. **Trading & chat** — wire the buttons to create trade requests and message threads.
-4. **Accounts** — sign-in so trainers have profiles and a trade history.
+- Map tiles: OpenStreetMap. supabase-js and Leaflet load from CDN.
+- Realtime is light polling (chat 4 s, trades 15 s) — can be upgraded to
+  Supabase Realtime channels later.
+- Not yet built: ratings, report/block, push notifications, custom SMTP for
+  higher OTP email limits.
 
-Not affiliated with Nintendo / The Pokémon Company. Sample only.
+Fan project — not affiliated with Nintendo / The Pokémon Company / Niantic.

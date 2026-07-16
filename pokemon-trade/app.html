@@ -5,25 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="theme-color" content="#0f1226" />
 <title>PokéTrade</title>
+<link rel="stylesheet" href="vendor/leaflet.css" />
 <style>
   :root {
     --bg: #0f1226; --panel: #181c3a; --panel-2: #21264d; --ink: #eef0ff;
     --muted: #9aa0cf; --accent: #ffcb05; --accent-2: #3d7dff; --danger: #ee1515;
+    --ok: #2ecc71;
   }
   * { box-sizing: border-box; }
   html, body { height: 100%; }
-  body { margin: 0;
-    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-    background: var(--bg); color: var(--ink);
-    display: flex; flex-direction: column; min-height: 100dvh; }
-
-  /* On large screens, keep a comfortable app-like column */
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg); color: var(--ink); display: flex; flex-direction: column; min-height: 100dvh; }
   .app { flex: 1; display: flex; flex-direction: column; width: 100%;
     max-width: 560px; margin: 0 auto; min-height: 100dvh; }
 
   .appbar { padding: calc(env(safe-area-inset-top, 0px) + 14px) 18px 10px;
     display: flex; align-items: center; justify-content: space-between;
-    position: sticky; top: 0; background: var(--bg); z-index: 10; }
+    position: sticky; top: 0; background: var(--bg); z-index: 500; }
   .appbar .brand { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 17px; }
   .poke { width: 20px; height: 20px; border-radius: 50%;
     background: linear-gradient(var(--danger) 0 50%, #fff 50% 100%);
@@ -32,24 +30,51 @@
     background: #fff; border: 2px solid #1a1a1a; border-radius: 50%; }
   .appbar .status { font-size: 12px; color: var(--muted); }
 
-  .screen { flex: 1; overflow-y: auto; padding: 4px 16px 90px; -webkit-overflow-scrolling: touch; }
+  .screen { flex: 1; padding: 4px 16px 96px; }
   h2.title { font-size: 20px; margin: 6px 2px 12px; }
+  .hidden { display: none !important; }
+  .muted { color: var(--muted); }
 
-  /* ---- Map ---- */
-  .map { position: relative; height: min(46vh, 340px); border-radius: 18px; overflow: hidden;
-    background:
-      linear-gradient(rgba(61,125,255,.06) 1px, transparent 1px) 0 0/24px 24px,
-      linear-gradient(90deg, rgba(61,125,255,.06) 1px, transparent 1px) 0 0/24px 24px,
-      radial-gradient(400px 200px at 40% 30%, rgba(61,125,255,.18), transparent 60%),
-      var(--panel-2); border: 1px solid var(--panel-2); margin-bottom: 14px; }
-  .pin { position: absolute; transform: translate(-50%, -100%); cursor: pointer; text-align: center; }
-  .pin .dot { width: 14px; height: 14px; border-radius: 50% 50% 50% 0; background: var(--accent);
-    transform: rotate(-45deg); margin: 0 auto; border: 2px solid #1a1a1a; }
-  .pin.me .dot { background: var(--accent-2); }
-  .pin .tag { font-size: 10px; margin-top: 5px; background: #000a; padding: 1px 5px; border-radius: 5px;
-    white-space: nowrap; }
+  .banner { background: #2a2f66; border: 1px solid var(--panel-2); border-radius: 12px;
+    padding: 10px 14px; font-size: 13px; color: var(--muted); margin-bottom: 12px; }
+  .banner b { color: var(--ink); }
 
-  /* ---- Lists ---- */
+  /* ---- forms ---- */
+  .field { margin-bottom: 12px; }
+  .field label { display: block; font-size: 12px; color: var(--muted); margin-bottom: 5px; }
+  input[type=text], input[type=email], input[type=tel] {
+    width: 100%; padding: 13px 14px; border-radius: 12px; border: 1px solid var(--panel-2);
+    background: var(--panel); color: var(--ink); font-size: 16px; outline: none; }
+  input:focus { border-color: var(--accent-2); }
+  .btn { display: inline-block; width: 100%; background: var(--accent); color: #1a1a1a;
+    font-weight: 800; padding: 14px 18px; border-radius: 999px; border: 0; cursor: pointer;
+    font-size: 15px; text-align: center; }
+  .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--panel-2); }
+  .btn.small { width: auto; padding: 9px 16px; font-size: 13px; }
+  .btn:disabled { opacity: .5; }
+  .err { color: #ff8080; font-size: 13px; min-height: 18px; margin: 8px 2px; }
+  .switch { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    background: var(--panel); border: 1px solid var(--panel-2); border-radius: 12px;
+    padding: 12px 14px; margin-bottom: 12px; }
+  .switch .k { font-weight: 600; font-size: 14px; }
+  .switch .sub { font-size: 12px; color: var(--muted); }
+  .switch input { width: 22px; height: 22px; accent-color: var(--accent); }
+
+  /* ---- auth ---- */
+  .authwrap { padding-top: 8vh; text-align: center; }
+  .authwrap .logo { font-size: 52px; }
+  .authwrap h1 { font-size: 26px; margin: 8px 0 4px; }
+  .authwrap p { color: var(--muted); margin: 0 0 26px; }
+  .authcard { text-align: left; background: var(--panel); border: 1px solid var(--panel-2);
+    border-radius: 16px; padding: 18px; }
+
+  /* ---- map ---- */
+  #map { height: min(44vh, 330px); border-radius: 18px; border: 1px solid var(--panel-2);
+    margin-bottom: 14px; background: var(--panel-2); z-index: 1; }
+  .emoji-pin { font-size: 22px; text-shadow: 0 1px 4px #000; }
+  .emoji-pin.me { filter: drop-shadow(0 0 6px var(--accent-2)); }
+
+  /* ---- lists ---- */
   .list .item { display: flex; align-items: center; gap: 12px; padding: 12px; background: var(--panel);
     border: 1px solid var(--panel-2); border-radius: 14px; margin-bottom: 10px; }
   .avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--panel-2);
@@ -59,25 +84,51 @@
   .item .desc { font-size: 12px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .item .go { background: var(--accent); color: #1a1a1a; border: 0; font-weight: 800;
     border-radius: 999px; padding: 10px 16px; font-size: 13px; cursor: pointer; flex: none; }
+  .empty { text-align: center; color: var(--muted); padding: 28px 16px; font-size: 14px;
+    background: var(--panel); border: 1px dashed var(--panel-2); border-radius: 14px; }
 
-  /* ---- Profile ---- */
-  .profile { text-align: center; padding-top: 12px; }
-  .profile .big { width: 84px; height: 84px; border-radius: 50%; background: var(--panel-2);
+  .pill { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 9px;
+    border-radius: 999px; background: var(--panel-2); color: var(--muted); }
+  .pill.proposed { color: var(--accent); }
+  .pill.accepted { color: var(--ok); }
+  .pill.completed { color: var(--accent-2); }
+  .pill.declined, .pill.cancelled { color: #ff8080; }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .actions .btn { width: auto; padding: 8px 14px; font-size: 12px; }
+  .tradecard { background: var(--panel); border: 1px solid var(--panel-2); border-radius: 14px;
+    padding: 13px 14px; margin-bottom: 10px; }
+  .tradecard .row1 { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+  .tradecard .swap { margin: 6px 0 2px; font-size: 14px; }
+  .tradecard .swap b { color: var(--accent); }
+
+  /* ---- profile ---- */
+  .profile { padding-top: 6px; }
+  .bigemoji { width: 84px; height: 84px; border-radius: 50%; background: var(--panel-2);
     display: grid; place-items: center; font-size: 40px; margin: 0 auto 10px; }
-  .stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin: 18px 0; }
-  .stat { background: var(--panel); border: 1px solid var(--panel-2); border-radius: 14px; padding: 12px 6px; }
-  .stat b { display: block; font-size: 20px; }
-  .stat span { font-size: 11px; color: var(--muted); }
-  .field { text-align: left; background: var(--panel); border: 1px solid var(--panel-2);
-    border-radius: 12px; padding: 10px 14px; margin-bottom: 10px; }
-  .field .k { font-size: 11px; color: var(--muted); }
-  .field .v { font-weight: 600; }
-  .back { display: inline-block; margin: 16px 0 0; color: var(--muted); font-size: 13px; text-decoration: none; }
 
-  .hidden { display: none; }
+  /* ---- modal ---- */
+  .modal { position: fixed; inset: 0; background: #000a; z-index: 900;
+    display: flex; align-items: flex-end; justify-content: center; }
+  .sheet { background: var(--bg); border: 1px solid var(--panel-2); border-bottom: 0;
+    border-radius: 20px 20px 0 0; width: 100%; max-width: 560px; max-height: 86dvh;
+    padding: 18px 18px calc(env(safe-area-inset-bottom, 0px) + 18px);
+    display: flex; flex-direction: column; }
+  .sheet h3 { margin: 0 0 12px; font-size: 18px; }
+  .sheet .x { position: absolute; right: 16px; margin-top: -4px; background: none; border: 0;
+    color: var(--muted); font-size: 22px; cursor: pointer; }
 
-  /* ---- Bottom nav (fixed, thumb-reachable) ---- */
-  .tabbar { position: fixed; left: 0; right: 0; bottom: 0; display: flex; z-index: 20;
+  /* ---- chat ---- */
+  #chatLog { flex: 1; overflow-y: auto; min-height: 180px; max-height: 46dvh; margin-bottom: 10px; }
+  .msg { max-width: 78%; padding: 9px 13px; border-radius: 14px; margin: 5px 0; font-size: 14px;
+    background: var(--panel); border: 1px solid var(--panel-2); width: fit-content; }
+  .msg.mine { background: #223a7a; margin-left: auto; }
+  .msg .t { display: block; font-size: 10px; color: var(--muted); margin-top: 3px; }
+  .chatrow { display: flex; gap: 8px; }
+  .chatrow input { flex: 1; }
+  .chatrow .btn { width: auto; }
+
+  /* ---- tabs ---- */
+  .tabbar { position: fixed; left: 0; right: 0; bottom: 0; display: flex; z-index: 800;
     border-top: 1px solid var(--panel-2); background: #10132bee; backdrop-filter: blur(8px);
     padding-bottom: env(safe-area-inset-bottom, 0px); }
   .tabbar .inner { display: flex; width: 100%; max-width: 560px; margin: 0 auto; }
@@ -85,96 +136,496 @@
     font-size: 11px; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; }
   .tab .ico { font-size: 20px; }
   .tab.active { color: var(--accent); }
+  .tab .badge { position: absolute; margin-left: 26px; background: var(--danger); color: #fff;
+    border-radius: 999px; font-size: 10px; font-weight: 800; padding: 1px 6px; }
 </style>
 </head>
 <body>
   <div class="app">
     <div class="appbar">
       <div class="brand"><span class="poke"></span> PokéTrade</div>
-      <div class="status" id="status">📍 Locating…</div>
+      <div class="status" id="status"></div>
     </div>
 
-    <div class="screen">
+    <!-- ============ AUTH ============ -->
+    <div class="screen authwrap" id="view-auth">
+      <div class="logo">🗺️</div>
+      <h1>Trainers near you</h1>
+      <p>Sign in to see who's trading around you.</p>
+      <div class="authcard">
+        <div id="auth-step-email">
+          <div class="field"><label>Email</label>
+            <input type="email" id="authEmail" placeholder="you@example.com" autocomplete="email" /></div>
+          <button class="btn" id="btnSendCode">Send me a sign-in code</button>
+        </div>
+        <div id="auth-step-code" class="hidden">
+          <div class="field"><label>Enter the 6-digit code we emailed you</label>
+            <input type="tel" id="authCode" placeholder="123456" maxlength="6" autocomplete="one-time-code" /></div>
+          <button class="btn" id="btnVerifyCode">Verify &amp; sign in</button>
+          <button class="btn ghost" id="btnBackEmail" style="margin-top:8px">Use a different email</button>
+        </div>
+        <div class="err" id="authErr"></div>
+      </div>
+      <p style="margin-top:18px"><button class="btn ghost" id="btnDemo">👀 Just looking? Try the demo</button></p>
+      <p class="muted" style="font-size:12px">No password. No exact location ever stored.
+        <a href="brief.html" style="color:var(--accent-2)">How it works &amp; security</a></p>
+    </div>
+
+    <!-- ============ ONBOARDING ============ -->
+    <div class="screen hidden" id="view-onboard">
+      <h2 class="title">Set up your trainer profile</h2>
+      <div class="field"><label>Trainer name (public)</label>
+        <input type="text" id="obName" maxlength="24" placeholder="AshK" /></div>
+      <div class="field"><label>Avatar emoji</label>
+        <input type="text" id="obEmoji" maxlength="4" value="🧢" /></div>
+      <div class="field"><label>Pokémon you're offering (comma-separated)</label>
+        <input type="text" id="obOffering" placeholder="Pikachu, Pidgey" /></div>
+      <div class="field"><label>Pokémon you want</label>
+        <input type="text" id="obWanting" placeholder="Squirtle, Ditto" /></div>
+      <div class="switch">
+        <div><div class="k">Show me on the map</div>
+          <div class="sub">Approximate area only (~500 m) — never your exact spot</div></div>
+        <input type="checkbox" id="obShare" checked />
+      </div>
+      <button class="btn" id="btnSaveOnboard">Start trading</button>
+      <div class="err" id="obErr"></div>
+    </div>
+
+    <!-- ============ MAIN ============ -->
+    <div class="screen hidden" id="view-main">
+      <div id="demoBanner" class="banner hidden"><b>Demo mode.</b> Sample trainers &amp; trades —
+        <a href="app.html" style="color:var(--accent)">sign in</a> to go live.</div>
+
       <!-- MAP TAB -->
       <div data-screen="map">
         <h2 class="title">Trainers near you</h2>
-        <div class="map" id="mapArea"></div>
+        <div id="map"></div>
         <div class="list" id="nearList"></div>
       </div>
 
       <!-- TRADES TAB -->
       <div data-screen="trades" class="hidden">
-        <h2 class="title">Open trades</h2>
-        <div class="list" id="tradeList"></div>
+        <h2 class="title">Your trades</h2>
+        <div id="tradeList"></div>
       </div>
 
       <!-- PROFILE TAB -->
       <div data-screen="profile" class="hidden">
         <h2 class="title">Profile</h2>
         <div class="profile">
-          <div class="big">🧑‍🚀</div>
-          <div style="font-weight:800; font-size:18px;">You</div>
-          <div style="color:var(--muted); font-size:13px;">Trainer since 2026</div>
-          <div class="stats">
-            <div class="stat"><b>12</b><span>Trades</span></div>
-            <div class="stat"><b>34</b><span>Caught</span></div>
-            <div class="stat"><b>4.9★</b><span>Rating</span></div>
+          <div class="bigemoji" id="pfBigEmoji">🧢</div>
+          <div class="field"><label>Trainer name</label><input type="text" id="pfName" maxlength="24" /></div>
+          <div class="field"><label>Avatar emoji</label><input type="text" id="pfEmoji" maxlength="4" /></div>
+          <div class="field"><label>Offering (comma-separated)</label><input type="text" id="pfOffering" /></div>
+          <div class="field"><label>Wanting</label><input type="text" id="pfWanting" /></div>
+          <div class="switch">
+            <div><div class="k">Show me on the map</div>
+              <div class="sub">Approximate area only (~500 m)</div></div>
+            <input type="checkbox" id="pfShare" />
           </div>
-          <div class="field"><div class="k">Sharing location</div><div class="v">On · approximate</div></div>
-          <div class="field"><div class="k">Looking for</div><div class="v">Squirtle, Ditto</div></div>
-          <div class="field"><div class="k">Offering</div><div class="v">Charmander, Pidgey ×3</div></div>
+          <button class="btn" id="btnSaveProfile">Save changes</button>
+          <div class="err" id="pfErr"></div>
+          <button class="btn ghost" id="btnSignOut" style="margin-top:6px">Sign out</button>
+          <p class="muted" style="font-size:12px; text-align:center; margin-top:14px">
+            <a href="brief.html" style="color:var(--accent-2)">About PokéTrade &amp; security</a></p>
         </div>
-        <a class="back" href="index.html">← About PokéTrade</a>
       </div>
     </div>
   </div>
 
-  <nav class="tabbar"><div class="inner">
+  <!-- tab bar -->
+  <nav class="tabbar hidden" id="tabbar"><div class="inner">
     <button class="tab active" data-tab="map"><span class="ico">🗺️</span>Map</button>
-    <button class="tab" data-tab="trades"><span class="ico">🔁</span>Trades</button>
+    <button class="tab" data-tab="trades"><span class="ico">🔁</span>Trades<span class="badge hidden" id="tradeBadge"></span></button>
     <button class="tab" data-tab="profile"><span class="ico">👤</span>Profile</button>
   </div></nav>
 
+  <!-- propose-trade sheet -->
+  <div class="modal hidden" id="proposeModal">
+    <div class="sheet">
+      <button class="x" onclick="document.getElementById('proposeModal').classList.add('hidden')">✕</button>
+      <h3 id="proposeTitle">Propose a trade</h3>
+      <div class="field"><label>You give</label><input type="text" id="prOffer" maxlength="120" placeholder="Pikachu" /></div>
+      <div class="field"><label>You get</label><input type="text" id="prWant" maxlength="120" placeholder="Staryu" /></div>
+      <button class="btn" id="btnSendProposal">Send proposal</button>
+      <div class="err" id="prErr"></div>
+    </div>
+  </div>
+
+  <!-- chat sheet -->
+  <div class="modal hidden" id="chatModal">
+    <div class="sheet">
+      <button class="x" id="btnCloseChat">✕</button>
+      <h3 id="chatTitle">Chat</h3>
+      <div id="chatLog"></div>
+      <div class="chatrow">
+        <input type="text" id="chatInput" maxlength="1000" placeholder="Message…" />
+        <button class="btn" id="btnSendMsg">Send</button>
+      </div>
+      <div class="err" id="chatErr"></div>
+    </div>
+  </div>
+
+  <script src="vendor/leaflet.js"></script>
+  <script src="vendor/supabase.js"></script>
   <script src="data.js"></script>
-  <script>
-    // ---- Map pins + nearby list ----
-    const mapArea = document.getElementById('mapArea');
-    const nearList = document.getElementById('nearList');
-    const tradeList = document.getElementById('tradeList');
+  <script type="module">
+    const { createClient } = window.supabase;
 
-    TRAINERS.forEach(t => {
-      const pin = document.createElement('div');
-      pin.className = 'pin' + (t.me ? ' me' : '');
-      pin.style.left = t.x + '%';
-      pin.style.top = t.y + '%';
-      pin.innerHTML = `<div class="dot"></div><div class="tag">${t.me ? 'You' : t.name}</div>`;
-      mapArea.appendChild(pin);
+    // Publishable key — safe to expose; Row-Level Security does the protecting.
+    const SUPABASE_URL = 'https://ymuwuhvqqftgpxwhzoub.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_-j-P1TcLeGZ6lGspru2YwA_3RxAlucJ';
+    const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const $ = id => document.getElementById(id);
+    const show = (id, on = true) => $(id).classList.toggle('hidden', !on);
+
+    let me = null;          // my profile row
+    let demo = false;
+    let map, myMarker, markerLayer;
+    let chatTradeId = null, chatTimer = null, tradeTimer = null;
+
+    // ---------- routing ----------
+    async function route() {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { toAuth(); return; }
+      const { data: prof } = await sb.from('pt_profiles').select('*').eq('id', session.user.id).maybeSingle();
+      if (!prof) { toOnboard(session); return; }
+      me = prof;
+      toMain();
+    }
+    function swapView(name) {
+      ['view-auth','view-onboard','view-main'].forEach(v => show(v, v === name));
+      show('tabbar', name === 'view-main');
+    }
+    function toAuth() { swapView('view-auth'); $('status').textContent = ''; }
+    function toOnboard(session) {
+      swapView('view-onboard');
+      $('obName').value = (session.user.email || '').split('@')[0].slice(0, 24);
+    }
+    async function toMain() {
+      swapView('view-main');
+      $('status').textContent = demo ? '👀 demo' : '✅ ' + me.username;
+      show('demoBanner', demo);
+      initMap();
+      await refreshMap();
+      await refreshTrades();
+      clearInterval(tradeTimer);
+      if (!demo) tradeTimer = setInterval(refreshTrades, 15000);
+    }
+
+    // ---------- auth ----------
+    $('btnSendCode').onclick = async () => {
+      const email = $('authEmail').value.trim();
+      $('authErr').textContent = '';
+      if (!email.includes('@')) { $('authErr').textContent = 'Enter a valid email.'; return; }
+      $('btnSendCode').disabled = true;
+      const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
+      $('btnSendCode').disabled = false;
+      if (error) { $('authErr').textContent = error.message; return; }
+      show('auth-step-email', false); show('auth-step-code', true);
+      $('authCode').focus();
+    };
+    $('btnVerifyCode').onclick = async () => {
+      const email = $('authEmail').value.trim(), token = $('authCode').value.trim();
+      $('authErr').textContent = '';
+      $('btnVerifyCode').disabled = true;
+      const { error } = await sb.auth.verifyOtp({ email, token, type: 'email' });
+      $('btnVerifyCode').disabled = false;
+      if (error) { $('authErr').textContent = error.message; return; }
+      route();
+    };
+    $('btnBackEmail').onclick = () => { show('auth-step-code', false); show('auth-step-email', true); };
+    $('btnSignOut') && ($('btnSignOut').onclick = async () => {
+      clearInterval(tradeTimer);
+      await sb.auth.signOut(); me = null; demo = false; location.reload();
     });
 
-    TRAINERS.filter(t => !t.me).forEach(t => {
-      const row = (subtitle, action) => `
-        <div class="item">
-          <div class="avatar">${t.emoji}</div>
-          <div class="meta"><div class="name">${t.name}</div><div class="desc">${subtitle}</div></div>
-          <button class="go" onclick="alert('Skeleton: ${action} ${t.name}.')">Trade</button>
-        </div>`;
-      nearList.insertAdjacentHTML('beforeend', row(`${t.dist} away · offers ${t.offers}`, 'Open chat with'));
-      tradeList.insertAdjacentHTML('beforeend', row(`Offers ${t.offers} · wants ${t.wants}`, 'Propose trade to'));
-    });
+    // ---------- demo mode ----------
+    $('btnDemo').onclick = () => {
+      demo = true;
+      me = { id: 'demo-me', username: 'You', emoji: '🧑‍🚀', lat: -33.870, lng: 151.208,
+             offering: ['Charmander'], wanting: ['Squirtle'], share_location: true };
+      toMain();
+    };
+    const demoProfiles = () => TRAINERS.filter(t => !t.me).map((t, i) => ({
+      id: 'demo-' + i, username: t.name, emoji: t.emoji,
+      lat: -33.87 + (t.y - 55) * 0.0009, lng: 151.208 + (t.x - 50) * 0.0011,
+      offering: [t.offers], wanting: [t.wants], share_location: true,
+    }));
 
-    document.getElementById('status').textContent =
-      '📍 ' + TRAINERS.filter(t => !t.me).length + ' nearby';
+    // ---------- onboarding ----------
+    $('btnSaveOnboard').onclick = async () => {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session) { toAuth(); return; }
+      const row = {
+        id: session.user.id,
+        username: $('obName').value.trim(),
+        emoji: $('obEmoji').value.trim() || '🧢',
+        offering: csv($('obOffering').value), wanting: csv($('obWanting').value),
+        share_location: $('obShare').checked,
+      };
+      if (row.username.length < 2) { $('obErr').textContent = 'Pick a name (2+ characters).'; return; }
+      if (row.share_location) Object.assign(row, await getRoundedLocation());
+      $('btnSaveOnboard').disabled = true;
+      const { error } = await sb.from('pt_profiles').insert(row);
+      $('btnSaveOnboard').disabled = false;
+      if (error) {
+        $('obErr').textContent = error.code === '23505' ? 'That trainer name is taken.' : error.message;
+        return;
+      }
+      route();
+    };
+    const csv = s => s.split(',').map(x => x.trim()).filter(Boolean).slice(0, 12);
 
-    // ---- Tab switching ----
-    document.querySelectorAll('.tab').forEach(btn => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.tab').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const target = btn.dataset.tab;
-        document.querySelectorAll('[data-screen]').forEach(s =>
-          s.classList.toggle('hidden', s.dataset.screen !== target));
+    // Round client-side too, so exact coordinates never even leave the phone.
+    function getRoundedLocation() {
+      return new Promise(res => {
+        if (!navigator.geolocation) return res({});
+        navigator.geolocation.getCurrentPosition(
+          p => res({ lat: Math.round(p.coords.latitude / 0.005) * 0.005,
+                     lng: Math.round(p.coords.longitude / 0.005) * 0.005 }),
+          () => res({}), { timeout: 8000, maximumAge: 300000 });
       });
-    });
+    }
+
+    // ---------- map & nearby ----------
+    function initMap() {
+      if (map) { setTimeout(() => map.invalidateSize(), 60); return; }
+      map = L.map('map', { zoomControl: false });
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+        { attribution: '&copy; OpenStreetMap' }).addTo(map);
+      markerLayer = L.layerGroup().addTo(map);
+      map.setView([me?.lat ?? -33.87, me?.lng ?? 151.21], 13);
+      setTimeout(() => map.invalidateSize(), 60);
+    }
+    const pinIcon = (emoji, mine) => L.divIcon({
+      className: '', iconSize: [26, 26],
+      html: `<div class="emoji-pin${mine ? ' me' : ''}">${mine ? '🔵' : '📍'}${emoji}</div>` });
+
+    async function refreshMap() {
+      let others;
+      if (demo) { others = demoProfiles(); }
+      else {
+        const { data, error } = await sb.from('pt_profiles')
+          .select('id,username,emoji,lat,lng,offering,wanting,share_location')
+          .neq('id', me.id).eq('share_location', true).not('lat', 'is', null);
+        if (error) { console.error(error); return; }
+        others = data;
+        // keep my location fresh (if sharing)
+        if (me.share_location) {
+          const loc = await getRoundedLocation();
+          if (loc.lat && (loc.lat !== me.lat || loc.lng !== me.lng)) {
+            me.lat = loc.lat; me.lng = loc.lng;
+            await sb.from('pt_profiles').update({ lat: loc.lat, lng: loc.lng }).eq('id', me.id);
+          }
+        }
+      }
+      markerLayer.clearLayers();
+      if (me.lat != null) {
+        L.marker([me.lat, me.lng], { icon: pinIcon(me.emoji, true) })
+          .bindPopup('You (approximate)').addTo(markerLayer);
+        map.setView([me.lat, me.lng], 13);
+      }
+      const withDist = others.map(o => ({ ...o,
+        dist: (me.lat != null && o.lat != null) ? haversine(me.lat, me.lng, o.lat, o.lng) : null }))
+        .sort((a, b) => (a.dist ?? 9e9) - (b.dist ?? 9e9));
+      for (const o of withDist) {
+        if (o.lat == null) continue;
+        L.marker([o.lat, o.lng], { icon: pinIcon(o.emoji, false) })
+          .bindPopup(`<b>${esc(o.username)}</b><br>offers ${esc(o.offering.join(', ') || '—')}`)
+          .addTo(markerLayer);
+      }
+      $('status').textContent = (demo ? '👀 demo · ' : '✅ ') +
+        (demo ? '' : me.username + ' · ') + withDist.length + ' trainer' + (withDist.length === 1 ? '' : 's');
+      renderNearList(withDist);
+    }
+    function renderNearList(list) {
+      const el = $('nearList'); el.innerHTML = '';
+      if (!list.length) {
+        el.innerHTML = `<div class="empty">No trainers sharing their area yet.<br>
+          You're early — share this app to fill the map! 🚀</div>`;
+        return;
+      }
+      for (const o of list) {
+        const d = document.createElement('div'); d.className = 'item';
+        d.innerHTML = `
+          <div class="avatar">${esc(o.emoji)}</div>
+          <div class="meta"><div class="name">${esc(o.username)}</div>
+            <div class="desc">${o.dist != null ? fmtKm(o.dist) + ' away · ' : ''}offers ${esc(o.offering.join(', ') || '—')} · wants ${esc(o.wanting.join(', ') || '—')}</div></div>
+          <button class="go">Trade</button>`;
+        d.querySelector('.go').onclick = () => openPropose(o);
+        el.appendChild(d);
+      }
+    }
+    const haversine = (a1, o1, a2, o2) => {
+      const r = Math.PI / 180, R = 6371;
+      const dA = (a2 - a1) * r, dO = (o2 - o1) * r;
+      const h = Math.sin(dA/2)**2 + Math.cos(a1*r) * Math.cos(a2*r) * Math.sin(dO/2)**2;
+      return 2 * R * Math.asin(Math.sqrt(h));
+    };
+    const fmtKm = k => k < 1 ? Math.round(k * 1000) + ' m' : k.toFixed(1) + ' km';
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c =>
+      ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+
+    // ---------- propose ----------
+    let proposeTo = null;
+    function openPropose(o) {
+      if (demo) { alert('Demo mode — sign in to send real trade proposals!'); return; }
+      proposeTo = o;
+      $('proposeTitle').textContent = 'Trade with ' + o.username;
+      $('prOffer').value = (me.offering[0] || '');
+      $('prWant').value = (o.offering[0] || '');
+      $('prErr').textContent = '';
+      show('proposeModal');
+    }
+    $('btnSendProposal').onclick = async () => {
+      const offer = $('prOffer').value.trim(), want = $('prWant').value.trim();
+      if (!offer || !want) { $('prErr').textContent = 'Fill in both sides of the trade.'; return; }
+      $('btnSendProposal').disabled = true;
+      const { error } = await sb.from('pt_trades')
+        .insert({ proposer: me.id, receiver: proposeTo.id, offer, want });
+      $('btnSendProposal').disabled = false;
+      if (error) { $('prErr').textContent = error.message; return; }
+      show('proposeModal', false);
+      switchTab('trades');
+      refreshTrades();
+    };
+
+    // ---------- trades ----------
+    async function refreshTrades() {
+      const el = $('tradeList');
+      if (demo) {
+        el.innerHTML = `<div class="empty">Demo mode — trades live here.<br>
+          Propose one from the map to see the flow.</div>`;
+        return;
+      }
+      const { data, error } = await sb.from('pt_trades')
+        .select(`id, offer, want, status, created_at, proposer, receiver,
+                 p:pt_profiles!pt_trades_proposer_fkey(username,emoji),
+                 r:pt_profiles!pt_trades_receiver_fkey(username,emoji)`)
+        .order('created_at', { ascending: false }).limit(50);
+      if (error) { console.error(error); return; }
+      const open = data.filter(t => t.status === 'proposed' && t.receiver === me.id).length;
+      $('tradeBadge').textContent = open; show('tradeBadge', open > 0);
+      el.innerHTML = '';
+      if (!data.length) {
+        el.innerHTML = `<div class="empty">No trades yet. Find a trainer on the map<br>and hit <b>Trade</b>. 🤝</div>`;
+        return;
+      }
+      for (const t of data) {
+        const mineProposed = t.proposer === me.id;
+        const other = mineProposed ? t.r : t.p;
+        const card = document.createElement('div'); card.className = 'tradecard';
+        card.innerHTML = `
+          <div class="row1">
+            <div class="name">${esc(other?.emoji || '❓')} ${esc(other?.username || 'unknown')}</div>
+            <span class="pill ${t.status}">${t.status}</span>
+          </div>
+          <div class="swap">${mineProposed
+            ? `You give <b>${esc(t.offer)}</b> for <b>${esc(t.want)}</b>`
+            : `${esc(other?.username || 'They')} gives <b>${esc(t.offer)}</b> for your <b>${esc(t.want)}</b>`}</div>
+          <div class="actions"></div>`;
+        const act = card.querySelector('.actions');
+        const btn = (label, ghost, fn) => {
+          const b = document.createElement('button');
+          b.className = 'btn' + (ghost ? ' ghost' : ''); b.textContent = label; b.onclick = fn;
+          act.appendChild(b);
+        };
+        if (t.status === 'proposed' && !mineProposed) {
+          btn('Accept', false, () => setStatus(t.id, 'accepted'));
+          btn('Decline', true, () => setStatus(t.id, 'declined'));
+        }
+        if (t.status === 'proposed' && mineProposed)
+          btn('Cancel', true, () => setStatus(t.id, 'cancelled'));
+        if (t.status === 'accepted') {
+          btn('Mark completed', false, () => setStatus(t.id, 'completed'));
+          btn('Cancel', true, () => setStatus(t.id, 'cancelled'));
+        }
+        if (['proposed', 'accepted'].includes(t.status))
+          btn('💬 Chat', true, () => openChat(t, other));
+        el.appendChild(card);
+      }
+    }
+    async function setStatus(id, status) {
+      const { error } = await sb.from('pt_trades').update({ status }).eq('id', id);
+      if (error) alert(error.message);
+      refreshTrades();
+    }
+
+    // ---------- chat ----------
+    function openChat(t, other) {
+      chatTradeId = t.id;
+      $('chatTitle').textContent = 'Chat · ' + (other?.username || 'trade');
+      $('chatLog').innerHTML = ''; $('chatErr').textContent = '';
+      show('chatModal');
+      loadChat();
+      clearInterval(chatTimer);
+      chatTimer = setInterval(loadChat, 4000);
+    }
+    $('btnCloseChat').onclick = () => { show('chatModal', false); clearInterval(chatTimer); chatTradeId = null; };
+    async function loadChat() {
+      if (!chatTradeId) return;
+      const { data, error } = await sb.from('pt_messages')
+        .select('id,sender,body,created_at').eq('trade_id', chatTradeId).order('id').limit(200);
+      if (error) { $('chatErr').textContent = error.message; return; }
+      const log = $('chatLog');
+      const atBottom = log.scrollTop + log.clientHeight >= log.scrollHeight - 30;
+      log.innerHTML = data.map(m => `
+        <div class="msg${m.sender === me.id ? ' mine' : ''}">${esc(m.body)}
+          <span class="t">${new Date(m.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+        </div>`).join('');
+      if (atBottom) log.scrollTop = log.scrollHeight;
+    }
+    $('btnSendMsg').onclick = sendMsg;
+    $('chatInput').addEventListener('keydown', e => { if (e.key === 'Enter') sendMsg(); });
+    async function sendMsg() {
+      const body = $('chatInput').value.trim();
+      if (!body || !chatTradeId) return;
+      $('chatInput').value = '';
+      const { error } = await sb.from('pt_messages')
+        .insert({ trade_id: chatTradeId, sender: me.id, body });
+      if (error) { $('chatErr').textContent = error.message; return; }
+      loadChat();
+    }
+
+    // ---------- profile ----------
+    function fillProfileForm() {
+      if (!me) return;
+      $('pfBigEmoji').textContent = me.emoji;
+      $('pfName').value = me.username; $('pfEmoji').value = me.emoji;
+      $('pfOffering').value = (me.offering || []).join(', ');
+      $('pfWanting').value = (me.wanting || []).join(', ');
+      $('pfShare').checked = !!me.share_location;
+    }
+    $('btnSaveProfile').onclick = async () => {
+      if (demo) { alert('Demo mode — sign in to have a real profile!'); return; }
+      const upd = {
+        username: $('pfName').value.trim(), emoji: $('pfEmoji').value.trim() || '🧢',
+        offering: csv($('pfOffering').value), wanting: csv($('pfWanting').value),
+        share_location: $('pfShare').checked,
+      };
+      if (upd.share_location && me.lat == null) Object.assign(upd, await getRoundedLocation());
+      const { error } = await sb.from('pt_profiles').update(upd).eq('id', me.id);
+      $('pfErr').textContent = error
+        ? (error.code === '23505' ? 'That trainer name is taken.' : error.message) : '';
+      if (!error) { Object.assign(me, upd); $('pfErr').textContent = ''; fillProfileForm(); refreshMap(); }
+    };
+
+    // ---------- tabs ----------
+    function switchTab(name) {
+      document.querySelectorAll('.tab').forEach(b =>
+        b.classList.toggle('active', b.dataset.tab === name));
+      document.querySelectorAll('[data-screen]').forEach(s =>
+        s.classList.toggle('hidden', s.dataset.screen !== name));
+      if (name === 'map') { initMap(); refreshMap(); }
+      if (name === 'trades') refreshTrades();
+      if (name === 'profile') fillProfileForm();
+    }
+    document.querySelectorAll('.tab').forEach(b => b.onclick = () => switchTab(b.dataset.tab));
+
+    // go
+    route();
   </script>
 </body>
 </html>
