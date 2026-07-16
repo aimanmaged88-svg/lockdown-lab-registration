@@ -159,7 +159,10 @@
           <button class="btn" id="btnSendCode">Send me a sign-in code</button>
         </div>
         <div id="auth-step-code" class="hidden">
-          <div class="field"><label>Enter the 6-digit code we emailed you</label>
+          <p class="muted" style="font-size:13px; margin:0 0 12px">📬 Check your email —
+            <b style="color:var(--ink)">tap the sign-in link on this phone</b>, or if the email
+            shows a 6-digit code, enter it here.</p>
+          <div class="field"><label>6-digit code (if your email has one)</label>
             <input type="tel" id="authCode" placeholder="123456" maxlength="6" autocomplete="one-time-code" /></div>
           <button class="btn" id="btnVerifyCode">Verify &amp; sign in</button>
           <button class="btn ghost" id="btnBackEmail" style="margin-top:8px">Use a different email</button>
@@ -277,6 +280,13 @@
     const SUPABASE_KEY = 'sb_publishable_-j-P1TcLeGZ6lGspru2YwA_3RxAlucJ';
     const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 
+    // If the user arrives via the sign-in link in the email, supabase-js picks
+    // the session out of the URL — route again the moment that happens.
+    let routing = false;
+    sb.auth.onAuthStateChange((event) => {
+      if (event === 'SIGNED_IN' && !me && !routing) route();
+    });
+
     const $ = id => document.getElementById(id);
     const show = (id, on = true) => $(id).classList.toggle('hidden', !on);
 
@@ -287,12 +297,15 @@
 
     // ---------- routing ----------
     async function route() {
-      const { data: { session } } = await sb.auth.getSession();
-      if (!session) { toAuth(); return; }
-      const { data: prof } = await sb.from('pt_profiles').select('*').eq('id', session.user.id).maybeSingle();
-      if (!prof) { toOnboard(session); return; }
-      me = prof;
-      toMain();
+      routing = true;
+      try {
+        const { data: { session } } = await sb.auth.getSession();
+        if (!session) { toAuth(); return; }
+        const { data: prof } = await sb.from('pt_profiles').select('*').eq('id', session.user.id).maybeSingle();
+        if (!prof) { toOnboard(session); return; }
+        me = prof;
+        toMain();
+      } finally { routing = false; }
     }
     function swapView(name) {
       ['view-auth','view-onboard','view-main'].forEach(v => show(v, v === name));
@@ -320,7 +333,13 @@
       $('authErr').textContent = '';
       if (!email.includes('@')) { $('authErr').textContent = 'Enter a valid email.'; return; }
       $('btnSendCode').disabled = true;
-      const { error } = await sb.auth.signInWithOtp({ email, options: { shouldCreateUser: true } });
+      // Ask the email link to come back to this exact page (must be allowed
+      // in Supabase Auth -> URL Configuration).
+      const appUrl = location.protocol.startsWith('http')
+        ? location.href.split('#')[0].split('?')[0]
+        : 'https://lockdown-lab-registration.netlify.app/pokemon-trade/app.html';
+      const { error } = await sb.auth.signInWithOtp({ email,
+        options: { shouldCreateUser: true, emailRedirectTo: appUrl } });
       $('btnSendCode').disabled = false;
       if (error) { $('authErr').textContent = error.message; return; }
       show('auth-step-email', false); show('auth-step-code', true);
