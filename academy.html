@@ -1,11 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Lockdown Lab Live — Start Here</title>
-<meta name="description" content="Your basketball personal trainer. How the Lab works, what to expect, and how to get in." />
+<title>Lockdown Lab · Basketball IQ Academy</title>
 <style>
+/* ===== Bundled fonts: Bebas Neue (display) + Manrope (body) ===== */
 
 @font-face {
   font-family: 'Bebas Neue';
@@ -52,305 +47,1038 @@
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
-:root{
-  --bg:#050506;
-  --glass:rgba(255,255,255,.055); --glass2:rgba(255,255,255,.028);
-  --line:rgba(255,255,255,.11); --line2:rgba(255,255,255,.06);
-  --text:#f6f4f1; --muted:#a09a92; --dim:#6d6861;
-  --accent:#ff6b00; --accent-hi:#ff8a2b; --accent-soft:rgba(255,107,0,.15); --accent-glow:rgba(255,107,0,.38);
-  --good:#30d158; --good-soft:rgba(48,209,88,.14);
-  --fd:'Bebas Neue',"Arial Narrow",Arial,sans-serif;
-  --fb:'Manrope',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  --fm:ui-monospace,"SF Mono","Roboto Mono",Menlo,monospace;
-  --r:22px;
-  color-scheme:dark;
-}
-*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html{scroll-behavior:smooth}
-body{background:var(--bg);color:var(--text);font-family:var(--fb);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;
-  background-image:radial-gradient(120% 60% at 50% -8%, rgba(255,107,0,.13), transparent 58%),
-                   radial-gradient(70% 40% at 100% 30%, rgba(255,107,0,.05), transparent 55%);
-  background-attachment:fixed}
-a{color:inherit;text-decoration:none}
-::selection{background:var(--accent);color:#000}
-.wrap{max-width:1020px;margin:0 auto;padding:0 20px}
-.display{font-family:var(--fd);text-transform:uppercase;font-weight:400;letter-spacing:.8px;line-height:.95;text-wrap:balance}
-.mono{font-family:var(--fm);font-variant-numeric:tabular-nums}
-.amber{color:var(--accent)}
-.eyebrow{font-family:var(--fm);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);display:inline-flex;align-items:center;gap:9px}
-.eyebrow::before{content:"";width:20px;height:1.5px;background:var(--accent)}
-.btn{font-family:var(--fd);text-transform:uppercase;letter-spacing:1.5px;font-size:16px;display:inline-flex;align-items:center;justify-content:center;gap:9px;
-  padding:15px 28px;border-radius:999px;transition:transform .16s, background .16s, border-color .16s;cursor:pointer;user-select:none}
-.btn:active{transform:scale(.96)}
-.btn-p{background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:#150a00;box-shadow:0 12px 34px -10px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,.35)}
-.btn-p:hover{transform:translateY(-2px)}
-.btn-g{background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(12px)}
-.btn-g:hover{border-color:var(--accent)}
-.chip{font-family:var(--fm);font-size:9.5px;letter-spacing:1.6px;text-transform:uppercase;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:5px 12px;display:inline-flex;align-items:center;gap:6px}
-.chip .d{width:6px;height:6px;border-radius:50%;background:var(--good);animation:pulse 2s infinite}
-@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(48,209,88,.5)}70%{box-shadow:0 0 0 8px rgba(48,209,88,0)}100%{box-shadow:0 0 0 0 rgba(48,209,88,0)}}
 
-/* nav */
-nav{position:sticky;top:0;z-index:40;border-bottom:1px solid var(--line2);background:rgba(5,5,6,.62);backdrop-filter:blur(26px) saturate(150%)}
-nav .row{display:flex;align-items:center;gap:11px;height:66px}
-nav .lg{width:36px;height:36px;color:#fff}
-nav b{font-family:var(--fd);font-size:19px;letter-spacing:2px;text-transform:uppercase;font-weight:400}
-nav b i{font-style:normal;color:var(--accent)}
-nav .sp{flex:1}
-nav .btn{padding:11px 22px;font-size:14px}
-nav .navlinks{display:flex;gap:22px;margin-right:14px}
-nav .navlinks a{font-size:13px;color:var(--muted);transition:color .18s}
-nav .navlinks a:hover{color:var(--text)}
-@media(max-width:760px){nav .navlinks{display:none}}
+  :root{
+    --bg:#060606;
+    --bg-2:#0b0b0c;
+    --glass:rgba(255,255,255,.045);
+    --glass-2:rgba(255,255,255,.03);
+    --line:rgba(255,255,255,.09);
+    --line-2:rgba(255,255,255,.06);
+    --text:#f5f3f0;
+    --muted:#9b968f;
+    --dim:#6a655e;
+    --accent:#ff6b00;
+    --accent-hi:#ff8a2b;
+    --accent-soft:rgba(255,107,0,.14);
+    --accent-glow:rgba(255,107,0,.35);
+    --good:#22c55e;
+    --good-soft:rgba(34,197,94,.14);
+    --r:18px;
+    --fd:'Bebas Neue',"Arial Narrow",Helvetica,Arial,system-ui,sans-serif;
+    --fb:'Manrope',system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --fm:ui-monospace,"SF Mono","Roboto Mono",Menlo,monospace;
+    color-scheme:dark;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);color:var(--text);font-family:var(--fb);line-height:1.6;
+    -webkit-font-smoothing:antialiased;overflow-x:hidden;
+    background-image:
+      radial-gradient(120% 80% at 50% -10%, rgba(255,107,0,.10), transparent 55%),
+      radial-gradient(90% 60% at 100% 0%, rgba(255,107,0,.05), transparent 50%);
+    background-attachment:fixed;
+  }
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
+  ::selection{background:var(--accent);color:#000}
+  .wrap{max-width:1140px;margin:0 auto;padding:0 22px}
 
-/* hero */
-header{padding:76px 0 50px;position:relative}
-.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:44px;align-items:center}
-@media(max-width:860px){.hero-grid{grid-template-columns:1fr}}
-h1.hero{font-size:clamp(52px,9vw,96px);margin:20px 0 0}
-.hero-sub{color:var(--muted);font-size:clamp(15px,2vw,18px);max-width:520px;margin-top:20px}
-.hero-sub b{color:var(--text)}
-.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:30px}
-.trust{display:flex;gap:18px;flex-wrap:wrap;margin-top:24px;font-family:var(--fm);font-size:10.5px;letter-spacing:1px;color:var(--dim);text-transform:uppercase}
+  /* ---------- shared display type ---------- */
+  .display{font-family:var(--fd);text-transform:uppercase;font-weight:400;letter-spacing:1px;line-height:.94;text-wrap:balance}
+  .eyebrow{font-family:var(--fd);text-transform:uppercase;font-weight:700;letter-spacing:3.5px;font-size:12px;color:var(--accent);display:inline-flex;align-items:center;gap:9px}
+  .eyebrow::before{content:"";width:22px;height:1.5px;background:var(--accent);display:inline-block}
+  .mono{font-family:var(--fm);font-variant-numeric:tabular-nums}
+  .grad{background:linear-gradient(180deg,#fff, #b9b4ad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .amber{color:var(--accent)}
 
-/* scouting dossier card */
-.dossier{border:1px solid var(--line);border-radius:26px;background:linear-gradient(165deg,rgba(255,255,255,.075),rgba(255,255,255,.02));
-  backdrop-filter:blur(20px);padding:26px 24px;position:relative;overflow:hidden;transform:rotate(1.6deg);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.1), 0 50px 100px -40px rgba(0,0,0,.9), 0 0 70px -30px var(--accent-glow);transition:transform .5s cubic-bezier(.2,.8,.2,1)}
-.dossier:hover{transform:rotate(0)}
-.dossier .stamp{position:absolute;top:18px;right:-34px;background:var(--accent);color:#150a00;font-family:var(--fm);font-weight:800;font-size:10px;
-  letter-spacing:2px;padding:6px 44px;transform:rotate(35deg);text-transform:uppercase}
-.dossier .dh{font-family:var(--fm);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:8px;margin-bottom:16px}
-.dossier .dh::after{content:"";flex:1;height:1px;background:var(--line)}
-.drow{display:flex;justify-content:space-between;align-items:baseline;padding:9px 0;border-bottom:1px dashed var(--line2)}
-.drow .k{font-family:var(--fm);font-size:10px;letter-spacing:1.8px;text-transform:uppercase;color:var(--dim)}
-.drow .v{font-family:var(--fd);font-size:21px;letter-spacing:1px;text-transform:uppercase}
-.drow .v.blur{color:var(--accent);filter:blur(0px)}
-.dbar{margin-top:16px}
-.dbar .lb{display:flex;justify-content:space-between;font-family:var(--fm);font-size:9px;letter-spacing:1.6px;text-transform:uppercase;color:var(--dim);margin-bottom:7px}
-.dbar .tr{height:7px;border-radius:99px;background:rgba(255,255,255,.09);overflow:hidden}
-.dbar .tr i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent-hi));box-shadow:0 0 14px var(--accent-glow);animation:fill 2.4s 1s cubic-bezier(.2,.8,.2,1) forwards}
-@keyframes fill{to{width:82%}}
-.dfoot{margin-top:18px;font-family:var(--fm);font-size:9.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--dim)}
-.dfoot b{color:var(--accent)}
+  /* ---------- buttons ---------- */
+  .btn{
+    font-family:var(--fd);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;font-size:15px;
+    display:inline-flex;align-items:center;justify-content:center;gap:10px;
+    padding:15px 26px;border-radius:999px;border:1px solid transparent;cursor:pointer;
+    transition:transform .18s cubic-bezier(.2,.7,.2,1),box-shadow .25s,background .2s,border-color .2s;
+    will-change:transform;user-select:none;
+  }
+  .btn:active{transform:scale(.97)}
+  .btn-primary{background:var(--accent);color:#0a0500;box-shadow:0 10px 34px -8px var(--accent-glow)}
+  .btn-primary:hover{background:var(--accent-hi);transform:translateY(-2px);box-shadow:0 16px 44px -8px var(--accent-glow)}
+  .btn-ghost{background:var(--glass);color:var(--text);border-color:var(--line);backdrop-filter:blur(8px)}
+  .btn-ghost:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .btn-block{width:100%}
 
-/* sections */
-section{padding:74px 0;position:relative}
-.sec-head{max-width:660px;margin-bottom:40px}
-.sec-head h2{font-size:clamp(34px,5vw,54px);margin-top:14px}
-.sec-head p{color:var(--muted);margin-top:14px;font-size:16px}
-.card{border:1px solid var(--line);border-radius:var(--r);background:linear-gradient(180deg,var(--glass),var(--glass2));backdrop-filter:blur(14px);
-  padding:24px;box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+  /* ---------- nav ---------- */
+  nav{position:sticky;top:0;z-index:50;border-bottom:1px solid var(--line-2);
+    background:rgba(6,6,6,.6);backdrop-filter:blur(18px) saturate(120%)}
+  nav .row{display:flex;align-items:center;justify-content:space-between;height:64px}
+  .brand{display:flex;align-items:center;gap:11px}
+  .brand .mark{width:30px;height:30px;border-radius:9px;background:var(--accent);position:relative;box-shadow:0 6px 20px -6px var(--accent-glow);flex:0 0 auto}
+  .brand .mark::before,.brand .mark::after{content:"";position:absolute;background:#0a0500}
+  .brand .mark::before{left:50%;top:4px;bottom:4px;width:2px;transform:translateX(-50%)}
+  .brand .mark::after{top:50%;left:4px;right:4px;height:2px;transform:translateY(-50%)}
+  .brand b{font-family:var(--fd);text-transform:uppercase;letter-spacing:2.5px;font-weight:700;font-size:16px}
+  .brand small{color:var(--accent);font-size:10px;letter-spacing:2px;font-family:var(--fm);display:block;margin-top:-2px}
+  .navlinks{display:flex;gap:26px;align-items:center}
+  .navlinks a{font-size:13px;color:var(--muted);letter-spacing:.4px;transition:color .18s}
+  .navlinks a:hover{color:var(--text)}
+  .nav-cta{padding:10px 20px;font-size:13px}
+  @media(max-width:820px){.navlinks{display:none}}
 
-/* how it works */
-.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
-@media(max-width:860px){.steps{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:520px){.steps{grid-template-columns:1fr}}
-.step{border:1px solid var(--line);border-radius:var(--r);background:linear-gradient(180deg,var(--glass),var(--glass2));backdrop-filter:blur(12px);
-  padding:22px 20px;position:relative;overflow:hidden;transition:transform .25s,border-color .25s;box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
-.step:hover{transform:translateY(-5px);border-color:var(--accent)}
-.step .n{font-family:var(--fm);font-size:10px;letter-spacing:2px;color:var(--accent)}
-.step h3{font-family:var(--fd);text-transform:uppercase;font-size:24px;letter-spacing:.6px;margin:12px 0 7px;line-height:1}
-.step p{color:var(--muted);font-size:13.5px}
-.step .big{position:absolute;right:-4px;bottom:-20px;font-family:var(--fd);font-size:96px;color:rgba(255,255,255,.035);line-height:1;pointer-events:none}
+  /* ---------- hero ---------- */
+  header{padding:74px 0 40px;position:relative}
+  .hero-badge{display:inline-flex;align-items:center;gap:12px;padding:8px 15px;border:1px solid var(--line);border-radius:999px;background:var(--glass);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-family:var(--fm)}
+  .hero-badge .dot{width:7px;height:7px;border-radius:50%;background:var(--good);box-shadow:0 0 0 0 var(--good-soft);animation:pulse 2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(34,197,94,.5)}70%{box-shadow:0 0 0 8px rgba(34,197,94,0)}100%{box-shadow:0 0 0 0 rgba(34,197,94,0)}}
+  h1.hero{font-size:clamp(46px,9.2vw,116px);margin:26px 0 0;letter-spacing:-1px}
+  h1.hero .l2{color:var(--accent)}
+  .hero-sub{max-width:560px;color:var(--muted);font-size:clamp(15px,2vw,18px);margin-top:24px}
+  .hero-sub b{color:var(--text);font-weight:600}
+  .hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:34px}
 
-/* expect grid */
-.expect{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-@media(max-width:860px){.expect{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:520px){.expect{grid-template-columns:1fr}}
-.ex{border:1px solid var(--line);border-radius:var(--r);background:linear-gradient(180deg,var(--glass),var(--glass2));backdrop-filter:blur(12px);
-  padding:22px 20px;transition:transform .25s,border-color .25s;box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
-.ex:hover{transform:translateY(-5px);border-color:var(--accent)}
-.ex .ico{width:44px;height:44px;border-radius:14px;background:var(--accent-soft);display:grid;place-items:center;font-size:20px;margin-bottom:14px}
-.ex h3{font-family:var(--fd);text-transform:uppercase;font-size:21px;letter-spacing:.6px;margin-bottom:6px;line-height:1}
-.ex p{color:var(--muted);font-size:13.5px}
-.ex .tag{float:right;font-family:var(--fm);font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:99px;padding:3px 8px}
+  .hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}
+  @media(max-width:920px){.hero-grid{grid-template-columns:1fr;gap:30px}}
+  .hero-single{max-width:900px}
+  .hero-single .hero-sub{max-width:600px}
 
-/* the deal / contract */
-.deal{border:1px solid rgba(255,107,0,.5);border-radius:28px;background:linear-gradient(170deg,var(--accent-soft),var(--glass2));backdrop-filter:blur(16px);
-  padding:34px 30px;position:relative;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.1), 0 30px 80px -40px var(--accent-glow)}
-.deal .dtag{font-family:var(--fm);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent);margin-bottom:12px;display:flex;align-items:center;gap:8px}
-.deal h2{font-size:clamp(32px,5vw,50px);margin-bottom:10px}
-.deal>p{color:var(--muted);font-size:16px;max-width:560px;margin-bottom:24px}
-.deal>p b{color:var(--text)}
-.rules{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:700px){.rules{grid-template-columns:1fr}}
-.rule{display:flex;gap:13px;align-items:flex-start;border:1px solid var(--line);border-radius:16px;background:rgba(0,0,0,.28);padding:15px 16px}
-.rule .rn{font-family:var(--fd);font-size:22px;color:var(--accent);line-height:1.1;flex:0 0 auto}
-.rule b{display:block;font-size:14.5px;margin-bottom:2px}
-.rule span{color:var(--muted);font-size:13px}
-.deal .sign{margin-top:24px;font-family:var(--fm);font-size:10px;letter-spacing:1.6px;text-transform:uppercase;color:var(--dim)}
-.deal .sign b{color:var(--accent)}
+  /* video / film placeholder */
+  .film{position:relative;border-radius:calc(var(--r) + 6px);overflow:hidden;border:1px solid var(--line);
+    background:linear-gradient(160deg,#141414,#0a0a0a);aspect-ratio:4/3;min-height:300px;
+    box-shadow:0 40px 90px -40px rgba(0,0,0,.9)}
+  .film::before{content:"";position:absolute;inset:0;background:
+    repeating-linear-gradient(0deg,transparent 0 38px,rgba(255,255,255,.02) 38px 39px),
+    repeating-linear-gradient(90deg,transparent 0 38px,rgba(255,255,255,.02) 38px 39px);}
+  .film .court{position:absolute;inset:22px;border:1.5px solid var(--line);border-radius:10px}
+  .film .court::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:1.5px;background:var(--line);transform:translateX(-50%)}
+  .film .court::after{content:"";position:absolute;left:50%;top:50%;width:78px;height:78px;border:1.5px solid var(--line);border-radius:50%;transform:translate(-50%,-50%)}
+  .film .play{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:74px;height:74px;border-radius:50%;
+    background:var(--accent);display:grid;place-items:center;box-shadow:0 12px 40px -8px var(--accent-glow);cursor:pointer;
+    transition:transform .2s;z-index:2}
+  .film .play:hover{transform:translate(-50%,-50%) scale(1.08)}
+  .film .play svg{margin-left:4px}
+  .film .tag{position:absolute;left:18px;top:16px;font-family:var(--fm);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);z-index:2}
+  .film .tag .rec{color:#ff4444}
+  .film .cap{position:absolute;left:18px;right:18px;bottom:16px;z-index:2;font-family:var(--fd);text-transform:uppercase;letter-spacing:1px;font-size:15px}
+  .film .cap small{display:block;font-family:var(--fm);letter-spacing:1.5px;font-size:10px;color:var(--accent);margin-bottom:3px}
+  /* defender read markers floating */
+  .mk{position:absolute;z-index:3;font-family:var(--fm);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:#000;background:var(--accent);
+    padding:3px 7px;border-radius:5px;white-space:nowrap;box-shadow:0 6px 18px -6px var(--accent-glow);animation:float 4s ease-in-out infinite}
+  .mk.e{top:30%;left:20%;animation-delay:0s}
+  .mk.h{top:58%;right:16%;animation-delay:.8s;background:#fff}
+  .mk.s{top:42%;right:26%;animation-delay:1.6s}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
 
-/* faq */
-.faq{max-width:760px}
-details{border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,var(--glass),var(--glass2));backdrop-filter:blur(12px);
-  margin-bottom:10px;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
-summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:18px 20px;font-family:var(--fd);text-transform:uppercase;font-size:19px;letter-spacing:.7px;transition:color .2s}
-summary::-webkit-details-marker{display:none}
-summary .q{color:var(--accent);font-family:var(--fm);font-size:11px;letter-spacing:2px;flex:0 0 auto}
-summary .ar{margin-left:auto;color:var(--dim);transition:transform .25s;font-size:13px}
-details[open] .ar{transform:rotate(45deg);color:var(--accent)}
-details .a{padding:0 20px 18px 20px;color:var(--muted);font-size:14.5px}
-details .a b{color:var(--text)}
+  /* ---------- stat strip ---------- */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:44px}
+  @media(max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}}
+  .stat{padding:20px 18px;border:1px solid var(--line);border-radius:var(--r);background:var(--glass);backdrop-filter:blur(8px);position:relative;overflow:hidden}
+  .stat .n{font-family:var(--fd);font-size:38px;font-weight:700;letter-spacing:.5px;line-height:1;color:var(--text);font-variant-numeric:tabular-nums}
+  .stat .n .u{color:var(--accent);font-size:24px}
+  .stat .l{font-family:var(--fm);font-size:10px;letter-spacing:1.6px;text-transform:uppercase;color:var(--dim);margin-top:9px}
+  .stat.live .n{color:var(--good)}
+  .stat.live .n .u{color:var(--good)}
 
-/* final cta */
-.final{border:1px solid var(--line);border-radius:32px;text-align:center;padding:60px 26px;position:relative;overflow:hidden;
-  background:radial-gradient(120% 100% at 50% 0%, rgba(255,107,0,.2), var(--glass2) 60%);backdrop-filter:blur(16px);
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.12), 0 40px 100px -50px var(--accent-glow)}
-.final .lg{width:76px;height:81px;color:#fff;margin:0 auto 14px;display:block}
-.final h2{font-size:clamp(38px,6vw,64px)}
-.final p{color:var(--muted);margin:14px auto 26px;max-width:440px}
-footer{border-top:1px solid var(--line2);padding:34px 0 46px;margin-top:30px}
-.foot{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;color:var(--dim);font-size:12.5px}
-.foot .fm{font-family:var(--fm);letter-spacing:1px;font-size:10px;text-transform:uppercase}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+  /* ---------- section scaffolding ---------- */
+  section{padding:78px 0;position:relative}
+  .sec-head{max-width:720px;margin-bottom:44px}
+  .sec-head h2{font-size:clamp(32px,5vw,56px);margin-top:16px}
+  .sec-head p{color:var(--muted);margin-top:16px;font-size:17px;max-width:600px}
+  .rule{height:1px;background:linear-gradient(90deg,var(--line),transparent);margin:0}
+
+  /* problem split */
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:720px){.split{grid-template-columns:1fr}}
+  .col{padding:30px;border:1px solid var(--line);border-radius:var(--r);background:var(--glass-2)}
+  .col.hot{border-color:rgba(255,107,0,.4);background:linear-gradient(180deg,var(--accent-soft),transparent)}
+  .col h4{font-family:var(--fm);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:18px}
+  .col.hot h4{color:var(--accent)}
+  .col ul{list-style:none;display:flex;flex-direction:column;gap:14px}
+  .col li{display:flex;align-items:center;gap:13px;font-family:var(--fd);text-transform:uppercase;letter-spacing:1px;font-size:24px}
+  .col li .ico{width:26px;height:26px;border-radius:8px;flex:0 0 auto;display:grid;place-items:center;font-size:14px;border:1px solid var(--line-2)}
+  .col.hot li .ico{background:var(--accent);color:#000;border-color:transparent}
+  .gap-note{text-align:center;margin-top:34px;font-family:var(--fd);text-transform:uppercase;font-size:clamp(22px,3.5vw,34px);letter-spacing:1px}
+  .gap-note .amber{display:block}
+
+  /* reads framework */
+  .reads{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:860px){.reads{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:460px){.reads{grid-template-columns:1fr}}
+  .read{padding:26px 22px;border:1px solid var(--line);border-radius:var(--r);background:var(--glass-2);position:relative;overflow:hidden;transition:transform .25s,border-color .25s,background .25s}
+  .read:hover{transform:translateY(-5px);border-color:var(--accent);background:var(--glass)}
+  .read .num{font-family:var(--fm);font-size:11px;letter-spacing:2px;color:var(--accent)}
+  .read h3{font-family:var(--fd);text-transform:uppercase;font-size:32px;margin:16px 0 8px;letter-spacing:.5px}
+  .read p{color:var(--muted);font-size:14px}
+  .read .big{position:absolute;right:-6px;bottom:-18px;font-family:var(--fd);font-weight:700;font-size:90px;color:rgba(255,255,255,.03);pointer-events:none}
+
+  /* week roadmap */
+  .weeks{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  @media(max-width:720px){.weeks{grid-template-columns:1fr}}
+  .week{padding:30px;border:1px solid var(--line);border-radius:var(--r);background:var(--glass-2);position:relative;overflow:hidden;transition:transform .25s,border-color .25s}
+  .week:hover{transform:translateY(-4px);border-color:var(--accent)}
+  .week .wtag{display:inline-flex;align-items:center;gap:9px;font-family:var(--fm);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:16px}
+  .week .wtag i{width:30px;height:30px;border-radius:8px;border:1px solid var(--accent);display:grid;place-items:center;font-style:normal;font-family:var(--fd);font-size:15px;color:var(--accent)}
+  .week h3{font-family:var(--fd);text-transform:uppercase;font-size:clamp(26px,3.6vw,38px);letter-spacing:.5px;margin-bottom:12px}
+  .week p{color:var(--muted);font-size:15px}
+  .week .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+  .chip{font-family:var(--fm);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);padding:6px 11px;border-radius:999px}
+
+  /* skills grid */
+  .skills{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+  @media(max-width:900px){.skills{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:520px){.skills{grid-template-columns:repeat(2,1fr)}}
+  .skill{padding:22px 16px;border:1px solid var(--line-2);border-radius:14px;background:var(--glass-2);transition:transform .2s,color .2s,border-color .2s;text-align:center}
+  .skill:hover{transform:translateY(-4px);border-color:var(--accent);color:var(--accent)}
+  .skill .si{font-family:var(--fm);font-size:11px;color:var(--dim);margin-bottom:12px}
+  .skill .sn{font-family:var(--fd);text-transform:uppercase;font-size:19px;letter-spacing:.5px;line-height:1.05}
+
+  /* segments */
+  .segs{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:720px){.segs{grid-template-columns:1fr}}
+  .seg{padding:28px;border:1px solid var(--line);border-radius:var(--r);background:var(--glass-2);transition:transform .25s,border-color .25s}
+  .seg:hover{transform:translateY(-4px);border-color:var(--accent)}
+  .seg .emoji{font-size:30px;margin-bottom:16px}
+  .seg h3{font-family:var(--fd);text-transform:uppercase;font-size:26px;letter-spacing:.5px;margin-bottom:8px}
+  .seg .freq{font-family:var(--fm);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:14px}
+  .seg p{color:var(--muted);font-size:14px}
+
+  /* leaderboard */
+  .lb-wrap{border:1px solid var(--line);border-radius:calc(var(--r) + 4px);overflow:hidden;background:var(--glass-2)}
+  .lb-head{display:flex;justify-content:space-between;align-items:center;padding:20px 24px;border-bottom:1px solid var(--line);background:var(--glass)}
+  .lb-head h3{font-family:var(--fd);text-transform:uppercase;letter-spacing:1px;font-size:22px}
+  .lb-head .live{font-family:var(--fm);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--good);display:flex;align-items:center;gap:8px}
+  .lb-head .live .dot{width:6px;height:6px;border-radius:50%;background:var(--good);animation:pulse 2s infinite}
+  .lb-row{display:grid;grid-template-columns:56px 1fr auto auto;gap:16px;align-items:center;padding:16px 24px;border-bottom:1px solid var(--line-2);transition:background .2s}
+  .lb-row:last-child{border-bottom:none}
+  .lb-row:hover{background:var(--glass)}
+  .lb-rank{font-family:var(--fd);font-size:26px;color:var(--dim);width:36px}
+  .lb-row.top .lb-rank{color:var(--accent)}
+  .lb-name{font-family:var(--fd);text-transform:uppercase;font-size:22px;letter-spacing:.5px}
+  .lb-badge{font-family:var(--fm);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;padding:5px 11px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+  .lb-row.top .lb-badge{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+  .lb-pts{font-family:var(--fm);font-variant-numeric:tabular-nums;font-size:16px;color:var(--text)}
+  .lb-pts u{color:var(--dim);text-decoration:none;font-size:11px;margin-left:3px}
+  @media(max-width:600px){.lb-badge{display:none}.lb-row{grid-template-columns:44px 1fr auto}}
+
+  /* testimonials */
+  .quotes{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:820px){.quotes{grid-template-columns:1fr}}
+  .quote{padding:28px;border:1px solid var(--line);border-radius:var(--r);background:var(--glass-2)}
+  .quote .stars{color:var(--accent);letter-spacing:3px;font-size:13px;margin-bottom:14px}
+  .quote p{font-size:16px;line-height:1.55}
+  .quote .who{display:flex;align-items:center;gap:12px;margin-top:20px}
+  .quote .av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#7a3400);display:grid;place-items:center;font-family:var(--fd);font-weight:700;color:#000;flex:0 0 auto}
+  .quote .who b{font-size:14px;display:block}
+  .quote .who span{font-family:var(--fm);font-size:11px;color:var(--dim)}
+
+  /* ---------- wizard ---------- */
+  #register{padding-top:40px}
+  .wiz{border:1px solid var(--line);border-radius:calc(var(--r) + 8px);background:linear-gradient(180deg,var(--glass),var(--glass-2));backdrop-filter:blur(12px);overflow:hidden;box-shadow:0 50px 120px -50px rgba(0,0,0,.9)}
+  .wiz-top{padding:26px 30px 0}
+  .wiz-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+  .wiz-step{font-family:var(--fm);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+  .wiz-step b{color:var(--accent)}
+  .wiz-pct{font-family:var(--fd);font-size:26px;color:var(--accent);font-variant-numeric:tabular-nums}
+  .bar{height:5px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+  .bar>i{display:block;height:100%;width:16%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent-hi));transition:width .5s cubic-bezier(.2,.7,.2,1);box-shadow:0 0 18px var(--accent-glow)}
+  .dots{display:flex;gap:7px;margin-top:16px;flex-wrap:wrap}
+  .dots .d{flex:1;min-width:20px;height:3px;border-radius:2px;background:rgba(255,255,255,.09);transition:background .3s}
+  .dots .d.on{background:var(--accent)}
+  .wiz-body{padding:34px 30px 30px;min-height:360px;position:relative}
+  .panel{position:absolute;inset:34px 30px 30px;opacity:0;transform:translateX(24px);pointer-events:none;transition:opacity .4s,transform .4s}
+  .panel.active{opacity:1;transform:none;pointer-events:auto;position:relative;inset:auto}
+  .panel .p-eye{font-family:var(--fm);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+  .panel h3{font-family:var(--fd);text-transform:uppercase;font-size:clamp(28px,4vw,40px);letter-spacing:.5px;margin-bottom:8px}
+  .panel .p-sub{color:var(--muted);margin-bottom:26px;font-size:15px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  @media(max-width:560px){.grid2{grid-template-columns:1fr}}
+  .fld{margin-bottom:16px}
+  .fld.full{grid-column:1/-1}
+  .fld label{display:block;font-family:var(--fm);font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
+  .fld input,.fld select,.fld textarea{width:100%;background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:12px;padding:14px 15px;color:var(--text);font-size:15px;font-family:var(--fb);outline:none;transition:border-color .18s,box-shadow .18s}
+  .fld textarea{min-height:92px;resize:vertical}
+  .fld input::placeholder,.fld textarea::placeholder{color:#57534d}
+  .fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+  .fld select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8'><path d='M1 1l5 5 5-5' stroke='%23ff6b00' stroke-width='2' fill='none' stroke-linecap='round'/></svg>");background-repeat:no-repeat;background-position:right 15px center;padding-right:40px}
+  /* choice pills */
+  .pills{display:flex;flex-wrap:wrap;gap:10px}
+  .pill{font-family:var(--fd);text-transform:uppercase;letter-spacing:1px;font-size:16px;padding:11px 18px;border-radius:12px;border:1px solid var(--line);background:rgba(0,0,0,.3);cursor:pointer;transition:all .18s;user-select:none}
+  .pill:hover{border-color:var(--accent)}
+  .pill.sel{background:var(--accent);color:#000;border-color:var(--accent)}
+  /* consent rows */
+  .consent{display:flex;gap:14px;align-items:flex-start;padding:16px;border:1px solid var(--line);border-radius:12px;background:rgba(0,0,0,.25);margin-bottom:12px;cursor:pointer;transition:border-color .18s}
+  .consent:hover{border-color:var(--accent)}
+  .consent .box{width:22px;height:22px;border-radius:7px;border:1.5px solid var(--dim);flex:0 0 auto;display:grid;place-items:center;transition:all .18s;margin-top:2px}
+  .consent.on .box{background:var(--accent);border-color:var(--accent)}
+  .consent .box svg{opacity:0;transition:opacity .18s}
+  .consent.on .box svg{opacity:1}
+  .consent .ct b{font-size:14px;display:block;margin-bottom:3px}
+  .consent .ct span{color:var(--muted);font-size:13px}
+  .wiz-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:22px 30px;border-top:1px solid var(--line);background:rgba(0,0,0,.2)}
+  .wiz-foot .btn{padding:13px 24px}
+  .link-back{font-family:var(--fd);text-transform:uppercase;letter-spacing:1.5px;font-size:14px;color:var(--muted);background:none;border:none;cursor:pointer;padding:10px 4px;transition:color .18s}
+  .link-back:hover{color:var(--text)}
+  .link-back:disabled{opacity:.3;cursor:not-allowed}
+  .trust{display:flex;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:20px;font-family:var(--fm);font-size:11px;letter-spacing:1px;color:var(--dim)}
+  .trust span{display:inline-flex;align-items:center;gap:7px}
+  .trust .g{color:var(--good)}
+
+  /* ---------- success overlay ---------- */
+  .success{position:fixed;inset:0;z-index:100;background:rgba(4,4,4,.86);backdrop-filter:blur(14px);display:none;align-items:center;justify-content:center;padding:22px;overflow:auto}
+  .success.show{display:flex;animation:fade .4s}
+  @keyframes fade{from{opacity:0}to{opacity:1}}
+  .success-card{max-width:560px;width:100%;text-align:center;border:1px solid var(--line);border-radius:24px;padding:48px 34px;
+    background:radial-gradient(120% 90% at 50% 0%, rgba(255,107,0,.16), var(--bg-2) 62%);position:relative;animation:pop .5s cubic-bezier(.2,.8,.2,1)}
+  @keyframes pop{from{transform:scale(.9) translateY(20px);opacity:0}to{transform:none;opacity:1}}
+  .success .crest{width:82px;height:82px;border-radius:22px;background:var(--accent);display:grid;place-items:center;margin:0 auto 26px;box-shadow:0 20px 60px -14px var(--accent-glow);animation:float 4s ease-in-out infinite}
+  .success .crest svg{width:42px;height:42px}
+  .success .eyebrow{justify-content:center;margin-bottom:14px}
+  .success h2{font-family:var(--fd);text-transform:uppercase;font-size:clamp(34px,7vw,56px);letter-spacing:.5px;line-height:.95}
+  .success .who{color:var(--accent);font-family:var(--fd);text-transform:uppercase;font-size:20px;margin-top:6px}
+  .success p{color:var(--muted);margin-top:18px;font-size:15px}
+  .checklist{text-align:left;margin:26px 0;display:flex;flex-direction:column;gap:10px}
+  .checklist .ci{display:flex;gap:13px;align-items:flex-start;padding:14px 16px;border:1px solid var(--line-2);border-radius:12px;background:var(--glass-2)}
+  .checklist .n{width:24px;height:24px;border-radius:7px;background:var(--accent-soft);color:var(--accent);font-family:var(--fm);font-size:12px;display:grid;place-items:center;flex:0 0 auto;margin-top:1px}
+  .checklist b{font-size:14px;display:block}
+  .checklist span{color:var(--muted);font-size:13px}
+  .success .btn{margin-top:6px}
+  canvas#confetti{position:fixed;inset:0;pointer-events:none;z-index:101;display:none}
+  canvas#confetti.show{display:block}
+
+  /* footer */
+  footer{border-top:1px solid var(--line-2);padding:44px 0;margin-top:20px}
+  .foot{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;color:var(--dim);font-size:13px}
+  .foot .fm{font-family:var(--fm);letter-spacing:1px}
+
+  .skeleton-note{position:fixed;left:14px;bottom:14px;z-index:60;font-family:var(--fm);font-size:11px;letter-spacing:1px;color:var(--dim);background:rgba(6,6,6,.7);border:1px solid var(--line);padding:8px 12px;border-radius:999px;backdrop-filter:blur(8px)}
+  .skeleton-note b{color:var(--accent)}
+
+  /* ---------- launch announcement bar ---------- */
+  .announce{display:flex;justify-content:center;align-items:center;gap:12px;flex-wrap:wrap;text-align:center;
+    padding:10px 16px;background:linear-gradient(90deg,#5c2700,var(--accent) 45%,var(--accent-hi) 55%,#5c2700);
+    color:#150a00;font-family:var(--fm);font-size:11px;letter-spacing:1.6px;text-transform:uppercase;font-weight:600}
+  .announce b{font-weight:800}
+  .announce .tagpill{background:#150a00;color:var(--accent);padding:3px 9px;border-radius:999px;font-size:10px;letter-spacing:1.5px}
+  @media(max-width:560px){.announce{font-size:10px;gap:8px}}
+
+  /* ---------- hero two-col with phone ---------- */
+  .hero-two{display:grid;grid-template-columns:1.05fr .95fr;gap:48px;align-items:center}
+  @media(max-width:960px){.hero-two{grid-template-columns:1fr;gap:40px}.phone{transform:none!important}}
+  .kicker{display:inline-flex;align-items:center;gap:9px;font-family:var(--fm);font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:16px}
+  .kicker b{color:var(--accent)}
+
+  .phone-wrap{display:flex;justify-content:center;position:relative}
+  .phone{position:relative;width:300px;aspect-ratio:9/19.2;border-radius:44px;border:1px solid var(--line);
+    background:linear-gradient(160deg,#1a1a1a,#080808);padding:11px;transform:rotate(3deg);transition:transform .5s cubic-bezier(.2,.7,.2,1);
+    box-shadow:0 60px 130px -45px rgba(0,0,0,.95), 0 0 0 9px rgba(255,255,255,.02), 0 0 60px -20px var(--accent-glow)}
+  .phone:hover{transform:rotate(0)}
+  .phone .notch{position:absolute;top:13px;left:50%;transform:translateX(-50%);width:98px;height:22px;background:#000;border-radius:0 0 15px 15px;z-index:4}
+  .phone .ribbon{position:absolute;top:26px;right:-9px;z-index:5;background:var(--accent);color:#150a00;font-family:var(--fm);font-weight:800;
+    font-size:10px;letter-spacing:1.5px;text-transform:uppercase;padding:6px 11px;border-radius:6px;box-shadow:0 10px 26px -8px var(--accent-glow)}
+  .screen{height:100%;border-radius:34px;overflow:hidden;border:1px solid var(--line-2);padding:26px 14px 14px;display:flex;flex-direction:column;gap:9px;position:relative;
+    background:radial-gradient(120% 55% at 50% 0%, rgba(255,107,0,.16), #0a0a0a 62%)}
+  .app-top{display:flex;align-items:center;gap:7px}
+  .app-top .mk2{width:18px;height:18px;border-radius:6px;background:var(--accent);flex:0 0 auto}
+  .app-top b{font-family:var(--fd);letter-spacing:1.2px;font-size:13px}
+  .app-top .live2{margin-left:auto;display:flex;align-items:center;gap:4px;font-family:var(--fm);font-size:8px;letter-spacing:1.5px;color:var(--good);border:1px solid var(--good);border-radius:999px;padding:2px 7px}
+  .app-top .live2 .ld{width:5px;height:5px;border-radius:50%;background:var(--good);animation:pulse 2s infinite}
+  /* player profile */
+  .prof{display:flex;flex-direction:column;align-items:center;text-align:center}
+  .prof-av{position:relative;width:78px;height:78px;margin-top:2px}
+  .av-ring{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,var(--accent),#ffd0a3,var(--accent-hi),#ff5e00,var(--accent));animation:spin 4.5s linear infinite;box-shadow:0 0 20px -2px var(--accent-glow)}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .av-img{position:absolute;inset:4px;border-radius:50%;background:linear-gradient(140deg,#ff9a3d,#8a3a00);border:3px solid #0c0c0c;display:grid;place-items:center;font-family:var(--fd);font-size:27px;letter-spacing:1px;color:#150a00;z-index:2}
+  .av-badge{position:absolute;bottom:-5px;left:50%;transform:translateX(-50%);z-index:3;white-space:nowrap;background:var(--accent);color:#150a00;font-family:var(--fm);font-weight:700;font-size:7px;letter-spacing:1px;text-transform:uppercase;padding:2px 8px;border-radius:999px;border:2px solid #0c0c0c}
+  .prof-name{font-family:var(--fd);text-transform:uppercase;font-size:23px;letter-spacing:.5px;margin-top:11px;line-height:1}
+  .prof-meta{font-family:var(--fm);font-size:8px;letter-spacing:1.3px;text-transform:uppercase;color:var(--muted);margin-top:5px}
+  .prof-rank{margin-top:9px;display:inline-flex;align-items:center;gap:5px;font-family:var(--fm);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:3px 10px;background:var(--accent-soft)}
+  .prof-rank .rk-arrow{color:var(--good);animation:bob 1.5s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+  .prof-stats{display:flex;gap:6px}
+  .ps{flex:1;text-align:center;border:1px solid var(--line-2);border-radius:12px;padding:9px 3px;background:var(--glass-2)}
+  .ps b{font-family:var(--fd);font-size:18px;display:block;line-height:1;letter-spacing:.5px}
+  .ps span{font-family:var(--fm);font-size:7px;letter-spacing:.7px;text-transform:uppercase;color:var(--muted);margin-top:4px;display:block}
+  .ps.hot{border-color:var(--accent);background:var(--accent-soft)}
+  .ps.hot b{color:var(--accent)}
+  .app-bar i{position:relative;overflow:hidden}
+  .app-bar i::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.55),transparent);transform:translateX(-100%);animation:sweep 2.6s ease-in-out infinite}
+  @keyframes sweep{0%{transform:translateX(-120%)}55%,100%{transform:translateX(320%)}}
+  .app-card{border:1px solid var(--line);border-radius:12px;padding:10px 11px;background:var(--glass);display:flex;flex-direction:column;gap:7px}
+  .ac-top{display:flex;justify-content:space-between;align-items:center;font-family:var(--fm);font-size:8.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--muted)}
+  .ac-top b{font-family:var(--fd);font-size:14px;color:var(--accent);letter-spacing:.5px}
+  .app-bar.sm{height:5px}
+  .mini-lb{border:1px solid var(--line-2);border-radius:12px;overflow:hidden;background:var(--glass-2)}
+  .mlb-h{font-family:var(--fm);font-size:7.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);padding:8px 11px 5px}
+  .mlb-r{display:grid;grid-template-columns:14px 1fr auto;gap:8px;align-items:center;padding:6px 11px;border-top:1px solid var(--line-2);font-family:var(--fm);font-size:10px}
+  .mlb-r span{font-family:var(--fd);color:var(--dim)}
+  .mlb-r b{font-weight:500;color:var(--text)}
+  .mlb-r u{text-decoration:none;color:var(--muted);font-variant-numeric:tabular-nums;font-size:9px}
+  .mlb-r.me{background:var(--accent-soft)}
+  .mlb-r.me span,.mlb-r.me b,.mlb-r.me u{color:var(--accent)}
+  .prof-badges{display:flex;gap:6px;justify-content:center;margin-top:auto}
+  .pb{width:31px;height:31px;border-radius:10px;display:grid;place-items:center;font-size:14px;border:1px solid var(--line-2);background:var(--glass-2)}
+  .pb.on{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 14px -4px var(--accent-glow)}
+  .pb.locked{opacity:.35;filter:grayscale(1)}
+  .xp-pop{position:absolute;top:118px;right:20px;z-index:5;pointer-events:none;font-family:var(--fd);font-size:16px;letter-spacing:.5px;color:var(--good);text-shadow:0 2px 12px rgba(0,0,0,.7);animation:xppop 3.4s ease-in-out infinite}
+  @keyframes xppop{0%{opacity:0;transform:translateY(10px) scale(.9)}12%{opacity:1;transform:translateY(0) scale(1)}38%{opacity:1;transform:translateY(-8px)}58%,100%{opacity:0;transform:translateY(-22px)}}
+  .app-hi{font-family:var(--fd);text-transform:uppercase;line-height:1;font-size:22px;margin-top:4px}
+  .app-hi span{color:var(--muted);font-size:10px;font-family:var(--fm);letter-spacing:1.5px;display:block;margin-bottom:5px;text-transform:uppercase}
+  .app-xp{border:1px solid var(--line);border-radius:14px;padding:12px;background:var(--glass)}
+  .app-xp-top{display:flex;justify-content:space-between;font-family:var(--fm);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+  .app-xp-top b{color:var(--accent)}
+  .app-bar{height:6px;border-radius:999px;background:rgba(255,255,255,.09);overflow:hidden}
+  .app-bar i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--accent),var(--accent-hi));box-shadow:0 0 12px var(--accent-glow)}
+  .app-road{display:flex;flex-direction:column;gap:7px}
+  .app-step{display:flex;align-items:center;gap:9px;border:1px solid var(--line-2);border-radius:11px;padding:9px 11px;font-family:var(--fm);font-size:10px;letter-spacing:.5px;color:var(--muted)}
+  .app-step .rc{width:19px;height:19px;border-radius:6px;display:grid;place-items:center;font-size:10px;flex:0 0 auto;background:rgba(255,255,255,.06)}
+  .app-step.done{color:var(--text)}.app-step.done .rc{background:var(--good);color:#000}
+  .app-step.now{color:#150a00;background:var(--accent);border-color:var(--accent);font-weight:700}.app-step.now .rc{background:#150a00;color:var(--accent)}
+  .app-badges{display:flex;gap:7px;margin-top:auto}
+  .app-badges span{flex:1;text-align:center;border:1px solid var(--line-2);border-radius:11px;padding:9px 4px;font-family:var(--fm);font-size:11px;background:var(--glass-2)}
+
+  /* ---------- founding perks ---------- */
+  .perks{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+  @media(max-width:860px){.perks{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:460px){.perks{grid-template-columns:1fr}}
+  .perk{padding:24px 20px;border:1px solid var(--line);border-radius:var(--r);background:var(--glass-2);transition:transform .25s,border-color .25s;position:relative}
+  .perk:hover{transform:translateY(-5px);border-color:var(--accent)}
+  .perk .pk-ico{width:40px;height:40px;border-radius:11px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-size:19px;margin-bottom:16px}
+  .perk h3{font-family:var(--fd);text-transform:uppercase;font-size:22px;letter-spacing:.5px;margin-bottom:7px;line-height:1}
+  .perk p{color:var(--muted);font-size:13px}
+  .perk .tagpill{position:absolute;top:16px;right:16px;font-family:var(--fm);font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:2px 7px}
+  .perk.feature{border-color:var(--accent);background:linear-gradient(180deg,var(--accent-soft),transparent);box-shadow:0 0 50px -22px var(--accent-glow)}
+  .perk.feature .pk-ico{background:var(--accent);color:#150a00}
+
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
 </style>
-</head>
-<body>
 
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="ll" viewBox="0 0 120 128" fill="none"><g stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M47 30 v-5 a13 13 0 0 1 26 0 v5"/><path d="M38 30 H47"/><path d="M73 30 H82"/><path d="M47 30 v10 L27 88 a9 9 0 0 0 8.5 13.5 h49 a9 9 0 0 0 8.5 -13.5 L73 40 v-10"/></g><g stroke="currentColor" stroke-width="6" stroke-linecap="butt" stroke-linejoin="miter"><path d="M67 34 L58 68 H79"/><path d="M56 44 L46 84 H81"/></g></symbol></svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="ll-mark" viewBox="0 0 120 128" fill="none"><g stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M47 30 v-5 a13 13 0 0 1 26 0 v5"/><path d="M38 30 H47"/><path d="M73 30 H82"/><path d="M47 30 v10 L27 88 a9 9 0 0 0 8.5 13.5 h49 a9 9 0 0 0 8.5 -13.5 L73 40 v-10"/></g><g stroke="currentColor" stroke-width="6" stroke-linecap="butt" stroke-linejoin="miter"><path d="M67 34 L58 68 H79"/><path d="M56 44 L46 84 H81"/></g></symbol></svg>
 
+<!-- ============ LAUNCH ANNOUNCEMENT ============ -->
+<div class="announce">
+  <span class="tagpill">New</span>
+  <span><b>Early registration is now OPEN</b> — the Lockdown Lab app + academy · founding cohort only</span>
+  <span class="tagpill">Limited seats</span>
+</div>
+
+<!-- ============ NAV ============ -->
 <nav>
   <div class="wrap row">
-    <svg class="lg"><use href="#ll"/></svg>
-    <b>Lockdown Lab <i>Live</i></b>
-    <span class="sp"></span>
+    <a class="brand" href="#top">
+      <svg style="width:38px;height:38px;color:#fff" aria-hidden="true"><use href="#ll-mark"/></svg>
+      <span><b>Lockdown Lab</b><small>@lockdownlab3</small></span>
+    </a>
     <div class="navlinks">
-      <a href="#how">How it works</a>
-      <a href="#expect">What to expect</a>
-      <a href="#deal">The deal</a>
-      <a href="#faq">FAQs</a>
+      <a href="#problem">The Edge</a>
+      <a href="#framework">The Framework</a>
+      <a href="#program">Program</a>
+      <a href="#register">Register</a>
+      <a href="/app.html">The App</a>
     </div>
-    <a class="btn btn-p" href="/app.html">Log In →</a>
+    <a href="/app.html" class="btn btn-primary nav-cta">Open App →</a>
   </div>
 </nav>
 
-<!-- HERO -->
+<a id="top"></a>
+<!-- ============ HERO ============ -->
 <header>
-  <div class="wrap hero-grid">
+  <div class="wrap hero-two">
     <div>
-      <span class="chip"><span class="d"></span>Founding squad · Invite only · Free</span>
-      <h1 class="hero display">Meet Your<br>Basketball<br><span class="amber">Personal Trainer.</span></h1>
-      <p class="hero-sub">Lockdown Lab Live reads your game like an NBA scouting department — every check-in, every session, every rep. <b>You put the work in. The Lab does the reading. Coach does the rest.</b></p>
+      <span class="kicker"><span class="dot" style="width:7px;height:7px;border-radius:50%;background:var(--good);display:inline-block"></span>Coming soon · <b>The Lockdown Lab App</b></span>
+      <span class="hero-badge"><span class="dot"></span>Early Access · Founding Cohort · All Ages</span>
+      <h1 class="hero display">You Don't Need<br>The Ball To<br><span class="l2">Dominate.</span></h1>
+      <p class="hero-sub">The <b>Basketball IQ app + live academy</b> is about to drop — and founding members get in first. Learn how elite players read defenders, make smarter decisions and dominate the game. <b>Get early access to the app and help build it with your feedback.</b></p>
       <div class="hero-cta">
-        <a class="btn btn-p" href="/app.html">Create My Profile 🔒</a>
-        <a class="btn btn-g" href="#how">How it works</a>
+        <a href="#register" class="btn btn-primary">Claim Early Access →</a>
+        <a href="#founding" class="btn btn-ghost">Why founders matter</a>
       </div>
-      <div class="trust"><span>● 2-min daily check-in</span><span>Direct line to coach</span><span>Sydney AEST</span></div>
+      <div class="trust" style="justify-content:flex-start;margin-top:26px">
+        <span><span class="g">●</span> Early app access</span>
+        <span>Shape the app</span>
+        <span>Founding-member status</span>
+      </div>
     </div>
 
-    <div class="dossier">
-      <span class="stamp">Classified</span>
-      <div class="dh">🔒 Scouting Report · Lockdown Lab</div>
-      <div class="drow"><span class="k">Player</span><span class="v">You</span></div>
-      <div class="drow"><span class="k">Position</span><span class="v">Your call</span></div>
-      <div class="drow"><span class="k">IQ Rating</span><span class="v blur">Unscouted</span></div>
-      <div class="drow"><span class="k">Tendencies</span><span class="v blur">Reading…</span></div>
-      <div class="dbar">
-        <div class="lb"><span>Profile building</span><span>Day 1 → Day 30</span></div>
-        <div class="tr"><i></i></div>
+    <div class="phone-wrap">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="ribbon">Early Access</div>
+        <div class="screen">
+          <div class="app-top"><span class="mk2"></span><b>LOCKDOWN LAB</b><span class="live2"><i class="ld"></i>Live</span></div>
+          <div class="prof">
+            <div class="prof-av">
+              <span class="av-ring"></span>
+              <span class="av-img">MT</span>
+              <span class="av-badge">★ Founder</span>
+            </div>
+            <div class="prof-name">Marcus T.</div>
+            <div class="prof-meta">Point Guard · Age 15</div>
+            <div class="prof-rank"><span class="rk-arrow">▲</span> Rank #2 · Top 3%</div>
+          </div>
+          <div class="prof-stats">
+            <div class="ps hot"><b>842</b><span>IQ Score</span></div>
+            <div class="ps"><b>🔥7</b><span>Streak</span></div>
+            <div class="ps"><b>18</b><span>Badges</span></div>
+          </div>
+          <div class="app-xp">
+            <div class="app-xp-top"><span>Level 3 · <b>Sharp</b></span><span>620 / 1000 XP</span></div>
+            <div class="app-bar"><i style="width:62%"></i></div>
+          </div>
+          <div class="app-card">
+            <div class="ac-top"><span>🎯 Week 2 Challenge</span><b>7/10</b></div>
+            <div class="app-bar sm"><i style="width:70%"></i></div>
+          </div>
+          <div class="mini-lb">
+            <div class="mlb-h">IQ Leaderboard</div>
+            <div class="mlb-r"><span>1</span><b>Jalen</b><u>901</u></div>
+            <div class="mlb-r me"><span>2</span><b>You</b><u>842</u></div>
+            <div class="mlb-r"><span>3</span><b>Tyrese</b><u>815</u></div>
+          </div>
+          <div class="prof-badges">
+            <span class="pb on">🏆</span><span class="pb on">🎯</span><span class="pb on">🧠</span><span class="pb on">⚡</span><span class="pb locked">🔒</span>
+          </div>
+          <div class="xp-pop">+120 XP</div>
+        </div>
       </div>
-      <div class="dfoot">The Lab starts scouting <b>the day you join</b>. Every check-in sharpens your file.</div>
     </div>
+  </div>
+
+  <!-- animated stats -->
+  <div class="wrap">
+    <div class="stats">
+      <div class="stat">
+        <div class="n"><span data-count="14" data-suffix="">0</span></div>
+        <div class="l">Days left to lock in</div>
+      </div>
+      <div class="stat live">
+        <div class="n"><span id="enrolCount">—</span><span class="u"></span></div>
+        <div class="l">Early sign-ups · live</div>
+      </div>
+      <div class="stat">
+        <div class="n"><span id="seatsLeft">—</span><span class="u" id="seatCap">/30</span></div>
+        <div class="l">Founding seats left</div>
+      </div>
+      <div class="stat">
+        <div class="n"><span data-count="4">0</span><span class="u">wks</span></div>
+        <div class="l">To a smarter player</div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:18px" class="mono" id="countdown">Early access closes in — : — : — : —</div>
   </div>
 </header>
 
-<!-- HOW IT WORKS -->
-<section id="how">
+<div class="wrap"><div class="rule"></div></div>
+
+<!-- ============ PROBLEM ============ -->
+<section id="problem">
   <div class="wrap">
     <div class="sec-head">
-      <span class="eyebrow">The System</span>
-      <h2 class="display">How This Works.</h2>
-      <p>Four steps. Two minutes a day. That's the whole machine — and it compounds fast.</p>
+      <span class="eyebrow">The Opportunity</span>
+      <h2 class="display grad">The Gap Isn't Physical.<br>It's Mental.</h2>
+      <p>Most players spend every hour training their hands and their legs. The players who separate themselves train something almost nobody does — the six inches between the ears.</p>
     </div>
-    <div class="steps">
-      <div class="step"><span class="n">STEP 01</span><h3>Join The Lab</h3><p>Hit Log In → Join. Name, position, age, a 4-digit PIN. Twenty seconds and you have a profile.</p><span class="big">01</span></div>
-      <div class="step"><span class="n">STEP 02</span><h3>Check In Daily</h3><p>Energy, confidence, minutes, what you worked on, one honest line. Every day. That's your end of the deal.</p><span class="big">02</span></div>
-      <div class="step"><span class="n">STEP 03</span><h3>The Lab Reads You</h3><p>Your AI scouting profile rebuilds itself from your data — trends, patterns, tendencies. Like an NBA front office, on you.</p><span class="big">03</span></div>
-      <div class="step"><span class="n">STEP 04</span><h3>Get Coached</h3><p>Coach sees your file, drops homework, messages you direct, and builds your sessions around what the Lab finds.</p><span class="big">04</span></div>
-    </div>
-  </div>
-</section>
-
-<!-- WHAT TO EXPECT -->
-<section id="expect" style="background:linear-gradient(180deg,transparent,rgba(255,255,255,.015),transparent)">
-  <div class="wrap">
-    <div class="sec-head">
-      <span class="eyebrow">Inside The App</span>
-      <h2 class="display">What To Expect.</h2>
-      <p>This isn't a group chat. It's your training HQ — everything runs through it.</p>
-    </div>
-    <div class="expect">
-      <div class="ex"><span class="tag">Daily</span><div class="ico">🧠</div><h3>Your Lab Profile</h3><p>An AI scouting file that updates every time you log. It notices what you can't — confidence trends, habits, blind spots.</p></div>
-      <div class="ex"><span class="tag">Direct</span><div class="ico">💬</div><h3>Coach Chat</h3><p>A straight line to coach. Questions, clips, booking a 1-on-1 — no group-chat noise, ever.</p></div>
-      <div class="ex"><span class="tag">Live</span><div class="ico">📅</div><h3>Sessions</h3><p>Weekly live session on Zoom plus the morning workout group — all times Sydney AEST. Zoom links drop in Coach Chat.</p></div>
-      <div class="ex"><span class="tag">Earned</span><div class="ico">⚡</div><h3>XP · Streaks · Levels</h3><p>Rookie → Sharp → Locked In → Elite IQ → Franchise. Check-ins and sessions earn XP. Streaks prove you're about it.</p></div>
-      <div class="ex"><span class="tag">Squad</span><div class="ico">🏀</div><h3>Community</h3><p>The squad feed — wins, runs, shoutouts. Auto-moderated: disrespect gets filtered before it lands.</p></div>
-      <div class="ex"><span class="tag">Assigned</span><div class="ico">📋</div><h3>Homework</h3><p>Coach drops film work and challenges straight to your home screen. Bring your findings to sessions.</p></div>
-    </div>
-  </div>
-</section>
-
-<!-- THE DEAL -->
-<section id="deal">
-  <div class="wrap">
-    <div class="deal">
-      <div class="dtag">⚠ Read this before you join</div>
-      <h2 class="display">You're Gonna Have To<br><span class="amber">Put The Work In.</span></h2>
-      <p>Real talk: the Lab can read your game, but it can't play for you. This works for players who show up. <b>If you're not about it, don't take a founding spot from someone who is.</b></p>
-      <div class="rules">
-        <div class="rule"><span class="rn">01</span><div><b>Check in every day</b><span>Two minutes. No entries, no reads — the profile only gets smart if you feed it.</span></div></div>
-        <div class="rule"><span class="rn">02</span><div><b>Be honest in your logs</b><span>Bad day? Log it. The Lab reads truth, not highlight reels.</span></div></div>
-        <div class="rule"><span class="rn">03</span><div><b>Do the homework</b><span>Film work isn't optional. Champions study. That's the whole point of Basketball IQ.</span></div></div>
-        <div class="rule"><span class="rn">04</span><div><b>Show up to sessions</b><span>Camera on, five minutes early, notebook ready. Sydney time, no excuses.</span></div></div>
-        <div class="rule"><span class="rn">05</span><div><b>Respect the squad</b><span>The feed is family. Disrespect gets filtered — and coach sees everything.</span></div></div>
-        <div class="rule"><span class="rn">06</span><div><b>Protect your streak</b><span>Streaks are receipts. Anyone can show up once — founders show up daily.</span></div></div>
+    <div class="split">
+      <div class="col">
+        <h4>What Most Players Train</h4>
+        <ul>
+          <li><span class="ico">↗</span> Shooting</li>
+          <li><span class="ico">↗</span> Ball Handling</li>
+          <li><span class="ico">↗</span> Finishing</li>
+        </ul>
       </div>
-      <div class="sign">Signed: <b>The Lockdown Lab</b> — basketball isn't about moves. It's about solving problems.</div>
+      <div class="col hot">
+        <h4>What Elite Players Train</h4>
+        <ul>
+          <li><span class="ico">◆</span> Basketball IQ</li>
+          <li><span class="ico">◆</span> Decision Making</li>
+          <li><span class="ico">◆</span> Court Awareness</li>
+        </ul>
+      </div>
     </div>
+    <p class="gap-note">Basketball is not about moves.<span class="amber">It's about solving problems.</span></p>
   </div>
 </section>
 
-<!-- FAQ -->
-<section id="faq" style="background:linear-gradient(180deg,transparent,rgba(255,255,255,.015),transparent)">
+<!-- ============ FRAMEWORK ============ -->
+<section id="framework" style="background:linear-gradient(180deg,transparent,var(--bg-2),transparent)">
   <div class="wrap">
     <div class="sec-head">
-      <span class="eyebrow">Questions</span>
-      <h2 class="display">FAQs.</h2>
+      <span class="eyebrow">The Foundation</span>
+      <h2 class="display grad">Four Reads.<br>One Faster Decision.</h2>
+      <p>Basketball IQ is the ability to recognise patterns and make better decisions, faster. Before every play, elite players scan four things in a fraction of a second.</p>
     </div>
-    <div class="faq">
-      <details open><summary><span class="q">Q1</span>What actually is this?<span class="ar">＋</span></summary><div class="a">Your basketball personal trainer in an app. You check in daily, the Lab builds an AI scouting profile on your game, and coach uses it to train you — live sessions, homework, and a direct message line. Built by Lockdown Lab (<b>@lockdownlab3</b>).</div></details>
-      <details><summary><span class="q">Q2</span>How much does it cost?<span class="ar">＋</span></summary><div class="a"><b>Free for the founding squad.</b> You're early — that's the reward. Later features (Court Finder, Random Runs) will be PRO add-ons, but founders always get first access.</div></details>
-      <details><summary><span class="q">Q3</span>What's a daily check-in?<span class="ar">＋</span></summary><div class="a">Four sliders and one honest line: energy, confidence, minutes on your game, what you worked on. Takes about <b>two minutes</b>. Each one earns +40 XP and feeds your scouting profile.</div></details>
-      <details><summary><span class="q">Q4</span>What if I miss a day?<span class="ar">＋</span></summary><div class="a">Your streak resets — that's the accountability part. Your XP and profile stay. Get back in the next morning and start rebuilding. The Lab notices comebacks too.</div></details>
-      <details><summary><span class="q">Q5</span>Who can see my stuff?<span class="ar">＋</span></summary><div class="a"><b>Your check-ins and messages: only you and coach.</b> Community posts: the whole squad sees those. Nobody outside the Lab sees anything — the database is locked to the public.</div></details>
-      <details><summary><span class="q">Q6</span>Do I need to download anything?<span class="ar">＋</span></summary><div class="a">No app store needed. Open the link, then <b>Add to Home Screen</b> (Share button on iPhone, menu on Android) and it lives on your phone like any other app.</div></details>
-      <details><summary><span class="q">Q7</span>I forgot my PIN.<span class="ar">＋</span></summary><div class="a">Message coach outside the app and he'll reset you. Pick something you'll remember this time. 😤</div></details>
-      <details><summary><span class="q">Q8</span>When are sessions?<span class="ar">＋</span></summary><div class="a">Weekly live session plus the morning workout group — all <b>Sydney (AEST)</b>. Exact times and Zoom links drop in your Coach Chat and the community feed.</div></details>
+    <div class="reads">
+      <div class="read"><span class="num">READ 01</span><h3>Eyes</h3><p>Where are they looking? Focus reveals intent.</p><span class="big">01</span></div>
+      <div class="read"><span class="num">READ 02</span><h3>Hips</h3><p>Which way are they turned? Hips point to the drive.</p><span class="big">02</span></div>
+      <div class="read"><span class="num">READ 03</span><h3>Shoulders</h3><p>Where is the lean? Shoulders reveal balance.</p><span class="big">03</span></div>
+      <div class="read"><span class="num">READ 04</span><h3>Tendencies</h3><p>What do they always do? Habits expose the read.</p><span class="big">04</span></div>
     </div>
   </div>
 </section>
 
-<!-- FINAL CTA -->
+<!-- ============ PROGRAM ============ -->
+<section id="program">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">The Journey</span>
+      <h2 class="display grad">Four Weeks.<br>One Smarter Player.</h2>
+      <p>A live, guided path through the mental game — one focused session each week, with film study, games and a challenge to take back to the court.</p>
+    </div>
+    <div class="weeks">
+      <div class="week">
+        <span class="wtag"><i>01</i> Week One</span>
+        <h3>See The Game Differently</h3>
+        <p>Learn how elite players read information before they ever make a decision. The whole framework, applied to live film.</p>
+        <div class="chips"><span class="chip">NBA Detective</span><span class="chip">Read the Defender</span><span class="chip">Film Study</span></div>
+      </div>
+      <div class="week">
+        <span class="wtag"><i>02</i> Week Two</span>
+        <h3>You Don't Need The Ball To Dominate</h3>
+        <p>Spacing, timing, movement and screening. Discover how to change every possession without touching the ball.</p>
+        <div class="chips"><span class="chip">Off-ball Movement</span><span class="chip">Cutting</span><span class="chip">Screening</span></div>
+      </div>
+      <div class="week">
+        <span class="wtag"><i>03</i> Week Three</span>
+        <h3>Defensive IQ</h3>
+        <p>Read the offence before it happens. Anticipate cuts, kill advantages and become the hardest player to score on.</p>
+        <div class="chips"><span class="chip">Escape Room</span><span class="chip">Anticipation</span><span class="chip">Positioning</span></div>
+      </div>
+      <div class="week">
+        <span class="wtag"><i>04</i> Week Four</span>
+        <h3>Build Your Personal Playbook</h3>
+        <p>Turn four weeks of reads into your own decision system — a playbook built around your game and your strengths.</p>
+        <div class="chips"><span class="chip">Self-Scouting</span><span class="chip">Playbook</span><span class="chip">Graduation</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SKILLS ============ -->
+<section style="background:linear-gradient(180deg,transparent,var(--bg-2),transparent)">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">What You'll Master</span>
+      <h2 class="display grad">Ten Things You Can't Coach<br>With A Shooting Machine.</h2>
+    </div>
+    <div class="skills">
+      <div class="skill"><div class="si">01</div><div class="sn">Basketball IQ</div></div>
+      <div class="skill"><div class="si">02</div><div class="sn">Decision Making</div></div>
+      <div class="skill"><div class="si">03</div><div class="sn">Pattern Recognition</div></div>
+      <div class="skill"><div class="si">04</div><div class="sn">Court Awareness</div></div>
+      <div class="skill"><div class="si">05</div><div class="sn">Communication</div></div>
+      <div class="skill"><div class="si">06</div><div class="sn">Leadership</div></div>
+      <div class="skill"><div class="si">07</div><div class="sn">Confidence</div></div>
+      <div class="skill"><div class="si">08</div><div class="sn">Film Study</div></div>
+      <div class="skill"><div class="si">09</div><div class="sn">Reading Defenders</div></div>
+      <div class="skill"><div class="si">10</div><div class="sn">Off-ball Movement</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ SEGMENTS ============ -->
 <section>
   <div class="wrap">
-    <div class="final">
-      <svg class="lg"><use href="#ll"/></svg>
-      <h2 class="display">Your Trainer<br><span class="amber">Is Waiting.</span></h2>
-      <p>Twenty seconds to join. Two minutes a day. A scouting file that never sleeps.</p>
-      <a class="btn btn-p" href="/app.html" style="font-size:18px;padding:17px 36px">Enter The Lab →</a>
-      <div style="margin-top:18px"><a class="chip" href="https://instagram.com/lockdownlab3" target="_blank" rel="noopener">📸 Follow @lockdownlab3</a></div>
+    <div class="sec-head">
+      <span class="eyebrow">Every Week · Course Extras</span>
+      <h2 class="display grad">Learning Should<br>Feel Like Hooping.</h2>
+      <p>Recurring segments keep every session competitive, fun and unmistakably Lockdown Lab.</p>
+    </div>
+    <div class="segs">
+      <div class="seg"><div class="emoji">🎯</div><div class="freq">Every Week</div><h3>Trickshot of the Week</h3><p>Film your best trickshot. The lab votes. Winners climb the board.</p></div>
+      <div class="seg"><div class="emoji">🎬</div><div class="freq">Every Week</div><h3>Clip of the Week</h3><p>The smartest play caught on film — broken down by the group.</p></div>
     </div>
   </div>
 </section>
 
+<!-- ============ TESTIMONIALS ============ -->
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">From The Lab</span>
+      <h2 class="display grad">Players See It.<br>Parents Feel It.</h2>
+      <p>Testimonial placeholders — swap for real reviews once the first cohort graduates.</p>
+    </div>
+    <div class="quotes">
+      <div class="quote">
+        <div class="stars">★★★★★</div>
+        <p>"He came back from one session talking about reading hips and shoulders. His coach asked what changed. This is different."</p>
+        <div class="who"><span class="av">DP</span><div><b>Danielle P.</b><span>Parent of a U16 guard</span></div></div>
+      </div>
+      <div class="quote">
+        <div class="stars">★★★★★</div>
+        <p>"I used to just run around. Now I actually see the play before it happens. I get open without the ball now."</p>
+        <div class="who"><span class="av">MT</span><div><b>Marcus T.</b><span>Player · Age 15</span></div></div>
+      </div>
+      <div class="quote">
+        <div class="stars">★★★★★</div>
+        <p>"The film study is next level. It feels like MasterClass but for basketball IQ. Worth every session."</p>
+        <div class="who"><span class="av">JR</span><div><b>James R.</b><span>Parent · AAU coach</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="rule"></div></div>
+
+<!-- ============ FOUNDING ACCESS ============ -->
+<section id="founding">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">You're Early · You Matter</span>
+      <h2 class="display grad">Don't Just Join The App.<br>Help Build It.</h2>
+      <p>This is the part that actually matters: founding members get early access to the Lockdown Lab app before anyone else — and a real say in what it becomes. Your feedback shapes the features, the drills and the direction we take. You're not a customer here. You're a founder.</p>
+    </div>
+    <div class="perks">
+      <div class="perk feature"><span class="tagpill">Your voice</span><div class="pk-ico">🛠️</div><h3>Build It With Us</h3><p>Your feedback goes straight to the roadmap. Founders help decide the features, drills and drops we build next — this app grows around you.</p></div>
+      <div class="perk"><span class="tagpill">First</span><div class="pk-ico">📱</div><h3>Early App Access</h3><p>Get the Lockdown Lab app before public launch — every feature, drop and update lands on your phone first.</p></div>
+      <div class="perk"><span class="tagpill">Rare</span><div class="pk-ico">🏆</div><h3>Founding Member</h3><p>A permanent Founder badge on your profile. Everyone who comes after sees you were here first.</p></div>
+      <div class="perk"><span class="tagpill">Locked</span><div class="pk-ico">💸</div><h3>Founding Price</h3><p>Lock in the early-access rate for life. When prices rise at launch, yours never moves.</p></div>
+    </div>
+  </div>
+</section>
+
+<div class="wrap"><div class="rule"></div></div>
+
+<!-- ============ REGISTRATION WIZARD ============ -->
+<section id="register">
+  <div class="wrap" style="max-width:720px">
+    <div class="sec-head" style="text-align:center;margin:0 auto 34px">
+      <span class="eyebrow" style="justify-content:center">Early Registration</span>
+      <h2 class="display grad">Claim Your Founding Seat.</h2>
+      <p style="margin-left:auto;margin-right:auto">This is the real deal: a small, live founding cohort — a handful of players, four weeks on Zoom, coached in real time, plus early access to the app — which you'll help build with your feedback. No pre-recorded fluff and no fake pressure; the seats are genuinely limited so the coaching stays personal. Answer these honestly and we'll build the sessions, and the app, around what you actually need. Two minutes, and you're a founder.</p>
+    </div>
+
+    <div class="wiz">
+      <div class="wiz-top">
+        <div class="wiz-meta">
+          <span class="wiz-step">Step <b id="stepNum">1</b> of 6 · <span id="stepName">The Player</span></span>
+          <span class="wiz-pct"><span id="pct">16</span>%</span>
+        </div>
+        <div class="bar"><i id="barFill"></i></div>
+        <div class="dots" id="dots"></div>
+      </div>
+
+      <div class="wiz-body">
+        <!-- STEP 1 -->
+        <div class="panel active" data-step="1">
+          <div class="p-eye">Read 01 · Who's Stepping On The Court</div>
+          <h3>The Player</h3>
+          <p class="p-sub">Let's start with the athlete we're about to level up.</p>
+          <div class="grid2">
+            <div class="fld full"><label>Player Full Name</label><input type="text" data-field="player_name" required placeholder="e.g. Marcus Thompson"></div>
+            <div class="fld"><label>Age</label><input type="number" data-field="age" min="5" max="99" placeholder="Your age"></div>
+            <div class="fld"><label>Gender</label><select data-field="gender"><option value="">Select</option><option>Male</option><option>Female</option><option>Prefer not to say</option></select></div>
+          </div>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="panel" data-step="2">
+          <div class="p-eye">Read 02 · The Support Team</div>
+          <h3>Parent &amp; Contact</h3>
+          <p class="p-sub">So we can send Zoom links, updates and coach feedback.</p>
+          <div class="grid2">
+            <div class="fld full"><label>Parent / Guardian Name</label><input type="text" data-field="parent_name" placeholder="Full name"></div>
+            <div class="fld"><label>Email</label><input type="email" data-field="email" required placeholder="you@email.com"></div>
+            <div class="fld"><label>Phone</label><input type="tel" data-field="phone" placeholder="+1 (555) 000-0000"></div>
+            <div class="fld full"><label>Emergency Contact</label><input type="text" data-field="emergency_contact" placeholder="Name & phone"></div>
+          </div>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="panel" data-step="3">
+          <div class="p-eye">Read 03 · Scouting Report</div>
+          <h3>Basketball Experience</h3>
+          <p class="p-sub">Help us tailor the film and the reads to your game.</p>
+          <div class="grid2">
+            <div class="fld"><label>Years Playing</label><select data-field="years_playing"><option value="">Select</option><option>Just starting</option><option>1–2 years</option><option>3–5 years</option><option>5+ years</option></select></div>
+            <div class="fld"><label>Current Team</label><input type="text" data-field="current_team" placeholder="School / club / AAU"></div>
+            <div class="fld"><label>Favourite Player</label><input type="text" data-field="favourite_player" placeholder="Who do you study?"></div>
+            <div class="fld full"><label>Primary Position</label>
+              <div class="pills" data-single data-field="position">
+                <span class="pill">Point Guard</span><span class="pill">Shooting Guard</span><span class="pill">Small Forward</span><span class="pill">Power Forward</span><span class="pill">Center</span>
+              </div>
+            </div>
+            <div class="fld"><label>Biggest Strength</label><input type="text" data-field="strength" placeholder="e.g. Handles"></div>
+            <div class="fld"><label>Biggest Weakness</label><input type="text" data-field="weakness" placeholder="e.g. Decision making"></div>
+          </div>
+        </div>
+
+        <!-- STEP 4 -->
+        <div class="panel" data-step="4">
+          <div class="p-eye">Read 04 · The Mission</div>
+          <h3>Your Goals</h3>
+          <p class="p-sub">The clearer the target, the faster we get you there.</p>
+          <div class="fld full"><label>What do you most want to improve?</label><textarea data-field="goal_improve" placeholder="e.g. Reading defenders and making faster decisions"></textarea></div>
+          <div class="fld full"><label>What frustrates you most about your game right now?</label><textarea data-field="frustrations" placeholder="Be honest — this is where the growth is"></textarea></div>
+          <div class="fld full"><label>What do you hope to walk away with?</label><textarea data-field="hopes" placeholder="e.g. A personal playbook and real court confidence"></textarea></div>
+        </div>
+
+        <!-- STEP 5 -->
+        <div class="panel" data-step="5">
+          <div class="p-eye">Read 05 · Game Time</div>
+          <h3>Availability</h3>
+          <p class="p-sub">Live sessions run on Zoom — all times are <b style="color:var(--text)">Sydney (AEST)</b>. Pick what fits.</p>
+          <div class="fld full"><label>Preferred Session</label>
+            <div class="pills" data-single data-field="preferred_session">
+              <span class="pill">Weeknights 6–7pm</span><span class="pill">Weeknights 7–8pm</span><span class="pill">Weeknights 8–9pm</span><span class="pill">Weeknights 9–10pm</span><span class="pill">Saturday AM</span><span class="pill">Saturday PM</span><span class="pill">Sunday AM</span><span class="pill">Sunday PM</span>
+            </div>
+          </div>
+          <input type="hidden" data-field="timezone" value="Sydney (AEST)">
+        </div>
+
+        <!-- STEP 6 -->
+        <div class="panel" data-step="6">
+          <div class="p-eye">Final Read · Lock It In</div>
+          <h3>Agreement</h3>
+          <p class="p-sub">A few confirmations and you're officially in the Lab.</p>
+          <label class="consent" data-consent data-field="consent_terms"><span class="box"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg></span><span class="ct"><b>Terms &amp; Conditions</b><span>I agree to the Lockdown Lab program terms and code of conduct.</span></span></label>
+          <label class="consent" data-consent data-field="consent_photo"><span class="box"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg></span><span class="ct"><b>Photo &amp; Film Consent</b><span>Sessions may be recorded for film study and highlights.</span></span></label>
+          <label class="consent" data-consent data-field="consent_parent"><span class="box"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5 9-11"/></svg></span><span class="ct"><b>Parent / Guardian Approval</b><span>I confirm I am the parent or guardian, or have their approval to register.</span></span></label>
+        </div>
+      </div>
+
+      <div class="wiz-foot">
+        <button class="link-back" id="backBtn" disabled>← Back</button>
+        <button class="btn btn-primary" id="nextBtn">Continue →</button>
+      </div>
+    </div>
+
+    <div class="trust">
+      <span><span class="g">🔒</span> Secure &amp; encrypted</span>
+      <span>No spam — ever</span>
+      <span>Powered by Supabase &amp; Stripe</span>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
 <footer>
   <div class="wrap foot">
-    <div style="display:flex;align-items:center;gap:10px"><svg style="width:34px;height:34px;color:#fff"><use href="#ll"/></svg><b style="font-family:var(--fd);letter-spacing:2px;text-transform:uppercase;font-weight:400">Lockdown Lab Live</b></div>
-    <div class="fm">© 2026 Lockdown Lab · @lockdownlab3 · Sydney AEST</div>
+    <div class="brand"><svg style="width:44px;height:44px;color:#fff" aria-hidden="true"><use href="#ll-mark"/></svg><span><b>Lockdown Lab</b><small>Basketball IQ Academy</small></span></div>
+    <div class="fm">© 2026 Lockdown Lab · @lockdownlab3 · Live on Zoom</div>
   </div>
 </footer>
 
-</body>
-</html>
+<!-- ============ SUCCESS OVERLAY ============ -->
+<canvas id="confetti"></canvas>
+<div class="success" id="success">
+  <div class="success-card">
+    <div class="crest">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#0a0500" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <span class="eyebrow">You're In · Founding Member</span>
+    <h2>Welcome To<br>Lockdown Lab</h2>
+    <div class="who" id="successName">You're officially a founding member.</div>
+    <p>You got in early — that founding status is yours for good. Here's exactly what happens next.</p>
+    <div class="checklist">
+      <div class="ci"><span class="n">1</span><div><b>Check your email</b><span>Confirmation, your founder badge &amp; Zoom link are on the way.</span></div></div>
+      <div class="ci"><span class="n">2</span><div><b>Help build the app</b><span>Early access when it drops — plus your feedback shapes what we build next.</span></div></div>
+      <div class="ci"><span class="n">3</span><div><b>Grab your Welcome Pack</b><span>Framework cheat-sheet &amp; Week 1 prep checklist.</span></div></div>
+    </div>
+    <a class="btn btn-primary btn-block" href="welcome-pack.pdf" target="_blank" rel="noopener" download>Download Welcome Pack ↓</a>
+    <button class="link-back" style="margin-top:14px" onclick="closeSuccess()">Back to site</button>
+  </div>
+</div>
+
+
+<script>
+(function(){
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- Supabase config (public keys — RLS protects data) ---------- */
+  const SUPABASE_URL = 'https://ymuwuhvqqftgpxwhzoub.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_-j-P1TcLeGZ6lGspru2YwA_3RxAlucJ';
+  const FOUNDING_CAP = 30; // total founding seats — change to taste
+
+  /* ---------- count-up stats ---------- */
+  function countUp(el){
+    const target = +el.dataset.count; const dur = 1200; const start = performance.now();
+    if(reduce){el.textContent = target; return;}
+    function tick(now){
+      const p = Math.min((now-start)/dur,1);
+      const eased = 1-Math.pow(1-p,3);
+      el.textContent = Math.round(target*eased);
+      if(p<1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+  const io = new IntersectionObserver((es)=>{
+    es.forEach(e=>{ if(e.isIntersecting){ e.target.querySelectorAll('[data-count]').forEach(countUp); io.unobserve(e.target);} });
+  },{threshold:.4});
+  document.querySelectorAll('.stats').forEach(s=>io.observe(s));
+
+  /* ---------- real seat counter (from Supabase) ---------- */
+  async function loadRealStats(){
+    const capEl = document.getElementById('seatCap');
+    if(capEl) capEl.textContent = '/'+FOUNDING_CAP;
+    try{
+      const r = await fetch(SUPABASE_URL+'/rest/v1/rpc/registration_count', {
+        method:'POST',
+        headers:{ apikey:SUPABASE_KEY, Authorization:'Bearer '+SUPABASE_KEY, 'Content-Type':'application/json' },
+        body:'{}',
+        signal: AbortSignal.timeout(6000)
+      });
+      if(!r.ok) throw new Error('count');
+      const n = await r.json();
+      const count = Number.isFinite(n) ? n : 0;
+      document.getElementById('enrolCount').textContent = count;
+      document.getElementById('seatsLeft').textContent = Math.max(0, FOUNDING_CAP - count);
+    }catch(e){
+      document.getElementById('enrolCount').textContent = '0';
+      document.getElementById('seatsLeft').textContent = FOUNDING_CAP;
+    }
+  }
+  loadRealStats();
+
+  /* ---------- countdown ---------- */
+  const intake = new Date('2026-07-28T18:00:00Z').getTime();
+  const cd = document.getElementById('countdown');
+  function pad(n){return String(n).padStart(2,'0');}
+  function updateCd(){
+    let diff = intake - Date.now();
+    if(diff<0) diff=0;
+    const d=Math.floor(diff/864e5), h=Math.floor(diff/36e5)%24, m=Math.floor(diff/6e4)%60, s=Math.floor(diff/1e3)%60;
+    cd.innerHTML = 'Early access closes in <b class="amber">'+pad(d)+'</b>d <b class="amber">'+pad(h)+'</b>h <b class="amber">'+pad(m)+'</b>m <b class="amber">'+pad(s)+'</b>s';
+  }
+  updateCd(); setInterval(updateCd,1000);
+
+  /* ---------- choice pills ---------- */
+  document.querySelectorAll('.pills[data-single]').forEach(group=>{
+    group.addEventListener('click',e=>{
+      const pill = e.target.closest('.pill'); if(!pill) return;
+      group.querySelectorAll('.pill').forEach(p=>p.classList.remove('sel'));
+      pill.classList.add('sel');
+    });
+  });
+  /* ---------- consent toggles ---------- */
+  document.querySelectorAll('[data-consent]').forEach(c=>{
+    c.addEventListener('click',e=>{e.preventDefault(); c.classList.toggle('on'); validateStep();});
+  });
+
+  /* ---------- wizard engine ---------- */
+  const names = ['The Player','Parent & Contact','Basketball Experience','Your Goals','Availability','Agreement'];
+  const total = 6; let step = 1;
+  const panels = [...document.querySelectorAll('.panel')];
+  const barFill = document.getElementById('barFill');
+  const dots = document.getElementById('dots');
+  panels.forEach((_,i)=>{ const d=document.createElement('span'); d.className='d'+(i===0?' on':''); dots.appendChild(d); });
+  const dEls = [...dots.children];
+  const nextBtn = document.getElementById('nextBtn');
+  const backBtn = document.getElementById('backBtn');
+
+  function render(){
+    panels.forEach(p=>p.classList.toggle('active', +p.dataset.step===step));
+    const pct = Math.round(step/total*100);
+    document.getElementById('stepNum').textContent = step;
+    document.getElementById('stepName').textContent = names[step-1];
+    document.getElementById('pct').textContent = pct;
+    barFill.style.width = pct+'%';
+    dEls.forEach((d,i)=>d.classList.toggle('on', i<step));
+    backBtn.disabled = step===1;
+    nextBtn.textContent = step===total ? 'Complete Registration ✓' : 'Continue →';
+    validateStep();
+  }
+  function validateStep(){
+    if(step===total){
+      const all = [...document.querySelectorAll('[data-consent]')].every(c=>c.classList.contains('on'));
+      nextBtn.style.opacity = all?1:.5;
+      nextBtn.dataset.ok = all?'1':'0';
+    } else { nextBtn.style.opacity=1; nextBtn.dataset.ok='1'; }
+  }
+  /* ---------- Supabase registration capture (config defined at top) ---------- */
+  const errBox = document.createElement('div');
+  errBox.style.cssText = 'display:none;margin:14px 30px 0;padding:12px 15px;border:1px solid #ff5252;background:rgba(255,82,82,.12);color:#ff9a9a;border-radius:10px;font-size:13px;font-family:var(--fb)';
+  document.querySelector('.wiz-foot').insertAdjacentElement('beforebegin', errBox);
+  const showWizError = m => { errBox.textContent = m; errBox.style.display='block'; };
+  const clearWizError = () => { errBox.style.display='none'; };
+
+  function collectForm(){
+    const data = { source:'landing_teaser', user_agent: navigator.userAgent };
+    document.querySelectorAll('#register [data-field]').forEach(el=>{
+      const key = el.dataset.field;
+      if(el.matches('[data-consent]')){ data[key] = el.classList.contains('on'); return; }
+      if(el.classList.contains('pills')){ const s = el.querySelector('.pill.sel'); data[key] = s ? s.textContent.trim() : null; return; }
+      const v = (el.value||'').trim();
+      if(key==='age'){ data[key] = v ? parseInt(v,10) : null; return; }
+      data[key] = v || null;
+    });
+    return data;
+  }
+  async function submitRegistration(data){
+    const res = await fetch(SUPABASE_URL + '/rest/v1/registrations', {
+      method:'POST',
+      headers:{ apikey:SUPABASE_KEY, Authorization:'Bearer '+SUPABASE_KEY, 'Content-Type':'application/json', Prefer:'return=minimal' },
+      body: JSON.stringify(data)
+    });
+    if(!res.ok) throw new Error(await res.text().catch(()=>'HTTP '+res.status));
+  }
+
+  nextBtn.addEventListener('click', async ()=>{
+    clearWizError();
+    if(nextBtn.dataset.ok==='0'){
+      document.querySelectorAll('[data-consent]:not(.on) .box').forEach(b=>{b.animate([{transform:'translateX(0)'},{transform:'translateX(-4px)'},{transform:'translateX(4px)'},{transform:'translateX(0)'}],{duration:250});});
+      return;
+    }
+    if(step<total){ step++; render(); document.getElementById('register').scrollIntoView({behavior: reduce?'auto':'smooth', block:'start'}); return; }
+    if(nextBtn.dataset.busy==='1') return;
+    const data = collectForm();
+    if(!data.player_name){ showWizError('Please add the player’s name (Step 1) before submitting.'); return; }
+    if(!data.email || data.email.indexOf('@') < 1){ showWizError('Please add a valid email (Step 2) so we can send your Zoom link.'); return; }
+    nextBtn.dataset.busy='1';
+    const label = nextBtn.textContent;
+    nextBtn.textContent = 'Locking your spot…'; nextBtn.style.opacity=.75; backBtn.disabled=true;
+    try {
+      await submitRegistration(data);
+      openSuccess();
+    } catch(err){
+      showWizError('We couldn’t save your registration just now — please try again in a moment.');
+    } finally {
+      nextBtn.dataset.busy='0'; nextBtn.textContent=label; nextBtn.style.opacity=1; backBtn.disabled=false;
+    }
+  });
+  backBtn.addEventListener('click',()=>{ if(step>1){ step--; render(); } });
+  render();
+
+  /* ---------- success + confetti ---------- */
+  const successEl = document.getElementById('success');
+  window.closeSuccess = ()=>{ successEl.classList.remove('show'); document.getElementById('confetti').classList.remove('show'); stopConfetti(); };
+  function openSuccess(){
+    const nameInput = document.querySelector('.panel[data-step="1"] input[type="text"]');
+    const nm = nameInput && nameInput.value.trim();
+    document.getElementById('successName').textContent = nm ? nm+' — you’re a founding member.' : 'You’re officially a founding member.';
+    successEl.classList.add('show');
+    fireConfetti();
+  }
+
+  /* confetti */
+  const canvas = document.getElementById('confetti'); const ctx = canvas.getContext('2d');
+  let parts=[], raf=null;
+  function size(){ canvas.width=innerWidth; canvas.height=innerHeight; }
+  addEventListener('resize',size); size();
+  function fireConfetti(){
+    if(reduce) return;
+    canvas.classList.add('show');
+    const colors=['#ff6b00','#ff8a2b','#ffffff','#ffb37a'];
+    parts = Array.from({length:160},()=>({
+      x:innerWidth/2+(Math.random()-.5)*140, y:innerHeight/2,
+      vx:(Math.random()-.5)*14, vy:Math.random()*-16-4,
+      g:.38+Math.random()*.2, s:5+Math.random()*7,
+      rot:Math.random()*6, vr:(Math.random()-.5)*.4,
+      c:colors[Math.random()*colors.length|0], life:0
+    }));
+    cancelAnimationFrame(raf); loop();
+  }
+  function stopConfetti(){ cancelAnimationFrame(raf); ctx.clearRect(0,0,canvas.width,canvas.height); }
+  function loop(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    let alive=false;
+    parts.forEach(p=>{
+      p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr; p.life++;
+      if(p.y<canvas.height+40) alive=true;
+      ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot); ctx.fillStyle=p.c;
+      ctx.globalAlpha=Math.max(0,1-p.life/160);
+      ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6); ctx.restore();
+    });
+    if(alive) raf=requestAnimationFrame(loop); else stopConfetti();
+  }
+})();
+</script>
