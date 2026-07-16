@@ -1,0 +1,95 @@
+import type { Role } from "@/types";
+
+/**
+ * Role definitions and the permission matrix.
+ *
+ * In production these are enforced server-side via Supabase Row Level
+ * Security; the client uses them only to shape navigation and views.
+ */
+
+export interface RoleDefinition {
+  id: Role;
+  label: string;
+  description: string;
+  homePath: string;
+  demoUser: { name: string; detail: string; initials: string };
+}
+
+export const roles: RoleDefinition[] = [
+  {
+    id: "parent",
+    label: "Parent / Guardian",
+    description: "See how your family member's day went, follow their progress and celebrate every win.",
+    homePath: "/family",
+    demoUser: { name: "Sarah Andersson", detail: "Milo's mum", initials: "SA" },
+  },
+  {
+    id: "support-worker",
+    label: "Support Worker",
+    description: "Start prepared, document effortlessly, and spend your energy on people — not paperwork.",
+    homePath: "/dashboard",
+    demoUser: { name: "Grace Whitfield", detail: "Senior support worker", initials: "GW" },
+  },
+  {
+    id: "participant",
+    label: "Participant",
+    description: "Your goals, your story, your team — in your own space.",
+    homePath: "/participants/ava",
+    demoUser: { name: "Ava Nguyen", detail: "Writer & advocate", initials: "AN" },
+  },
+  {
+    id: "team-leader",
+    label: "Team Leader",
+    description: "Keep every shift, participant and worker supported and on track.",
+    homePath: "/dashboard",
+    demoUser: { name: "Priya Sharma", detail: "Team leader, north team", initials: "PS" },
+  },
+  {
+    id: "therapist",
+    label: "Therapist",
+    description: "Follow therapy goals between sessions with real observations from the whole team.",
+    homePath: "/participants",
+    demoUser: { name: "Dr. Priya Raman", detail: "Speech pathologist", initials: "PR" },
+  },
+  {
+    id: "provider-admin",
+    label: "Provider Administrator",
+    description: "Outcomes, quality and workforce — the whole organisation at a glance.",
+    homePath: "/provider",
+    demoUser: { name: "Amelia Torres", detail: "Operations director", initials: "AT" },
+  },
+  {
+    id: "ceo",
+    label: "CEO",
+    description: "One question, answered honestly: are we genuinely improving people's lives?",
+    homePath: "/executive",
+    demoUser: { name: "David Chen", detail: "Chief Executive, Sunrise Support Collective", initials: "DC" },
+  },
+  {
+    id: "system-admin",
+    label: "System Administrator",
+    description: "Permissions, audit logs, integrations and platform health.",
+    homePath: "/settings",
+    demoUser: { name: "Ray Kaur", detail: "Platform administrator", initials: "RK" },
+  },
+];
+
+export function getRole(id: Role): RoleDefinition {
+  return roles.find((r) => r.id === id) ?? roles[1];
+}
+
+/** Which navigation sections each role can see. */
+export const rolePermissions: Record<Role, string[]> = {
+  parent: ["family", "timeline", "learning", "notifications", "settings", "help"],
+  participant: ["participants", "timeline", "learning", "community", "notifications", "settings", "help"],
+  "support-worker": ["dashboard", "participants", "shift", "timeline", "assistant", "learning", "community", "notifications", "settings", "help"],
+  "team-leader": ["dashboard", "participants", "shift", "timeline", "assistant", "learning", "community", "reports", "notifications", "settings", "help"],
+  therapist: ["dashboard", "participants", "timeline", "assistant", "learning", "reports", "notifications", "settings", "help"],
+  "provider-admin": ["provider", "dashboard", "participants", "timeline", "assistant", "learning", "community", "reports", "notifications", "settings", "help"],
+  ceo: ["executive", "provider", "participants", "timeline", "reports", "notifications", "settings", "help"],
+  "system-admin": ["dashboard", "participants", "reports", "notifications", "settings", "help"],
+};
+
+export function canSee(role: Role, navKey: string): boolean {
+  return rolePermissions[role]?.includes(navKey) ?? false;
+}
