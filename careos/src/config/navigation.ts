@@ -2,6 +2,9 @@ import {
   LayoutDashboard,
   Users,
   CalendarClock,
+  CalendarRange,
+  ShieldCheck,
+  Receipt,
   Sparkles,
   GraduationCap,
   MapPin,
@@ -21,7 +24,7 @@ export interface NavItem {
   label: string;
   href: string;
   icon: LucideIcon;
-  section: "care" | "insight" | "system";
+  section: "care" | "operations" | "insight" | "system";
 }
 
 /**
@@ -36,6 +39,9 @@ export const navItems: NavItem[] = [
   { key: "participants", label: "Participants", href: "/participants", icon: Users, section: "care" },
   { key: "shift", label: "Today's Shift", href: "/shift", icon: CalendarClock, section: "care" },
   { key: "timeline", label: "Timeline", href: "/timeline", icon: History, section: "care" },
+  { key: "roster", label: "Rostering", href: "/roster", icon: CalendarRange, section: "operations" },
+  { key: "compliance", label: "Compliance", href: "/compliance", icon: ShieldCheck, section: "operations" },
+  { key: "billing", label: "Billing & Claims", href: "/billing", icon: Receipt, section: "operations" },
   { key: "assistant", label: "AI Assistant", href: "/assistant", icon: Sparkles, section: "insight" },
   { key: "learning", label: "Learning Hub", href: "/learning", icon: GraduationCap, section: "insight" },
   { key: "community", label: "Community Planner", href: "/community", icon: MapPin, section: "insight" },

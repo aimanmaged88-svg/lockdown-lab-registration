@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 
 const sectionLabels: Record<string, string> = {
   care: "Care",
+  operations: "Operations",
   insight: "Insight",
   system: "System",
 };
@@ -22,7 +23,7 @@ export function Sidebar() {
   const { role, definition } = useRole();
 
   const visible = navItems.filter((item) => canSee(role, item.key));
-  const sections = ["care", "insight", "system"].filter((s) => visible.some((i) => i.section === s));
+  const sections = ["care", "operations", "insight", "system"].filter((s) => visible.some((i) => i.section === s));
 
   return (
     <aside className="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col bg-sidebar text-sidebar-foreground lg:flex" aria-label="Primary navigation">
