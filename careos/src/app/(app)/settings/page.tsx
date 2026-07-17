@@ -185,7 +185,7 @@ export default function SettingsPage() {
       {/* Audit log */}
       <motion.div variants={fadeUp}>
         <Card>
-          <CardHeader className="flex-row items-center justify-between space-y-0">
+          <CardHeader className="flex-col items-start gap-3 space-y-0 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <CardTitle className="flex items-center gap-2 text-base">
                 <ScrollText className="h-4 w-4 text-primary" aria-hidden="true" />
@@ -228,8 +228,9 @@ export default function SettingsPage() {
             <CardDescription>Eight roles, one principle: everyone sees exactly what helps them care — nothing more.</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="overflow-x-auto scrollbar-thin">
-              <table className="w-full min-w-[560px] text-sm">
+            {/* Table on wide screens; stacked cards on phones so nothing clips. */}
+            <div className="hidden overflow-x-auto scrollbar-thin md:block">
+              <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b text-left text-xs uppercase tracking-wide text-muted-foreground">
                     <th scope="col" className="pb-2.5 pr-4 font-medium">Role</th>
@@ -240,8 +241,8 @@ export default function SettingsPage() {
                 <tbody className="divide-y">
                   {roles.map((r) => (
                     <tr key={r.id}>
-                      <td className="py-3 pr-4 font-medium">{r.label}</td>
-                      <td className="py-3 pr-4 text-muted-foreground">{r.demoUser.name}</td>
+                      <td className="py-3 pr-4 font-medium align-top">{r.label}</td>
+                      <td className="py-3 pr-4 align-top text-muted-foreground">{r.demoUser.name}</td>
                       <td className="py-3">
                         <div className="flex flex-wrap gap-1">
                           {rolePermissions[r.id].map((area) => (
@@ -254,6 +255,19 @@ export default function SettingsPage() {
                 </tbody>
               </table>
             </div>
+            <ul className="space-y-3 md:hidden">
+              {roles.map((r) => (
+                <li key={r.id} className="rounded-2xl border bg-background/60 p-4">
+                  <p className="font-medium">{r.label}</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">{r.demoUser.name}</p>
+                  <div className="mt-2.5 flex flex-wrap gap-1">
+                    {rolePermissions[r.id].map((area) => (
+                      <Badge key={area} variant="muted" className="font-normal capitalize">{area}</Badge>
+                    ))}
+                  </div>
+                </li>
+              ))}
+            </ul>
           </CardContent>
         </Card>
       </motion.div>

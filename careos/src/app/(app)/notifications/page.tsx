@@ -86,10 +86,10 @@ export default function NotificationsPage() {
                       <p className={cn("text-sm", n.read ? "font-medium text-muted-foreground" : "font-semibold")}>{n.title}</p>
                       <Badge variant="muted" className="font-normal">{config.label}</Badge>
                       {!n.read && <span className="h-2 w-2 rounded-full bg-primary" aria-label="Unread" />}
+                      <time className="ml-auto shrink-0 text-xs text-muted-foreground">{n.time}</time>
                     </div>
                     <p className="mt-0.5 text-sm leading-relaxed text-muted-foreground">{n.body}</p>
                   </div>
-                  <time className="shrink-0 text-xs text-muted-foreground">{n.time}</time>
                 </Link>
               </motion.li>
             );

@@ -23,11 +23,29 @@ export function MobileTabBar() {
   const visible = navItems.filter((item) => canSee(role, item.key));
   const tabs = visible.slice(0, 4);
 
+  // Short, self-contained labels for the tab bar (avoids dangling words like "Today's").
+  const shortLabels: Record<string, string> = {
+    shift: "Shift",
+    participants: "People",
+    dashboard: "Home",
+    executive: "Exec",
+    provider: "Org",
+    family: "Family",
+    timeline: "Timeline",
+    assistant: "Assistant",
+    learning: "Learn",
+    community: "Places",
+    reports: "Reports",
+    notifications: "Alerts",
+    settings: "Settings",
+    help: "Help",
+  };
+
   return (
     <>
       <nav
         aria-label="Quick navigation"
-        className="glass fixed inset-x-0 bottom-0 z-40 border-t pb-safe lg:hidden"
+        className="glass fixed inset-x-0 bottom-0 z-40 border-t bg-card pb-safe shadow-[0_-8px_24px_-12px_rgb(16_24_40_/_0.16)] lg:hidden"
       >
         <div className="mx-auto grid h-16 max-w-md grid-cols-5">
           {tabs.map((item) => {
@@ -51,7 +69,7 @@ export function MobileTabBar() {
                   />
                 )}
                 <item.icon className="relative h-5 w-5" aria-hidden="true" />
-                <span className="relative">{item.label.split(" ")[0]}</span>
+                <span className="relative">{shortLabels[item.key] ?? item.label}</span>
               </Link>
             );
           })}

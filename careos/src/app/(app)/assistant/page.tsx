@@ -165,7 +165,7 @@ export default function AssistantPage() {
                 key={s}
                 type="button"
                 onClick={() => send(s)}
-                className="rounded-full border bg-background px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/30 hover:bg-primary-soft hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                className="inline-flex min-h-[38px] items-center rounded-full border bg-background px-3.5 py-2 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/30 hover:bg-primary-soft hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               >
                 {s}
               </button>
@@ -181,9 +181,9 @@ export default function AssistantPage() {
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about a participant, draft a note, find a pattern…"
+              placeholder="Ask, draft a note, find a pattern…"
               aria-label="Message the AI assistant"
-              className="h-11"
+              className="h-11 text-ellipsis"
             />
             <Button type="submit" size="icon" className="h-11 w-11 shrink-0" disabled={!input.trim() || thinking} aria-label="Send message">
               <Send className="h-4 w-4" aria-hidden="true" />

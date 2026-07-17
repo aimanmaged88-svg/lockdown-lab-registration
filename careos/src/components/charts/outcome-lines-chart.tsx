@@ -19,10 +19,10 @@ interface OutcomeLinesChartProps {
 export function OutcomeLinesChart({ data, xKey, series, height = 280 }: OutcomeLinesChartProps) {
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <LineChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: -14 }}>
+      <LineChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: 4 }}>
         <CartesianGrid strokeDasharray="3 6" vertical={false} stroke="hsl(var(--border))" />
         <XAxis dataKey={xKey} tickLine={false} axisLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} dy={6} />
-        <YAxis tickLine={false} axisLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} width={40} />
+        <YAxis tickLine={false} axisLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} width={44} />
         <Tooltip
           contentStyle={{
             borderRadius: 12,

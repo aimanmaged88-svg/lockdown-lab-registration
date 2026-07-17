@@ -279,7 +279,7 @@ export default function ShiftPage() {
                   Dictate
                 </Button>
                 <Button
-                  variant="secondary"
+                  variant="default"
                   className="ml-auto"
                   disabled={!note || drafting}
                   onClick={() => {

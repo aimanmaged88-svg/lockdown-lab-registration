@@ -71,7 +71,7 @@ export default function DashboardPage() {
         {/* Today's shifts */}
         <motion.div variants={fadeUp} className="xl:col-span-2">
           <Card className="h-full">
-            <CardHeader className="flex-row items-center justify-between space-y-0">
+            <CardHeader className="flex-col items-start gap-3 space-y-0 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <CardTitle>Today's shifts</CardTitle>
                 <CardDescription>Every shift starts prepared — briefing, goals and alerts loaded.</CardDescription>
@@ -191,7 +191,7 @@ export default function DashboardPage() {
         {/* Recent moments */}
         <motion.div variants={fadeUp} className="xl:col-span-2">
           <Card>
-            <CardHeader className="flex-row items-center justify-between space-y-0">
+            <CardHeader className="flex-col items-start gap-3 space-y-0 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <CardTitle>Recent moments</CardTitle>
                 <CardDescription>The latest from every timeline.</CardDescription>

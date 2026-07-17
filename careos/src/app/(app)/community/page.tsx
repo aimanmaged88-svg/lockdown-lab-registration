@@ -169,7 +169,7 @@ export default function CommunityPlannerPage() {
 
                   <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{place.notes}</p>
 
-                  <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t pt-3.5">
+                  <div className="mt-4 flex flex-col items-start gap-3 border-t pt-3.5 sm:flex-row sm:items-center sm:justify-between">
                     <div className="flex items-center gap-2">
                       <Heart className="h-3.5 w-3.5 text-destructive" aria-hidden="true" />
                       <div className="flex -space-x-1.5">
@@ -187,6 +187,7 @@ export default function CommunityPlannerPage() {
                     <Button
                       variant="soft"
                       size="sm"
+                      className="w-full sm:w-auto"
                       onClick={() =>
                         toast.success(`${place.name} added to the outing plan`, {
                           description: "Route, sensory kit reminders and risk notes attach automatically in the full platform.",

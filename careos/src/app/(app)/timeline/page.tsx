@@ -57,11 +57,13 @@ export default function TimelinePage() {
       >
         <div className="mb-6 overflow-hidden rounded-3xl border bg-card shadow-card">
           <div className={cn("h-1.5 bg-gradient-to-r", participant.gradient)} aria-hidden="true" />
-          <div className="flex flex-wrap items-center gap-4 p-5">
-            <PersonAvatar initials={participant.initials} gradient={participant.gradient} size="lg" />
-            <div className="min-w-0 flex-1">
-              <h2 className="font-display text-xl font-semibold">{participant.preferredName}'s journey</h2>
-              <p className="text-sm text-muted-foreground">{participant.tagline}</p>
+          <div className="flex flex-col gap-4 p-5 sm:flex-row sm:items-center">
+            <div className="flex min-w-0 flex-1 items-center gap-4">
+              <PersonAvatar initials={participant.initials} gradient={participant.gradient} size="lg" />
+              <div className="min-w-0">
+                <h2 className="font-display text-xl font-semibold">{participant.preferredName}'s journey</h2>
+                <p className="text-sm text-muted-foreground">{participant.tagline}</p>
+              </div>
             </div>
             <div className="flex gap-6 text-center">
               <div>

@@ -69,7 +69,7 @@ export default function ProviderPage() {
                 series={[
                   { key: "outcomes", label: "Outcomes index", color: "--chart-1" },
                   { key: "engagement", label: "Family engagement", color: "--chart-2" },
-                  { key: "consistency", label: "Staff consistency", color: "--chart-3" },
+                  { key: "consistency", label: "Staff consistency", color: "--chart-5" },
                 ]}
               />
             </CardContent>
@@ -153,7 +153,7 @@ export default function ProviderPage() {
       {/* Participants needing attention */}
       <motion.div variants={fadeUp}>
         <Card>
-          <CardHeader className="flex-row items-center justify-between space-y-0">
+          <CardHeader className="flex-col items-start gap-3 space-y-0 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <CardTitle className="flex items-center gap-2">
                 <Building2 className="h-4 w-4 text-primary" aria-hidden="true" />

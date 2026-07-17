@@ -173,7 +173,7 @@ export const learningTopics: LearningTopic[] = [
   {
     slug: "adhd",
     title: "ADHD",
-    emoji: "⚡",
+    emoji: "⚡️",
     gradient: "from-orange-400 to-red-400",
     summary: "Executive function, interest-driven attention and designing environments that work with the brain.",
     minutes: 25,

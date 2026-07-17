@@ -57,26 +57,28 @@ export default function FamilyPortalPage() {
         <Card className="overflow-hidden">
           <div className={cn("h-1.5 bg-gradient-to-r", milo.gradient)} aria-hidden="true" />
           <CardContent className="p-6">
-            <div className="flex flex-wrap items-center gap-4">
-              <PersonAvatar initials={milo.initials} gradient={milo.gradient} size="xl" />
-              <div className="min-w-0 flex-1">
-                <h2 className="font-display text-xl font-semibold">Today in three moments</h2>
-                <ul className="mt-2 space-y-1.5">
-                  {milo.todaysWins.map((win) => (
-                    <li key={win} className="flex gap-2 text-sm leading-relaxed text-muted-foreground">
-                      <PartyPopper className="mt-0.5 h-4 w-4 shrink-0 text-warning" aria-hidden="true" />
-                      {win}
-                    </li>
-                  ))}
-                </ul>
+            <div className="flex flex-col gap-5 lg:flex-row lg:items-center">
+              <div className="flex min-w-0 flex-1 items-start gap-4">
+                <PersonAvatar initials={milo.initials} gradient={milo.gradient} size="xl" />
+                <div className="min-w-0 flex-1">
+                  <h2 className="font-display text-xl font-semibold">Today in three moments</h2>
+                  <ul className="mt-2 space-y-1.5">
+                    {milo.todaysWins.map((win) => (
+                      <li key={win} className="flex gap-2 text-sm leading-relaxed text-muted-foreground">
+                        <PartyPopper className="mt-0.5 h-4 w-4 shrink-0 text-warning" aria-hidden="true" />
+                        {win}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-              <div className="grid shrink-0 grid-cols-3 gap-3 text-center sm:grid-cols-3">
+              <div className="grid w-full shrink-0 grid-cols-3 gap-3 text-center lg:w-auto">
                 {[
                   { label: "Mood", value: "😄", detail: "Great" },
                   { label: "Meals", value: "3/3", detail: "All done" },
                   { label: "Goals", value: "2", detail: "Progressed" },
                 ].map((s) => (
-                  <div key={s.label} className="rounded-2xl bg-muted/60 px-4 py-3">
+                  <div key={s.label} className="rounded-2xl bg-muted/60 px-3 py-3 lg:px-4">
                     <p className="font-display text-xl font-semibold">{s.value}</p>
                     <p className="text-xs text-muted-foreground">{s.label} · {s.detail}</p>
                   </div>
@@ -126,7 +128,7 @@ export default function FamilyPortalPage() {
           </Card>
 
           <Card>
-            <CardHeader className="flex-row items-center justify-between space-y-0">
+            <CardHeader className="flex-col items-start gap-3 space-y-0 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <CardTitle className="flex items-center gap-2 text-base">
                   <Heart className="h-4 w-4 text-destructive" aria-hidden="true" />

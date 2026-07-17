@@ -123,7 +123,7 @@ export function CareTimeline({ events }: { events: TimelineEvent[] }) {
 
       {years.map((year) => (
         <section key={year} aria-label={`Events from ${year}`}>
-          <div className="sticky top-16 z-10 -mx-1 mb-4 flex items-center gap-3 bg-background/85 px-1 py-2 backdrop-blur-sm">
+          <div className="glass sticky top-16 z-10 -mx-1 mb-4 flex items-center gap-3 rounded-lg px-2 py-2">
             <h2 className="font-display text-xl font-semibold">{year}</h2>
             <div className="h-px flex-1 bg-border" aria-hidden="true" />
             <span className="text-xs text-muted-foreground">

@@ -19,14 +19,14 @@ export const roles: RoleDefinition[] = [
   {
     id: "parent",
     label: "Parent / Guardian",
-    description: "See how your family member's day went, follow their progress and celebrate every win.",
+    description: "See how their day went and celebrate every win.",
     homePath: "/family",
     demoUser: { name: "Sarah Andersson", detail: "Milo's mum", initials: "SA" },
   },
   {
     id: "support-worker",
     label: "Support Worker",
-    description: "Start prepared, document effortlessly, and spend your energy on people — not paperwork.",
+    description: "Start prepared and spend your energy on people, not paperwork.",
     homePath: "/dashboard",
     demoUser: { name: "Grace Whitfield", detail: "Senior support worker", initials: "GW" },
   },
@@ -47,7 +47,7 @@ export const roles: RoleDefinition[] = [
   {
     id: "therapist",
     label: "Therapist",
-    description: "Follow therapy goals between sessions with real observations from the whole team.",
+    description: "Follow therapy goals between sessions with the team's notes.",
     homePath: "/participants",
     demoUser: { name: "Dr. Priya Raman", detail: "Speech pathologist", initials: "PR" },
   },

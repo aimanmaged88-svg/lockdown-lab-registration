@@ -10,10 +10,11 @@ interface GoalsBarChartProps {
 export function GoalsBarChart({ data, height = 280 }: GoalsBarChartProps) {
   return (
     <ResponsiveContainer width="100%" height={height}>
-      <BarChart data={data} margin={{ top: 8, right: 12, bottom: 0, left: -20 }} barGap={4}>
-        <CartesianGrid strokeDasharray="3 6" vertical={false} stroke="hsl(var(--border))" />
-        <XAxis dataKey="category" tickLine={false} axisLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 11 }} dy={6} interval={0} />
-        <YAxis tickLine={false} axisLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} width={40} />
+      {/* Horizontal layout keeps the life-area labels fully readable at every width. */}
+      <BarChart layout="vertical" data={data} margin={{ top: 4, right: 12, bottom: 0, left: 8 }} barGap={4}>
+        <CartesianGrid strokeDasharray="3 6" horizontal={false} stroke="hsl(var(--border))" />
+        <XAxis type="number" tickLine={false} axisLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} />
+        <YAxis type="category" dataKey="category" tickLine={false} axisLine={false} tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }} width={92} />
         <Tooltip
           cursor={{ fill: "hsl(var(--muted) / 0.6)" }}
           contentStyle={{
@@ -26,8 +27,8 @@ export function GoalsBarChart({ data, height = 280 }: GoalsBarChartProps) {
           }}
         />
         <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 12, paddingTop: 8 }} />
-        <Bar dataKey="achieved" name="Achieved this quarter" fill="hsl(var(--chart-3))" radius={[6, 6, 0, 0]} animationDuration={900} />
-        <Bar dataKey="active" name="Active" fill="hsl(var(--chart-1))" radius={[6, 6, 0, 0]} animationDuration={900} />
+        <Bar dataKey="achieved" name="Achieved this quarter" fill="hsl(var(--chart-3))" radius={[0, 6, 6, 0]} animationDuration={900} />
+        <Bar dataKey="active" name="Active" fill="hsl(var(--chart-1))" radius={[0, 6, 6, 0]} animationDuration={900} />
       </BarChart>
     </ResponsiveContainer>
   );

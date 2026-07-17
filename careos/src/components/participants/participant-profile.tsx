@@ -153,17 +153,16 @@ export function ParticipantProfile({ participant: p, timeline }: { participant: 
       >
         <div className={cn("h-24 bg-gradient-to-r opacity-90 md:h-28", p.gradient)} aria-hidden="true" />
         <div className="px-6 pb-6">
-          <div className="-mt-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-            <div className="flex items-end gap-4">
-              <PersonAvatar initials={p.initials} gradient={p.gradient} size="xl" className="ring-4 ring-card" />
-              <div className="pb-1">
-                <h1 className="font-display text-2xl font-semibold tracking-tight md:text-3xl">{p.preferredName}</h1>
-                <p className="text-sm text-muted-foreground">
-                  {p.name} · {p.pronouns} · {p.age} · {p.location}
-                </p>
-              </div>
+          {/* Avatar overlaps the banner; the name always sits on the card surface below it. */}
+          <PersonAvatar initials={p.initials} gradient={p.gradient} size="xl" className="-mt-11 ring-4 ring-card" />
+          <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <h1 className="font-display text-2xl font-semibold tracking-tight md:text-3xl">{p.preferredName}</h1>
+              <p className="mt-0.5 text-sm text-muted-foreground">
+                {p.name} · {p.pronouns} · {p.age} · {p.location}
+              </p>
             </div>
-            <div className="flex items-center gap-2 pb-1">
+            <div className="flex flex-wrap items-center gap-2">
               <MoodPill mood={p.mood} />
               <Badge variant="secondary">{p.yearsSupported} years together</Badge>
             </div>
@@ -208,20 +207,24 @@ export function ParticipantProfile({ participant: p, timeline }: { participant: 
 
       <motion.div variants={fadeUp}>
         <Tabs defaultValue="overview">
-          <div className="overflow-x-auto pb-1 scrollbar-thin">
-            <TabsList className="h-11 w-max">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="dna">Care DNA</TabsTrigger>
-              <TabsTrigger value="timeline">Timeline</TabsTrigger>
-              <TabsTrigger value="goals">Goals</TabsTrigger>
-              <TabsTrigger value="communication">Communication</TabsTrigger>
-              <TabsTrigger value="sensory">Sensory</TabsTrigger>
-              <TabsTrigger value="health">Health</TabsTrigger>
-              <TabsTrigger value="daily">Daily life</TabsTrigger>
-              <TabsTrigger value="community">Community</TabsTrigger>
-              <TabsTrigger value="documents">Documents</TabsTrigger>
-              <TabsTrigger value="insights">AI insights</TabsTrigger>
-            </TabsList>
+          {/* Right-edge fade signals the tab strip scrolls horizontally on small screens. */}
+          <div className="relative">
+            <div className="overflow-x-auto pb-1 scrollbar-thin [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <TabsList className="h-11 w-max">
+                <TabsTrigger value="overview">Overview</TabsTrigger>
+                <TabsTrigger value="dna">Care DNA</TabsTrigger>
+                <TabsTrigger value="timeline">Timeline</TabsTrigger>
+                <TabsTrigger value="goals">Goals</TabsTrigger>
+                <TabsTrigger value="communication">Communication</TabsTrigger>
+                <TabsTrigger value="sensory">Sensory</TabsTrigger>
+                <TabsTrigger value="health">Health</TabsTrigger>
+                <TabsTrigger value="daily">Daily life</TabsTrigger>
+                <TabsTrigger value="community">Community</TabsTrigger>
+                <TabsTrigger value="documents">Documents</TabsTrigger>
+                <TabsTrigger value="insights">AI insights</TabsTrigger>
+              </TabsList>
+            </div>
+            <div className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-background to-transparent lg:hidden" aria-hidden="true" />
           </div>
 
           {/* -------------------------------- OVERVIEW -------------------------------- */}
