@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { PageHeader } from "@/components/shared/page-header";
-import { auditReadiness, attentionRequired, dueSoon, practiceStandards, autoEvidence } from "@/data/compliance";
+import { auditReadiness, attentionRequired, dueSoon, practiceStandards, autoEvidence, complianceFrameworks, type ControlStatus } from "@/data/compliance";
 import { staggerContainer, fadeUp } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
@@ -129,6 +129,70 @@ export default function CompliancePage() {
           </Card>
         </motion.div>
       </div>
+
+      {/* Frameworks & controls mapping */}
+      <motion.div variants={fadeUp}>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Frameworks & controls</CardTitle>
+            <CardDescription>
+              Every NDIS framework mapped to its controls — each one auto-linked to the everyday records that prove it. No spreadsheets, no scramble.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            {complianceFrameworks.map((fw) => (
+              <div key={fw.name} className="rounded-2xl border bg-background/60 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div>
+                    <p className="text-sm font-semibold">{fw.name}</p>
+                    <p className="text-xs text-muted-foreground">{fw.version}</p>
+                  </div>
+                  <Badge variant={fw.coverage === 100 ? "success" : "warning"}>{fw.coverage}% mapped</Badge>
+                </div>
+                <div className="mt-3 overflow-x-auto scrollbar-thin">
+                  <table className="w-full min-w-[440px] text-sm">
+                    <thead>
+                      <tr className="border-b text-left text-[11px] uppercase tracking-wide text-muted-foreground">
+                        <th scope="col" className="pb-2 pr-3 font-medium">Control</th>
+                        <th scope="col" className="pb-2 pr-3 font-medium">Status</th>
+                        <th scope="col" className="pb-2 pr-3 font-medium">Progress</th>
+                        <th scope="col" className="pb-2 font-medium text-right">Evidence</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {fw.controls.map((c) => {
+                        const st: Record<ControlStatus, { label: string; variant: "success" | "warning" | "muted" }> = {
+                          implemented: { label: "Implemented", variant: "success" },
+                          "in-progress": { label: "In progress", variant: "warning" },
+                          "not-started": { label: "Not started", variant: "muted" },
+                        };
+                        return (
+                          <tr key={c.id}>
+                            <td className="py-2.5 pr-3 font-medium">{c.name}</td>
+                            <td className="py-2.5 pr-3"><Badge variant={st[c.status].variant} className="font-normal">{st[c.status].label}</Badge></td>
+                            <td className="py-2.5 pr-3">
+                              <div className="flex items-center gap-2">
+                                <Progress value={c.progress} indicatorClassName={c.status === "implemented" ? "bg-success" : "bg-warning"} className="h-1.5 w-16" />
+                                <span className="text-xs tabular-nums text-muted-foreground">{c.progress}%</span>
+                              </div>
+                            </td>
+                            <td className="py-2.5 text-right">
+                              <span className="inline-flex items-center gap-1 text-xs text-muted-foreground">
+                                <FileCheck2 className="h-3.5 w-3.5" aria-hidden="true" />
+                                {c.evidence}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </motion.div>
 
       {/* Practice standards */}
       <motion.div variants={fadeUp}>
