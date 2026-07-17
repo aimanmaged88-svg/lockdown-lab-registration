@@ -421,6 +421,8 @@ body.rmode *{animation:none!important;transition:none!important}
     </div>
 
     <div class="ob-form on" data-obf="join">
+      <span class="ob-lbl">Invite code · the Lab is invite-only</span>
+      <input id="jInvite" placeholder="LAB-····" maxlength="10" autocomplete="off" style="text-transform:uppercase">
       <span class="ob-lbl">Your name</span>
       <input id="jName" placeholder="e.g. Marcus T." maxlength="40" autocomplete="off">
       <span class="ob-lbl">Position</span>
@@ -738,6 +740,14 @@ body.rmode *{animation:none!important;transition:none!important}
         <span class="cl">🎟 Invite requests · your call, UNC</span>
         <div id="cInvList"></div>
       </div>
+      <div class="card">
+        <span class="cl">🎟 The door · every join needs a code</span>
+        <div class="composer" style="margin:2px 0 8px">
+          <input id="mintLabel" placeholder="Who's this code for? (e.g. IG DM — @kid)" maxlength="40">
+          <button class="btn btn-p btn-sm" id="mintBtn">Mint code</button>
+        </div>
+        <div id="activeCodes"></div>
+      </div>
       <div id="rosterList"><p style="color:var(--dim);font-size:13px">Loading squad…</p></div>
     </section>
 
@@ -934,7 +944,7 @@ body.rmode *{animation:none!important;transition:none!important}
     if(!/^\d{4}$/.test(pin)) return obErr('#jErr','PIN needs to be exactly 4 digits.');
     busy($('#jGo'),1);
     try{
-      const r=await api({action:'register',name,pos,age,pin});
+      const r=await api({action:'register',name,pos,age,pin,invite:$('#jInvite').value.trim().toUpperCase()});
       sess={type:'player',pid:r.pid,pin,name}; localStorage.setItem(SESS_KEY,JSON.stringify(sess));
       PST=r.state; enterApp(); toast('Welcome to the Lab 🔒');
     }catch(e){ obErr('#jErr',e.message); }
@@ -1005,14 +1015,16 @@ body.rmode *{animation:none!important;transition:none!important}
       if(sess.type==='player'){
         const prevM=PST?PST.messages.length:0, prevX=PST?PST.profile.xp:0;
         const prevPost=(PST&&PST.posts[0])?PST.posts[0].id:null;
-        const prevInv=PST?JSON.stringify((PST.invites||[]).map(i=>i.status)):null;
+        const prevInv=PST?JSON.stringify((PST.invites||[]).map(i=>i.status+(i.used_by?'u':''))):null;
         const r=await api({action:'state',pid:sess.pid,pin:sess.pin}); PST=r.state; renderPlayer(true);
         const nm=PST.messages;
         if(nm.length>prevM && nm[nm.length-1].from_coach){ S.recv(); haptic(20); toast('Coach replied 💬'); notify('coach','Coach replied 💬',nm[nm.length-1].text); }
         if(PST.profile.xp>prevX){ S.like(); }
         const np=PST.posts[0];
         if(np && np.id!==prevPost && np.is_coach && prevPost){ notify('announce','The Lab 📢',np.text); }
-        if(prevInv && JSON.stringify((PST.invites||[]).map(i=>i.status))!==prevInv){ const ap=(PST.invites||[]).find(i=>i.status==='approved'); if(ap){ toast('UNC approved your invite 🎟'); notify('sessions','Invite approved 🎟','Your mate '+ap.friend_name+' is cleared. Share the code.'); } }
+        if(prevInv && JSON.stringify((PST.invites||[]).map(i=>i.status+(i.used_by?'u':'')))!==prevInv){ const used=(PST.invites||[]).find(i=>i.used_by); const ap=(PST.invites||[]).find(i=>i.status==='approved'&&!i.used_by);
+          if(ap){ toast('UNC approved your invite 🎟'); notify('sessions','Invite approved 🎟','Your mate '+ap.friend_name+' is cleared. Share the code.'); }
+          else if(used){ toast(used.friend_name+' is in the Lab 🔓'); notify('sessions','Your mate\'s in 🔓',used.friend_name+' just used your code.'); } }
       }
       else {
         if($('[data-page="cplayer"]').classList.contains('on') && curPid){ await loadDetail(curPid,true); }
@@ -1408,9 +1420,10 @@ body.rmode *{animation:none!important;transition:none!important}
     $('#invList').innerHTML=list.map(i=>{
       if(i.status==='pending') return '<div class="intelnote"><span>⏳</span><span><b style="color:var(--text)">'+esc(i.friend_name)+'</b> — waiting on UNC\'s sign-off</span></div>';
       if(i.status==='denied') return '<div class="intelnote"><span>🚫</span><span><b style="color:var(--text)">'+esc(i.friend_name)+'</b> — not this time</span></div>';
+      if(i.used_by) return '<div class="intelnote"><span>🔓</span><span><b style="color:var(--text)">'+esc(i.friend_name)+'</b> — <b style="color:var(--good)">in the Lab ✓</b> · code '+esc(i.code||'')+' burned</span></div>';
       return '<div class="intelnote" style="align-items:center;flex-wrap:wrap"><span>✅</span><span style="flex:1;min-width:140px"><b style="color:var(--text)">'+esc(i.friend_name)+'</b> — cleared · code <b class="mono" style="color:var(--accent)">'+esc(i.code||'')+'</b></span><button class="btn btn-sm" data-wa="'+esc(i.code||'')+'" style="background:linear-gradient(180deg,#2fdf70,#25d366);color:#04340f;font-family:var(--fd);letter-spacing:1px">WhatsApp ▷</button><button class="btn btn-g btn-sm" data-share="'+esc(i.code||'')+'">⋯</button></div>';
     }).join('')||'<p style="color:var(--dim);font-size:12.5px">The Lab grows by invite only. Drop a mate\'s name — if UNC clears them, you get a code to send.</p>';
-    const invText=code=>'You’re invited to Lockdown Lab Live 🔒 Invite-only — I vouched for you. Code: '+code+'\nJoin here: '+((location.origin&&location.origin.startsWith('http'))?location.origin:'https://lockdown-lab-registration.netlify.app')+'/app.html';
+    const invText=code=>'You’re invited to Lockdown Lab Live 🔒 Invite-only — I vouched for you. Code: '+code+'\nJoin here: '+((location.origin&&location.origin.startsWith('http'))?location.origin:'https://lockdown-lab-registration.netlify.app')+'/app.html?code='+encodeURIComponent(code);
     document.querySelectorAll('[data-wa]').forEach(b=>b.addEventListener('click',()=>{
       window.open('https://wa.me/?text='+encodeURIComponent(invText(b.dataset.wa)),'_blank');
       S.like(); haptic(12);
@@ -1433,7 +1446,23 @@ body.rmode *{animation:none!important;transition:none!important}
   });
 
   /* ---------- invites: coach side ---------- */
+  const waLink=code=>'https://wa.me/?text='+encodeURIComponent('You’re invited to Lockdown Lab Live 🔒 Invite-only. Code: '+code+'\nJoin here: https://lockdown-lab-registration.netlify.app/app.html?code='+encodeURIComponent(code));
+  function renderActiveCodes(){
+    const list=(ROSTER&&ROSTER.active_codes)||[];
+    $('#activeCodes').innerHTML=list.length?list.map(c=>'<div class="intelnote" style="align-items:center"><span>🎟</span><span style="flex:1"><b class="mono" style="color:var(--accent)">'+esc(c.code||'')+'</b> · '+esc(c.friend_name)+((c.player&&c.player.name)?' <span style="color:var(--dim);font-size:11px">(vouched by '+esc(c.player.name)+')</span>':'')+'</span><a class="btn btn-sm" style="background:linear-gradient(180deg,#2fdf70,#25d366);color:#04340f;font-family:var(--fd);letter-spacing:1px" href="'+waLink(c.code||'')+'" target="_blank" rel="noopener">▷</a></div>').join('')
+      :'<p style="color:var(--dim);font-size:12px">No live codes. Mint one for anyone you\'re letting in from IG — or approve a request above.</p>';
+  }
+  $('#mintBtn').addEventListener('click',async()=>{
+    busy($('#mintBtn'),1);
+    try{
+      const r=await api({action:'invite_mint',code:sess.code,label:$('#mintLabel').value.trim()});
+      $('#mintLabel').value=''; toast('Code minted: '+r.code+' 🎟'); S.like(); haptic(12);
+      ROSTER=await api({action:'roster',code:sess.code}); renderActiveCodes();
+    }catch(e){ toast(e.message,true); }
+    busy($('#mintBtn'),0,'Mint code');
+  });
   function renderCoachInvites(){
+    renderActiveCodes();
     const list=(ROSTER&&ROSTER.invites)||[];
     $('#cInvCard').style.display=list.length?'block':'none';
     $('#cInvList').innerHTML=list.map(i=>'<div class="intelnote" style="align-items:center"><span>🎟</span><span style="flex:1"><b style="color:var(--text)">'+esc(i.friend_name)+'</b><br><span style="font-size:11px;color:var(--dim)">vouched by '+esc((i.player&&i.player.name)||'—')+'</span></span><button class="btn btn-p btn-sm" data-inv-ok="'+i.id+'">✓</button><button class="btn btn-g btn-sm" data-inv-no="'+i.id+'">✕</button></div>').join('');
@@ -1445,6 +1474,9 @@ body.rmode *{animation:none!important;transition:none!important}
   [['postInput','postBtn'],['msgInput','msgBtn'],['cMsgInput','cMsgBtn'],['jPin','jGo'],['lPin','lGo'],['cCode','cGo']].forEach(([i,b])=>{
     const el=$('#'+i); if(el) el.addEventListener('keydown',e=>{ if(e.key==='Enter'){e.preventDefault();$('#'+b).click();} });
   });
+
+  /* prefill invite code from a shared link */
+  try{ const qc=new URLSearchParams(location.search).get('code'); if(qc&&$('#jInvite')) $('#jInvite').value=qc.toUpperCase(); }catch(e){}
 
   /* ---------- boot ---------- */
   (async function boot(){
