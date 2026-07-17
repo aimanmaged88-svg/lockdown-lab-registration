@@ -696,6 +696,12 @@ body.rmode *{animation:none!important;transition:none!important}
         <p style="font-size:11.5px;color:var(--dim);margin-top:10px">Some hoopers need to see the play, some need reps, some want the why, some learn loud. Pick yours — homework and film sessions get tailored to how your brain works.</p>
       </div>
 
+      <div class="card hot" id="installCard">
+        <span class="cl">One tap from a real app · no app store needed</span>
+        <h3>📲 Put The Lab On Your Phone</h3>
+        <div id="installBody"></div>
+      </div>
+
       <div class="card">
         <span class="cl">Notifications · your phone, your rules</span>
         <h3>🔔 Notifications</h3>
@@ -990,6 +996,7 @@ body.rmode *{animation:none!important;transition:none!important}
     requestAnimationFrame(()=>moveInd(isCoach?$('#navCoach'):$('#navPlayer')));
     clearInterval(pollT);
     pollT=setInterval(pollTick, 25000);
+    setTimeout(updInstBar, 2500);
   }
   async function pollTick(){
     try{
@@ -1271,7 +1278,7 @@ body.rmode *{animation:none!important;transition:none!important}
     lastPage=(document.querySelector('.tabpage.on')||{}).dataset?.page||((sess&&sess.type==='coach')?'roster':'home');
     if(lastPage==='settings') return;
     $('#learnCard').style.display=(sess&&sess.type==='player')?'block':'none';
-    renderSettings(); go('settings'); stagger('[data-page="settings"]');
+    renderSettings(); renderInstall(); go('settings'); stagger('[data-page="settings"]');
   });
   $('#backSettings').addEventListener('click',()=>go(lastPage==='settings'?((sess&&sess.type==='coach')?'roster':'home'):lastPage));
   function renderSettings(){
@@ -1308,6 +1315,47 @@ body.rmode *{animation:none!important;transition:none!important}
     localStorage.setItem('ll_motion',calm?'calm':'full'); renderSettings();
     if(!calm){ S.like(); burst(false); }
   });
+
+  /* ---------- install: make it an app ---------- */
+  let installEv=null;
+  addEventListener('beforeinstallprompt',e=>{ e.preventDefault(); installEv=e; renderInstall(); updInstBar(); });
+  const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||!!navigator.standalone;
+  const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  function renderInstall(){
+    const el=$('#installBody'); if(!el) return;
+    if(isStandalone()){
+      el.innerHTML='<p style="font-size:13.5px;color:var(--good)">✓ You\'re already running the app. Locked in.</p>';
+    } else if(installEv){
+      el.innerHTML='<p style="font-size:12.5px;color:var(--muted);margin-bottom:12px">Own icon, full screen, no browser bars. One tap:</p><button class="btn btn-p btn-block" id="doInstall">Install Lockdown Lab 📲</button>';
+      $('#doInstall').addEventListener('click',async()=>{ if(!installEv)return; installEv.prompt(); const c=await installEv.userChoice.catch(()=>null); if(c&&c.outcome==='accepted'){ toast('Welcome home 📲'); S.levelup&&S.checkin(); burst(false); } installEv=null; renderInstall(); updInstBar(); });
+    } else if(isIOS){
+      el.innerHTML='<p style="font-size:12.5px;color:var(--muted);margin-bottom:10px">On iPhone it takes 10 seconds, in Safari:</p>'
+        +'<ol style="font-size:13px;color:var(--text);padding-left:20px;display:flex;flex-direction:column;gap:7px">'
+        +'<li>Tap the <b>Share</b> button <span style="border:1px solid var(--line);border-radius:6px;padding:1px 7px">⬆️</span> at the bottom</li>'
+        +'<li>Scroll down · tap <b>Add to Home Screen</b> <span style="border:1px solid var(--line);border-radius:6px;padding:1px 7px">➕</span></li>'
+        +'<li>Tap <b>Add</b> — the Lab lands on your home screen with our logo</li></ol>';
+    } else {
+      el.innerHTML='<p style="font-size:12.5px;color:var(--muted);margin-bottom:10px">In your browser:</p>'
+        +'<ol style="font-size:13px;color:var(--text);padding-left:20px;display:flex;flex-direction:column;gap:7px">'
+        +'<li>Open the <b>⋮ menu</b> (top right)</li>'
+        +'<li>Tap <b>Add to Home screen</b> / <b>Install app</b></li>'
+        +'<li>Confirm — done. Real app, our logo.</li></ol>';
+    }
+  }
+  /* one-time nudge banner above the nav */
+  function updInstBar(){
+    let bar=$('#instBar');
+    const show=!isStandalone()&&sess&&localStorage.getItem('ll_instdis')!=='1';
+    if(!show){ if(bar)bar.remove(); return; }
+    if(!bar){
+      bar=document.createElement('div'); bar.id='instBar';
+      bar.style.cssText='position:fixed;bottom:84px;left:50%;transform:translateX(-50%);width:calc(100% - 28px);max-width:432px;z-index:29;display:flex;align-items:center;gap:10px;background:rgba(16,16,17,.85);backdrop-filter:blur(20px);border:1px solid var(--line);border-radius:18px;padding:10px 14px;box-shadow:0 14px 40px -16px rgba(0,0,0,.9)';
+      bar.innerHTML='<span style="font-size:18px">📲</span><span style="flex:1;font-size:12px;color:var(--muted)"><b style="color:var(--text)">Make it an app.</b> Own icon, full screen, one tap.</span><button class="btn btn-p btn-sm" id="instGo" style="font-size:12px;padding:8px 13px">Show me</button><button style="color:var(--dim);font-size:15px;padding:4px" id="instX">✕</button>';
+      document.body.appendChild(bar);
+      $('#instGo').addEventListener('click',()=>{ $('#setBtn').click(); setTimeout(()=>{ const c=$('#installCard'); if(c)c.scrollIntoView({behavior:'smooth'}); },350); });
+      $('#instX').addEventListener('click',()=>{ localStorage.setItem('ll_instdis','1'); bar.remove(); });
+    }
+  }
 
   /* ---------- notification settings ---------- */
   function renderNP(){
