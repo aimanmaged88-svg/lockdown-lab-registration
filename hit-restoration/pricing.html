@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pricing — Hit Restoration Co. (Prototype)</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="assets/fonts/fonts.css">
+<link rel="stylesheet" href="assets/brand.css">
+<style>
+  .price-cards{display:grid; grid-template-columns:repeat(4,1fr); gap:16px}
+  @media(max-width:960px){.price-cards{grid-template-columns:1fr 1fr}}
+  @media(max-width:520px){.price-cards{grid-template-columns:1fr}}
+  .est{display:grid; grid-template-columns:1fr 1fr; gap:30px; align-items:start}
+  @media(max-width:860px){.est{grid-template-columns:1fr}}
+  .flow{display:grid; grid-template-columns:30px 1fr; gap:16px; padding-bottom:22px; position:relative}
+  .flow::before{content:""; position:absolute; left:14px; top:30px; bottom:0; width:2px; background:var(--line)}
+  .flow:last-child::before{display:none}
+  .flow .fn{width:30px; height:30px; border-radius:50%; background:var(--red); color:#fff; font-weight:800; display:flex; align-items:center; justify-content:center; font-size:.85rem}
+  .est-out{position:sticky; top:110px}
+</style>
+</head>
+<body>
+<main>
+<section class="section-tight"><div class="container">
+  <span class="kicker">Pricing</span>
+  <h1 style="max-width:22rem">Staged. Transparent.<br>Never off a guess.</h1>
+  <p class="lead" style="max-width:44rem">Nothing is charged against a value we've guessed at. Every charge lands only once the number it's based on is confirmed with you — inspection when your card arrives, restoration on a quote you approve, grading on the final result.</p>
+</div></section>
+
+<section style="background:#0D0D0D; border-top:1px solid var(--line); border-bottom:1px solid var(--line)"><div class="container section-tight">
+  <div class="price-cards">
+    <div class="card">
+      <span class="badge badge-red mb1">Every card</span>
+      <div class="price-big">$10 <small>/ card</small></div>
+      <h4 class="mt1">Inspection</h4>
+      <p class="small muted mb0">Charged when your card physically arrives. Non-refundable, but credited toward your invoice if you proceed.</p>
+    </div>
+    <div class="card">
+      <span class="badge badge-red mb1">If restoring</span>
+      <div class="price-big">$20+ <small>base</small></div>
+      <h4 class="mt1">Restoration</h4>
+      <p class="small muted mb0">A flat base by value tier, plus 10% of your card's confirmed value. Quoted firm before any work starts.</p>
+    </div>
+    <div class="card">
+      <span class="badge badge-red mb1">If grading</span>
+      <div class="price-big">At cost <small>+ handling</small></div>
+      <h4 class="mt1">Grading submission</h4>
+      <p class="small muted mb0">The grader's own fee plus submission-partner charges, passed through with a small handling markup.</p>
+    </div>
+    <div class="card">
+      <span class="badge badge-red mb1">On return</span>
+      <div class="price-big">4% <small>of value</small></div>
+      <h4 class="mt1">Grading upcharge</h4>
+      <p class="small muted mb0">4% of the final graded value, charged once the card returns from the grader.</p>
+    </div>
+  </div>
+
+  <h3 class="mt4 mb2">Restoration tiers</h3>
+  <div class="table-wrap" style="max-width:640px">
+    <table class="table">
+      <thead><tr><th>Confirmed card value</th><th>Flat base</th><th>Plus</th></tr></thead>
+      <tbody id="tierRows"></tbody>
+    </table>
+  </div>
+  <p class="small muted mt1">The 10% is calculated on the value we confirm together at intake — not your declared estimate.</p>
+</div></section>
+
+<section class="section"><div class="container">
+  <span class="kicker">Estimate yours</span>
+  <h2>What might it cost?</h2>
+  <p class="muted" style="max-width:40rem">A live estimate — the firm quote always follows a physical inspection at the confirmed value. Nothing here charges you anything.</p>
+  <div class="est mt3">
+    <div class="panel panel-pad">
+      <div class="field"><label>Declared card value (AUD)</label><input class="input" id="val" type="number" min="1" value="450"></div>
+      <div class="field"><label>Restoration</label>
+        <div class="pill-opts"><span class="pill on" id="restoToggle">Include restoration</span></div>
+        <div id="jobWrap" class="mt2"><label class="small muted">Work needed (optional — for your own estimate)</label><div class="pill-opts mt1" id="jobs"></div></div>
+      </div>
+      <div class="field"><label>Grading concierge</label>
+        <div class="pill-opts"><span class="pill" id="gradeToggle">Include grading</span></div>
+        <div id="graderWrap" class="mt2" style="display:none; max-width:240px"><label class="small muted">Grader</label><select class="select mt1" id="grader"></select></div>
+      </div>
+    </div>
+    <div>
+      <div class="panel panel-pad est-out">
+        <h3 style="font-size:1.2rem">Your estimate</h3>
+        <div id="estLines"></div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; border-top:1px solid var(--line-strong); margin-top:8px; padding-top:14px">
+          <b>Estimated to intake</b><span class="price-big" id="estTotal" style="font-size:1.9rem">$0.00</span>
+        </div>
+        <p class="small muted mt2" id="estNote"></p>
+        <a class="btn btn-red w100 btn-lg mt2" href="portal.html#submit">Start a submission</a>
+      </div>
+    </div>
+  </div>
+</div></section>
+
+<section style="background:#0D0D0D; border-top:1px solid var(--line); border-bottom:1px solid var(--line)"><div class="container section-tight">
+  <span class="kicker">Payment flow</span>
+  <h2>When each charge happens</h2>
+  <div class="mt3" style="max-width:640px">
+    <div class="flow"><div class="fn">1</div><div><b class="white">Submit online</b><div class="small muted">No charge — an estimate only.</div></div></div>
+    <div class="flow"><div class="fn">2</div><div><b class="white">Card arrives</b><div class="small muted">We confirm condition and value. The $10 inspection fee is charged.</div></div></div>
+    <div class="flow"><div class="fn">3</div><div><b class="white">Firm restoration quote</b><div class="small muted">Issued on the confirmed value — you approve and pay before any work begins.</div></div></div>
+    <div class="flow"><div class="fn">4</div><div><b class="white">Restoration carried out</b><div class="small muted">Then your before/after reveal lands in the portal.</div></div></div>
+    <div class="flow"><div class="fn">5</div><div><b class="white">Grading submission</b><div class="small muted">If selected, the submission fee is charged before your card ships out.</div></div></div>
+    <div class="flow"><div class="fn">6</div><div><b class="white">Graded & returned</b><div class="small muted">The 4% upcharge on the final value is charged; your card ships back once it's paid.</div></div></div>
+  </div>
+</div></section>
+
+<section class="section"><div class="container">
+  <span class="kicker">Pricing questions</span>
+  <h2>Straight answers</h2>
+  <div class="accordion mt2" id="faq" style="max-width:760px"></div>
+</div></section>
+</main>
+
+<script src="assets/art.js"></script>
+<script src="assets/demo-data.js"></script>
+<script src="assets/shell.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const $ = s => document.querySelector(s);
+  // tiers
+  $('#tierRows').innerHTML = HRDATA.PRICING.tiers.map(t => `<tr><td>${t.label}</td><td>${t.custom?'Custom quote':HR.fmtAUD(t.base)}</td><td>${t.custom?'—':'+ 10% of value'}</td></tr>`).join('');
+  // jobs + graders
+  $('#jobs').innerHTML = HRDATA.SERVICES.map(s => `<span class="pill" data-job="${s.key}">${s.name}</span>`).join('');
+  $('#grader').innerHTML = Object.entries(HRDATA.GRADERS).map(([k,v]) => `<option value="${k}">${v}</option>`).join('');
+
+  let resto = true, grade = false;
+  $('#jobs').addEventListener('click', e => { const p=e.target.closest('[data-job]'); if(p) p.classList.toggle('on'); });
+  $('#restoToggle').addEventListener('click', () => { resto=!resto; $('#restoToggle').classList.toggle('on',resto); $('#restoToggle').textContent = resto?'Include restoration':'No restoration'; $('#jobWrap').style.display = resto?'':'none'; calc(); });
+  $('#gradeToggle').addEventListener('click', () => { grade=!grade; $('#gradeToggle').classList.toggle('on',grade); $('#gradeToggle').textContent = grade?'Include grading':'Include grading'; $('#graderWrap').style.display = grade?'':'none'; calc(); });
+  $('#val').addEventListener('input', calc);
+  $('#grader').addEventListener('change', calc);
+
+  function calc() {
+    const v = parseFloat($('#val').value) || 0;
+    const lines = [];
+    lines.push(['Inspection (credited if you proceed)', HR.fmtAUD(HRDATA.PRICING.inspection)]);
+    let total = HRDATA.PRICING.inspection, custom = false;
+    if (resto) {
+      const f = HRDATA.restorationFee(v);
+      if (f === null) { custom = true; lines.push(['Restoration (value ≥ $10,000)', 'Custom quote']); }
+      else { lines.push([`Restoration — base + 10% of ${HR.fmtAUD(v)}`, HR.fmtAUD(f)]); total += f; }
+    }
+    if (grade) {
+      const g = HRDATA.PRICING.graderEstimates[$('#grader').value] || 0;
+      lines.push([`${HRDATA.GRADERS[$('#grader').value]} submission (est.)`, '~' + HR.fmtAUD(g)]);
+      total += g;
+      lines.push(['<span class="muted">Later: upcharge on return</span>', '<span class="muted">4% of final graded value</span>']);
+    }
+    $('#estLines').innerHTML = lines.map(([l,r]) => `<div style="display:flex; justify-content:space-between; gap:12px; padding:9px 0; border-bottom:1px dashed var(--line); font-size:.92rem"><span>${l}</span><b class="white">${r}</b></div>`).join('');
+    $('#estTotal').textContent = custom ? 'Custom' : HR.fmtAUD(total);
+    $('#estNote').innerHTML = 'This is an estimate. The $10 inspection is charged when your card arrives; your firm restoration quote follows the confirmed value and needs your approval before work starts.' + (grade ? ' The 4% grading upcharge is calculated on the final graded value when your card returns — it isn\'t in this total.' : '');
+  }
+  calc();
+
+  // pricing FAQs (subset)
+  const wanted = ['What does it cost?','Do you guarantee a grade?','Do I have to disclose restoration when I sell?','How do I get my cards to you?'];
+  $('#faq').innerHTML = HRDATA.FAQS.filter(f => wanted.includes(f.q)).map(f => `<details><summary>${f.q}</summary><div class="a-body">${f.a}</div></details>`).join('');
+});
+</script>
+</body>
+</html>

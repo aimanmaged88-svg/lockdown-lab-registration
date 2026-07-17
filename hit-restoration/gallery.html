@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Before & After Gallery — Hit Restoration Co. (Prototype)</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="assets/fonts/fonts.css">
+<link rel="stylesheet" href="assets/brand.css">
+<style>
+  .gal-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:22px}
+  @media(max-width:960px){.gal-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:640px){.gal-grid{grid-template-columns:1fr}}
+  .gal-item{background:var(--surface); border:1px solid var(--line); border-radius:var(--r-lg); padding:14px}
+  .gal-item.feat{border-color:rgba(200,16,46,.45)}
+  .gal-item .chips{display:flex; gap:6px; flex-wrap:wrap; margin-top:10px}
+  .gal-item .chips .c{font-size:.66rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--steel); border:1px solid var(--line); border-radius:999px; padding:3px 9px}
+  .filterbar{display:flex; gap:20px; flex-wrap:wrap; align-items:flex-end; justify-content:space-between; margin-bottom:26px}
+</style>
+</head>
+<body>
+<main class="container section-tight" style="min-height:70vh">
+  <span class="kicker">Before & after</span>
+  <div class="spread mb2">
+    <h1 class="mb0" style="font-size:clamp(2.2rem,5vw,3.4rem)">The proof is in the reveal.</h1>
+  </div>
+  <p class="lead" style="max-width:44rem">Real restorations, dragged to compare. Every card here was photographed before a tool touched it and again when it left the bench.</p>
+  <div class="note-build">Sample artwork stands in for the real restoration photography Hit Restoration Co. is shooting ahead of launch — flagged in the client's own docs as a launch dependency. The layout, filtering and reveal interaction are the finished article.</div>
+
+  <div class="filterbar mt3">
+    <div>
+      <div class="small muted mb1" style="font-weight:700; letter-spacing:.1em; text-transform:uppercase">Category</div>
+      <div class="pill-opts" id="catPills"></div>
+    </div>
+    <div>
+      <div class="small muted mb1" style="font-weight:700; letter-spacing:.1em; text-transform:uppercase">Service</div>
+      <div class="pill-opts" id="svcPills"></div>
+    </div>
+    <div class="muted small" id="count"></div>
+  </div>
+
+  <div class="gal-grid" id="grid"></div>
+  <div id="empty" style="display:none" class="empty" ><div class="lock" style="border:1px dashed var(--line-strong); border-radius:12px; padding:40px; text-align:center; color:var(--steel)">No restorations match those filters. <a href="#" id="clear" style="text-decoration:underline">Clear filters</a></div></div>
+
+  <div class="center mt4">
+    <h2>Your card belongs here.</h2>
+    <a class="btn btn-red btn-lg" href="portal.html#submit">Start a submission</a>
+  </div>
+</main>
+
+<script src="assets/art.js"></script>
+<script src="assets/demo-data.js"></script>
+<script src="assets/shell.js"></script>
+<script>
+(function () {
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const CATS = [['all','All'],['pokemon','Pokémon'],['sports','Sports'],['yugioh','Yu-Gi-Oh!'],['magic','Magic'],['onepiece','One Piece']];
+  let cat = 'all', svc = 'all';
+
+  function draw() {
+    const items = HRDATA.GALLERY.filter(g =>
+      (cat==='all' || g.category===cat) && (svc==='all' || g.services.includes(svc)));
+    $('#count').textContent = items.length + ' restoration' + (items.length===1?'':'s');
+    $('#empty').style.display = items.length ? 'none' : 'block';
+    $('#grid').innerHTML = items.map(g => `
+      <div class="gal-item ${g.featured?'feat':''} fx in">
+        <div class="slab">
+          <div class="slab-label"><span class="l-name">${esc(g.title)}</span>
+            ${g.after && g.after!=='Restored' ? `<span class="l-grade">${esc(g.after)}</span>` : '<span class="l-grade" style="color:var(--success)">RESTORED</span>'}</div>
+          <div class="slab-window" data-rev="${g.id}"></div>
+        </div>
+        <div class="spread mt2">
+          <b class="white" style="font-size:.95rem">${esc(g.title)}</b>
+          ${g.featured?'<span class="badge badge-red">Featured</span>':''}
+        </div>
+        <div class="row mt1" style="gap:8px">
+          <span class="badge-gem" style="padding:5px 10px"><span class="g-label">${esc(g.before.split('—')[0].trim())}</span><span class="g-value" style="font-size:.95rem">${esc(g.after)}</span></span>
+        </div>
+        <p class="small muted mt1 mb0">${esc(g.blurb)}</p>
+        <div class="chips">${g.services.map(s => `<span class="c">${esc((HRDATA.SERVICES.find(x=>x.key===s)||{}).name||s)}</span>`).join('')}</div>
+      </div>`).join('');
+    items.forEach(g => {
+      const host = $(`[data-rev="${g.id}"]`);
+      if (host) HR.mountReveal(host,
+        HRART.cardSVG({name:g.title,category:g.category,state:'before',seed:g.id}),
+        HRART.cardSVG({name:g.title,category:g.category,state:'after',seed:g.id}));
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    $('#catPills').innerHTML = CATS.map(([v,l]) => `<span class="pill ${v==='all'?'on':''}" data-cat="${v}">${l}</span>`).join('');
+    $('#svcPills').innerHTML = `<span class="pill on" data-svc="all">All</span>` + HRDATA.SERVICES.map(s => `<span class="pill" data-svc="${s.key}">${s.name}</span>`).join('');
+    $('#catPills').addEventListener('click', e => { const p=e.target.closest('[data-cat]'); if(!p)return; cat=p.dataset.cat; document.querySelectorAll('[data-cat]').forEach(x=>x.classList.toggle('on',x===p)); draw(); });
+    $('#svcPills').addEventListener('click', e => { const p=e.target.closest('[data-svc]'); if(!p)return; svc=p.dataset.svc; document.querySelectorAll('[data-svc]').forEach(x=>x.classList.toggle('on',x===p)); draw(); });
+    $('#clear').addEventListener('click', e => { e.preventDefault(); cat='all'; svc='all'; document.querySelectorAll('[data-cat]').forEach(x=>x.classList.toggle('on',x.dataset.cat==='all')); document.querySelectorAll('[data-svc]').forEach(x=>x.classList.toggle('on',x.dataset.svc==='all')); draw(); });
+    draw();
+  });
+})();
+</script>
+</body>
+</html>

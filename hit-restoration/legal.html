@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms & Waiver (Draft) — Hit Restoration Co. (Prototype)</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="assets/fonts/fonts.css">
+<link rel="stylesheet" href="assets/brand.css">
+<style>
+  .legal-wrap{display:grid; grid-template-columns:230px 1fr; gap:44px; align-items:start}
+  @media(max-width:860px){.legal-wrap{grid-template-columns:1fr}.toc{position:static!important; display:none}}
+  .toc{position:sticky; top:100px}
+  .toc a{display:block; font-size:.85rem; color:var(--steel); padding:5px 0}
+  .toc a:hover{color:var(--white)}
+  .legal-body{max-width:48rem}
+  .legal-body h2{font-size:1.4rem; margin-top:38px; scroll-margin-top:100px}
+  .legal-body h3{font-size:1.05rem; font-family:var(--body); font-weight:800; color:var(--white); text-transform:none; letter-spacing:0; margin-top:26px; scroll-margin-top:100px}
+  .clause{color:var(--silver); line-height:1.75; margin:0 0 12px; display:grid; grid-template-columns:44px 1fr; gap:10px}
+  .clause .cn{color:var(--steel); font-weight:700; font-variant-numeric:tabular-nums}
+  .draft-band{border:1px solid rgba(217,164,65,.5); background:var(--warning-dim); border-radius:var(--r-md); padding:18px 22px; margin-bottom:30px}
+  .draft-band b{color:#F2C879}
+  .wv-list{list-style:none; padding:0; margin:0}
+  .wv-list li{display:grid; grid-template-columns:26px 1fr; gap:12px; padding:12px 0; border-bottom:1px solid var(--line); color:var(--silver); line-height:1.6}
+  .wv-box{width:20px; height:20px; border:2px solid var(--line-strong); border-radius:5px; margin-top:2px}
+  .sig-line{border-bottom:1px solid var(--line-strong); height:44px; margin-top:26px}
+  .sig-label{font-size:.78rem; color:var(--steel); letter-spacing:.08em; text-transform:uppercase}
+</style>
+</head>
+<body>
+<main class="container section-tight" style="min-height:70vh">
+  <span class="kicker">Legal</span>
+  <h1>Terms &amp; Conditions and Waiver</h1>
+
+  <div class="draft-band">
+    <b>DRAFT — not yet in force.</b> This document is pending review by an Australian solicitor. Wording may change before it's published or used with customers. Shown here so the flow and content can be reviewed as part of the prototype.
+  </div>
+
+  <div class="legal-wrap">
+    <nav class="toc" id="toc"></nav>
+    <div class="legal-body" id="body"></div>
+  </div>
+</main>
+
+<script src="assets/art.js"></script>
+<script src="assets/demo-data.js"></script>
+<script src="assets/shell.js"></script>
+<script>
+(function () {
+  const esc = s => String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  // Verbatim from the client's draft Word document.
+  const PART_A = [
+    { n:'1', title:'About These Terms', clauses:[
+      ['', 'These Terms & Conditions (“Terms”) govern the submission of trading cards and other collectible items (“Item(s)”) to Hit Restoration Co. (“we”, “us”, “our”) for restoration and/or grading submission concierge services (“Services”). By submitting an Item to us, you (“you”, “the Customer”) agree to these Terms.'] ] },
+    { n:'2', title:'Our Services', clauses:[
+      ['2.1','Restoration Services may include cleaning, dent and crease reduction, corner correction, surface treatment, and related conservation work.'],
+      ['2.2','Grading Concierge Services involve us submitting your Item, on your behalf, to an independent third-party grading company (including PSA, CGC, BGS, or SGC) via our Australian submission partner.'],
+      ['2.3','We are not affiliated with, and do not act as an agent of, any grading company. Grading decisions are made solely by the relevant grading company, applying its own independent standards.'] ] },
+    { n:'3', title:'No Guarantee of Outcome', clauses:[
+      ['3.1','Restoration is a skilled craft process performed with reasonable care. It is not an exact science, and outcomes vary depending on an Item’s existing condition and materials.'],
+      ['3.2','We do not guarantee that restoration will achieve any particular visual result, will not be detected by a grading company, or will result in any specific grade or increase in value.'],
+      ['3.3','We do not guarantee any specific grade, turnaround time, or outcome from a grading company. Turnaround times quoted are estimates only and are largely outside our control once an Item is with a grading company.'] ] },
+    { n:'4', title:'Condition Assessment, Quotes & Payment', clauses:[
+      ['4.1','On receipt of your Item, we will inspect and confirm its condition and estimated value. A non-refundable inspection fee of $10 per Item applies, which is credited toward your final invoice if you proceed with our Services.'],
+      ['4.2','We will provide a quote for the Restoration Fee based on the confirmed value of your Item. No restoration work will begin until you have approved and paid this quote.'],
+      ['4.3','If you decline a quote, your Item will be returned to you at your cost, less the inspection fee referred to in clause 4.1.'],
+      ['4.4','If Grading Concierge Services are selected, a separate Grading Submission fee (covering the grading company’s own fee and our submission partner’s charges) applies before your Item is submitted for grading, and a Grading Upcharge (calculated on the final graded value) applies before your Item is returned to you.'],
+      ['4.5','Full pricing is set out in our current Fee Schedule, published on our website and updated from time to time.'] ] },
+    { n:'5', title:'Ownership and Risk of Loss or Damage', clauses:[
+      ['5.1','You warrant that you are the lawful owner of each Item submitted, or are submitting it with the full authority of its lawful owner.'],
+      ['5.2','While your Item is in our direct physical custody, we will take reasonable care of it and maintain insurance appropriate to its declared value, as set out in our Fee Schedule or confirmed at intake. Our liability for loss or damage occurring while your Item is in our direct custody is limited to the lesser of the declared value confirmed at intake and any applicable insurance proceeds, except to the extent caused by our negligence, wilful misconduct, or fraud, which cannot be excluded by law.'],
+      ['5.3','Once your Item leaves our custody — including while with a courier, our Australian submission partner, or a grading company — it is no longer within our control. We are not liable for loss, damage, or delay occurring during this time, except to the extent we are able to recover compensation from the relevant third party on your behalf, in which case we will pass that recovery on to you.'],
+      ['5.4','We recommend you independently confirm the insurance arrangements of any courier or third party used in connection with your submission if you require additional certainty.'] ] },
+    { n:'6', title:'Your Warranties and Indemnity', clauses:[
+      ['6.1','You warrant that: (a) you lawfully own the Item(s) submitted, or have full authority from the lawful owner to submit them; (b) the Item(s) are not stolen, counterfeit, or fraudulently obtained; and (c) all information you provide to us (including declared value and condition information) is true and accurate to the best of your knowledge.'],
+      ['6.2','You indemnify us against any claim, loss, cost, or liability we incur arising from a breach of the warranties in clause 6.1, including any claim made by a third party asserting ownership of, or an interest in, an Item you have submitted.'] ] },
+    { n:'7', title:'Disclosure on Resale', clauses:[
+      ['7.1','You acknowledge that restoration work performed on an Item may need to be disclosed when the Item is subsequently sold, consistent with standard hobby practice and the policies of grading companies.'],
+      ['7.2','Responsibility for making any such disclosure rests solely with you. We are not responsible for, and make no representation as to, your compliance with this obligation.'] ] },
+    { n:'8', title:'Limitation of Liability', clauses:[
+      ['8.1','To the maximum extent permitted by law, our total liability to you arising out of or in connection with the Services, however arising, is limited to the amount you paid us for the specific Services giving rise to the claim.'],
+      ['8.2','Nothing in these Terms excludes, restricts, or modifies any consumer guarantee, right, or remedy conferred on you under the Australian Consumer Law (Schedule 2 of the Competition and Consumer Act 2010 (Cth)) or any other applicable law that cannot lawfully be excluded, restricted, or modified. Where our liability may be limited under that law, it is limited to the maximum extent permitted.'],
+      ['8.3','We are not liable for any indirect, special, or consequential loss, including loss of profit or loss of resale opportunity, except where such liability cannot be excluded by law.'] ] },
+    { n:'9', title:'Cancellation', clauses:[
+      ['9.1','Once you have approved a quote and work has commenced, fees paid are non-refundable, except where required by the Australian Consumer Law.'],
+      ['9.2','We may decline or discontinue Services at our discretion, including where we reasonably suspect an Item is stolen, counterfeit, or otherwise unlawfully obtained, and may report such Items to the relevant authorities.'] ] },
+    { n:'10', title:'Disputes', clauses:[
+      ['10.1','If a dispute arises, please contact us first so we can attempt to resolve it informally.'],
+      ['10.2','If we cannot resolve a dispute informally within a reasonable time, either party may refer it to mediation before commencing court proceedings.'] ] },
+    { n:'11', title:'General', clauses:[
+      ['11.1','These Terms are governed by the laws of Victoria, Australia, and the parties submit to the non-exclusive jurisdiction of its courts.'],
+      ['11.2','If any provision of these Terms is found invalid or unenforceable, the remaining provisions continue in full force.'],
+      ['11.3','These Terms, together with our current Fee Schedule and any signed Waiver & Acknowledgment Form, form the entire agreement between you and us in relation to the Services.'] ] }
+  ];
+  const WAIVER = [
+    'I have read and agree to Hit Restoration Co.’s Terms & Conditions, available at hitrestorationco.com.au.',
+    'I understand that restoration is a skilled service performed with care, but does not guarantee any particular visual outcome, grading result, or increase in value.',
+    'I understand that once my Item(s) leave Hit Restoration Co.’s premises — including while with a courier, submission partner, or grading company — they are outside Hit Restoration Co.’s direct control, and Hit Restoration Co.’s liability during that time is limited as set out in the Terms & Conditions.',
+    'I confirm that I am the lawful owner of the Item(s) listed below, or am submitting them with the full authority of the lawful owner, and that they are not stolen, counterfeit, or fraudulently obtained.',
+    'I understand that I am responsible for disclosing any restoration work when I sell or transfer this Item in future.',
+    'I understand that a non-refundable $10 inspection fee applies per Item, credited toward my invoice if I proceed.'
+  ];
+
+  const body = document.getElementById('body');
+  let html = `<p class="muted">These are the Submission Terms & Conditions and the Waiver & Acknowledgment Form that will govern restoration and grading concierge submissions to Hit Restoration Co.</p>
+    <h2 id="partA" style="color:var(--red-hot)">Part A — Submission Terms & Conditions</h2>`;
+  PART_A.forEach(s => {
+    html += `<h3 id="s${s.n}">${s.n}. ${esc(s.title)}</h3>`;
+    s.clauses.forEach(([n, t]) => {
+      html += `<div class="clause">${n ? `<span class="cn">${n}</span>` : '<span></span>'}<span>${esc(t)}</span></div>`;
+    });
+  });
+  html += `<h2 id="partB" style="color:var(--red-hot); margin-top:44px">Part B — Card Submission Waiver & Acknowledgment Form</h2>
+    <p class="muted">This form is completed and signed at the point of submission, alongside the full Terms & Conditions above.</p>
+    <div class="grid" style="grid-template-columns:1fr 1fr; gap:16px; margin:18px 0">
+      <div><div class="sig-label">Customer name</div><div class="sig-line"></div></div>
+      <div><div class="sig-label">Order / submission reference</div><div class="sig-line"></div></div>
+    </div>
+    <div style="max-width:280px"><div class="sig-label">Date</div><div class="sig-line"></div></div>
+    <h3>Please read and initial each statement:</h3>
+    <ul class="wv-list">${WAIVER.map(w => `<li><span class="wv-box"></span><span>${esc(w)}</span></li>`).join('')}</ul>
+    <h3>Item(s) submitted</h3>
+    <div class="table-wrap"><table class="table"><thead><tr><th>#</th><th>Description</th><th>Declared value (AUD)</th><th>Service requested</th></tr></thead>
+      <tbody>${[1,2,3].map(i => `<tr><td>${i}</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>`).join('')}</tbody></table></div>
+    <div class="grid" style="grid-template-columns:1fr 1fr 1fr; gap:16px; margin-top:30px">
+      <div><div class="sig-line"></div><div class="sig-label" style="margin-top:6px">Signature</div></div>
+      <div><div class="sig-line"></div><div class="sig-label" style="margin-top:6px">Print name</div></div>
+      <div><div class="sig-line"></div><div class="sig-label" style="margin-top:6px">Date</div></div>
+    </div>
+    <h2 id="privacy" style="margin-top:44px">Privacy Policy</h2>
+    <div class="note-build">To be drafted alongside the solicitor review — covers how customer and payment data is collected, stored and used. Required before launch.</div>`;
+  body.innerHTML = html;
+
+  // TOC
+  const toc = document.getElementById('toc');
+  toc.innerHTML = '<div class="small muted mb1" style="font-weight:700; letter-spacing:.1em; text-transform:uppercase">Contents</div>'
+    + '<a href="#partA">Part A — Terms</a>'
+    + PART_A.map(s => `<a href="#s${s.n}" style="padding-left:12px">${s.n}. ${esc(s.title)}</a>`).join('')
+    + '<a href="#partB">Part B — Waiver</a>'
+    + '<a href="#privacy">Privacy Policy</a>';
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Track an Order — Hit Restoration Co. (Prototype)</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="assets/fonts/fonts.css">
+<link rel="stylesheet" href="assets/brand.css">
+<style>
+  .track-hero{max-width:560px; margin:60px auto 30px}
+  .demo-hint{display:inline-flex; gap:8px; align-items:center; cursor:pointer; border:1px dashed rgba(217,164,65,.5);
+    background:var(--warning-dim); color:#E8C983; border-radius:999px; padding:8px 15px; font-size:.82rem; margin-top:14px}
+  .result{display:none}
+  .result.show{display:block}
+  .tl-item{display:grid; grid-template-columns:14px 1fr; gap:14px; padding-bottom:18px; position:relative}
+  .tl-item::before{content:""; position:absolute; left:6px; top:16px; bottom:0; width:2px; background:var(--line)}
+  .tl-item:last-child::before{display:none}
+  .tl-dot{width:14px; height:14px; border-radius:50%; background:var(--success); margin-top:4px}
+  .tl-item.latest .tl-dot{background:var(--red); box-shadow:0 0 0 4px rgba(200,16,46,.2)}
+  .card-track{border:1px solid var(--line); border-radius:var(--r-md); padding:16px; background:var(--surface-2); margin-bottom:12px}
+</style>
+</head>
+<body>
+<main class="container" style="min-height:70vh; padding-bottom:70px">
+  <div class="track-hero center">
+    <span class="kicker" style="justify-content:center">Guest tracking</span>
+    <h1 style="font-size:clamp(2.2rem,5vw,3.4rem)">Where's my card?</h1>
+    <p class="lead">Track any order with your order number and email. No account, no login.</p>
+  </div>
+
+  <div class="panel panel-pad" style="max-width:560px; margin:0 auto" id="lookupCard">
+    <div class="field"><label>Order number</label><input class="input" id="ordNum" placeholder="HR-2026-XXXX"></div>
+    <div class="field"><label>Email on the order</label><input class="input" id="ordEmail" type="email" placeholder="you@email.com"></div>
+    <button class="btn btn-red w100 btn-lg" id="trackBtn">Track my order</button>
+    <div id="err" class="hint" style="color:#FF7A90; display:none; margin-top:12px"></div>
+    <div class="center"><span class="demo-hint" id="demoFill">✨ Prototype demo — click to fill HR-2026-0342 / hash@demo.com.au</span></div>
+  </div>
+
+  <div class="result" id="result" style="max-width:820px; margin:36px auto 0"></div>
+</main>
+
+<script src="assets/art.js"></script>
+<script src="assets/demo-data.js"></script>
+<script src="assets/shell.js"></script>
+<script>
+(function () {
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const fmtD = iso => new Date(iso.replace(' ','T')).toLocaleString('en-AU',{day:'numeric',month:'short',year:'numeric'});
+
+  function allOrders() {
+    // guest tracker sees sample orders + any created in the portal demo (localStorage), merged with staff mutations
+    const mut = HR.store.get('orderMut', {});
+    const base = HRDATA.ORDERS.map(o => {
+      const m = mut[o.id] || {};
+      const merged = Object.assign({}, o, m);
+      merged.timeline = (o.timeline||[]).concat(m.timelineAdd||[]);
+      merged.cards = o.cards.map(c => Object.assign({}, c, (m.cards||{})[c.id]||{}));
+      return merged;
+    });
+    return base.concat(HR.store.get('localOrders', []));
+  }
+
+  function render(o) {
+    const gr = o.service !== 'restoration';
+    const revealCards = o.cards.filter(c => c.reveal);
+    $('#result').innerHTML = `
+      <div class="spread mb2">
+        <div>
+          <div class="row" style="gap:10px"><h2 class="mb0" style="font-size:1.6rem">${esc(o.number)}</h2>${HR.stageChip(o.status)}</div>
+          <p class="small muted mt1 mb0">${o.name ? esc(o.name) + ' · ' : ''}${o.service==='both'?'Restoration + grading':o.service==='grading'?'Grading concierge':'Restoration'} · placed ${fmtD(o.created)}</p>
+        </div>
+        <a class="btn btn-ghost btn-sm" href="portal.html">Full portal view →</a>
+      </div>
+
+      ${o.outboundTracking ? `<div class="card mb2" style="border-color:rgba(59,155,92,.4)"><div class="spread"><div><b class="white">Return shipping</b><div class="small muted">${esc(o.carrier||'')} · ${esc(o.outboundTracking)}</div></div><span class="badge badge-success">Insured & tracked</span></div></div>` : ''}
+
+      ${revealCards.length ? `<div class="panel panel-pad mb2">
+        <h3 style="font-size:1.15rem">Your reveal is ready</h3>
+        <div class="grid ${revealCards.length>1?'g2':''}">
+          ${revealCards.map(c => `<div>
+            <div class="slab"><div class="slab-label"><span class="l-name">${esc(c.name)}</span>${c.gradeAfter&&c.gradeAfter!=='Restored'?`<span class="l-grade">${esc(c.gradeAfter)}</span>`:'<span class="l-grade" style="color:var(--success)">RESTORED</span>'}</div>
+            <div class="slab-window" data-rev="${c.id}"></div></div>
+          </div>`).join('')}
+        </div>
+      </div>` : ''}
+
+      <div class="grid" style="grid-template-columns:1fr 1fr; gap:22px" id="trkCols">
+        <div class="panel panel-pad">
+          <h3 style="font-size:1.15rem">Live tracker</h3>
+          ${HR.stepperHTML(o.status, { grading: gr })}
+        </div>
+        <div>
+          <div class="panel panel-pad mb2">
+            <h3 style="font-size:1.15rem">Your cards</h3>
+            ${o.cards.map(c => `<div class="card-track">
+              <div class="spread"><b class="white" style="font-size:.92rem">${esc(c.name)}</b>${HR.stageChip(c.stage)}</div>
+              <div class="small muted mt1">${esc(c.set||'')}${c.grader?' · '+HRDATA.GRADERS[c.grader]:''}</div>
+              <div class="mt1">${HR.miniStepper(c.stage, c.service!=='restoration')}</div>
+              <div class="small mt1" style="color:var(--silver)">${esc((HRDATA.STAGES[HRDATA.stageIdx(c.stage)]||{}).say||'')}</div>
+            </div>`).join('')}
+          </div>
+          <div class="panel panel-pad">
+            <h3 style="font-size:1.15rem">History</h3>
+            ${(o.timeline||[]).map((t,i,arr) => {
+              const s = HRDATA.STAGES[HRDATA.stageIdx(t.stage)] || {label:t.stage};
+              return `<div class="tl-item ${i===arr.length-1?'latest':''}"><div class="tl-dot"></div>
+                <div><b class="white" style="font-size:.88rem">${s.label}</b>
+                <div class="small muted">${esc(t.note||'')}</div>
+                <div class="small" style="color:var(--steel); font-size:.72rem">${esc(t.at)}</div></div></div>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+      <div class="note-build">In the live build this reads real-time status straight from the backend, and the same lookup powers the "track" links in stage-update emails and SMS. Dealer-partner details are never exposed on customer-facing views.</div>
+      <style>@media(max-width:820px){#trkCols{grid-template-columns:1fr!important}}</style>`;
+
+    revealCards.forEach(c => {
+      const host = $(`[data-rev="${c.id}"]`);
+      if (host) HR.mountReveal(host,
+        HRART.cardSVG({name:c.name,category:c.category,state:'before',seed:c.id}),
+        HRART.cardSVG({name:c.name,category:c.category,state:'after',seed:c.id}));
+    });
+    $('#result').classList.add('show');
+    $('#result').scrollIntoView({ behavior:'smooth', block:'start' });
+  }
+
+  function lookup() {
+    const num = $('#ordNum').value.trim();
+    const email = $('#ordEmail').value.trim().toLowerCase();
+    $('#err').style.display = 'none';
+    if (!num || !email) { showErr('Enter both your order number and email.'); return; }
+    const o = allOrders().find(o => o.number.toLowerCase() === num.toLowerCase() && o.email.toLowerCase() === email);
+    if (!o) { $('#result').classList.remove('show'); showErr('No order matches that combination — double-check the order number and the email you used.'); return; }
+    render(o);
+  }
+  function showErr(m){ const e=$('#err'); e.textContent=m; e.style.display='block'; }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    $('#trackBtn').addEventListener('click', lookup);
+    $('#ordEmail').addEventListener('keydown', e => { if (e.key==='Enter') lookup(); });
+    $('#demoFill').addEventListener('click', () => { $('#ordNum').value='HR-2026-0342'; $('#ordEmail').value='hash@demo.com.au'; lookup(); });
+    // support #HR-2026-0342 deep link
+    const h = location.hash.replace(/^#/,'');
+    if (/^HR-/i.test(h)) { $('#ordNum').value = h; }
+  });
+})();
+</script>
+</body>
+</html>

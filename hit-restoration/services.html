@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Services — Hit Restoration Co. (Prototype)</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="assets/fonts/fonts.css">
+<link rel="stylesheet" href="assets/brand.css">
+<style>
+  .svc-row{display:grid; grid-template-columns:1fr 1fr; gap:44px; align-items:center; padding:44px 0; border-bottom:1px solid var(--line)}
+  .svc-row:nth-child(even) .svc-art{order:-1}
+  @media(max-width:820px){.svc-row{grid-template-columns:1fr; gap:26px; padding:30px 0}.svc-row:nth-child(even) .svc-art{order:0}}
+  .grader-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px}
+  @media(max-width:640px){.grader-grid{grid-template-columns:1fr 1fr}}
+  .grader{background:var(--surface); border:1px solid var(--line-strong); border-radius:var(--r-md); padding:20px; text-align:center}
+  .grader .g{font-family:var(--display); font-size:1.8rem; color:var(--white)}
+  .step-num{display:grid; grid-template-columns:repeat(4,1fr); gap:16px}
+  @media(max-width:820px){.step-num{grid-template-columns:1fr 1fr}}
+  @media(max-width:520px){.step-num{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<main>
+<section class="section-tight"><div class="container">
+  <span class="kicker">What we do</span>
+  <h1 style="max-width:20rem">Two services.<br>Buy them how you like.</h1>
+  <p class="lead" style="max-width:44rem">Restoration and full grading concierge — order either alone, or restoration flowing straight into grading as one path. Your choice, per card.</p>
+</div></section>
+
+<section style="background:#0D0D0D; border-top:1px solid var(--line); border-bottom:1px solid var(--line)"><div class="container section-tight">
+  <span class="kicker">Restoration</span>
+  <h2 style="max-width:24rem">Five crafts, one bench.</h2>
+  <p class="muted" style="max-width:42rem">Skilled, conservative work — performed with care, never rushed. Not sure what a card needs? Submit it and inspection tells you exactly what will (and won't) help before you spend on work.</p>
+  <div id="svcRows"></div>
+</div></section>
+
+<section id="grading" class="section"><div class="container">
+  <span class="kicker">Grading concierge</span>
+  <div class="split">
+    <div>
+      <h2>You never deal with the grader. We do.</h2>
+      <p class="lead">Choose a grader per card and we handle the entire submission on your behalf — prep, documentation, secure shipping, and tracking the whole way. Your card returns graded and comes home to you.</p>
+      <p class="muted">All submissions are routed through our established Australian submission channel, so every grader is handled the same, consistent way. You watch it move through your portal the entire time.</p>
+      <a class="btn btn-red mt2" href="how-it-works.html">See the full journey</a>
+    </div>
+    <div>
+      <div class="grader-grid mb2" id="graders"></div>
+      <div class="panel panel-pad">
+        <h4>Estimated submission fees <span class="badge badge-warning">placeholder</span></h4>
+        <div id="graderFees"></div>
+        <div class="note-build">Real grading fees are a pass-through of the grader's own fee plus submission-partner charges and a small handling markup — confirmed at intake once the partner rate is locked. A 4% upcharge on the final graded value is charged when the card returns.</div>
+      </div>
+    </div>
+  </div>
+
+  <h3 class="mt4 mb2">How a submission works</h3>
+  <div class="step-num">
+    <div class="card"><div class="red" style="font-family:var(--display); font-size:1.5rem">01</div><h4>Pick a grader</h4><p class="small muted mb0">PSA, CGC, BGS or SGC — per card, at submission or straight after restoration.</p></div>
+    <div class="card"><div class="red" style="font-family:var(--display); font-size:1.5rem">02</div><h4>We prep & document</h4><p class="small muted mb0">Sleeved, photographed, batched and logged against your order.</p></div>
+    <div class="card"><div class="red" style="font-family:var(--display); font-size:1.5rem">03</div><h4>We submit & track</h4><p class="small muted mb0">Sent on your behalf, with the reference logged so your tracker stays live.</p></div>
+    <div class="card"><div class="red" style="font-family:var(--display); font-size:1.5rem">04</div><h4>Graded & home</h4><p class="small muted mb0">Back in-house, final QC, then tracked and insured to your door. Upcharge on the final value.</p></div>
+  </div>
+</div></section>
+
+<section style="background:#0D0D0D; border-top:1px solid var(--line)"><div class="container section-tight">
+  <div class="split">
+    <div>
+      <span class="kicker">Bundled path</span>
+      <h2>Restore, then grade — one flow.</h2>
+      <p class="lead">The most popular path: we bring the card back, you approve the reveal, and it flows straight into grading without leaving our care. Restoration-only orders simply skip the grading stages.</p>
+      <a class="btn btn-red" href="pricing.html">See pricing & estimate yours →</a>
+    </div>
+    <div class="panel panel-pad">
+      <h4 class="mb2">One order, tracked the whole way</h4>
+      <div id="bundleStepper"></div>
+    </div>
+  </div>
+</div></section>
+
+<section class="section"><div class="container center">
+  <h2>Ready when you are.</h2>
+  <div class="row" style="justify-content:center">
+    <a class="btn btn-red btn-lg" href="portal.html#submit">Start a submission</a>
+    <a class="btn btn-ghost btn-lg" href="pricing.html">See pricing</a>
+  </div>
+</div></section>
+</main>
+
+<script src="assets/art.js"></script>
+<script src="assets/demo-data.js"></script>
+<script src="assets/shell.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const goodFor = { cleaning:['Surface grime','Fingerprints','Handling residue'], dent_removal:['Dents','Indentations','Pressure marks'], crease_repair:['Creases','Folds','Bends'], corner_repair:['Soft corners','Rounding','Fraying'], surface_treatment:['Scratches','Print lines','General wear'] };
+  const seeds = { cleaning:'pokemon|svc-clean', dent_removal:'sports|svc-dent', crease_repair:'yugioh|svc-crease', corner_repair:'pokemon|svc-corner', surface_treatment:'magic|svc-surface' };
+  document.getElementById('svcRows').innerHTML = HRDATA.SERVICES.map((s,i) => {
+    const [cat,seed] = seeds[s.key].split('|');
+    return `<div class="svc-row">
+      <div>
+        <span class="badge badge-red mb1">0${i+1}</span>
+        <h3 style="font-size:1.5rem">${s.name}</h3>
+        <p class="muted">${s.copy}</p>
+        <div class="row" style="gap:8px">${(goodFor[s.key]||[]).map(g=>`<span class="badge badge-steel">${g}</span>`).join('')}</div>
+      </div>
+      <div class="svc-art">
+        <div class="slab" style="max-width:360px; margin:0 auto">
+          <div class="slab-label"><span class="l-name">${s.name} — before / after</span><span class="l-grade" style="color:var(--success)">RESTORED</span></div>
+          <div class="slab-window" data-svc-rev="${s.key}|${cat}|${seed}"></div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  HRDATA.SERVICES.forEach(s => {
+    const host = document.querySelector(`[data-svc-rev^="${s.key}|"]`);
+    const [,cat,seed] = host.dataset.svcRev.split('|');
+    HR.mountReveal(host, HRART.cardSVG({name:s.name,category:cat,state:'before',seed}), HRART.cardSVG({name:s.name,category:cat,state:'after',seed}));
+  });
+
+  document.getElementById('graders').innerHTML = Object.entries(HRDATA.GRADERS).map(([k,v]) => `<div class="grader"><div class="g">${v}</div></div>`).join('');
+  document.getElementById('graderFees').innerHTML = Object.entries(HRDATA.PRICING.graderEstimates).map(([k,v]) => `<div style="display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px dashed var(--line); font-size:.9rem"><span>${HRDATA.GRADERS[k]} submission</span><b class="white">~${HR.fmtAUD(v)}</b></div>`).join('');
+  document.getElementById('bundleStepper').innerHTML = HR.stepperHTML('submitted', { grading:true });
+});
+</script>
+</body>
+</html>
