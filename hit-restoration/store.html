@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DIY Care Store — Hit Restoration Co. (Prototype)</title>
+<meta name="description" content="HRC private-label DIY card care — the bench, bottled. Card-safe solutions, tools and kits, shipped Australia-wide.">
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="assets/fonts/fonts.css">
+<link rel="stylesheet" href="assets/brand.css">
+<style>
+  /* ---------- page hero ---------- */
+  .store-hero{padding:76px 0 50px}
+  .store-hero h1 .hl{color:var(--red-hot)}
+  .store-hero .lead{max-width:38rem}
+  .store-hero .note-build{max-width:46rem}
+  .store-hero .note-build a{display:inline; padding:0; color:#FFD98A; text-decoration:underline; cursor:pointer}
+
+  /* ---------- filter bar ---------- */
+  .filter-bar{display:flex; justify-content:space-between; align-items:center; gap:14px; flex-wrap:wrap; margin-bottom:26px}
+  .pill-opts .pill{font-family:var(--body)}
+
+  /* ---------- product grid ---------- */
+  .p-card{display:flex; flex-direction:column; padding:18px; scroll-margin-top:140px;
+    animation:cardIn .4s ease backwards; transition:transform .18s ease, border-color .25s ease, box-shadow .25s ease}
+  @keyframes cardIn{from{opacity:0; transform:translateY(12px)}}
+  .p-card.hi{border-color:var(--red); box-shadow:0 0 0 3px rgba(200,16,46,.25)}
+  .p-art{position:relative; border-radius:10px; overflow:hidden; border:1px solid var(--line); margin-bottom:16px; background:#101010}
+  .p-art svg{transition:opacity .2s ease, filter .2s ease}
+  .p-art.oos svg{opacity:.38; filter:grayscale(.7)}
+  .p-stockwrap{position:absolute; top:10px; left:10px; z-index:2}
+  .p-cat{font-size:.68rem; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:var(--steel); margin-bottom:6px}
+  .p-name{font-family:var(--body); font-weight:800; font-size:1.03rem; text-transform:none; letter-spacing:0; line-height:1.35; margin:0 0 7px; color:var(--white)}
+  .p-desc{font-size:.86rem; color:var(--steel); margin:0 0 14px}
+  .p-vars{margin:0 0 14px}
+  .p-vars .pill{padding:6px 13px; font-size:.8rem}
+  .p-foot{margin-top:auto; display:flex; justify-content:space-between; align-items:flex-end; gap:12px}
+  .p-price{font-family:var(--display); font-size:1.55rem; color:var(--white); line-height:1}
+  .p-var-note{display:block; font-size:.76rem; font-weight:600; color:var(--steel); margin-top:6px}
+
+  /* ---------- why-buy tiles ---------- */
+  .why-tile{display:flex; gap:14px; align-items:flex-start}
+  .why-tile .ic{flex:none; width:38px; height:38px; border-radius:10px; background:var(--red-dim); border:1px solid rgba(200,16,46,.4);
+    display:flex; align-items:center; justify-content:center; color:var(--red-hot); font-size:1.05rem}
+  .why-tile b{display:block; color:var(--white); margin-bottom:4px}
+  .why-tile p{margin:0; font-size:.86rem; color:var(--steel)}
+
+  /* ---------- bench cross-sell band ---------- */
+  .bench-band{background:linear-gradient(120deg,#1A0A0E,#14060A 55%,#0F0F0F); border:1px solid rgba(200,16,46,.35);
+    border-radius:var(--r-lg); padding:46px 44px; display:grid; grid-template-columns:1.25fr .75fr; gap:32px; align-items:center;
+    position:relative; overflow:hidden}
+  .bench-band::after{content:"HR"; position:absolute; right:-24px; bottom:-58px; font-family:var(--display); font-size:13rem;
+    color:rgba(200,16,46,.07); pointer-events:none}
+  @media(max-width:860px){.bench-band{grid-template-columns:1fr; padding:32px 24px}}
+
+  /* ---------- floating cart button ---------- */
+  .cart-fab{position:fixed; right:24px; bottom:24px; z-index:90; display:inline-flex; align-items:center; gap:10px;
+    background:var(--red); color:var(--white); border:0; border-radius:999px; padding:14px 22px;
+    font-family:var(--body); font-weight:800; font-size:.95rem; letter-spacing:.02em; cursor:pointer;
+    box-shadow:0 14px 40px rgba(0,0,0,.55); transition:background .15s ease, transform .12s ease}
+  .cart-fab:hover{background:var(--red-hot)}
+  .cart-fab:active{transform:translateY(1px)}
+  .cart-fab .cf-n{background:var(--white); color:var(--red); border-radius:999px; min-width:22px; height:22px; padding:0 6px;
+    display:none; align-items:center; justify-content:center; font-size:.76rem; font-weight:800}
+  .cart-fab .cf-n.show{display:inline-flex}
+  @media(max-width:640px){.cart-fab{right:14px; bottom:14px; padding:13px 18px}}
+
+  /* ---------- cart drawer (built on .modal-back/.modal) ---------- */
+  .modal-back.as-drawer{justify-content:flex-end; align-items:stretch; padding:0}
+  .drawer{max-width:432px; width:100%; min-height:100%; border-radius:0; border-top:0; border-right:0; border-bottom:0;
+    padding:0; display:flex; flex-direction:column; box-shadow:-30px 0 60px rgba(0,0,0,.5)}
+  .modal-back.open .drawer{animation:drawerIn .28s ease}
+  @keyframes drawerIn{from{transform:translateX(36px); opacity:.4}}
+  .dr-head{display:flex; justify-content:space-between; align-items:center; gap:12px; padding:20px 22px; border-bottom:1px solid var(--line)}
+  .dr-head h3{margin:0; font-size:1.15rem}
+  .x-btn{background:none; border:1px solid var(--line-strong); color:var(--silver); border-radius:8px; width:34px; height:34px;
+    cursor:pointer; font-size:.95rem; line-height:1; flex:none}
+  .x-btn:hover{color:var(--white); border-color:var(--white)}
+  .dr-body{flex:1; overflow-y:auto; padding:8px 22px}
+  .dr-foot{border-top:1px solid var(--line); padding:18px 22px 22px; background:#121212}
+
+  .ci{display:flex; gap:14px; padding:16px 0; border-bottom:1px solid var(--line); align-items:flex-start}
+  .ci:last-child{border-bottom:0}
+  .ci-art{flex:none; width:58px; border-radius:8px; overflow:hidden; border:1px solid var(--line)}
+  .ci-info{flex:1; min-width:0}
+  .ci-info b{display:block; color:var(--white); font-size:.9rem; line-height:1.35}
+  .ci-ops{display:flex; align-items:center; gap:14px; margin-top:9px}
+  .qty{display:inline-flex; align-items:center; border:1px solid var(--line-strong); border-radius:8px; overflow:hidden}
+  .qty button{background:var(--surface-2); border:0; color:var(--white); width:30px; height:30px; cursor:pointer;
+    font-size:1.05rem; font-family:var(--body); line-height:1}
+  .qty button:hover{background:var(--surface-3)}
+  .qty .q{min-width:32px; text-align:center; font-size:.88rem; font-weight:700; color:var(--white)}
+  .ci-rem{background:none; border:0; color:var(--steel); font-size:.78rem; font-weight:700; cursor:pointer;
+    text-decoration:underline; font-family:var(--body); padding:0}
+  .ci-rem:hover{color:var(--red-hot)}
+  .ci-tot{font-weight:800; color:var(--white); font-size:.92rem; white-space:nowrap}
+  .cart-empty{text-align:center; padding:56px 10px}
+  .cart-empty svg{margin:0 auto 18px; opacity:.8}
+
+  .tot-row{display:flex; justify-content:space-between; gap:12px; font-size:.94rem; color:var(--silver); margin-bottom:8px}
+  .tot-row .free{color:#6FCE92; font-weight:800}
+  .tot-row.grand{border-top:1px solid var(--line-strong); padding-top:12px; margin-top:4px; font-weight:800; color:var(--white); font-size:1.08rem}
+  .ship-nudge{font-size:.82rem; color:var(--silver); margin:2px 0 8px}
+  .ship-bar{height:4px; border-radius:2px; background:rgba(255,255,255,.08); overflow:hidden; margin-bottom:16px}
+  .ship-bar i{display:block; height:100%; background:var(--red); border-radius:2px; transition:width .3s ease}
+
+  /* ---------- checkout modal ---------- */
+  .ck-modal{max-width:620px}
+  .modal-back.open .ck-modal{animation:popIn .25s ease}
+  @keyframes popIn{from{transform:translateY(16px); opacity:0}}
+  .ck-steps{display:flex; gap:18px; margin:6px 0 22px; flex-wrap:wrap}
+  .ck-steps span{font-size:.72rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--steel);
+    padding-bottom:6px; border-bottom:2px solid transparent}
+  .ck-steps span.on{color:var(--white); border-bottom-color:var(--red)}
+  .ck-steps span.done{color:#6FCE92}
+  .frow{display:grid; grid-template-columns:1fr 1fr; gap:0 14px}
+  .frow-3{grid-template-columns:1.2fr .7fr .7fr}
+  @media(max-width:560px){.frow,.frow-3{grid-template-columns:1fr}.modal{padding:22px}}
+  .input.bad,.select.bad{border-color:var(--red-hot)}
+  .pay-card{background:linear-gradient(135deg,#181818,#101014); border:1px solid var(--line-strong); border-radius:var(--r-md);
+    padding:20px; margin:14px 0 4px}
+  .pay-num{font-size:1.22rem; font-weight:800; letter-spacing:.12em; color:var(--white); margin:12px 0; font-variant-numeric:tabular-nums}
+  .pay-num small{font-size:.66rem; letter-spacing:.14em; color:var(--steel); font-weight:800}
+  .pay-meta{display:flex; gap:22px; font-size:.8rem; color:var(--steel); flex-wrap:wrap}
+  .pay-meta b{color:var(--silver)}
+  .ok-line{display:flex; justify-content:space-between; gap:14px; font-size:.9rem; padding:9px 0; border-bottom:1px solid var(--line)}
+  .ok-line:last-child{border-bottom:0}
+  .ok-box{background:#101010; border:1px solid var(--line); border-radius:var(--r-md); padding:10px 18px; margin:14px 0}
+</style>
+</head>
+<body>
+
+<main>
+  <!-- ============ PAGE HERO ============ -->
+  <section class="hero">
+    <div class="hero-bg"></div><div class="hero-grid-lines"></div>
+    <div class="container store-hero">
+      <span class="kicker">DIY care range · Private label</span>
+      <h1>The bench, <span class="hl">bottled.</span></h1>
+      <p class="lead mt2">Every product here earned its place at our bench first. The same card-safe solutions, tools and cloths our technicians restore with — private-labelled and shipped Australia-wide.</p>
+      <div class="row mt2">
+        <span class="badge">$9.95 flat AU shipping</span>
+        <span class="badge">Free over $99</span>
+        <span class="badge">Card-safe formulas</span>
+        <span class="badge">Live stock — sells out at zero</span>
+      </div>
+      <div class="note-build">Sample catalog — the final range (5–15 SKUs), product photography and descriptions are a client content dependency. Stripe payment and live inventory sync land in the real build; this page simulates both, including the hard stop at zero stock. <a data-act="reset-demo" href="#" role="button">Reset demo stock &amp; cart</a></div>
+    </div>
+  </section>
+
+  <!-- ============ RANGE ============ -->
+  <section class="section-tight" id="range">
+    <div class="container">
+      <div class="filter-bar">
+        <div class="pill-opts" id="filterPills" role="group" aria-label="Filter products by category"></div>
+        <span class="small muted" id="gridCount"></span>
+      </div>
+      <div class="grid g3" id="productGrid"></div>
+    </div>
+  </section>
+
+  <!-- ============ WHY BUY FROM US ============ -->
+  <section class="section" style="background:#0D0D0D; border-top:1px solid var(--line); border-bottom:1px solid var(--line)">
+    <div class="container">
+      <span class="kicker">Why buy from us</span>
+      <h2 class="mb3">Small range. Real reasons.</h2>
+      <div class="grid g3">
+        <div class="card why-tile fx">
+          <div class="ic">◉</div>
+          <div><b>Straight off the bench</b>
+          <p>These are the exact products our technicians restore with every day — private-labelled for home use, not rebadged mystery stock.</p></div>
+        </div>
+        <div class="card why-tile fx">
+          <div class="ic">➤</div>
+          <div><b>AU shipping, flat and simple</b>
+          <p>$9.95 flat Australia-wide, free over $99. Packed in Melbourne with the same care as a return shipment.</p></div>
+        </div>
+        <div class="card why-tile fx">
+          <div class="ic">✓</div>
+          <div><b>Card-safe formulas</b>
+          <p>Print-safe, gloss-safe, holo-safe. If it could hurt a card, it doesn't make the range.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CROSS-SELL: THE BENCH ============ -->
+  <section class="section">
+    <div class="container">
+      <div class="bench-band fx">
+        <div>
+          <span class="kicker">When DIY isn't enough</span>
+          <h2 style="font-size:clamp(1.6rem,3.2vw,2.3rem)">Beyond DIY?<br><span class="red">Send it to the bench.</span></h2>
+          <p class="muted mb0">Deep creases, soft corners, real value on the line — that's bench work, not kitchen-table work. Submit it and the same hands behind these products will restore it, reveal it, and submit it for grading if you want.</p>
+        </div>
+        <div>
+          <a class="btn btn-red btn-lg w100 mb1" href="portal.html#submit">Start a submission</a>
+          <a class="btn btn-ghost btn-lg w100" href="services.html">See the five crafts</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ============ FLOATING CART ============ -->
+<button class="cart-fab" id="cartFab" data-act="open-cart" aria-label="Open cart">
+  <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9.5" cy="20" r="1.5"/><circle cx="17.5" cy="20" r="1.5"/><path d="M2.5 3.5h3l2.4 11.5h10.8l2.3-8.5H6.4"/></svg>
+  Cart <span class="cf-n" id="fabCount">0</span>
+</button>
+
+<!-- ============ CART DRAWER ============ -->
+<div class="modal-back as-drawer" id="cartBack">
+  <aside class="modal drawer" role="dialog" aria-modal="true" aria-label="Shopping cart">
+    <div class="dr-head">
+      <div><h3>Your cart</h3><span class="muted small" id="drawerCount"></span></div>
+      <button class="x-btn" data-act="close-cart" aria-label="Close cart">✕</button>
+    </div>
+    <div class="dr-body" id="drawerBody"></div>
+    <div class="dr-foot" id="drawerFoot"></div>
+  </aside>
+</div>
+
+<!-- ============ CHECKOUT MODAL ============ -->
+<div class="modal-back" id="ckBack">
+  <div class="modal ck-modal" role="dialog" aria-modal="true" aria-label="Demo checkout">
+    <div class="spread">
+      <h3 style="margin:0">Checkout</h3>
+      <button class="x-btn" data-act="ck-close" aria-label="Close checkout">✕</button>
+    </div>
+    <div class="ck-steps" id="ckSteps"><span class="on">1 · Shipping</span><span>2 · Payment</span><span>3 · Done</span></div>
+
+    <div id="ckStep-details">
+      <div class="spread mb2" style="gap:8px">
+        <p class="small muted mb0">Where's it going? Australia-only at launch.</p>
+        <button class="ci-rem" type="button" data-act="fill-sample">Fill with sample details</button>
+      </div>
+      <div class="frow">
+        <div class="field"><label for="ckName">Full name</label><input id="ckName" class="input" autocomplete="name" placeholder="Jordan Lee"></div>
+        <div class="field"><label for="ckEmail">Email</label><input id="ckEmail" class="input" type="email" autocomplete="email" placeholder="you@example.com.au"></div>
+      </div>
+      <div class="field"><label for="ckAddr">Street address</label><input id="ckAddr" class="input" autocomplete="street-address" placeholder="12 Ruby Lane"></div>
+      <div class="frow frow-3">
+        <div class="field"><label for="ckSuburb">Suburb</label><input id="ckSuburb" class="input" placeholder="Brunswick"></div>
+        <div class="field"><label for="ckState">State</label>
+          <select id="ckState" class="select">
+            <option value="">Choose…</option><option>VIC</option><option>NSW</option><option>QLD</option><option>WA</option><option>SA</option><option>TAS</option><option>ACT</option><option>NT</option>
+          </select></div>
+        <div class="field"><label for="ckPost">Postcode</label><input id="ckPost" class="input" inputmode="numeric" maxlength="4" placeholder="3056"></div>
+      </div>
+      <div class="row mt2">
+        <button class="btn btn-red" data-act="ck-continue">Continue to payment</button>
+        <button class="btn btn-ghost" data-act="ck-to-cart">← Back to cart</button>
+      </div>
+    </div>
+
+    <div id="ckStep-payment" style="display:none">
+      <span class="badge badge-warning">Demo payment — nothing is charged</span>
+      <div class="pay-card">
+        <div class="spread"><span class="small muted" style="letter-spacing:.14em; font-weight:800; text-transform:uppercase">HRC demo card</span><span class="muted small">Prototype only</span></div>
+        <div class="pay-num">4242 4242 4242 4242 <small>— DEMO ONLY</small></div>
+        <div class="pay-meta"><span>Exp <b>12/28</b></span><span>CVC <b>424</b></span><span>Name <b id="payName">—</b></span></div>
+      </div>
+      <div class="ok-box" id="ckPayList"></div>
+      <div class="note-build">Real build: payment runs through <b>Stripe Checkout</b> on a new standalone HRC Stripe account (per the scope docs) — card details never touch this site. Placing this order only simulates the charge, then decrements the demo stock so the live-stock rule is visible.</div>
+      <div class="row mt2">
+        <button class="btn btn-red btn-lg" id="placeBtn" data-act="place">Place order (demo)</button>
+        <button class="btn btn-ghost" data-act="ck-back">← Back</button>
+      </div>
+    </div>
+
+    <div id="ckStep-success" style="display:none"><div id="ckSuccess"></div></div>
+  </div>
+</div>
+
+<script src="assets/art.js"></script>
+<script src="assets/demo-data.js"></script>
+<script src="assets/shell.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const P = HRDATA.PRODUCTS;
+  const SHIP = HRDATA.PRICING.storeShipping;
+  const CATS = [['all', 'All'], ['care', 'Card care'], ['tools', 'Tools'], ['kits', 'Kits'], ['accessories', 'Accessories']];
+  const CATLBL = { care: 'Card care', tools: 'Tools', kits: 'Kits', accessories: 'Accessories' };
+  const $ = s => document.querySelector(s);
+  const r2 = n => Math.round(n * 100) / 100;
+  const money = n => HR.fmtAUD(n);
+
+  const vById = {}, pByVid = {};
+  P.forEach(p => p.variants.forEach(v => { vById[v.id] = v; pByVid[v.id] = p; }));
+
+  /* Demo stock overlay — orders decrement here; the grid always renders through it. */
+  const adj = () => HR.store.get('stockAdj', {});
+  const effStock = v => Math.max(0, v.stock - (adj()[v.id] || 0));
+
+  const sel = {};                                   // selected variant per product
+  P.forEach(p => { sel[p.id] = p.variants[0].id; });
+  let filter = 'all';
+  let cart = HR.store.get('cart', []);              // [{pid, vid, qty}] — shared shape with HR.cartCount
+
+  /* Clamp any persisted cart against current effective stock */
+  cart = cart.filter(i => {
+    const v = vById[i.vid]; if (!v) return false;
+    const m = effStock(v); if (m <= 0) return false;
+    if (i.qty > m) i.qty = m;
+    return true;
+  });
+  saveCart();
+
+  function saveCart() { HR.store.set('cart', cart); renderFab(); }
+  function cartQty(vid) { const it = cart.find(i => i.vid === vid); return it ? it.qty : 0; }
+  function cartN() { return cart.reduce((n, i) => n + i.qty, 0); }
+  function subtotal() { return r2(cart.reduce((s, i) => s + vById[i.vid].price * i.qty, 0)); }
+  function shipCost(sub) { return sub >= SHIP.freeOver ? 0 : SHIP.flat; }
+
+  /* ---------- range grid ---------- */
+  function stockBadge(st) {
+    if (st <= 0) return `<span class="badge badge-steel">Out of stock</span>`;
+    if (st <= 8) return `<span class="badge badge-warning">Only ${st} left</span>`;
+    return '';
+  }
+  function buyBtn(p, st) {
+    return st <= 0
+      ? `<button class="btn btn-soft btn-sm" disabled>Out of stock</button>`
+      : `<button class="btn btn-red btn-sm" data-act="add" data-pid="${p.id}">Add to cart</button>`;
+  }
+  function cardHTML(p, i) {
+    const v = vById[sel[p.id]];
+    const st = effStock(v);
+    return `<article class="card card-hover p-card" id="${p.slug}" style="animation-delay:${Math.min(i * 40, 240)}ms">
+      <div class="p-art ${st <= 0 ? 'oos' : ''}">
+        ${HRART.productSVG({ kind: p.kind, label: p.name })}
+        <div class="p-stockwrap">${stockBadge(st)}</div>
+      </div>
+      <div class="p-cat">${CATLBL[p.category]}</div>
+      <h3 class="p-name">${p.name}</h3>
+      <p class="p-desc">${p.desc}</p>
+      ${p.variants.length > 1 ? `<div class="pill-opts p-vars">${p.variants.map(x => {
+        const xs = effStock(x);
+        return `<button type="button" class="pill ${sel[p.id] === x.id ? 'on' : ''}" data-act="variant" data-pid="${p.id}" data-vid="${x.id}" aria-pressed="${sel[p.id] === x.id}">${x.name}${xs <= 0 ? ' · out' : ''}</button>`;
+      }).join('')}</div>` : ''}
+      <div class="p-foot">
+        <div><div class="p-price">${money(v.price)}</div><span class="p-var-note">${v.name}</span></div>
+        <div class="p-buy">${buyBtn(p, st)}</div>
+      </div>
+    </article>`;
+  }
+  function renderGrid() {
+    const list = P.filter(p => filter === 'all' || p.category === filter);
+    $('#productGrid').innerHTML = list.map(cardHTML).join('');
+    $('#gridCount').textContent = `Showing ${list.length} of ${P.length} sample SKUs`;
+  }
+  function refreshCard(p) {
+    const root = document.getElementById(p.slug); if (!root) return;
+    const v = vById[sel[p.id]], st = effStock(v);
+    root.querySelector('.p-art').classList.toggle('oos', st <= 0);
+    root.querySelector('.p-stockwrap').innerHTML = stockBadge(st);
+    root.querySelector('.p-price').textContent = money(v.price);
+    root.querySelector('.p-var-note').textContent = v.name;
+    root.querySelector('.p-buy').innerHTML = buyBtn(p, st);
+    root.querySelectorAll('[data-act="variant"]').forEach(b => {
+      const on = b.dataset.vid === sel[p.id];
+      b.classList.toggle('on', on); b.setAttribute('aria-pressed', on);
+    });
+  }
+  function renderFilters() {
+    $('#filterPills').innerHTML = CATS.map(c =>
+      `<button type="button" class="pill ${filter === c[0] ? 'on' : ''}" data-act="filter" data-cat="${c[0]}" aria-pressed="${filter === c[0]}">${c[1]}</button>`).join('');
+  }
+
+  /* ---------- cart ---------- */
+  function renderFab() {
+    const n = cartN(), b = $('#fabCount');
+    b.textContent = n; b.classList.toggle('show', n > 0);
+    $('#cartFab').setAttribute('aria-label', `Open cart — ${n} item${n === 1 ? '' : 's'}`);
+  }
+  function renderCart() {
+    const body = $('#drawerBody'), foot = $('#drawerFoot');
+    const n = cartN();
+    $('#drawerCount').textContent = n ? `${n} item${n === 1 ? '' : 's'}` : '';
+    if (!cart.length) {
+      body.innerHTML = `<div class="cart-empty">
+        <svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#8A8D91" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9.5" cy="20" r="1.5"/><circle cx="17.5" cy="20" r="1.5"/><path d="M2.5 3.5h3l2.4 11.5h10.8l2.3-8.5H6.4"/></svg>
+        <h4>Nothing in here yet</h4>
+        <p class="small muted" style="max-width:250px; margin:0 auto 18px">Everything below is bench-approved. New to card care? Start with the Restoration Starter Bundle.</p>
+        <button class="btn btn-ghost btn-sm" data-act="close-cart">Browse the range</button>
+      </div>`;
+      foot.style.display = 'none';
+      return;
+    }
+    body.innerHTML = cart.map(i => {
+      const p = pByVid[i.vid], v = vById[i.vid];
+      return `<div class="ci">
+        <div class="ci-art">${HRART.productSVG({ kind: p.kind, label: p.name })}</div>
+        <div class="ci-info">
+          <b>${p.name}</b>
+          <span class="muted small">${v.name} · ${money(v.price)} each</span>
+          <div class="ci-ops">
+            <div class="qty">
+              <button data-act="dec" data-vid="${v.id}" aria-label="Decrease quantity">−</button>
+              <span class="q">${i.qty}</span>
+              <button data-act="inc" data-vid="${v.id}" aria-label="Increase quantity">+</button>
+            </div>
+            <button class="ci-rem" data-act="rem" data-vid="${v.id}">Remove</button>
+          </div>
+        </div>
+        <div class="ci-tot">${money(r2(v.price * i.qty))}</div>
+      </div>`;
+    }).join('');
+    const sub = subtotal(), sh = shipCost(sub), tot = r2(sub + sh);
+    foot.style.display = '';
+    foot.innerHTML = `
+      ${sh > 0
+        ? `<div class="ship-nudge">You're <b class="white">${money(r2(SHIP.freeOver - sub))}</b> from free shipping</div>
+           <div class="ship-bar"><i style="width:${Math.min(100, (sub / SHIP.freeOver) * 100).toFixed(1)}%"></i></div>`
+        : `<div class="mb2"><span class="badge badge-success">Free shipping unlocked</span></div>`}
+      <div class="tot-row"><span>Subtotal</span><b>${money(sub)}</b></div>
+      <div class="tot-row"><span>Shipping</span>${sh > 0 ? `<b>${money(sh)}</b>` : `<span class="free">FREE</span>`}</div>
+      <div class="tot-row grand"><span>Total</span><span>${money(tot)}</span></div>
+      <button class="btn btn-red btn-lg w100 mt2" data-act="checkout">Checkout — ${money(tot)}</button>
+      <p class="hint center mt2 mb0">Demo checkout — nothing is charged. Shipping at the scoped prototype rate ($${SHIP.flat} flat, free over $${SHIP.freeOver} — TBC).</p>`;
+  }
+  function openDrawer() { renderCart(); $('#cartBack').classList.add('open'); }
+  function closeDrawer() { $('#cartBack').classList.remove('open'); }
+
+  function addToCart(pid) {
+    const p = P.find(x => x.id === pid);
+    const v = vById[sel[p.id]];
+    const max = effStock(v);
+    if (max <= 0) { HR.toast('Out of stock — none left to add.'); return; }
+    if (cartQty(v.id) >= max) { HR.toast(`That's all our stock — ${max} max`); return; }
+    const it = cart.find(i => i.vid === v.id);
+    if (it) it.qty += 1; else cart.push({ pid: p.id, vid: v.id, qty: 1 });
+    saveCart();
+    if ($('#cartBack').classList.contains('open')) renderCart();
+    HR.toast(`Added — ${p.name} (${v.name})`);
+  }
+  function cartOp(act, vid) {
+    const it = cart.find(i => i.vid === vid);
+    if (!it) return;
+    if (act === 'inc') {
+      const max = effStock(vById[vid]);
+      if (it.qty >= max) { HR.toast(`That's all our stock — ${max} max`); return; }
+      it.qty += 1;
+    } else if (act === 'dec') {
+      it.qty -= 1;
+      if (it.qty <= 0) cart = cart.filter(i => i.vid !== vid);
+    } else if (act === 'rem') {
+      cart = cart.filter(i => i.vid !== vid);
+    }
+    saveCart(); renderCart();
+  }
+
+  /* ---------- checkout ---------- */
+  function setStep(k) {
+    ['details', 'payment', 'success'].forEach(s => { $('#ckStep-' + s).style.display = s === k ? '' : 'none'; });
+    const idx = { details: 0, payment: 1, success: 2 }[k];
+    document.querySelectorAll('#ckSteps span').forEach((el, i) => {
+      el.classList.toggle('on', i === idx);
+      el.classList.toggle('done', i < idx);
+    });
+  }
+  function openCheckout() {
+    if (!cart.length) { HR.toast('Your cart is empty.'); return; }
+    closeDrawer(); setStep('details');
+    $('#ckBack').classList.add('open');
+    $('#ckBack').scrollTop = 0;
+  }
+  function closeCheckout() { $('#ckBack').classList.remove('open'); }
+  function validate() {
+    const f = [$('#ckName'), $('#ckEmail'), $('#ckAddr'), $('#ckSuburb'), $('#ckState'), $('#ckPost')];
+    let ok = true;
+    f.forEach(el => { const bad = !el.value.trim(); el.classList.toggle('bad', bad); if (bad) ok = false; });
+    const em = $('#ckEmail'), po = $('#ckPost');
+    if (em.value.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em.value.trim())) { em.classList.add('bad'); ok = false; }
+    if (po.value.trim() && !/^\d{4}$/.test(po.value.trim())) { po.classList.add('bad'); ok = false; }
+    if (!ok) HR.toast('Check the highlighted fields — all are required.');
+    return ok;
+  }
+  function enterPayment() {
+    $('#payName').textContent = $('#ckName').value.trim();
+    const sub = subtotal(), sh = shipCost(sub), tot = r2(sub + sh);
+    $('#ckPayList').innerHTML = cart.map(i => {
+      const p = pByVid[i.vid], v = vById[i.vid];
+      return `<div class="ok-line"><span>${i.qty} × ${p.name} <span class="muted">(${v.name})</span></span><b>${money(r2(v.price * i.qty))}</b></div>`;
+    }).join('') + `
+      <div class="ok-line"><span class="muted">Subtotal</span><b>${money(sub)}</b></div>
+      <div class="ok-line"><span class="muted">Shipping</span><b>${sh > 0 ? money(sh) : 'FREE'}</b></div>
+      <div class="ok-line"><span><b>Total</b></span><b class="white">${money(tot)}</b></div>`;
+    $('#placeBtn').textContent = `Place order (demo) — ${money(tot)}`;
+  }
+  function fillSample() {
+    $('#ckName').value = 'Jordan Lee'; $('#ckEmail').value = 'hash@demo.com.au';
+    $('#ckAddr').value = '12 Ruby Lane'; $('#ckSuburb').value = 'Brunswick';
+    $('#ckState').value = 'VIC'; $('#ckPost').value = '3056';
+    document.querySelectorAll('#ckStep-details .bad').forEach(el => el.classList.remove('bad'));
+  }
+  function placeOrder() {
+    const num = 'HS-2026-' + String(Math.floor(1000 + Math.random() * 9000));
+    const sub = subtotal(), sh = shipCost(sub), tot = r2(sub + sh);
+    const lines = cart.map(i => {
+      const p = pByVid[i.vid], v = vById[i.vid];
+      return { name: p.name, variant: v.name, qty: i.qty, total: r2(v.price * i.qty) };
+    });
+    /* Decrement the demo stock overlay — this is the live-stock rule made visible */
+    const a = adj();
+    cart.forEach(i => { a[i.vid] = (a[i.vid] || 0) + i.qty; });
+    HR.store.set('stockAdj', a);
+    const shipTo = `${$('#ckName').value.trim()}, ${$('#ckAddr').value.trim()}, ${$('#ckSuburb').value.trim()} ${$('#ckState').value} ${$('#ckPost').value.trim()}`;
+    const email = $('#ckEmail').value.trim();
+    cart = []; saveCart();
+    renderGrid(); renderCart();
+    $('#ckSuccess').innerHTML = `
+      <div class="row mb2">
+        <span class="badge-gem"><span class="g-label">Demo order</span><span class="g-value">${num}</span></span>
+        <span class="badge badge-success">Stock decremented</span>
+      </div>
+      <h3 style="font-size:1.35rem">Order placed. Stock updated.</h3>
+      <p class="small muted mb0">Nothing was charged and nothing ships — but the stock really moved. Close this and check the range: every unit you just bought has come off the shelf, and anything you emptied now reads <b class="white">Out of stock</b>. That's the live-stock rule the real build enforces at Stripe checkout.</p>
+      <div class="ok-box">
+        ${lines.map(l => `<div class="ok-line"><span>${l.qty} × ${l.name} <span class="muted">(${l.variant})</span></span><b>${money(l.total)}</b></div>`).join('')}
+        <div class="ok-line"><span class="muted">Subtotal</span><b>${money(sub)}</b></div>
+        <div class="ok-line"><span class="muted">Shipping</span><b>${sh > 0 ? money(sh) : 'FREE'}</b></div>
+        <div class="ok-line"><span><b>Total</b></span><b class="white">${money(tot)}</b></div>
+      </div>
+      <p class="small muted">Ship to: ${shipTo}<br>In the real build a Stripe receipt and confirmation email land at <b class="white">${email}</b>.</p>
+      <div class="row mt2">
+        <button class="btn btn-red" data-act="ck-close">Back to the range</button>
+        <a class="btn btn-ghost" href="portal.html#submit">Send a card to the bench</a>
+      </div>`;
+    setStep('success');
+    $('#ckBack').scrollTop = 0;
+  }
+  function resetDemo() {
+    HR.store.del('stockAdj'); HR.store.del('cart');
+    cart = []; saveCart();
+    renderGrid(); renderCart();
+    HR.toast('Demo stock and cart reset.');
+  }
+
+  /* ---------- events ---------- */
+  document.addEventListener('click', e => {
+    const t = e.target.closest('[data-act]');
+    if (!t) return;
+    const act = t.dataset.act;
+    if (act === 'filter') { filter = t.dataset.cat; renderFilters(); renderGrid(); }
+    else if (act === 'variant') { sel[t.dataset.pid] = t.dataset.vid; refreshCard(P.find(p => p.id === t.dataset.pid)); }
+    else if (act === 'add') addToCart(t.dataset.pid);
+    else if (act === 'open-cart') openDrawer();
+    else if (act === 'close-cart') closeDrawer();
+    else if (act === 'inc' || act === 'dec' || act === 'rem') cartOp(act, t.dataset.vid);
+    else if (act === 'checkout') openCheckout();
+    else if (act === 'ck-close') closeCheckout();
+    else if (act === 'ck-continue') { if (validate()) { enterPayment(); setStep('payment'); } }
+    else if (act === 'ck-back') setStep('details');
+    else if (act === 'ck-to-cart') { closeCheckout(); openDrawer(); }
+    else if (act === 'place') placeOrder();
+    else if (act === 'fill-sample') fillSample();
+    else if (act === 'reset-demo') { e.preventDefault(); resetDemo(); }
+  });
+  ['cartBack', 'ckBack'].forEach(id => {
+    const el = document.getElementById(id);
+    el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
+  });
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    if ($('#ckBack').classList.contains('open')) closeCheckout();
+    else if ($('#cartBack').classList.contains('open')) closeDrawer();
+  });
+  document.addEventListener('input', e => {
+    if (e.target.classList && e.target.classList.contains('bad')) e.target.classList.remove('bad');
+  });
+  document.addEventListener('change', e => {
+    if (e.target.classList && e.target.classList.contains('bad') && e.target.value) e.target.classList.remove('bad');
+  });
+
+  /* ---------- boot ---------- */
+  renderFilters(); renderGrid(); renderFab();
+
+  /* land teaser links from index.html (#slug anchors) after the grid renders */
+  if (location.hash) {
+    const id = decodeURIComponent(location.hash.slice(1));
+    const el = document.getElementById(id);
+    if (el && el.classList.contains('p-card')) {
+      requestAnimationFrame(() => {
+        el.scrollIntoView({ block: 'center' });
+        el.classList.add('hi');
+        setTimeout(() => el.classList.remove('hi'), 2600);
+      });
+    }
+  }
+});
+</script>
+</body>
+</html>

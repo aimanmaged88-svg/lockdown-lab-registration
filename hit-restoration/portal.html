@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Customer Portal — Hit Restoration Co. (Prototype)</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="assets/fonts/fonts.css">
+<link rel="stylesheet" href="assets/brand.css">
+<style>
+  .portal-nav{border-bottom:1px solid var(--line); background:#0F0F0F}
+  .portal-nav .in{display:flex; gap:4px; align-items:center; overflow-x:auto}
+  .portal-nav a{padding:14px 16px; font-size:.88rem; font-weight:700; color:var(--steel); border-bottom:2px solid transparent; white-space:nowrap}
+  .portal-nav a.on{color:var(--white); border-bottom-color:var(--red)}
+  .portal-nav .who{margin-left:auto; font-size:.8rem; color:var(--steel); white-space:nowrap; padding-right:4px}
+  .auth-wrap{max-width:440px; margin:70px auto}
+  .kpis{display:grid; grid-template-columns:repeat(3,1fr); gap:14px}
+  @media(max-width:640px){.kpis{grid-template-columns:1fr}}
+  .order-row{display:grid; grid-template-columns:1fr auto; gap:18px; align-items:center}
+  .order-row .meta{display:flex; gap:14px; flex-wrap:wrap; align-items:center; margin-top:8px}
+  .order-row .meta .m{font-size:.82rem; color:var(--steel)}
+  .msg-thread{display:flex; flex-direction:column; gap:12px; max-height:430px; overflow-y:auto; padding:4px}
+  .msg{max-width:78%; border-radius:12px; padding:11px 15px; font-size:.92rem; line-height:1.5}
+  .msg.customer{align-self:flex-end; background:var(--red-dim); border:1px solid rgba(200,16,46,.4); color:var(--white)}
+  .msg.staff{align-self:flex-start; background:var(--surface-2); border:1px solid var(--line-strong)}
+  .msg .who{font-size:.68rem; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--steel); margin-bottom:4px}
+  .msg .when{font-size:.68rem; color:var(--steel); margin-top:6px}
+  .card-line{display:grid; grid-template-columns:64px 1fr auto; gap:16px; align-items:center; padding:16px; border:1px solid var(--line); border-radius:var(--r-md); background:var(--surface-2); margin-bottom:12px}
+  .card-line .thumb{width:64px; border-radius:6px; overflow:hidden; background:#0C0C0C}
+  @media(max-width:700px){.card-line{grid-template-columns:48px 1fr} .card-line .right{grid-column:1/-1}}
+  .pay-chips{display:flex; gap:8px; flex-wrap:wrap}
+  .wiz-steps{display:flex; gap:6px; margin-bottom:26px}
+  .wiz-steps .ws{flex:1; text-align:center; font-size:.72rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:var(--steel); padding-bottom:10px; border-bottom:3px solid var(--line)}
+  .wiz-steps .ws.on{color:var(--white); border-bottom-color:var(--red)}
+  .wiz-steps .ws.done{color:var(--success); border-bottom-color:var(--success)}
+  @media(max-width:700px){.wiz-steps .ws{font-size:.6rem}}
+  .wiz-card{border:1px solid var(--line-strong); border-radius:var(--r-md); padding:20px; background:var(--surface-2); margin-bottom:14px; position:relative}
+  .wiz-card .rm{position:absolute; top:12px; right:12px}
+  .est-line{display:flex; justify-content:space-between; gap:14px; padding:9px 0; border-bottom:1px dashed var(--line); font-size:.92rem}
+  .est-line:last-child{border-bottom:0}
+  .est-line b{color:var(--white)}
+  .reveal-hero{max-width:520px; margin:0 auto}
+  .empty{border:1px dashed var(--line-strong); border-radius:var(--r-md); padding:40px; text-align:center; color:var(--steel)}
+</style>
+</head>
+<body data-nofooter="1">
+
+<div id="portalNav" class="portal-nav" style="display:none">
+  <div class="container in">
+    <a href="#dashboard" data-v="dashboard">Dashboard</a>
+    <a href="#submit" data-v="submit">New submission</a>
+    <a href="#account" data-v="account">Account</a>
+    <a href="#" id="signOut">Sign out</a>
+    <span class="who" id="whoAmI"></span>
+  </div>
+</div>
+
+<main class="container" id="view" style="min-height:70vh; padding-top:34px; padding-bottom:80px"></main>
+
+<script src="assets/art.js"></script>
+<script src="assets/demo-data.js"></script>
+<script src="assets/shell.js"></script>
+<script>
+(function () {
+  const $ = sel => document.querySelector(sel);
+  const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const DEMO = { email: 'hash@demo.com.au', name: 'Jordan Lee' };
+  const fmtD = iso => new Date(iso.replace(' ', 'T')).toLocaleDateString('en-AU', { day: 'numeric', month: 'short', year: 'numeric' });
+
+  /* ---------- local demo state (orders merge: sample data + mutations + wizard-created) ---------- */
+  const mutOf = id => (HR.store.get('orderMut', {})[id]) || {};
+  function saveMut(id, patch) {
+    const all = HR.store.get('orderMut', {});
+    all[id] = Object.assign({}, all[id] || {}, patch);
+    HR.store.set('orderMut', all);
+  }
+  function myOrders() {
+    const base = HRDATA.ORDERS.filter(o => !o.staffOnly && o.email === DEMO.email).map(o => {
+      const m = mutOf(o.id);
+      const merged = Object.assign({}, o, m);
+      merged.timeline = (o.timeline || []).concat(m.timelineAdd || []);
+      merged.messages = (o.messages || []).concat(m.messagesAdd || []);
+      merged.cards = o.cards.map(c => Object.assign({}, c, (m.cards || {})[c.id] || {}));
+      return merged;
+    });
+    return base.concat(HR.store.get('localOrders', []));
+  }
+  const orderByNumber = n => myOrders().find(o => o.number === n);
+  const session = () => HR.store.get('session', null);
+
+  /* ---------- routing ---------- */
+  function route() {
+    const h = location.hash.replace(/^#/, '') || 'dashboard';
+    if (!session() && h !== 'login') { HR.store.set('afterLogin', h); location.hash = 'login'; return; }
+    const nav = $('#portalNav');
+    nav.style.display = session() ? '' : 'none';
+    if (session()) {
+      $('#whoAmI').textContent = session().name + ' · ' + session().email + ' · demo session';
+      nav.querySelectorAll('a[data-v]').forEach(a => a.classList.toggle('on', h.split('/')[0] === a.dataset.v));
+    }
+    if (h === 'login') return vLogin();
+    if (h === 'dashboard') return vDashboard();
+    if (h === 'submit') return vWizard();
+    if (h === 'account') return vAccount();
+    if (h.startsWith('order/')) return vOrder(decodeURIComponent(h.slice(6)));
+    vDashboard();
+  }
+
+  /* ---------- views ---------- */
+  function vLogin() {
+    $('#view').innerHTML = `
+      <div class="auth-wrap fx in">
+        <div class="center mb3">${HRART.logoSVG(64)}</div>
+        <div class="card">
+          <h3 class="center" style="font-size:1.35rem">Customer portal</h3>
+          <p class="small muted center">Every order, every card, every stage — live.</p>
+          <div class="field"><label>Email</label><input class="input" id="liEmail" value="hash@demo.com.au"></div>
+          <div class="field"><label>Password</label><input class="input" id="liPass" type="password" value="demo-prototype"></div>
+          <button class="btn btn-red w100 btn-lg" id="liGo">Enter the demo portal →</button>
+          <div class="row mt2" style="gap:8px">
+            <button class="btn btn-soft btn-sm" style="flex:1" disabled>Google — real build</button>
+            <button class="btn btn-soft btn-sm" style="flex:1" disabled>Apple — real build</button>
+          </div>
+          <div class="note-build">Prototype sign-in — one click, no real account. The live build uses proper email/password + Google/Apple SSO, password reset, and email verification.</div>
+        </div>
+      </div>`;
+    $('#liGo').addEventListener('click', () => {
+      HR.store.set('session', DEMO);
+      const next = HR.store.get('afterLogin', 'dashboard');
+      HR.store.del('afterLogin');
+      location.hash = next === 'login' ? 'dashboard' : next;
+      HR.toast('Signed in — demo session');
+    });
+  }
+
+  function vDashboard() {
+    const orders = myOrders();
+    const active = orders.filter(o => o.status !== 'delivered');
+    const cardsWithUs = orders.flatMap(o => o.cards).filter(c => !['submitted', 'delivered'].includes(c.stage)).length;
+    const reveals = orders.flatMap(o => o.cards).filter(c => c.reveal).length;
+    const needsAction = orders.filter(o => o.status === 'quote_ready');
+    $('#view').innerHTML = `
+      <div class="spread mb3">
+        <div><span class="kicker">Dashboard</span><h2 class="mb0" style="font-size:2rem">G'day, ${esc(session().name.split(' ')[0])}.</h2></div>
+        <a class="btn btn-red" href="#submit">+ New submission</a>
+      </div>
+      ${needsAction.length ? `<div class="card mb2" style="border-color:rgba(217,164,65,.55); background:var(--warning-dim)">
+        <div class="spread"><div><b style="color:#F2C879">Action needed:</b> <span class="small">your quote for ${needsAction.map(o => o.number).join(', ')} is ready — work starts once you approve it.</span></div>
+        <a class="btn btn-red btn-sm" href="#order/${needsAction[0].number}">Review quote</a></div></div>` : ''}
+      <div class="kpis mb3">
+        <div class="stat"><div class="v">${active.length}</div><div class="l">Active orders</div></div>
+        <div class="stat"><div class="v">${cardsWithUs}</div><div class="l">Cards with us</div></div>
+        <div class="stat"><div class="v">${reveals}</div><div class="l">Reveals ready</div></div>
+      </div>
+      <h3 style="font-size:1.15rem">Your orders</h3>
+      ${orders.length ? orders.map(o => {
+        const gr = o.service !== 'restoration';
+        return `<a class="card card-hover order-row mb2" href="#order/${o.number}" style="display:grid">
+          <div>
+            <div class="row" style="gap:10px"><b style="color:var(--white); font-size:1.05rem">${o.number}</b>${HR.stageChip(o.status)}${o.local ? '<span class="badge badge-warning">Created in this demo</span>' : ''}</div>
+            <div class="meta">
+              <span class="m">${fmtD(o.created)}</span><span class="m">·</span>
+              <span class="m">${o.cards.length} card${o.cards.length > 1 ? 's' : ''}</span><span class="m">·</span>
+              <span class="m">${o.service === 'both' ? 'Restore + grade' : o.service === 'grading' ? 'Grading concierge' : 'Restoration'}</span>
+              ${(o.messages || []).length ? `<span class="m">· ${(o.messages || []).length} messages</span>` : ''}
+            </div>
+            <div class="mt2" style="max-width:420px">${HR.miniStepper(o.status, gr)}</div>
+          </div>
+          <span class="btn btn-soft btn-sm">Open →</span>
+        </a>`;
+      }).join('') : `<div class="empty">No orders yet — <a href="#submit" style="text-decoration:underline">start your first submission</a>.</div>`}
+      <div class="note-build">Dashboard data is sample/demo state. Live build: real orders from the backend, per-stage email + SMS pings (Postmark/Twilio are scoped), and the AI concierge chat bubble with human handoff sits bottom-right on every portal page.</div>`;
+  }
+
+  function vOrder(num) {
+    const o = orderByNumber(num);
+    if (!o) { $('#view').innerHTML = `<div class="empty">Order not found. <a href="#dashboard" style="text-decoration:underline">Back to dashboard</a></div>`; return; }
+    const gr = o.service !== 'restoration';
+    const revealCards = o.cards.filter(c => c.reveal);
+    const payChip = (label, on, warn) => `<span class="badge ${on ? 'badge-success' : warn ? 'badge-warning' : 'badge-steel'}">${label}</span>`;
+    $('#view').innerHTML = `
+      <div class="crumbs"><a href="#dashboard">Dashboard</a> / ${o.number}</div>
+      <div class="spread mb2">
+        <div>
+          <div class="row" style="gap:10px"><h2 class="mb0" style="font-size:1.7rem">${o.number}</h2>${HR.stageChip(o.status)}</div>
+          <p class="small muted mt1 mb0">Placed ${fmtD(o.created)} · ${o.cards.length} card${o.cards.length > 1 ? 's' : ''} · ${o.service === 'both' ? 'Restoration + grading concierge' : o.service === 'grading' ? 'Grading concierge' : 'Restoration'}</p>
+        </div>
+        <div class="pay-chips">
+          ${payChip('Inspection ' + (o.inspectionPaid ? 'paid' : 'pending'), o.inspectionPaid)}
+          ${o.quote ? payChip('Quote ' + (o.quotePaid ? 'paid' : 'awaiting approval'), o.quotePaid, !o.quotePaid) : ''}
+          ${o.gradingFee ? payChip('Grading fee ' + (o.gradingFeePaid ? 'paid' : 'pending'), o.gradingFeePaid) : ''}
+          ${o.upcharge ? payChip('Upcharge ' + (o.upchargePaid ? 'paid' : 'pending'), o.upchargePaid) : ''}
+        </div>
+      </div>
+
+      ${o.status === 'quote_ready' && !o.quotePaid ? `
+      <div class="card mb2" style="border-color:rgba(217,164,65,.6)">
+        <div class="spread">
+          <div>
+            <h3 style="font-size:1.2rem" class="mb1">Your quote is ready — ${HR.fmtAUD(o.quote)}</h3>
+            <p class="small muted mb0" style="max-width:38rem">Based on the confirmed intake value of your card${o.cards.length > 1 ? 's' : ''}. Nothing starts until you approve. Your $${o.inspection} inspection fee is credited against this.</p>
+          </div>
+          <button class="btn btn-red btn-lg" id="approveQuote">Approve & pay ${HR.fmtAUD(o.quote)}</button>
+        </div>
+        <div class="note-build">Demo payment — clicking approve simulates a Stripe payment and moves the order into restoration. The live build takes a real card payment here (new standalone Stripe account, per scope).</div>
+      </div>` : ''}
+
+      ${revealCards.length ? `
+      <div class="panel panel-pad mb2">
+        <div class="spread mb2"><h3 style="font-size:1.2rem" class="mb0">The reveal</h3><span class="badge badge-red">Before / after</span></div>
+        <div class="grid ${revealCards.length > 1 ? 'g2' : ''}">
+          ${revealCards.map(c => `
+            <div class="reveal-hero">
+              <div class="slab">
+                <div class="slab-label"><span class="l-name">${esc(c.name)}</span>${c.gradeAfter && c.gradeAfter !== 'Restored' ? `<span class="l-grade">${esc(c.gradeAfter)}</span>` : '<span class="l-grade" style="color:var(--success)">RESTORED</span>'}</div>
+                <div class="slab-window" data-reveal="${c.id}"></div>
+              </div>
+              ${c.gradeBefore ? `<p class="small muted center mt1 mb0">${esc(c.gradeBefore)} → <b style="color:#6FCE92">${esc(c.gradeAfter || 'Restored')}</b>${c.cert ? ` · Cert #${esc(c.cert)}` : ''}</p>` : ''}
+            </div>`).join('')}
+        </div>
+      </div>` : ''}
+
+      <div class="grid" style="grid-template-columns:1.1fr .9fr; gap:22px" id="orderCols">
+        <div>
+          <div class="panel panel-pad mb2">
+            <h3 style="font-size:1.15rem">Cards in this order</h3>
+            ${o.cards.map(c => `
+              <div class="card-line">
+                <div class="thumb">${HRART.cardSVG({ name: c.name, category: c.category, state: c.reveal ? 'after' : 'before', seed: c.id })}</div>
+                <div>
+                  <b style="color:var(--white); font-size:.95rem">${esc(c.name)}</b>
+                  <div class="small muted">${esc(c.set || '')}${c.grader ? ' · ' + HRDATA.GRADERS[c.grader] : ''} · declared ${HR.fmtAUD(c.declared)}</div>
+                  <div class="mt1" style="max-width:300px">${HR.miniStepper(c.stage, c.service !== 'restoration')}</div>
+                  <div class="small mt1" style="color:var(--silver)">${esc((HRDATA.STAGES[HRDATA.stageIdx(c.stage)] || {}).say || '')}</div>
+                </div>
+                <div class="right">${c.cert ? `<span class="badge-gem"><span class="g-label">${HRDATA.GRADERS[c.grader]}</span><span class="g-value">${esc((c.gradeAfter || '').replace(/[^0-9.]/g, '') || '—')}</span></span>` : HR.stageChip(c.stage)}</div>
+              </div>`).join('')}
+            ${o.outboundTracking ? `<div class="small mt2" style="color:var(--silver)"><b class="white">Return shipping:</b> ${esc(o.carrier || '')} · ${esc(o.outboundTracking)} <span class="badge badge-success" style="margin-left:6px">Insured</span></div>` : ''}
+          </div>
+          <div class="panel panel-pad">
+            <h3 style="font-size:1.15rem">Messages</h3>
+            <div class="msg-thread" id="thread">
+              ${(o.messages || []).map(m => `
+                <div class="msg ${m.from}">
+                  <div class="who">${m.from === 'staff' ? esc(m.who || 'Hit Restoration Co.') : 'You'}</div>
+                  <div>${esc(m.body)}</div><div class="when">${esc(m.at)}</div>
+                </div>`).join('') || '<p class="small muted">No messages yet — ask us anything about this order.</p>'}
+            </div>
+            <div class="row mt2" style="flex-wrap:nowrap">
+              <input class="input" id="msgBox" placeholder="Message the team about ${o.number}…" style="flex:1">
+              <button class="btn btn-red" id="msgSend">Send</button>
+            </div>
+            <div class="note-build">Prototype thread with a canned reply. Scoped for launch: AI-powered live chat that answers instantly and hands off to Hash's team when it can't (Tidio/Intercom category — monthly subscription, priced separately per the scope response).</div>
+          </div>
+        </div>
+        <div>
+          <div class="panel panel-pad mb2">
+            <h3 style="font-size:1.15rem">Live tracker</h3>
+            ${HR.stepperHTML(o.status, { grading: gr })}
+          </div>
+          <div class="panel panel-pad">
+            <h3 style="font-size:1.15rem">History</h3>
+            ${(o.timeline || []).slice().reverse().map(t => {
+              const s = HRDATA.STAGES[HRDATA.stageIdx(t.stage)] || { label: t.stage };
+              return `<div style="padding:10px 0; border-bottom:1px dashed var(--line)">
+                <b style="color:var(--white); font-size:.88rem">${s.label}</b>
+                <div class="small muted">${esc(t.note || '')}</div>
+                <div class="small" style="color:var(--steel); font-size:.72rem; margin-top:2px">${esc(t.at)}</div>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+      <style>@media(max-width:900px){#orderCols{grid-template-columns:1fr!important}}</style>`;
+
+    // mount reveals
+    revealCards.forEach(c => {
+      const host = document.querySelector(`[data-reveal="${c.id}"]`);
+      if (host) HR.mountReveal(host,
+        HRART.cardSVG({ name: c.name, category: c.category, state: 'before', seed: c.id }),
+        HRART.cardSVG({ name: c.name, category: c.category, state: 'after', seed: c.id }));
+    });
+
+    // quote approval simulation
+    const aq = $('#approveQuote');
+    if (aq) aq.addEventListener('click', () => {
+      const stamp = new Date().toISOString().slice(0, 16).replace('T', ' ');
+      if (o.local) {
+        const locals = HR.store.get('localOrders', []);
+        const lo = locals.find(x => x.number === o.number);
+        if (lo) { lo.status = 'in_restoration'; lo.quotePaid = true; lo.cards.forEach(c => c.stage = 'in_restoration'); lo.timeline.push({ stage: 'in_restoration', at: stamp, note: 'Quote approved & paid (demo payment)' }); HR.store.set('localOrders', locals); }
+      } else {
+        saveMut(o.id, {
+          status: 'in_restoration', quotePaid: true, quoteApproved: true,
+          cards: Object.fromEntries(o.cards.map(c => [c.id, { stage: 'in_restoration' }])),
+          timelineAdd: (mutOf(o.id).timelineAdd || []).concat([{ stage: 'in_restoration', at: stamp, note: 'Quote approved & paid (demo payment)' }])
+        });
+      }
+      HR.toast('Payment simulated — your cards are in restoration ✓');
+      route();
+    });
+
+    // messages
+    const send = () => {
+      const box = $('#msgBox');
+      const txt = box.value.trim();
+      if (!txt) return;
+      const stamp = new Date().toISOString().slice(0, 16).replace('T', ' ');
+      const add = m => {
+        if (o.local) {
+          const locals = HR.store.get('localOrders', []);
+          const lo = locals.find(x => x.number === o.number);
+          if (lo) { lo.messages = lo.messages || []; lo.messages.push(m); HR.store.set('localOrders', locals); }
+        } else {
+          saveMut(o.id, { messagesAdd: (mutOf(o.id).messagesAdd || []).concat([m]) });
+        }
+      };
+      add({ from: 'customer', at: stamp, body: txt });
+      route();
+      setTimeout(() => {
+        add({ from: 'staff', who: 'Hash', at: stamp, body: '(Demo reply) Got it — a real reply from the team lands here. In the live build you also get an email/SMS ping when we respond.' });
+        route();
+        HR.toast('New reply from Hit Restoration Co.');
+      }, 1400);
+    };
+    const sb = $('#msgSend');
+    if (sb) { sb.addEventListener('click', send); $('#msgBox').addEventListener('keydown', e => { if (e.key === 'Enter') send(); }); }
+  }
+
+  /* ---------- submission wizard ---------- */
+  const wiz = { step: 1, cards: [], details: { name: DEMO.name, email: DEMO.email, phone: '0400 000 000', address: '12 Sample St, Melbourne VIC 3000' }, agreed: false };
+  function blankCard() { return { name: '', set: '', category: 'pokemon', declared: '', service: 'both', jobs: [], grader: 'psa' }; }
+
+  function cardEstimate(c) {
+    const v = parseFloat(c.declared) || 0;
+    const out = { inspection: HRDATA.PRICING.inspection, resto: 0, grading: 0, custom: false };
+    if (c.service !== 'grading') {
+      const f = HRDATA.restorationFee(v);
+      if (f === null) out.custom = true; else out.resto = f;
+    }
+    if (c.service !== 'restoration') out.grading = HRDATA.PRICING.graderEstimates[c.grader] || 0;
+    return out;
+  }
+
+  function vWizard() {
+    if (!wiz.cards.length) wiz.cards.push(blankCard());
+    const stepNames = ['Your cards', 'Your details', 'Estimate', 'Shipping', 'Done'];
+    const head = `
+      <span class="kicker">New submission</span>
+      <h2 style="font-size:1.9rem">Send it right.</h2>
+      <div class="wiz-steps">${stepNames.map((n, i) => `<div class="ws ${wiz.step === i + 1 ? 'on' : wiz.step > i + 1 ? 'done' : ''}">${i + 1}. ${n}</div>`).join('')}</div>`;
+
+    if (wiz.step === 1) {
+      $('#view').innerHTML = head + `
+        ${wiz.cards.map((c, i) => `
+        <div class="wiz-card" data-i="${i}">
+          ${wiz.cards.length > 1 ? `<button class="btn btn-soft btn-sm rm" data-rm="${i}">✕</button>` : ''}
+          <h4>Card ${i + 1}</h4>
+          <div class="grid g2">
+            <div class="field"><label>Card name *</label><input class="input" data-f="name" value="${esc(c.name)}" placeholder="e.g. 1999 Base Set Charizard Holo"></div>
+            <div class="field"><label>Set / release</label><input class="input" data-f="set" value="${esc(c.set)}" placeholder="e.g. Pokémon Base Set"></div>
+            <div class="field"><label>Category</label><select class="select" data-f="category">
+              ${['pokemon|Pokémon', 'sports|Sports', 'magic|Magic: The Gathering', 'yugioh|Yu-Gi-Oh!', 'onepiece|One Piece', 'other|Other'].map(o => { const [v, l] = o.split('|'); return `<option value="${v}" ${c.category === v ? 'selected' : ''}>${l}</option>`; }).join('')}
+            </select></div>
+            <div class="field"><label>Declared value (AUD) *</label><input class="input" data-f="declared" type="number" min="1" value="${esc(c.declared)}" placeholder="e.g. 450"><div class="hint">We confirm this together at intake — your quote is based on the confirmed number.</div></div>
+          </div>
+          <div class="field"><label>Service for this card</label>
+            <div class="pill-opts" data-svc>
+              ${[['restoration', 'Restoration only'], ['grading', 'Grading only'], ['both', 'Restore + grade']].map(([v, l]) => `<span class="pill ${c.service === v ? 'on' : ''}" data-set-svc="${v}">${l}</span>`).join('')}
+            </div>
+          </div>
+          ${c.service !== 'grading' ? `<div class="field"><label>Restoration work (pick what it needs)</label>
+            <div class="pill-opts" data-jobs>
+              ${HRDATA.SERVICES.map(s => `<span class="pill ${c.jobs.includes(s.key) ? 'on' : ''}" data-job="${s.key}">${s.name}</span>`).join('')}
+            </div><div class="hint">Not sure? Leave it — inspection tells us what will actually help.</div></div>` : ''}
+          ${c.service !== 'restoration' ? `<div class="field" style="max-width:280px"><label>Grader</label><select class="select" data-f="grader">
+            ${Object.entries(HRDATA.GRADERS).map(([v, l]) => `<option value="${v}" ${c.grader === v ? 'selected' : ''}>${l}</option>`).join('')}
+          </select></div>` : ''}
+          <button class="btn btn-soft btn-sm" data-photo disabled>＋ Add photos — real build</button>
+        </div>`).join('')}
+        <div class="row">
+          <button class="btn btn-ghost" id="addCard">＋ Add another card</button>
+          <button class="btn btn-red" id="next1" style="margin-left:auto">Continue →</button>
+        </div>
+        <div class="note-build">Photo upload is stubbed — the live build takes per-card photos here (they become your "before" record and help intake). Multi-card orders track each card independently, exactly like this, in the real backend.</div>`;
+
+      document.querySelectorAll('.wiz-card').forEach(el => {
+        const i = +el.dataset.i;
+        el.querySelectorAll('[data-f]').forEach(inp => inp.addEventListener('change', () => { wiz.cards[i][inp.dataset.f] = inp.value; if (inp.dataset.f === 'category' || inp.tagName === 'SELECT') vWizard(); }));
+        el.querySelectorAll('[data-set-svc]').forEach(p => p.addEventListener('click', () => { syncInputs(); wiz.cards[i].service = p.dataset.setSvc; vWizard(); }));
+        el.querySelectorAll('[data-job]').forEach(p => p.addEventListener('click', () => {
+          syncInputs();
+          const j = wiz.cards[i].jobs;
+          const k = p.dataset.job;
+          j.includes(k) ? j.splice(j.indexOf(k), 1) : j.push(k);
+          vWizard();
+        }));
+        const rm = el.querySelector('[data-rm]');
+        if (rm) rm.addEventListener('click', () => { syncInputs(); wiz.cards.splice(i, 1); vWizard(); });
+      });
+      function syncInputs() {
+        document.querySelectorAll('.wiz-card').forEach(el => {
+          const i = +el.dataset.i;
+          el.querySelectorAll('[data-f]').forEach(inp => { wiz.cards[i][inp.dataset.f] = inp.value; });
+        });
+      }
+      $('#addCard').addEventListener('click', () => { syncInputs(); wiz.cards.push(blankCard()); vWizard(); });
+      $('#next1').addEventListener('click', () => {
+        syncInputs();
+        const bad = wiz.cards.findIndex(c => !c.name.trim() || !(parseFloat(c.declared) > 0));
+        if (bad >= 0) { HR.toast(`Card ${bad + 1}: name and a declared value are required`); return; }
+        wiz.step = 2; vWizard(); window.scrollTo(0, 0);
+      });
+    }
+
+    else if (wiz.step === 2) {
+      $('#view').innerHTML = head + `
+        <div class="panel panel-pad" style="max-width:620px">
+          <div class="grid g2">
+            <div class="field"><label>Full name *</label><input class="input" id="dName" value="${esc(wiz.details.name)}"></div>
+            <div class="field"><label>Email *</label><input class="input" id="dEmail" value="${esc(wiz.details.email)}"></div>
+            <div class="field"><label>Phone</label><input class="input" id="dPhone" value="${esc(wiz.details.phone)}"><div class="hint">For SMS stage updates (Twilio — real build).</div></div>
+            <div class="field"><label>Return address *</label><input class="input" id="dAddr" value="${esc(wiz.details.address)}"></div>
+          </div>
+          <div class="row mt2"><button class="btn btn-ghost" id="back2">← Back</button><button class="btn btn-red" id="next2" style="margin-left:auto">Continue →</button></div>
+        </div>`;
+      $('#back2').addEventListener('click', () => { wiz.step = 1; vWizard(); });
+      $('#next2').addEventListener('click', () => {
+        wiz.details = { name: $('#dName').value, email: $('#dEmail').value, phone: $('#dPhone').value, address: $('#dAddr').value };
+        if (!wiz.details.name.trim() || !wiz.details.email.includes('@') || !wiz.details.address.trim()) { HR.toast('Name, email and return address are required'); return; }
+        wiz.step = 3; vWizard(); window.scrollTo(0, 0);
+      });
+    }
+
+    else if (wiz.step === 3) {
+      let insp = 0, resto = 0, grading = 0, anyCustom = false, anyGrading = false;
+      const lines = wiz.cards.map(c => {
+        const e = cardEstimate(c);
+        insp += e.inspection; resto += e.resto; grading += e.grading;
+        if (e.custom) anyCustom = true;
+        if (c.service !== 'restoration') anyGrading = true;
+        return { c, e };
+      });
+      const total = insp + resto + grading;
+      $('#view').innerHTML = head + `
+        <div class="grid" style="grid-template-columns:1.1fr .9fr; gap:22px" id="estCols">
+          <div>
+            ${lines.map(({ c, e }, i) => `
+            <div class="wiz-card">
+              <div class="spread"><h4 class="mb0">${i + 1}. ${esc(c.name)}</h4><span class="badge badge-steel">${c.service === 'both' ? 'Restore + grade' : c.service}</span></div>
+              <div class="mt1">
+                <div class="est-line"><span>Inspection (credited if you proceed)</span><b>${HR.fmtAUD(e.inspection)}</b></div>
+                ${c.service !== 'grading' ? `<div class="est-line"><span>Restoration — est. on declared ${HR.fmtAUD(parseFloat(c.declared) || 0)}</span><b>${e.custom ? 'Custom quote' : HR.fmtAUD(e.resto)}</b></div>` : ''}
+                ${c.service !== 'restoration' ? `<div class="est-line"><span>Grading submission — ${HRDATA.GRADERS[c.grader]} (placeholder est.)</span><b>${HR.fmtAUD(e.grading)}</b></div>
+                <div class="est-line"><span class="muted">Later: grading upcharge on return</span><span class="muted">4% of final graded value</span></div>` : ''}
+              </div>
+            </div>`).join('')}
+          </div>
+          <div>
+            <div class="panel panel-pad" style="position:sticky; top:120px">
+              <h3 style="font-size:1.15rem">Estimate</h3>
+              <div class="est-line"><span>Inspection (${wiz.cards.length} card${wiz.cards.length > 1 ? 's' : ''})</span><b>${HR.fmtAUD(insp)}</b></div>
+              <div class="est-line"><span>Restoration</span><b>${anyCustom ? 'Incl. custom quote' : HR.fmtAUD(resto)}</b></div>
+              ${anyGrading ? `<div class="est-line"><span>Grading submission</span><b>${HR.fmtAUD(grading)}</b></div>` : ''}
+              <div class="est-line" style="border-top:1px solid var(--line-strong); margin-top:6px; padding-top:12px"><span><b>Estimated today → intake</b></span><span class="price-big" style="font-size:1.6rem">${HR.fmtAUD(total)}</span></div>
+              <p class="small muted mt2">Nothing is charged now. The $10/card inspection is charged when your cards physically arrive; your firm restoration quote follows the confirmed value and needs your approval before work starts.${anyGrading ? ' The 4% grading upcharge is calculated on the final graded value when the card returns.' : ''}</p>
+              <div class="row mt2"><button class="btn btn-ghost" id="back3">← Back</button><button class="btn btn-red" id="next3" style="flex:1">Looks right →</button></div>
+            </div>
+          </div>
+        </div>
+        <style>@media(max-width:900px){#estCols{grid-template-columns:1fr!important}}</style>`;
+      $('#back3').addEventListener('click', () => { wiz.step = 2; vWizard(); });
+      $('#next3').addEventListener('click', () => { wiz.step = 4; vWizard(); window.scrollTo(0, 0); });
+    }
+
+    else if (wiz.step === 4) {
+      $('#view').innerHTML = head + `
+        <div class="panel panel-pad" style="max-width:640px">
+          <h3 style="font-size:1.2rem">Getting your cards to us</h3>
+          <p class="small" style="color:var(--silver)">You arrange and pay for shipping to us — tracked and insured is strongly recommended. Full packing instructions and our intake address come with your confirmation email.</p>
+          <div class="card" style="background:var(--surface-2); padding:18px">
+            <b class="white small">Pack it like it matters:</b>
+            <ul class="small muted" style="margin:8px 0 0; padding-left:18px; line-height:1.9">
+              <li>Sleeve + toploader (or card saver) per card — no loose cards.</li>
+              <li>Rigid mailer or box, cards immobilised, nothing rattling.</li>
+              <li>Photograph the package before sending — your record, and ours.</li>
+              <li>Ship to the intake address in your confirmation <span class="badge badge-warning">placeholder in prototype</span></li>
+            </ul>
+          </div>
+          <label class="check mt2"><input type="checkbox" id="agree"><span>I've read and agree to the <a href="legal.html" target="_blank" style="display:inline; text-decoration:underline">Terms & Conditions and Waiver</a> <span class="badge badge-warning">draft — pending solicitor review</span>, including that I own (or am authorised to submit) these cards, and that restoration must be disclosed if I later sell them.</span></label>
+          <div class="row mt2"><button class="btn btn-ghost" id="back4">← Back</button><button class="btn btn-red btn-lg" id="placeOrder" style="margin-left:auto">Place submission</button></div>
+          <div class="note-build">The live build emails a confirmation (Postmark/Resend), shows the real intake address, and logs the T&C acceptance timestamp against the order — the signed waiver is also collected at physical intake per the client's process.</div>
+        </div>`;
+      $('#back4').addEventListener('click', () => { wiz.step = 3; vWizard(); });
+      $('#placeOrder').addEventListener('click', () => {
+        if (!$('#agree').checked) { HR.toast('Please accept the terms first'); return; }
+        const locals = HR.store.get('localOrders', []);
+        const num = 'HR-2026-0' + (410 + locals.length + 1);
+        const now = new Date().toISOString().slice(0, 16).replace('T', ' ');
+        const anyG = wiz.cards.some(c => c.service !== 'restoration');
+        const allG = wiz.cards.every(c => c.service === 'grading');
+        locals.push({
+          id: 'local-' + Date.now(), local: true, number: num, email: wiz.details.email, name: wiz.details.name,
+          service: allG ? 'grading' : anyG ? 'both' : 'restoration', created: now.slice(0, 10), status: 'submitted',
+          inspection: HRDATA.PRICING.inspection * wiz.cards.length, inspectionPaid: false,
+          cards: wiz.cards.map((c, i) => ({ id: 'lc-' + Date.now() + '-' + i, pos: i + 1, name: c.name, set: c.set, category: c.category, declared: parseFloat(c.declared) || 0, service: c.service, jobs: c.jobs, grader: c.service === 'restoration' ? null : c.grader, stage: 'submitted', reveal: false })),
+          timeline: [{ stage: 'submitted', at: now, note: 'Order created in prototype demo' }],
+          messages: []
+        });
+        HR.store.set('localOrders', locals);
+        wiz.step = 5; wiz.placed = num; vWizard(); window.scrollTo(0, 0);
+      });
+    }
+
+    else {
+      $('#view').innerHTML = head + `
+        <div class="center" style="max-width:560px; margin:30px auto">
+          <div style="font-size:3rem; margin-bottom:10px">✓</div>
+          <h2 style="font-size:2rem">You're in the queue.</h2>
+          <p class="lead">Submission <b class="white">${esc(wiz.placed || '')}</b> is created. Ship your cards when ready — the tracker starts the moment they arrive.</p>
+          <div class="row" style="justify-content:center">
+            <a class="btn btn-red" href="#order/${esc(wiz.placed || '')}">Open the order tracker</a>
+            <a class="btn btn-ghost" href="#dashboard">Back to dashboard</a>
+          </div>
+          <div class="note-build" style="text-align:left">In the live build this same moment sends the confirmation email with packing instructions + intake address, and staff see the new order appear in their queue instantly (try it — this demo order is now on the staff admin's board too).</div>
+        </div>`;
+      wiz.cards = []; wiz.step = 1;
+    }
+  }
+
+  function vAccount() {
+    const prefs = HR.store.get('prefs', { email: true, sms: true, marketing: false });
+    $('#view').innerHTML = `
+      <span class="kicker">Account</span>
+      <h2 style="font-size:1.9rem">Settings</h2>
+      <div class="grid g2" style="align-items:start">
+        <div class="panel panel-pad">
+          <h3 style="font-size:1.15rem">Profile</h3>
+          <div class="field"><label>Full name</label><input class="input" id="pfName" value="${esc(session().name)}"></div>
+          <div class="field"><label>Email</label><input class="input" value="${esc(session().email)}" disabled><div class="hint">Sign-in email — changeable in the real build with re-verification.</div></div>
+          <div class="field"><label>Phone</label><input class="input" id="pfPhone" value="0400 000 000"></div>
+          <div class="field"><label>Default return address</label><input class="input" id="pfAddr" value="12 Sample St, Melbourne VIC 3000"></div>
+          <button class="btn btn-red" id="pfSave">Save changes</button>
+        </div>
+        <div>
+          <div class="panel panel-pad mb2">
+            <h3 style="font-size:1.15rem">Notifications</h3>
+            <label class="check mb1"><input type="checkbox" id="nEmail" ${prefs.email ? 'checked' : ''}><span><b class="white">Email</b> — every stage change (Postmark/Resend in the real build)</span></label>
+            <label class="check mb1"><input type="checkbox" id="nSms" ${prefs.sms ? 'checked' : ''}><span><b class="white">SMS</b> — key stages only: received, quote ready, reveal, shipped (Twilio)</span></label>
+            <label class="check"><input type="checkbox" id="nMkt" ${prefs.marketing ? 'checked' : ''}><span><b class="white">News & drops</b> — occasional, no spam</span></label>
+          </div>
+          <div class="panel panel-pad">
+            <h3 style="font-size:1.15rem">Payment methods</h3>
+            <p class="small muted mb1">Saved cards live here once Stripe is connected in the real build.</p>
+            <button class="btn btn-soft btn-sm" disabled>＋ Add card — real build</button>
+          </div>
+        </div>
+      </div>`;
+    $('#pfSave').addEventListener('click', () => HR.toast('Saved (demo)'));
+    ['nEmail', 'nSms', 'nMkt'].forEach(id => $('#' + id).addEventListener('change', () => {
+      HR.store.set('prefs', { email: $('#nEmail').checked, sms: $('#nSms').checked, marketing: $('#nMkt').checked });
+      HR.toast('Preference saved (demo)');
+    }));
+  }
+
+  /* ---------- boot ---------- */
+  document.addEventListener('DOMContentLoaded', () => {
+    $('#signOut').addEventListener('click', e => { e.preventDefault(); HR.store.del('session'); location.hash = 'login'; HR.toast('Signed out'); });
+    window.addEventListener('hashchange', route);
+    route();
+  });
+})();
+</script>
+</body>
+</html>

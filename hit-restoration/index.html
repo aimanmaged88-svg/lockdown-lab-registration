@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hit Restoration Co. — Card Restoration & Grading Concierge (Prototype)</title>
+<meta name="description" content="Trading-card restoration and full grading concierge. Restore — Submit. Australia.">
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="assets/fonts/fonts.css">
+<link rel="stylesheet" href="assets/brand.css">
+<style>
+  .hero-wrap{display:grid; grid-template-columns:1.05fr .9fr; gap:56px; align-items:center; padding:92px 0 84px}
+  @media(max-width:960px){.hero-wrap{grid-template-columns:1fr; padding:56px 0 60px}}
+  .hero h1 .hl{color:var(--red-hot)}
+  .trust-strip{border-top:1px solid var(--line); border-bottom:1px solid var(--line); background:#0D0D0D}
+  .trust-strip .row-strip{display:grid; grid-template-columns:repeat(4,1fr); gap:0}
+  .trust-strip .t{padding:22px 18px; border-left:1px solid var(--line); display:flex; gap:12px; align-items:flex-start}
+  .trust-strip .t:first-child{border-left:0}
+  .trust-strip .t b{display:block; color:var(--white); font-size:.95rem}
+  .trust-strip .t span{font-size:.82rem; color:var(--steel)}
+  .trust-strip .ic{flex:none; width:34px; height:34px; border-radius:9px; background:var(--red-dim); border:1px solid rgba(200,16,46,.4);
+    display:flex; align-items:center; justify-content:center; color:var(--red-hot); font-size:1rem}
+  @media(max-width:820px){.trust-strip .row-strip{grid-template-columns:1fr 1fr}.trust-strip .t{border-top:1px solid var(--line)}}
+  .svc-tile{position:relative; overflow:hidden}
+  .svc-tile .n{position:absolute; top:16px; right:20px; font-family:var(--display); font-size:2.2rem; color:rgba(255,255,255,.07)}
+  .proc-band{counter-reset:pstep}
+  .proc-step{position:relative; padding-left:0}
+  .proc-step .pn{font-family:var(--display); color:var(--red-hot); font-size:1.5rem; margin-bottom:8px}
+  .stage-ticker{display:flex; gap:8px; flex-wrap:wrap; margin-top:18px}
+  .stage-ticker .s{font-size:.72rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--steel);
+    border:1px solid var(--line); border-radius:999px; padding:5px 11px}
+  .stage-ticker .s.hot{color:var(--white); border-color:rgba(200,16,46,.6); background:var(--red-dim)}
+  .cta-band{background:linear-gradient(120deg,#1A0A0E, #14060A 55%, #0F0F0F); border:1px solid rgba(200,16,46,.35); border-radius:var(--r-lg);
+    padding:54px 48px; display:grid; grid-template-columns:1.2fr .8fr; gap:34px; align-items:center; position:relative; overflow:hidden}
+  .cta-band::after{content:"HR"; position:absolute; right:-30px; bottom:-70px; font-family:var(--display); font-size:17rem; color:rgba(200,16,46,.07); pointer-events:none}
+  @media(max-width:860px){.cta-band{grid-template-columns:1fr; padding:38px 26px}}
+  .store-tease{display:grid; grid-template-columns:repeat(4,1fr); gap:16px}
+  @media(max-width:960px){.store-tease{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:560px){.store-tease{grid-template-columns:1fr 1fr}}
+  .store-tease .pt{background:var(--surface); border:1px solid var(--line); border-radius:var(--r-md); padding:14px; text-align:center}
+  .store-tease .pt b{display:block; font-size:.85rem; color:var(--white); margin-top:10px; font-weight:700}
+  .store-tease .pt span{font-size:.82rem; color:var(--steel)}
+</style>
+</head>
+<body>
+
+<main>
+  <!-- ============ HERO ============ -->
+  <section class="hero">
+    <div class="hero-bg"></div><div class="hero-grid-lines"></div>
+    <div class="container hero-wrap">
+      <div>
+        <span class="kicker">Card restoration · Grading concierge · Australia</span>
+        <h1>Your card comes back <span class="hl">better.</span><br>And you watch every step.</h1>
+        <p class="lead mt2" style="max-width:34rem">We restore trading cards — cleaning, dents, creases, corners, surface — then submit them to PSA, CGC, BGS or SGC on your behalf. Tracked live, stage by stage, from your door and back to it.</p>
+        <div class="row mt3">
+          <a class="btn btn-red btn-lg" href="portal.html#submit">Start a submission</a>
+          <a class="btn btn-ghost btn-lg" href="how-it-works.html">See how it works</a>
+        </div>
+        <div class="stage-ticker" aria-hidden="true">
+          <span class="s">Submitted</span><span class="s">Received</span><span class="s hot">In restoration</span>
+          <span class="s">Reveal</span><span class="s">At grader</span><span class="s">Delivered</span>
+        </div>
+      </div>
+      <div class="fx">
+        <div class="slab">
+          <div class="slab-label">
+            <span class="l-name">1999 Base Set Charizard Holo</span>
+            <span class="badge-gem"><span class="g-label">Graded</span><span class="g-value">PSA 8</span></span>
+          </div>
+          <div class="slab-window" id="heroReveal" aria-label="Before and after restoration reveal — drag to compare"></div>
+        </div>
+        <p class="small muted center mt2">Drag to reveal — sample artwork stands in for real restoration photography.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ TRUST STRIP ============ -->
+  <section class="trust-strip">
+    <div class="container row-strip">
+      <div class="t"><div class="ic">✓</div><div><b>Insured in our custody</b><span>Declared value confirmed together at intake</span></div></div>
+      <div class="t"><div class="ic">◉</div><div><b>Tracked in 12 stages</b><span>Live status, per card, no login needed</span></div></div>
+      <div class="t"><div class="ic">$</div><div><b>Quote before work</b><span>Nothing starts until you approve it</span></div></div>
+      <div class="t"><div class="ic">✉</div><div><b>A person, not a ticket</b><span>Concierge thread on every order</span></div></div>
+    </div>
+  </section>
+
+  <!-- ============ SERVICES ============ -->
+  <section class="section">
+    <div class="container">
+      <div class="spread mb3">
+        <div><span class="kicker">What we do</span>
+        <h2 class="mb0">Five crafts.<br>One obsession.</h2></div>
+        <a class="btn btn-ghost" href="services.html">All services →</a>
+      </div>
+      <div class="grid g3" id="svcGrid"></div>
+      <div class="card card-hover mt2" style="border-color:rgba(200,16,46,.4)">
+        <div class="spread">
+          <div style="max-width:44rem">
+            <h3 class="mb1">Grading concierge</h3>
+            <p class="mb0 muted">We submit your card to <b class="white">PSA, CGC, BGS or SGC</b> on your behalf — packing, paperwork, tracking, the lot. You never deal with the grader. Order it alone, or straight after restoration as one path.</p>
+          </div>
+          <a class="btn btn-red" href="services.html#grading">How submissions work</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PROCESS TEASER ============ -->
+  <section class="section" style="background:#0D0D0D; border-top:1px solid var(--line); border-bottom:1px solid var(--line)">
+    <div class="container">
+      <span class="kicker">The journey</span>
+      <div class="spread mb3">
+        <h2 class="mb0" style="max-width:30rem">Strangers don't get trusted. Processes do.</h2>
+        <a class="btn btn-ghost" href="how-it-works.html">The full 12 stages →</a>
+      </div>
+      <div class="grid g4 proc-band">
+        <div class="card proc-step fx"><div class="pn">01</div><h4>Submit online</h4><p class="small muted mb0">Add your cards, declare values, pick services per card. Estimate on the spot — no charge yet.</p></div>
+        <div class="card proc-step fx"><div class="pn">02</div><h4>We confirm in hand</h4><p class="small muted mb0">Your cards are logged and photographed on arrival. Value confirmed, firm quote issued. You approve before anything starts.</p></div>
+        <div class="card proc-step fx"><div class="pn">03</div><h4>Restore & reveal</h4><p class="small muted mb0">Skilled bench work, then your before/after reveal lands in the portal. The best moment in the hobby.</p></div>
+        <div class="card proc-step fx"><div class="pn">04</div><h4>Graded & home</h4><p class="small muted mb0">If grading's selected we handle the whole submission. Final QC, then tracked and insured back to your door.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BEFORE / AFTER FEATURE ============ -->
+  <section class="section">
+    <div class="container split">
+      <div>
+        <span class="kicker">Before & after</span>
+        <h2>The reveal is the receipt.</h2>
+        <p class="lead">Every restoration gets photographed before a tool touches it and again when it leaves the bench. Your portal serves the reveal — drag it, share it, keep it.</p>
+        <div class="row mt2">
+          <span class="badge-gem"><span class="g-label">Raw → Graded</span><span class="g-value">PSA 8</span></span>
+          <span class="badge-gem"><span class="g-label">Raw → Graded</span><span class="g-value">CGC 8.5</span></span>
+          <span class="badge-gem"><span class="g-label">Raw → Graded</span><span class="g-value">SGC 9</span></span>
+        </div>
+        <a class="btn btn-red mt3" href="gallery.html">Open the gallery</a>
+        <div class="note-build">Real before/after photography is being shot ahead of launch — the client's docs flag it as a launch dependency. Sample artwork holds the layout meanwhile.</div>
+      </div>
+      <div class="fx">
+        <div class="slab">
+          <div class="slab-label"><span class="l-name">1996 Topps Kobe Bryant RC</span><span class="l-grade">CGC 8.5</span></div>
+          <div class="slab-window" id="kobeReveal"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRICING TEASER ============ -->
+  <section class="section" style="background:#0D0D0D; border-top:1px solid var(--line); border-bottom:1px solid var(--line)">
+    <div class="container">
+      <span class="kicker">Pricing</span>
+      <div class="spread mb3">
+        <h2 class="mb0">Staged. Transparent.<br>Never off a guess.</h2>
+        <a class="btn btn-ghost" href="pricing.html">Full pricing & estimator →</a>
+      </div>
+      <div class="grid g4">
+        <div class="stat fx"><div class="v">$10</div><div class="l">Inspection, per card</div><div class="d">Credited to your invoice if you proceed</div></div>
+        <div class="stat fx"><div class="v">$20+</div><div class="l">Restoration base</div><div class="d">By value tier, + 10% of confirmed value</div></div>
+        <div class="stat fx"><div class="v">At cost</div><div class="l">Grading submission</div><div class="d">Grader's fee passed through + handling</div></div>
+        <div class="stat fx"><div class="v">4%</div><div class="l">Grading upcharge</div><div class="d">Of final graded value, on return</div></div>
+      </div>
+      <p class="small muted mt2 mb0">Every charge lands only after the number it's based on is confirmed with you — inspection at intake, restoration on an approved quote, grading on the final grade.</p>
+    </div>
+  </section>
+
+  <!-- ============ STORE TEASER ============ -->
+  <section class="section">
+    <div class="container">
+      <div class="spread mb3">
+        <div><span class="kicker">DIY care range</span>
+        <h2 class="mb0">The bench, bottled.</h2></div>
+        <a class="btn btn-ghost" href="store.html">Shop the range →</a>
+      </div>
+      <div class="store-tease" id="storeTease"></div>
+    </div>
+  </section>
+
+  <!-- ============ FAQ TEASER + CTA ============ -->
+  <section class="section">
+    <div class="container">
+      <div class="cta-band fx">
+        <div>
+          <h2 style="font-size:clamp(1.7rem,3.4vw,2.5rem)">Something valuable?<br>Something sentimental?<br><span class="red">Send it right.</span></h2>
+          <p class="muted mb0">Start your submission in about three minutes. No charge until your card is in our hands and you've approved a firm quote.</p>
+        </div>
+        <div>
+          <a class="btn btn-red btn-lg w100 mb1" href="portal.html#submit">Start a submission</a>
+          <a class="btn btn-ghost btn-lg w100" href="track.html">Track an order</a>
+          <p class="small muted center mt2 mb0">Questions first? <a href="about.html#faq" style="display:inline; padding:0; text-decoration:underline">Read the FAQ</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="assets/art.js"></script>
+<script src="assets/demo-data.js"></script>
+<script src="assets/shell.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // hero + kobe reveals
+  HR.mountReveal(document.getElementById('heroReveal'),
+    HRART.cardSVG({ name: '1999 Base Set Charizard Holo', category: 'pokemon', state: 'before', seed: 'charizard' }),
+    HRART.cardSVG({ name: '1999 Base Set Charizard Holo', category: 'pokemon', state: 'after', seed: 'charizard' }));
+  HR.mountReveal(document.getElementById('kobeReveal'),
+    HRART.cardSVG({ name: '1996 Topps Kobe Bryant RC', category: 'sports', state: 'before', seed: 'kobe' }),
+    HRART.cardSVG({ name: '1996 Topps Kobe Bryant RC', category: 'sports', state: 'after', seed: 'kobe' }));
+
+  // services grid
+  document.getElementById('svcGrid').innerHTML = HRDATA.SERVICES.map((s, i) => `
+    <div class="card card-hover svc-tile fx">
+      <div class="n">0${i + 1}</div>
+      <h3 style="font-size:1.2rem">${s.name}</h3>
+      <p class="small muted mb0">${s.copy}</p>
+    </div>`).join('') + `
+    <div class="card card-hover svc-tile fx" style="display:flex; flex-direction:column; justify-content:center; align-items:flex-start; background:var(--red-dim); border-color:rgba(200,16,46,.45)">
+      <h3 style="font-size:1.2rem">Not sure what it needs?</h3>
+      <p class="small muted">Submit it anyway — inspection tells us exactly what will (and won't) help, before you spend a dollar on work.</p>
+      <a class="btn btn-red btn-sm" href="portal.html#submit">Get it inspected</a>
+    </div>`;
+
+  // store tease (first 4 products)
+  document.getElementById('storeTease').innerHTML = HRDATA.PRODUCTS.slice(0, 4).map(p => `
+    <a class="pt card-hover" href="store.html#${p.slug}">
+      ${HRART.productSVG({ kind: p.kind, label: p.name })}
+      <b>${p.name}</b>
+      <span>from ${HR.fmtAUD(Math.min(...p.variants.map(v => v.price)))}</span>
+    </a>`).join('');
+});
+</script>
+</body>
+</html>

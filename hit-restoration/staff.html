@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Staff Admin — Hit Restoration Co. (Prototype)</title>
+<meta name="robots" content="noindex">
+<link rel="stylesheet" href="assets/fonts/fonts.css">
+<link rel="stylesheet" href="assets/brand.css">
+<style>
+  .staff-nav{border-bottom:1px solid var(--line); background:#0F0F0F}
+  .staff-nav .in{display:flex; gap:2px; align-items:center; overflow-x:auto}
+  .staff-nav a{padding:14px 15px; font-size:.86rem; font-weight:700; color:var(--steel); border-bottom:2px solid transparent; white-space:nowrap}
+  .staff-nav a.on{color:var(--white); border-bottom-color:var(--red)}
+  .staff-nav .who{margin-left:auto; font-size:.78rem; color:var(--steel); white-space:nowrap; display:flex; gap:10px; align-items:center; padding-right:4px}
+  .role-pick{max-width:560px; margin:70px auto}
+  .kb-card .n{font-weight:800; color:var(--white); font-size:.9rem}
+  .kb-card .c{font-size:.78rem; color:var(--steel); margin-top:3px}
+  .kb-card .f{display:flex; gap:6px; margin-top:8px; flex-wrap:wrap}
+  .lock{border:1px dashed var(--line-strong); border-radius:var(--r-md); padding:34px; text-align:center; color:var(--steel)}
+  .stageSel{max-width:230px}
+  .two-phase{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+  @media(max-width:860px){.two-phase{grid-template-columns:1fr}}
+  .phase{border:1px solid var(--line-strong); border-radius:var(--r-md); padding:18px; background:var(--surface-2)}
+  .phase h5{margin:0 0 12px; font-size:.75rem; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:var(--red-hot)}
+  .phase.inb h5{color:#6FCE92}
+  .bar-row{display:grid; grid-template-columns:170px 1fr 34px; gap:10px; align-items:center; margin-bottom:8px; font-size:.8rem}
+  .bar-row .bar{height:10px; border-radius:5px; background:var(--surface-3); overflow:hidden}
+  .bar-row .bar i{display:block; height:100%; background:var(--red); border-radius:5px}
+  .note-int{background:var(--surface-2); border:1px solid var(--line); border-radius:8px; padding:10px 13px; font-size:.86rem; margin-bottom:8px}
+  .note-int .w{font-size:.7rem; color:var(--steel); margin-top:3px}
+  .photo-slot{border:1px dashed var(--line-strong); border-radius:8px; padding:14px; text-align:center; font-size:.78rem; color:var(--steel)}
+</style>
+</head>
+<body data-nofooter="1">
+
+<div id="staffNav" class="staff-nav" style="display:none">
+  <div class="container in">
+    <a href="#queue" data-v="queue">Orders queue</a>
+    <a href="#batches" data-v="batches">Grading batches</a>
+    <a href="#customers" data-v="customers">Customers</a>
+    <a href="#products" data-v="products">Store & stock</a>
+    <a href="#reports" data-v="reports">Reports</a>
+    <span class="who"><span id="roleBadge"></span><button class="btn btn-soft btn-sm" id="switchRole">Switch role</button></span>
+  </div>
+</div>
+
+<main class="container" id="view" style="min-height:72vh; padding-top:30px; padding-bottom:80px"></main>
+
+<script src="assets/art.js"></script>
+<script src="assets/demo-data.js"></script>
+<script src="assets/shell.js"></script>
+<script>
+(function () {
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  const role = () => HR.store.get('staffRole', null);
+  const isAdmin = () => role() === 'admin';
+  const stamp = () => new Date().toISOString().slice(0, 16).replace('T', ' ');
+
+  /* ---- shared demo state (same keys the customer portal uses → changes flow through) ---- */
+  const mutOf = id => (HR.store.get('orderMut', {})[id]) || {};
+  function saveMut(id, patch) {
+    const all = HR.store.get('orderMut', {});
+    all[id] = Object.assign({}, all[id] || {}, patch);
+    HR.store.set('orderMut', all);
+  }
+  function allOrders() {
+    const base = HRDATA.ORDERS.map(o => {
+      const m = mutOf(o.id);
+      const merged = Object.assign({}, o, m);
+      merged.timeline = (o.timeline || []).concat(m.timelineAdd || []);
+      merged.messages = (o.messages || []).concat(m.messagesAdd || []);
+      merged.notes = m.notesAdd || [];
+      merged.cards = o.cards.map(c => Object.assign({}, c, (m.cards || {})[c.id] || {}));
+      return merged;
+    });
+    return base.concat(HR.store.get('localOrders', []).map(o => Object.assign({ notes: o.notesAdd || [] }, o)));
+  }
+  const byNumber = n => allOrders().find(o => o.number === n);
+  const rank = k => HRDATA.stageIdx(k);
+  function rollup(cards) { return cards.slice().sort((a, b) => rank(a.stage) - rank(b.stage))[0].stage; }
+
+  function persistOrder(o, patchOrderLevel) {
+    if (o.local) {
+      const locals = HR.store.get('localOrders', []);
+      const lo = locals.find(x => x.number === o.number);
+      if (lo) { Object.assign(lo, patchOrderLevel(lo) || {}); HR.store.set('localOrders', locals); }
+    }
+  }
+
+  function setCardStage(o, card, newStage, note) {
+    if (o.local) {
+      const locals = HR.store.get('localOrders', []);
+      const lo = locals.find(x => x.number === o.number);
+      const lc = lo.cards.find(c => c.id === card.id);
+      lc.stage = newStage;
+      if (newStage === 'restoration_complete') lc.reveal = true;
+      lo.status = rollup(lo.cards);
+      lo.timeline = lo.timeline || [];
+      lo.timeline.push({ stage: newStage, at: stamp(), note: note || ('Stage updated by staff (' + role() + ')') });
+      HR.store.set('localOrders', locals);
+    } else {
+      const m = mutOf(o.id);
+      const cards = Object.assign({}, m.cards || {});
+      cards[card.id] = Object.assign({}, cards[card.id] || {}, { stage: newStage }, newStage === 'restoration_complete' ? { reveal: true } : {});
+      const mergedCards = o.cards.map(c => Object.assign({}, c, cards[c.id] || {}, c.id === card.id ? { stage: newStage } : {}));
+      saveMut(o.id, {
+        cards,
+        status: rollup(mergedCards),
+        timelineAdd: (m.timelineAdd || []).concat([{ stage: newStage, at: stamp(), note: note || ('Stage updated by staff (' + role() + ')') }])
+      });
+    }
+  }
+
+  function nextStageFor(card) {
+    const gr = card.service !== 'restoration';
+    let i = rank(card.stage) + 1;
+    while (i < HRDATA.STAGES.length) {
+      const s = HRDATA.STAGES[i];
+      if (!gr && s.grading) { i++; continue; }
+      return s.key;
+    }
+    return null;
+  }
+
+  /* ---------- routing ---------- */
+  function route() {
+    const h = location.hash.replace(/^#/, '') || 'queue';
+    if (!role()) return vRolePick();
+    $('#staffNav').style.display = '';
+    $('#roleBadge').innerHTML = isAdmin()
+      ? '<span class="badge badge-red">Admin — Hash</span>'
+      : '<span class="badge badge-steel">Technician — bench</span>';
+    document.querySelectorAll('#staffNav a[data-v]').forEach(a => a.classList.toggle('on', h.split('/')[0] === a.dataset.v));
+    if (h === 'queue') return vQueue();
+    if (h.startsWith('order/')) return vOrder(decodeURIComponent(h.slice(6)));
+    if (h === 'batches') return gate(vBatches, 'Grading coordination is an Admin capability — the Technician role covers the restoration bench only.');
+    if (h === 'customers') return gate(vCustomers, 'Customer records are an Admin capability.');
+    if (h === 'products') return gate(vProducts, 'Store management is an Admin capability.');
+    if (h === 'reports') return gate(vReports, 'Reporting is an Admin capability.');
+    vQueue();
+  }
+  function gate(fn, msg) {
+    if (isAdmin()) return fn();
+    $('#view').innerHTML = `<div class="lock"><div style="font-size:1.6rem; margin-bottom:8px">🔒</div><b class="white">Not available to Technician</b><p class="small mt1 mb0">${msg}<br>This is the role-scoped access the client asked for — enforced server-side in the real build.</p></div>`;
+  }
+
+  function vRolePick() {
+    $('#staffNav').style.display = 'none';
+    $('#view').innerHTML = `
+      <div class="role-pick">
+        <div class="center mb3">${HRART.logoSVG(58)}</div>
+        <div class="card">
+          <h3 class="center" style="font-size:1.3rem">Staff admin</h3>
+          <p class="small muted center">Two launch roles, different visibility — pick one to preview it.</p>
+          <div class="grid g2 mt2">
+            <button class="btn btn-soft" style="flex-direction:column; padding:22px; height:auto; gap:6px" data-role="technician">
+              <b>Technician</b><span class="small muted" style="font-weight:400; white-space:normal">Restoration bench — queue, card work, photos. No shipping, grading, customer or revenue data.</span>
+            </button>
+            <button class="btn btn-soft" style="flex-direction:column; padding:22px; height:auto; gap:6px; border-color:rgba(200,16,46,.5)" data-role="admin">
+              <b>Admin (Hash)</b><span class="small muted" style="font-weight:400; white-space:normal">Everything — logistics, grading batches, customers, store, reporting, comms.</span>
+            </button>
+          </div>
+          <div class="note-build">Prototype role toggle. Real build: separate logins with server-enforced permissions (Technician / Admin at launch, Grading Coordinator role ready for when the team grows — per the client's questionnaire: 2 people at launch).</div>
+        </div>
+      </div>`;
+    document.querySelectorAll('[data-role]').forEach(b => b.addEventListener('click', () => {
+      HR.store.set('staffRole', b.dataset.role);
+      HR.toast('Viewing as ' + (b.dataset.role === 'admin' ? 'Admin' : 'Technician'));
+      route();
+    }));
+  }
+
+  /* ---------- queue (kanban by stage) ---------- */
+  function vQueue() {
+    const orders = allOrders();
+    const unread = orders.reduce((n, o) => n + (o.messages || []).filter(m => m.from === 'customer').length, 0);
+    const groups = HRDATA.STAGES.map(s => ({
+      s, cards: orders.flatMap(o => o.cards.filter(c => c.stage === s.key).map(c => ({ o, c })))
+    })).filter(g => g.cards.length);
+    $('#view').innerHTML = `
+      <div class="spread mb2">
+        <div><span class="kicker">Orders queue</span><h2 class="mb0" style="font-size:1.8rem">The board</h2></div>
+        <div class="row">
+          ${isAdmin() ? `<span class="badge ${unread ? 'badge-warning' : 'badge-steel'}">${unread} customer message${unread === 1 ? '' : 's'}</span>` : ''}
+          <span class="badge badge-steel">${orders.length} orders · ${orders.flatMap(o => o.cards).length} cards</span>
+        </div>
+      </div>
+      <p class="small muted mb2">Every card, grouped by its live stage — per-card status inside multi-card orders, exactly as scoped. Click through to work an order.</p>
+      <div class="kanban">
+        ${groups.map(g => `
+          <div class="kb-col">
+            <h6>${g.s.n}. ${g.s.label}<span class="badge badge-steel">${g.cards.length}</span></h6>
+            ${g.cards.map(({ o, c }) => `
+              <div class="kb-card" data-open="${o.number}">
+                <div class="n">${esc(c.name)}</div>
+                <div class="c">${o.number} · ${esc(o.name || o.email)}</div>
+                <div class="f">
+                  ${c.service !== 'restoration' ? `<span class="badge badge-red" style="font-size:.6rem">${HRDATA.GRADERS[c.grader] || 'GRADE'}</span>` : ''}
+                  ${c.service !== 'grading' ? `<span class="badge badge-steel" style="font-size:.6rem">RESTO</span>` : ''}
+                  ${o.local ? '<span class="badge badge-warning" style="font-size:.6rem">NEW — DEMO</span>' : ''}
+                </div>
+              </div>`).join('')}
+          </div>`).join('')}
+      </div>
+      <div class="note-build">Live build: drag-and-drop between columns, filters (grader, service, overdue), and this board updates in real time as orders land — including submissions created in the customer portal demo, which already appear here.</div>`;
+    document.querySelectorAll('[data-open]').forEach(el => el.addEventListener('click', () => location.hash = 'order/' + el.dataset.open));
+  }
+
+  /* ---------- staff order detail ---------- */
+  function vOrder(num) {
+    const o = byNumber(num);
+    if (!o) { $('#view').innerHTML = '<div class="lock">Order not found. <a href="#queue" style="text-decoration:underline">Back to queue</a></div>'; return; }
+    const subs = HR.store.get('gradingSubs', {});
+    $('#view').innerHTML = `
+      <div class="crumbs"><a href="#queue">Queue</a> / ${o.number}</div>
+      <div class="spread mb2">
+        <div>
+          <div class="row" style="gap:10px"><h2 class="mb0" style="font-size:1.6rem">${o.number}</h2>${HR.stageChip(o.status)}</div>
+          <p class="small muted mt1 mb0">${esc(o.name || '—')} · ${esc(o.email)} ${isAdmin() ? '· lifetime value visible in Customers' : ''}</p>
+        </div>
+        <div class="row">
+          ${isAdmin() ? `
+          <span class="badge ${o.inspectionPaid ? 'badge-success' : 'badge-warning'}">Inspection ${o.inspectionPaid ? '✓' : 'due'}</span>
+          ${o.quote ? `<span class="badge ${o.quotePaid ? 'badge-success' : 'badge-warning'}">Quote ${o.quotePaid ? '✓ ' + HR.fmtAUD(o.quote) : 'unpaid'}</span>` : ''}
+          ${o.gradingFee ? `<span class="badge ${o.gradingFeePaid ? 'badge-success' : 'badge-warning'}">Grading fee ${o.gradingFeePaid ? '✓' : 'due'}</span>` : ''}` : ''}
+        </div>
+      </div>
+
+      ${o.cards.map(c => {
+        const nxt = nextStageFor(c);
+        const sub = subs[c.id] || {};
+        const grCard = c.service !== 'restoration';
+        return `
+        <div class="panel panel-pad mb2">
+          <div class="spread mb2">
+            <div class="row" style="gap:12px">
+              <div style="width:52px; border-radius:6px; overflow:hidden">${HRART.cardSVG({ name: c.name, category: c.category, state: rank(c.stage) >= rank('restoration_complete') ? 'after' : 'before', seed: c.id })}</div>
+              <div>
+                <b style="color:var(--white)">${esc(c.name)}</b>
+                <div class="small muted">${esc(c.set || '')} · declared ${HR.fmtAUD(c.declared)}${c.confirmed ? ' · confirmed ' + HR.fmtAUD(c.confirmed) : ''}${grCard ? ' · ' + (HRDATA.GRADERS[c.grader] || '') : ''}</div>
+              </div>
+            </div>
+            ${HR.stageChip(c.stage)}
+          </div>
+          <div style="max-width:520px" class="mb2">${HR.miniStepper(c.stage, grCard)}</div>
+
+          <div class="row mb2">
+            ${nxt ? `<button class="btn btn-red btn-sm" data-adv="${c.id}">Advance → ${HRDATA.STAGES[rank(nxt)].label}</button>` : '<span class="badge badge-success">Journey complete</span>'}
+            <select class="select btn-sm stageSel" data-jump="${c.id}">
+              <option value="">Set stage…</option>
+              ${HRDATA.STAGES.filter(s => grCard || !s.grading).map(s => `<option value="${s.key}" ${s.key === c.stage ? 'selected' : ''}>${s.n}. ${s.label}</option>`).join('')}
+            </select>
+          </div>
+
+          ${c.service !== 'grading' ? `
+          <div class="grid g3 mb2">
+            <div class="photo-slot">BEFORE photo<br>${c.stage !== 'submitted' ? '✓ on file (sample)' : 'required at intake'}<br><button class="btn btn-soft btn-sm mt1" disabled>Upload — real build</button></div>
+            <div class="photo-slot">AFTER photo<br>${c.reveal ? '✓ reveal live' : 'required before reveal'}<br><button class="btn btn-soft btn-sm mt1" disabled>Upload — real build</button></div>
+            <div class="photo-slot">Bench jobs<br><span class="small" style="color:var(--silver)">${(c.jobs || []).map(j => (HRDATA.SERVICES.find(s => s.key === j) || {}).name).filter(Boolean).join(' · ') || 'per inspection'}</span></div>
+          </div>` : ''}
+
+          ${grCard && isAdmin() ? `
+          <h4 class="mt2">Grading submission log — two-phase</h4>
+          <div class="two-phase">
+            <div class="phase">
+              <h5>Phase 1 — Outbound (at submission)</h5>
+              <div class="grid g2" style="gap:10px">
+                <div class="field mb0"><label>Grader</label><input class="input" value="${HRDATA.GRADERS[c.grader] || ''}" disabled></div>
+                <div class="field mb0"><label>Service tier</label><input class="input" data-sub="${c.id}|out|tier" value="${esc(sub.out?.tier || '')}" placeholder="e.g. Value"></div>
+                <div class="field mb0"><label>Dealer partner <span class="badge badge-red" style="font-size:.55rem">INTERNAL</span></label>
+                  <select class="select" data-sub="${c.id}|out|dealer">${['', ...HRDATA.DEALERS].map(d => `<option ${sub.out?.dealer === d ? 'selected' : ''}>${d}</option>`).join('')}</select></div>
+                <div class="field mb0"><label>Dealer batch ref</label><input class="input" data-sub="${c.id}|out|ref" value="${esc(sub.out?.ref || '')}" placeholder="e.g. SLB-2291"></div>
+                <div class="field mb0"><label>Ship date</label><input class="input" type="date" data-sub="${c.id}|out|ship" value="${esc(sub.out?.ship || '')}"></div>
+                <div class="field mb0"><label>Outbound tracking</label><input class="input" data-sub="${c.id}|out|track" value="${esc(sub.out?.track || '')}" placeholder="AP…AU"></div>
+                <div class="field mb0"><label>Declared value</label><input class="input" value="${HR.fmtAUD(c.confirmed || c.declared)}" disabled></div>
+                <div class="field mb0"><label>Est. return</label><input class="input" type="date" data-sub="${c.id}|out|eta" value="${esc(sub.out?.eta || '')}"></div>
+              </div>
+              <button class="btn btn-soft btn-sm mt2" data-savesub="${c.id}|out">Save outbound</button>
+            </div>
+            <div class="phase inb">
+              <h5>Phase 2 — Inbound (on return — cert doesn't exist before this)</h5>
+              <div class="grid g2" style="gap:10px">
+                <div class="field mb0"><label>Cert number</label><input class="input" data-sub="${c.id}|in|cert" value="${esc(sub.in?.cert || c.cert || '')}" placeholder="e.g. 88231447"></div>
+                <div class="field mb0"><label>Final grade</label><input class="input" data-sub="${c.id}|in|grade" value="${esc(sub.in?.grade || c.gradeAfter || '')}" placeholder="e.g. PSA 8"></div>
+                <div class="field mb0"><label>Graded value (for 4% upcharge)</label><input class="input" data-sub="${c.id}|in|value" value="${esc(sub.in?.value || c.gradedValue || '')}" placeholder="AUD"></div>
+                <div class="field mb0"><label>Return tracking</label><input class="input" data-sub="${c.id}|in|track" value="${esc(sub.in?.track || '')}"></div>
+                <div class="field mb0"><label>Date received</label><input class="input" type="date" data-sub="${c.id}|in|recv" value="${esc(sub.in?.recv || '')}"></div>
+                <div class="field mb0"><label>Grader notes</label><input class="input" data-sub="${c.id}|in|notes" value="${esc(sub.in?.notes || '')}"></div>
+              </div>
+              <button class="btn btn-soft btn-sm mt2" data-savesub="${c.id}|in">Save inbound</button>
+              ${sub.in?.value ? `<div class="small mt1" style="color:#6FCE92">Upcharge on this card: <b>${HR.fmtAUD(parseFloat(sub.in.value) * HRDATA.PRICING.gradingUpchargePct)}</b> (4% of ${HR.fmtAUD(parseFloat(sub.in.value))})</div>` : ''}
+            </div>
+          </div>` : grCard && !isAdmin() ? `<div class="note-build">Grading log is Admin-only — the Technician role never sees dealer-partner details, per the role split in the client's questionnaire.</div>` : ''}
+        </div>`;
+      }).join('')}
+
+      <div class="grid ${isAdmin() ? 'g2' : ''}" style="align-items:start">
+        <div class="panel panel-pad">
+          <h3 style="font-size:1.1rem">Internal notes <span class="badge badge-steel">staff only</span></h3>
+          ${(o.notes || []).map(n => `<div class="note-int">${esc(n.body)}<div class="w">${esc(n.who)} · ${esc(n.at)}</div></div>`).join('') || '<p class="small muted">No notes yet.</p>'}
+          <div class="row" style="flex-wrap:nowrap"><input class="input" id="noteBox" placeholder="Add an internal note…" style="flex:1"><button class="btn btn-soft" id="noteAdd">Add</button></div>
+        </div>
+        ${isAdmin() ? `
+        <div class="panel panel-pad">
+          <h3 style="font-size:1.1rem">Customer thread</h3>
+          <div style="max-height:260px; overflow-y:auto">
+            ${(o.messages || []).map(m => `<div class="note-int" style="${m.from === 'customer' ? 'border-left:3px solid var(--warning)' : 'border-left:3px solid var(--line-strong)'}">${esc(m.body)}<div class="w">${m.from === 'customer' ? esc(o.name || 'Customer') : 'Staff — ' + esc(m.who || '')} · ${esc(m.at)}</div></div>`).join('') || '<p class="small muted">No messages on this order.</p>'}
+          </div>
+          <div class="row mt1" style="flex-wrap:nowrap"><input class="input" id="replyBox" placeholder="Reply as Hit Restoration Co.…" style="flex:1"><button class="btn btn-red" id="replySend">Send</button></div>
+          <div class="note-build">Replies land in the customer's portal thread instantly (try it — open ${o.number} in the portal). Live build adds the AI-first chat layer with human handoff.</div>
+        </div>` : ''}
+      </div>`;
+
+    // stage controls
+    document.querySelectorAll('[data-adv]').forEach(b => b.addEventListener('click', () => {
+      const card = o.cards.find(c => c.id === b.dataset.adv);
+      const nxt = nextStageFor(card);
+      if (nxt) { setCardStage(o, card, nxt); HR.toast(card.name + ' → ' + HRDATA.STAGES[rank(nxt)].label); route(); }
+    }));
+    document.querySelectorAll('[data-jump]').forEach(sel => sel.addEventListener('change', () => {
+      if (!sel.value) return;
+      const card = o.cards.find(c => c.id === sel.dataset.jump);
+      setCardStage(o, card, sel.value, 'Stage set manually by staff (' + role() + ')');
+      HR.toast(card.name + ' → ' + HRDATA.STAGES[rank(sel.value)].label);
+      route();
+    }));
+    // grading sub save
+    document.querySelectorAll('[data-savesub]').forEach(b => b.addEventListener('click', () => {
+      const [cid, phase] = b.dataset.savesub.split('|');
+      const subs2 = HR.store.get('gradingSubs', {});
+      subs2[cid] = subs2[cid] || {};
+      subs2[cid][phase] = subs2[cid][phase] || {};
+      document.querySelectorAll(`[data-sub^="${cid}|${phase}|"]`).forEach(inp => {
+        const key = inp.dataset.sub.split('|')[2];
+        subs2[cid][phase][key] = inp.value;
+      });
+      HR.store.set('gradingSubs', subs2);
+      HR.toast('Saved ' + (phase === 'out' ? 'outbound' : 'inbound') + ' log (demo — audit-logged in the real build)');
+      route();
+    }));
+    // notes
+    $('#noteAdd').addEventListener('click', () => {
+      const t = $('#noteBox').value.trim(); if (!t) return;
+      const entry = { body: t, who: isAdmin() ? 'Hash (Admin)' : 'Technician', at: stamp() };
+      if (o.local) persistOrder(o, lo => { lo.notesAdd = (lo.notesAdd || []).concat([entry]); });
+      else saveMut(o.id, { notesAdd: (mutOf(o.id).notesAdd || []).concat([entry]) });
+      route();
+    });
+    // reply
+    const rs = $('#replySend');
+    if (rs) rs.addEventListener('click', () => {
+      const t = $('#replyBox').value.trim(); if (!t) return;
+      const m = { from: 'staff', who: 'Hash', at: stamp(), body: t };
+      if (o.local) persistOrder(o, lo => { lo.messages = (lo.messages || []).concat([m]); });
+      else saveMut(o.id, { messagesAdd: (mutOf(o.id).messagesAdd || []).concat([m]) });
+      HR.toast('Sent — visible in the customer portal now');
+      route();
+    });
+  }
+
+  /* ---------- batches ---------- */
+  function vBatches() {
+    const extra = HR.store.get('localBatches', []);
+    const batches = HRDATA.BATCHES.concat(extra);
+    $('#view').innerHTML = `
+      <div class="spread mb2">
+        <div><span class="kicker">Grading batches</span><h2 class="mb0" style="font-size:1.8rem">Submission runs</h2></div>
+        <button class="btn btn-red" id="newBatch">＋ New batch</button>
+      </div>
+      <p class="small muted mb2">All four graders route through an Australian dealer partner (PSA has paused direct international submissions from Australia — the client's scope routes everything through one channel for consistency). Dealer details are internal-only and never shown to customers.</p>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Batch</th><th>Grader</th><th>Dealer partner 🔒</th><th>Cards</th><th>Shipped</th><th>Tracking</th><th>Est. return</th><th>Status</th></tr></thead>
+          <tbody>
+            ${batches.map(b => `<tr>
+              <td><b style="color:var(--white)">${esc(b.ref)}</b></td>
+              <td>${HRDATA.GRADERS[b.grader] || esc(b.grader)}</td>
+              <td>${esc(b.dealer || '—')}</td>
+              <td>${b.cards}</td>
+              <td>${esc(b.shipDate || '—')}</td>
+              <td class="small">${esc(b.outTracking || '—')}</td>
+              <td>${esc(b.estReturn || '—')}</td>
+              <td><span class="badge ${b.status === 'returned' ? 'badge-success' : b.status === 'open' ? 'badge-warning' : 'badge-steel'}">${esc(b.status)}</span></td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="note-build">No grader APIs exist — every reference number here is manual staff entry, by design (a first-class field, not an afterthought, exactly as the scope confirmation requires). Live build: assign cards to batches from the queue, batch-level status pushes each card's stage automatically, and candidate partners (SLABD / Leo Games / House of Cards N Collectables) remain to be confirmed by the client.</div>`;
+    $('#newBatch').addEventListener('click', () => {
+      const extra2 = HR.store.get('localBatches', []);
+      extra2.push({ ref: 'B-0' + (17 + extra2.length), grader: 'psa', dealer: 'SLABD', status: 'open', shipDate: null, outTracking: null, estReturn: null, cards: 0, note: '' });
+      HR.store.set('localBatches', extra2);
+      HR.toast('Batch created (demo)');
+      vBatches();
+    });
+  }
+
+  /* ---------- customers ---------- */
+  function vCustomers() {
+    $('#view').innerHTML = `
+      <span class="kicker">Customers</span><h2 style="font-size:1.8rem">Directory</h2>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Customer</th><th>Email</th><th>Orders</th><th>Cards</th><th>Lifetime value</th><th>Since</th><th>Notes</th></tr></thead>
+          <tbody>${HRDATA.CUSTOMERS.map(c => `<tr>
+            <td><b style="color:var(--white)">${esc(c.name)}</b></td><td>${esc(c.email)}</td>
+            <td>${c.orders}</td><td>${c.cards}</td><td>${HR.fmtAUD(c.lifetime)}</td><td>${esc(c.since)}</td>
+            <td class="small">${esc(c.note || '—')}</td></tr>`).join('')}</tbody>
+        </table>
+      </div>
+      <div class="note-build">Lightweight CRM as scoped — order history, lifetime value, notes. Sample rows; live build links each row to their orders and thread. "Dean Okafor" is the power-seller persona — bulk tools for accounts like his are Phase 2, per the client's questionnaire.</div>`;
+  }
+
+  /* ---------- store & stock ---------- */
+  function vProducts() {
+    const adj = HR.store.get('stockAdj', {});
+    const stockOf = v => Math.max(0, v.stock + (adj[v.id] || 0));
+    $('#view').innerHTML = `
+      <span class="kicker">Store & stock</span><h2 style="font-size:1.8rem">Products & fulfilment</h2>
+      <div class="table-wrap mb2">
+        <table class="table">
+          <thead><tr><th>Product</th><th>Variant</th><th>Price</th><th>Stock</th><th></th></tr></thead>
+          <tbody>
+            ${HRDATA.PRODUCTS.flatMap(p => p.variants.map(v => `<tr>
+              <td><b style="color:var(--white)">${esc(p.name)}</b></td>
+              <td>${esc(v.name)}</td><td>${HR.fmtAUD(v.price)}</td>
+              <td><span class="badge ${stockOf(v) === 0 ? 'badge-red' : stockOf(v) <= 8 ? 'badge-warning' : 'badge-success'}">${stockOf(v)}</span></td>
+              <td class="row" style="gap:6px"><button class="btn btn-soft btn-sm" data-stk="${v.id}|-1">−</button><button class="btn btn-soft btn-sm" data-stk="${v.id}|1">＋</button></td>
+            </tr>`)).join('')}
+          </tbody>
+        </table>
+      </div>
+      <div class="note-build">Stock edits here flow straight to the storefront (open the Store page — counts match, and anything at zero shows Out of stock and can't be bought). That's the live-stock enforcement the client scoped, simulated locally. Live build: WooCommerce-equivalent inventory + Stripe order sync + a fulfilment queue with EasyPost/Shippo label generation.</div>`;
+    document.querySelectorAll('[data-stk]').forEach(b => b.addEventListener('click', () => {
+      const [id, d] = b.dataset.stk.split('|');
+      const adj2 = HR.store.get('stockAdj', {});
+      adj2[id] = (adj2[id] || 0) + parseInt(d, 10);
+      HR.store.set('stockAdj', adj2);
+      vProducts();
+    }));
+  }
+
+  /* ---------- reports ---------- */
+  function vReports() {
+    const R = HRDATA.REPORT;
+    const rev = R.revenueMonth;
+    const revTotal = Object.values(rev).reduce((a, b) => a + b, 0);
+    const maxStage = Math.max(...Object.values(R.cardsByStage));
+    $('#view').innerHTML = `
+      <span class="kicker">Reports</span><h2 style="font-size:1.8rem">The numbers</h2>
+      <div class="grid g4 mb3">
+        <div class="stat"><div class="v">${R.ordersActive}</div><div class="l">Active orders</div></div>
+        <div class="stat"><div class="v">${R.cardsInHouse}</div><div class="l">Cards in house</div></div>
+        <div class="stat"><div class="v">${R.avgTurnaroundDays}d</div><div class="l">Avg turnaround</div></div>
+        <div class="stat"><div class="v">${R.gradeImprovements}</div><div class="l">Cards graded</div></div>
+      </div>
+      <div class="grid g2" style="align-items:start">
+        <div class="panel panel-pad">
+          <h3 style="font-size:1.1rem">Cards by stage</h3>
+          ${HRDATA.STAGES.map(s => {
+            const n = R.cardsByStage[s.key] || 0;
+            return `<div class="bar-row"><span>${s.n}. ${s.label}</span><div class="bar"><i style="width:${maxStage ? (n / maxStage) * 100 : 0}%"></i></div><b style="color:var(--white)">${n}</b></div>`;
+          }).join('')}
+        </div>
+        <div>
+          <div class="panel panel-pad mb2">
+            <h3 style="font-size:1.1rem">Revenue — July (sample)</h3>
+            ${Object.entries({ 'Inspection fees': rev.inspection, 'Restoration': rev.restoration, 'Grading submissions': rev.grading, 'Grading upcharges (4%)': rev.upcharges, 'DIY store': rev.store }).map(([l, v]) => `
+              <div class="est-line" style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px dashed var(--line); font-size:.9rem"><span>${l}</span><b style="color:var(--white)">${HR.fmtAUD(v)}</b></div>`).join('')}
+            <div style="display:flex; justify-content:space-between; padding:12px 0 0; font-size:1rem"><b>Total</b><span class="price-big" style="font-size:1.5rem">${HR.fmtAUD(revTotal)}</span></div>
+          </div>
+          <div class="panel panel-pad">
+            <h3 style="font-size:1.1rem">Turnaround by stage <span class="badge badge-steel">sample</span></h3>
+            ${[['Received → quote', '0.8d'], ['Quote → approval', '1.2d'], ['In restoration', '6.4d'], ['At grader', '18.9d'], ['QC → delivered', '2.1d']].map(([l, v]) => `
+              <div style="display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px dashed var(--line); font-size:.9rem"><span class="muted">${l}</span><b style="color:var(--white)">${v}</b></div>`).join('')}
+          </div>
+        </div>
+      </div>
+      <div class="note-build">All sample numbers. Live build computes these from real order history: turnaround by stage, revenue by line item, order volume, grade-improvement stats — the exact reporting set from the scope sheet — plus CSV export for bookkeeping (the client's stated Phase-1 accounting approach).</div>`;
+  }
+
+  /* ---------- boot ---------- */
+  document.addEventListener('DOMContentLoaded', () => {
+    $('#switchRole').addEventListener('click', () => { HR.store.del('staffRole'); route(); });
+    window.addEventListener('hashchange', route);
+    route();
+  });
+})();
+</script>
+</body>
+</html>
