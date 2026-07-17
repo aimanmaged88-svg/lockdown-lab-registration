@@ -21,7 +21,7 @@ export const roles: RoleDefinition[] = [
     label: "Parent / Guardian",
     description: "See how their day went and celebrate every win.",
     homePath: "/family",
-    demoUser: { name: "Sarah Andersson", detail: "Milo's mum", initials: "SA" },
+    demoUser: { name: "Faraz Normani", detail: "Zayd & Idris's dad", initials: "FN" },
   },
   {
     id: "support-worker",

@@ -181,7 +181,7 @@ export default function ExecutivePage() {
         <Card>
           <CardHeader>
             <CardTitle>The people behind the numbers</CardTitle>
-            <CardDescription>Three of the 86 lives your organisation is changing right now.</CardDescription>
+            <CardDescription>Five of the 86 lives your organisation is changing right now.</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-3">

@@ -1,5 +1,6 @@
 "use client";
 
+import * as React from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import {
@@ -20,50 +21,103 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { PageHeader } from "@/components/shared/page-header";
 import { PersonAvatar } from "@/components/shared/person-avatar";
+import { MoodPill } from "@/components/shared/mood-pill";
 import { TrendAreaChart } from "@/components/charts/trend-area-chart";
 import { getParticipant } from "@/data/participants";
 import { getTimeline } from "@/data/timeline";
+import { demoFamily } from "@/data/family";
 import { staggerContainer, fadeUp } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 /**
  * The Family Portal. A parent opens this and knows — within ten seconds —
- * that their person had a good day. Relief, not information overload.
+ * that their people had a good day. Relief, not information overload.
  * Families see what's agreed for sharing; they never edit operational records.
  */
+
+const demoPhotos: Record<string, { caption: string; emoji: string; gradient: string }[]> = {
+  zayd: [
+    { caption: "Kickboard victory lap", emoji: "🏊", gradient: "from-cyan-200 to-blue-200 dark:from-cyan-900 dark:to-blue-900" },
+    { caption: "300 pieces, done", emoji: "🧩", gradient: "from-indigo-200 to-violet-200 dark:from-indigo-900 dark:to-violet-900" },
+    { caption: "Trampoline air time", emoji: "🤸", gradient: "from-teal-200 to-emerald-200 dark:from-teal-900 dark:to-emerald-900" },
+    { caption: "Brothers' cup tower", emoji: "🏗️", gradient: "from-amber-200 to-orange-200 dark:from-amber-900 dark:to-orange-900" },
+  ],
+  idris: [
+    { caption: "Drum circle, sandpit", emoji: "🥁", gradient: "from-fuchsia-200 to-purple-200 dark:from-fuchsia-900 dark:to-purple-900" },
+    { caption: "Bubble chase", emoji: "🫧", gradient: "from-sky-200 to-cyan-200 dark:from-sky-900 dark:to-cyan-900" },
+    { caption: "Feeding the ducks", emoji: "🦆", gradient: "from-lime-200 to-green-200 dark:from-lime-900 dark:to-green-900" },
+    { caption: "Brothers' cup tower", emoji: "🏗️", gradient: "from-amber-200 to-orange-200 dark:from-amber-900 dark:to-orange-900" },
+  ],
+};
+
 export default function FamilyPortalPage() {
-  // Demo: Sarah (Milo's mum) is the signed-in family member.
-  const milo = getParticipant("milo")!;
-  const timeline = getTimeline("milo").filter((e) => e.highlight).slice(0, 4);
-  const sharedDocs = milo.documents.filter((d) => d.sharedWithFamily);
-  const sharedAppointments = milo.appointments.filter((a) => a.sharedWithFamily);
-  const moodData = milo.moodTrend.map((m) => ({ period: m.date.slice(8), value: m.score }));
+  const children = demoFamily.childrenIds.map((id) => getParticipant(id)!);
+  const [selectedId, setSelectedId] = React.useState<string>(children[0].id);
+  const child = children.find((c) => c.id === selectedId)!;
+
+  const highlights = getTimeline(child.id).filter((e) => e.highlight).slice(0, 3);
+  const sharedDocs = child.documents.filter((d) => d.sharedWithFamily);
+  const sharedAppointments = child.appointments.filter((a) => a.sharedWithFamily);
+  const moodData = child.moodTrend.map((m) => ({ period: m.date.slice(8), value: m.score }));
+  const photos = demoPhotos[child.id] ?? [];
 
   return (
     <motion.div variants={staggerContainer} initial="initial" animate="animate" className="space-y-6">
       <PageHeader
-        eyebrow="Family Portal"
-        title="Milo had a great day 💙"
-        description="Wednesday 15 July · updated 20 minutes ago by Daniel (Milo's support worker)"
+        eyebrow={`Family Portal · ${demoFamily.parentName}`}
+        title={`Good evening, ${demoFamily.parentFirstName} — the boys had a good day 💙`}
+        description="Wednesday 15 July · updated 25 minutes ago by the support team"
       >
         <Badge variant="success" className="px-3 py-1.5 text-sm">
           <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
-          Everything on track
+          Both boys on track
         </Badge>
       </PageHeader>
 
+      {/* Child selector */}
+      <motion.div variants={fadeUp} className="flex flex-wrap gap-3" role="group" aria-label="Choose which child to view">
+        {children.map((c) => {
+          const active = c.id === selectedId;
+          return (
+            <button
+              key={c.id}
+              type="button"
+              onClick={() => setSelectedId(c.id)}
+              aria-pressed={active}
+              className={cn(
+                "flex items-center gap-3 rounded-2xl border p-3 pr-5 text-left transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                active ? "border-primary/40 bg-primary-soft shadow-glow" : "bg-card shadow-soft hover:shadow-card"
+              )}
+            >
+              <PersonAvatar initials={c.initials} gradient={c.gradient} size="sm" />
+              <div>
+                <p className="text-sm font-semibold">{c.preferredName}, {c.age}</p>
+                <MoodPill mood={c.mood} className="mt-0.5" />
+              </div>
+            </button>
+          );
+        })}
+      </motion.div>
+
       {/* Today at a glance */}
-      <motion.section variants={fadeUp} aria-label="Today's summary">
+      <motion.section
+        key={child.id}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+        aria-label={`${child.preferredName}'s day`}
+        className="space-y-6"
+      >
         <Card className="overflow-hidden">
-          <div className={cn("h-1.5 bg-gradient-to-r", milo.gradient)} aria-hidden="true" />
+          <div className={cn("h-1.5 bg-gradient-to-r", child.gradient)} aria-hidden="true" />
           <CardContent className="p-6">
             <div className="flex flex-col gap-5 lg:flex-row lg:items-center">
               <div className="flex min-w-0 flex-1 items-start gap-4">
-                <PersonAvatar initials={milo.initials} gradient={milo.gradient} size="xl" />
+                <PersonAvatar initials={child.initials} gradient={child.gradient} size="xl" />
                 <div className="min-w-0 flex-1">
-                  <h2 className="font-display text-xl font-semibold">Today in three moments</h2>
+                  <h2 className="font-display text-xl font-semibold">{child.preferredName}'s day in three moments</h2>
                   <ul className="mt-2 space-y-1.5">
-                    {milo.todaysWins.map((win) => (
+                    {child.todaysWins.map((win) => (
                       <li key={win} className="flex gap-2 text-sm leading-relaxed text-muted-foreground">
                         <PartyPopper className="mt-0.5 h-4 w-4 shrink-0 text-warning" aria-hidden="true" />
                         {win}
@@ -74,7 +128,7 @@ export default function FamilyPortalPage() {
               </div>
               <div className="grid w-full shrink-0 grid-cols-3 gap-3 text-center lg:w-auto">
                 {[
-                  { label: "Mood", value: "😄", detail: "Great" },
+                  { label: "Mood", value: child.mood === "great" ? "😄" : "🙂", detail: child.mood === "great" ? "Great" : "Good" },
                   { label: "Meals", value: "3/3", detail: "All done" },
                   { label: "Goals", value: "2", detail: "Progressed" },
                 ].map((s) => (
@@ -87,112 +141,99 @@ export default function FamilyPortalPage() {
             </div>
           </CardContent>
         </Card>
-      </motion.section>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Goals + mood */}
-        <motion.div variants={fadeUp} className="space-y-6 lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Sparkles className="h-4 w-4 text-primary" aria-hidden="true" />
-                How Milo's goals are going
-              </CardTitle>
-              <CardDescription>The team updates these after every shift — you always see the latest.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {milo.goals.slice(0, 3).map((goal) => (
-                <div key={goal.id} className="rounded-2xl border bg-background/60 p-4">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="text-sm font-semibold">{goal.title}</p>
-                    <span className="text-sm font-semibold text-primary">{goal.progress}%</span>
-                  </div>
-                  <Progress value={goal.progress} className="mt-2" aria-label={`${goal.title}: ${goal.progress}%`} />
-                  <p className="mt-2.5 text-xs leading-relaxed text-muted-foreground">{goal.latestUpdate}</p>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-base">
-                <Smile className="h-4 w-4 text-secondary" aria-hidden="true" />
-                Mood this week
-              </CardTitle>
-              <CardDescription>Logged gently by the team across the day — 5 is a brilliant day.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <TrendAreaChart data={moodData} id="family-mood" color="--chart-2" height={160} />
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader className="flex-col items-start gap-3 space-y-0 sm:flex-row sm:items-center sm:justify-between">
-              <div>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          {/* Goals + mood */}
+          <div className="space-y-6 lg:col-span-2">
+            <Card>
+              <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
-                  <Heart className="h-4 w-4 text-destructive" aria-hidden="true" />
-                  Recent highlights
+                  <Sparkles className="h-4 w-4 text-primary" aria-hidden="true" />
+                  How {child.preferredName}'s goals are going
                 </CardTitle>
-                <CardDescription>The moments you'd never want to miss.</CardDescription>
-              </div>
-              <Button variant="ghost" size="sm" asChild>
-                <Link href="/timeline">Full story</Link>
-              </Button>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              {timeline.map((event) => (
-                <div key={event.id} className="rounded-2xl border border-primary/15 bg-gradient-to-br from-card to-primary-soft/30 p-4">
-                  <div className="flex items-center gap-2">
-                    <Badge variant="warning">✦</Badge>
-                    <time dateTime={event.date} className="text-xs text-muted-foreground">
-                      {new Intl.DateTimeFormat("en-AU", { day: "numeric", month: "long", year: "numeric" }).format(new Date(event.date))}
-                    </time>
+                <CardDescription>The team updates these after every session — you always see the latest.</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {child.goals.slice(0, 3).map((goal) => (
+                  <div key={goal.id} className="rounded-2xl border bg-background/60 p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <p className="text-sm font-semibold">{goal.title}</p>
+                      <span className="text-sm font-semibold text-primary">{goal.progress}%</span>
+                    </div>
+                    <Progress value={goal.progress} className="mt-2" aria-label={`${goal.title}: ${goal.progress}%`} />
+                    <p className="mt-2.5 text-xs leading-relaxed text-muted-foreground">{goal.latestUpdate}</p>
                   </div>
-                  <p className="mt-1.5 text-sm font-semibold">{event.title}</p>
-                  <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{event.description}</p>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
-        </motion.div>
+                ))}
+              </CardContent>
+            </Card>
 
-        {/* Right rail */}
-        <div className="space-y-6">
-          <motion.div variants={fadeUp}>
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <Smile className="h-4 w-4 text-secondary" aria-hidden="true" />
+                  Mood this week
+                </CardTitle>
+                <CardDescription>Logged gently by the team across the day — 5 is a brilliant day.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <TrendAreaChart data={moodData} id={`family-mood-${child.id}`} color="--chart-2" height={160} />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex-col items-start gap-3 space-y-0 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Heart className="h-4 w-4 text-destructive" aria-hidden="true" />
+                    Recent highlights
+                  </CardTitle>
+                  <CardDescription>The moments you'd never want to miss.</CardDescription>
+                </div>
+                <Button variant="ghost" size="sm" asChild>
+                  <Link href="/timeline">Full story</Link>
+                </Button>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {highlights.map((event) => (
+                  <div key={event.id} className="rounded-2xl border border-primary/15 bg-gradient-to-br from-card to-primary-soft/30 p-4">
+                    <div className="flex items-center gap-2">
+                      <Badge variant="warning">✦</Badge>
+                      <time dateTime={event.date} className="text-xs text-muted-foreground">
+                        {new Intl.DateTimeFormat("en-AU", { day: "numeric", month: "long", year: "numeric" }).format(new Date(event.date))}
+                      </time>
+                    </div>
+                    <p className="mt-1.5 text-sm font-semibold">{event.title}</p>
+                    <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{event.description}</p>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right rail */}
+          <div className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
                   <Camera className="h-4 w-4 text-warning" aria-hidden="true" />
                   Shared photos
                 </CardTitle>
-                <CardDescription>Only shared with Milo's consent plan.</CardDescription>
+                <CardDescription>Only shared under {child.preferredName}'s consent plan.</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-2.5">
-                  {["Animation frame 1", "Pool celebration", "Lego station build", "Trail bridge count"].map((caption, i) => (
-                    <figure key={caption} className="overflow-hidden rounded-xl border">
-                      <div
-                        aria-hidden="true"
-                        className={cn(
-                          "flex h-20 items-center justify-center bg-gradient-to-br text-2xl",
-                          ["from-sky-200 to-indigo-200 dark:from-sky-900 dark:to-indigo-900",
-                           "from-teal-200 to-emerald-200 dark:from-teal-900 dark:to-emerald-900",
-                           "from-amber-200 to-orange-200 dark:from-amber-900 dark:to-orange-900",
-                           "from-rose-200 to-pink-200 dark:from-rose-900 dark:to-pink-900"][i]
-                        )}
-                      >
-                        {["🎬", "🏊", "🚂", "🌉"][i]}
+                  {photos.map((photo) => (
+                    <figure key={photo.caption} className="overflow-hidden rounded-xl border">
+                      <div aria-hidden="true" className={cn("flex h-20 items-center justify-center bg-gradient-to-br text-2xl", photo.gradient)}>
+                        {photo.emoji}
                       </div>
-                      <figcaption className="truncate px-2 py-1.5 text-[11px] text-muted-foreground">{caption} · demo</figcaption>
+                      <figcaption className="truncate px-2 py-1.5 text-[11px] text-muted-foreground">{photo.caption} · demo</figcaption>
                     </figure>
                   ))}
                 </div>
               </CardContent>
             </Card>
-          </motion.div>
 
-          <motion.div variants={fadeUp}>
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
@@ -212,9 +253,7 @@ export default function FamilyPortalPage() {
                 ))}
               </CardContent>
             </Card>
-          </motion.div>
 
-          <motion.div variants={fadeUp}>
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
@@ -239,34 +278,32 @@ export default function FamilyPortalPage() {
                 ))}
               </CardContent>
             </Card>
-          </motion.div>
 
-          <motion.div variants={fadeUp}>
             <Card className="border-secondary/20 bg-gradient-to-br from-card to-secondary-soft/40">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-base">
                   <MessageCircleHeart className="h-4 w-4 text-secondary" aria-hidden="true" />
                   Send a note to the team
                 </CardTitle>
-                <CardDescription>Puppy arriving? Big weekend? The team reads every note before their next shift.</CardDescription>
+                <CardDescription>Cousins visiting? Big weekend coming? The team reads every note before their next session.</CardDescription>
               </CardHeader>
               <CardContent>
                 <Button
                   variant="secondary"
                   className="w-full"
-                  onClick={() => toast.success("The team will see your note before the next shift starts.")}
+                  onClick={() => toast.success("The team will see your note before the boys' next session.")}
                 >
                   Write a note
                 </Button>
               </CardContent>
             </Card>
-          </motion.div>
+          </div>
         </div>
-      </div>
+      </motion.section>
 
       <motion.p variants={fadeUp} className="flex items-center gap-1.5 text-xs text-muted-foreground">
         <ShieldCheck className="h-3.5 w-3.5 text-success" aria-hidden="true" />
-        You're seeing everything Milo's care plan shares with family. Operational records stay with the care team, and every view is audit-logged.
+        You're seeing everything Zayd and Idris's care plans share with family. Operational records stay with the care team, and every view is audit-logged.
       </motion.p>
     </motion.div>
   );

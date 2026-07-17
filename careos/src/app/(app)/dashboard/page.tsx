@@ -50,7 +50,7 @@ export default function DashboardPage() {
       <PageHeader
         eyebrow="Wednesday 15 July 2026"
         title={`Good morning, ${firstName}`}
-        description="Three people are counting on the team today. Here's everything you need to make their day a little better."
+        description="Five people are counting on the team today. Here's everything you need to make their day a little better."
       >
         <div className="flex items-center gap-2 rounded-xl border bg-card px-3.5 py-2 text-sm shadow-soft">
           <CloudSun className="h-4 w-4 text-warning" aria-hidden="true" />
@@ -61,7 +61,7 @@ export default function DashboardPage() {
 
       {/* Key numbers */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard label="Participants today" value="3" icon={HeartHandshake} detail="All core-team shifts" />
+        <StatCard label="Participants today" value="5" icon={HeartHandshake} detail="All core-team shifts" />
         <StatCard label="Goals progressed this week" value="9" icon={Target} change="+3" direction="up" detail="vs last week" />
         <StatCard label="Milestones this month" value="4" icon={PartyPopper} change="+2" direction="up" detail="worth celebrating" />
         <StatCard label="Care alerts" value={String(importantAlerts.length)} icon={TriangleAlert} detail="reviewed & current" positive={false} />

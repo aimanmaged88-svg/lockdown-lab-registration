@@ -7,13 +7,21 @@ import { PersonAvatar } from "@/components/shared/person-avatar";
 import { CareTimeline } from "@/components/timeline/care-timeline";
 import { participants } from "@/data/participants";
 import { getTimeline } from "@/data/timeline";
+import { demoFamily } from "@/data/family";
+import { useRole } from "@/providers/role-provider";
 import { fadeUp, staggerContainer } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
 /** The Care Timeline — CareOS's hero feature, one story per person. */
 export default function TimelinePage() {
-  const [selectedId, setSelectedId] = React.useState(participants[0].id);
-  const participant = participants.find((p) => p.id === selectedId)!;
+  const { role } = useRole();
+  // Families see their own children's stories — nobody else's.
+  const visibleParticipants =
+    role === "parent"
+      ? participants.filter((p) => (demoFamily.childrenIds as readonly string[]).includes(p.id))
+      : participants;
+  const [selectedId, setSelectedId] = React.useState(visibleParticipants[0].id);
+  const participant = visibleParticipants.find((p) => p.id === selectedId) ?? visibleParticipants[0];
   const events = getTimeline(selectedId);
   const highlights = events.filter((e) => e.highlight).length;
 
@@ -26,7 +34,7 @@ export default function TimelinePage() {
       />
 
       <motion.div variants={fadeUp} className="flex flex-wrap gap-3" role="group" aria-label="Choose whose story to open">
-        {participants.map((p) => {
+        {visibleParticipants.map((p) => {
           const active = p.id === selectedId;
           return (
             <button
