@@ -46,8 +46,8 @@ export default function ExecutivePage() {
       {/* Organisation health hero */}
       <motion.section variants={fadeUp} aria-label="Organisation health">
         <Card className="overflow-hidden border-primary/15 bg-gradient-to-br from-card via-card to-primary-soft/50">
-          <CardContent className="flex flex-col gap-6 p-6 md:flex-row md:items-center md:p-8">
-            <div className="flex items-center gap-6">
+          <CardContent className="flex flex-col gap-6 p-6 lg:flex-row lg:items-center lg:p-8">
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
               <div className="relative flex h-28 w-28 shrink-0 items-center justify-center" aria-hidden="true">
                 <svg viewBox="0 0 120 120" className="h-full w-full -rotate-90">
                   <circle cx="60" cy="60" r="52" fill="none" stroke="hsl(var(--muted))" strokeWidth="10" />
@@ -75,7 +75,7 @@ export default function ExecutivePage() {
                 </p>
               </div>
             </div>
-            <div className="grid flex-1 grid-cols-2 gap-3 md:max-w-sm md:justify-self-end">
+            <div className="grid flex-1 grid-cols-2 gap-3 sm:grid-cols-4 lg:max-w-sm lg:grid-cols-2 lg:justify-self-end">
               {[
                 { label: "People supported", value: organisation.participants },
                 { label: "Goals achieved (Q)", value: outcomeSummary.goalsAchievedThisQuarter },
