@@ -3,9 +3,18 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<title>LockDownLab Live</title>
-<meta name="description" content="LockDownLab Live — accountability, coaching and community. Founding squad only." />
+<title>Lockdown Lab Live</title>
+<meta name="description" content="Lockdown Lab Live — your game, read daily. Accountability, mental game, fuel and a direct line to coach. Founding squad only." />
 <meta name="robots" content="noindex" />
+<meta name="theme-color" content="#050506" />
+<link rel="manifest" href="/manifest.json" />
+<link rel="icon" type="image/png" href="/favicon.png" />
+<link rel="apple-touch-icon" href="/icons/icon-180.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Lockdown Lab" />
+<link rel="preconnect" href="https://ymuwuhvqqftgpxwhzoub.supabase.co" crossorigin />
 <style>
 /* ===== Bundled fonts: Bebas Neue (display) + Manrope (body) ===== */
 
@@ -628,6 +637,16 @@ body.rmode *{animation:none!important;transition:none!important}
         <div class="igi"><b>@lockdownlab3</b><span>66 posts · clips & drills on IG</span></div>
         <span class="go">Follow →</span>
       </a>
+      <div class="card" id="invCard">
+        <span class="cl">🎟 Bring a mate · every name gets UNC's sign-off</span>
+        <h3>Put A Mate On</h3>
+        <div class="composer" style="margin:10px 0 4px">
+          <input id="invName" placeholder="Your mate's name…" maxlength="40">
+          <button class="btn btn-p btn-sm" id="invBtn">Ask UNC</button>
+        </div>
+        <div id="invList" style="margin-top:8px"></div>
+      </div>
+
       <div class="composer">
         <input id="postInput" placeholder="Post to the Lab…" maxlength="240">
         <button class="btn btn-p btn-sm" id="postBtn">Post</button>
@@ -678,6 +697,21 @@ body.rmode *{animation:none!important;transition:none!important}
       </div>
 
       <div class="card">
+        <span class="cl">Notifications · your phone, your rules</span>
+        <h3>🔔 Notifications</h3>
+        <div class="sharerow" id="npPush" style="margin-top:6px"><span class="swtch"></span><span><b style="color:var(--text)">Push notifications</b> · master switch</span></div>
+        <div id="npList" style="margin-top:4px">
+          <div class="sharerow" data-np="coach"><span class="swtch"></span><span>Coach messages</span></div>
+          <div class="sharerow" data-np="player"><span class="swtch"></span><span>Player messages</span></div>
+          <div class="sharerow" data-np="announce"><span class="swtch"></span><span>Announcements</span></div>
+          <div class="sharerow" data-np="sessions"><span class="swtch"></span><span>Sessions, bookings &amp; invites</span></div>
+          <div class="sharerow" data-np="marketing"><span class="swtch"></span><span>Marketing &amp; news</span></div>
+          <div class="sharerow" data-np="vibrate"><span class="swtch"></span><span>Vibration</span></div>
+        </div>
+        <p style="font-size:11.5px;color:var(--dim);margin-top:10px" id="npHint">Heads-up while the Lab is open in the background. Install the app to your home screen (Share → Add to Home Screen) for the full app feel.</p>
+      </div>
+
+      <div class="card">
         <span class="cl">Feel</span>
         <h3>⚙️ Fine-Tune</h3>
         <div class="flbl">Text size</div>
@@ -694,6 +728,10 @@ body.rmode *{animation:none!important;transition:none!important}
       <span class="eyebrow">Your Squad</span>
       <h1 class="page display">Roster</h1>
       <p class="sub">Tap a player to coach them. Intel feeds their AI profile — silently.</p>
+      <div class="card" id="cInvCard" style="display:none">
+        <span class="cl">🎟 Invite requests · your call, UNC</span>
+        <div id="cInvList"></div>
+      </div>
       <div id="rosterList"><p style="color:var(--dim);font-size:13px">Loading squad…</p></div>
     </section>
 
@@ -786,6 +824,22 @@ body.rmode *{animation:none!important;transition:none!important}
   if(localStorage.getItem('ll_text')==='big') document.documentElement.classList.add('big');
   if(localStorage.getItem('ll_motion')==='calm'){ document.body.classList.add('rmode'); RM=true; }
 
+  /* ============ PWA: service worker (skipped on file:// test runs) ============ */
+  if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+    addEventListener('load',()=>{ navigator.serviceWorker.register('/sw.js').catch(()=>{}); });
+  }
+
+  /* ============ NOTIFICATIONS ============ */
+  const NOTIF_DEF={push:false,coach:true,player:true,announce:true,sessions:true,marketing:false,vibrate:true};
+  let NP={...NOTIF_DEF}; try{ NP={...NOTIF_DEF,...(JSON.parse(localStorage.getItem('ll_notif'))||{})}; }catch(e){}
+  function saveNP(){ localStorage.setItem('ll_notif',JSON.stringify(NP)); }
+  function notify(kind,title,body){
+    if(!NP.push||!NP[kind]) return;
+    if(!('Notification' in window)||Notification.permission!=='granted') return;
+    if(!document.hidden) return; // app visible = in-app toast already covers it
+    try{ new Notification(title,{body:String(body||'').slice(0,120),icon:'/icons/icon-192.png',badge:'/icons/icon-96.png',tag:'lll-'+kind}); }catch(e){}
+  }
+
   /* ============ SOUND ENGINE (Web Audio, no files) ============ */
   let AC=null, master=null, sndOn=localStorage.getItem('ll_snd')!=='0';
   function ac(){ try{ if(!AC){AC=new (window.AudioContext||window.webkitAudioContext)(); master=AC.createGain(); master.gain.value=.5; master.connect(AC.destination);} if(AC.state==='suspended') AC.resume(); }catch(e){} return AC; }
@@ -807,7 +861,7 @@ body.rmode *{animation:none!important;transition:none!important}
     drop:n=>tone(440+n*55,.09,'sine',.07),
     breath:()=>tone(285,.5,'sine',.05)
   };
-  function haptic(p){ try{ if(navigator.vibrate) navigator.vibrate(p); }catch(e){} }
+  function haptic(p){ try{ if(NP.vibrate&&navigator.vibrate) navigator.vibrate(p); }catch(e){} }
 
   /* ============ ripple + press feedback (delegated) ============ */
   document.addEventListener('pointerdown',e=>{
@@ -930,6 +984,7 @@ body.rmode *{animation:none!important;transition:none!important}
     $('#navPlayer').style.display=isCoach?'none':'flex';
     $('#navCoach').style.display=isCoach?'flex':'none';
     $('#hSub').textContent=isCoach?'Coach Mode 🔐':'Founding Beta';
+    $('#invCard').style.display=isCoach?'none':'block';
     ac(); S.poweron(); haptic([0,20,40,20]);
     if(isCoach){ go('roster'); renderRoster(); } else { go('home'); renderPlayer(); stagger('[data-page="home"]'); }
     requestAnimationFrame(()=>moveInd(isCoach?$('#navCoach'):$('#navPlayer')));
@@ -939,7 +994,18 @@ body.rmode *{animation:none!important;transition:none!important}
   async function pollTick(){
     try{
       if(!sess) return;
-      if(sess.type==='player'){ const prevM=PST?PST.messages.length:0; const prevX=PST?PST.profile.xp:0; const r=await api({action:'state',pid:sess.pid,pin:sess.pin}); PST=r.state; renderPlayer(true); const nm=PST.messages; if(nm.length>prevM && nm[nm.length-1].from_coach){ S.recv(); haptic(20); toast('Coach replied 💬'); } if(PST.profile.xp>prevX){ S.like(); } }
+      if(sess.type==='player'){
+        const prevM=PST?PST.messages.length:0, prevX=PST?PST.profile.xp:0;
+        const prevPost=(PST&&PST.posts[0])?PST.posts[0].id:null;
+        const prevInv=PST?JSON.stringify((PST.invites||[]).map(i=>i.status)):null;
+        const r=await api({action:'state',pid:sess.pid,pin:sess.pin}); PST=r.state; renderPlayer(true);
+        const nm=PST.messages;
+        if(nm.length>prevM && nm[nm.length-1].from_coach){ S.recv(); haptic(20); toast('Coach replied 💬'); notify('coach','Coach replied 💬',nm[nm.length-1].text); }
+        if(PST.profile.xp>prevX){ S.like(); }
+        const np=PST.posts[0];
+        if(np && np.id!==prevPost && np.is_coach && prevPost){ notify('announce','The Lab 📢',np.text); }
+        if(prevInv && JSON.stringify((PST.invites||[]).map(i=>i.status))!==prevInv){ const ap=(PST.invites||[]).find(i=>i.status==='approved'); if(ap){ toast('UNC approved your invite 🎟'); notify('sessions','Invite approved 🎟','Your mate '+ap.friend_name+' is cleared. Share the code.'); } }
+      }
       else {
         if($('[data-page="cplayer"]').classList.contains('on') && curPid){ await loadDetail(curPid,true); }
         else { ROSTER=await api({action:'roster',code:sess.code}); renderRoster(true); }
@@ -971,7 +1037,7 @@ body.rmode *{animation:none!important;transition:none!important}
     $('#aiList').innerHTML=PST.ai.map(([k,t])=>'<li class="'+(k==='◆'?'intel':'')+'"><span class="k">'+k+'</span><span>'+esc(t)+'</span></li>').join('');
     renderFeed(PST.posts);
     renderThread(PST.messages);
-    renderMind(); renderFuel(); renderDiary();
+    renderMind(); renderFuel(); renderDiary(); renderInvites();
   }
   /* absorb a fresh state + fire level-up if it crossed a threshold */
   function absorb(r){ const oldL=PST?lvl(PST.profile.xp).n:1; PST=r.state; renderPlayer(true); const nl=lvl(PST.profile.xp); if(nl.n>oldL) setTimeout(()=>levelUpShow(nl.n,nl.name),600); }
@@ -1160,6 +1226,7 @@ body.rmode *{animation:none!important;transition:none!important}
   function renderRoster(soft){
     if(!ROSTER) return;
     renderFeed(ROSTER.posts);
+    renderCoachInvites();
     const t=ROSTER.today;
     $('#rosterList').innerHTML=ROSTER.players.length?ROSTER.players.map(p=>{
       const ok=p.last_checkin===t;
@@ -1215,6 +1282,7 @@ body.rmode *{animation:none!important;transition:none!important}
     document.querySelectorAll('#learnPills .pill').forEach(x=>x.classList.toggle('sel',x.dataset.learn===learn));
     document.querySelectorAll('#textPills .pill').forEach(x=>x.classList.toggle('sel',(localStorage.getItem('ll_text')==='big')===(x.dataset.tx==='big')));
     document.querySelectorAll('#motionPills .pill').forEach(x=>x.classList.toggle('sel',(localStorage.getItem('ll_motion')==='calm')===(x.dataset.mo==='calm')));
+    renderNP();
   }
   function setTheme(hex){ THEME=hex; localStorage.setItem('ll_theme',hex); applyTheme(hex); renderSettings(); S.like(); haptic(12); }
   $('#swList').addEventListener('click',e=>{ const sw=e.target.closest('.sw'); if(sw){ setTheme(sw.dataset.hex); toast('Yours now 🎨'); } });
@@ -1240,6 +1308,61 @@ body.rmode *{animation:none!important;transition:none!important}
     localStorage.setItem('ll_motion',calm?'calm':'full'); renderSettings();
     if(!calm){ S.like(); burst(false); }
   });
+
+  /* ---------- notification settings ---------- */
+  function renderNP(){
+    $('#npPush').classList.toggle('on',NP.push&&('Notification' in window)&&Notification.permission==='granted');
+    document.querySelectorAll('#npList .sharerow').forEach(r=>r.classList.toggle('on',!!NP[r.dataset.np]));
+    $('#npList').style.opacity=NP.push?'1':'.45';
+  }
+  $('#npPush').addEventListener('click',async()=>{
+    if(!('Notification' in window)){ toast('This browser can\'t do notifications',true); return; }
+    if(!NP.push){
+      const perm=await Notification.requestPermission();
+      if(perm!=='granted'){ toast('Notifications blocked in browser settings',true); NP.push=false; saveNP(); renderNP(); return; }
+      NP.push=true; saveNP(); renderNP(); S.like(); toast('Locked in 🔔');
+      try{ new Notification('Lockdown Lab Live',{body:'Notifications are on. The Lab will find you.',icon:'/icons/icon-192.png'}); }catch(e){}
+    } else { NP.push=false; saveNP(); renderNP(); toast('Notifications off'); }
+  });
+  $('#npList').addEventListener('click',e=>{
+    const r=e.target.closest('.sharerow'); if(!r)return;
+    NP[r.dataset.np]=!NP[r.dataset.np]; saveNP(); renderNP(); S.pill();
+  });
+
+  /* ---------- invites: player side ---------- */
+  function renderInvites(){
+    if(!PST) return;
+    const list=PST.invites||[];
+    $('#invList').innerHTML=list.map(i=>{
+      if(i.status==='pending') return '<div class="intelnote"><span>⏳</span><span><b style="color:var(--text)">'+esc(i.friend_name)+'</b> — waiting on UNC\'s sign-off</span></div>';
+      if(i.status==='denied') return '<div class="intelnote"><span>🚫</span><span><b style="color:var(--text)">'+esc(i.friend_name)+'</b> — not this time</span></div>';
+      return '<div class="intelnote" style="align-items:center"><span>✅</span><span style="flex:1"><b style="color:var(--text)">'+esc(i.friend_name)+'</b> — cleared · code <b class="mono" style="color:var(--accent)">'+esc(i.code||'')+'</b></span><button class="btn btn-g btn-sm" data-share="'+esc(i.code||'')+'" data-fname="'+esc(i.friend_name)+'">Share 🎟</button></div>';
+    }).join('')||'<p style="color:var(--dim);font-size:12.5px">The Lab grows by invite only. Drop a mate\'s name — if UNC clears them, you get a code to send.</p>';
+    document.querySelectorAll('[data-share]').forEach(b=>b.addEventListener('click',async()=>{
+      const text='You\'re invited to Lockdown Lab Live 🔒 Invite code: '+b.dataset.share+' — join here: '+location.origin+'/app.html';
+      try{
+        if(navigator.share) await navigator.share({title:'Lockdown Lab Live',text});
+        else { await navigator.clipboard.writeText(text); toast('Invite copied 📋'); }
+        S.like(); haptic(12);
+      }catch(e){}
+    }));
+  }
+  $('#invBtn').addEventListener('click',async()=>{
+    const v=$('#invName').value.trim(); if(!v){ toast('Whose name goes to UNC?',true); return; }
+    busy($('#invBtn'),1);
+    try{ const r=await api({action:'invite_req',pid:sess.pid,pin:sess.pin,friend:v}); PST=r.state; renderInvites(); $('#invName').value=''; toast('Sent to UNC for sign-off 🎟'); S.msg(); }
+    catch(e){ toast(e.message,true); }
+    busy($('#invBtn'),0,'Ask UNC');
+  });
+
+  /* ---------- invites: coach side ---------- */
+  function renderCoachInvites(){
+    const list=(ROSTER&&ROSTER.invites)||[];
+    $('#cInvCard').style.display=list.length?'block':'none';
+    $('#cInvList').innerHTML=list.map(i=>'<div class="intelnote" style="align-items:center"><span>🎟</span><span style="flex:1"><b style="color:var(--text)">'+esc(i.friend_name)+'</b><br><span style="font-size:11px;color:var(--dim)">vouched by '+esc((i.player&&i.player.name)||'—')+'</span></span><button class="btn btn-p btn-sm" data-inv-ok="'+i.id+'">✓</button><button class="btn btn-g btn-sm" data-inv-no="'+i.id+'">✕</button></div>').join('');
+    document.querySelectorAll('[data-inv-ok]').forEach(b=>b.addEventListener('click',async()=>{ try{ await api({action:'invite_approve',code:sess.code,invite_id:b.dataset.invOk}); toast('Cleared 🎟'); ROSTER=await api({action:'roster',code:sess.code}); renderRoster(true); }catch(e){toast(e.message,true);} }));
+    document.querySelectorAll('[data-inv-no]').forEach(b=>b.addEventListener('click',async()=>{ try{ await api({action:'invite_deny',code:sess.code,invite_id:b.dataset.invNo}); toast('Denied'); ROSTER=await api({action:'roster',code:sess.code}); renderRoster(true); }catch(e){toast(e.message,true);} }));
+  }
 
   /* enter-to-send */
   [['postInput','postBtn'],['msgInput','msgBtn'],['cMsgInput','cMsgBtn'],['jPin','jGo'],['lPin','lGo'],['cCode','cGo']].forEach(([i,b])=>{
