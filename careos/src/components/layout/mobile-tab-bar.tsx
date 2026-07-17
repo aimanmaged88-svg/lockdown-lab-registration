@@ -36,6 +36,7 @@ export function MobileTabBar() {
     compliance: "Comply",
     billing: "Billing",
     marketplace: "Find",
+    "support-circle": "Circle",
     assistant: "Assistant",
     learning: "Learn",
     community: "Places",

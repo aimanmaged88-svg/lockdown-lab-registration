@@ -21,6 +21,15 @@ compounds in value over years and makes NDIS reporting a button, not a scramble.
 | **ShiftCare / Brevity / Splose** (incumbents) | End-to-end care management: rostering (drag-drop, split shifts, availability), NDIS invoicing (batch/bulk claims), compliance flagging, caregiver app. | Match on features; win on: participant-first Care DNA + Timeline, explainable AI, family portal, one-source billing, and a premium App-Store-grade experience. |
 | **MySolas** | Two-sided NDIS **marketplace**: participants search Providers / Accommodation / Jobs / Market by category + postcode. "Grow your NDIS business." | `/marketplace` — discovery **matched by Care DNA**, not keyword+postcode. Every provider, worker, SIL home and activity carries a fit score and "why this fits" reasons from the person's real needs. Connecting shares a fit summary only, consent-gated. |
 
+## Signature differentiators (things competitors don't have)
+- **Support Circle** (`/support-circle`) — a private peer-support Q&A community for the
+  provider's qualified team. AI first-responder replies instantly; qualified colleagues who
+  support the participant jump in with real advice, viewing that person's Care DNA via
+  permissioned, audit-logged access. Hard non-emergency guardrail (000 / provider on-call).
+  Turns a workforce into a shared brain — retention + quality + faster onboarding.
+- **Care DNA matching** across the Marketplace — outcome fit, not keyword+postcode.
+- **Auto-evidence** — compliance & billing as by-products of everyday care.
+
 ## Feature parity checklist (surface-level now, deepen later)
 - [x] Rostering — weekly board, AI gap-fill, credential/award checks, clash prevention
 - [x] Compliance — audit-readiness %, by-scope, practice standards, auto-evidence
