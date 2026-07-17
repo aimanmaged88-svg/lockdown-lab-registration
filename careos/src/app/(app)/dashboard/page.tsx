@@ -60,14 +60,14 @@ export default function DashboardPage() {
       </PageHeader>
 
       {/* Key numbers */}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Participants today" value="3" icon={HeartHandshake} detail="All core-team shifts" />
         <StatCard label="Goals progressed this week" value="9" icon={Target} change="+3" direction="up" detail="vs last week" />
         <StatCard label="Milestones this month" value="4" icon={PartyPopper} change="+2" direction="up" detail="worth celebrating" />
         <StatCard label="Care alerts" value={String(importantAlerts.length)} icon={TriangleAlert} detail="reviewed & current" positive={false} />
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         {/* Today's shifts */}
         <motion.div variants={fadeUp} className="xl:col-span-2">
           <Card className="h-full">
@@ -156,7 +156,7 @@ export default function DashboardPage() {
             </Link>
           </Button>
         </div>
-        <div className="grid gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {participants.map((p) => (
             <Link
               key={p.id}
@@ -187,7 +187,7 @@ export default function DashboardPage() {
         </div>
       </motion.section>
 
-      <div className="grid gap-6 xl:grid-cols-3">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
         {/* Recent moments */}
         <motion.div variants={fadeUp} className="xl:col-span-2">
           <Card>

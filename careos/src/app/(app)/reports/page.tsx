@@ -24,7 +24,7 @@ export default function ReportsPage() {
       {categories.map((category) => (
         <motion.section key={category} variants={fadeUp} aria-label={`${category} reports`}>
           <h2 className="mb-4 font-display text-lg font-semibold">{category}</h2>
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {reports
               .filter((r) => r.category === category)
               .map((report) => (

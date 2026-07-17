@@ -36,7 +36,7 @@ export default function LearningHubPage() {
       {inProgress.length > 0 && (
         <motion.section variants={fadeUp} aria-labelledby="continue-learning">
           <h2 id="continue-learning" className="mb-4 font-display text-xl font-semibold">Pick up where you left off</h2>
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
             {inProgress.slice(0, 3).map((topic) => (
               <Link
                 key={topic.slug}
@@ -61,7 +61,7 @@ export default function LearningHubPage() {
       {/* All topics */}
       <motion.section variants={fadeUp} aria-labelledby="all-topics">
         <h2 id="all-topics" className="mb-4 font-display text-xl font-semibold">All topics</h2>
-        <motion.div variants={staggerContainer} initial="initial" animate="animate" className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        <motion.div variants={staggerContainer} initial="initial" animate="animate" className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
           {learningTopics.map((topic) => (
             <motion.div key={topic.slug} variants={fadeUp}>
               <Link

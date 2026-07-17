@@ -48,14 +48,14 @@ export default function ProviderPage() {
         </Button>
       </PageHeader>
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Participant outcomes index" value={String(outcomeSummary.outcomesIndex)} icon={Target} change={`+${outcomeSummary.outcomesIndexDelta}`} direction="up" detail="this quarter" />
         <StatCard label="Goals achieved this quarter" value={String(outcomeSummary.goalsAchievedThisQuarter)} icon={ClipboardCheck} change="+12" direction="up" detail="vs last quarter" />
         <StatCard label="Family engagement" value={`${outcomeSummary.familyEngagementRate}%`} icon={HeartHandshake} change="+9pts" direction="up" detail="weekly active families" />
         <StatCard label="Staff consistency" value={`${outcomeSummary.staffConsistencyScore}%`} icon={Users} change="+1pt" direction="up" detail="core-team shift coverage" />
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-5">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-5">
         <motion.div variants={fadeUp} className="xl:col-span-3">
           <Card className="h-full">
             <CardHeader>
@@ -89,7 +89,7 @@ export default function ProviderPage() {
         </motion.div>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         {/* Quality & risk */}
         <motion.div variants={fadeUp}>
           <Card className="h-full">
@@ -169,7 +169,7 @@ export default function ProviderPage() {
             </Button>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-3 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
               {participants.map((p) => {
                 const needsAttention = p.goals.filter((g) => g.status === "needs-attention").length;
                 return (

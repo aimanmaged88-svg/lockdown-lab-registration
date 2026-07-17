@@ -189,7 +189,7 @@ export function ParticipantProfile({ participant: p, timeline }: { participant: 
 
       {/* Care alerts are always visible, regardless of tab */}
       {p.riskAlerts.length > 0 && (
-        <motion.section variants={fadeUp} aria-label="Care alerts" className="grid gap-3 md:grid-cols-2">
+        <motion.section variants={fadeUp} aria-label="Care alerts" className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {p.riskAlerts.map((alert) => {
             const style = alertStyles[alert.level];
             const Icon = style.icon;
@@ -226,7 +226,7 @@ export function ParticipantProfile({ participant: p, timeline }: { participant: 
 
           {/* -------------------------------- OVERVIEW -------------------------------- */}
           <TabsContent value="overview">
-            <motion.div variants={staggerContainer} initial="initial" animate="animate" className="grid gap-5 lg:grid-cols-2">
+            <motion.div variants={staggerContainer} initial="initial" animate="animate" className="grid grid-cols-1 gap-5 lg:grid-cols-2">
               <SectionCard title="Today's wins" icon={Sun} description="Worth celebrating, worth sharing.">
                 <BulletList items={p.todaysWins} tone="success" />
               </SectionCard>
@@ -283,7 +283,7 @@ export function ParticipantProfile({ participant: p, timeline }: { participant: 
                   </span>
                 </p>
               </div>
-              <div className="grid gap-5 lg:grid-cols-2">
+              <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
                 <SectionCard title="Favourite things" icon={Sun}>
                   <dl className="space-y-3">
                     {p.favouriteThings.map((f) => (
@@ -326,7 +326,7 @@ export function ParticipantProfile({ participant: p, timeline }: { participant: 
 
           {/* -------------------------------- GOALS -------------------------------- */}
           <TabsContent value="goals">
-            <motion.div variants={staggerContainer} initial="initial" animate="animate" className="grid gap-5 lg:grid-cols-2">
+            <motion.div variants={staggerContainer} initial="initial" animate="animate" className="grid grid-cols-1 gap-5 lg:grid-cols-2">
               {p.goals.map((goal) => (
                 <GoalCard key={goal.id} goal={goal} />
               ))}
@@ -335,11 +335,11 @@ export function ParticipantProfile({ participant: p, timeline }: { participant: 
 
           {/* -------------------------------- COMMUNICATION -------------------------------- */}
           <TabsContent value="communication">
-            <motion.div variants={staggerContainer} initial="initial" animate="animate" className="grid gap-5 lg:grid-cols-2">
+            <motion.div variants={staggerContainer} initial="initial" animate="animate" className="grid grid-cols-1 gap-5 lg:grid-cols-2">
               <SectionCard title="How communication works" icon={MessageCircle} className="lg:col-span-2">
                 <p className="text-sm leading-relaxed text-muted-foreground">{p.communication.style}</p>
                 <Separator className="my-4" />
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                   <div>
                     <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Tools</p>
                     <ChipList items={p.communication.tools} variant="default" />
@@ -357,7 +357,7 @@ export function ParticipantProfile({ participant: p, timeline }: { participant: 
                 <BulletList items={p.communication.avoid} tone="destructive" />
               </SectionCard>
               <SectionCard title="Know the signals" icon={Ear} className="lg:col-span-2" description="Small signals, big meaning.">
-                <div className="grid gap-3 sm:grid-cols-3">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
                   {p.communication.keyPhrases.map((k) => (
                     <div key={k.phrase} className="rounded-xl border bg-background/60 p-3.5">
                       <p className="text-sm font-semibold">{k.phrase}</p>
@@ -371,9 +371,9 @@ export function ParticipantProfile({ participant: p, timeline }: { participant: 
 
           {/* -------------------------------- SENSORY -------------------------------- */}
           <TabsContent value="sensory">
-            <motion.div variants={staggerContainer} initial="initial" animate="animate" className="grid gap-5 lg:grid-cols-2">
+            <motion.div variants={staggerContainer} initial="initial" animate="animate" className="grid grid-cols-1 gap-5 lg:grid-cols-2">
               <SectionCard title="Sensory profile" icon={Ear} className="lg:col-span-2">
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {p.sensory.preferences.map((s) => (
                     <div key={s.sense} className="flex items-start justify-between gap-3 rounded-xl border bg-background/60 p-3.5">
                       <div>
@@ -404,7 +404,7 @@ export function ParticipantProfile({ participant: p, timeline }: { participant: 
 
           {/* -------------------------------- HEALTH -------------------------------- */}
           <TabsContent value="health">
-            <motion.div variants={staggerContainer} initial="initial" animate="animate" className="grid gap-5 lg:grid-cols-2">
+            <motion.div variants={staggerContainer} initial="initial" animate="animate" className="grid grid-cols-1 gap-5 lg:grid-cols-2">
               <SectionCard title="Health snapshot" icon={HeartPulse}>
                 <dl className="space-y-3 text-sm">
                   {[
@@ -444,7 +444,7 @@ export function ParticipantProfile({ participant: p, timeline }: { participant: 
                 </ul>
               </SectionCard>
               <SectionCard title="Food & nutrition" icon={Utensils} className="lg:col-span-2">
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                   <div className="space-y-4">
                     <div>
                       <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Loves</p>
@@ -474,7 +474,7 @@ export function ParticipantProfile({ participant: p, timeline }: { participant: 
 
           {/* -------------------------------- DAILY LIFE -------------------------------- */}
           <TabsContent value="daily">
-            <motion.div variants={staggerContainer} initial="initial" animate="animate" className="grid gap-5 lg:grid-cols-2">
+            <motion.div variants={staggerContainer} initial="initial" animate="animate" className="grid grid-cols-1 gap-5 lg:grid-cols-2">
               <SectionCard title="Morning routine" icon={Sun} description="Consistency builds confidence.">
                 <RoutineList steps={p.morningRoutine} />
               </SectionCard>
@@ -486,7 +486,7 @@ export function ParticipantProfile({ participant: p, timeline }: { participant: 
 
           {/* -------------------------------- COMMUNITY -------------------------------- */}
           <TabsContent value="community">
-            <motion.div variants={staggerContainer} initial="initial" animate="animate" className="grid gap-5 lg:grid-cols-2">
+            <motion.div variants={staggerContainer} initial="initial" animate="animate" className="grid grid-cols-1 gap-5 lg:grid-cols-2">
               <SectionCard title="Favourite places" icon={MapPin}>
                 <BulletList items={p.community.favouritePlaces} />
                 <Separator className="my-4" />
@@ -499,7 +499,7 @@ export function ParticipantProfile({ participant: p, timeline }: { participant: 
                 <BulletList items={p.community.outingTips} tone="primary" />
               </SectionCard>
               <SectionCard title="Upcoming appointments" icon={CalendarDays} className="lg:col-span-2">
-                <ul className="grid gap-3 md:grid-cols-3">
+                <ul className="grid grid-cols-1 gap-3 md:grid-cols-3">
                   {p.appointments.map((a) => (
                     <li key={a.id} className="rounded-xl border bg-background/60 p-3.5">
                       <p className="text-xs font-medium text-primary">
@@ -517,7 +517,7 @@ export function ParticipantProfile({ participant: p, timeline }: { participant: 
 
           {/* -------------------------------- DOCUMENTS -------------------------------- */}
           <TabsContent value="documents">
-            <motion.div variants={staggerContainer} initial="initial" animate="animate" className="grid gap-5 lg:grid-cols-2">
+            <motion.div variants={staggerContainer} initial="initial" animate="animate" className="grid grid-cols-1 gap-5 lg:grid-cols-2">
               <SectionCard title="Documents" icon={FileText} description="Role-based visibility. Family sharing is explicit, never accidental.">
                 <ul className="space-y-2.5">
                   {p.documents.map((d) => (
@@ -564,7 +564,7 @@ export function ParticipantProfile({ participant: p, timeline }: { participant: 
                 Every insight explains its reasoning and waits for a human to act on it.
               </p>
             </div>
-            <motion.div variants={staggerContainer} initial="initial" animate="animate" className="grid gap-5 lg:grid-cols-2">
+            <motion.div variants={staggerContainer} initial="initial" animate="animate" className="grid grid-cols-1 gap-5 lg:grid-cols-2">
               {p.aiInsights.map((insight) => (
                 <AiInsightCard key={insight.id} insight={insight} />
               ))}

@@ -48,7 +48,7 @@ export default function HelpCentrePage() {
 
       <motion.section variants={fadeUp} aria-labelledby="popular-guides">
         <h2 id="popular-guides" className="mb-4 font-display text-xl font-semibold">Popular guides</h2>
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
           {guides.map((guide) => (
             <button
               key={guide.title}

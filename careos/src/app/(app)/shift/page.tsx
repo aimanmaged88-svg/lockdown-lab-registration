@@ -126,7 +126,7 @@ export default function ShiftPage() {
         })}
       </motion.div>
 
-      <div className="grid gap-6 xl:grid-cols-5">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-5">
         {/* Briefing column */}
         <motion.div variants={fadeUp} className="space-y-5 xl:col-span-2">
           <Card className="border-primary/10 bg-gradient-to-br from-card to-primary-soft/40">

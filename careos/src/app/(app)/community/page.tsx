@@ -74,7 +74,7 @@ export default function CommunityPlannerPage() {
         </div>
       </motion.div>
 
-      <div className="grid gap-6 xl:grid-cols-5">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-5">
         {/* Map abstraction */}
         <motion.div variants={fadeUp} className="xl:col-span-2">
           <Card className="sticky top-20 overflow-hidden">

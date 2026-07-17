@@ -53,7 +53,7 @@ export function LearningTopicView({ topic }: { topic: LearningTopic }) {
         </div>
       </motion.section>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <motion.div variants={fadeUp}>
           <Card className="h-full">
             <CardHeader>
@@ -87,7 +87,7 @@ export function LearningTopicView({ topic }: { topic: LearningTopic }) {
               </CardTitle>
               <CardDescription>The ideas worth keeping in your pocket.</CardDescription>
             </CardHeader>
-            <CardContent className="grid gap-3">
+            <CardContent className="grid grid-cols-1 gap-3">
               {topic.learningCards.map((card) => (
                 <div key={card.title} className="rounded-2xl border bg-gradient-to-br from-card to-muted/40 p-4">
                   <p className="text-sm font-semibold">{card.title}</p>
@@ -111,7 +111,7 @@ export function LearningTopicView({ topic }: { topic: LearningTopic }) {
           </CardHeader>
           <CardContent className="space-y-4">
             {topic.scenarios.map((s) => (
-              <div key={s.situation} className="grid gap-3 rounded-2xl border p-4 md:grid-cols-2 md:gap-5">
+              <div key={s.situation} className="grid grid-cols-1 gap-3 rounded-2xl border p-4 md:grid-cols-2 md:gap-5">
                 <div>
                   <Badge variant="muted" className="mb-2">The situation</Badge>
                   <p className="text-sm leading-relaxed">{s.situation}</p>
@@ -136,7 +136,7 @@ export function LearningTopicView({ topic }: { topic: LearningTopic }) {
             </CardTitle>
             <CardDescription>Placeholder in the demo — production links to vetted national bodies and clinical guidelines.</CardDescription>
           </CardHeader>
-          <CardContent className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+          <CardContent className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
             {topic.references.map((ref) => (
               <div key={ref} className="flex items-center gap-2.5 rounded-xl border border-dashed bg-muted/40 p-3.5 text-sm text-muted-foreground">
                 <ExternalLink className="h-4 w-4 shrink-0" aria-hidden="true" />

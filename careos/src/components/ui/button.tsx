@@ -8,8 +8,10 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground shadow-soft hover:bg-primary/90 hover:shadow-glow",
-        secondary: "bg-secondary text-secondary-foreground shadow-soft hover:bg-secondary/90",
+        default:
+          "bg-gradient-to-b from-primary to-primary/85 text-primary-foreground shadow-soft shadow-primary/25 [box-shadow:inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(16_24_40/0.1),0_4px_12px_-2px_hsl(var(--primary)/0.35)] hover:brightness-105 hover:shadow-glow",
+        secondary:
+          "bg-gradient-to-b from-secondary to-secondary/85 text-secondary-foreground [box-shadow:inset_0_1px_0_rgb(255_255_255/0.25),0_1px_2px_rgb(16_24_40/0.08),0_4px_12px_-2px_hsl(var(--secondary)/0.3)] hover:brightness-105",
         outline: "border border-input bg-card shadow-soft hover:bg-accent hover:text-accent-foreground",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         soft: "bg-primary-soft text-primary hover:bg-primary/15",

@@ -42,6 +42,32 @@ export default function WelcomePage() {
             transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
             className="max-w-2xl"
           >
+            <div className="mb-6 flex items-center gap-5">
+              {/* App-icon presentation — the product should feel shipped, not prototyped. */}
+              <div
+                aria-hidden="true"
+                className="relative flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-[22%] bg-gradient-to-br from-primary to-secondary shadow-lifted md:h-24 md:w-24"
+              >
+                <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/30 to-transparent" />
+                <svg viewBox="0 0 24 24" fill="none" className="relative h-11 w-11 text-white md:h-12 md:w-12">
+                  <path
+                    d="M12 20.5C12 20.5 4 15.5 4 9.8C4 6.9 6.2 4.8 8.8 4.8C10.2 4.8 11.4 5.5 12 6.5C12.6 5.5 13.8 4.8 15.2 4.8C17.8 4.8 20 6.9 20 9.8C20 15.5 12 20.5 12 20.5Z"
+                    fill="currentColor"
+                    fillOpacity="0.92"
+                  />
+                  <path d="M6.5 11.5H9L10.5 8.5L13 14L14.5 11.5H17.5" stroke="hsl(222 63% 47%)" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </div>
+              <div>
+                <p className="font-display text-xl font-semibold leading-tight md:text-2xl">CareOS</p>
+                <p className="text-sm text-muted-foreground">The Participant Outcomes Platform</p>
+                <div className="mt-2 flex flex-wrap gap-1.5 text-[11px] font-medium text-muted-foreground">
+                  <span className="rounded-full border bg-card px-2 py-0.5">iPhone · iPad · Desktop</span>
+                  <span className="rounded-full border bg-card px-2 py-0.5">Dark mode</span>
+                  <span className="rounded-full border bg-card px-2 py-0.5">Accessibility-first</span>
+                </div>
+              </div>
+            </div>
             <h1 className="font-display text-4xl font-semibold tracking-tight md:text-5xl text-balance">
               Every person has a story.
               <br />
@@ -59,7 +85,7 @@ export default function WelcomePage() {
             variants={staggerContainer}
             initial="initial"
             animate="animate"
-            className="mt-10 grid gap-3 sm:grid-cols-2"
+            className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-2"
           >
             {roles.map((r) => (
               <motion.li key={r.id} variants={fadeUp}>

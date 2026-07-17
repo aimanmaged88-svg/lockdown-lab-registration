@@ -53,7 +53,7 @@ export default function ParticipantsPage() {
           variants={staggerContainer}
           initial="initial"
           animate="animate"
-          className="grid gap-5 md:grid-cols-2 xl:grid-cols-3"
+          className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3"
         >
           {filtered.map((p) => (
             <ParticipantCard key={p.id} participant={p} />

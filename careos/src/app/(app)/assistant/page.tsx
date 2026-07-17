@@ -94,7 +94,7 @@ export default function AssistantPage() {
   }, [messages, thinking]);
 
   return (
-    <div className="flex h-[calc(100vh-10rem)] flex-col gap-5">
+    <div className="flex h-[calc(100dvh-14.5rem)] flex-col gap-5 lg:h-[calc(100vh-10rem)]">
       <PageHeader
         eyebrow="AI Assistant"
         title="Your quiet second pair of hands"

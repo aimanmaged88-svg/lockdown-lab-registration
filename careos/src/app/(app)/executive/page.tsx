@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, CheckCircle2, CircleDot, Eye, Quote, Sparkles } from "lucide-react";
+import { ArrowRight, CheckCircle2, CircleDot, Eye, FileDown, Quote, Sparkles } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,6 +10,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { OutcomeLinesChart } from "@/components/charts/outcome-lines-chart";
 import { organisation, outcomeSummary, ceoQuestions, familyEngagementSeries } from "@/data/organisation";
 import { participants } from "@/data/participants";
+import { useRole } from "@/providers/role-provider";
 import { staggerContainer, fadeUp } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
@@ -24,13 +25,23 @@ const statusConfig = {
  * "Are we genuinely improving people's lives?"
  */
 export default function ExecutivePage() {
+  const { definition } = useRole();
+  const firstName = definition.demoUser.name.split(" ")[0];
+
   return (
     <motion.div variants={staggerContainer} initial="initial" animate="animate" className="space-y-8">
       <PageHeader
-        eyebrow={`${organisation.name} · Executive view`}
-        title="Are we genuinely improving people's lives?"
+        eyebrow={`Prepared for ${definition.demoUser.name} · ${organisation.name} · Wednesday 15 July 2026`}
+        title={`Good morning, ${firstName}. Are we genuinely improving people's lives?`}
         description="Yes — and here is the evidence, the honest caveats, and the one decision that needs you today."
-      />
+      >
+        <Button variant="soft" asChild>
+          <a href="/executive-brief.pdf" download>
+            <FileDown className="h-4 w-4" aria-hidden="true" />
+            Board brief (PDF)
+          </a>
+        </Button>
+      </PageHeader>
 
       {/* Organisation health hero */}
       <motion.section variants={fadeUp} aria-label="Organisation health">
@@ -84,7 +95,7 @@ export default function ExecutivePage() {
       {/* The five questions */}
       <motion.section variants={fadeUp} aria-label="The five questions every CEO asks">
         <h2 className="mb-4 font-display text-xl font-semibold">Five questions, answered honestly</h2>
-        <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
           {ceoQuestions.map((q) => {
             const config = statusConfig[q.status];
             const Icon = config.icon;
@@ -113,7 +124,7 @@ export default function ExecutivePage() {
         </div>
       </motion.section>
 
-      <div className="grid gap-6 xl:grid-cols-5">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-5">
         <motion.div variants={fadeUp} className="xl:col-span-3">
           <Card className="h-full">
             <CardHeader>
@@ -172,7 +183,7 @@ export default function ExecutivePage() {
             <CardDescription>Three of the 86 lives your organisation is changing right now.</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-3 md:grid-cols-3">
+            <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
               {participants.map((p) => (
                 <Link
                   key={p.id}
