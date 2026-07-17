@@ -34,6 +34,8 @@
         </a>
         <nav class="main" aria-label="Main">
           ${PAGES.map(p => `<a href="${p.href}" class="${here === p.href ? 'active' : ''}">${p.label}</a>`).join('')}
+          <a href="portal.html" class="nav-only-mobile">Portal</a>
+          <a href="portal.html#submit" class="nav-only-mobile">Start a submission</a>
         </nav>
         <div class="head-cta">
           <a class="btn btn-ghost btn-sm" href="portal.html">Portal</a>
@@ -84,9 +86,73 @@
     </footer>`;
   }
 
+  function brainstormHTML() {
+    return `<section class="brainstorm" id="brainstorm" aria-label="Brainstorm">
+      <div class="container">
+        <div class="bs-card">
+          <span class="bs-eyebrow">◆ Hash's space</span>
+          <h3>Hey Hash — brainstorm here 💭</h3>
+          <p class="muted mb0">Anything you love, want tweaked, or just thought of while clicking around — drop it in below and it comes straight back to the team. No idea's too small or too wild.</p>
+          <form class="bs-form" id="bsForm" name="brainstorm" method="POST" data-netlify="true" netlify-honeypot="bot-field" action="/">
+            <input type="hidden" name="form-name" value="brainstorm">
+            <input type="hidden" name="page" id="bsPage">
+            <p hidden><label>Skip: <input name="bot-field"></label></p>
+            <div class="field mb1"><input class="input" name="name" id="bsName" placeholder="Your name (optional)" autocomplete="off"></div>
+            <div class="field mb0"><textarea class="textarea" name="idea" id="bsIdea" placeholder="e.g. Love the reveal slider — can the grade badge be gold? Also want a bulk upload for dealer submissions…" required></textarea></div>
+            <div class="bs-actions">
+              <span class="status" id="bsStatus">Goes straight to the team ✓</span>
+              <button type="submit" class="btn btn-red" id="bsSend">Send it through →</button>
+            </div>
+          </form>
+          <div class="bs-recent" id="bsRecent"></div>
+        </div>
+      </div>
+    </section>`;
+  }
+
+  function renderRecent() {
+    const box = document.getElementById('bsRecent');
+    if (!box) return;
+    const list = store.get('brainstorm', []);
+    if (!list.length) { box.innerHTML = ''; return; }
+    box.innerHTML = `<h4>Your recent notes (${list.length})</h4>` +
+      list.slice(-4).reverse().map(n => `<div class="bs-note">${escapeHTML(n.idea)}<div class="m">${n.name ? escapeHTML(n.name) + ' · ' : ''}${escapeHTML(n.page)} · just now</div></div>`).join('');
+  }
+
+  function wireBrainstorm() {
+    const form = document.getElementById('bsForm');
+    if (!form) return;
+    document.getElementById('bsPage').value = (location.pathname.split('/').pop() || 'index.html').replace('.html', '');
+    renderRecent();
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const idea = document.getElementById('bsIdea').value.trim();
+      const name = document.getElementById('bsName').value.trim();
+      if (!idea) { toast('Type an idea first 🙂'); return; }
+      const page = document.getElementById('bsPage').value;
+      // mirror locally so it feels instant + shows in the staff "Brainstorm inbox" (same-browser demo)
+      const list = store.get('brainstorm', []);
+      list.push({ idea, name, page, at: new Date().toISOString().slice(0, 16).replace('T', ' ') });
+      store.set('brainstorm', list);
+      // send to Netlify Forms → reaches the team's email + Netlify dashboard on the live site
+      const body = new URLSearchParams({ 'form-name': 'brainstorm', page, name, idea, 'bot-field': '' }).toString();
+      fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body })
+        .catch(() => {}); // offline/local dev: local mirror still captured it
+      document.getElementById('bsIdea').value = '';
+      document.getElementById('bsName').value = '';
+      const s = document.getElementById('bsStatus');
+      if (s) s.textContent = 'Sent — thanks Hash! Keep them coming ✓';
+      toast('Sent to the team 🚀');
+      renderRecent();
+    });
+  }
+
+  function escapeHTML(s) { return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
   function mount() {
     injectHead();
     document.body.insertAdjacentHTML('afterbegin', ribbonHTML() + headerHTML());
+    if (!document.body.dataset.nobrainstorm) document.body.insertAdjacentHTML('beforeend', brainstormHTML());
     if (!document.body.dataset.nofooter) document.body.insertAdjacentHTML('beforeend', footerHTML());
     const head = document.getElementById('siteHead');
     const burger = document.getElementById('navBurger');
@@ -94,6 +160,7 @@
       const open = head.classList.toggle('open');
       burger.setAttribute('aria-expanded', open ? 'true' : 'false');
     });
+    wireBrainstorm();
     // scroll-reveal
     const io = ('IntersectionObserver' in window) ? new IntersectionObserver(es => {
       es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });

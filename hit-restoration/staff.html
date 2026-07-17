@@ -32,7 +32,10 @@
   .photo-slot{border:1px dashed var(--line-strong); border-radius:8px; padding:14px; text-align:center; font-size:.78rem; color:var(--steel)}
 </style>
 </head>
-<body data-nofooter="1">
+<body data-nofooter="1" data-nobrainstorm="1">
+<form name="brainstorm" data-netlify="true" netlify-honeypot="bot-field" hidden>
+<input type="text" name="page"><input type="text" name="name"><textarea name="idea"></textarea><input name="bot-field">
+</form>
 
 <div id="staffNav" class="staff-nav" style="display:none">
   <div class="container in">
@@ -41,6 +44,7 @@
     <a href="#customers" data-v="customers">Customers</a>
     <a href="#products" data-v="products">Store & stock</a>
     <a href="#reports" data-v="reports">Reports</a>
+    <a href="#brainstorm" data-v="brainstorm">Brainstorm</a>
     <span class="who"><span id="roleBadge"></span><button class="btn btn-soft btn-sm" id="switchRole">Switch role</button></span>
   </div>
 </div>
@@ -139,6 +143,7 @@
     if (h === 'customers') return gate(vCustomers, 'Customer records are an Admin capability.');
     if (h === 'products') return gate(vProducts, 'Store management is an Admin capability.');
     if (h === 'reports') return gate(vReports, 'Reporting is an Admin capability.');
+    if (h === 'brainstorm') return vBrainstorm();
     vQueue();
   }
   function gate(fn, msg) {
@@ -479,6 +484,26 @@
         </div>
       </div>
       <div class="note-build">All sample numbers. Live build computes these from real order history: turnaround by stage, revenue by line item, order volume, grade-improvement stats — the exact reporting set from the scope sheet — plus CSV export for bookkeeping (the client's stated Phase-1 accounting approach).</div>`;
+  }
+
+  /* ---------- brainstorm inbox (feedback Hash leaves anywhere on the site) ---------- */
+  function vBrainstorm() {
+    const list = HR.store.get('brainstorm', []).slice().reverse();
+    $('#view').innerHTML = `
+      <div class="spread mb2">
+        <div><span class="kicker">Brainstorm inbox</span><h2 class="mb0" style="font-size:1.8rem">Ideas from Hash</h2></div>
+        <span class="badge ${list.length ? 'badge-warning' : 'badge-steel'}">${list.length} note${list.length === 1 ? '' : 's'}</span>
+      </div>
+      <p class="small muted mb2">Every note Hash drops in the brainstorm box (bottom of any page) lands here. On the live site each one is also emailed to the team and saved in the Netlify dashboard — so nothing gets lost, whichever device he's on.</p>
+      ${list.length ? list.map(n => `
+        <div class="panel panel-pad mb2">
+          <div class="spread mb1"><b class="white">${esc(n.name || 'Hash')}</b><span class="badge badge-steel">on “${esc(n.page)}”</span></div>
+          <p class="mb0" style="color:var(--silver)">${esc(n.idea)}</p>
+          <div class="small muted mt1" style="font-size:.72rem">${esc(n.at)}</div>
+        </div>`).join('') : `
+        <div class="lock"><div style="font-size:1.6rem; margin-bottom:8px">💭</div><b class="white">No notes yet</b>
+        <p class="small mt1 mb0">Open any page, scroll to the brainstorm box at the bottom, and leave a note — it'll show up here.<br>(This inbox reads notes left in <b>this browser</b>; live submissions also arrive by email + in the Netlify dashboard.)</p></div>`}
+      <div class="note-build">Demo inbox reads from this browser's local storage. In the live build this is backed by the database (or the connected form service), so notes from Hash's phone, laptop — anywhere — all collect here and ping the team by email.</div>`;
   }
 
   /* ---------- boot ---------- */
