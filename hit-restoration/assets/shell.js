@@ -134,7 +134,8 @@
       const list = store.get('brainstorm', []);
       list.push({ idea, name, page, at: new Date().toISOString().slice(0, 16).replace('T', ' ') });
       store.set('brainstorm', list);
-      // send to Netlify Forms → reaches the team's email + Netlify dashboard on the live site
+      // Netlify Forms → captured in the Netlify dashboard + staff "Brainstorm inbox",
+      // and auto-emailed to the team via the form's Netlify email notification.
       const body = new URLSearchParams({ 'form-name': 'brainstorm', page, name, idea, 'bot-field': '' }).toString();
       fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body })
         .catch(() => {}); // offline/local dev: local mirror still captured it
