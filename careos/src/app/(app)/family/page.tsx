@@ -26,6 +26,7 @@ import { TrendAreaChart } from "@/components/charts/trend-area-chart";
 import { getParticipant } from "@/data/participants";
 import { getTimeline } from "@/data/timeline";
 import { demoFamily } from "@/data/family";
+import { FarazCorner } from "@/components/family/faraz-corner";
 import { staggerContainer, fadeUp } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
@@ -300,6 +301,8 @@ export default function FamilyPortalPage() {
           </div>
         </div>
       </motion.section>
+
+      <FarazCorner />
 
       <motion.p variants={fadeUp} className="flex items-center gap-1.5 text-xs text-muted-foreground">
         <ShieldCheck className="h-3.5 w-3.5 text-success" aria-hidden="true" />
