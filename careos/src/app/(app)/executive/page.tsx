@@ -26,7 +26,8 @@ const statusConfig = {
  */
 export default function ExecutivePage() {
   const { definition } = useRole();
-  const firstName = definition.demoUser.name.split(" ")[0];
+  // Greet by given name, skipping honorifics ("Dr. Yasser Zaki" → "Yasser").
+  const firstName = definition.demoUser.name.replace(/^(Dr|Prof|Mr|Mrs|Ms)\.?\s+/i, "").split(" ")[0];
 
   return (
     <motion.div variants={staggerContainer} initial="initial" animate="animate" className="space-y-8">

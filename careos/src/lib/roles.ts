@@ -63,7 +63,7 @@ export const roles: RoleDefinition[] = [
     label: "CEO",
     description: "One question, answered honestly: are we genuinely improving people's lives?",
     homePath: "/executive",
-    demoUser: { name: "David Chen", detail: "Chief Executive, Sunrise Support Collective", initials: "DC" },
+    demoUser: { name: "Dr. Yasser Zaki", detail: "Founder & CEO, Tender Loving Care Disability Services", initials: "YZ" },
   },
   {
     id: "system-admin",
