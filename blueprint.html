@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Junior Basketball Development Blueprint — 2026 Digital Edition · Amanda Hodgson</title>
+<meta name="description" content="The mental toughness blueprint for junior basketballers — a tap-through digital book by Amanda Hodgson. Prepare young athletes for high-pressure games and long-term success." />
+<meta name="theme-color" content="#050506" />
+<meta property="og:title" content="Junior Basketball Development Blueprint — 2026 Digital Edition" />
+<meta property="og:description" content="How to mentally prepare junior basketballers for high-pressure games & long-term success. By Amanda Hodgson." />
+<meta property="og:type" content="book" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#050506; --bg2:#0b0b0d;
+  --text:#f6f4f1; --muted:#a09a92; --dim:#6d6861;
+  --accent:#ff6b00; --accent-hi:#ff8a2b; --accent-soft:rgba(255,107,0,.15); --accent-glow:rgba(255,107,0,.38);
+  --good:#30d158; --good-soft:rgba(48,209,88,.14);
+  --glass:rgba(255,255,255,.055); --line:rgba(255,255,255,.11);
+  --fd:'Bebas Neue',"Arial Narrow",Arial,sans-serif;
+  --fb:'Manrope',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --r:22px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  margin:0;font-family:var(--fb);background:var(--bg);color:var(--text);
+  line-height:1.6;overflow-x:hidden;
+  background-image:radial-gradient(120% 60% at 50% -10%,rgba(255,107,0,.13),transparent 60%);
+  background-attachment:fixed;
+}
+img{max-width:100%}
+a{color:inherit}
+
+/* reading progress */
+#progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:60;
+  background:linear-gradient(90deg,var(--accent),var(--accent-hi));box-shadow:0 0 12px var(--accent-glow)}
+
+/* layout */
+.wrap{max-width:760px;margin:0 auto;padding:0 20px}
+section{padding:64px 0;position:relative}
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* type */
+h1,h2,h3{font-family:var(--fd);font-weight:400;letter-spacing:.01em;line-height:.98;margin:0}
+.eyebrow{font-family:var(--fd);color:var(--accent);letter-spacing:.22em;font-size:.82rem;text-transform:uppercase;margin:0 0 14px}
+p{margin:0 0 16px}
+.lead{font-size:1.13rem;color:#e9e6e1}
+.muted{color:var(--muted)}
+strong{color:#fff;font-weight:700}
+
+/* HERO */
+.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;text-align:center;padding:80px 20px 48px;position:relative}
+.hero .badge{display:inline-flex;align-items:center;gap:8px;align-self:center;
+  font-family:var(--fd);letter-spacing:.18em;font-size:.72rem;text-transform:uppercase;color:var(--accent-hi);
+  border:1px solid var(--line);background:var(--glass);padding:7px 15px;border-radius:999px;margin-bottom:26px}
+.hero h1{font-size:clamp(2.6rem,13.5vw,5.4rem);text-transform:uppercase;
+  background:linear-gradient(180deg,#fff 30%,#c9c4bd);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero .sub{max-width:30ch;margin:20px auto 0;font-size:1.12rem;color:var(--muted)}
+.hero .author{margin-top:30px;font-family:var(--fd);letter-spacing:.16em;font-size:1.15rem}
+.hero .author span{color:var(--accent)}
+.hero .tag{margin-top:6px;font-size:.82rem;color:var(--dim);letter-spacing:.04em}
+.scrollcue{margin-top:40px;color:var(--dim);font-size:.78rem;letter-spacing:.15em;text-transform:uppercase;animation:bob 2.2s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0);opacity:.5}50%{transform:translateY(7px);opacity:1}}
+
+/* IG chip */
+.ig-chip{display:inline-flex;align-items:center;gap:9px;text-decoration:none;
+  background:linear-gradient(135deg,#feda75 0%,#fa7e1e 25%,#d62976 50%,#962fbf 75%,#4f5bd5 100%);
+  color:#fff;font-weight:700;font-size:.92rem;padding:11px 18px;border-radius:999px;margin-top:26px;
+  box-shadow:0 8px 26px rgba(214,41,118,.34);transition:transform .18s ease}
+.ig-chip:active{transform:scale(.96)}
+.ig-chip svg{width:18px;height:18px;fill:#fff;flex:none}
+
+/* chapter number rail */
+.chnum{font-family:var(--fd);font-size:.9rem;letter-spacing:.2em;color:var(--accent);text-transform:uppercase;margin-bottom:10px}
+.chtitle{font-size:clamp(2.1rem,8vw,3.2rem);text-transform:uppercase;margin-bottom:22px}
+.divider{height:1px;background:linear-gradient(90deg,var(--accent),transparent);margin:0 0 26px;width:120px}
+
+/* cards / lists */
+.card{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);padding:22px 22px;margin:18px 0;backdrop-filter:blur(8px)}
+ul.clean{list-style:none;padding:0;margin:16px 0}
+ul.clean li{position:relative;padding:9px 0 9px 30px;border-bottom:1px solid var(--line)}
+ul.clean li:last-child{border-bottom:0}
+ul.clean li::before{content:"";position:absolute;left:4px;top:17px;width:8px;height:8px;border-radius:50%;
+  background:var(--accent);box-shadow:0 0 10px var(--accent-glow)}
+
+/* numbered steps */
+.step{display:flex;gap:16px;padding:18px 0;border-top:1px solid var(--line)}
+.step:first-of-type{border-top:0}
+.step .n{font-family:var(--fd);font-size:2rem;color:var(--accent);line-height:1;flex:none;width:44px}
+.step h4{margin:0 0 6px;font-size:1.08rem;font-weight:700}
+.step p{margin:0;color:var(--muted);font-size:.98rem}
+
+/* trigger grid */
+.trigger{border-left:3px solid var(--accent);padding:12px 0 12px 16px;margin:14px 0}
+.trigger b{display:block;color:#fff;font-size:1rem;margin-bottom:3px}
+.trigger span{color:var(--muted);font-size:.96rem}
+
+/* interactive checklist */
+.check{display:flex;gap:13px;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--line);cursor:pointer;user-select:none}
+.check:last-child{border-bottom:0}
+.check .box{flex:none;width:24px;height:24px;border-radius:7px;border:2px solid var(--dim);margin-top:2px;
+  display:grid;place-items:center;transition:all .18s ease}
+.check .box svg{width:14px;height:14px;stroke:#fff;stroke-width:3.5;fill:none;opacity:0;transform:scale(.5);transition:all .18s ease}
+.check.done .box{background:var(--good);border-color:var(--good)}
+.check.done .box svg{opacity:1;transform:none}
+.check.done .lbl{color:var(--dim);text-decoration:line-through}
+.check .lbl{font-size:1rem;transition:color .18s}
+
+/* input fields for workshop */
+.field{margin:14px 0}
+.field label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:6px;letter-spacing:.02em}
+.field textarea{width:100%;background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:14px;
+  color:var(--text);font-family:var(--fb);font-size:.98rem;padding:12px 14px;resize:vertical;min-height:56px}
+.field textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+
+/* AI COACH NOTE */
+.ainote{border:1px solid var(--accent-soft);background:
+  linear-gradient(180deg,rgba(255,107,0,.09),rgba(255,107,0,.03));
+  border-radius:var(--r);margin:24px 0;overflow:hidden}
+.ainote summary{list-style:none;cursor:pointer;padding:16px 20px;display:flex;align-items:center;gap:12px;font-weight:700}
+.ainote summary::-webkit-details-marker{display:none}
+.ainote summary .bot{width:34px;height:34px;border-radius:10px;flex:none;display:grid;place-items:center;
+  background:var(--accent-soft);font-size:1.1rem}
+.ainote summary .cap{font-family:var(--fd);letter-spacing:.14em;font-size:.82rem;color:var(--accent-hi);text-transform:uppercase;flex:1}
+.ainote summary .chev{color:var(--accent);transition:transform .25s;font-size:1.2rem}
+.ainote[open] summary .chev{transform:rotate(180deg)}
+.ainote .body{padding:2px 20px 20px;color:#e4e0da;font-size:.98rem}
+.ainote .body p:last-child{margin-bottom:0}
+.ainote .body b{color:var(--accent-hi)}
+
+/* quote */
+.pull{font-family:var(--fd);font-size:clamp(1.9rem,7vw,2.8rem);line-height:1.02;text-transform:uppercase;
+  color:#fff;text-align:center;padding:20px 0;letter-spacing:.01em}
+.pull span{color:var(--accent)}
+
+/* AI intro section special bg */
+.ai-hero{background:radial-gradient(120% 80% at 50% 0%,rgba(255,107,0,.14),transparent 60%)}
+.pillrow{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}
+.pill{border:1px solid var(--line);background:var(--glass);border-radius:999px;padding:9px 15px;font-size:.9rem;font-weight:600}
+.pill b{color:var(--accent-hi)}
+
+/* resources */
+.res-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:18px}
+.res h4{font-family:var(--fd);letter-spacing:.1em;font-size:1rem;color:var(--accent);margin:0 0 10px;text-transform:uppercase}
+.res ul{margin:0;padding-left:18px;color:var(--muted)}
+.res ul li{margin:5px 0}
+
+/* CLOSING CTA */
+.close-cta{text-align:center;padding:88px 20px}
+.close-cta h2{font-size:clamp(2.4rem,10vw,4rem);text-transform:uppercase;margin-bottom:18px}
+.ig-big{display:inline-flex;align-items:center;gap:12px;text-decoration:none;
+  background:linear-gradient(135deg,#feda75 0%,#fa7e1e 25%,#d62976 50%,#962fbf 75%,#4f5bd5 100%);
+  color:#fff;font-weight:800;font-size:1.12rem;padding:17px 30px;border-radius:999px;margin-top:14px;
+  box-shadow:0 12px 40px rgba(214,41,118,.4);transition:transform .18s ease}
+.ig-big:active{transform:scale(.97)}
+.ig-big svg{width:26px;height:26px;fill:#fff}
+.handle{font-family:var(--fd);letter-spacing:.14em;font-size:1.3rem;margin-top:22px;color:var(--accent)}
+.footer{text-align:center;padding:34px 20px 60px;color:var(--dim);font-size:.82rem;border-top:1px solid var(--line)}
+
+/* floating chapters button + sheet */
+#chBtn{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:55;
+  display:flex;align-items:center;gap:8px;border:none;cursor:pointer;
+  background:var(--accent);color:#100800;font-family:var(--fd);letter-spacing:.12em;font-size:.9rem;text-transform:uppercase;
+  padding:13px 18px;border-radius:999px;box-shadow:0 10px 30px var(--accent-glow);transition:transform .18s}
+#chBtn:active{transform:scale(.95)}
+#chBtn svg{width:16px;height:16px;stroke:#100800;stroke-width:2.4;fill:none}
+#sheet{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);
+  opacity:0;pointer-events:none;transition:opacity .25s}
+#sheet.open{opacity:1;pointer-events:auto}
+.sheet-inner{position:absolute;left:0;right:0;bottom:0;background:var(--bg2);border-top:1px solid var(--line);
+  border-radius:24px 24px 0 0;padding:14px 14px calc(20px + env(safe-area-inset-bottom));max-height:82vh;overflow:auto;
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.22,1,.36,1)}
+#sheet.open .sheet-inner{transform:none}
+.sheet-grab{width:44px;height:5px;border-radius:3px;background:var(--dim);margin:6px auto 14px}
+.sheet-inner h3{font-family:var(--fd);letter-spacing:.16em;color:var(--muted);font-size:.86rem;text-transform:uppercase;padding:0 10px 8px}
+.toc-item{display:flex;align-items:center;gap:14px;padding:14px 12px;border-radius:14px;text-decoration:none;color:var(--text);cursor:pointer}
+.toc-item:active{background:var(--glass)}
+.toc-item .tnum{font-family:var(--fd);font-size:1.1rem;color:var(--accent);width:30px;flex:none}
+.toc-item .ttl{font-weight:600;font-size:1rem}
+.toc-item.ig{color:#fff;background:linear-gradient(135deg,rgba(214,41,118,.22),rgba(79,91,213,.16));margin-top:6px}
+.toc-item.ig .tnum{color:#e46}
+
+@media (min-width:720px){ section{padding:80px 0} .res-grid{grid-template-columns:1fr 1fr} }
+</style>
+</head>
+<body>
+<div id="progress"></div>
+
+<!-- ============ COVER ============ -->
+<header class="hero" id="top">
+  <span class="badge">● 2026 Digital Edition · Tap to read</span>
+  <h1>Junior<br>Basketball<br>Blueprint</h1>
+  <p class="sub">How to mentally prepare junior basketballers for high-pressure games &amp; long-term success.</p>
+  <div class="author">BY <span>AMANDA HODGSON</span></div>
+  <div class="tag">A GUIDE FOR PARENTS &amp; ATHLETES · AGES ~10–18</div>
+  <a class="ig-chip" href="https://www.instagram.com/amanda_hodgson_/" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16M12 0C8.74 0 8.33.01 7.05.07c-1.28.06-2.15.26-2.91.56-.79.31-1.46.72-2.13 1.38A5.9 5.9 0 0 0 .63 4.14c-.3.76-.5 1.63-.56 2.91C.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.28.26 2.15.56 2.91.31.79.72 1.46 1.38 2.13.67.66 1.34 1.07 2.13 1.38.76.3 1.63.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.28-.06 2.15-.26 2.91-.56a5.9 5.9 0 0 0 2.13-1.38 5.9 5.9 0 0 0 1.38-2.13c.3-.76.5-1.63.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.28-.26-2.15-.56-2.91a5.9 5.9 0 0 0-1.38-2.13A5.9 5.9 0 0 0 19.86.63c-.76-.3-1.63-.5-2.91-.56C15.67.01 15.26 0 12 0z"/><path d="M12 5.84A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84zM12 16a4 4 0 1 1 4-4 4 4 0 0 1-4 4z"/><circle cx="18.41" cy="5.59" r="1.44"/></svg>
+    Follow @amanda_hodgson_
+  </a>
+  <div class="scrollcue">Scroll to begin ↓</div>
+</header>
+
+<!-- ============ CH 1 — INTRO ============ -->
+<section class="reveal" id="ch1">
+  <div class="wrap">
+    <div class="chnum">Chapter 01</div>
+    <h2 class="chtitle">The Advantage of a Strong Mental Game</h2>
+    <div class="divider"></div>
+    <p class="lead">It's called a blueprint for a reason. These pages help you understand <strong>why the mind slips into a protective state of avoiding adversity</strong>, the signs your body is under pressure, and a step-by-step toolkit to stay focused, sharp and high-performing in any situation.</p>
+    <p class="muted">As an ex-basketballer, it's immediately evident to me how much more is demanded of our athletes just to stay in the mix for top teams. They're doing huge amounts of extra training — yet no one is guiding these young athletes through the mental hurdles they face, or helping them build the fortitude to keep going.</p>
+    <p class="muted">Early on, using the skills I developed as a player and a performance coach, I decided I'd arm my boys with the mindset tools they needed — not just to have an edge, but to <strong>thrive and be happy</strong> while working hard toward their goals. In three short years they've been selected for State-level high-performance squads and the top teams at their competitive club, won a State Championship, and taken home a Bronze medal at the U14 Club National Championships. A huge part of those milestones was the time we invested in their mental and emotional acuity.</p>
+    <p>This guide helps parents and junior athletes build <strong>resilience, focus and consistency under pressure</strong> — to perform at their best and enjoy the journey without burnout, plus specific communication tools that limit the feeling of pressure and expectation.</p>
+
+    <details class="ainote">
+      <summary><span class="bot">🤖</span><span class="cap">AI Coach's Note · how to get the most from this book</span><span class="chev">⌄</span></summary>
+      <div class="body">
+        <p>This edition is <b>interactive</b> — tap the <b>Chapters</b> button (bottom-right) to jump anywhere, tick off the checklists as you go, and type straight into the workshop pages. Your progress and answers save on <b>this device</b> automatically.</p>
+        <p>New to this 2026 version: a plain-English <b>intro to AI</b> for parents and coaches near the end, and short "AI Coach's Notes" like this one that add a practical tip to each chapter. They're optional extras — Amanda's words are the blueprint; these just help you action them.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ CH 2 — ABOUT ME ============ -->
+<section class="reveal" id="ch2">
+  <div class="wrap">
+    <div class="chnum">Chapter 02</div>
+    <h2 class="chtitle">About Me &amp; My Sons</h2>
+    <div class="divider"></div>
+    <p class="lead">One of the skills I was most proud of as a player was the ability to never be swayed from my focus. The game on the line, seconds to go, the coach yelling — that was my favourite place on earth.</p>
+    <p class="muted">Full transparency: my boys had the "advantage" of a massive life trauma when they were young. Their dad went into heart failure, leading to many life-and-death situations they witnessed. He eventually had a heart transplant, and the boys were there through the whole recovery. The tools we used to navigate that — and the skills they built to prepare their minds for the worst case — are the same ones they use now to overcome high-pressure situations on the court.</p>
+    <p class="muted">Investing time in your athlete's mental wellbeing gives them an edge rarely seen nowadays. As physical demands increase, no one is paying attention to the mental load that comes with them. This is your opportunity to get a head start — not just to gain an advantage, but more importantly, <strong>to protect your child</strong>.</p>
+    <div class="pull">Sport is the only place where those <span>hard emotions</span> should be welcomed regularly.</div>
+    <p class="muted">As parents, we try to minimise our children being uncomfortable or in any situation where they must navigate adversity. So often I see parents helping kids <strong>avoid</strong> pressure instead of helping them <strong>walk through it</strong> — which is detrimental to their development as an athlete. Pre-emptively building strategies for them to overcome high-pressure scenarios is what serves them best.</p>
+  </div>
+</section>
+
+<!-- ============ CH 3 — UNDERSTANDING PRESSURE ============ -->
+<section class="reveal" id="ch3">
+  <div class="wrap">
+    <div class="chnum">Chapter 03</div>
+    <h2 class="chtitle">Understanding the Pressure of a Game</h2>
+    <div class="divider"></div>
+    <p class="lead">Giving your kids the tools to independently manage high-pressure, in-game scenarios arms them for similar moments in life — and for any disappointments down the track in their sport.</p>
+    <div class="card">
+      <div class="chnum" style="color:var(--good)">Advantages of pressure in junior sport</div>
+      <ul class="clean">
+        <li>Learning to <strong>manage anxiety</strong></li>
+        <li>Developing the ability to <strong>self-assess</strong></li>
+        <li>Developing <strong>quick thinking</strong> in a high-pressure moment</li>
+        <li>The ability to <strong>overcome things quickly</strong> and move on</li>
+        <li>Improving <strong>self-talk</strong> as a tool to overcome intrusive thoughts</li>
+      </ul>
+    </div>
+    <details class="ainote">
+      <summary><span class="bot">🤖</span><span class="cap">AI Coach's Note · reframe it in one line</span><span class="chev">⌄</span></summary>
+      <div class="body">
+        <p>A phrase that lands well with juniors: <b>"Pressure is a privilege — it means the moment matters and you're the one they trust in it."</b> Say it in the car, put it on a locker sticker. Repeated calm framing teaches the brain that pressure = opportunity, not threat, long before game day.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ CH 4 — PHYSIO/PSYCH EFFECTS ============ -->
+<section class="reveal" id="ch4">
+  <div class="wrap">
+    <div class="chnum">Chapter 04</div>
+    <h2 class="chtitle">Effects of High-Pressure Situations</h2>
+    <div class="divider"></div>
+    <p class="lead">When the pressure hits, the <strong>fight-or-flight</strong> mechanism is triggered — leading to symptoms that affect gameplay. How many of these can your athlete recognise?</p>
+    <p class="muted" style="font-size:.9rem">Tap each one you've felt — it saves as you go.</p>
+    <div class="card" data-check="symptoms">
+      <div class="check"><span class="box"><svg viewBox="0 0 24 24"><polyline points="4 12 9 18 20 5"/></svg></span><span class="lbl">Increased heart rate &amp; blood pressure — feeling nervous and overwhelmed</span></div>
+      <div class="check"><span class="box"><svg viewBox="0 0 24 24"><polyline points="4 12 9 18 20 5"/></svg></span><span class="lbl">Impaired motor function (that "uncoordinated" feeling)</span></div>
+      <div class="check"><span class="box"><svg viewBox="0 0 24 24"><polyline points="4 12 9 18 20 5"/></svg></span><span class="lbl">Increased muscle tension — reduced flexibility &amp; movement</span></div>
+      <div class="check"><span class="box"><svg viewBox="0 0 24 24"><polyline points="4 12 9 18 20 5"/></svg></span><span class="lbl">Impaired decision making</span></div>
+      <div class="check"><span class="box"><svg viewBox="0 0 24 24"><polyline points="4 12 9 18 20 5"/></svg></span><span class="lbl">Unable to understand simple instructions from coach or teammates</span></div>
+      <div class="check"><span class="box"><svg viewBox="0 0 24 24"><polyline points="4 12 9 18 20 5"/></svg></span><span class="lbl">Feeling like everyone is "against" you and you can't do anything right</span></div>
+    </div>
+    <details class="ainote">
+      <summary><span class="bot">🤖</span><span class="cap">AI Coach's Note · the fastest reset that exists</span><span class="chev">⌄</span></summary>
+      <div class="body">
+        <p>When the body flips into fight-or-flight, the quickest switch back is the breath. Teach <b>box breathing</b>: in for 4, hold 4, out for 4, hold 4 — three rounds. It's discreet enough to do at the free-throw line or on the bench, and it physically lowers heart rate so the "uncoordinated" feeling fades. Pair it with a long exhale (out longer than in) for an even faster calm.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ CH 5 — STRONG MINDSET ============ -->
+<section class="reveal" id="ch5">
+  <div class="wrap">
+    <div class="chnum">Chapter 05</div>
+    <h2 class="chtitle">The Ultimate Feeling of a Strong Mindset</h2>
+    <div class="divider"></div>
+    <div class="pull">Calm under fire. <span>Focused</span> when it counts. Free to <span>play</span>.</div>
+    <p class="muted" style="text-align:center">A strong mindset feels like time slowing down — you see the play, you trust your training, and the noise (the crowd, the score, the last mistake) fades into the background. This is the state every tool in this blueprint is building toward.</p>
+    <div class="card" style="text-align:center">
+      <p style="margin:0"><strong>Make it real:</strong> screenshot this page and set it as your athlete's phone wallpaper for the season — a daily reminder of the feeling they're training for.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CH 6 — PRE-GAME ROUTINE ============ -->
+<section class="reveal" id="ch6">
+  <div class="wrap">
+    <div class="chnum">Chapter 06</div>
+    <h2 class="chtitle">Building a Pre-Game Mindset Routine</h2>
+    <div class="divider"></div>
+    <p class="lead">Three easy pre-game tools before every game to elevate your mental strength. <strong>Don't skip these</strong> — they set you up for the next day.</p>
+    <div class="card">
+      <div class="step"><div class="n">1</div><div><h4>Visualise the night before</h4><p>Imagine the role you'll play, who your opposition will be, the moves you'll make (successfully) — and celebrating the win with your team afterwards.</p></div></div>
+      <div class="step"><div class="n">2</div><div><h4>Focus on two skills you'll do well</h4><p>Ease the pressure by leaning into what you know you do well and can contribute. Pick two (max) and commit to doing them all game — despite anything that goes "wrong".</p></div></div>
+      <div class="step"><div class="n">3</div><div><h4>Reverse your bad habits under pressure</h4><p>For every bad habit, choose a direct opposite action to trigger the moment you feel yourself slipping. E.g. replace eye-rolling with giving a teammate five, or speaking encouraging words.</p></div></div>
+    </div>
+    <p class="muted" style="font-size:.9rem">Tap to build tonight's routine:</p>
+    <div class="card" data-check="routine">
+      <div class="check"><span class="box"><svg viewBox="0 0 24 24"><polyline points="4 12 9 18 20 5"/></svg></span><span class="lbl">I visualised tomorrow's game last night</span></div>
+      <div class="check"><span class="box"><svg viewBox="0 0 24 24"><polyline points="4 12 9 18 20 5"/></svg></span><span class="lbl">I chose my two go-to skills for this game</span></div>
+      <div class="check"><span class="box"><svg viewBox="0 0 24 24"><polyline points="4 12 9 18 20 5"/></svg></span><span class="lbl">I have a reverse-action ready for my main bad habit</span></div>
+    </div>
+    <details class="ainote">
+      <summary><span class="bot">🤖</span><span class="cap">AI Coach's Note · make the routine stick</span><span class="chev">⌄</span></summary>
+      <div class="body">
+        <p>Habits form best when they're <b>anchored to something that already happens</b>. Tie visualisation to lights-out, and the "two skills" pick to putting shoes in the bag. Writing the two skills on a wristband or inside a shoe gives an in-game cue exactly when adrenaline makes them hard to recall.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ CH 7 — CONFIDENCE THROUGH CHALLENGE ============ -->
+<section class="reveal" id="ch7">
+  <div class="wrap">
+    <div class="chnum">Chapter 07</div>
+    <h2 class="chtitle">Confidence Through Challenge</h2>
+    <div class="divider"></div>
+    <p class="lead">How you react to tough calls, coaches' decisions and in-game adversity dictates how you play and the kind of teammate you are. Use these <strong>behaviour triggers</strong> to take control of your emotions.</p>
+    <div class="trigger"><b>Disagree with a ref call</b><span>Immediately move on. Commit to creating positive impact within 30 seconds — be specific: get the next rebound, get a stop on defence.</span></div>
+    <div class="trigger"><b>Turnover (yours or a teammate's)</b><span>Speak encouragement — internally for you, or directly to your teammate.</span></div>
+    <div class="trigger"><b>Critical mistake at a crucial time</b><span>Have an affirmation ready: "On to the next", "Next stop is mine", "There's X minutes left to create impact." Ask your coach to hold you accountable to the positive action.</span></div>
+    <div class="trigger"><b>Momentum swings</b><span>Remind yourself it's part of the game — the next swing is yours. Increase your intensity to make it happen sooner.</span></div>
+    <div class="trigger"><b>Self-doubt</b><span>You were put on that team for a reason. Simplify: focus on one or two skills you know you can do well.</span></div>
+    <div class="trigger"><b>Missing shots</b><span>Create immediate impact elsewhere — defensive pressure, boxing out, assists. Ask your coach whether to keep shooting or look for the next pass.</span></div>
+    <div class="trigger"><b>Trash talk</b><span>Easy one — ignore it. Nothing annoys a trash-talker more than an opponent who stays locked into their own game.</span></div>
+    <div class="trigger"><b>Social media pressure</b><span>If it's affecting your game, remove it. Your number-one priority is your performance and contribution to the team.</span></div>
+    <div class="trigger"><b>Extended time on the bench</b><span>Stay mentally in the game: study your likely match-ups, read what's working in offence, support teammates with high energy. <strong>Never</strong> sit away from the team, go quiet or sulk.</span></div>
+    <details class="ainote">
+      <summary><span class="bot">🤖</span><span class="cap">AI Coach's Note · turn triggers into a wallet card</span><span class="chev">⌄</span></summary>
+      <div class="body">
+        <p>Nine triggers is a lot to recall mid-game. Have your athlete pick their <b>top three</b> (the situations that actually derail them) and write just those on a small card for the kit bag. Fewer, rehearsed responses beat a long list they can't reach for under adrenaline.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ CH 8 — COMMUNICATION TOOLS ============ -->
+<section class="reveal" id="ch8">
+  <div class="wrap">
+    <div class="chnum">Chapter 08</div>
+    <h2 class="chtitle">Communication Tools for Parents</h2>
+    <div class="divider"></div>
+    <p class="lead">A baseline of communication to support your junior athlete's mental fortitude — as a player and a teammate.</p>
+    <div class="card">
+      <div class="chnum">On the way to the game</div>
+      <div class="step"><div class="n">1</div><div><h4>"What do you do well?"</h4></div></div>
+      <div class="step"><div class="n">2</div><div><h4>"What do you need to pay attention to?"</h4></div></div>
+      <div class="step"><div class="n">3</div><div><h4>"What are two skills you can do well to create impact?"</h4></div></div>
+      <p class="muted" style="margin-top:14px">Be led by your athlete on timing — an opportunity will present itself. With consistency, these conversations become easier and "normal".</p>
+    </div>
+    <div class="card">
+      <div class="chnum">On the way home / during the week</div>
+      <ul class="clean">
+        <li>"What are you most proud of?" <span class="muted">(they must have at least one)</span></li>
+        <li>"What's something you need to work on?"</li>
+        <li>"How does that translate to training this week — how can I help?"</li>
+      </ul>
+      <p class="muted" style="margin-top:6px">Revisit these as checkpoints for whether actions match what was discussed. Teenage emotions are unpredictable, but keeping them connected to their commitment and goals makes it easier.</p>
+    </div>
+    <details class="ainote">
+      <summary><span class="bot">🤖</span><span class="cap">AI Coach's Note · the one rule that keeps them talking</span><span class="chev">⌄</span></summary>
+      <div class="body">
+        <p>Lead with <b>pride before critique</b>, always. Ask "what are you most proud of?" first, then "one thing to work on." And when they've had a rough game, resist coaching in the car — a simple <b>"I loved watching you play"</b> keeps the door open so the real conversation can happen later, on their terms.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ CH 9 — PERMANENT CHANGE ============ -->
+<section class="reveal" id="ch9">
+  <div class="wrap">
+    <div class="chnum">Chapter 09</div>
+    <h2 class="chtitle">How to Make Permanent Changes</h2>
+    <div class="divider"></div>
+    <p class="lead">The steps so far help you change your mindset in the moment. But how do you build that into a <strong>permanent mindset</strong> that happens automatically?</p>
+    <p class="muted">Some say 21 days, some say 60. My advice: keep doing it until you realise it's automatic — however long that takes, because it's different for everyone. It might take two games, or half a season of small improvements.</p>
+    <div class="card">
+      <div class="chnum" style="color:var(--good)">Signs you're building a stronger mindset</div>
+      <ul class="clean">
+        <li>Your <strong>reaction time reduces</strong> — to a play, a ref's call, a decision</li>
+        <li>You use the triggers <strong>more than you don't</strong> throughout the game</li>
+        <li>Your mind is <strong>focused on the team</strong>, not personal outcomes or mistakes</li>
+        <li>Coaches and teammates start to <strong>notice a positive change</strong></li>
+        <li>You can <strong>move quickly on</strong> to the next play</li>
+      </ul>
+    </div>
+    <p class="muted">At this point, actively practise positive self-talk based on the results you've noticed. A few key sentences before the game will help frame your mindset.</p>
+  </div>
+</section>
+
+<!-- ============ CH 10 — SELF-ASSESSMENT WORKSHOP ============ -->
+<section class="reveal" id="ch10">
+  <div class="wrap">
+    <div class="chnum">Chapter 10 · Workshop</div>
+    <h2 class="chtitle">Self-Assessment Workshop</h2>
+    <div class="divider"></div>
+    <p class="lead">Time to get specific. Ask your coach, mentor or parents for help here. You might not have three — but don't list more than three. That's too many to change at once. <span class="muted">(Everything you type saves on this device.)</span></p>
+    <div class="card">
+      <p style="margin:0 0 8px"><strong>Three negative behaviour / thought patterns in your game</strong> — ranked most-impactful first.</p>
+      <div class="field"><label>1 · Pattern &amp; how it affects my game</label><textarea data-save="wk1"></textarea></div>
+      <div class="field"><label>2 · Pattern &amp; how it affects my game</label><textarea data-save="wk2"></textarea></div>
+      <div class="field"><label>3 · Pattern &amp; how it affects my game</label><textarea data-save="wk3"></textarea></div>
+    </div>
+    <div class="card">
+      <p style="margin:0 0 8px"><strong>Your triggers.</strong> Using Chapters 6 &amp; 7, write a trigger you'll use to overcome each behaviour. If nothing fits, create your own — an action or thought that moves you on to the next play quickly.</p>
+      <div class="field"><label>Trigger for behaviour 1</label><textarea data-save="tr1"></textarea></div>
+      <div class="field"><label>Trigger for behaviour 2</label><textarea data-save="tr2"></textarea></div>
+      <div class="field"><label>Trigger for behaviour 3</label><textarea data-save="tr3"></textarea></div>
+    </div>
+    <div class="card">
+      <p style="margin:0 0 8px"><strong>Post-game assessment.</strong> What situation arose, which trigger you used, and how it impacted your game. Be honest — was the outcome positive or negative, and what could be different next time? <strong>Don't skip this step.</strong></p>
+      <div class="field"><label>Post-game reflection</label><textarea data-save="post" style="min-height:110px"></textarea></div>
+    </div>
+    <details class="ainote">
+      <summary><span class="bot">🤖</span><span class="cap">AI Coach's Note · a rhythm for the reflection</span><span class="chev">⌄</span></summary>
+      <div class="body">
+        <p>Reflection sticks when it's short and regular. Try <b>three lines after every game</b>: one win, one lesson, one focus for next time. A rolling log like this turns a season into visible progress — and makes the parent conversations in Chapter 8 effortless, because the athlete already knows their own answers.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ CH 11 — RESOURCES ============ -->
+<section class="reveal" id="ch11">
+  <div class="wrap">
+    <div class="chnum">Chapter 11</div>
+    <h2 class="chtitle">Resources</h2>
+    <div class="divider"></div>
+    <p class="lead">You now have a step-by-step process to strengthen your mind and impact on the court. Here's what supports the work.</p>
+    <div class="res-grid">
+      <div class="res card"><h4>📚 Books</h4><ul><li>The Mountain Is You — Brianna Wiest</li><li>Relentless — Tim Grover</li><li>Limitless — Jim Kwik</li><li>Atomic Habits — James Clear</li></ul></div>
+      <div class="res card"><h4>🎧 Podcasts</h4><ul><li>Mind the Game</li><li>The Mindset Mentor</li><li>The High Performance Podcast</li><li>Unlocking Us</li><li>The Rich Roll Podcast</li></ul></div>
+      <div class="res card"><h4>📓 Journal</h4><ul><li>I Choose Joy — Danelle Delgado <span class="muted">(on Amazon)</span></li></ul></div>
+      <div class="res card"><h4>🎵 Other</h4><ul><li>Binaural Beats on Spotify — search "Binaural Beats for Focus / Sleep / Relaxing" or whatever state you're after</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CH 12 — AI INTRO (NEW) ============ -->
+<section class="reveal ai-hero" id="ch12">
+  <div class="wrap">
+    <div class="chnum">Chapter 12 · New for 2026</div>
+    <h2 class="chtitle">Meet Your Assistant Coach: AI</h2>
+    <div class="divider"></div>
+    <p class="lead">You've just read a blueprint built on <strong>years</strong> of lived experience. Here's the exciting part: a tool now exists that can help you share it with more families, faster — without you learning to code a thing. Let's demystify it.</p>
+    <p class="muted"><strong>So what is AI, in plain English?</strong> Think of it as an incredibly well-read assistant who's available 24/7, never gets tired, and does exactly what you ask. You type what you want in normal words — like texting a really capable friend — and it helps you write, plan, brainstorm and organise. That's it. No tech background needed. If you can send a DM, you can use AI.</p>
+
+    <div class="card">
+      <div class="chnum" style="color:var(--good)">Four ways AI could help <em>your</em> coaching, starting today</div>
+      <div class="pillrow">
+        <span class="pill">📱 <b>Content:</b> turn one tip into a week of Instagram posts &amp; captions</span>
+        <span class="pill">💬 <b>DMs:</b> draft warm, on-brand replies to parents' questions</span>
+        <span class="pill">🏀 <b>Drills:</b> brainstorm pre-game routines for different ages</span>
+        <span class="pill">📖 <b>Resources:</b> spin this blueprint into worksheets &amp; email series</span>
+      </div>
+    </div>
+
+    <p class="muted"><strong>Why this matters for you specifically:</strong> the hardest part of growing something meaningful is finding the hours. AI gives you those hours back. The wisdom, the voice, the standards — that's all you. AI is just the assistant who helps you get it out into the world so more kids benefit.</p>
+
+    <div class="pull">You bring the <span>expertise</span>.<br>AI handles the <span>busywork</span>.</div>
+
+    <details class="ainote" open>
+      <summary><span class="bot">✨</span><span class="cap">Your first 5-minute AI experiment</span><span class="chev">⌄</span></summary>
+      <div class="body">
+        <p>Open a free AI chat tool and paste this: <b>"I'm a basketball mindset coach for junior athletes. Write me 5 short, encouraging Instagram captions about handling pressure on the court, in a warm and motivating voice."</b></p>
+        <p>Read what comes back. Tweak it to sound like <b>you</b>. That's the whole skill — you're the coach, AI is the intern taking your direction. Once it clicks, you'll wonder how you managed without it. 🚀</p>
+      </div>
+    </details>
+    <p class="muted" style="font-size:.86rem">This chapter was added by AI for the 2026 edition, as a friendly on-ramp — written to sit alongside Amanda's blueprint, not replace a word of it.</p>
+  </div>
+</section>
+
+<!-- ============ CLOSING / IG CTA ============ -->
+<section class="reveal" id="close">
+  <div class="wrap">
+    <div class="chnum" style="text-align:center">A note to finish</div>
+    <p class="lead" style="text-align:center;max-width:34ch;margin:0 auto 18px">I can't wait to hear how these tools make a positive impact on your — or your child's — game.</p>
+    <p class="muted" style="text-align:center">Using these same tools, my boys achieved goals reserved for the top kids in the State. When anyone asks how, I always say it was working on their resilience and mental fortitude — in games and through the physical work required. It seemed crazy to keep that to myself, so I created this book for you. <strong>The best kind of success is the one you share with others.</strong></p>
+  </div>
+</section>
+
+<div class="close-cta reveal">
+  <div class="chnum">Need more help?</div>
+  <h2>Let's Stay<br>Connected</h2>
+  <p class="muted" style="max-width:32ch;margin:0 auto">Have questions, or did this guide help? DM me on Instagram for more direction — and follow along for useful tips every week.</p>
+  <a class="ig-big" href="https://www.instagram.com/amanda_hodgson_/" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16M12 0C8.74 0 8.33.01 7.05.07c-1.28.06-2.15.26-2.91.56-.79.31-1.46.72-2.13 1.38A5.9 5.9 0 0 0 .63 4.14c-.3.76-.5 1.63-.56 2.91C.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.28.26 2.15.56 2.91.31.79.72 1.46 1.38 2.13.67.66 1.34 1.07 2.13 1.38.76.3 1.63.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.28-.06 2.15-.26 2.91-.56a5.9 5.9 0 0 0 2.13-1.38 5.9 5.9 0 0 0 1.38-2.13c.3-.76.5-1.63.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.28-.26-2.15-.56-2.91a5.9 5.9 0 0 0-1.38-2.13A5.9 5.9 0 0 0 19.86.63c-.76-.3-1.63-.5-2.91-.56C15.67.01 15.26 0 12 0z"/><path d="M12 5.84A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84zM12 16a4 4 0 1 1 4-4 4 4 0 0 1-4 4z"/><circle cx="18.41" cy="5.59" r="1.44"/></svg>
+    Follow @amanda_hodgson_
+  </a>
+  <div class="handle">Thank you &amp; good luck 🏀</div>
+</div>
+
+<div class="footer">
+  Junior Basketball Development Blueprint · 2026 Digital Edition<br>
+  © Amanda Hodgson · A guide for parents &amp; athletes
+</div>
+
+<!-- floating chapters button -->
+<button id="chBtn" aria-label="Open chapters menu">
+  <svg viewBox="0 0 24 24"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="14" y2="17"/></svg>
+  Chapters
+</button>
+
+<!-- bottom-sheet TOC -->
+<div id="sheet" role="dialog" aria-modal="true">
+  <div class="sheet-inner">
+    <div class="sheet-grab"></div>
+    <h3>Jump to a chapter</h3>
+    <a class="toc-item" data-go="top"><span class="tnum">—</span><span class="ttl">Cover</span></a>
+    <a class="toc-item" data-go="ch1"><span class="tnum">01</span><span class="ttl">The Advantage of a Strong Mental Game</span></a>
+    <a class="toc-item" data-go="ch2"><span class="tnum">02</span><span class="ttl">About Me &amp; My Sons</span></a>
+    <a class="toc-item" data-go="ch3"><span class="tnum">03</span><span class="ttl">Understanding the Pressure of a Game</span></a>
+    <a class="toc-item" data-go="ch4"><span class="tnum">04</span><span class="ttl">Effects of High-Pressure Situations</span></a>
+    <a class="toc-item" data-go="ch5"><span class="tnum">05</span><span class="ttl">The Ultimate Feeling of a Strong Mindset</span></a>
+    <a class="toc-item" data-go="ch6"><span class="tnum">06</span><span class="ttl">Building a Pre-Game Routine</span></a>
+    <a class="toc-item" data-go="ch7"><span class="tnum">07</span><span class="ttl">Confidence Through Challenge</span></a>
+    <a class="toc-item" data-go="ch8"><span class="tnum">08</span><span class="ttl">Communication Tools for Parents</span></a>
+    <a class="toc-item" data-go="ch9"><span class="tnum">09</span><span class="ttl">How to Make Permanent Changes</span></a>
+    <a class="toc-item" data-go="ch10"><span class="tnum">10</span><span class="ttl">Self-Assessment Workshop</span></a>
+    <a class="toc-item" data-go="ch11"><span class="tnum">11</span><span class="ttl">Resources</span></a>
+    <a class="toc-item" data-go="ch12"><span class="tnum">12</span><span class="ttl">Meet Your Assistant Coach: AI ✨</span></a>
+    <a class="toc-item ig" href="https://www.instagram.com/amanda_hodgson_/" target="_blank" rel="noopener"><span class="tnum">↗</span><span class="ttl">Follow @amanda_hodgson_ on Instagram</span></a>
+  </div>
+</div>
+
+<script>
+(function(){
+  // reading progress
+  var bar=document.getElementById('progress');
+  function onScroll(){
+    var h=document.documentElement;
+    var max=h.scrollHeight-h.clientHeight;
+    bar.style.width=(max>0?(h.scrollTop/max*100):0)+'%';
+  }
+  document.addEventListener('scroll',onScroll,{passive:true});onScroll();
+
+  // scroll reveal
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
+  },{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(function(el){io.observe(el);});
+
+  // chapters sheet
+  var sheet=document.getElementById('sheet');
+  document.getElementById('chBtn').addEventListener('click',function(){sheet.classList.add('open');});
+  sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.classList.remove('open');});
+  document.querySelectorAll('[data-go]').forEach(function(a){
+    a.addEventListener('click',function(){
+      sheet.classList.remove('open');
+      var t=document.getElementById(this.getAttribute('data-go'));
+      if(t)setTimeout(function(){t.scrollIntoView({behavior:'smooth'});},120);
+    });
+  });
+
+  // interactive checklists (persisted)
+  document.querySelectorAll('[data-check]').forEach(function(group){
+    var key='jbb:'+group.getAttribute('data-check');
+    var saved=JSON.parse(localStorage.getItem(key)||'[]');
+    var items=group.querySelectorAll('.check');
+    items.forEach(function(it,i){
+      if(saved.indexOf(i)>-1)it.classList.add('done');
+      it.addEventListener('click',function(){
+        it.classList.toggle('done');
+        var done=[];items.forEach(function(x,j){if(x.classList.contains('done'))done.push(j);});
+        localStorage.setItem(key,JSON.stringify(done));
+      });
+    });
+  });
+
+  // persist workshop text
+  document.querySelectorAll('[data-save]').forEach(function(t){
+    var key='jbb:'+t.getAttribute('data-save');
+    t.value=localStorage.getItem(key)||'';
+    t.addEventListener('input',function(){localStorage.setItem(key,t.value);});
+  });
+})();
+</script>
+</body>
+</html>
