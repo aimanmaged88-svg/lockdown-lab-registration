@@ -862,12 +862,30 @@ body.rmode *{animation:none!important;transition:none!important}
   function tone(freq,dur,type,vol,at){ if(!sndOn) return; const a=ac(); if(!a) return; const o=a.createOscillator(),g=a.createGain(); o.type=type||'sine'; o.frequency.value=freq; const t=a.currentTime+(at||0); g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(vol||.1,t+.012); g.gain.exponentialRampToValueAtTime(.0001,t+dur); o.connect(g).connect(master); o.start(t); o.stop(t+dur+.03); }
   function noise(dur,vol){ if(!sndOn) return; const a=ac(); if(!a) return; const n=a.createBufferSource(); const buf=a.createBuffer(1,a.sampleRate*dur,a.sampleRate); const d=buf.getChannelData(0); for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*(1-i/d.length); n.buffer=buf; const g=a.createGain(); g.gain.value=vol||.05; const f=a.createBiquadFilter(); f.type='highpass'; f.frequency.value=1400; n.connect(f).connect(g).connect(master); n.start(); }
   function sweep(f1,f2,dur,type,vol,at){ if(!sndOn) return; const a=ac(); if(!a) return; const o=a.createOscillator(),g=a.createGain(); o.type=type||'sine'; const t=a.currentTime+(at||0); o.frequency.setValueAtTime(f1,t); o.frequency.exponentialRampToValueAtTime(f2,t+dur); g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(vol||.1,t+.015); g.gain.exponentialRampToValueAtTime(.0001,t+dur); o.connect(g).connect(master); o.start(t); o.stop(t+dur+.03); }
+  /* swish — ball through the net: bright noise burst sweeping down (message SENT) */
+  function swish(vol,at){ if(!sndOn) return; const a=ac(); if(!a) return; const t=a.currentTime+(at||0); const dur=.24;
+    const n=a.createBufferSource(); const buf=a.createBuffer(1,Math.ceil(a.sampleRate*dur),a.sampleRate); const d=buf.getChannelData(0);
+    for(let i=0;i<d.length;i++){ const k=i/d.length; d[i]=(Math.random()*2-1)*Math.pow(1-k,1.7); }
+    n.buffer=buf; const bp=a.createBiquadFilter(); bp.type='bandpass'; bp.Q.value=.7;
+    bp.frequency.setValueAtTime(7000,t); bp.frequency.exponentialRampToValueAtTime(2400,t+dur);
+    const g=a.createGain(); g.gain.setValueAtTime(vol||.15,t); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    n.connect(bp).connect(g).connect(master); n.start(t); n.stop(t+dur+.02); }
+  /* dribble — one ball bounce: pitched thud dropping fast + court slap (message RECEIVED) */
+  function bounce(freq,vol,at){ if(!sndOn) return; const a=ac(); if(!a) return; const t=a.currentTime+(at||0);
+    const o=a.createOscillator(),g=a.createGain(); o.type='sine';
+    o.frequency.setValueAtTime(freq,t); o.frequency.exponentialRampToValueAtTime(freq*.46,t+.09);
+    g.gain.setValueAtTime(.0001,t); g.gain.exponentialRampToValueAtTime(vol||.14,t+.006); g.gain.exponentialRampToValueAtTime(.0001,t+.14);
+    o.connect(g).connect(master); o.start(t); o.stop(t+.17);
+    const bd=.028; const n=a.createBufferSource(); const buf=a.createBuffer(1,Math.ceil(a.sampleRate*bd),a.sampleRate); const dd=buf.getChannelData(0);
+    for(let i=0;i<dd.length;i++)dd[i]=(Math.random()*2-1)*(1-i/dd.length); n.buffer=buf;
+    const lp=a.createBiquadFilter(); lp.type='lowpass'; lp.frequency.value=1100; const ng=a.createGain(); ng.gain.value=(vol||.14)*.5;
+    n.connect(lp).connect(ng).connect(master); n.start(t); }
   const S={
     tick:()=>tone(200,.05,'triangle',.05),
     pill:()=>tone(340,.06,'triangle',.06),
     like:()=>{tone(880,.07,'sine',.08);tone(1320,.09,'sine',.05,.04);},
-    msg:()=>tone(720,.09,'sine',.08),
-    recv:()=>{tone(420,.1,'sine',.07);tone(560,.12,'sine',.05,.05);},
+    msg:()=>swish(.16),
+    recv:()=>{bounce(235,.15);bounce(300,.09,.12);},
     toast:()=>tone(660,.09,'triangle',.06),
     err:()=>{tone(180,.16,'sawtooth',.08);tone(120,.2,'sawtooth',.06,.05);},
     checkin:()=>{tone(659,.16,'sine',.16);tone(988,.24,'triangle',.11,.09);noise(.12,.03);},
@@ -1027,7 +1045,12 @@ body.rmode *{animation:none!important;transition:none!important}
           else if(used){ toast(used.friend_name+' is in the Lab 🔓'); notify('sessions','Your mate\'s in 🔓',used.friend_name+' just used your code.'); } }
       }
       else {
-        if($('[data-page="cplayer"]').classList.contains('on') && curPid){ await loadDetail(curPid,true); }
+        if($('[data-page="cplayer"]').classList.contains('on') && curPid){
+          const prevCM=(CD&&CD.messages)?CD.messages.length:0;
+          await loadDetail(curPid,true);
+          const cm=(CD&&CD.messages)||[];
+          if(cm.length>prevCM && cm[cm.length-1] && !cm[cm.length-1].from_coach){ S.recv(); haptic(20); toast('New message 💬'); notify('player','New message 💬',cm[cm.length-1].text); }
+        }
         else { ROSTER=await api({action:'roster',code:sess.code}); renderRoster(true); }
       }
     }catch(e){ /* silent */ }
@@ -1283,7 +1306,7 @@ body.rmode *{animation:none!important;transition:none!important}
   $('#qHw').addEventListener('click',async()=>{ const t=prompt('Homework for this player:'); if(!t)return; try{ await api({action:'hw_add',code:sess.code,pid:curPid,text:t}); toast('Homework sent 📋'); }catch(e){toast(e.message,true);} });
   $('#qShout').addEventListener('click',async()=>{ const nm=(CD&&CD.profile)?CD.profile.name:'this player'; try{ await api({action:'cpost',code:sess.code,text:'⭐ Shoutout to '+nm+' — putting in real work. The Lab sees you.'}); toast('Shoutout posted ⭐'); }catch(e){toast(e.message,true);} });
   $('#intelAdd').addEventListener('click',async()=>{ const t=$('#intelText').value.trim(); if(!t)return; busy($('#intelAdd'),1); try{ await api({action:'intel_add',code:sess.code,pid:curPid,text:t}); $('#intelText').value=''; toast('Intel locked 🔒'); loadDetail(curPid,true);}catch(e){toast(e.message,true);} busy($('#intelAdd'),0,'Add Intel 🔒'); });
-  $('#cMsgBtn').addEventListener('click',async()=>{ const v=$('#cMsgInput').value.trim(); if(!v)return; busy($('#cMsgBtn'),1); try{ const r=await api({action:'cmsg',code:sess.code,pid:curPid,text:v}); $('#cMsgInput').value=''; CD.messages=r.messages; loadDetail(curPid,true);}catch(e){toast(e.message,true);} busy($('#cMsgBtn'),0,'Send'); });
+  $('#cMsgBtn').addEventListener('click',async()=>{ const v=$('#cMsgInput').value.trim(); if(!v)return; S.msg(); haptic(15); busy($('#cMsgBtn'),1); try{ const r=await api({action:'cmsg',code:sess.code,pid:curPid,text:v}); $('#cMsgInput').value=''; CD.messages=r.messages; loadDetail(curPid,true);}catch(e){toast(e.message,true);} busy($('#cMsgBtn'),0,'Send'); });
 
   /* ---------- MAKE IT YOURS: settings ---------- */
   let lastPage='home';
