@@ -35,6 +35,7 @@ export function MobileTabBar() {
     roster: "Roster",
     compliance: "Comply",
     billing: "Billing",
+    marketplace: "Find",
     assistant: "Assistant",
     learning: "Learn",
     community: "Places",

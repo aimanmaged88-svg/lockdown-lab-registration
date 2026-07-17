@@ -19,6 +19,7 @@ compounds in value over years and makes NDIS reporting a button, not a scramble.
 | **Easy Compliance** | "NDIS admin, done for you": audit prep + document gathering, **rostering, invoicing, payslips**. From $399/mo. | `/roster`, `/compliance`, `/billing` — all built, all outcome-linked. Payslips + claims from one source. |
 | **Checkbase** | "Audit-ready compliance software": worker records, participant files, SIL houses, **audit packs**, compliance dashboard (readiness %, by-scope, due-in-30-days). | `/compliance` mirrors their dashboard **and** adds "compliance as a by-product of care" — evidence auto-generated from everyday records. |
 | **ShiftCare / Brevity / Splose** (incumbents) | End-to-end care management: rostering (drag-drop, split shifts, availability), NDIS invoicing (batch/bulk claims), compliance flagging, caregiver app. | Match on features; win on: participant-first Care DNA + Timeline, explainable AI, family portal, one-source billing, and a premium App-Store-grade experience. |
+| **MySolas** | Two-sided NDIS **marketplace**: participants search Providers / Accommodation / Jobs / Market by category + postcode. "Grow your NDIS business." | `/marketplace` — discovery **matched by Care DNA**, not keyword+postcode. Every provider, worker, SIL home and activity carries a fit score and "why this fits" reasons from the person's real needs. Connecting shares a fit summary only, consent-gated. |
 
 ## Feature parity checklist (surface-level now, deepen later)
 - [x] Rostering — weekly board, AI gap-fill, credential/award checks, clash prevention

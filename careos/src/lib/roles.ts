@@ -80,13 +80,13 @@ export function getRole(id: Role): RoleDefinition {
 
 /** Which navigation sections each role can see. */
 export const rolePermissions: Record<Role, string[]> = {
-  parent: ["family", "timeline", "learning", "notifications", "settings", "help"],
-  participant: ["participants", "timeline", "learning", "community", "notifications", "settings", "help"],
-  "support-worker": ["dashboard", "participants", "shift", "timeline", "roster", "assistant", "learning", "community", "notifications", "settings", "help"],
-  "team-leader": ["dashboard", "participants", "shift", "timeline", "roster", "compliance", "billing", "assistant", "learning", "community", "reports", "notifications", "settings", "help"],
+  parent: ["family", "timeline", "marketplace", "learning", "notifications", "settings", "help"],
+  participant: ["participants", "timeline", "marketplace", "learning", "community", "notifications", "settings", "help"],
+  "support-worker": ["dashboard", "participants", "shift", "timeline", "roster", "assistant", "marketplace", "learning", "community", "notifications", "settings", "help"],
+  "team-leader": ["dashboard", "participants", "shift", "timeline", "roster", "compliance", "billing", "assistant", "marketplace", "learning", "community", "reports", "notifications", "settings", "help"],
   therapist: ["dashboard", "participants", "timeline", "assistant", "learning", "reports", "notifications", "settings", "help"],
-  "provider-admin": ["provider", "dashboard", "participants", "timeline", "roster", "compliance", "billing", "assistant", "learning", "community", "reports", "notifications", "settings", "help"],
-  ceo: ["executive", "provider", "participants", "timeline", "compliance", "billing", "reports", "notifications", "settings", "help"],
+  "provider-admin": ["provider", "dashboard", "participants", "timeline", "roster", "compliance", "billing", "assistant", "marketplace", "learning", "community", "reports", "notifications", "settings", "help"],
+  ceo: ["executive", "provider", "participants", "timeline", "compliance", "billing", "marketplace", "reports", "notifications", "settings", "help"],
   "system-admin": ["dashboard", "participants", "roster", "compliance", "billing", "reports", "notifications", "settings", "help"],
 };
 
