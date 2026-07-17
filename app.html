@@ -1408,10 +1408,15 @@ body.rmode *{animation:none!important;transition:none!important}
     $('#invList').innerHTML=list.map(i=>{
       if(i.status==='pending') return '<div class="intelnote"><span>⏳</span><span><b style="color:var(--text)">'+esc(i.friend_name)+'</b> — waiting on UNC\'s sign-off</span></div>';
       if(i.status==='denied') return '<div class="intelnote"><span>🚫</span><span><b style="color:var(--text)">'+esc(i.friend_name)+'</b> — not this time</span></div>';
-      return '<div class="intelnote" style="align-items:center"><span>✅</span><span style="flex:1"><b style="color:var(--text)">'+esc(i.friend_name)+'</b> — cleared · code <b class="mono" style="color:var(--accent)">'+esc(i.code||'')+'</b></span><button class="btn btn-g btn-sm" data-share="'+esc(i.code||'')+'" data-fname="'+esc(i.friend_name)+'">Share 🎟</button></div>';
+      return '<div class="intelnote" style="align-items:center;flex-wrap:wrap"><span>✅</span><span style="flex:1;min-width:140px"><b style="color:var(--text)">'+esc(i.friend_name)+'</b> — cleared · code <b class="mono" style="color:var(--accent)">'+esc(i.code||'')+'</b></span><button class="btn btn-sm" data-wa="'+esc(i.code||'')+'" style="background:linear-gradient(180deg,#2fdf70,#25d366);color:#04340f;font-family:var(--fd);letter-spacing:1px">WhatsApp ▷</button><button class="btn btn-g btn-sm" data-share="'+esc(i.code||'')+'">⋯</button></div>';
     }).join('')||'<p style="color:var(--dim);font-size:12.5px">The Lab grows by invite only. Drop a mate\'s name — if UNC clears them, you get a code to send.</p>';
+    const invText=code=>'You’re invited to Lockdown Lab Live 🔒 Invite-only — I vouched for you. Code: '+code+'\nJoin here: '+((location.origin&&location.origin.startsWith('http'))?location.origin:'https://lockdown-lab-registration.netlify.app')+'/app.html';
+    document.querySelectorAll('[data-wa]').forEach(b=>b.addEventListener('click',()=>{
+      window.open('https://wa.me/?text='+encodeURIComponent(invText(b.dataset.wa)),'_blank');
+      S.like(); haptic(12);
+    }));
     document.querySelectorAll('[data-share]').forEach(b=>b.addEventListener('click',async()=>{
-      const text='You\'re invited to Lockdown Lab Live 🔒 Invite code: '+b.dataset.share+' — join here: '+location.origin+'/app.html';
+      const text=invText(b.dataset.share);
       try{
         if(navigator.share) await navigator.share({title:'Lockdown Lab Live',text});
         else { await navigator.clipboard.writeText(text); toast('Invite copied 📋'); }
