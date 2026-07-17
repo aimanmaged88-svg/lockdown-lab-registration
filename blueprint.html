@@ -11,24 +11,72 @@
 <meta property="og:type" content="book" />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet">
+<script>try{var _t=localStorage.getItem('jbb:theme');if(_t)document.documentElement.setAttribute('data-theme',_t);}catch(e){}</script>
 <style>
+/* ===== THEME SYSTEM — default = "Blueprint" (Amanda's original look) ===== */
 :root{
+  --bg:#f6f4ee; --bg2:#ffffff;
+  --text:#1a1c30; --muted:#54586e; --dim:#9195a8;
+  --accent:#3b30c9; --accent-hi:#5a4ef2; --accent-soft:rgba(59,48,201,.11); --accent-glow:rgba(59,48,201,.30);
+  --good:#0f9d58; --good-soft:rgba(15,157,88,.13);
+  --glass:rgba(59,48,201,.045); --line:rgba(26,28,48,.13);
+  --halo:rgba(59,48,201,.12);
+  --note-bg:linear-gradient(180deg,rgba(59,48,201,.08),rgba(59,48,201,.02));
+  --title-grad:linear-gradient(180deg,#1a1c30 26%,#3b30c9);
+  --on-accent:#ffffff;
+  --input-bg:rgba(26,28,48,.035);
+  --fd:'Playfair Display',Georgia,'Times New Roman',serif;
+  --fb:'Manrope',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --disp-tt:none; --disp-weight:800;
+  --r:22px;
+}
+/* Royal Court — deep navy + electric blue, serif */
+:root[data-theme="royal"]{
+  --bg:#0a0a1f; --bg2:#12122e;
+  --text:#eef0ff; --muted:#a6a8c8; --dim:#6b6d8f;
+  --accent:#5a4ef2; --accent-hi:#8b82ff; --accent-soft:rgba(122,110,255,.18); --accent-glow:rgba(90,78,242,.45);
+  --good:#3ddc84; --good-soft:rgba(61,220,132,.15);
+  --glass:rgba(255,255,255,.05); --line:rgba(255,255,255,.12);
+  --halo:rgba(90,78,242,.22);
+  --note-bg:linear-gradient(180deg,rgba(122,110,255,.12),rgba(122,110,255,.03));
+  --title-grad:linear-gradient(180deg,#ffffff 22%,#8b82ff);
+  --on-accent:#0a0a1f; --input-bg:rgba(0,0,0,.3);
+  --fd:'Playfair Display',Georgia,serif; --disp-tt:none; --disp-weight:800;
+}
+/* Court Night — dark charcoal + orange, condensed sport type */
+:root[data-theme="court"]{
   --bg:#050506; --bg2:#0b0b0d;
   --text:#f6f4f1; --muted:#a09a92; --dim:#6d6861;
   --accent:#ff6b00; --accent-hi:#ff8a2b; --accent-soft:rgba(255,107,0,.15); --accent-glow:rgba(255,107,0,.38);
   --good:#30d158; --good-soft:rgba(48,209,88,.14);
   --glass:rgba(255,255,255,.055); --line:rgba(255,255,255,.11);
-  --fd:'Bebas Neue',"Arial Narrow",Arial,sans-serif;
-  --fb:'Manrope',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  --r:22px;
+  --halo:rgba(255,107,0,.13);
+  --note-bg:linear-gradient(180deg,rgba(255,107,0,.09),rgba(255,107,0,.03));
+  --title-grad:linear-gradient(180deg,#fff 30%,#c9c4bd);
+  --on-accent:#100800; --input-bg:rgba(0,0,0,.35);
+  --fd:'Bebas Neue',"Arial Narrow",Arial,sans-serif; --disp-tt:uppercase; --disp-weight:400;
+}
+/* Hardwood — warm cream + amber, serif */
+:root[data-theme="hardwood"]{
+  --bg:#f4ece0; --bg2:#fffaf3;
+  --text:#2a2016; --muted:#6e604f; --dim:#a8977f;
+  --accent:#c85a12; --accent-hi:#e8862f; --accent-soft:rgba(200,90,18,.12); --accent-glow:rgba(200,90,18,.30);
+  --good:#2f8f4e; --good-soft:rgba(47,143,78,.14);
+  --glass:rgba(120,80,30,.05); --line:rgba(60,40,20,.15);
+  --halo:rgba(200,90,18,.14);
+  --note-bg:linear-gradient(180deg,rgba(200,90,18,.09),rgba(200,90,18,.02));
+  --title-grad:linear-gradient(180deg,#2a2016 26%,#c05a10);
+  --on-accent:#fffaf3; --input-bg:rgba(60,40,20,.04);
+  --fd:'Playfair Display',Georgia,serif; --disp-tt:none; --disp-weight:800;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{scroll-behavior:smooth}
 body{
   margin:0;font-family:var(--fb);background:var(--bg);color:var(--text);
   line-height:1.6;overflow-x:hidden;
-  background-image:radial-gradient(120% 60% at 50% -10%,rgba(255,107,0,.13),transparent 60%);
+  background-image:radial-gradient(120% 60% at 50% -10%,var(--halo),transparent 60%);
+  transition:background-color .3s ease,color .3s ease;
   background-attachment:fixed;
 }
 img{max-width:100%}
@@ -45,20 +93,20 @@ section{padding:64px 0;position:relative}
 .reveal.in{opacity:1;transform:none}
 
 /* type */
-h1,h2,h3{font-family:var(--fd);font-weight:400;letter-spacing:.01em;line-height:.98;margin:0}
+h1,h2,h3{font-family:var(--fd);font-weight:var(--disp-weight);letter-spacing:.01em;line-height:1;margin:0}
 .eyebrow{font-family:var(--fd);color:var(--accent);letter-spacing:.22em;font-size:.82rem;text-transform:uppercase;margin:0 0 14px}
 p{margin:0 0 16px}
-.lead{font-size:1.13rem;color:#e9e6e1}
+.lead{font-size:1.13rem;color:var(--text)}
 .muted{color:var(--muted)}
-strong{color:#fff;font-weight:700}
+strong{color:var(--text);font-weight:700}
 
 /* HERO */
 .hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;text-align:center;padding:80px 20px 48px;position:relative}
 .hero .badge{display:inline-flex;align-items:center;gap:8px;align-self:center;
   font-family:var(--fd);letter-spacing:.18em;font-size:.72rem;text-transform:uppercase;color:var(--accent-hi);
   border:1px solid var(--line);background:var(--glass);padding:7px 15px;border-radius:999px;margin-bottom:26px}
-.hero h1{font-size:clamp(2.6rem,13.5vw,5.4rem);text-transform:uppercase;
-  background:linear-gradient(180deg,#fff 30%,#c9c4bd);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero h1{font-size:clamp(2.7rem,13.5vw,5.6rem);text-transform:var(--disp-tt);line-height:.98;
+  background:var(--title-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
 .hero .sub{max-width:30ch;margin:20px auto 0;font-size:1.12rem;color:var(--muted)}
 .hero .author{margin-top:30px;font-family:var(--fd);letter-spacing:.16em;font-size:1.15rem}
 .hero .author span{color:var(--accent)}
@@ -76,7 +124,7 @@ strong{color:#fff;font-weight:700}
 
 /* chapter number rail */
 .chnum{font-family:var(--fd);font-size:.9rem;letter-spacing:.2em;color:var(--accent);text-transform:uppercase;margin-bottom:10px}
-.chtitle{font-size:clamp(2.1rem,8vw,3.2rem);text-transform:uppercase;margin-bottom:22px}
+.chtitle{font-size:clamp(2.1rem,8vw,3.3rem);text-transform:var(--disp-tt);margin-bottom:22px}
 .divider{height:1px;background:linear-gradient(90deg,var(--accent),transparent);margin:0 0 26px;width:120px}
 
 /* cards / lists */
@@ -113,13 +161,12 @@ ul.clean li::before{content:"";position:absolute;left:4px;top:17px;width:8px;hei
 /* input fields for workshop */
 .field{margin:14px 0}
 .field label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:6px;letter-spacing:.02em}
-.field textarea{width:100%;background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:14px;
+.field textarea{width:100%;background:var(--input-bg);border:1px solid var(--line);border-radius:14px;
   color:var(--text);font-family:var(--fb);font-size:.98rem;padding:12px 14px;resize:vertical;min-height:56px}
 .field textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
 
 /* AI COACH NOTE */
-.ainote{border:1px solid var(--accent-soft);background:
-  linear-gradient(180deg,rgba(255,107,0,.09),rgba(255,107,0,.03));
+.ainote{border:1px solid var(--accent-soft);background:var(--note-bg);
   border-radius:var(--r);margin:24px 0;overflow:hidden}
 .ainote summary{list-style:none;cursor:pointer;padding:16px 20px;display:flex;align-items:center;gap:12px;font-weight:700}
 .ainote summary::-webkit-details-marker{display:none}
@@ -133,12 +180,12 @@ ul.clean li::before{content:"";position:absolute;left:4px;top:17px;width:8px;hei
 .ainote .body b{color:var(--accent-hi)}
 
 /* quote */
-.pull{font-family:var(--fd);font-size:clamp(1.9rem,7vw,2.8rem);line-height:1.02;text-transform:uppercase;
-  color:#fff;text-align:center;padding:20px 0;letter-spacing:.01em}
+.pull{font-family:var(--fd);font-size:clamp(1.9rem,7vw,2.8rem);line-height:1.05;text-transform:var(--disp-tt);
+  color:var(--text);text-align:center;padding:20px 0;letter-spacing:.01em}
 .pull span{color:var(--accent)}
 
 /* AI intro section special bg */
-.ai-hero{background:radial-gradient(120% 80% at 50% 0%,rgba(255,107,0,.14),transparent 60%)}
+.ai-hero{background:radial-gradient(120% 80% at 50% 0%,var(--halo),transparent 60%)}
 .pillrow{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}
 .pill{border:1px solid var(--line);background:var(--glass);border-radius:999px;padding:9px 15px;font-size:.9rem;font-weight:600}
 .pill b{color:var(--accent-hi)}
@@ -151,7 +198,7 @@ ul.clean li::before{content:"";position:absolute;left:4px;top:17px;width:8px;hei
 
 /* CLOSING CTA */
 .close-cta{text-align:center;padding:88px 20px}
-.close-cta h2{font-size:clamp(2.4rem,10vw,4rem);text-transform:uppercase;margin-bottom:18px}
+.close-cta h2{font-size:clamp(2.4rem,10vw,4rem);text-transform:var(--disp-tt);margin-bottom:18px}
 .ig-big{display:inline-flex;align-items:center;gap:12px;text-decoration:none;
   background:linear-gradient(135deg,#feda75 0%,#fa7e1e 25%,#d62976 50%,#962fbf 75%,#4f5bd5 100%);
   color:#fff;font-weight:800;font-size:1.12rem;padding:17px 30px;border-radius:999px;margin-top:14px;
@@ -164,10 +211,10 @@ ul.clean li::before{content:"";position:absolute;left:4px;top:17px;width:8px;hei
 /* floating chapters button + sheet */
 #chBtn{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:55;
   display:flex;align-items:center;gap:8px;border:none;cursor:pointer;
-  background:var(--accent);color:#100800;font-family:var(--fd);letter-spacing:.12em;font-size:.9rem;text-transform:uppercase;
+  background:var(--accent);color:var(--on-accent);font-family:var(--fd);letter-spacing:.12em;font-size:.9rem;text-transform:uppercase;
   padding:13px 18px;border-radius:999px;box-shadow:0 10px 30px var(--accent-glow);transition:transform .18s}
 #chBtn:active{transform:scale(.95)}
-#chBtn svg{width:16px;height:16px;stroke:#100800;stroke-width:2.4;fill:none}
+#chBtn svg{width:16px;height:16px;stroke:var(--on-accent);stroke-width:2.4;fill:none}
 #sheet{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);
   opacity:0;pointer-events:none;transition:opacity .25s}
 #sheet.open{opacity:1;pointer-events:auto}
@@ -183,6 +230,29 @@ ul.clean li::before{content:"";position:absolute;left:4px;top:17px;width:8px;hei
 .toc-item .ttl{font-weight:600;font-size:1rem}
 .toc-item.ig{color:#fff;background:linear-gradient(135deg,rgba(214,41,118,.22),rgba(79,91,213,.16));margin-top:6px}
 .toc-item.ig .tnum{color:#e46}
+
+/* theme picker */
+#themeWrap{position:fixed;top:calc(12px + env(safe-area-inset-top));right:14px;z-index:58}
+#themeBtn{width:46px;height:46px;border-radius:50%;border:1px solid var(--line);cursor:pointer;
+  background:var(--bg2);color:var(--accent);display:grid;place-items:center;
+  box-shadow:0 6px 20px rgba(0,0,0,.18);transition:transform .18s}
+#themeBtn:active{transform:scale(.92)}
+#themeBtn svg{width:22px;height:22px;fill:currentColor}
+#themeMenu{position:absolute;top:56px;right:0;width:214px;background:var(--bg2);border:1px solid var(--line);
+  border-radius:16px;padding:8px;box-shadow:0 18px 46px rgba(0,0,0,.3);
+  opacity:0;transform:translateY(-8px) scale(.97);pointer-events:none;transition:all .2s ease}
+#themeMenu.open{opacity:1;transform:none;pointer-events:auto}
+.tm-title{font-family:var(--fd);letter-spacing:.14em;text-transform:uppercase;font-size:.72rem;color:var(--muted);padding:6px 10px 8px}
+.tm-opt{display:flex;align-items:center;gap:11px;width:100%;border:none;background:none;cursor:pointer;
+  color:var(--text);font-family:var(--fb);font-weight:600;font-size:.95rem;text-align:left;padding:10px 10px;border-radius:11px}
+.tm-opt:hover{background:var(--glass)}
+.tm-opt.cur{background:var(--accent-soft)}
+.tm-opt em{color:var(--muted);font-style:normal;font-weight:500;font-size:.82rem}
+.tm-opt .sw{display:inline-flex;flex:none}
+.tm-opt .sw i{width:17px;height:17px;border-radius:50%;border:1.5px solid rgba(255,255,255,.6);box-shadow:0 0 0 1px var(--line)}
+.tm-opt .sw i+i{margin-left:-7px}
+.tm-opt .chk{margin-left:auto;color:var(--accent);opacity:0;font-weight:800}
+.tm-opt.cur .chk{opacity:1}
 
 @media (min-width:720px){ section{padding:80px 0} .res-grid{grid-template-columns:1fr 1fr} }
 </style>
@@ -219,6 +289,7 @@ ul.clean li::before{content:"";position:absolute;left:4px;top:17px;width:8px;hei
       <summary><span class="bot">🤖</span><span class="cap">AI Coach's Note · how to get the most from this book</span><span class="chev">⌄</span></summary>
       <div class="body">
         <p>This edition is <b>interactive</b> — tap the <b>Chapters</b> button (bottom-right) to jump anywhere, tick off the checklists as you go, and type straight into the workshop pages. Your progress and answers save on <b>this device</b> automatically.</p>
+        <p>Prefer a different look? Tap the <b>🎨 palette</b> button (top-right) to recolour the whole book — the original <b>Blueprint</b> style, a deep <b>Royal Court</b>, a dark <b>Court Night</b>, or warm <b>Hardwood</b>. Your choice is remembered.</p>
         <p>New to this 2026 version: a plain-English <b>intro to AI</b> for parents and coaches near the end, and short "AI Coach's Notes" like this one that add a practical tip to each chapter. They're optional extras — Amanda's words are the blueprint; these just help you action them.</p>
       </div>
     </details>
@@ -517,6 +588,20 @@ ul.clean li::before{content:"";position:absolute;left:4px;top:17px;width:8px;hei
   © Amanda Hodgson · A guide for parents &amp; athletes
 </div>
 
+<!-- theme picker -->
+<div id="themeWrap">
+  <button id="themeBtn" aria-label="Change colour theme" title="Change colour theme">
+    <svg viewBox="0 0 24 24"><path d="M12 2C6.49 2 2 6.49 2 12s4.49 10 10 10c.93 0 1.68-.75 1.68-1.68 0-.44-.17-.83-.44-1.13-.26-.29-.43-.68-.43-1.11 0-.93.75-1.68 1.68-1.68H16c3.31 0 6-2.69 6-6 0-4.96-4.49-8.72-10-8.72zM6.5 13a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3-4a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3 4a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg>
+  </button>
+  <div id="themeMenu" role="menu">
+    <div class="tm-title">Colour theme</div>
+    <button class="tm-opt" data-theme="blueprint"><span class="sw"><i style="background:#3b30c9"></i><i style="background:#f6f4ee"></i></span>Blueprint <em>· original</em><span class="chk">✓</span></button>
+    <button class="tm-opt" data-theme="royal"><span class="sw"><i style="background:#5a4ef2"></i><i style="background:#0a0a1f"></i></span>Royal Court<span class="chk">✓</span></button>
+    <button class="tm-opt" data-theme="court"><span class="sw"><i style="background:#ff6b00"></i><i style="background:#050506"></i></span>Court Night<span class="chk">✓</span></button>
+    <button class="tm-opt" data-theme="hardwood"><span class="sw"><i style="background:#c85a12"></i><i style="background:#f4ece0"></i></span>Hardwood<span class="chk">✓</span></button>
+  </div>
+</div>
+
 <!-- floating chapters button -->
 <button id="chBtn" aria-label="Open chapters menu">
   <svg viewBox="0 0 24 24"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="14" y2="17"/></svg>
@@ -561,6 +646,23 @@ ul.clean li::before{content:"";position:absolute;left:4px;top:17px;width:8px;hei
     es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}});
   },{threshold:.12});
   document.querySelectorAll('.reveal').forEach(function(el){io.observe(el);});
+
+  // theme picker
+  var root=document.documentElement, TKEY='jbb:theme';
+  function setTheme(t){
+    root.setAttribute('data-theme',t);
+    try{localStorage.setItem(TKEY,t);}catch(e){}
+    document.querySelectorAll('.tm-opt').forEach(function(o){o.classList.toggle('cur',o.getAttribute('data-theme')===t);});
+  }
+  var stored='blueprint';try{stored=localStorage.getItem(TKEY)||'blueprint';}catch(e){}
+  setTheme(stored);
+  var tBtn=document.getElementById('themeBtn'), tMenu=document.getElementById('themeMenu');
+  tBtn.addEventListener('click',function(e){e.stopPropagation();tMenu.classList.toggle('open');});
+  tMenu.addEventListener('click',function(e){e.stopPropagation();});
+  document.addEventListener('click',function(){tMenu.classList.remove('open');});
+  document.querySelectorAll('.tm-opt').forEach(function(o){
+    o.addEventListener('click',function(){setTheme(o.getAttribute('data-theme'));tMenu.classList.remove('open');});
+  });
 
   // chapters sheet
   var sheet=document.getElementById('sheet');
