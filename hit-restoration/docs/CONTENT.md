@@ -48,8 +48,8 @@ design brief, and T&C draft. Pages must use this copy — do not invent pricing 
   2. Card arrives — condition + value confirmed; $10 inspection fee charged.
   3. Firm restoration quote issued on confirmed value — approve & pay before any work begins.
   4. Restoration carried out.
-  5. If grading: grading submission fee charged before the card ships out.
-  6. Card returns graded: final 4% upcharge charged; card ships back once paid.
+  5. If grading: the flat all-in PSA fee (by chosen speed) charged before the card ships out.
+  6. Card returns graded: any tier-jump difference + $20 admin settled; card ships back once paid.
 - Store shipping (prototype assumption): $9.95 flat, free over $99 — TBC.
 
 ## The 12 order stages (customer-facing labels — identical for customers and staff)
