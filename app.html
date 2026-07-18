@@ -542,11 +542,12 @@ body.rmode *{animation:none!important;transition:none!important}
       <div class="sess"><div class="dt"><b>THU</b><span>7–8pm</span></div><div class="inf"><b>Live Session · The Lab</b><span>Zoom · link drops in Coach Chat</span></div><span class="chip live"><span class="d"></span>Weekly</span></div>
       <div class="sess"><div class="dt"><b>SAT</b><span>AM</span></div><div class="inf"><b>Morning Workout Group</b><span>Details in the community feed</span></div><span class="chip">Set</span></div>
       <div class="sess"><div class="dt"><b>1·1</b><span>Book</span></div><div class="inf"><b>1-on-1 with Coach</b><span>Message coach to lock a slot</span></div><button class="btn btn-g btn-sm" id="bookBtn">Message</button></div>
-      <div class="card lock" style="margin-top:16px">
-        <span class="cl">Find A Game</span>
+      <div class="card" style="margin-top:16px">
+        <span class="cl">Find a game · 971 Sydney courts mapped</span>
         <h3>📍 Court Finder</h3>
-        <p style="color:var(--muted);font-size:13px">Live map of courts + who's running where, fed by the squad.</p>
-        <div class="overlay"><span class="chip pro">🔒 PRO · Coming Soon</span></div>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:10px">Every court in the city, in your pocket. Founding squad only.</p>
+        <button class="btn btn-g btn-block" id="cfBtn">Find courts near me 📍</button>
+        <div id="cfList" style="margin-top:10px"></div>
       </div>
       <div class="card lock">
         <span class="cl">Pick-Up</span>
@@ -1346,6 +1347,33 @@ body.rmode *{animation:none!important;transition:none!important}
   $('#qShout').addEventListener('click',async()=>{ const nm=(CD&&CD.profile)?CD.profile.name:'this player'; try{ await api({action:'cpost',code:sess.code,text:'⭐ Shoutout to '+nm+' — putting in real work. The Lab sees you.'}); toast('Shoutout posted ⭐'); }catch(e){toast(e.message,true);} });
   $('#intelAdd').addEventListener('click',async()=>{ const t=$('#intelText').value.trim(); if(!t)return; busy($('#intelAdd'),1); try{ await api({action:'intel_add',code:sess.code,pid:curPid,text:t}); $('#intelText').value=''; toast('Intel locked 🔒'); loadDetail(curPid,true);}catch(e){toast(e.message,true);} busy($('#intelAdd'),0,'Add Intel 🔒'); });
   $('#cMsgBtn').addEventListener('click',async()=>{ const v=$('#cMsgInput').value.trim(); if(!v)return; S.msg(); haptic(15); busy($('#cMsgBtn'),1); try{ const r=await api({action:'cmsg',code:sess.code,pid:curPid,text:v}); $('#cMsgInput').value=''; CD.messages=r.messages; loadDetail(curPid,true);}catch(e){toast(e.message,true);} busy($('#cMsgBtn'),0,'Send'); });
+
+  /* ---------- COURT FINDER: 971 Sydney courts ---------- */
+  let COURTS=null;
+  async function loadCourts(){
+    if(COURTS) return COURTS;
+    const base=(location.origin&&location.origin.startsWith('http'))?'':'https://lockdown-lab-registration.netlify.app';
+    const r=await fetch(base+'/courts.json'); const j=await r.json(); COURTS=j.courts; return COURTS;
+  }
+  function hav(a,b,c,d){ const R=6371,toR=x=>x*Math.PI/180; const h=Math.sin(toR(c-a)/2)**2+Math.cos(toR(a))*Math.cos(toR(c))*Math.sin(toR(d-b)/2)**2; return 2*R*Math.asin(Math.sqrt(h)); }
+  $('#cfBtn').addEventListener('click',()=>{
+    if(!navigator.geolocation){ toast('No location on this device',true); return; }
+    busy($('#cfBtn'),1);
+    navigator.geolocation.getCurrentPosition(async pos=>{
+      try{
+        const cs=await loadCourts();
+        const la=pos.coords.latitude, lo=pos.coords.longitude;
+        const near=cs.map(c=>({...c,dd:hav(la,lo,c.lat,c.lon)})).sort((x,y)=>x.dd-y.dd).slice(0,12);
+        $('#cfList').innerHTML=near.map(c=>'<a class="sess" style="text-decoration:none;color:inherit" target="_blank" rel="noopener" href="https://maps.google.com/?q='+c.lat+','+c.lon+'">'
+          +'<div class="dt"><b style="font-size:16px">'+(c.dd<1?Math.round(c.dd*1000)+'m':c.dd.toFixed(1)+'km')+'</b><span>away</span></div>'
+          +'<div class="inf"><b>'+esc(c.name)+'</b><span>'+[c.suburb,(c.indoor?'indoor':'outdoor'),c.surface].filter(Boolean).join(' · ')+' · tap for map</span></div>'
+          +(c.lit?'<span class="chip">💡</span>':'')+'</a>').join('');
+        toast('Closest courts locked in 📍'); S.like(); haptic(12);
+        stagger('#cfList');
+      }catch(e){ toast('Couldn\'t load the court map',true); }
+      busy($('#cfBtn'),0,'Find courts near me 📍');
+    },()=>{ toast('Allow location to find courts near you',true); busy($('#cfBtn'),0,'Find courts near me 📍'); },{timeout:10000,maximumAge:600000});
+  });
 
   /* ---------- MAKE IT YOURS: settings ---------- */
   let lastPage='home';
