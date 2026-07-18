@@ -13,8 +13,10 @@
   @media(max-width:820px){.svc-row{grid-template-columns:1fr; gap:26px; padding:30px 0}.svc-row:nth-child(even) .svc-art{order:0}}
   .grader-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:14px}
   @media(max-width:640px){.grader-grid{grid-template-columns:1fr 1fr}}
-  .grader{background:var(--surface); border:1px solid var(--line-strong); border-radius:var(--r-md); padding:20px; text-align:center}
-  .grader .g{font-family:var(--display); font-size:1.8rem; color:var(--white)}
+  .grader{background:var(--surface); border:1px solid var(--line-strong); border-radius:var(--r-md); padding:18px 12px; text-align:center}
+  .grader .g{font-family:var(--display); font-size:1.7rem; color:var(--white)}
+  .grader .t{font-size:.86rem; color:var(--silver); margin-top:6px; font-weight:700}
+  .grader .t small{display:block; font-weight:400; color:var(--steel); font-size:.7rem; margin-top:2px}
   .step-num{display:grid; grid-template-columns:repeat(4,1fr); gap:16px}
   @media(max-width:820px){.step-num{grid-template-columns:1fr 1fr}}
   @media(max-width:520px){.step-num{grid-template-columns:1fr}}
@@ -36,6 +38,23 @@
   <h2 style="max-width:24rem">Five crafts, one bench.</h2>
   <p class="muted" style="max-width:42rem">Skilled, conservative work — performed with care, never rushed. Not sure what a card needs? Submit it and inspection tells you exactly what will (and won't) help before you spend on work.</p>
   <div id="svcRows"></div>
+</div></section>
+
+<section id="authenticity" style="border-top:1px solid var(--line)"><div class="container section-tight">
+  <div class="split">
+    <div>
+      <div class="tag-row mb1"><span class="badge badge-red">New</span><span class="badge badge-steel">Included with every $10 inspection</span></div>
+      <span class="kicker">Authenticity screen</span>
+      <h2>Fakes stop here.</h2>
+      <p class="lead">Counterfeits are the hobby's biggest problem right now — "super fakes" good enough to fool a glance, and even fake graded slabs. So every card that hits our bench gets an authenticity screen before anything else happens.</p>
+      <p class="muted">Print pattern, stock, foil layering, light test — checked and photo-logged at intake. If a card doesn't pass, we tell you straight: it never goes to restoration or a grader, and it comes back to you. We'd rather lose a job than pass a fake down the line.</p>
+    </div>
+    <div>
+      <div class="card mb2"><h4>✓ Screened at intake</h4><p class="small muted mb0">Built into the $10 inspection on every card — nothing extra to buy.</p></div>
+      <div class="card mb2"><h4>✓ Flagged, never forwarded</h4><p class="small muted mb0">A suspect card never continues to restoration or a grading submission.</p></div>
+      <div class="card"><h4>✓ On the record</h4><p class="small muted mb0">The screen is photo-logged with the rest of your card's intake record.</p></div>
+    </div>
+  </div>
 </div></section>
 
 <section id="grading" class="section"><div class="container">
@@ -120,7 +139,9 @@ document.addEventListener('DOMContentLoaded', () => {
     HR.mountReveal(host, HRART.cardSVG({name:s.name,category:cat,state:'before',seed}), HRART.cardSVG({name:s.name,category:cat,state:'after',seed}));
   });
 
-  document.getElementById('graders').innerHTML = Object.entries(HRDATA.GRADERS).map(([k,v]) => `<div class="grader"><div class="g">${v}</div></div>`).join('');
+  const trendBadge = t => t==='improving' ? '<span style="color:#6FCE92">▼ improving</span>' : t==='slower' ? '<span style="color:#E8C983">▲ slower</span>' : '<span style="color:var(--steel)">— steady</span>';
+  document.getElementById('graders').innerHTML = HRDATA.TURNAROUND.map(x => `<div class="grader"><div class="g">${HRDATA.GRADERS[x.grader]}</div><div class="t">~${x.days} days<small>${trendBadge(x.trend)}</small></div></div>`).join('')
+    + `<div style="grid-column:1/-1" class="small muted center">Live turnaround board — door-to-door estimates, updated weekly by our team. <span class="badge badge-warning" style="font-size:.6rem">Sample data in prototype</span></div>`;
   document.getElementById('graderFees').innerHTML = Object.entries(HRDATA.PRICING.graderEstimates).map(([k,v]) => `<div style="display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px dashed var(--line); font-size:.9rem"><span>${HRDATA.GRADERS[k]} submission</span><b class="white">~${HR.fmtAUD(v)}</b></div>`).join('');
   document.getElementById('bundleStepper').innerHTML = HR.stepperHTML('submitted', { grading:true });
 });

@@ -99,6 +99,41 @@
   </div>
 </div></section>
 
+<section class="section-tight" style="border-top:1px solid var(--line)"><div class="container">
+  <div class="tag-row mb1"><span class="badge badge-red">New</span></div>
+  <span class="kicker">Worth grading?</span>
+  <h2>The maths, before you commit.</h2>
+  <p class="muted" style="max-width:40rem">The question every collector asks. Put in what your card's worth raw and what you reckon it's worth graded — we'll show the fees and the honest answer.</p>
+  <div class="est mt3">
+    <div class="panel panel-pad">
+      <div class="grid g2" style="gap:12px">
+        <div class="field mb0"><label>Raw value (AUD)</label><input class="input" id="wRaw" type="number" min="1" value="400"></div>
+        <div class="field mb0"><label>Est. graded value (AUD)</label><input class="input" id="wGraded" type="number" min="1" value="800"></div>
+      </div>
+      <div class="field mt2 mb0"><label>Quick presets</label>
+        <div class="pill-opts">
+          <span class="pill" data-mult="1.4">Conservative ×1.4</span>
+          <span class="pill on" data-mult="2">Typical ×2</span>
+          <span class="pill" data-mult="3">Strong ×3</span>
+        </div>
+        <div class="hint">Presets multiply your raw value — overwrite the graded number with your own if you know it.</div>
+      </div>
+      <div class="field mt2 mb0" style="max-width:220px"><label>Grader</label><select class="select" id="wGrader"></select></div>
+    </div>
+    <div>
+      <div class="panel panel-pad">
+        <h3 style="font-size:1.15rem">The verdict</h3>
+        <div id="wLines"></div>
+        <div style="display:flex; justify-content:space-between; align-items:baseline; border-top:1px solid var(--line-strong); margin-top:8px; padding-top:14px">
+          <b>Est. net after fees</b><span class="price-big" id="wNet" style="font-size:1.9rem">—</span>
+        </div>
+        <p class="mt2 mb0" id="wVerdict" style="font-weight:700"></p>
+        <p class="small muted mt1 mb0">Estimates only — grader fees are placeholder rates confirmed at intake, and no grade or value is ever guaranteed.</p>
+      </div>
+    </div>
+  </div>
+</div></section>
+
 <section style="background:#0D0D0D; border-top:1px solid var(--line); border-bottom:1px solid var(--line)"><div class="container section-tight">
   <span class="kicker">Payment flow</span>
   <h2>When each charge happens</h2>
@@ -160,8 +195,39 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   calc();
 
+  // "worth grading?" calculator
+  $('#wGrader').innerHTML = Object.entries(HRDATA.GRADERS).map(([k,v]) => `<option value="${k}">${v}</option>`).join('');
+  function wCalc() {
+    const raw = parseFloat($('#wRaw').value) || 0;
+    const graded = parseFloat($('#wGraded').value) || 0;
+    const gFee = HRDATA.PRICING.graderEstimates[$('#wGrader').value] || 0;
+    const upcharge = graded * HRDATA.PRICING.gradingUpchargePct;
+    const insp = HRDATA.PRICING.inspection;
+    const fees = insp + gFee + upcharge;
+    const net = graded - raw - fees;
+    $('#wLines').innerHTML = [
+      ['Value uplift (graded − raw)', HR.fmtAUD(graded - raw)],
+      ['Inspection (credited)', '− ' + HR.fmtAUD(insp)],
+      [`${HRDATA.GRADERS[$('#wGrader').value]} submission (est.)`, '− ' + HR.fmtAUD(gFee)],
+      ['4% upcharge on graded value', '− ' + HR.fmtAUD(upcharge)]
+    ].map(([l,r]) => `<div style="display:flex; justify-content:space-between; gap:12px; padding:8px 0; border-bottom:1px dashed var(--line); font-size:.92rem"><span>${l}</span><b class="white">${r}</b></div>`).join('');
+    $('#wNet').textContent = (net >= 0 ? '+' : '−') + HR.fmtAUD(Math.abs(net)).slice(1);
+    $('#wNet').style.color = net > 0 ? '#6FCE92' : '#FF7A90';
+    $('#wVerdict').innerHTML = net > raw * 0.5 ? '<span style="color:#6FCE92">Strong case — the uplift comfortably clears the fees.</span>'
+      : net > 0 ? '<span style="color:#E8C983">Worth a look — positive after fees, but not a blowout.</span>'
+      : '<span style="color:#FF7A90">Probably keep it raw — fees eat the uplift at these numbers.</span>';
+  }
+  ['wRaw','wGraded'].forEach(id => $('#'+id).addEventListener('input', wCalc));
+  $('#wGrader').addEventListener('change', wCalc);
+  document.querySelectorAll('[data-mult]').forEach(p => p.addEventListener('click', () => {
+    document.querySelectorAll('[data-mult]').forEach(x => x.classList.toggle('on', x === p));
+    $('#wGraded').value = Math.round((parseFloat($('#wRaw').value) || 0) * parseFloat(p.dataset.mult));
+    wCalc();
+  }));
+  wCalc();
+
   // pricing FAQs (subset)
-  const wanted = ['What does it cost?','Do you guarantee a grade?','Do I have to disclose restoration when I sell?','How do I get my cards to you?'];
+  const wanted = ['Do you check for fakes?','What does it cost?','Do you guarantee a grade?','Do I have to disclose restoration when I sell?','How do I get my cards to you?'];
   $('#faq').innerHTML = HRDATA.FAQS.filter(f => wanted.includes(f.q)).map(f => `<details><summary>${f.q}</summary><div class="a-body">${f.a}</div></details>`).join('');
 });
 </script>

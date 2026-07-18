@@ -221,7 +221,16 @@
     { id: 'g8', title: '1998 Pikachu Jungle', category: 'pokemon', services: ['crease_repair', 'cleaning'], before: 'Raw — folded', after: 'Restored', blurb: 'A folded childhood favourite brought back for display.' }
   ];
 
+  /* Sample turnaround board — staff-updated weekly in the real build (no grader APIs exist) */
+  const TURNAROUND = [
+    { grader: 'psa', days: 38, trend: 'steady' },
+    { grader: 'cgc', days: 24, trend: 'improving' },
+    { grader: 'bgs', days: 52, trend: 'slower' },
+    { grader: 'sgc', days: 19, trend: 'improving' }
+  ];
+
   const FAQS = [
+    { q: 'Do you check for fakes?', a: 'Every card, every time. Counterfeits — including “super fakes” and even fake graded slabs — are the biggest problem in the hobby right now, so an authenticity screen is built into the $10 inspection on every submission. If a card doesn’t pass, we tell you straight, it never goes to restoration or a grader, and it’s returned to you. We’d rather lose a job than pass a fake down the line.' },
     { q: 'Is my card insured while you have it?', a: 'Yes. While your card is in our direct custody it’s covered against loss or damage up to the declared value we confirm together at intake, and every physical handoff is photo-logged with timestamps. Once it’s with a courier or a grading company, their cover applies — we’ll always pass on anything we can recover on your behalf.' },
     { q: 'Do you guarantee a grade?', a: 'No — and you should be wary of anyone who does. Grading decisions belong to the grading companies alone. What we guarantee is careful, skilled work, honest updates at every stage, and a firm quote before anything starts.' },
     { q: 'What does it cost?', a: 'A $10 inspection fee per card at intake (credited to your invoice if you proceed), then a firm restoration quote based on your card’s confirmed value — a flat base of $20–$120 by value tier plus 10% of confirmed value. Grading concierge adds the grader’s own fee plus 4% of final graded value when it returns. Nothing is ever charged against a guessed value.' },
@@ -248,7 +257,7 @@
   const DEALERS = ['SLABD', 'Leo Games (Sydney)', 'House of Cards N Collectables (Sydney)'];
 
   window.HRDATA = {
-    STAGES, stageIdx, SERVICES, PRICING, restorationFee, GRADERS,
+    STAGES, stageIdx, SERVICES, PRICING, restorationFee, GRADERS, TURNAROUND,
     ORDERS, BATCHES, PRODUCTS, GALLERY, FAQS, REPORT, CUSTOMERS, DEALERS
   };
 })();
