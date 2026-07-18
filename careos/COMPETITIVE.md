@@ -42,6 +42,16 @@ compounds in value over years and makes NDIS reporting a button, not a scramble.
 - **Care DNA matching** across the Marketplace — outcome fit, not keyword+postcode.
 - **Auto-evidence** — compliance & billing as by-products of everyday care.
 
+## Sector problems → CareOS answers (researched 18 Jul 2026)
+Problems found by scouring sector news, NDIA announcements and provider forums — each now has a module:
+
+| Sector problem (with evidence) | CareOS module |
+|---|---|
+| Claim rejections push payment out 30–60 days; ~half of providers run at a loss on ~2% margins; NDIA moving to automated claim validation; claim window shrinking to 90 days (Dec 2026); community-participation budgets reset −50% from Oct 2026. | **Budget Guardian** (`/budgets`) — live burn-rate forecast per plan category with suggested fixes months early; Claim Guard pre-validates every claim (item numbers, service agreements, plan match, 90-day countdown); plain-language family view. |
+| Reportable incidents must reach the NDIS Commission within 24h of ANY worker's first awareness (5 business days for unauthorised restrictive practices); missing it invites enforcement/deregistration; audited under Module 2A. | **Incident Manager** (`/incidents`) — capture IS awareness (two taps from Smart Shift, offline-capable); auto-classification against the six reportable categories; visible escalating countdowns; Commission notification auto-drafted; root-cause → improvement loop. |
+| Funding cut at reassessment when evidence is missing or reports say "managing well with support" (read as improvement → hours trimmed); families scramble for weeks assembling documents. | **Review Ready** (`/review-ready`) — every note/arrival auto-filed as timestamped evidence; AI language guard flags funding-losing phrasing and suggests functional-impact wording; one-click consent-gated evidence pack (needs → supports → outcomes). |
+| 43% of NDIS workers burnt out at least half the time; turnover ~26% for casuals (~3× national churn); ~8 weeks to refill a role; onboarding costs in the tens of millions sector-wide. | **Team Pulse** (`/wellbeing`) — burnout radar from the same roster data that runs payroll (load fairness, rest patterns, declined-offer drift) with fixes drafted; kudos loop from families/peers that lands on the worker's phone and review file. |
+
 ## Feature parity checklist (surface-level now, deepen later)
 - [x] Rostering — weekly board, AI gap-fill, credential/award checks, clash prevention
 - [x] Compliance — audit-readiness %, by-scope, practice standards, auto-evidence
@@ -50,7 +60,7 @@ compounds in value over years and makes NDIS reporting a button, not a scramble.
 - [ ] Worker records / HR file vault (surface exists in compliance; give it its own module)
 - [ ] Participant document vault with e-sign (service agreements)
 - [x] Caregiver mobile clock-in/out — `/timepay` GPS tap-to-clock-in + **KnockIn™** geofenced arrival confirmation (`/arrivals`)
-- [ ] Incident management workflow (entry point exists on Smart Shift; build the full flow)
+- [x] Incident management workflow — **Incident Manager** (`/incidents`), Module 2A-aligned with Commission clocks
 - [ ] Invoicing to plan-managed / self-managed participants (not just NDIA bulk claim)
 
 ## Standing instructions for future sessions
