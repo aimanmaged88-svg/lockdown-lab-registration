@@ -82,12 +82,12 @@ export function getRole(id: Role): RoleDefinition {
 export const rolePermissions: Record<Role, string[]> = {
   parent: ["family", "timeline", "support-circle", "marketplace", "learning", "notifications", "settings", "help"],
   participant: ["participants", "timeline", "support-circle", "marketplace", "learning", "community", "notifications", "settings", "help"],
-  "support-worker": ["dashboard", "participants", "shift", "timeline", "roster", "timepay", "assistant", "support-circle", "marketplace", "learning", "community", "notifications", "settings", "help"],
-  "team-leader": ["dashboard", "participants", "shift", "timeline", "roster", "timepay", "compliance", "billing", "assistant", "support-circle", "marketplace", "learning", "community", "reports", "notifications", "settings", "help"],
+  "support-worker": ["dashboard", "participants", "shift", "timeline", "roster", "timepay", "arrivals", "assistant", "support-circle", "marketplace", "learning", "community", "notifications", "settings", "help"],
+  "team-leader": ["dashboard", "participants", "shift", "timeline", "roster", "timepay", "arrivals", "compliance", "billing", "assistant", "support-circle", "marketplace", "learning", "community", "reports", "notifications", "settings", "help"],
   therapist: ["dashboard", "participants", "timeline", "assistant", "support-circle", "learning", "reports", "notifications", "settings", "help"],
-  "provider-admin": ["provider", "dashboard", "participants", "timeline", "roster", "timepay", "compliance", "billing", "assistant", "support-circle", "marketplace", "learning", "community", "reports", "notifications", "settings", "help"],
-  ceo: ["executive", "provider", "participants", "timeline", "timepay", "compliance", "billing", "support-circle", "marketplace", "reports", "notifications", "settings", "help"],
-  "system-admin": ["dashboard", "participants", "roster", "timepay", "compliance", "billing", "reports", "notifications", "settings", "help"],
+  "provider-admin": ["provider", "dashboard", "participants", "timeline", "roster", "timepay", "arrivals", "compliance", "billing", "assistant", "support-circle", "marketplace", "learning", "community", "reports", "notifications", "settings", "help"],
+  ceo: ["executive", "provider", "participants", "timeline", "timepay", "arrivals", "compliance", "billing", "support-circle", "marketplace", "reports", "notifications", "settings", "help"],
+  "system-admin": ["dashboard", "participants", "roster", "timepay", "arrivals", "compliance", "billing", "reports", "notifications", "settings", "help"],
 };
 
 export function canSee(role: Role, navKey: string): boolean {

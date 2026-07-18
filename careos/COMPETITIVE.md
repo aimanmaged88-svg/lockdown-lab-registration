@@ -26,6 +26,14 @@ compounds in value over years and makes NDIS reporting a button, not a scramble.
 | **Innovate Care Forum** (Tania Gomez Consulting) | NOT a competitor — an industry **event** (5 Aug, Sydney). | No feature. Flag to the founder as a networking/marketing opportunity, not a threat. |
 
 ## Signature differentiators (things competitors don't have)
+- **KnockIn™ Smart Arrivals** (`/arrivals`) — founder's own feature, name chosen to be
+  trademark-able (coined compound: knock on the door + clock in; no dominant existing use
+  found — run formal IP Australia clearance before filing). Geofence at the participant's
+  home fires an **alarm-grade, full-screen "confirm you're starting your shift" prompt**
+  the second the worker arrives — sounds through silent mode, cannot be dismissed or turned
+  off in the app while a rostered shift is held. Stamps geofence entry and confirmation
+  **separately, to the second**; escalation ladder (60s repeat → team leader at 3 min →
+  on-call at 5 min); confirmed arrivals appear instantly in the Family Portal.
 - **Support Circle** (`/support-circle`) — a private peer-support Q&A community for the
   provider's qualified team. AI first-responder replies instantly; qualified colleagues who
   support the participant jump in with real advice, viewing that person's Care DNA via
@@ -41,7 +49,7 @@ compounds in value over years and makes NDIS reporting a button, not a scramble.
 - [ ] SIL house / site management view (Checkbase has it — add a Sites module next)
 - [ ] Worker records / HR file vault (surface exists in compliance; give it its own module)
 - [ ] Participant document vault with e-sign (service agreements)
-- [ ] Caregiver mobile clock-in/out (Smart Shift covers the shift; add GPS clock-in)
+- [x] Caregiver mobile clock-in/out — `/timepay` GPS tap-to-clock-in + **KnockIn™** geofenced arrival confirmation (`/arrivals`)
 - [ ] Incident management workflow (entry point exists on Smart Shift; build the full flow)
 - [ ] Invoicing to plan-managed / self-managed participants (not just NDIA bulk claim)
 
