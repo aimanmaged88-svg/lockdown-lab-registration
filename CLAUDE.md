@@ -19,4 +19,11 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   toggle already shipped; tier perks/design still open).
 - True closed-app push notifications (needs VAPID web-push server).
 - Optional: email alerts to coach on new knocks (needs an email service).
-- Test-data sweep of ZZ* bot accounts — only with his explicit go-ahead.
+- Test-data sweep of ZZ* + Demo Kid bot accounts — only with his explicit go-ahead.
+- **White-label fitness template** — saved 2026-07-18. Aiman wants the app to
+  double as a sellable template for fitness coaches/gyms ("people say let's
+  invest money into it"). The bones already support it: single-file app,
+  10-theme + custom-colour system, generic check-in/mind/fuel/squad/coach
+  structure. To productise: swap logo + copy strings + coach personas per
+  vertical, new Supabase project per client. Pitch angle: invite-only
+  community app for any coach, not just hoops.

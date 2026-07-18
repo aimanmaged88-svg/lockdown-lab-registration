@@ -390,6 +390,56 @@ header{gap:8px}
 .oa i{font-style:normal;position:absolute;top:4px;left:5px;width:5px;height:5px;background:var(--accent);border-radius:50%;box-shadow:0 0 7px var(--accent);animation:pulse 2s infinite}
 .oa-big{font-size:58px;border-width:4px;border-radius:20px;padding:24px 24px 8px 30px;letter-spacing:3px;box-shadow:0 18px 50px -18px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,.15)}
 .oa-big i{width:11px;height:11px;top:12px;left:13px}
+/* the badge breathes — always on air */
+header .oa{animation:oabreathe 3.4s ease-in-out infinite}
+@keyframes oabreathe{0%,100%{box-shadow:0 0 0 0 rgba(255,107,0,0)}50%{box-shadow:0 0 22px -4px var(--accent-glow)}}
+
+/* ============ INVESTOR-GRADE FINISH ============ */
+/* header lockup: badge carries the LIVE, wordmark stays one clean line */
+header .ttl{min-width:0;flex:1}
+header .ttl b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:16px;letter-spacing:1.2px}
+header .ttl b i{display:none}
+header .ttl small{white-space:nowrap;display:block;overflow:hidden;text-overflow:ellipsis;font-size:8px;letter-spacing:1.6px}
+.hbtn{white-space:nowrap;flex:0 0 auto;padding:7px 11px}
+/* iPhone notch + home-bar: content never fights the hardware */
+header{padding-top:calc(14px + env(safe-area-inset-top))}
+nav{bottom:calc(14px + env(safe-area-inset-bottom))}
+main{padding-bottom:calc(110px + env(safe-area-inset-bottom))}
+#toast{bottom:calc(96px + env(safe-area-inset-bottom))}
+/* no visible scrollbars, no rubber-band voids */
+main{overscroll-behavior:contain;scrollbar-width:none}
+main::-webkit-scrollbar{display:none}
+body{overscroll-behavior:none}
+/* keyboard users get a real focus ring */
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:6px}
+button:focus-visible,.btn:focus-visible{outline-offset:3px}
+/* headlines never widow awkwardly */
+h1.page,.card h3{text-wrap:balance}
+/* glass toast */
+#toast.dark{backdrop-filter:blur(18px) saturate(150%)}
+/* roster cards lift under the thumb */
+.pcard{transition:transform .18s cubic-bezier(.2,.8,.2,1), border-color .18s, box-shadow .18s}
+.pcard:active{transform:scale(.975)}
+@media(hover:hover){.pcard:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 45%,var(--line));box-shadow:0 16px 40px -20px rgba(0,0,0,.9), 0 8px 30px -18px var(--accent-glow)}}
+/* primary buttons carry a living sheen */
+.btn-p::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.35) 48%,transparent 62%);transform:translateX(-130%);animation:btnsheen 4.6s ease-in-out infinite}
+@keyframes btnsheen{0%,64%{transform:translateX(-130%)}86%,100%{transform:translateX(130%)}}
+/* onboarding entrance choreography */
+#onboard .ob-card{animation:obrise .6s cubic-bezier(.2,.8,.2,1) both}
+@keyframes obrise{from{opacity:0;transform:translateY(22px) scale(.97)}to{opacity:1;transform:none}}
+#onboard .oa-big{animation:oaland .7s cubic-bezier(.2,1.3,.4,1) both, oabreathe 3.4s ease-in-out .8s infinite}
+@keyframes oaland{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:scale(1)}}
+/* wait room: the door actually knocks */
+#waitRoom>div:nth-child(2){animation:knockknock 2.8s ease-in-out infinite;transform-origin:bottom center}
+@keyframes knockknock{0%,74%,100%{transform:rotate(0)}78%{transform:rotate(-5deg)}82%{transform:rotate(4deg)}86%{transform:rotate(-3deg)}90%{transform:rotate(0)}}
+/* stats settle with weight */
+.stat{transition:transform .2s}
+.stat:active{transform:scale(.96)}
+/* one switch honours every vestibular need — OS setting or the in-app Calm toggle */
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
+body.rmode *,body.rmode *::before,body.rmode *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 /* ============ THE COACHING PANEL ============ */
 .cgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .ccard{border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--glass),var(--glass2));padding:13px 13px 11px;cursor:pointer;transition:transform .16s,border-color .2s;position:relative;overflow:hidden;text-align:left}
@@ -1174,7 +1224,7 @@ body.rmode *{animation:none!important;transition:none!important}
     if(!PST) return;
     const p=PST.profile;
     $('#heroName').textContent=p.name+(p.founding?' ⭐':'');
-    if(p.founding) $('#hSub').textContent='Founding Member ⭐';
+    if(p.founding) $('#hSub').textContent='Founding ⭐';
     renderRuns();
     $('#avInit').textContent=p.name.split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();
     countUp($('#stXp'),p.xp); countUp($('#stLogs'),PST.checkins.length); countUp($('#stSess'),p.sessions);
