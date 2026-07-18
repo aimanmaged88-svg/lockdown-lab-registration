@@ -442,14 +442,17 @@ body.rmode *{animation:none!important;transition:none!important}
     </div>
 
     <div class="ob-form on" data-obf="join">
-      <span class="ob-lbl">Invite code · the Lab is invite-only · codes burn after 6h</span>
-      <input id="jInvite" placeholder="LAB-····" maxlength="10" autocomplete="off" style="text-transform:uppercase">
+      <span class="ob-lbl">Invite code · got one? drop it here · codes burn after 6h</span>
+      <input id="jInvite" placeholder="LAB-···· (leave blank to knock)" maxlength="10" autocomplete="off" style="text-transform:uppercase">
+      <p style="color:var(--dim);font-size:11.5px;margin:-4px 0 4px">No code? No stress — fill this in and <b style="color:var(--accent)">knock</b>. UNC gets pinged and the app unlocks itself the second he clears you.</p>
       <span class="ob-lbl">Your name</span>
       <input id="jName" placeholder="e.g. Marcus T." maxlength="40" autocomplete="off">
       <span class="ob-lbl">Position</span>
       <div class="pills" id="jPos"><span class="pill">PG</span><span class="pill">SG</span><span class="pill">SF</span><span class="pill">PF</span><span class="pill">C</span></div>
       <span class="ob-lbl">Age</span>
       <input id="jAge" type="number" inputmode="numeric" min="5" max="99" placeholder="Your age">
+      <span class="ob-lbl">Where can UNC reach you? (IG @ or mobile — optional)</span>
+      <input id="jContact" placeholder="@yourhandle or 04·· ··· ···" maxlength="80" autocomplete="off">
       <span class="ob-lbl">Create a 4-digit PIN (don't forget it)</span>
       <input id="jPin" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off">
       <div class="ob-err" id="jErr"></div>
@@ -474,6 +477,16 @@ body.rmode *{animation:none!important;transition:none!important}
       <div class="ob-note">Players never see the coach side</div>
     </div>
   </div>
+</div>
+
+<!-- ============ WAIT ROOM (knocked, waiting on UNC) ============ -->
+<div id="waitRoom" style="display:none;min-height:100dvh;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:32px 26px;gap:14px">
+  <span class="oa oa-big" aria-label="Live — on air"><i></i>LIVE</span>
+  <div style="font-size:52px;margin-top:8px">🚪</div>
+  <h1 class="display" style="font-family:var(--fd);font-size:38px;letter-spacing:2px;text-transform:uppercase">Knock heard.</h1>
+  <p style="color:var(--muted);font-size:14px;line-height:1.6;max-width:300px">Your request is with <b style="color:var(--text)">UNC</b>. Nothing else to do — this screen <b style="color:var(--accent)">unlocks itself</b> the second he clears you. You can also close the app and log back in later with your name + PIN.</p>
+  <div style="display:flex;align-items:center;gap:8px;font-family:var(--fm);font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--good)"><span style="width:7px;height:7px;border-radius:50%;background:var(--good);box-shadow:0 0 8px var(--good)"></span><span id="wrStat">Watching the door…</span></div>
+  <button class="btn btn-g" id="wrOut" style="margin-top:10px">Log out</button>
 </div>
 
 <!-- ============ APP ============ -->
@@ -542,7 +555,16 @@ body.rmode *{animation:none!important;transition:none!important}
       <div class="sess"><div class="dt"><b>THU</b><span>7–8pm</span></div><div class="inf"><b>Live Session · The Lab</b><span>Zoom · link drops in Coach Chat</span></div><span class="chip live"><span class="d"></span>Weekly</span></div>
       <div class="sess"><div class="dt"><b>SAT</b><span>AM</span></div><div class="inf"><b>Morning Workout Group</b><span>Details in the community feed</span></div><span class="chip">Set</span></div>
       <div class="sess"><div class="dt"><b>1·1</b><span>Book</span></div><div class="inf"><b>1-on-1 with Coach</b><span>Message coach to lock a slot</span></div><button class="btn btn-g btn-sm" id="bookBtn">Message</button></div>
-      <div class="card" style="margin-top:16px">
+      <div class="card" id="runCard" style="margin-top:16px">
+        <span class="cl">Live from the blacktop · clears itself after 2h</span>
+        <h3>🏀 Running now</h3>
+        <div id="runList"><p style="color:var(--dim);font-size:12.5px">Nobody's on the board. Next run starts with you.</p></div>
+        <div class="composer" style="margin-top:10px">
+          <input id="runWhere" placeholder="Where you running? e.g. Alexandria Park" maxlength="60">
+          <button class="btn btn-p btn-sm" id="runBtn">I'm here</button>
+        </div>
+      </div>
+      <div class="card">
         <span class="cl">Find a game · 971 Sydney courts mapped</span>
         <h3>📍 Court Finder</h3>
         <p style="color:var(--muted);font-size:13px;margin-bottom:10px">Every court in the city, in your pocket. Founding squad only.</p>
@@ -773,6 +795,10 @@ body.rmode *{animation:none!important;transition:none!important}
         <span class="cl">🎓 Coach desk · questions waiting — answer as the panel</span>
         <div id="deskList"></div>
       </div>
+      <div class="card hot" id="knockCard" style="display:none">
+        <span class="cl">🚪 Knocks at the door · they've signed up — you decide</span>
+        <div id="knockList"></div>
+      </div>
       <div class="card" id="cInvCard" style="display:none">
         <span class="cl">🎟 Invite requests · your call, UNC</span>
         <div id="cInvList"></div>
@@ -1000,12 +1026,16 @@ body.rmode *{animation:none!important;transition:none!important}
     if(!/^\d{4}$/.test(pin)) return obErr('#jErr','PIN needs to be exactly 4 digits.');
     busy($('#jGo'),1);
     try{
-      const r=await api({action:'register',name,pos,age,pin,invite:$('#jInvite').value.trim().toUpperCase()});
-      sess={type:'player',pid:r.pid,pin,name}; localStorage.setItem(SESS_KEY,JSON.stringify(sess));
-      PST=r.state; enterApp(); toast('Welcome to the Lab 🔒');
+      const r=await api({action:'register',name,pos,age,pin,contact:$('#jContact').value.trim(),invite:$('#jInvite').value.trim().toUpperCase()});
+      sess={type:'player',pid:r.pid,pin,name,pending:!!r.pending}; localStorage.setItem(SESS_KEY,JSON.stringify(sess));
+      if(r.pending){ showWaitRoom(); toast('Knock sent to UNC 🚪'); }
+      else { PST=r.state; enterApp(); toast('Welcome to the Lab 🔒'); }
     }catch(e){ obErr('#jErr',e.message); }
-    busy($('#jGo'),0,'Create My Profile 🔒');
+    busy($('#jGo'),0,jBtnLabel());
   });
+  /* button reads the room: code = straight in, no code = knock */
+  const jBtnLabel=()=>$('#jInvite').value.trim()?'Create My Profile 🔒':'Knock On The Door 🚪';
+  $('#jInvite').addEventListener('input',()=>{ $('#jGo').textContent=jBtnLabel(); });
   $('#lGo').addEventListener('click',async()=>{
     obClear();
     const name=$('#lName').value.trim(), pin=$('#lPin').value.trim();
@@ -1013,10 +1043,42 @@ body.rmode *{animation:none!important;transition:none!important}
     busy($('#lGo'),1);
     try{
       const r=await api({action:'login',name,pin});
-      sess={type:'player',pid:r.pid,pin,name}; localStorage.setItem(SESS_KEY,JSON.stringify(sess));
-      PST=r.state; enterApp(); toast('Back in the Lab');
+      sess={type:'player',pid:r.pid,pin,name,pending:!!r.pending}; localStorage.setItem(SESS_KEY,JSON.stringify(sess));
+      if(r.pending){ showWaitRoom(); }
+      else { PST=r.state; enterApp(); toast('Back in the Lab'); }
     }catch(e){ obErr('#lErr',e.message); }
     busy($('#lGo'),0,'Back In The Lab →');
+  });
+  /* ---------- wait room: poll until UNC opens the door ---------- */
+  let wrT=null;
+  function showWaitRoom(){
+    $('#onboard').style.display='none'; $('#app').style.display='none';
+    $('#waitRoom').style.display='flex';
+    clearInterval(pollT); clearInterval(wrT);
+    wrT=setInterval(wrTick,15000);
+  }
+  async function wrTick(){
+    if(!sess||!sess.pending){ clearInterval(wrT); return; }
+    try{
+      const r=await api({action:'state',pid:sess.pid,pin:sess.pin});
+      if(r.state){
+        sess.pending=false; localStorage.setItem(SESS_KEY,JSON.stringify(sess));
+        clearInterval(wrT); PST=r.state;
+        $('#waitRoom').style.display='none';
+        enterApp(); toast('UNC opened the door 🔓 Welcome in.'); S.drop(); haptic([0,30,60,30]);
+        notify('coach','You\'re in 🔓','UNC cleared you. Welcome to the Lab.');
+      }
+    }catch(e){
+      if(/unauthorized/.test(String(e.message||''))){
+        clearInterval(wrT);
+        $('#wrStat').textContent='Not this time — hit up UNC directly.';
+        setTimeout(()=>{ localStorage.removeItem(SESS_KEY); sess=null; $('#waitRoom').style.display='none'; $('#onboard').style.display='flex'; },4500);
+      }
+    }
+  }
+  $('#wrOut').addEventListener('click',()=>{
+    clearInterval(wrT); localStorage.removeItem(SESS_KEY); sess=null;
+    $('#waitRoom').style.display='none'; $('#onboard').style.display='flex';
   });
   $('#cGo').addEventListener('click',async()=>{
     obClear();
@@ -1073,6 +1135,7 @@ body.rmode *{animation:none!important;transition:none!important}
         const prevPost=(PST&&PST.posts[0])?PST.posts[0].id:null;
         const prevInv=PST?JSON.stringify((PST.invites||[]).map(i=>i.status+(i.used_by?'u':''))):null;
         const prevAns=PST?((PST.coachq||[]).filter(q=>q.answer).length):null;
+        const prevRun=PST?((PST.runs||[])[0]?runKey(PST.runs[0]):''):null;
         const r=await api({action:'state',pid:sess.pid,pin:sess.pin}); PST=r.state; renderPlayer(true);
         const nm=PST.messages;
         if(nm.length>prevM && nm[nm.length-1].from_coach){ S.recv(); haptic(20); toast('Coach replied 💬'); notify('coach','Coach replied 💬',nm[nm.length-1].text); }
@@ -1080,6 +1143,8 @@ body.rmode *{animation:none!important;transition:none!important}
         if(prevAns!==null){ const nowAns=(PST.coachq||[]).filter(q=>q.answer); if(nowAns.length>prevAns){ const c=coachBy(nowAns[0].coach); S.recv(); haptic(20); toast(c.n+' answered you '+c.ico); notify('coach',c.n+' answered '+c.ico,nowAns[0].answer); } }
         const np=PST.posts[0];
         if(np && np.id!==prevPost && np.is_coach && prevPost){ notify('announce','The Lab 📢',np.text); }
+        const nr=(PST.runs||[])[0];
+        if(prevRun!==null && nr && runKey(nr)!==prevRun && nr.player && nr.player.name!==sess.name){ toast('🏀 '+nr.player.name+' is running at '+nr.court); notify('sessions','🏀 Run on','​'+nr.player.name+' is at '+nr.court+' right now. Pull up.'); }
         if(prevInv && JSON.stringify((PST.invites||[]).map(i=>i.status+(i.used_by?'u':'')))!==prevInv){ const used=(PST.invites||[]).find(i=>i.used_by); const ap=(PST.invites||[]).find(i=>i.status==='approved'&&!i.used_by);
           if(ap){ toast('UNC approved your invite 🎟'); notify('sessions','Invite approved 🎟','Your mate '+ap.friend_name+' is cleared. Share the code.'); }
           else if(used){ toast(used.friend_name+' is in the Lab 🔓'); notify('sessions','Your mate\'s in 🔓',used.friend_name+' just used your code.'); } }
@@ -1091,10 +1156,16 @@ body.rmode *{animation:none!important;transition:none!important}
           const cm=(CD&&CD.messages)||[];
           if(cm.length>prevCM && cm[cm.length-1] && !cm[cm.length-1].from_coach){ S.recv(); haptic(20); toast('New message 💬'); notify('player','New message 💬',cm[cm.length-1].text); }
         }
-        else { ROSTER=await api({action:'roster',code:sess.code}); renderRoster(true); }
+        else {
+          const prevK=(ROSTER&&ROSTER.knocks)?ROSTER.knocks.length:0;
+          ROSTER=await api({action:'roster',code:sess.code}); renderRoster(true);
+          const nk=(ROSTER.knocks||[]);
+          if(nk.length>prevK){ const k=nk[nk.length-1]; S.recv(); haptic(20); toast('🚪 '+k.name+' is knocking'); notify('player','🚪 Knock at the door',k.name+' wants into the Lab. Open the app to clear them.'); }
+        }
       }
     }catch(e){ /* silent */ }
   }
+  const runKey=r=>(r.player&&r.player.name||'')+'@'+r.court+'@'+r.created_at;
 
   /* ---------- player render ---------- */
   const LEVELS=[[0,'Rookie'],[250,'Sharp'],[600,'Locked In'],[1100,'Elite IQ'],[1800,'Franchise']];
@@ -1102,7 +1173,9 @@ body.rmode *{animation:none!important;transition:none!important}
   function renderPlayer(soft){
     if(!PST) return;
     const p=PST.profile;
-    $('#heroName').textContent=p.name;
+    $('#heroName').textContent=p.name+(p.founding?' ⭐':'');
+    if(p.founding) $('#hSub').textContent='Founding Member ⭐';
+    renderRuns();
     $('#avInit').textContent=p.name.split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();
     countUp($('#stXp'),p.xp); countUp($('#stLogs'),PST.checkins.length); countUp($('#stSess'),p.sessions);
     $('#streakChip').textContent=p.streak;
@@ -1316,7 +1389,7 @@ body.rmode *{animation:none!important;transition:none!important}
       const ok=p.last_checkin===t;
       const init=esc(p.name.split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase());
       return '<div class="pcard" data-pid="'+p.id+'"><div class="top"><span class="pv">'+init+'</span>'+
-        '<div class="nm"><b>'+esc(p.name)+'</b><span>'+esc(p.pos||'—')+(p.age?' · '+p.age:'')+' · '+p.xp+' XP</span></div>'+
+        '<div class="nm"><b>'+esc(p.name)+(p.founding?' ⭐':'')+'</b><span>'+esc(p.pos||'—')+(p.age?' · '+p.age:'')+' · '+p.xp+' XP</span></div>'+
         '<div class="flag '+(ok?'ok':'warn')+'">'+(ok?'✓ checked in':'⚠ not today')+'<br><span style="color:var(--dim)">🔥 '+p.streak+'d</span></div></div></div>';
     }).join(''):'<div class="card"><h3>No players yet</h3><p style="color:var(--muted);font-size:13px">Send the boys the app link — they hit <b>Join</b>, pick a PIN, done.</p></div>';
     document.querySelectorAll('.pcard[data-pid]').forEach(c=>c.addEventListener('click',()=>{ curPid=c.dataset.pid; go('cplayer'); loadDetail(curPid); }));
@@ -1327,7 +1400,10 @@ body.rmode *{animation:none!important;transition:none!important}
       CD=await api({action:'cdetail',code:sess.code,pid});
       const p=CD.profile;
       const learn=(p.prefs&&p.prefs.learn)?'<br>🧬 Learns best: <b style="color:var(--accent)">'+esc(p.prefs.learn)+'</b> — coach them that way':'';
-      $('#cpHead').innerHTML='<span class="eyebrow">Player file</span><h1 class="page display">'+esc(p.name)+'</h1><p class="sub">'+esc(p.pos||'—')+(p.age?' · '+p.age:'')+' · '+p.xp+' XP · 🔥 '+p.streak+'d streak · '+p.sessions+' sessions'+learn+'</p>';
+      const reach=CD.contact?'<br>📇 Reach: <b style="color:var(--text)">'+esc(CD.contact)+'</b>':'';
+      $('#cpHead').innerHTML='<span class="eyebrow">Player file</span><h1 class="page display">'+esc(p.name)+(p.founding?' ⭐':'')+'</h1><p class="sub">'+esc(p.pos||'—')+(p.age?' · '+p.age:'')+' · '+p.xp+' XP · 🔥 '+p.streak+'d streak · '+p.sessions+' sessions'+learn+reach+'</p>'
+        +'<button class="btn '+(p.founding?'btn-p':'btn-g')+' btn-sm" id="foundBtn" style="margin-top:6px">'+(p.founding?'⭐ Founding member — tap to remove':'☆ Make founding member')+'</button>';
+      $('#foundBtn').addEventListener('click',async()=>{ try{ await api({action:'founding_set',code:sess.code,pid:p.id,founding:!p.founding}); toast(p.founding?'Star removed':'⭐ Founding member locked in'); S.like(); loadDetail(p.id,true); }catch(e){toast(e.message,true);} });
       const cs=CD.checkins||[];
       $('#cpStats').innerHTML=cs.slice(0,7).map(c=>'<div class="mv"><b>'+c.conf+'</b><span>'+c.d.slice(5)+'</span></div>').join('')||'<span style="color:var(--dim);font-size:12px">No check-ins yet</span>';
       $('#intelList').innerHTML=(CD.intel||[]).map(n=>'<div class="intelnote"><span>🔒</span><span>'+esc(n.text)+'</span></div>').join('');
@@ -1365,15 +1441,43 @@ body.rmode *{animation:none!important;transition:none!important}
         const cs=await loadCourts();
         const la=pos.coords.latitude, lo=pos.coords.longitude;
         const near=cs.map(c=>({...c,dd:hav(la,lo,c.lat,c.lon)})).sort((x,y)=>x.dd-y.dd).slice(0,12);
-        $('#cfList').innerHTML=near.map(c=>'<a class="sess" style="text-decoration:none;color:inherit" target="_blank" rel="noopener" href="https://maps.google.com/?q='+c.lat+','+c.lon+'">'
+        $('#cfList').innerHTML=near.map(c=>'<div class="sess" style="align-items:center"><a style="text-decoration:none;color:inherit;display:flex;gap:12px;flex:1;min-width:0" target="_blank" rel="noopener" href="https://maps.google.com/?q='+c.lat+','+c.lon+'">'
           +'<div class="dt"><b style="font-size:16px">'+(c.dd<1?Math.round(c.dd*1000)+'m':c.dd.toFixed(1)+'km')+'</b><span>away</span></div>'
-          +'<div class="inf"><b>'+esc(c.name)+'</b><span>'+[c.suburb,(c.indoor?'indoor':'outdoor'),c.surface].filter(Boolean).join(' · ')+' · tap for map</span></div>'
-          +(c.lit?'<span class="chip">💡</span>':'')+'</a>').join('');
+          +'<div class="inf"><b>'+esc(c.name)+'</b><span>'+[c.suburb,(c.indoor?'indoor':'outdoor'),c.surface].filter(Boolean).join(' · ')+' · tap for map</span></div></a>'
+          +(c.lit?'<span class="chip">💡</span>':'')
+          +'<button class="btn btn-g btn-sm" data-runhere="'+esc(c.name)+'" style="flex:0 0 auto">🏀 I\'m here</button></div>').join('');
+        document.querySelectorAll('[data-runhere]').forEach(b=>b.addEventListener('click',()=>goRun(b.dataset.runhere)));
         toast('Closest courts locked in 📍'); S.like(); haptic(12);
         stagger('#cfList');
       }catch(e){ toast('Couldn\'t load the court map',true); }
       busy($('#cfBtn'),0,'Find courts near me 📍');
     },()=>{ toast('Allow location to find courts near you',true); busy($('#cfBtn'),0,'Find courts near me 📍'); },{timeout:10000,maximumAge:600000});
+  });
+
+  /* ---------- I'm running here ---------- */
+  const agoM=t=>Math.max(0,Math.round((Date.now()-new Date(t).getTime())/60000));
+  function renderRuns(){
+    if(!PST||!$('#runList')) return;
+    const list=PST.runs||[];
+    $('#runList').innerHTML=list.length?list.map(r=>{
+      const n=(r.player&&r.player.name)||'Someone';
+      const star=(r.player&&r.player.founding)?' ⭐':'';
+      const m=agoM(r.created_at);
+      return '<div class="intelnote" style="align-items:center"><span>🏀</span><span style="flex:1"><b style="color:var(--text)">'+esc(n)+star+'</b> — '+esc(r.court)+'</span><span style="font-size:11px;color:var(--dim)">'+(m<1?'just now':m+'m ago')+'</span></div>';
+    }).join(''):'<p style="color:var(--dim);font-size:12.5px">Nobody\'s on the board. Next run starts with you.</p>';
+  }
+  async function goRun(court){
+    try{
+      const r=await api({action:'run_add',pid:sess.pid,pin:sess.pin,court});
+      PST.runs=r.runs; renderRuns(); $('#runWhere').value='';
+      toast('You\'re on the board 🏀 Squad can see it for 2 hours'); S.like(); haptic(12);
+      document.querySelector('main').scrollTop=0;
+    }catch(e){ toast(e.message,true); }
+  }
+  $('#runBtn').addEventListener('click',()=>{
+    const v=$('#runWhere').value.trim();
+    if(v.length<2){ toast('Which court? Name it',true); return; }
+    goRun(v);
   });
 
   /* ---------- MAKE IT YOURS: settings ---------- */
@@ -1631,8 +1735,25 @@ body.rmode *{animation:none!important;transition:none!important}
     }catch(e){ toast(e.message,true); }
     busy($('#mintBtn'),0,'Mint code');
   });
+  /* ---------- knocks: no-code sign-ups waiting on UNC ---------- */
+  function contactLink(c){
+    if(!c) return '';
+    const digits=c.replace(/[\s()-]/g,'');
+    if(/^(\+?61|0)\d{8,9}$/.test(digits)){ const intl=digits.replace(/^0/,'61').replace(/^\+/,''); return '<a class="btn btn-g btn-sm" href="https://wa.me/'+intl+'" target="_blank" rel="noopener">💬</a>'; }
+    if(/^\S+@\S+\.\S+$/.test(c)) return '<a class="btn btn-g btn-sm" href="mailto:'+esc(c)+'">✉️</a>';
+    if(/^@/.test(c)) return '<a class="btn btn-g btn-sm" href="https://instagram.com/'+esc(c.slice(1))+'" target="_blank" rel="noopener">📸</a>';
+    return '';
+  }
+  function renderKnocks(){
+    const list=(ROSTER&&ROSTER.knocks)||[];
+    $('#knockCard').style.display=list.length?'block':'none';
+    $('#knockList').innerHTML=list.map(k=>'<div class="intelnote" style="align-items:center;flex-wrap:wrap"><span>🚪</span><span style="flex:1;min-width:130px"><b style="color:var(--text)">'+esc(k.name)+'</b> '+(k.pos?'· '+esc(k.pos):'')+(k.age?' · '+k.age:'')+'<br><span style="font-size:11px;color:var(--dim)">'+(k.contact?'reach: '+esc(k.contact):'no contact left')+'</span></span>'+contactLink(k.contact)+'<button class="btn btn-p btn-sm" data-knock-ok="'+k.id+'">Let them in ✓</button><button class="btn btn-g btn-sm" data-knock-no="'+k.id+'">✕</button></div>').join('');
+    document.querySelectorAll('[data-knock-ok]').forEach(b=>b.addEventListener('click',async()=>{ try{ await api({action:'knock_approve',code:sess.code,pid:b.dataset.knockOk}); toast('Door opened 🔓 Their app unlocks itself.'); S.like(); haptic(12); ROSTER=await api({action:'roster',code:sess.code}); renderRoster(true); }catch(e){toast(e.message,true);} }));
+    document.querySelectorAll('[data-knock-no]').forEach(b=>b.addEventListener('click',async()=>{ try{ await api({action:'knock_deny',code:sess.code,pid:b.dataset.knockNo}); toast('Turned away'); ROSTER=await api({action:'roster',code:sess.code}); renderRoster(true); }catch(e){toast(e.message,true);} }));
+  }
   function renderCoachInvites(){
     renderActiveCodes();
+    renderKnocks();
     const list=(ROSTER&&ROSTER.invites)||[];
     $('#cInvCard').style.display=list.length?'block':'none';
     $('#cInvList').innerHTML=list.map(i=>'<div class="intelnote" style="align-items:center"><span>🎟</span><span style="flex:1"><b style="color:var(--text)">'+esc(i.friend_name)+'</b><br><span style="font-size:11px;color:var(--dim)">vouched by '+esc((i.player&&i.player.name)||'—')+'</span></span><button class="btn btn-p btn-sm" data-inv-ok="'+i.id+'">✓</button><button class="btn btn-g btn-sm" data-inv-no="'+i.id+'">✕</button></div>').join('');
@@ -1651,13 +1772,17 @@ body.rmode *{animation:none!important;transition:none!important}
   });
 
   /* prefill invite code from a shared link */
-  try{ const qc=new URLSearchParams(location.search).get('code'); if(qc&&$('#jInvite')) $('#jInvite').value=qc.toUpperCase(); }catch(e){}
+  try{ const qc=new URLSearchParams(location.search).get('code'); if(qc&&$('#jInvite')) $('#jInvite').value=qc.toUpperCase(); $('#jGo').textContent=jBtnLabel(); }catch(e){}
 
   /* ---------- boot ---------- */
   (async function boot(){
     if(!sess){ $('#onboard').style.display='flex'; return; }
     try{
-      if(sess.type==='player'){ const r=await api({action:'state',pid:sess.pid,pin:sess.pin}); PST=r.state; }
+      if(sess.type==='player'){
+        const r=await api({action:'state',pid:sess.pid,pin:sess.pin});
+        if(r.pending){ sess.pending=true; showWaitRoom(); return; }
+        sess.pending=false; PST=r.state;
+      }
       else { ROSTER=await api({action:'roster',code:sess.code}); }
       enterApp();
     }catch(e){
