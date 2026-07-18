@@ -192,9 +192,22 @@
           ${payChip('Inspection ' + (o.inspectionPaid ? 'paid' : 'pending'), o.inspectionPaid)}
           ${o.quote ? payChip('Quote ' + (o.quotePaid ? 'paid' : 'awaiting approval'), o.quotePaid, !o.quotePaid) : ''}
           ${o.gradingFee ? payChip('Grading fee ' + (o.gradingFeePaid ? 'paid' : 'pending'), o.gradingFeePaid) : ''}
-          ${o.upcharge ? payChip('Upcharge ' + (o.upchargePaid ? 'paid' : 'pending'), o.upchargePaid) : ''}
+          ${o.upcharge ? payChip('Tier adjustment ' + (o.upchargePaid ? 'paid' : 'pending'), o.upchargePaid) : ''}
         </div>
       </div>
+
+      ${o.extraApproval && o.extraApproval.status === 'pending' ? `
+      <div class="card mb2" style="border-color:rgba(217,164,65,.6)">
+        <div class="spread">
+          <div style="max-width:38rem">
+            <div class="tag-row mb1"><span class="badge badge-warning">Approval needed — work is paused</span></div>
+            <h3 style="font-size:1.2rem" class="mb1">We found extra work: ${HR.fmtAUD(o.extraApproval.amount)}</h3>
+            <p class="small muted mb0">${esc(o.extraApproval.note)} — beyond your approved quote, so nothing proceeds until you say yes (our additional-cost policy, T&amp;C clause 4.6). Not sure? Message us below.</p>
+          </div>
+          <button class="btn btn-red btn-lg" id="approveExtra">Approve & pay ${HR.fmtAUD(o.extraApproval.amount)}</button>
+        </div>
+      </div>` : ''}
+      ${o.extraApproval && o.extraApproval.status === 'approved' ? `<div class="card mb2" style="border-color:rgba(59,155,92,.45)"><span class="badge badge-success">Additional work approved</span> <span class="small muted">${esc(o.extraApproval.note)} · ${HR.fmtAUD(o.extraApproval.amount)} · work resumed</span></div>` : ''}
 
       ${o.status === 'quote_ready' && !o.quotePaid ? `
       <div class="card mb2" style="border-color:rgba(217,164,65,.6)">
@@ -303,6 +316,23 @@
       route();
     });
 
+    // clause 4.6 additional-work approval
+    const ae = $('#approveExtra');
+    if (ae) ae.addEventListener('click', () => {
+      const stamp2 = new Date().toISOString().slice(0, 16).replace('T', ' ');
+      const approved = Object.assign({}, o.extraApproval, { status: 'approved', paidAt: stamp2 });
+      const tl = { stage: 'in_restoration', at: stamp2, note: 'Additional work approved & paid by customer (' + HR.fmtAUD(o.extraApproval.amount) + ') — work resumed' };
+      if (o.local) {
+        const locals = HR.store.get('localOrders', []);
+        const lo = locals.find(x => x.number === o.number);
+        if (lo) { lo.extraApproval = approved; lo.timeline.push(tl); HR.store.set('localOrders', locals); }
+      } else {
+        saveMut(o.id, { extraApproval: approved, timelineAdd: (mutOf(o.id).timelineAdd || []).concat([tl]) });
+      }
+      HR.toast('Approved — the bench is back on it ✓');
+      route();
+    });
+
     // messages
     const send = () => {
       const box = $('#msgBox');
@@ -332,7 +362,7 @@
 
   /* ---------- submission wizard ---------- */
   const wiz = { step: 1, cards: [], details: { name: DEMO.name, email: DEMO.email, phone: '0400 000 000', address: '12 Sample St, Melbourne VIC 3000' }, agreed: false };
-  function blankCard() { return { name: '', set: '', category: 'pokemon', declared: '', service: 'both', jobs: [], grader: 'psa' }; }
+  function blankCard() { return { name: '', set: '', category: 'pokemon', declared: '', service: 'both', jobs: [], grader: 'psa', psaTier: 'regular' }; }
 
   function cardEstimate(c) {
     const v = parseFloat(c.declared) || 0;
@@ -341,7 +371,7 @@
       const f = HRDATA.restorationFee(v);
       if (f === null) out.custom = true; else out.resto = f;
     }
-    if (c.service !== 'restoration') out.grading = HRDATA.PRICING.graderEstimates[c.grader] || 0;
+    if (c.service !== 'restoration') out.grading = HRDATA.psaTier(c.psaTier).fee;
     return out;
   }
 
@@ -376,9 +406,9 @@
             <div class="pill-opts" data-jobs>
               ${HRDATA.SERVICES.map(s => `<span class="pill ${c.jobs.includes(s.key) ? 'on' : ''}" data-job="${s.key}">${s.name}</span>`).join('')}
             </div><div class="hint">Not sure? Leave it — inspection tells us what will actually help.</div></div>` : ''}
-          ${c.service !== 'restoration' ? `<div class="field" style="max-width:280px"><label>Grader</label><select class="select" data-f="grader">
-            ${Object.entries(HRDATA.GRADERS).map(([v, l]) => `<option value="${v}" ${c.grader === v ? 'selected' : ''}>${l}</option>`).join('')}
-          </select></div>` : ''}
+          ${c.service !== 'restoration' ? `<div class="field" style="max-width:360px"><label>PSA speed (launch grader)</label><select class="select" data-f="psaTier">
+            ${HRDATA.PRICING.psaTiers.map(t => `<option value="${t.key}" ${c.psaTier === t.key ? 'selected' : ''}>PSA ${t.name} — ${HR.fmtAUD(t.fee)} all-in (${t.days})</option>`).join('')}
+          </select><div class="hint">CGC, BGS &amp; SGC — coming soon after launch.</div></div>` : ''}
           <button class="btn btn-soft btn-sm" data-photo disabled>＋ Add photos — real build</button>
         </div>`).join('')}
         <div class="row">
@@ -389,7 +419,11 @@
 
       document.querySelectorAll('.wiz-card').forEach(el => {
         const i = +el.dataset.i;
-        el.querySelectorAll('[data-f]').forEach(inp => inp.addEventListener('change', () => { wiz.cards[i][inp.dataset.f] = inp.value; if (inp.dataset.f === 'category' || inp.tagName === 'SELECT') vWizard(); }));
+        el.querySelectorAll('[data-f]').forEach(inp => inp.addEventListener('change', () => {
+          syncInputs(); // capture in-progress values in OTHER fields before any re-render wipes them
+          wiz.cards[i][inp.dataset.f] = inp.value;
+          if (inp.dataset.f === 'category' || inp.tagName === 'SELECT') vWizard();
+        }));
         el.querySelectorAll('[data-set-svc]').forEach(p => p.addEventListener('click', () => { syncInputs(); wiz.cards[i].service = p.dataset.setSvc; vWizard(); }));
         el.querySelectorAll('[data-job]').forEach(p => p.addEventListener('click', () => {
           syncInputs();
@@ -453,9 +487,9 @@
               <div class="spread"><h4 class="mb0">${i + 1}. ${esc(c.name)}</h4><span class="badge badge-steel">${c.service === 'both' ? 'Restore + grade' : c.service}</span></div>
               <div class="mt1">
                 <div class="est-line"><span>Inspection (credited if you proceed)</span><b>${HR.fmtAUD(e.inspection)}</b></div>
-                ${c.service !== 'grading' ? `<div class="est-line"><span>Restoration — est. on declared ${HR.fmtAUD(parseFloat(c.declared) || 0)}</span><b>${e.custom ? 'Custom quote' : HR.fmtAUD(e.resto)}</b></div>` : ''}
-                ${c.service !== 'restoration' ? `<div class="est-line"><span>Grading submission — ${HRDATA.GRADERS[c.grader]} (placeholder est.)</span><b>${HR.fmtAUD(e.grading)}</b></div>
-                <div class="est-line"><span class="muted">Later: grading upcharge on return</span><span class="muted">4% of final graded value</span></div>` : ''}
+                ${c.service !== 'grading' ? `<div class="est-line"><span>Restoration — base + ${(HRDATA.restorationTier(parseFloat(c.declared) || 0).pct || 0) * 100}% of declared ${HR.fmtAUD(parseFloat(c.declared) || 0)}</span><b>${e.custom ? 'Custom quote' : HR.fmtAUD(e.resto)}</b></div>` : ''}
+                ${c.service !== 'restoration' ? `<div class="est-line"><span>PSA ${HRDATA.psaTier(c.psaTier).name} — all-in (${HRDATA.psaTier(c.psaTier).days})</span><b>${HR.fmtAUD(e.grading)}</b></div>
+                <div class="est-line"><span class="muted">Only if PSA re-tiers after grading</span><span class="muted">tier difference + $20 admin</span></div>` : ''}
               </div>
             </div>`).join('')}
           </div>
@@ -464,9 +498,9 @@
               <h3 style="font-size:1.15rem">Estimate</h3>
               <div class="est-line"><span>Inspection (${wiz.cards.length} card${wiz.cards.length > 1 ? 's' : ''})</span><b>${HR.fmtAUD(insp)}</b></div>
               <div class="est-line"><span>Restoration</span><b>${anyCustom ? 'Incl. custom quote' : HR.fmtAUD(resto)}</b></div>
-              ${anyGrading ? `<div class="est-line"><span>Grading submission</span><b>${HR.fmtAUD(grading)}</b></div>` : ''}
+              ${anyGrading ? `<div class="est-line"><span>PSA grading (all-in)</span><b>${HR.fmtAUD(grading)}</b></div>` : ''}
               <div class="est-line" style="border-top:1px solid var(--line-strong); margin-top:6px; padding-top:12px"><span><b>Estimated today → intake</b></span><span class="price-big" style="font-size:1.6rem">${HR.fmtAUD(total)}</span></div>
-              <p class="small muted mt2">Nothing is charged now. The $10/card inspection is charged when your cards physically arrive; your firm restoration quote follows the confirmed value and needs your approval before work starts.${anyGrading ? ' The 4% grading upcharge is calculated on the final graded value when the card returns.' : ''}</p>
+              <p class="small muted mt2">Nothing is charged now. The $10/card inspection is charged when your cards physically arrive; your firm restoration quote follows the confirmed value and needs your approval before work starts.${anyGrading ? ' A tier-jump charge only applies if PSA reassesses a card into a higher tier after grading — the fee difference plus $20 admin.' : ''}</p>
               <div class="row mt2"><button class="btn btn-ghost" id="back3">← Back</button><button class="btn btn-red" id="next3" style="flex:1">Looks right →</button></div>
             </div>
           </div>
@@ -506,7 +540,7 @@
           id: 'local-' + Date.now(), local: true, number: num, email: wiz.details.email, name: wiz.details.name,
           service: allG ? 'grading' : anyG ? 'both' : 'restoration', created: now.slice(0, 10), status: 'submitted',
           inspection: HRDATA.PRICING.inspection * wiz.cards.length, inspectionPaid: false,
-          cards: wiz.cards.map((c, i) => ({ id: 'lc-' + Date.now() + '-' + i, pos: i + 1, name: c.name, set: c.set, category: c.category, declared: parseFloat(c.declared) || 0, service: c.service, jobs: c.jobs, grader: c.service === 'restoration' ? null : c.grader, stage: 'submitted', reveal: false })),
+          cards: wiz.cards.map((c, i) => ({ id: 'lc-' + Date.now() + '-' + i, pos: i + 1, name: c.name, set: c.set, category: c.category, declared: parseFloat(c.declared) || 0, service: c.service, jobs: c.jobs, grader: c.service === 'restoration' ? null : 'psa', psaTier: c.service === 'restoration' ? null : c.psaTier, stage: 'submitted', reveal: false })),
           timeline: [{ stage: 'submitted', at: now, note: 'Order created in prototype demo' }],
           messages: []
         });

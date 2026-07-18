@@ -28,27 +28,39 @@
 
   const PRICING = {
     inspection: 10,
+    /* Tiered percentage scales with card value (client-confirmed, replaces flat 10%) */
     tiers: [
-      { max: 100,   base: 20,  label: 'Under $100' },
-      { max: 2000,  base: 50,  label: '$100 – $2,000' },
-      { max: 10000, base: 120, label: '$2,000 – $10,000' },
-      { max: null,  base: null, label: '$10,000+', custom: true }
+      { max: 100,   base: 20,  pct: 0.075, label: 'Under $100' },
+      { max: 2000,  base: 50,  pct: 0.10,  label: '$100 – $2,000' },
+      { max: 10000, base: 120, pct: 0.125, label: '$2,000 – $10,000' },
+      { max: null,  base: null, pct: null,  label: '$10,000+', custom: true }
     ],
-    pct: 0.10,
-    gradingUpchargePct: 0.04,
-    /* Placeholder estimates — real rates are pass-through of grader fee + dealer partner
-       charges + handling, confirmed once the dealer partner is locked in. */
-    graderEstimates: { psa: 75, cgc: 55, bgs: 85, sgc: 60 },
+    /* PSA launch pricing — flat, all-in, per card, by service speed (client-confirmed, final) */
+    psaTiers: [
+      { key: 'regular', name: 'Regular',       days: '40–50 business days', fee: 225 },
+      { key: 'express', name: 'Express',       days: '20–30 business days', fee: 375 },
+      { key: 'super',   name: 'Super Express', days: '10 business days',    fee: 850 }
+    ],
+    /* If PSA reassesses a card into a higher tier after grading:
+       customer pays the difference between tier fees + this admin fee. Replaces the old 4% upcharge. */
+    tierJumpAdmin: 20,
     storeShipping: { flat: 9.95, freeOver: 99 }
   };
 
-  function restorationFee(value) {
-    if (value >= 10000) return null; // custom quote
-    const tier = PRICING.tiers.find(t => t.max !== null && value < t.max) || PRICING.tiers[2];
-    return Math.round((tier.base + value * PRICING.pct) * 100) / 100;
+  function restorationTier(value) {
+    if (value >= 10000) return PRICING.tiers[3];
+    return PRICING.tiers.find(t => t.max !== null && value < t.max) || PRICING.tiers[2];
   }
+  function restorationFee(value) {
+    const tier = restorationTier(value);
+    if (tier.custom) return null; // custom quote
+    return Math.round((tier.base + value * tier.pct) * 100) / 100;
+  }
+  const psaTier = k => PRICING.psaTiers.find(t => t.key === k) || PRICING.psaTiers[0];
 
   const GRADERS = { psa: 'PSA', cgc: 'CGC', bgs: 'BGS', sgc: 'SGC' };
+  /* PSA-only at launch — others are confirmed future additions, shown as coming soon */
+  const GRADER_STATUS = { psa: 'live', cgc: 'coming', bgs: 'coming', sgc: 'coming' };
 
   /* ---------- sample orders (shared by portal, staff and guest tracking) ---------- */
   const ORDERS = [
@@ -56,17 +68,17 @@
       id: 'o1', number: 'HR-2026-0342', email: 'hash@demo.com.au', name: 'Jordan Lee',
       service: 'both', created: '2026-06-02', status: 'delivered',
       inspection: 20, inspectionPaid: true, quote: 396.5, quotePaid: true,
-      gradingFee: 130, gradingFeePaid: true, upcharge: 148, upchargePaid: true,
+      gradingFee: 450, gradingFeePaid: true, upcharge: 170, upchargePaid: true, // 2 × PSA Regular; Charizard re-tiered Regular→Express: $150 diff + $20 admin
       outboundTracking: 'AP334920117AU', carrier: 'Australia Post',
       cards: [
         { id: 'c1', pos: 1, name: '1999 Base Set Charizard Holo', set: 'Pokémon Base Set', category: 'pokemon',
           declared: 1800, confirmed: 1650, service: 'both', jobs: ['cleaning', 'corner_repair', 'surface_treatment'],
-          grader: 'psa', stage: 'delivered', reveal: true, gradeBefore: 'Raw — heavy wear', gradeAfter: 'PSA 8',
+          grader: 'psa', psaTier: 'regular', tierOnReturn: 'express', stage: 'delivered', reveal: true, gradeBefore: 'Raw — heavy wear', gradeAfter: 'PSA 8',
           cert: '88231447', gradedValue: 2600 },
         { id: 'c2', pos: 2, name: '1996 Topps Kobe Bryant RC', set: 'Topps Basketball', category: 'sports',
           declared: 900, confirmed: 850, service: 'both', jobs: ['cleaning', 'dent_removal'],
-          grader: 'cgc', stage: 'delivered', reveal: true, gradeBefore: 'Raw — dented', gradeAfter: 'CGC 8.5',
-          cert: '4051220089', gradedValue: 1100 }
+          grader: 'psa', psaTier: 'regular', stage: 'delivered', reveal: true, gradeBefore: 'Raw — dented', gradeAfter: 'PSA 8.5',
+          cert: '90114327', gradedValue: 1100 }
       ],
       timeline: [
         { stage: 'submitted', at: '2026-06-02 09:14', note: 'Order created online' },
@@ -77,7 +89,7 @@
         { stage: 'prepped_for_grading', at: '2026-06-16 10:10', note: 'Batched for submission' },
         { stage: 'shipped_to_grader', at: '2026-06-17 09:00', note: 'Shipped — batch B-014' },
         { stage: 'at_grader', at: '2026-06-20 12:00', note: 'Confirmed received' },
-        { stage: 'graded_returned', at: '2026-07-08 14:22', note: 'Back in-house. PSA 8 / CGC 8.5' },
+        { stage: 'graded_returned', at: '2026-07-08 14:22', note: 'Back in-house. PSA 8 / PSA 8.5. Charizard re-tiered by PSA — adjustment settled.' },
         { stage: 'final_qc', at: '2026-07-09 09:30', note: 'Final QC passed' },
         { stage: 'shipped_to_you', at: '2026-07-09 15:05', note: 'AP334920117AU (Australia Post, insured)' },
         { stage: 'delivered', at: '2026-07-11 10:48', note: 'Delivered — signature received' }
@@ -86,7 +98,7 @@
         { from: 'customer', at: '2026-06-05 16:02', body: 'Hey — saw the quote come through. Before I approve, is the corner work on the Charizard likely to be noticeable?' },
         { from: 'staff', who: 'Hash', at: '2026-06-05 16:31', body: 'Good question. The rebuild is done to sit flush with the original stock — under normal light you won’t pick it. We’ll shoot close-ups for your reveal so you can judge it yourself before it ships anywhere.' },
         { from: 'customer', at: '2026-06-05 16:44', body: 'Perfect, approved. Go ahead.' },
-        { from: 'staff', who: 'Hash', at: '2026-07-08 14:30', body: 'They’re back — PSA 8 on the Charizard, CGC 8.5 on the Kobe. Huge result from where they started. Final QC tomorrow, then they’re on their way to you.' }
+        { from: 'staff', who: 'Hash', at: '2026-07-08 14:30', body: 'They’re back — PSA 8 on the Charizard, PSA 8.5 on the Kobe. Huge result from where they started. Final QC tomorrow, then they’re on their way to you.' }
       ]
     },
     {
@@ -122,7 +134,7 @@
       cards: [
         { id: 'c6', pos: 1, name: '2022 Umbreon VMAX Alt Art', set: 'Evolving Skies', category: 'pokemon',
           declared: 380, confirmed: 350, service: 'both', jobs: ['cleaning', 'corner_repair'],
-          grader: 'psa', stage: 'quote_ready', reveal: false }
+          grader: 'psa', psaTier: 'regular', stage: 'quote_ready', reveal: false }
       ],
       timeline: [
         { stage: 'submitted', at: '2026-07-12 13:40', note: 'Order created online' },
@@ -139,9 +151,9 @@
       gradingFee: 110, gradingFeePaid: true,
       cards: [
         { id: 'c7', pos: 1, name: '2019 Ja Morant Prizm RC', set: 'Panini Prizm', category: 'sports',
-          declared: 250, confirmed: 250, service: 'grading', jobs: [], grader: 'psa', stage: 'prepped_for_grading' },
+          declared: 250, confirmed: 250, service: 'grading', jobs: [], grader: 'psa', psaTier: 'express', stage: 'prepped_for_grading' },
         { id: 'c8', pos: 2, name: 'Charizard VMAX Shiny', set: 'Shining Fates', category: 'pokemon',
-          declared: 180, confirmed: 180, service: 'grading', jobs: [], grader: 'psa', stage: 'prepped_for_grading' }
+          declared: 180, confirmed: 180, service: 'grading', jobs: [], grader: 'psa', psaTier: 'regular', stage: 'prepped_for_grading' }
       ],
       timeline: [
         { stage: 'submitted', at: '2026-07-14 08:12', note: 'Order created online' },
@@ -171,7 +183,7 @@
       note: 'All 5 back 08 Jul. Certs logged.' },
     { ref: 'B-015', grader: 'psa', dealer: 'SLABD', status: 'open', shipDate: null,
       outTracking: null, estReturn: null, cards: 2, note: 'Building — target ship Fri.' },
-    { ref: 'B-016', grader: 'cgc', dealer: 'Leo Games (Sydney)', status: 'at_grader', shipDate: '2026-07-03',
+    { ref: 'B-016', grader: 'psa', dealer: 'Leo Games (Sydney)', status: 'at_grader', shipDate: '2026-07-03',
       outTracking: 'AP228817740AU', estReturn: '2026-08-02', cards: 4, note: '' }
   ];
 
@@ -212,38 +224,30 @@
   /* ---------- gallery (sample entries — real photography replaces the art) ---------- */
   const GALLERY = [
     { id: 'g1', title: '1999 Base Set Charizard Holo', category: 'pokemon', services: ['cleaning', 'corner_repair', 'surface_treatment'], before: 'Raw — heavy wear', after: 'PSA 8', blurb: 'Soft corners rebuilt, surface haze lifted. Came back a PSA 8.', featured: true },
-    { id: 'g2', title: '1996 Topps Kobe Bryant RC', category: 'sports', services: ['cleaning', 'dent_removal'], before: 'Raw — dented', after: 'CGC 8.5', blurb: 'Two deep dents worked flat. Graded CGC 8.5.', featured: true },
+    { id: 'g2', title: '1996 Topps Kobe Bryant RC', category: 'sports', services: ['cleaning', 'dent_removal'], before: 'Raw — dented', after: 'PSA 8.5', blurb: 'Two deep dents worked flat. Graded PSA 8.5.', featured: true },
     { id: 'g3', title: 'Blue-Eyes White Dragon LOB', category: 'yugioh', services: ['cleaning', 'crease_repair'], before: 'Raw — creased', after: 'Restored', blurb: 'A front-to-back crease softened to near-invisible.' },
-    { id: 'g4', title: '2003 LeBron James Topps RC', category: 'sports', services: ['corner_repair'], before: 'Raw — corner wear', after: 'BGS 8', blurb: 'All four corners sharpened. BGS 8 on return.' },
+    { id: 'g4', title: '2003 LeBron James Topps RC', category: 'sports', services: ['corner_repair'], before: 'Raw — corner wear', after: 'PSA 8', blurb: 'All four corners sharpened. PSA 8 on return.' },
     { id: 'g5', title: 'Umbreon VMAX Alt Art', category: 'pokemon', services: ['cleaning', 'surface_treatment'], before: 'Raw — scratched', after: 'PSA 9', blurb: 'Surface scratches polished out of the alt art. PSA 9.', featured: true },
     { id: 'g6', title: 'Black Lotus (Revised)', category: 'magic', services: ['cleaning'], before: 'Raw — grimy', after: 'Restored', blurb: 'Decades of handling residue lifted without touching the print.' },
-    { id: 'g7', title: 'Luffy Gear 5 Alt Art', category: 'onepiece', services: ['dent_removal', 'surface_treatment'], before: 'Raw — dented', after: 'SGC 9', blurb: 'Shipping dent removed, surface finished. SGC 9.' },
+    { id: 'g7', title: 'Luffy Gear 5 Alt Art', category: 'onepiece', services: ['dent_removal', 'surface_treatment'], before: 'Raw — dented', after: 'PSA 9', blurb: 'Shipping dent removed, surface finished. PSA 9.' },
     { id: 'g8', title: '1998 Pikachu Jungle', category: 'pokemon', services: ['crease_repair', 'cleaning'], before: 'Raw — folded', after: 'Restored', blurb: 'A folded childhood favourite brought back for display.' }
-  ];
-
-  /* Sample turnaround board — staff-updated weekly in the real build (no grader APIs exist) */
-  const TURNAROUND = [
-    { grader: 'psa', days: 38, trend: 'steady' },
-    { grader: 'cgc', days: 24, trend: 'improving' },
-    { grader: 'bgs', days: 52, trend: 'slower' },
-    { grader: 'sgc', days: 19, trend: 'improving' }
   ];
 
   const FAQS = [
     { q: 'Do you check for fakes?', a: 'Every card, every time. Counterfeits — including “super fakes” and even fake graded slabs — are the biggest problem in the hobby right now, so an authenticity screen is built into the $10 inspection on every submission. If a card doesn’t pass, we tell you straight, it never goes to restoration or a grader, and it’s returned to you. We’d rather lose a job than pass a fake down the line.' },
     { q: 'Is my card insured while you have it?', a: 'Yes. While your card is in our direct custody it’s covered against loss or damage up to the declared value we confirm together at intake, and every physical handoff is photo-logged with timestamps. Once it’s with a courier or a grading company, their cover applies — we’ll always pass on anything we can recover on your behalf.' },
     { q: 'Do you guarantee a grade?', a: 'No — and you should be wary of anyone who does. Grading decisions belong to the grading companies alone. What we guarantee is careful, skilled work, honest updates at every stage, and a firm quote before anything starts.' },
-    { q: 'What does it cost?', a: 'A $10 inspection fee per card at intake (credited to your invoice if you proceed), then a firm restoration quote based on your card’s confirmed value — a flat base of $20–$120 by value tier plus 10% of confirmed value. Grading concierge adds the grader’s own fee plus 4% of final graded value when it returns. Nothing is ever charged against a guessed value.' },
+    { q: 'What does it cost?', a: 'A $10 inspection fee per card at intake (credited to your invoice if you proceed), then a firm restoration quote on your card’s confirmed value — a flat base of $20–$120 by value tier plus 7.5–12.5% of confirmed value (the percentage scales with the tier). PSA grading is a flat, all-in fee by speed: $225 Regular, $375 Express, $850 Super Express. If PSA reassesses a card into a higher tier after grading, you pay just the difference between tier fees plus a $20 admin fee. Nothing is ever charged against a guessed value.' },
     { q: 'Do I have to disclose restoration when I sell?', a: 'Yes — standard hobby practice (and our terms) put that responsibility with you. We’re upfront about this because it protects everyone, including the card’s next owner.' },
     { q: 'How do I get my cards to you?', a: 'You arrange and pay for shipping to us — we recommend tracked and insured. Full packing instructions come with your submission confirmation. Return shipping back to you is tracked and insured via Australia Post or courier.' },
-    { q: 'How long does it take?', a: 'Restoration typically runs 1–3 weeks depending on the work. Grading adds the grader’s own turnaround, which is outside our control — your tracker shows the live status the whole way.' },
-    { q: 'Which graders do you submit to?', a: 'PSA, CGC, BGS and SGC — you pick per card. We handle the entire submission on your behalf; you never deal with the grader directly.' },
+    { q: 'How long does it take?', a: 'Restoration typically runs 1–3 weeks depending on the work. PSA grading depends on the speed you choose: Regular 40–50 business days, Express 20–30, Super Express 10. Your tracker shows the live status the whole way.' },
+    { q: 'Which graders do you submit to?', a: 'We’re launching with PSA — the world’s biggest grader — with the entire submission handled on your behalf; you never deal with PSA directly. CGC, BGS and SGC are confirmed future additions once we’re rolling.' },
     { q: 'Can I order restoration without grading, or grading without restoration?', a: 'Both. Restoration only, grading only, or restoration flowing straight into grading as one bundled path — your choice, per card.' }
   ];
 
   const REPORT = {
     ordersActive: 9, cardsInHouse: 14, avgTurnaroundDays: 24.5, gradeImprovements: 11,
-    revenueMonth: { inspection: 180, restoration: 2470, grading: 890, upcharges: 612, store: 486 },
+    revenueMonth: { inspection: 180, restoration: 2470, grading: 1800, upcharges: 340, store: 486 },
     cardsByStage: { submitted: 2, received: 3, quote_ready: 1, in_restoration: 3, restoration_complete: 1, prepped_for_grading: 2, shipped_to_grader: 0, at_grader: 4, graded_returned: 0, final_qc: 0, shipped_to_you: 1, delivered: 12 }
   };
 
@@ -257,7 +261,7 @@
   const DEALERS = ['SLABD', 'Leo Games (Sydney)', 'House of Cards N Collectables (Sydney)'];
 
   window.HRDATA = {
-    STAGES, stageIdx, SERVICES, PRICING, restorationFee, GRADERS, TURNAROUND,
+    STAGES, stageIdx, SERVICES, PRICING, restorationFee, restorationTier, psaTier, GRADERS, GRADER_STATUS,
     ORDERS, BATCHES, PRODUCTS, GALLERY, FAQS, REPORT, CUSTOMERS, DEALERS
   };
 })();

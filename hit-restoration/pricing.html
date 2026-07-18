@@ -43,19 +43,19 @@
       <span class="badge badge-red mb1">If restoring</span>
       <div class="price-big">$20+ <small>base</small></div>
       <h4 class="mt1">Restoration</h4>
-      <p class="small muted mb0">A flat base by value tier, plus 10% of your card's confirmed value. Quoted firm before any work starts.</p>
+      <p class="small muted mb0">A flat base by value tier, plus 7.5–12.5% of your card's confirmed value (the % scales with the tier). Quoted firm before any work starts.</p>
     </div>
     <div class="card">
       <span class="badge badge-red mb1">If grading</span>
-      <div class="price-big">At cost <small>+ handling</small></div>
-      <h4 class="mt1">Grading submission</h4>
-      <p class="small muted mb0">The grader's own fee plus submission-partner charges, passed through with a small handling markup.</p>
+      <div class="price-big">$225+ <small>all-in</small></div>
+      <h4 class="mt1">PSA submission</h4>
+      <p class="small muted mb0">One flat fee by speed — Regular $225, Express $375, Super Express $850. Per card, all-in, no hidden pass-throughs.</p>
     </div>
     <div class="card">
-      <span class="badge badge-red mb1">On return</span>
-      <div class="price-big">4% <small>of value</small></div>
-      <h4 class="mt1">Grading upcharge</h4>
-      <p class="small muted mb0">4% of the final graded value, charged once the card returns from the grader.</p>
+      <span class="badge badge-red mb1">Only if re-tiered</span>
+      <div class="price-big">Diff <small>+ $20</small></div>
+      <h4 class="mt1">Tier jump</h4>
+      <p class="small muted mb0">Only if PSA reassesses your card into a higher tier after grading: you pay the difference between tier fees plus a $20 admin fee. No jump, nothing extra.</p>
     </div>
   </div>
 
@@ -66,7 +66,7 @@
       <tbody id="tierRows"></tbody>
     </table>
   </div>
-  <p class="small muted mt1">The 10% is calculated on the value we confirm together at intake — not your declared estimate.</p>
+  <p class="small muted mt1">The percentage scales with the tier and is calculated on the value we confirm together at intake — not your declared estimate.</p>
 </div></section>
 
 <section class="section"><div class="container">
@@ -80,9 +80,10 @@
         <div class="pill-opts"><span class="pill on" id="restoToggle">Include restoration</span></div>
         <div id="jobWrap" class="mt2"><label class="small muted">Work needed (optional — for your own estimate)</label><div class="pill-opts mt1" id="jobs"></div></div>
       </div>
-      <div class="field"><label>Grading concierge</label>
-        <div class="pill-opts"><span class="pill" id="gradeToggle">Include grading</span></div>
-        <div id="graderWrap" class="mt2" style="display:none; max-width:240px"><label class="small muted">Grader</label><select class="select mt1" id="grader"></select></div>
+      <div class="field"><label>PSA grading concierge</label>
+        <div class="pill-opts"><span class="pill" id="gradeToggle">Include PSA grading</span></div>
+        <div id="graderWrap" class="mt2" style="display:none; max-width:320px"><label class="small muted">Speed</label><select class="select mt1" id="grader"></select>
+        <div class="hint">CGC, BGS &amp; SGC — coming soon after launch.</div></div>
       </div>
     </div>
     <div>
@@ -118,7 +119,7 @@
         </div>
         <div class="hint">Presets multiply your raw value — overwrite the graded number with your own if you know it.</div>
       </div>
-      <div class="field mt2 mb0" style="max-width:220px"><label>Grader</label><select class="select" id="wGrader"></select></div>
+      <div class="field mt2 mb0" style="max-width:320px"><label>PSA speed</label><select class="select" id="wGrader"></select></div>
     </div>
     <div>
       <div class="panel panel-pad">
@@ -128,7 +129,7 @@
           <b>Est. net after fees</b><span class="price-big" id="wNet" style="font-size:1.9rem">—</span>
         </div>
         <p class="mt2 mb0" id="wVerdict" style="font-weight:700"></p>
-        <p class="small muted mt1 mb0">Estimates only — grader fees are placeholder rates confirmed at intake, and no grade or value is ever guaranteed.</p>
+        <p class="small muted mt1 mb0">Estimates only — no grade or value is ever guaranteed. If PSA re-tiers your card after grading, the tier-fee difference + $20 admin applies (not included above; most cards never have one).</p>
       </div>
     </div>
   </div>
@@ -142,8 +143,8 @@
     <div class="flow"><div class="fn">2</div><div><b class="white">Card arrives</b><div class="small muted">We confirm condition and value. The $10 inspection fee is charged.</div></div></div>
     <div class="flow"><div class="fn">3</div><div><b class="white">Firm restoration quote</b><div class="small muted">Issued on the confirmed value — you approve and pay before any work begins.</div></div></div>
     <div class="flow"><div class="fn">4</div><div><b class="white">Restoration carried out</b><div class="small muted">Then your before/after reveal lands in the portal.</div></div></div>
-    <div class="flow"><div class="fn">5</div><div><b class="white">Grading submission</b><div class="small muted">If selected, the submission fee is charged before your card ships out.</div></div></div>
-    <div class="flow"><div class="fn">6</div><div><b class="white">Graded & returned</b><div class="small muted">The 4% upcharge on the final value is charged; your card ships back once it's paid.</div></div></div>
+    <div class="flow"><div class="fn">5</div><div><b class="white">PSA submission</b><div class="small muted">If selected, the flat all-in PSA fee (by your chosen speed) is charged before your card ships out.</div></div></div>
+    <div class="flow"><div class="fn">6</div><div><b class="white">Graded & returned</b><div class="small muted">If PSA re-tiered your card, the tier-fee difference + $20 admin is settled; your card ships back once any balance is paid.</div></div></div>
   </div>
 </div></section>
 
@@ -161,10 +162,10 @@
 document.addEventListener('DOMContentLoaded', () => {
   const $ = s => document.querySelector(s);
   // tiers
-  $('#tierRows').innerHTML = HRDATA.PRICING.tiers.map(t => `<tr><td>${t.label}</td><td>${t.custom?'Custom quote':HR.fmtAUD(t.base)}</td><td>${t.custom?'—':'+ 10% of value'}</td></tr>`).join('');
+  $('#tierRows').innerHTML = HRDATA.PRICING.tiers.map(t => `<tr><td>${t.label}</td><td>${t.custom?'Custom quote':HR.fmtAUD(t.base)}</td><td>${t.custom?'—':'+ '+(t.pct*100)+'% of value'}</td></tr>`).join('');
   // jobs + graders
   $('#jobs').innerHTML = HRDATA.SERVICES.map(s => `<span class="pill" data-job="${s.key}">${s.name}</span>`).join('');
-  $('#grader').innerHTML = Object.entries(HRDATA.GRADERS).map(([k,v]) => `<option value="${k}">${v}</option>`).join('');
+  $('#grader').innerHTML = HRDATA.PRICING.psaTiers.map(t => `<option value="${t.key}">${t.name} — ${HR.fmtAUD(t.fee)} (${t.days})</option>`).join('');
 
   let resto = true, grade = false;
   $('#jobs').addEventListener('click', e => { const p=e.target.closest('[data-job]'); if(p) p.classList.toggle('on'); });
@@ -180,36 +181,35 @@ document.addEventListener('DOMContentLoaded', () => {
     let total = HRDATA.PRICING.inspection, custom = false;
     if (resto) {
       const f = HRDATA.restorationFee(v);
+      const tier = HRDATA.restorationTier(v);
       if (f === null) { custom = true; lines.push(['Restoration (value ≥ $10,000)', 'Custom quote']); }
-      else { lines.push([`Restoration — base + 10% of ${HR.fmtAUD(v)}`, HR.fmtAUD(f)]); total += f; }
+      else { lines.push([`Restoration — base + ${(tier.pct*100)}% of ${HR.fmtAUD(v)}`, HR.fmtAUD(f)]); total += f; }
     }
     if (grade) {
-      const g = HRDATA.PRICING.graderEstimates[$('#grader').value] || 0;
-      lines.push([`${HRDATA.GRADERS[$('#grader').value]} submission (est.)`, '~' + HR.fmtAUD(g)]);
-      total += g;
-      lines.push(['<span class="muted">Later: upcharge on return</span>', '<span class="muted">4% of final graded value</span>']);
+      const t = HRDATA.psaTier($('#grader').value);
+      lines.push([`PSA ${t.name} (${t.days}) — all-in`, HR.fmtAUD(t.fee)]);
+      total += t.fee;
+      lines.push(['<span class="muted">Only if PSA re-tiers after grading</span>', '<span class="muted">tier difference + $20 admin</span>']);
     }
     $('#estLines').innerHTML = lines.map(([l,r]) => `<div style="display:flex; justify-content:space-between; gap:12px; padding:9px 0; border-bottom:1px dashed var(--line); font-size:.92rem"><span>${l}</span><b class="white">${r}</b></div>`).join('');
     $('#estTotal').textContent = custom ? 'Custom' : HR.fmtAUD(total);
-    $('#estNote').innerHTML = 'This is an estimate. The $10 inspection is charged when your card arrives; your firm restoration quote follows the confirmed value and needs your approval before work starts.' + (grade ? ' The 4% grading upcharge is calculated on the final graded value when your card returns — it isn\'t in this total.' : '');
+    $('#estNote').innerHTML = 'This is an estimate. The $10 inspection is charged when your card arrives; your firm restoration quote follows the confirmed value and needs your approval before work starts.' + (grade ? ' A tier-jump charge only applies if PSA reassesses your card into a higher tier after grading — most cards never have one.' : '');
   }
   calc();
 
   // "worth grading?" calculator
-  $('#wGrader').innerHTML = Object.entries(HRDATA.GRADERS).map(([k,v]) => `<option value="${k}">${v}</option>`).join('');
+  $('#wGrader').innerHTML = HRDATA.PRICING.psaTiers.map(t => `<option value="${t.key}">${t.name} — ${HR.fmtAUD(t.fee)} (${t.days})</option>`).join('');
   function wCalc() {
     const raw = parseFloat($('#wRaw').value) || 0;
     const graded = parseFloat($('#wGraded').value) || 0;
-    const gFee = HRDATA.PRICING.graderEstimates[$('#wGrader').value] || 0;
-    const upcharge = graded * HRDATA.PRICING.gradingUpchargePct;
+    const t = HRDATA.psaTier($('#wGrader').value);
     const insp = HRDATA.PRICING.inspection;
-    const fees = insp + gFee + upcharge;
+    const fees = insp + t.fee;
     const net = graded - raw - fees;
     $('#wLines').innerHTML = [
       ['Value uplift (graded − raw)', HR.fmtAUD(graded - raw)],
       ['Inspection (credited)', '− ' + HR.fmtAUD(insp)],
-      [`${HRDATA.GRADERS[$('#wGrader').value]} submission (est.)`, '− ' + HR.fmtAUD(gFee)],
-      ['4% upcharge on graded value', '− ' + HR.fmtAUD(upcharge)]
+      [`PSA ${t.name} — all-in (${t.days})`, '− ' + HR.fmtAUD(t.fee)]
     ].map(([l,r]) => `<div style="display:flex; justify-content:space-between; gap:12px; padding:8px 0; border-bottom:1px dashed var(--line); font-size:.92rem"><span>${l}</span><b class="white">${r}</b></div>`).join('');
     $('#wNet').textContent = (net >= 0 ? '+' : '−') + HR.fmtAUD(Math.abs(net)).slice(1);
     $('#wNet').style.color = net > 0 ? '#6FCE92' : '#FF7A90';

@@ -80,7 +80,7 @@
         </div>
         <div class="fine">
           <span>© 2026 Hit Restoration Co. · ABN TBC · Australia-only at launch</span>
-          <span>Sister brand: <a href="#" style="display:inline; padding:0" title="Cross-link to the existing Hit Collectables Shopify store (kept inert in this prototype)">Hit Collectables ↗</a></span>
+          <span><a href="https://instagram.com/hitrestorationco" target="_blank" rel="noopener" style="display:inline; padding:0">Instagram @hitrestorationco</a> · Sister brand: <a href="#" style="display:inline; padding:0" title="Cross-link to the existing Hit Collectables Shopify store (kept inert in this prototype)">Hit Collectables ↗</a></span>
         </div>
       </div>
     </footer>`;

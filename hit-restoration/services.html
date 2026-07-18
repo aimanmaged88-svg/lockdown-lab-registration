@@ -62,14 +62,14 @@
   <div class="split">
     <div>
       <h2>You never deal with the grader. We do.</h2>
-      <p class="lead">Choose a grader per card and we handle the entire submission on your behalf — prep, documentation, secure shipping, and tracking the whole way. Your card returns graded and comes home to you.</p>
+      <p class="lead">We're launching with <b class="white">PSA</b> — the world's biggest grader — every submission handled end-to-end on your behalf: prep, documentation, secure shipping, tracking the whole way. Pick your speed per card; your card returns graded and comes home to you.</p>
       <p class="muted">All submissions are routed through our established Australian submission channel, so every grader is handled the same, consistent way. You watch it move through your portal the entire time.</p>
       <a class="btn btn-red mt2" href="how-it-works.html">See the full journey</a>
     </div>
     <div>
       <div class="grader-grid mb2" id="graders"></div>
       <div class="panel panel-pad">
-        <h4>Estimated submission fees <span class="badge badge-warning">placeholder</span></h4>
+        <h4>PSA pricing <span class="badge badge-success">confirmed — flat, all-in, per card</span></h4>
         <div id="graderFees"></div>
         <div class="note-build">Real grading fees are a pass-through of the grader's own fee plus submission-partner charges and a small handling markup — confirmed at intake once the partner rate is locked. A 4% upcharge on the final graded value is charged when the card returns.</div>
       </div>
@@ -78,10 +78,10 @@
 
   <h3 class="mt4 mb2">How a submission works</h3>
   <div class="step-num">
-    <div class="card"><div class="red" style="font-family:var(--display); font-size:1.5rem">01</div><h4>Pick a grader</h4><p class="small muted mb0">PSA, CGC, BGS or SGC — per card, at submission or straight after restoration.</p></div>
+    <div class="card"><div class="red" style="font-family:var(--display); font-size:1.5rem">01</div><h4>Pick your speed</h4><p class="small muted mb0">PSA Regular, Express or Super Express — per card, at submission or straight after restoration.</p></div>
     <div class="card"><div class="red" style="font-family:var(--display); font-size:1.5rem">02</div><h4>We prep & document</h4><p class="small muted mb0">Sleeved, photographed, batched and logged against your order.</p></div>
     <div class="card"><div class="red" style="font-family:var(--display); font-size:1.5rem">03</div><h4>We submit & track</h4><p class="small muted mb0">Sent on your behalf, with the reference logged so your tracker stays live.</p></div>
-    <div class="card"><div class="red" style="font-family:var(--display); font-size:1.5rem">04</div><h4>Graded & home</h4><p class="small muted mb0">Back in-house, final QC, then tracked and insured to your door. Upcharge on the final value.</p></div>
+    <div class="card"><div class="red" style="font-family:var(--display); font-size:1.5rem">04</div><h4>Graded & home</h4><p class="small muted mb0">Back in-house, final QC, then tracked and insured to your door. If PSA re-tiered the card: just the fee difference + $20 admin.</p></div>
   </div>
 </div></section>
 
@@ -139,10 +139,12 @@ document.addEventListener('DOMContentLoaded', () => {
     HR.mountReveal(host, HRART.cardSVG({name:s.name,category:cat,state:'before',seed}), HRART.cardSVG({name:s.name,category:cat,state:'after',seed}));
   });
 
-  const trendBadge = t => t==='improving' ? '<span style="color:#6FCE92">▼ improving</span>' : t==='slower' ? '<span style="color:#E8C983">▲ slower</span>' : '<span style="color:var(--steel)">— steady</span>';
-  document.getElementById('graders').innerHTML = HRDATA.TURNAROUND.map(x => `<div class="grader"><div class="g">${HRDATA.GRADERS[x.grader]}</div><div class="t">~${x.days} days<small>${trendBadge(x.trend)}</small></div></div>`).join('')
-    + `<div style="grid-column:1/-1" class="small muted center">Live turnaround board — door-to-door estimates, updated weekly by our team. <span class="badge badge-warning" style="font-size:.6rem">Sample data in prototype</span></div>`;
-  document.getElementById('graderFees').innerHTML = Object.entries(HRDATA.PRICING.graderEstimates).map(([k,v]) => `<div style="display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px dashed var(--line); font-size:.9rem"><span>${HRDATA.GRADERS[k]} submission</span><b class="white">~${HR.fmtAUD(v)}</b></div>`).join('');
+  document.getElementById('graders').innerHTML =
+    `<div class="grader" style="border-color:rgba(200,16,46,.55)"><div class="g">PSA</div><div class="t" style="color:#6FCE92">Live at launch<small>your speed, your call</small></div></div>`
+    + ['CGC','BGS','SGC'].map(g => `<div class="grader" style="opacity:.55"><div class="g">${g}</div><div class="t">Coming soon<small>after launch</small></div></div>`).join('');
+  document.getElementById('graderFees').innerHTML = HRDATA.PRICING.psaTiers.map(t =>
+    `<div style="display:flex; justify-content:space-between; gap:10px; padding:8px 0; border-bottom:1px dashed var(--line); font-size:.9rem"><span><b class="white">${t.name}</b> <span class="muted">· ${t.days}</span></span><b class="white">${HR.fmtAUD(t.fee)}</b></div>`).join('')
+    + `<div class="small muted" style="padding-top:10px">Per card, all-in. If PSA reassesses a card into a higher tier after grading, you pay the tier-fee difference + $20 admin — that's the only extra there can ever be.</div>`;
   document.getElementById('bundleStepper').innerHTML = HR.stepperHTML('submitted', { grading:true });
 });
 </script>

@@ -273,7 +273,7 @@
               <h5>Phase 1 — Outbound (at submission)</h5>
               <div class="grid g2" style="gap:10px">
                 <div class="field mb0"><label>Grader</label><input class="input" value="${HRDATA.GRADERS[c.grader] || ''}" disabled></div>
-                <div class="field mb0"><label>Service tier</label><input class="input" data-sub="${c.id}|out|tier" value="${esc(sub.out?.tier || '')}" placeholder="e.g. Value"></div>
+                <div class="field mb0"><label>PSA speed tier</label><select class="select" data-sub="${c.id}|out|tier">${HRDATA.PRICING.psaTiers.map(t => `<option value="${t.key}" ${(sub.out?.tier || c.psaTier) === t.key ? 'selected' : ''}>${t.name} — ${HR.fmtAUD(t.fee)}</option>`).join('')}</select></div>
                 <div class="field mb0"><label>Dealer partner <span class="badge badge-red" style="font-size:.55rem">INTERNAL</span></label>
                   <select class="select" data-sub="${c.id}|out|dealer">${['', ...HRDATA.DEALERS].map(d => `<option ${sub.out?.dealer === d ? 'selected' : ''}>${d}</option>`).join('')}</select></div>
                 <div class="field mb0"><label>Dealer batch ref</label><input class="input" data-sub="${c.id}|out|ref" value="${esc(sub.out?.ref || '')}" placeholder="e.g. SLB-2291"></div>
@@ -289,17 +289,41 @@
               <div class="grid g2" style="gap:10px">
                 <div class="field mb0"><label>Cert number</label><input class="input" data-sub="${c.id}|in|cert" value="${esc(sub.in?.cert || c.cert || '')}" placeholder="e.g. 88231447"></div>
                 <div class="field mb0"><label>Final grade</label><input class="input" data-sub="${c.id}|in|grade" value="${esc(sub.in?.grade || c.gradeAfter || '')}" placeholder="e.g. PSA 8"></div>
-                <div class="field mb0"><label>Graded value (for 4% upcharge)</label><input class="input" data-sub="${c.id}|in|value" value="${esc(sub.in?.value || c.gradedValue || '')}" placeholder="AUD"></div>
+                <div class="field mb0"><label>Tier on return (PSA reassessment)</label><select class="select" data-sub="${c.id}|in|value">
+                  <option value="">Same tier — no adjustment</option>
+                  ${HRDATA.PRICING.psaTiers.map(t => `<option value="${t.key}" ${(sub.in?.value || c.tierOnReturn) === t.key ? 'selected' : ''}>${t.name} — ${HR.fmtAUD(t.fee)}</option>`).join('')}
+                </select></div>
                 <div class="field mb0"><label>Return tracking</label><input class="input" data-sub="${c.id}|in|track" value="${esc(sub.in?.track || '')}"></div>
                 <div class="field mb0"><label>Date received</label><input class="input" type="date" data-sub="${c.id}|in|recv" value="${esc(sub.in?.recv || '')}"></div>
                 <div class="field mb0"><label>Grader notes</label><input class="input" data-sub="${c.id}|in|notes" value="${esc(sub.in?.notes || '')}"></div>
               </div>
               <button class="btn btn-soft btn-sm mt2" data-savesub="${c.id}|in">Save inbound</button>
-              ${sub.in?.value ? `<div class="small mt1" style="color:#6FCE92">Upcharge on this card: <b>${HR.fmtAUD(parseFloat(sub.in.value) * HRDATA.PRICING.gradingUpchargePct)}</b> (4% of ${HR.fmtAUD(parseFloat(sub.in.value))})</div>` : ''}
+              ${(() => {
+                const outT = HRDATA.psaTier(sub.out?.tier || c.psaTier || 'regular');
+                const inK = sub.in?.value || c.tierOnReturn;
+                if (!inK) return '';
+                const inT = HRDATA.psaTier(inK);
+                if (inT.fee <= outT.fee) return '<div class="small mt1 muted">No tier jump — nothing extra due.</div>';
+                const due = inT.fee - outT.fee + HRDATA.PRICING.tierJumpAdmin;
+                return `<div class="small mt1" style="color:#E8C983">Tier jump ${outT.name} → ${inT.name}: <b>${HR.fmtAUD(due)}</b> due (${HR.fmtAUD(inT.fee - outT.fee)} difference + ${HR.fmtAUD(HRDATA.PRICING.tierJumpAdmin)} admin) — charged before return shipping.</div>`;
+              })()}
             </div>
           </div>` : grCard && !isAdmin() ? `<div class="note-build">Grading log is Admin-only — the Technician role never sees dealer-partner details, per the role split in the client's questionnaire.</div>` : ''}
         </div>`;
       }).join('')}
+
+      ${isAdmin() && o.cards.some(c => c.stage === 'in_restoration') ? `
+      <div class="panel panel-pad mb2" style="border-color:rgba(217,164,65,.5)">
+        <div class="spread mb1"><h3 style="font-size:1.1rem" class="mb0">Additional-cost approval <span class="badge badge-warning">T&amp;C clause 4.6</span></h3>
+        ${o.extraApproval ? (o.extraApproval.status === 'approved' ? '<span class="badge badge-success">Approved & paid by customer</span>' : '<span class="badge badge-warning">Sent — awaiting customer, work paused</span>') : ''}</div>
+        ${o.extraApproval ? `<p class="small muted mb0">${esc(o.extraApproval.note)} · ${HR.fmtAUD(o.extraApproval.amount)}${o.extraApproval.paidAt ? ' · approved ' + esc(o.extraApproval.paidAt) : ''}</p>` : `
+        <p class="small muted">Found work beyond the approved quote? Policy: the customer must approve the revised cost before that work proceeds. This pauses the job and pings them.</p>
+        <div class="row" style="flex-wrap:nowrap; align-items:stretch">
+          <input class="input" id="extraAmt" type="number" min="1" placeholder="Extra cost (AUD)" style="max-width:160px">
+          <input class="input" id="extraNote" placeholder="What was found — e.g. deeper crease under the holo layer than visible at intake" style="flex:1">
+          <button class="btn btn-red" id="extraSend">Request approval</button>
+        </div>`}
+      </div>` : ''}
 
       <div class="grid ${isAdmin() ? 'g2' : ''}" style="align-items:start">
         <div class="panel panel-pad">
@@ -345,6 +369,23 @@
       HR.toast('Saved ' + (phase === 'out' ? 'outbound' : 'inbound') + ' log (demo — audit-logged in the real build)');
       route();
     }));
+    // clause 4.6: request additional-cost approval
+    const ex = $('#extraSend');
+    if (ex) ex.addEventListener('click', () => {
+      const amt = parseFloat($('#extraAmt').value);
+      const note = $('#extraNote').value.trim();
+      if (!amt || !note) { HR.toast('Add the amount and what was found'); return; }
+      const req = { amount: amt, note, status: 'pending', at: stamp() };
+      const tl = { stage: 'in_restoration', at: stamp(), note: 'Additional work found — paused pending customer approval: ' + note + ' (' + HR.fmtAUD(amt) + ')' };
+      if (o.local) {
+        persistOrder(o, lo => { lo.extraApproval = req; lo.timeline = (lo.timeline || []); lo.timeline.push(tl); });
+      } else {
+        saveMut(o.id, { extraApproval: req, timelineAdd: (mutOf(o.id).timelineAdd || []).concat([tl]) });
+      }
+      HR.toast('Sent — customer sees it in their portal now (and gets an email/SMS in the live build)');
+      route();
+    });
+
     // notes
     $('#noteAdd').addEventListener('click', () => {
       const t = $('#noteBox').value.trim(); if (!t) return;
@@ -374,7 +415,7 @@
         <div><span class="kicker">Grading batches</span><h2 class="mb0" style="font-size:1.8rem">Submission runs</h2></div>
         <button class="btn btn-red" id="newBatch">＋ New batch</button>
       </div>
-      <p class="small muted mb2">All four graders route through an Australian dealer partner (PSA has paused direct international submissions from Australia — the client's scope routes everything through one channel for consistency). Dealer details are internal-only and never shown to customers.</p>
+      <p class="small muted mb2">All submissions route through an Australian dealer partner — PSA at launch, CGC/BGS/SGC to follow (PSA has paused direct international submissions from Australia; one consistent channel per the scope). Dealer details are internal-only and never shown to customers.</p>
       <div class="table-wrap">
         <table class="table">
           <thead><tr><th>Batch</th><th>Grader</th><th>Dealer partner 🔒</th><th>Cards</th><th>Shipped</th><th>Tracking</th><th>Est. return</th><th>Status</th></tr></thead>
@@ -472,7 +513,7 @@
         <div>
           <div class="panel panel-pad mb2">
             <h3 style="font-size:1.1rem">Revenue — July (sample)</h3>
-            ${Object.entries({ 'Inspection fees': rev.inspection, 'Restoration': rev.restoration, 'Grading submissions': rev.grading, 'Grading upcharges (4%)': rev.upcharges, 'DIY store': rev.store }).map(([l, v]) => `
+            ${Object.entries({ 'Inspection fees': rev.inspection, 'Restoration': rev.restoration, 'Grading submissions': rev.grading, 'Tier adjustments (+$20 admin)': rev.upcharges, 'DIY store': rev.store }).map(([l, v]) => `
               <div class="est-line" style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px dashed var(--line); font-size:.9rem"><span>${l}</span><b style="color:var(--white)">${HR.fmtAUD(v)}</b></div>`).join('')}
             <div style="display:flex; justify-content:space-between; padding:12px 0 0; font-size:1rem"><b>Total</b><span class="price-big" style="font-size:1.5rem">${HR.fmtAUD(revTotal)}</span></div>
           </div>
