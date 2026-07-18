@@ -11,6 +11,8 @@ design brief, and T&C draft. Pages must use this copy — do not invent pricing 
 - Market: Australia only at launch. All currency AUD. Melbourne, VIC (Victoria governing law).
 - Sister brand: Hit Collectables (existing Shopify store) — cross-nav link only, separate site + login.
 - Tagline on logo: "RESTORE — SUBMIT". Logo = graded-slab illustration with interlocked HR monogram.
+- Contact: interim restorations@hitcollectables.com.au; hello@hitrestorationco.com.au once live.
+  Instagram @hitrestorationco (confirmed).
 - IMPORTANT: customer-facing copy must NEVER name the Australian dealer partner used for grading
   routing (SLABD / Leo Games / House of Cards N Collectables are internal candidates — staff admin only).
 
@@ -28,18 +30,19 @@ design brief, and T&C draft. Pages must use this copy — do not invent pricing 
 ## Pricing (confirmed structure)
 - **Inspection fee**: $10 AUD flat per card, charged at physical intake. Non-refundable;
   credited toward the final invoice if the customer proceeds; kept if they decline.
-- **Restoration fee**: tiered flat base by the card's confirmed intake value, PLUS 10% of
-  confirmed intake value on all tiers:
-  - Under $100 → $20 base
-  - $100 – $2,000 → $50 base
-  - $2,000 – $10,000 → $120 base
+- **Restoration fee**: tiered flat base by the card's confirmed intake value, PLUS a tiered percentage of confirmed intake value
+  (UPDATED per client feedback July 2026 — % scales with tier):
+  - Under $100 → $20 base + 7.5%
+  - $100 – $2,000 → $50 base + 10%
+  - $2,000 – $10,000 → $120 base + 12.5%
   - $10,000+ → custom quote
-- **Grading submission** (only if grading selected): pass-through of the grading company's own
-  fee plus the Australian submission partner's charges, with a small handling markup. Charged
-  before the card ships out for grading. (Exact rates TBC once dealer partner confirmed —
-  prototype shows placeholder estimates.)
-- **Grading upcharge** (only if grading selected): 4% of the card's final graded value, charged
-  once it returns from the grader; card ships back only once paid.
+- **PSA grading** (UPDATED — confirmed final; PSA-only at launch, CGC/BGS/SGC "coming soon"):
+  flat all-in fee per card by speed — Regular (40–50 business days) $225 · Express (20–30) $375 ·
+  Super Express (10) $850. Charged before the card ships out.
+- **Tier jump** (REPLACES the old 4% upcharge): only if PSA reassesses a card into a higher
+  tier after grading — the tier-fee difference + $20 admin. Card ships back once paid.
+- **Additional-cost approval (T&C clause 4.6, new)**: extra work found mid-job requires customer
+  approval + payment before proceeding — a second checkpoint while In Restoration.
 - **Payment flow (staged — nothing charged against a guessed value):**
   1. Submit online — no charge, estimate only.
   2. Card arrives — condition + value confirmed; $10 inspection fee charged.
