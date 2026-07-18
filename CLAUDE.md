@@ -1,0 +1,22 @@
+# Lockdown Lab Live — project notes
+
+Invite-only basketball coaching PWA for Sydney coach Aiman ("UNC"). App lives at
+lockdown-lab-registration.netlify.app (app.html = the app, index.html = cryptic
+landing). Backend: Supabase project `ymuwuhvqqftgpxwhzoub`, edge function
+`app-api` (frontend must send the public anon key as Bearer + apikey).
+Master frontend source: scratchpad `app2-base.html` — app.html is built from it
+by injecting fonts.css into `/*FONTS*/` and the IG pic into `IGPIC`.
+Deploys are direct to Netlify (site 7f6a47a4-d4fd-4f14-b757-f1c9a4a99330), not git-driven.
+Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
+
+## Parked ideas (Aiman asked to save these)
+
+- **"A.I. MAN" Instagram post** — saved 2026-07-18, for a few weeks out.
+  Wordplay on his name: AIMAN = A·I·MAN, "the AI man". Perfect drop for when
+  the Ask The Coaches AI answers go live ("the Lab's AI was named after me the
+  whole time" energy). He spelled it out explicitly: A-I-M-A-N.
+- Foundation-member vs new-joiner tiers — he picks who's founding (founding ⭐
+  toggle already shipped; tier perks/design still open).
+- True closed-app push notifications (needs VAPID web-push server).
+- Optional: email alerts to coach on new knocks (needs an email service).
+- Test-data sweep of ZZ* bot accounts — only with his explicit go-ahead.
