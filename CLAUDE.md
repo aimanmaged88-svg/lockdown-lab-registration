@@ -25,6 +25,8 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   toggle already shipped; tier perks/design still open).
 - True closed-app push notifications (needs VAPID web-push server).
 - Optional: email alerts to coach on new knocks (needs an email service).
+- Zoom API auto-create for sessions (coach currently pastes links into the
+  Sessions board — ll_sessions; board shipped 2026-07-19).
 - Test-data sweep of ZZ* + Demo Kid bot accounts — only with his explicit go-ahead.
 - **White-label fitness template** — saved 2026-07-18. Aiman wants the app to
   double as a sellable template for fitness coaches/gyms ("people say let's
