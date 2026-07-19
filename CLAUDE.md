@@ -6,7 +6,13 @@ landing). Backend: Supabase project `ymuwuhvqqftgpxwhzoub`, edge function
 `app-api` (frontend must send the public anon key as Bearer + apikey).
 Master frontend source: scratchpad `app2-base.html` — app.html is built from it
 by injecting fonts.css into `/*FONTS*/` and the IG pic into `IGPIC`.
-Deploys are direct to Netlify (site 7f6a47a4-d4fd-4f14-b757-f1c9a4a99330), not git-driven.
+Deploys: BOTH direct-to-Netlify (site 7f6a47a4-d4fd-4f14-b757-f1c9a4a99330) AND
+git-driven from GitHub `main` — a merge to main AUTO-DEPLOYS and will clobber
+the live site with main's state (this happened 2026-07-19 via PR #9; fixed by
+merging main into the working branch, keeping current Lab files, then
+redeploying). Before deploying, make sure your branch contains main's extras
+(pokemon-trade/, athlete-os/, academy.html, access.html) so they stay live.
+Keeping main in sync with the live state is the only durable protection.
 Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
 
 ## Parked ideas (Aiman asked to save these)
