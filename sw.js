@@ -25,12 +25,23 @@ self.addEventListener('fetch', e => {
     );
   }
 });
-/* Web push (payload-free ping from the Lab API): someone's at the door */
+/* Web push (payload-free ping from the Lab API). The device's stored role
+   decides the message: coach hears the door, players hear the Lab. */
 self.addEventListener('push', e => {
-  e.waitUntil(self.registration.showNotification('\ud83d\udeaa The Door \u00b7 Lockdown Lab', {
-    body: "Someone's knocking or asking for a code. Open the Desk \u2014 bang bang.",
-    icon: '/icons/icon-192.png', badge: '/icons/icon-192.png', tag: 'll-door', renotify: true
-  }));
+  e.waitUntil((async () => {
+    let role = 'coach';
+    try { const c = await caches.open('ll-meta'); const r = await c.match('/ll-role'); if (r) role = (await r.text()) || 'coach'; } catch (err) {}
+    const coach = role !== 'player';
+    await self.registration.showNotification(
+      coach ? '\ud83d\udeaa The Door \u00b7 Lockdown Lab' : '\ud83d\udd12 The Lab \u00b7 Lockdown Lab Live',
+      {
+        body: coach ? "Someone's knocking or asking for a code. Open the Desk \u2014 bang bang."
+                    : "Something's landed for you \u2014 coach might've replied. Tap in.",
+        icon: '/icons/icon-192.png', badge: '/icons/icon-192.png',
+        tag: coach ? 'll-door' : 'll-lab', renotify: true
+      }
+    );
+  })());
 });
 /* Notification click: door pings open the Desk, everything else the app */
 self.addEventListener('notificationclick', e => {

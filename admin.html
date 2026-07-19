@@ -308,6 +308,7 @@ input::placeholder{color:#5d5851}
       const reg=await navigator.serviceWorker.register('/sw.js');
       const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:vapidBytes(VAPID_PUB)});
       await api({action:'push_sub',code:CODE,sub:sub.toJSON()});
+      try{ const c=await caches.open('ll-meta'); await c.put('/ll-role',new Response('coach')); }catch(e){}
       $('#lastUpd').textContent='push armed';
     }catch(e){}
   }
