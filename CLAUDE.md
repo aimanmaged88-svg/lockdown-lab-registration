@@ -35,6 +35,17 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   1 LB = $1 off a session, with a coach-set per-session cap (default $5).
   Phase 1 = badges + trophy wall live; Phase 2 = wallet per player + redeem
   step at booking + rate/cap control on the Money desk. Not built yet.
+- **Badge gate (Aiman's tier rule, 2026-07-19)** — when the vault ships:
+  Founding ⭐ members earn the FULL 55-badge vault (+ founding-only badges).
+  Non-founding members get the Starter Five free, can SEE the whole vault
+  (look-don't-touch), but can only EARN a 10-badge bronze "taster shelf".
+  Wanting the other 45 = the psychological hook to chase founding status.
+- **IG teaser run (4 weeks → Program 01)** — playbook artifact:
+  https://claude.ai/code/artifact/c2cfc2d6-f3c6-4a70-9abc-7f08324cdc49
+  16 drops, Mon 20 Jul → Sun 16 Aug 2026: W1 mystery, W2 vault look-don't-
+  touch, W3 Program 01 reveal (placeholders: program name, first-session
+  date, seat counts), W4 seats countdown + Friday batch-code story drop.
+  He posts manually — never automate IG.
 - **Wallpaper** — delivered a personal S26 Ultra 1440×3120 AMOLED-black
   motivation wallpaper (caged LIVE + "Build It. Every Day."). Master:
   scratchpad/wall-base.html → wall.html → wallpaper-s26.png.
