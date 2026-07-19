@@ -15,6 +15,30 @@ redeploying). Before deploying, make sure your branch contains main's extras
 Keeping main in sync with the live state is the only durable protection.
 Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
 
+## Badge economy + Money desk (2026-07-19)
+
+- **Money desk** — SHIPPED in admin.html (sidebar 💰 Money). Live calc:
+  price/seat × seats × sessions/week → per-session/week/month/block, plus
+  fill-the-seats scenarios (5/10/20 + whole squad from R.players). AUD.
+  Master: scratchpad/admin-base.html.
+- **Scout section** — SHIPPED as a PRIVATE coming-soon skeleton (sidebar 🔭
+  Scout, disabled mock: name/years/areas/who-they-scout-for/players-they-rate/
+  intention). Coach-only, never public. Vets scouts vs trolls later.
+- **Badge Vault (55 badges)** — DESIGNED, awaiting Aiman's approval BEFORE
+  app wiring. Artifact: https://claude.ai/code/artifact/84185e58-5b8a-44b5-a493-c4f883b7dc70
+  Master: scratchpad/badges-base.html (fonts injected → badges.html).
+  6 tiers (Bronze/Silver/Gold/Elite/Founding/Legend) across 12 categories,
+  all client-computable from existing metrics EXCEPT 3 coach-picks
+  (Player of Week / Most Improved / The Lockdown) which need a small backend.
+- **Lab Bucks (money layer)** — badges pay players back: Bronze 2, Silver 5,
+  Gold 10, Elite 20, Founding 15, Legend 25 LB (vault total = 505 LB).
+  1 LB = $1 off a session, with a coach-set per-session cap (default $5).
+  Phase 1 = badges + trophy wall live; Phase 2 = wallet per player + redeem
+  step at booking + rate/cap control on the Money desk. Not built yet.
+- **Wallpaper** — delivered a personal S26 Ultra 1440×3120 AMOLED-black
+  motivation wallpaper (caged LIVE + "Build It. Every Day."). Master:
+  scratchpad/wall-base.html → wall.html → wallpaper-s26.png.
+
 ## Parked ideas (Aiman asked to save these)
 
 - **"A.I. MAN" Instagram post** — saved 2026-07-18, for a few weeks out.
