@@ -1002,6 +1002,7 @@ body.rmode *{animation:none!important;transition:none!important}
   <nav id="navCoach" style="display:none">
     <button class="on" data-nav="roster"><span class="ic">📋</span><span>Roster</span></button>
     <button data-nav="comm"><span class="ic">🏀</span><span>Community</span></button>
+    <button id="navDash"><span class="ic">🎛</span><span>Dashboard</span></button>
   </nav>
 </div>
 
@@ -1301,7 +1302,8 @@ body.rmode *{animation:none!important;transition:none!important}
     document.querySelector('main').scrollTop=0;
     if(name!=='mind') brStop();
   }
-  document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>{go(b.dataset.nav);stagger('[data-page="'+b.dataset.nav+'"]');}));
+  document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>{ if(!b.dataset.nav) return; go(b.dataset.nav);stagger('[data-page="'+b.dataset.nav+'"]');}));
+  const nd=document.getElementById('navDash'); if(nd) nd.addEventListener('click',()=>{ S.pill&&S.pill(); location.href='/admin.html'; });
   /* inject sliding indicators */
   ['#navPlayer','#navCoach'].forEach(id=>{ const n=$(id); if(n&&!n.querySelector('.nav-ind')){ const i=document.createElement('span'); i.className='nav-ind'; n.insertBefore(i,n.firstChild); } });
   $('#logout').addEventListener('click',()=>{
