@@ -257,6 +257,28 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 .ob-lbl{font-family:var(--fm);font-size:9px;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);margin:2px 0 -4px}
 .ob-err{display:none;color:#ff9a9a;font-size:12.5px;background:rgba(255,69,58,.12);border:1px solid rgba(255,69,58,.5);border-radius:12px;padding:10px 12px}
 .ob-note{font-family:var(--fm);font-size:9px;letter-spacing:1px;color:var(--dim);text-align:center;text-transform:uppercase;margin-top:4px}
+/* ---- AI-guided join wizard ---- */
+.jai{display:flex;align-items:center;gap:8px;font-family:var(--fm);font-size:10.5px;letter-spacing:.6px;color:var(--muted);background:rgba(0,0,0,.32);border:1px solid var(--line2);border-radius:12px;padding:9px 12px;min-height:38px}
+.jai .d{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 8px var(--accent);animation:pulse 2s infinite;flex:0 0 auto}
+.jai b{color:var(--accent);letter-spacing:2px;font-size:8.5px;flex:0 0 auto;font-weight:600}
+#jaiText::after{content:"▌";color:var(--accent);animation:caret 1s steps(1) infinite}
+@keyframes caret{50%{opacity:0}}
+.jdots{display:flex;gap:6px;justify-content:center;margin:2px 0}
+.jdots i{width:6px;height:6px;border-radius:99px;background:rgba(255,255,255,.15);transition:all .3s}
+.jdots i.on{width:20px;background:var(--accent);box-shadow:0 0 10px var(--accent-glow)}
+.jstep{display:none;flex-direction:column;gap:11px}
+.jstep.on{display:flex;animation:page-in .4s cubic-bezier(.2,.8,.2,1)}
+.jback{font-family:var(--fm);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);text-align:center;padding:4px;transition:color .2s}
+.jback:hover{color:var(--muted)}
+.oss{display:flex;flex-direction:column;gap:8px}
+.ossrow{display:flex;gap:11px;align-items:center;border:1px solid var(--line2);border-radius:14px;padding:10px 12px;background:rgba(255,255,255,.03)}
+.ossrow span{font-size:20px}
+.ossrow b{font-family:var(--fd);text-transform:uppercase;font-size:15px;letter-spacing:.6px;display:block;font-weight:400}
+.ossrow small{font-size:11px;color:var(--muted)}
+#jBuild{padding:12px 0 6px;text-align:center}
+.jbar{height:6px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden;margin-bottom:12px}
+.jbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--accent),var(--accent-hi));transition:width .55s cubic-bezier(.2,.8,.2,1);box-shadow:0 0 12px var(--accent-glow)}
+.jbmsg{font-family:var(--fm);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)}
 
 #toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(20px);background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:#150a00;
   font-family:var(--fd);text-transform:uppercase;letter-spacing:1px;font-size:14px;padding:12px 22px;border-radius:999px;
@@ -492,22 +514,60 @@ body.rmode *{animation:none!important;transition:none!important}
     </div>
 
     <div class="ob-form on" data-obf="join">
-      <span class="ob-lbl">Invite code · got one? drop it here · codes burn after 6h</span>
-      <input id="jInvite" placeholder="LAB-···· (leave blank to knock)" maxlength="10" autocomplete="off" style="text-transform:uppercase">
-      <p style="color:var(--dim);font-size:11.5px;margin:-4px 0 4px">No code? No stress — fill this in and <b style="color:var(--accent)">knock</b>. UNC gets pinged and the app unlocks itself the second he clears you.</p>
-      <span class="ob-lbl">Your name</span>
-      <input id="jName" placeholder="e.g. Marcus T." maxlength="40" autocomplete="off">
-      <span class="ob-lbl">Position</span>
-      <div class="pills" id="jPos"><span class="pill">PG</span><span class="pill">SG</span><span class="pill">SF</span><span class="pill">PF</span><span class="pill">C</span></div>
-      <span class="ob-lbl">Age</span>
-      <input id="jAge" type="number" inputmode="numeric" min="5" max="99" placeholder="Your age">
-      <span class="ob-lbl">Where can UNC reach you? (IG @ or mobile — optional)</span>
-      <input id="jContact" placeholder="@yourhandle or 04·· ··· ···" maxlength="80" autocomplete="off">
-      <span class="ob-lbl">Create a 4-digit PIN (don't forget it)</span>
-      <input id="jPin" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off">
+      <div class="jai"><span class="d"></span><b>LAB AI</b><span id="jaiText"></span></div>
+      <div class="jdots" id="jDots"><i class="on"></i><i></i><i></i><i></i><i></i></div>
       <div class="ob-err" id="jErr"></div>
-      <button class="btn btn-p btn-block" id="jGo">Create My Profile 🔒</button>
-      <div class="ob-note">Free for the founding squad</div>
+
+      <div class="jstep on" data-js="0">
+        <div class="oss">
+          <div class="ossrow"><span>📊</span><div><b>Daily check-ins</b><small>The Lab reads your game, every day</small></div></div>
+          <div class="ossrow"><span>🧠</span><div><b>Mind · the flush file</b><small>Train the head like the handles</small></div></div>
+          <div class="ossrow"><span>🔋</span><div><b>Fuel + hydration</b><small>Eat and drink like an athlete</small></div></div>
+          <div class="ossrow"><span>📍</span><div><b>971 courts · live runs</b><small>Never hunt for a game again</small></div></div>
+          <div class="ossrow"><span>💬</span><div><b>Direct line to UNC</b><small>Six specialist coaches on call</small></div></div>
+        </div>
+        <button class="btn btn-p btn-block jnext">This is the one → build my profile</button>
+        <div class="ob-note">One app · everything · free for the founding squad</div>
+      </div>
+
+      <div class="jstep" data-js="1">
+        <span class="ob-lbl">Invite code · got one? drop it here · codes burn after 6h</span>
+        <input id="jInvite" placeholder="LAB-···· (leave blank to knock)" maxlength="10" autocomplete="off" style="text-transform:uppercase">
+        <p style="color:var(--dim);font-size:11.5px;margin:-4px 0 4px">No code? No stress — <b style="color:var(--accent)">knock</b>. UNC gets pinged and the app unlocks itself the second he clears you.</p>
+        <button class="btn btn-p btn-block jnext">Next →</button>
+        <button class="jback" type="button">← Back</button>
+      </div>
+
+      <div class="jstep" data-js="2">
+        <span class="ob-lbl">Your name</span>
+        <input id="jName" placeholder="e.g. Marcus T." maxlength="40" autocomplete="off">
+        <button class="btn btn-p btn-block jnext">Next →</button>
+        <button class="jback" type="button">← Back</button>
+      </div>
+
+      <div class="jstep" data-js="3">
+        <span class="ob-lbl">Position</span>
+        <div class="pills" id="jPos"><span class="pill">PG</span><span class="pill">SG</span><span class="pill">SF</span><span class="pill">PF</span><span class="pill">C</span></div>
+        <span class="ob-lbl">Age</span>
+        <input id="jAge" type="number" inputmode="numeric" min="5" max="99" placeholder="Your age">
+        <button class="btn btn-p btn-block jnext">Next →</button>
+        <button class="jback" type="button">← Back</button>
+      </div>
+
+      <div class="jstep" data-js="4">
+        <span class="ob-lbl">Where can UNC reach you? (IG @ or mobile — optional)</span>
+        <input id="jContact" placeholder="@yourhandle or 04·· ··· ···" maxlength="80" autocomplete="off">
+        <span class="ob-lbl">Create a 4-digit PIN (don't forget it)</span>
+        <input id="jPin" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off">
+        <button class="btn btn-p btn-block" id="jGo">Knock On The Door 🚪</button>
+        <button class="jback" type="button">← Back</button>
+        <div class="ob-note">Free for the founding squad</div>
+      </div>
+
+      <div id="jBuild" style="display:none">
+        <div class="jbar"><i id="jbarFill"></i></div>
+        <div class="jbmsg" id="jbMsg">Spinning up your AI profile…</div>
+      </div>
     </div>
 
     <div class="ob-form" data-obf="login">
@@ -1067,25 +1127,70 @@ body.rmode *{animation:none!important;transition:none!important}
   function obErr(id,msg){ const el=$(id); el.textContent=msg; el.style.display='block'; }
   function obClear(){ document.querySelectorAll('.ob-err').forEach(e=>e.style.display='none'); }
 
+  /* ---------- AI-guided join wizard ---------- */
+  let jstep=0, taiT=null, jbT=null;
+  const wait=ms=>new Promise(r=>setTimeout(r,ms));
+  function typeAI(t){ const el=$('#jaiText'); if(!el) return; clearInterval(taiT); if(RM){ el.textContent=t; return; } el.textContent=''; let i=0; taiT=setInterval(()=>{ el.textContent=t.slice(0,++i); if(i>=t.length) clearInterval(taiT); },16); }
+  function jaiLine(n){
+    if(n===0) return 'One profile. Your whole game — reads, mind, fuel, courts, coach. Four quick steps and I\'m reading you.';
+    if(n===1) return $('#jInvite').value.trim()?'Code detected — fast lane\'s open.':'No code needed. Knock, and UNC gets pinged the second you\'re done.';
+    if(n===2) return 'Name check. What do they call you on the court?';
+    if(n===3){ const nm=$('#jName').value.trim().split(/\s+/)[0]; return (nm?nm+' — locked. Now, ':'Now, ')+'where do you live on the floor?'; }
+    return 'Last step. Your PIN is your key — 4 digits, nobody else\'s. Then I build.';
+  }
+  function jGoTo(n){
+    jstep=Math.max(0,Math.min(4,n)); obClear();
+    document.querySelectorAll('.jstep').forEach(s=>s.classList.toggle('on',+s.dataset.js===jstep));
+    document.querySelectorAll('#jDots i').forEach((d,i)=>d.classList.toggle('on',i===jstep));
+    typeAI(jaiLine(jstep)); S.pill&&S.pill();
+  }
+  function jValidate(n){
+    if(n===2 && $('#jName').value.trim().length<2){ obErr('#jErr','Add your name first.'); return false; }
+    return true;
+  }
+  document.querySelectorAll('.jnext').forEach(b=>b.addEventListener('click',()=>{ if(jValidate(jstep)) jGoTo(jstep+1); }));
+  document.querySelectorAll('.jback').forEach(b=>b.addEventListener('click',()=>jGoTo(jstep-1)));
+  const POSAI={PG:'PG — floor general. The Lab loves a brain.',SG:'SG — shooters eat first here.',SF:'SF — the do-everything wing. Perfect.',PF:'PF — motor, muscle, boards. Respect.',C:'C — own the paint. We see you.'};
+  $('#jPos').addEventListener('click',e=>{ const p=e.target.closest('.pill'); if(p&&POSAI[p.textContent]) typeAI(POSAI[p.textContent]); });
+  const JBMSGS=['Spinning up your AI profile…','Reserving your locker…','Wiring your line to UNC…','Mapping 971 courts around you…','Sealing the door behind you…'];
+  function jBuildShow(){
+    document.querySelectorAll('.jstep').forEach(x=>x.style.display='none');
+    $('#jDots').style.display='none'; $('#jBuild').style.display='block';
+    let i=0; $('#jbarFill').style.width='10%'; $('#jbMsg').textContent=JBMSGS[0];
+    clearInterval(jbT); jbT=setInterval(()=>{ i=Math.min(i+1,JBMSGS.length-1); $('#jbMsg').textContent=JBMSGS[i]; $('#jbarFill').style.width=(10+i*20)+'%'; },620);
+    typeAI('Building. Hold tight — this takes seconds, not minutes.');
+  }
+  function jBuildHide(){ clearInterval(jbT); $('#jBuild').style.display='none'; $('#jDots').style.display='flex'; document.querySelectorAll('.jstep').forEach(x=>x.style.display=''); }
+  typeAI(jaiLine(0));
+
   $('#jGo').addEventListener('click',async()=>{
     obClear();
     const name=$('#jName').value.trim(), pin=$('#jPin').value.trim();
     const pos=($('#jPos').querySelector('.pill.sel')||{}).textContent||null;
     const age=parseInt($('#jAge').value,10)||null;
-    if(name.length<2) return obErr('#jErr','Add your name first.');
+    if(name.length<2){ jGoTo(2); return obErr('#jErr','Add your name first.'); }
     if(!/^\d{4}$/.test(pin)) return obErr('#jErr','PIN needs to be exactly 4 digits.');
-    busy($('#jGo'),1);
+    jBuildShow();
     try{
-      const r=await api({action:'register',name,pos,age,pin,contact:$('#jContact').value.trim(),invite:$('#jInvite').value.trim().toUpperCase()});
+      const [r]=await Promise.all([
+        api({action:'register',name,pos,age,pin,contact:$('#jContact').value.trim(),invite:$('#jInvite').value.trim().toUpperCase()}),
+        wait(2700)
+      ]);
+      $('#jbarFill').style.width='100%'; $('#jbMsg').textContent='Profile live. Opening the Lab…'; await wait(500);
       sess={type:'player',pid:r.pid,pin,name,pending:!!r.pending}; localStorage.setItem(SESS_KEY,JSON.stringify(sess));
       if(r.pending){ showWaitRoom(); toast('Knock sent to UNC 🚪'); }
       else { PST=r.state; enterApp(); toast('Welcome to the Lab 🔒'); }
-    }catch(e){ obErr('#jErr',e.message); }
-    busy($('#jGo'),0,jBtnLabel());
+      jBuildHide(); jGoTo(0);
+    }catch(e){
+      jBuildHide();
+      const m=String(e.message||'');
+      if(/code/i.test(m)) jGoTo(1); else if(/name/i.test(m)) jGoTo(2); else jGoTo(4);
+      obErr('#jErr',m); typeAI('Hold up — fix that and we go again.');
+    }
   });
   /* button reads the room: code = straight in, no code = knock */
-  const jBtnLabel=()=>$('#jInvite').value.trim()?'Create My Profile 🔒':'Knock On The Door 🚪';
-  $('#jInvite').addEventListener('input',()=>{ $('#jGo').textContent=jBtnLabel(); });
+  const jBtnLabel=()=>$('#jInvite').value.trim()?'Enter The Lab 🔒':'Knock On The Door 🚪';
+  $('#jInvite').addEventListener('input',()=>{ $('#jGo').textContent=jBtnLabel(); typeAI(jaiLine(1)); });
   $('#lGo').addEventListener('click',async()=>{
     obClear();
     const name=$('#lName').value.trim(), pin=$('#lPin').value.trim();
