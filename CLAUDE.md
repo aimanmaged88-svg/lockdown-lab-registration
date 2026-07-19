@@ -110,6 +110,25 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   a few "ZZ Street just joined" Lab posts + 2 spent test invites remain in
   DB. Do not delete without his explicit go-ahead.
 
+## The Target + Deck Bench (2026-07-19)
+
+- **Edge fn now v19.** New table ll_deckreq (topic/status pending|ready/url).
+  Coach actions deckreq_add (cap 5 pending) / deckreq_done (sets ready+url,
+  pushCoach) / deckreq_del; roster returns deckreqs (latest 12).
+- **Money tab additions** (admin): 🎯 The Target (#gAmt + #gWeeks pills incl.
+  custom → seats to fill / classes / sessions-per-week vs current cadence);
+  ⚡ Topic → Deck (TOPICS[32] youth-mindset bank, #topicGen/#topicBuild/
+  #topicCustom → deckreq_add); 🎬 Deck bench list (#deckBench pending/ready,
+  Open + Copy link, ✕ delete). Desk toasts when a deck flips ready
+  (prevDeck diff in refresh). NEWS id:11.
+- **Hourly Routine "Deck Bench — hourly check"** (trig_01TMZrhZnf5CwSUk2vtD5DJH,
+  fires :18, self-binds to this session). Runs have NO MCP connectors —
+  flow is curl-only: roster→pending rows→pptx skill deck (brand black/orange,
+  10-14 slides)→commit assets/decks/<slug>.pptx→push branch→public link via
+  raw.githubusercontent.com (repo is PUBLIC)→deckreq_done (buzzes his phone).
+  Routine must never touch app/admin/index/sw/edge or push main.
+- Optional later: mirror decks into Netlify assets for prettier URLs.
+
 ## Parked ideas (Aiman asked to save these)
 
 - **"A.I. MAN" Instagram post** — saved 2026-07-18, for a few weeks out.
