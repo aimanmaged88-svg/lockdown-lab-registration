@@ -53,6 +53,17 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   5.2s with dots. Every session card is expandable (.sess.rich → .open) to
   reveal full agenda + deck. sw cache bumped lll-v2 → lll-v3.
 
+## Guide tab — What's New + Feature phone (2026-07-19)
+
+- SHIPPED in admin (sidebar 🎓 Guide, section #sec-guide). Two cards:
+  **What's New** (#newsList, from NEWS[] — dated changelog, newest first,
+  NEW tag on recent) and **Feature phone** (#vscreen) — a virtual-phone
+  panel that tap-explains every feature. FEAT{coach[9],player[11]} data;
+  vSide toggle (Your desk / Player app), tile → detail (what/how steps/
+  where), back. renderNews()+paintPhone() run at load. Master admin-base.html.
+- **Intro tour** tile is a placeholder for Aiman's PowerPoint intro — when he
+  hands over the .pptx, wire the walkthrough into that tile (he flagged this).
+
 ## Parked ideas (Aiman asked to save these)
 
 - **"A.I. MAN" Instagram post** — saved 2026-07-18, for a few weeks out.
