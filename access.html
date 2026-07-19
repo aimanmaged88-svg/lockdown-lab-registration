@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex,nofollow">
-<title>Access Hub — Links & Codes</title>
+<title>Access Hub — Links, Codes & Progress</title>
 <style>
   :root{
     --bg:#0b0b0d; --card:#141419; --line:#26262e; --ink:#f2f2f4;
@@ -17,14 +17,22 @@
     padding:24px 16px 64px;
   }
   .wrap{max-width:640px; margin:0 auto}
-  header{margin:8px 0 24px}
+  header{margin:8px 0 18px}
   h1{font-size:24px; margin:0 0 4px; letter-spacing:.3px}
   .sub{color:var(--mut); font-size:14px}
+  .overall{
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:14px 16px; margin:14px 0 20px;
+  }
+  .overall .row{display:flex; justify-content:space-between; font-size:13px; color:var(--mut); margin-bottom:6px}
+  .overall .row b{color:var(--ink); font-size:15px}
+  .bar{height:8px; background:#0f0f14; border:1px solid var(--line); border-radius:20px; overflow:hidden}
+  .bar i{display:block; height:100%; background:var(--acc); border-radius:20px; transition:width .3s}
   .card{
     background:var(--card); border:1px solid var(--line); border-radius:14px;
     padding:16px; margin:14px 0;
   }
-  .card h2{font-size:17px; margin:0 0 10px; display:flex; align-items:center; gap:8px}
+  .card h2{font-size:17px; margin:0 0 10px; display:flex; align-items:center; gap:8px; flex-wrap:wrap}
   .num{
     display:inline-flex; align-items:center; justify-content:center;
     width:22px; height:22px; border-radius:6px; background:var(--acc);
@@ -37,8 +45,7 @@
   a.link{
     display:block; color:var(--ink); text-decoration:none;
     padding:10px 12px; border:1px solid var(--line); border-radius:10px;
-    margin:6px 0; background:#0f0f14; transition:.15s;
-    word-break:break-all;
+    margin:6px 0; background:#0f0f14; transition:.15s; word-break:break-all;
   }
   a.link:hover{border-color:var(--acc); background:#17171d}
   a.link .lbl{display:block; font-size:12px; color:var(--mut); margin-bottom:2px}
@@ -57,25 +64,58 @@
   .copy:hover{border-color:var(--acc)}
   .copy.done{color:var(--ok); border-color:var(--ok)}
   .note{font-size:12.5px; color:var(--mut); margin-top:8px}
-  footer{color:var(--mut); font-size:12px; text-align:center; margin-top:28px; line-height:1.7}
   .pills{display:flex; flex-wrap:wrap; gap:6px; margin-top:6px}
   .pill{font-size:12px; color:var(--acc); text-decoration:none; border:1px solid var(--line); border-radius:20px; padding:5px 10px; background:#0f0f14}
   .pill:hover{border-color:var(--acc)}
+  /* tracker */
+  .track{
+    margin-top:12px; padding:12px; border:1px solid var(--line);
+    border-radius:10px; background:#101015;
+  }
+  .track .t-head{display:flex; align-items:center; justify-content:space-between; margin-bottom:10px}
+  .track .t-title{font-size:12px; font-weight:700; letter-spacing:.8px; color:var(--mut); text-transform:uppercase}
+  .saved{font-size:11px; color:var(--ok); opacity:0; transition:opacity .25s}
+  .saved.show{opacity:1}
+  .t-grid{display:grid; grid-template-columns:1fr 1fr; gap:8px}
+  @media (max-width:480px){ .t-grid{grid-template-columns:1fr} }
+  .t-grid label{display:block; font-size:11px; color:var(--mut); margin-bottom:3px}
+  select,input[type=text],textarea{
+    width:100%; background:#0b0b10; color:var(--ink); border:1px solid var(--line);
+    border-radius:8px; padding:8px 10px; font:inherit; font-size:14px;
+  }
+  select:focus,input:focus,textarea:focus{outline:none; border-color:var(--acc)}
+  textarea{resize:vertical; min-height:56px}
+  .full{grid-column:1/-1}
+  .prog-row{display:flex; align-items:center; gap:10px}
+  input[type=range]{flex:1; accent-color:var(--acc)}
+  .pct{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:13px; font-weight:700; width:44px; text-align:right}
+  .mini-bar{margin-top:6px}
+  .t-actions{display:flex; justify-content:flex-end; margin-top:10px}
+  .st-chip{font-size:11px; padding:2px 8px; border-radius:20px; border:1px solid var(--line); color:var(--mut); margin-left:auto}
+  .st-chip.live{color:var(--ok); border-color:var(--ok)}
+  .st-chip.progress{color:var(--acc); border-color:var(--acc)}
+  .st-chip.waiting{color:var(--warn); border-color:var(--warn)}
+  footer{color:var(--mut); font-size:12px; text-align:center; margin-top:28px; line-height:1.7}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <h1>🔐 Access Hub</h1>
-    <div class="sub">All project links &amp; codes — tap a link to open, tap Copy for codes.</div>
+    <div class="sub">Links, codes &amp; live progress — everything saves automatically on this device.</div>
   </header>
 
+  <div class="overall">
+    <div class="row"><span>Overall progress</span><b id="ovPct">0%</b></div>
+    <div class="bar"><i id="ovBar" style="width:0%"></i></div>
+  </div>
+
   <!-- 1 -->
-  <div class="card">
-    <h2><span class="num">1</span> Lockdown Lab</h2>
+  <div class="card" data-proj="lockdown" data-name="Lockdown Lab">
+    <h2><span class="num">1</span> Lockdown Lab <span class="st-chip" data-chip></span></h2>
     <div class="code-row">
       <span class="k">Coach code</span>
-      <span class="v" id="c1">LAB-PYOD</span>
+      <span class="v">LAB-PYOD</span>
       <button class="copy" data-copy="LAB-PYOD">Copy</button>
     </div>
     <a class="link" target="_blank" rel="noopener" href="https://lockdown-lab-registration.netlify.app"><span class="lbl">Live site</span><span class="url">lockdown-lab-registration.netlify.app</span></a>
@@ -86,35 +126,36 @@
   </div>
 
   <!-- 2 -->
-  <div class="card">
-    <h2><span class="num">2</span> Athlete OS <span class="warn-tag">confirm = "Atlas OS"?</span></h2>
+  <div class="card" data-proj="athleteos" data-name="Athlete OS">
+    <h2><span class="num">2</span> Athlete OS <span class="warn-tag">confirm = "Atlas OS"?</span> <span class="st-chip" data-chip></span></h2>
     <div class="code-row">
       <span class="k">Coach code</span>
       <span class="v">OS-COACH</span>
       <button class="copy" data-copy="OS-COACH">Copy</button>
     </div>
+    <a class="link" target="_blank" rel="noopener" href="https://lockdown-lab-registration.netlify.app/athlete-os/app.html"><span class="lbl">Athlete app</span><span class="url">/athlete-os/app.html</span></a>
     <a class="link" target="_blank" rel="noopener" href="https://lockdown-lab-registration.netlify.app/athlete-os/"><span class="lbl">Landing</span><span class="url">/athlete-os/</span></a>
     <a class="link" target="_blank" rel="noopener" href="https://lockdown-lab-registration.netlify.app/athlete-os/coach.html"><span class="lbl">Coach dashboard</span><span class="url">/athlete-os/coach.html</span></a>
     <div class="note">Same Supabase backend as Lockdown Lab (edge function: aos-api).</div>
   </div>
 
   <!-- 3 -->
-  <div class="card">
-    <h2><span class="num">3</span> Hash client <span class="warn-tag">confirm name</span></h2>
+  <div class="card" data-proj="hash" data-name="Hash client">
+    <h2><span class="num">3</span> Hash client <span class="warn-tag">confirm name</span> <span class="st-chip" data-chip></span></h2>
     <a class="link" target="_blank" rel="noopener" href="https://hit-restoration-demo.netlify.app"><span class="lbl">Best-guess live site</span><span class="url">hit-restoration-demo.netlify.app</span></a>
     <a class="link" target="_blank" rel="noopener" href="https://app.netlify.com/projects/hit-restoration-demo"><span class="lbl">Netlify</span><span class="url">app.netlify.com/projects/hit-restoration-demo</span></a>
   </div>
 
   <!-- 4 -->
-  <div class="card">
-    <h2><span class="num">4</span> CareOS demo platform</h2>
+  <div class="card" data-proj="careos" data-name="CareOS demo">
+    <h2><span class="num">4</span> CareOS demo platform <span class="st-chip" data-chip></span></h2>
     <a class="link" target="_blank" rel="noopener" href="https://careos-demo.netlify.app"><span class="lbl">Live site</span><span class="url">careos-demo.netlify.app</span></a>
     <a class="link" target="_blank" rel="noopener" href="https://app.netlify.com/projects/careos-demo"><span class="lbl">Netlify</span><span class="url">app.netlify.com/projects/careos-demo</span></a>
   </div>
 
   <!-- 5 -->
-  <div class="card">
-    <h2><span class="num">5</span> 2026 digital one-pager <span class="warn-tag">which client?</span></h2>
+  <div class="card" data-proj="onepager" data-name="2026 one-pager">
+    <h2><span class="num">5</span> 2026 digital one-pager <span class="warn-tag">which client?</span> <span class="st-chip" data-chip></span></h2>
     <div class="note">Six 2026 demo sites on the account — tap the right one:</div>
     <div class="pills">
       <a class="pill" target="_blank" rel="noopener" href="https://apexmma-demo-2026.netlify.app">apexmma</a>
@@ -127,8 +168,8 @@
   </div>
 
   <!-- 6 -->
-  <div class="card">
-    <h2><span class="num">6</span> Daughters' comms app <span class="warn-tag">confirm</span></h2>
+  <div class="card" data-proj="daughters" data-name="Daughters' comms app">
+    <h2><span class="num">6</span> Daughters' comms app <span class="warn-tag">confirm</span> <span class="st-chip" data-chip></span></h2>
     <a class="link" target="_blank" rel="noopener" href="https://asiyas-voice.netlify.app"><span class="lbl">Best-guess live site</span><span class="url">asiyas-voice.netlify.app</span></a>
     <div class="pills">
       <a class="pill" target="_blank" rel="noopener" href="https://your-voice-app.netlify.app">your-voice-app</a>
@@ -137,8 +178,8 @@
   </div>
 
   <!-- 7 -->
-  <div class="card">
-    <h2><span class="num">7</span> Pokémon TCG location app</h2>
+  <div class="card" data-proj="pokemon" data-name="Pokémon TCG app">
+    <h2><span class="num">7</span> Pokémon TCG location app <span class="st-chip" data-chip></span></h2>
     <a class="link" target="_blank" rel="noopener" href="https://gostar-tcg-demo.netlify.app"><span class="lbl">Live site</span><span class="url">gostar-tcg-demo.netlify.app</span></a>
     <a class="link" target="_blank" rel="noopener" href="https://app.netlify.com/projects/gostar-tcg-demo"><span class="lbl">Netlify</span><span class="url">app.netlify.com/projects/gostar-tcg-demo</span></a>
   </div>
@@ -151,23 +192,102 @@
   </div>
 
   <footer>
-    ⚠️ = my best guess, confirm the mapping.<br>
+    ⚠️ = best guess, confirm the mapping.<br>
     Coach code LAB-PYOD is the built-in default (active unless a COACH_CODE secret was set in Supabase).<br>
-    Private — for your reference only.
+    Progress, contacts &amp; notes save to this device (browser storage) — private, no server.<br>
   </footer>
 </div>
 
 <script>
-  document.querySelectorAll('.copy').forEach(function(btn){
+(function(){
+  var KEY = 'accesshub_v1';
+  var STATUSES = ['Not started','Planning','In progress','Waiting on client','Testing','Live','Done'];
+  var CHIP_CLASS = { 'In progress':'progress', 'Waiting on client':'waiting', 'Live':'live', 'Done':'live' };
+  var store = {};
+  try { store = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ store = {}; }
+
+  function save(){ localStorage.setItem(KEY, JSON.stringify(store)); refreshOverall(); }
+
+  function refreshOverall(){
+    var cards = document.querySelectorAll('.card[data-proj]');
+    var total = 0;
+    cards.forEach(function(c){ var d = store[c.dataset.proj] || {}; total += (+d.p || 0); });
+    var pct = Math.round(total / cards.length);
+    document.getElementById('ovPct').textContent = pct + '%';
+    document.getElementById('ovBar').style.width = pct + '%';
+  }
+
+  document.querySelectorAll('.card[data-proj]').forEach(function(card){
+    var id = card.dataset.proj, name = card.dataset.name;
+    var d = store[id] = store[id] || { s:'Not started', p:0, c:'', n:'' };
+
+    var t = document.createElement('div');
+    t.className = 'track';
+    t.innerHTML =
+      '<div class="t-head"><span class="t-title">📋 Progress tracker</span><span class="saved">Saved ✓</span></div>' +
+      '<div class="t-grid">' +
+        '<div><label>Status</label><select data-f="s">' +
+          STATUSES.map(function(s){ return '<option'+(s===d.s?' selected':'')+'>'+s+'</option>'; }).join('') +
+        '</select></div>' +
+        '<div><label>Contact (who you’re speaking to)</label><input type="text" data-f="c" placeholder="Name / number / email" value=""></div>' +
+        '<div class="full"><label>Progress</label>' +
+          '<div class="prog-row"><input type="range" min="0" max="100" step="5" data-f="p" value="'+d.p+'"><span class="pct">'+d.p+'%</span></div>' +
+          '<div class="bar mini-bar"><i style="width:'+d.p+'%"></i></div>' +
+        '</div>' +
+        '<div class="full"><label>Notes (where it’s at, next steps)</label><textarea data-f="n" placeholder="e.g. Waiting on logo from client, follow up Friday…"></textarea></div>' +
+      '</div>' +
+      '<div class="t-actions"><button class="copy" data-update>Copy update 📤</button></div>';
+    card.appendChild(t);
+
+    t.querySelector('input[data-f=c]').value = d.c;
+    t.querySelector('textarea[data-f=n]').value = d.n;
+
+    var savedTag = t.querySelector('.saved'), savedTimer;
+    function flash(){ savedTag.classList.add('show'); clearTimeout(savedTimer); savedTimer = setTimeout(function(){ savedTag.classList.remove('show'); }, 1200); }
+
+    function refreshChip(){
+      var chip = card.querySelector('[data-chip]');
+      if (!chip) return;
+      chip.textContent = d.s + ' · ' + d.p + '%';
+      chip.className = 'st-chip ' + (CHIP_CLASS[d.s] || '');
+    }
+    refreshChip();
+
+    t.addEventListener('input', function(ev){
+      var f = ev.target.getAttribute('data-f');
+      if (!f) return;
+      d[f] = f === 'p' ? +ev.target.value : ev.target.value;
+      if (f === 'p') {
+        t.querySelector('.pct').textContent = d.p + '%';
+        t.querySelector('.mini-bar i').style.width = d.p + '%';
+      }
+      refreshChip(); save(); flash();
+    });
+
+    t.querySelector('[data-update]').addEventListener('click', function(){
+      var msg = '*' + name + '* — ' + d.s + ' (' + d.p + '%)' +
+        (d.c ? '\nContact: ' + d.c : '') +
+        (d.n ? '\nNotes: ' + d.n : '');
+      navigator.clipboard.writeText(msg).then(function(){
+        var b = t.querySelector('[data-update]'), old = b.textContent;
+        b.textContent = 'Copied ✓'; b.classList.add('done');
+        setTimeout(function(){ b.textContent = old; b.classList.remove('done'); }, 1400);
+      });
+    });
+  });
+
+  document.querySelectorAll('.copy[data-copy]').forEach(function(btn){
     btn.addEventListener('click', function(){
-      var t = btn.getAttribute('data-copy');
-      navigator.clipboard.writeText(t).then(function(){
+      navigator.clipboard.writeText(btn.getAttribute('data-copy')).then(function(){
         var old = btn.textContent;
         btn.textContent = 'Copied ✓'; btn.classList.add('done');
         setTimeout(function(){ btn.textContent = old; btn.classList.remove('done'); }, 1400);
       });
     });
   });
+
+  refreshOverall();
+})();
 </script>
 </body>
 </html>
