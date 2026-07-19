@@ -188,6 +188,14 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
 .chaprow .rm:hover{border-color:var(--bad);color:var(--bad)}
 .chapadd{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px}
 .chapadd input{flex:1;min-width:130px}
+/* squad DM: message a player right from their row */
+.dmthread{max-height:210px;overflow-y:auto;display:flex;flex-direction:column;gap:6px;margin-bottom:10px;padding-right:4px}
+.dmb{max-width:82%;padding:8px 12px;border-radius:14px;font-size:13px;line-height:1.45}
+.dmb.me{align-self:flex-end;background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:#150a00;border-bottom-right-radius:5px}
+.dmb.them{align-self:flex-start;background:rgba(255,255,255,.07);border:1px solid var(--line2);color:var(--text);border-bottom-left-radius:5px}
+.dmb small{display:block;font-size:9px;opacity:.65;margin-top:3px}
+.dmsend{display:flex;gap:8px}
+.dmsend input{flex:1}
 /* Guide: what's new + feature phone */
 .newsitem{border-left:2px solid var(--accent);background:var(--accent-soft);border-radius:0 12px 12px 0;padding:11px 14px;margin-bottom:9px}
 .newsitem .h{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
@@ -336,7 +344,7 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
 
     <section class="osec" id="sec-squad">
       <h2 class="oh">Squad</h2>
-      <p class="osub">Every player in the Lab. Tap reach to contact · ⭐ founding · ✎ edit (incl. PIN reset) · ✕ remove.</p>
+      <p class="osub">Every player in the Lab. 💬 message them in-app · reach buttons · ⭐ founding · ✎ edit (incl. PIN reset) · ✕ remove.</p>
       <div class="card">
         <div class="sqhead"><input id="sqSearch" placeholder="Search the squad…" autocomplete="off"></div>
         <div id="squad"><p class="empty">Fresh slate.</p></div>
@@ -525,10 +533,15 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
       const ok=p.last_checkin===((R&&R.today)||'');
       return '<div class="row" data-prow="'+p.id+'"><div class="info"><b>'+esc(p.name)+(p.founding?' ⭐':'')+'</b> '+(p.pos?'· '+esc(p.pos):'')+(p.age?' · '+p.age:'')
         +'<small>'+p.xp+' XP · 🔥 '+p.streak+'d · '+p.sessions+' sessions · '+(ok?'✓ checked in today':'⚠ not today')+(p.contact?' · reach: '+esc(p.contact):'')+'</small></div>'
-        +'<div class="rowbtns">'+contactBtns(p.contact)
+        +'<div class="rowbtns"><button class="btn btn-p" data-dm="'+p.id+'" title="Message them in the app">💬</button>'+contactBtns(p.contact)
         +'<button class="btn btn-g" data-star="'+p.id+'" title="Founding">'+(p.founding?'⭐':'☆')+'</button>'
         +'<button class="btn btn-g" data-ed="'+p.id+'" title="Edit">✎</button>'
         +'<button class="btn-x" data-del="'+p.id+'" data-nm="'+esc(p.name)+'" title="Remove">✕</button></div>'
+        +'<div class="editbox" id="dm-'+p.id+'">'
+        +'<div class="cl" style="margin-bottom:8px">💬 <b>'+esc(p.name.split(' ')[0])+'</b> · lands in their app + buzzes their phone</div>'
+        +'<div class="dmthread" id="dmt-'+p.id+'"><p class="empty">Loading the thread…</p></div>'
+        +'<div class="dmsend"><input id="dmi-'+p.id+'" placeholder="Type it… (Enter to send)" maxlength="400" autocomplete="off"><button class="btn btn-p" data-dmsend="'+p.id+'">Send</button></div>'
+        +'</div>'
         +'<div class="editbox" id="ed-'+p.id+'">'
         +'<div class="er"><span><label>Position</label><input data-f="pos" value="'+esc(p.pos||'')+'" maxlength="8"></span><span><label>Age</label><input data-f="age" type="number" min="5" max="99" value="'+(p.age||'')+'"></span></div>'
         +'<div class="er"><span><label>Reach (IG @ / mobile)</label><input data-f="contact" value="'+esc(p.contact||'')+'" maxlength="80"></span><span><label>New PIN (only to reset)</label><input data-f="new_pin" inputmode="numeric" maxlength="4" placeholder="••••"></span></div>'
@@ -537,6 +550,9 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
     }).join(''):'<p class="empty">'+(q?'Nobody matches that.':'Fresh slate.')+'</p>';
     box.querySelectorAll('[data-star]').forEach(b=>b.onclick=async()=>{ const p=(R.players||[]).find(x=>x.id===b.dataset.star); try{ await api({action:'founding_set',code:CODE,pid:b.dataset.star,founding:!(p&&p.founding)}); toast(p&&p.founding?'Star removed':'⭐ Founding locked in'); document.activeElement&&document.activeElement.blur(); refresh(); }catch(e){toast(e.message)} });
     box.querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>{ const eb=document.getElementById('ed-'+b.dataset.ed); if(eb) eb.classList.toggle('open'); });
+    box.querySelectorAll('[data-dm]').forEach(b=>b.onclick=()=>{ const eb=document.getElementById('dm-'+b.dataset.dm); if(!eb) return; const opening=!eb.classList.contains('open'); eb.classList.toggle('open'); if(opening){ loadDm(b.dataset.dm); const inp=document.getElementById('dmi-'+b.dataset.dm); if(inp) setTimeout(()=>inp.focus(),60); } });
+    box.querySelectorAll('[data-dmsend]').forEach(b=>b.onclick=()=>sendDm(b.dataset.dmsend));
+    box.querySelectorAll('[id^="dmi-"]').forEach(inp=>inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); sendDm(inp.id.slice(4)); } }));
     box.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=()=>{ const eb=document.getElementById('ed-'+b.dataset.cancel); if(eb) eb.classList.remove('open'); document.activeElement&&document.activeElement.blur(); refresh(); });
     box.querySelectorAll('[data-save]').forEach(b=>b.onclick=async()=>{
       const eb=document.getElementById('ed-'+b.dataset.save); if(!eb) return;
@@ -549,6 +565,24 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
       if(!confirm('Remove '+b.dataset.nm+' from the Lab?\n\nThis wipes their whole file — check-ins, messages, journal, everything. There is no undo.')) return;
       try{ await api({action:'player_delete',code:CODE,pid:b.dataset.del}); toast(b.dataset.nm+' removed'); document.activeElement&&document.activeElement.blur(); refresh(); }catch(e){toast(e.message)}
     });
+  }
+  /* squad DMs — thread loads on open, cmsg pings their phone */
+  function paintDm(pid,msgs){
+    const t=document.getElementById('dmt-'+pid); if(!t) return;
+    const list=(msgs||[]).slice(-10);
+    t.innerHTML=list.length?list.map(m=>'<div class="dmb '+(m.from_coach?'me':'them')+'">'+esc(m.text)+'<small>'+new Date(m.created_at).toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'})+'</small></div>').join(''):'<p class="empty">No messages yet — say the first word.</p>';
+    t.scrollTop=t.scrollHeight;
+  }
+  async function loadDm(pid){
+    try{ const r=await api({action:'cdetail',code:CODE,pid}); paintDm(pid,r.messages); }
+    catch(e){ const t=document.getElementById('dmt-'+pid); if(t) t.innerHTML='<p class="empty">Couldn’t load the thread — try again.</p>'; }
+  }
+  async function sendDm(pid){
+    const inp=document.getElementById('dmi-'+pid); if(!inp) return;
+    const text=inp.value.trim(); if(!text) return;
+    inp.value='';
+    try{ const r=await api({action:'cmsg',code:CODE,pid,text}); paintDm(pid,r.messages); toast('Sent 💬 · their phone got buzzed'); }
+    catch(e){ inp.value=text; toast(e.message); }
   }
   $('#sqSearch')&&$('#sqSearch').addEventListener('input',()=>{ if(R&&!$('#squad').querySelector('.editbox.open')) renderSquad(R.players||[],true); });
   let prevK=-1,prevR=-1;
@@ -637,6 +671,8 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
   /* Newest = highest id. Add a new entry (bump the id) and every coach's desk
      badges the Guide tab + pings them the next time it's open. */
   const NEWS=[
+    {id:9,d:'19 Jul',t:'Starter Five badges',body:'New players get thrown their first badge the second they walk in, and it branches into a five-badge journey that teaches them the app — with premium unlock animations and a welcome that settles the rookies.'},
+    {id:8,d:'19 Jul',t:'Message from Squad',body:'Tap 💬 next to any player to open their thread right there — type, hit Enter, their phone buzzes. No more digging through the coach app.'},
     {id:7,d:'19 Jul',t:'Update pings',body:'The desk now badges the Guide tab and pings you whenever something new ships — so you never miss a feature.'},
     {id:6,d:'19 Jul',t:'Session studio + trailer',body:'Sessions now take a description, chapters (the run of play) and a deck link. Players get a rotating “Next Up” trailer and can tap any session for the full agenda.'},
     {id:5,d:'19 Jul',t:'Money desk',body:'Set your price and see per-session, week, month and block earnings — plus fill-the-seats scenarios. Plan a week before you run it.'},
@@ -653,7 +689,7 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
       {k:'door',ic:'🚪',name:'The Door',what:'Everyone trying to get in.',how:['Read their case (the “why”) and their reach.','Tap “Let them in” — their app unlocks itself, nothing to send.','Or approve an invite request to mint a 6h code.'],where:'Sidebar › The Door'},
       {k:'sessions',ic:'📅',name:'Sessions',what:'Post a session or a whole program.',how:['Add title, date/time and Zoom link.','Optional: description, chapters, a deck link.','Pick one-off or a 6/8/10-week block, then Post — the squad gets buzzed.'],where:'Sidebar › Sessions'},
       {k:'codes',ic:'🎟',name:'Codes',what:'Keys to the door.',how:['Single = one person, burns in 6h.','Batch = one code for 10–100 people, lasts 7 days.','Fire it over WhatsApp with the ▷ button.'],where:'Sidebar › Codes'},
-      {k:'squad',ic:'👥',name:'Squad',what:'Every player, managed.',how:['Search the squad up top.','Tap reach to WhatsApp / IG / email them.','✎ edit position, age, contact or reset their PIN · ⭐ founding · ✕ remove.'],where:'Sidebar › Squad'},
+      {k:'squad',ic:'👥',name:'Squad',what:'Every player, managed.',how:['Search the squad up top.','💬 message them in-app — Enter to send, their phone buzzes.','Reach buttons for WhatsApp / IG / email.','✎ edit or reset PIN · ⭐ founding · ✕ remove.'],where:'Sidebar › Squad'},
       {k:'money',ic:'💰',name:'Money',what:'What a class is worth.',how:['Set price per seat, seats and sessions per week.','See per-session / week / month / block instantly.','Check the fill-the-seats scenarios to plan your week.'],where:'Sidebar › Money'},
       {k:'ideas',ic:'💡',name:'Coach’s Corner',what:'What to run and what to post.',how:['A session theme, a post idea and a talking point — daily.','Hit “Another” to keep digging.'],where:'Sidebar › Coach’s Corner'},
       {k:'scout',ic:'🔭',name:'Scout',what:'Vet scouts — coming soon.',how:['Private preview for now — not open to anyone.','It’ll let scouts pitch you with proof before they see a name.'],where:'Sidebar › Scout'},
@@ -669,7 +705,7 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
       {k:'psessions',ic:'🎬',name:'Sessions + trailer',what:'What you post, they see.',how:['Upcoming sessions play as a “Next Up” trailer.','Countdown, description, chapters and one-tap Join.','They can open the deck if you attached one.'],where:'Player app › Home'},
       {k:'runs',ic:'🏀',name:'Running now',what:'Pick-up games, live.',how:['A player posts which court they’re at.','It shows the squad for 2 hours, then clears.'],where:'Player app › Home'},
       {k:'invites',ic:'🎟',name:'Invites',what:'Players bring friends.',how:['They request to bring someone.','It lands in your Door as a vouched request.','Approve to mint them a code.'],where:'Player app › Squad'},
-      {k:'badges',ic:'🏅',name:'Badges',what:'55 collectibles + Lab Bucks.',how:['Designed and waiting on your OK.','Once live, badges pay players money off sessions.'],where:'Coming soon'},
+      {k:'badges',ic:'🏅',name:'Starter Five badges',what:'Their first badge journey — live now.',how:['They get “Through the Door” the moment they join.','It branches: check-in → Mind → Fuel → Squad post.','Each unlock is a full-screen moment. The 55-badge vault comes next.'],where:'Player app › Home'},
     ],
   };
   let vSide='coach', vView='home', vSel=null;

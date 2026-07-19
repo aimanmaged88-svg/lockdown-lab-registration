@@ -370,6 +370,64 @@ header{gap:8px}
   background:linear-gradient(180deg,#fff,var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 30px var(--accent-glow))}
 #levelup .lurank{font-family:var(--fd);text-transform:uppercase;font-size:34px;letter-spacing:2px;color:var(--text);margin-top:8px}
 #levelup .lurank b{color:var(--accent)}
+
+/* ---------- welcome moment (first entry) ---------- */
+#welcome{position:fixed;inset:0;z-index:90;display:none;align-items:center;justify-content:center;padding:22px;
+  background:radial-gradient(80% 55% at 50% 0%, rgba(255,107,0,.16), transparent 60%), rgba(4,4,5,.9);backdrop-filter:blur(16px)}
+#welcome.on{display:flex}
+#welcome .wl{max-width:400px;width:100%;text-align:center;border:1px solid var(--line);border-radius:24px;padding:28px 22px 22px;
+  background:linear-gradient(180deg,rgba(20,20,22,.96),rgba(10,10,11,.96));box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 40px 90px -30px rgba(0,0,0,.95);
+  animation:welrise .55s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes welrise{from{opacity:0;transform:translateY(26px) scale(.94)}to{opacity:1;transform:none}}
+#welcome .wlock{width:64px;height:64px;border-radius:50%;margin:0 auto 14px;display:grid;place-items:center;font-size:28px;
+  border:2px solid var(--accent);background:var(--accent-soft);box-shadow:0 0 36px -8px var(--accent-glow);animation:welpulse 2.4s infinite}
+@keyframes welpulse{0%,100%{box-shadow:0 0 36px -8px var(--accent-glow)}50%{box-shadow:0 0 52px -4px var(--accent-glow)}}
+#welcome .wk{font-family:var(--fm);font-size:9.5px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
+#welcome h2{font-family:var(--fd);text-transform:uppercase;font-size:34px;letter-spacing:1px;line-height:.95;margin-bottom:12px}
+#welcome p{font-size:13.5px;color:var(--muted);line-height:1.6;margin-bottom:11px;text-align:left}
+#welcome p b{color:var(--text)}
+#welcome .rk{border-left:2px solid var(--accent);background:var(--accent-soft);border-radius:0 12px 12px 0;padding:10px 13px;color:var(--text)}
+#welcome .btn{margin-top:6px}
+
+/* ---------- badge unlocked moment ---------- */
+#badgeUp{position:fixed;inset:0;z-index:85;display:none;align-items:center;justify-content:center;cursor:pointer;
+  background:radial-gradient(70% 50% at 50% 40%, rgba(255,107,0,.14), transparent 65%), rgba(4,4,5,.86);backdrop-filter:blur(14px)}
+#badgeUp.on{display:flex}
+#badgeUp .bu{text-align:center;padding:20px;animation:bupop .55s cubic-bezier(.2,1.4,.35,1)}
+@keyframes bupop{from{opacity:0;transform:scale(.55) translateY(26px)}to{opacity:1;transform:none}}
+#badgeUp .bring{position:relative;width:124px;height:124px;border-radius:50%;margin:0 auto 18px;display:grid;place-items:center;font-size:54px;
+  border:3px solid var(--tc,#c8804a);background:radial-gradient(circle at 50% 30%, rgba(255,255,255,.16), rgba(255,255,255,.02) 62%);
+  box-shadow:0 0 60px -10px var(--tc,#c8804a), inset 0 1px 0 rgba(255,255,255,.25);animation:buglow 2.2s ease-in-out infinite}
+@keyframes buglow{0%,100%{box-shadow:0 0 46px -12px var(--tc,#c8804a)}50%{box-shadow:0 0 74px -6px var(--tc,#c8804a)}}
+#badgeUp .bring::after{content:"";position:absolute;inset:-11px;border-radius:50%;border:1.5px dashed var(--tc,#c8804a);opacity:.5;animation:burot 10s linear infinite}
+@keyframes burot{to{transform:rotate(360deg)}}
+#badgeUp .buk{font-family:var(--fm);font-size:11px;letter-spacing:4.5px;text-transform:uppercase;color:var(--accent);margin-bottom:8px;animation:lushine 1.4s ease-in-out infinite}
+#badgeUp h2{font-family:var(--fd);text-transform:uppercase;font-size:clamp(38px,11vw,54px);letter-spacing:1px;line-height:.92}
+#badgeUp .bum{font-size:14px;color:var(--muted);max-width:290px;margin:10px auto 14px;line-height:1.55}
+#badgeUp .but{font-family:var(--fm);font-size:9px;letter-spacing:1.8px;text-transform:uppercase;color:var(--tc,#c8804a);border:1px solid var(--tc,#c8804a);border-radius:999px;padding:5px 13px;display:inline-block}
+#badgeUp .buh{font-family:var(--fm);font-size:8.5px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-top:20px}
+
+/* ---------- Starter Five journey card ---------- */
+#startCard .path{display:flex;align-items:flex-start;overflow-x:auto;padding:8px 2px 4px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+#startCard .path::-webkit-scrollbar{display:none}
+.snode{flex:0 0 auto;width:74px;text-align:center}
+.snode .crest{position:relative;width:52px;height:52px;margin:0 auto 7px;border-radius:50%;display:grid;place-items:center;font-size:23px;
+  border:2px solid var(--line);background:rgba(255,255,255,.04);transition:border-color .4s, box-shadow .4s, opacity .4s}
+.snode b{font-family:var(--fd);font-size:11.5px;letter-spacing:.5px;text-transform:uppercase;display:block;line-height:1.05;color:var(--muted)}
+.snode small{font-family:var(--fm);font-size:8px;letter-spacing:.5px;color:var(--dim);display:block;margin-top:3px;line-height:1.3}
+.snode.un .crest{border-color:#c8804a;box-shadow:0 0 18px -5px #c8804a;background:radial-gradient(circle at 50% 30%, rgba(255,255,255,.13), transparent 62%)}
+.snode.un b{color:var(--text)}
+.snode.un small{color:#c8804a}
+.snode.nx .crest{border-style:dashed;border-color:var(--accent);animation:snpulse 2.1s infinite}
+.snode.nx b{color:var(--accent)}
+@keyframes snpulse{0%,100%{box-shadow:0 0 0 0 rgba(255,107,0,.4)}55%{box-shadow:0 0 0 9px rgba(255,107,0,0)}}
+.snode.lk .crest{opacity:.38;filter:grayscale(1)}
+.snode.lk b,.snode.lk small{opacity:.5}
+.scon{flex:0 0 auto;width:22px;height:3px;border-radius:3px;background:var(--line2);margin-top:25px;overflow:hidden;position:relative}
+.scon i{position:absolute;inset:0;background:linear-gradient(90deg,#c8804a,var(--accent));transform:scaleX(0);transform-origin:left;transition:transform .9s ease .15s}
+.scon.fill i{transform:scaleX(1)}
+#startNext{margin-top:10px;font-size:12.5px;color:var(--muted);border-left:2px solid var(--accent);background:var(--accent-soft);border-radius:0 12px 12px 0;padding:9px 12px;line-height:1.5}
+#startNext b{color:var(--text)}
 #confetti{position:fixed;inset:0;z-index:79;pointer-events:none;display:none}
 #confetti.show{display:block}
 /* top loading shimmer */
@@ -666,6 +724,13 @@ body.rmode *{animation:none!important;transition:none!important}
       </div>
       <div class="xpbar"><i id="xpFill" style="width:0%"></i></div>
       <div class="xplab"><span id="lvlLab">Level 1 · Rookie</span><span id="xpLab">0 XP</span></div>
+
+      <div class="card" id="startCard" style="margin-top:16px">
+        <span class="cl" id="startCl">🏅 Starter Five · 0/5 collected</span>
+        <h3 id="startTitle">Your First Five</h3>
+        <div class="path" id="startPath"></div>
+        <div id="startNext"></div>
+      </div>
 
       <div class="card hot" style="margin-top:16px">
         <span class="cl">Daily Accountability · Sydney time</span>
@@ -1044,6 +1109,18 @@ body.rmode *{animation:none!important;transition:none!important}
 <canvas id="confetti"></canvas>
 <div id="levelup"><div class="lu"><div class="luk">Level Up</div><h2 id="luNum">2</h2><div class="lurank">You're now <b id="luRank">Sharp</b></div></div></div>
 
+<div id="badgeUp"><div class="bu"><div class="bring" id="buRing"><span id="buIco">🔓</span></div><div class="buk">Badge Unlocked</div><h2 id="buName">Through the Door</h2><p class="bum" id="buMean">You're in.</p><span class="but" id="buTier">Bronze</span><div class="buh">Tap anywhere to keep going</div></div></div>
+
+<div id="welcome"><div class="wl">
+  <div class="wlock">🔒</div>
+  <div class="wk">You're in · Founding Squad</div>
+  <h2>Welcome to the Lab</h2>
+  <p>This isn't a one-week program — it's a <b>long-term companion</b>. The Lab's AI reads what you log — check-ins, mind, fuel — and learns your game a little more every day. AI is the future, and yours starts tonight.</p>
+  <p><b>Be honest with it — especially on the rough days.</b> Honest data is the only data that makes you better. Nobody's judging in here; the Lab works for you, not against you.</p>
+  <p class="rk">🌱 <b>Brand new to hoops?</b> Perfect. Rookies aren't behind in the Lab — this is where you learn the game. UNC's got room for you.</p>
+  <button class="btn btn-p btn-block" id="wGo">Let's go 🔒</button>
+</div></div>
+
 <script>
 (function(){
   const API='https://ymuwuhvqqftgpxwhzoub.supabase.co/functions/v1/app-api';
@@ -1353,7 +1430,7 @@ body.rmode *{animation:none!important;transition:none!important}
     $('#hSub').textContent=isCoach?'Coach Mode 🔐':'Founding Beta';
     $('#invCard').style.display=isCoach?'none':'block';
     ac(); S.poweron(); haptic([0,20,40,20]);
-    if(isCoach){ go('roster'); renderRoster(); } else { go('home'); renderPlayer(); stagger('[data-page="home"]'); }
+    if(isCoach){ go('roster'); renderRoster(); } else { go('home'); renderPlayer(); stagger('[data-page="home"]'); maybeWelcome(); }
     pushSubAny();
     requestAnimationFrame(()=>moveInd(isCoach?$('#navCoach'):$('#navPlayer')));
     clearInterval(pollT);
@@ -1406,12 +1483,77 @@ body.rmode *{animation:none!important;transition:none!important}
   /* ---------- player render ---------- */
   const LEVELS=[[0,'Rookie'],[250,'Sharp'],[600,'Locked In'],[1100,'Elite IQ'],[1800,'Franchise']];
   function lvl(xp){ let i=0; LEVELS.forEach((l,x)=>{if(xp>=l[0])i=x}); const c=LEVELS[i],n=LEVELS[i+1]||[c[0]+700,'Legend']; return{n:i+1,name:c[1],cur:c[0],next:n[0]}; }
+  /* ---------- Starter Five: the first badge journey ----------
+     One badge lands the second they join, then it branches — each unlock
+     reveals the next. Five badges = they know the whole app. Unlocks are
+     persisted per player so a badge never re-locks. */
+  const STARTER=[
+    {k:'door', ic:'🔓', name:'Through the Door', rule:'Join the Lab',              meaning:'You’re in. Most people never even knock.',                      test:()=>true},
+    {k:'light',ic:'🌅', name:'First Light',      rule:'Log your first check-in',   meaning:'First check-in banked. Accountability starts today.',           test:st=>(st.checkins||[]).length>0||!!st.profile.last_checkin},
+    {k:'mind', ic:'🧠', name:'Clear Head',       rule:'Write one Mind entry',      meaning:'You flushed it and wrote the counter. That IS the rep.',        test:st=>(st.mind||[]).length>0},
+    {k:'fuel', ic:'🍎', name:'First Fuel',       rule:'Log your fuel once',        meaning:'Bodies run on fuel, not vibes. The Lab sees it now.',           test:st=>!!st.fuel_today},
+    {k:'ice',  ic:'👋', name:'Icebreaker',       rule:'Post once in the Squad feed',meaning:'You spoke, the squad heard. Culture starts with one word.',    test:st=>(st.posts||[]).some(x=>!x.is_coach&&x.author_name===st.profile.name)},
+  ];
+  let buQ=[],buOn=false;
+  function badgeUpShow(bd){ buQ.push(bd); pumpBu(); }
+  function pumpBu(){
+    if(buOn||!buQ.length) return;
+    const w=$('#welcome'); if(w&&w.classList.contains('on')) return; /* welcome first, badges after */
+    const bd=buQ.shift(); buOn=true;
+    $('#buIco').textContent=bd.ic; $('#buName').textContent=bd.name; $('#buMean').textContent=bd.meaning;
+    const el=$('#badgeUp'); el.classList.add('on');
+    try{S.checkin()}catch(e){} haptic([0,30,60,30,90]); burst(false); setTimeout(()=>burst(false),380);
+    const close=()=>{ el.classList.remove('on'); buOn=false; renderStarter(); setTimeout(pumpBu,480); };
+    el.onclick=close;
+    clearTimeout(el._t); el._t=setTimeout(close,3800);
+  }
+  function starterState(){ try{ return JSON.parse(localStorage.getItem('ll_start_'+sess.pid)||'{}'); }catch(e){ return {}; } }
+  function renderStarter(){
+    if(!PST||!sess||sess.type!=='player'||!$('#startCard')) return;
+    const key='ll_start_'+sess.pid;
+    const firstSync=!localStorage.getItem(key);
+    const st=starterState();
+    let changed=false;
+    STARTER.forEach(bd=>{
+      if(!st[bd.k]&&bd.test(PST)){
+        st[bd.k]=Date.now(); changed=true;
+        /* veterans sync their history quietly — only the door badge gets the full moment */
+        if(!firstSync||bd.k==='door') badgeUpShow(bd);
+      }
+    });
+    if(changed||firstSync){ try{ localStorage.setItem(key,JSON.stringify(st)); }catch(e){} }
+    const n=STARTER.filter(b=>st[b.k]).length;
+    const nextIdx=STARTER.findIndex(b=>!st[b.k]);
+    $('#startCl').textContent='🏅 Starter Five · '+n+'/5 collected';
+    $('#startTitle').textContent=n>=5?'Five For Five 🏆':'Your First Five';
+    $('#startPath').innerHTML=STARTER.map((b,i)=>{
+      const cls=st[b.k]?'un':(i===nextIdx?'nx':'lk');
+      const sub=st[b.k]?'✓ yours':(i===nextIdx?'next up':'locked');
+      return (i?'<span class="scon'+(st[STARTER[i-1].k]?' fill':'')+'"><i></i></span>':'')
+        +'<div class="snode '+cls+'"><span class="crest">'+b.ic+'</span><b>'+b.name+'</b><small>'+sub+'</small></div>';
+    }).join('');
+    $('#startNext').innerHTML=nextIdx<0
+      ?'<b>All five collected.</b> You know the Lab now — and the full vault is coming: 55 badges to be known for. Keep stacking.'
+      :'<b>Next badge:</b> '+esc(STARTER[nextIdx].rule)+'. Every badge is a rep — these five teach you the whole Lab.';
+  }
+  /* first-entry welcome: the why, before the first badge drops */
+  function maybeWelcome(){
+    if(!sess||sess.type!=='player') return;
+    if(localStorage.getItem('ll_wel_'+sess.pid)) return;
+    setTimeout(()=>{ $('#welcome').classList.add('on'); haptic(15); },850);
+  }
+  $('#wGo').addEventListener('click',()=>{
+    try{ localStorage.setItem('ll_wel_'+sess.pid,'1'); }catch(e){}
+    $('#welcome').classList.remove('on');
+    try{S.poweron()}catch(e){}
+    setTimeout(pumpBu,420);
+  });
   function renderPlayer(soft){
     if(!PST) return;
     const p=PST.profile;
     $('#heroName').textContent=p.name+(p.founding?' ⭐':'');
     if(p.founding) $('#hSub').textContent='Founding ⭐';
-    renderRuns(); renderSessList(); renderSessTrailer();
+    renderRuns(); renderSessList(); renderSessTrailer(); renderStarter();
     $('#avInit').textContent=p.name.split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();
     countUp($('#stXp'),p.xp); countUp($('#stLogs'),PST.checkins.length); countUp($('#stSess'),p.sessions);
     $('#streakChip').textContent=p.streak;
