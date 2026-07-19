@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex,nofollow" />
+<title>Athlete OS · Coach</title>
+<style>
+  :root{
+    --bg:#070707; --panel:rgba(255,255,255,.04); --panel2:rgba(255,255,255,.02);
+    --line:rgba(255,255,255,.10); --line2:rgba(255,255,255,.06);
+    --text:#f4f2ef; --muted:#9b968f; --dim:#6a655e;
+    --accent:#ff6b00; --accent-hi:#ff8a2b; --accent-soft:rgba(255,107,0,.14);
+    --good:#22c55e; --good-soft:rgba(34,197,94,.14); --bad:#ff5252;
+    --fd:"Arial Narrow",Helvetica,Arial,system-ui,sans-serif;
+    --fb:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --fm:ui-monospace,"SF Mono","Roboto Mono",Menlo,monospace;
+    color-scheme:dark;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:var(--fb);-webkit-font-smoothing:antialiased;
+    background-image:radial-gradient(110% 60% at 50% -10%, rgba(255,107,0,.08), transparent 55%);min-height:100vh}
+  a{color:inherit}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+  .mono{font-family:var(--fm);font-variant-numeric:tabular-nums}
+
+  /* login */
+  .login{min-height:100vh;display:grid;place-items:center;padding:22px}
+  .login-card{width:100%;max-width:380px;border:1px solid var(--line);border-radius:20px;background:var(--panel);
+    backdrop-filter:blur(12px);padding:34px 28px;text-align:center}
+  .brand{display:inline-flex;align-items:center;gap:11px;margin-bottom:22px}
+  .brand b{font-family:var(--fd);text-transform:uppercase;letter-spacing:2.5px;font-weight:700;font-size:18px}
+  .brand b i{font-style:normal;color:var(--accent)}
+  .login-card h1{font-family:var(--fd);text-transform:uppercase;letter-spacing:1px;font-size:26px;margin-bottom:6px}
+  .login-card p{color:var(--muted);font-size:13px;margin-bottom:22px}
+  input,select,textarea{width:100%;background:rgba(0,0,0,.4);border:1px solid var(--line);border-radius:11px;padding:12px 14px;
+    color:var(--text);font-size:15px;font-family:var(--fb);outline:none;transition:border-color .15s,box-shadow .15s}
+  input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+  .btn{font-family:var(--fd);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;font-size:14px;cursor:pointer;
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:999px;border:1px solid transparent;
+    transition:transform .15s,background .15s,border-color .15s}
+  .btn:active{transform:scale(.97)}
+  .btn-primary{background:var(--accent);color:#0a0500}
+  .btn-primary:hover{background:var(--accent-hi)}
+  .btn-ghost{background:var(--panel);border-color:var(--line);color:var(--text)}
+  .btn-ghost:hover{border-color:var(--accent)}
+  .btn-block{width:100%;margin-top:14px}
+  .btn-sm{padding:8px 14px;font-size:12px}
+  .err{display:none;margin-top:14px;color:#ff9a9a;font-size:13px;background:rgba(255,82,82,.12);border:1px solid #ff5252;border-radius:10px;padding:10px 12px}
+
+  /* dashboard */
+  #dash{display:none}
+  header.top{position:sticky;top:0;z-index:10;border-bottom:1px solid var(--line2);
+    background:rgba(7,7,7,.7);backdrop-filter:blur(14px)}
+  header.top .row{display:flex;align-items:center;gap:16px;height:62px}
+  header.top .brand{margin:0}
+  header.top .spacer{flex:1}
+  .pill{font-family:var(--fm);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);
+    border:1px solid var(--line);border-radius:999px;padding:6px 12px}
+  .pill b{color:var(--accent)}
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:26px 0 14px}
+  @media(max-width:760px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpi{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:16px}
+  .kpi .n{font-family:var(--fd);font-size:30px;line-height:1;font-variant-numeric:tabular-nums}
+  .kpi .l{font-family:var(--fm);font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--dim);margin-top:8px}
+  .kpi.accent .n{color:var(--accent)}
+
+  /* auto-categories */
+  .groups{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+  .gpill{font-family:var(--fm);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);cursor:pointer;
+    border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:var(--panel2);transition:all .15s}
+  .gpill b{color:var(--accent);margin-left:5px}
+  .gpill:hover,.gpill.on{border-color:var(--accent);color:var(--text)}
+
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+  .toolbar input{max-width:260px}
+  .toolbar select{max-width:170px;width:auto}
+  .toolbar .spacer{flex:1}
+
+  .tablewrap{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--panel2)}
+  .scroll{overflow-x:auto}
+  table{width:100%;border-collapse:collapse;min-width:900px}
+  thead th{font-family:var(--fm);font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--dim);
+    text-align:left;padding:13px 14px;border-bottom:1px solid var(--line);white-space:nowrap;background:var(--panel)}
+  tbody td{padding:12px 14px;border-bottom:1px solid var(--line2);font-size:14px;vertical-align:top}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr.arow:hover{background:rgba(255,255,255,.02)}
+  .player{font-family:var(--fd);text-transform:uppercase;letter-spacing:.5px;font-size:17px}
+  .sub{color:var(--muted);font-size:12px}
+  .badge{display:inline-block;font-family:var(--fm);font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:3px 9px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+  .badge.ok{border-color:var(--good);color:var(--good);background:var(--good-soft)}
+  .badge.warn{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+  .badge.inj{border-color:var(--bad);color:#ff9a9a;background:rgba(255,82,82,.10)}
+  .empty{padding:60px 20px;text-align:center;color:var(--muted)}
+  .empty b{display:block;font-family:var(--fd);text-transform:uppercase;font-size:22px;color:var(--text);margin-bottom:8px}
+  .foot{color:var(--dim);font-size:12px;text-align:center;padding:26px 0 40px;font-family:var(--fm)}
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--accent);color:#0a0500;
+    font-family:var(--fd);text-transform:uppercase;letter-spacing:1px;font-size:13px;padding:11px 18px;border-radius:999px;
+    opacity:0;transition:opacity .25s;pointer-events:none;z-index:50}
+  .toast.show{opacity:1}
+
+  /* athlete file (expanded row) */
+  tr.filerow td{background:rgba(0,0,0,.25);padding:18px 16px}
+  .file{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:18px}
+  @media(max-width:900px){.file{grid-template-columns:1fr}}
+  .file h4{font-family:var(--fm);font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--accent);margin-bottom:9px}
+  .file .box{border:1px solid var(--line2);border-radius:12px;background:var(--panel2);padding:12px;margin-bottom:8px;font-size:13px;color:var(--muted)}
+  .file .box b{color:var(--text)}
+  .cirow{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--line2);font-size:12.5px}
+  .cirow:last-child{border-bottom:none}
+  .cirow .d{color:var(--text);font-family:var(--fm)}
+  .notes .box{margin-bottom:6px}
+  .file textarea{min-height:64px;resize:vertical;font-size:13px;margin-bottom:8px}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login" id="login">
+  <div class="login-card">
+    <div class="brand"><b>Athlete <i>OS</i></b></div>
+    <h1>Coach Access</h1>
+    <p>Enter your coach code to open the athlete database. Athletes never see this side.</p>
+    <input type="password" id="token" placeholder="Coach code" autocomplete="off" style="text-transform:uppercase" />
+    <button class="btn btn-primary btn-block" id="loginBtn">Open The Dashboard →</button>
+    <div class="err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dash">
+  <header class="top">
+    <div class="wrap row">
+      <div class="brand"><b>Athlete <i>OS</i></b></div>
+      <span class="pill">Coach · <b>All Athletes</b></span>
+      <div class="spacer"></div>
+      <button class="btn btn-ghost" id="exportBtn">Export CSV</button>
+      <button class="btn btn-ghost" id="logoutBtn">Log out</button>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="kpis" id="kpis"></div>
+    <div class="groups" id="groups"></div>
+
+    <div class="toolbar">
+      <input type="search" id="search" placeholder="Search name, goals, location…" />
+      <select id="sportFilter"><option value="">All sports</option></select>
+      <select id="levelFilter"><option value="">All levels</option></select>
+      <select id="freqFilter">
+        <option value="">Any frequency</option>
+        <option value="1">1–2 days/wk</option>
+        <option value="3">3–4 days/wk</option>
+        <option value="5">5+ days/wk</option>
+      </select>
+      <select id="injFilter">
+        <option value="">Injury: any</option>
+        <option value="yes">Managing injury</option>
+        <option value="no">No injury</option>
+      </select>
+      <div class="spacer"></div>
+      <button class="btn btn-ghost" id="refreshBtn">Refresh</button>
+    </div>
+
+    <div class="tablewrap">
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Athlete</th><th>Sport</th><th>Level</th><th>Goals</th>
+              <th>Freq</th><th>Streak · XP</th><th>Check-in</th><th>File</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+      <div class="empty" id="empty" style="display:none"><b>No athletes yet</b>Share the app link — they hit Join, pick their sport, done.</div>
+    </div>
+
+    <div class="foot" id="foot"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const FN = 'https://ymuwuhvqqftgpxwhzoub.supabase.co/functions/v1/aos-api';
+  let CODE = sessionStorage.getItem('aos_coach_code') || '';
+  let ROWS = [], TODAY = '', openId = null;
+
+  const $ = s => document.querySelector(s);
+  const toast = (m)=>{ const t=$('#toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1800); };
+  function esc(s){ return (s==null?'':String(s)).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  function fmtDate(s){ try{ const d=new Date(s); return d.toLocaleDateString(undefined,{month:'short',day:'numeric'})+' '+d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'}); }catch(e){ return s; } }
+
+  async function api(payload){
+    const res = await fetch(FN, {
+      method:'POST',
+      headers:{ 'Content-Type':'application/json' },
+      body: JSON.stringify(Object.assign({code:CODE}, payload))
+    });
+    const j = await res.json().catch(()=>({}));
+    if(res.status===401) throw new Error('unauthorized');
+    if(!res.ok) throw new Error(j.error||('HTTP '+res.status));
+    return j;
+  }
+
+  /* ---- login ---- */
+  function showDash(){ $('#login').style.display='none'; $('#dash').style.display='block'; }
+  function showLogin(){ $('#dash').style.display='none'; $('#login').style.display='grid'; }
+
+  $('#loginBtn').addEventListener('click', doLogin);
+  $('#token').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+  async function doLogin(){
+    const t = $('#token').value.trim().toUpperCase();
+    if(!t){ return; }
+    CODE = t;
+    try{
+      await load();
+      sessionStorage.setItem('aos_coach_code', CODE);
+      showDash();
+    }catch(e){
+      const err = $('#loginErr'); err.style.display='block';
+      err.textContent = e.message==='unauthorized' || /coach code/.test(e.message) ? 'That code was not accepted. Check and try again.' : 'Could not connect. Try again.';
+    }
+  }
+  $('#logoutBtn').addEventListener('click', ()=>{ sessionStorage.removeItem('aos_coach_code'); CODE=''; $('#token').value=''; showLogin(); });
+
+  /* ---- data ---- */
+  async function load(){
+    const r = await api({ action:'roster' });
+    ROWS = r.athletes || []; TODAY = r.today || '';
+    buildFilters(); render();
+  }
+  $('#refreshBtn').addEventListener('click', ()=> load().then(()=>toast('Refreshed')));
+  $('#search').addEventListener('input', render);
+  ['sportFilter','levelFilter','freqFilter','injFilter'].forEach(id=>$('#'+id).addEventListener('change', render));
+
+  function buildFilters(){
+    const opt=(v)=>`<option value="${esc(v)}">${esc(v)}</option>`;
+    const sports=[...new Set(ROWS.map(r=>r.sport).filter(Boolean))].sort();
+    const levels=[...new Set(ROWS.map(r=>r.level).filter(Boolean))].sort();
+    $('#sportFilter').innerHTML='<option value="">All sports</option>'+sports.map(opt).join('');
+    $('#levelFilter').innerHTML='<option value="">All levels</option>'+levels.map(opt).join('');
+  }
+
+  function filtered(){
+    const q = $('#search').value.trim().toLowerCase();
+    const sf = $('#sportFilter').value, lf = $('#levelFilter').value;
+    const ff = $('#freqFilter').value, jf = $('#injFilter').value;
+    return ROWS.filter(r=>{
+      if(sf && r.sport!==sf) return false;
+      if(lf && r.level!==lf) return false;
+      if(ff){ const f=+r.train_freq||0; if(ff==='1'&&f>2) return false; if(ff==='3'&&(f<3||f>4)) return false; if(ff==='5'&&f<5) return false; }
+      if(jf==='yes' && !r.injuries) return false;
+      if(jf==='no' && r.injuries) return false;
+      if(!q) return true;
+      const goals=((r.goals||{}).tags||[]).join(' ')+' '+((r.goals||{}).note||'');
+      return [r.name,r.sport,r.level,r.position,goals,r.location,r.comp_schedule].some(v=> (v||'').toLowerCase().includes(q));
+    });
+  }
+
+  function render(){
+    const rows = filtered();
+    const inToday = ROWS.filter(r=>r.last_checkin===TODAY).length;
+    $('#kpis').innerHTML = [
+      ['Athletes', ROWS.length, 'accent'],
+      ['Checked in today', inToday, ''],
+      ['Streak 3d+', ROWS.filter(r=>r.streak>=3).length, ''],
+      ['Sports', new Set(ROWS.map(r=>r.sport)).size, ''],
+      ['Managing injury', ROWS.filter(r=>r.injuries).length, '']
+    ].map(([l,n,c])=>`<div class="kpi ${c}"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
+
+    /* auto-categories: one pill per sport, click to filter */
+    const bySport={}; ROWS.forEach(r=>bySport[r.sport]=(bySport[r.sport]||0)+1);
+    $('#groups').innerHTML=Object.entries(bySport).sort((a,b)=>b[1]-a[1])
+      .map(([s,n])=>`<span class="gpill ${$('#sportFilter').value===s?'on':''}" data-g="${esc(s)}">${esc(s)}<b>${n}</b></span>`).join('');
+    document.querySelectorAll('.gpill').forEach(g=>g.addEventListener('click',()=>{
+      $('#sportFilter').value = $('#sportFilter').value===g.dataset.g ? '' : g.dataset.g; render();
+    }));
+
+    const tb = $('#tbody');
+    $('#empty').style.display = rows.length ? 'none' : 'block';
+    tb.innerHTML = rows.map(r=>{
+      const ok = r.last_checkin===TODAY;
+      const goals = ((r.goals||{}).tags||[]).slice(0,3).join(', ');
+      return `<tr class="arow">
+        <td><div class="player">${esc(r.name)}</div><div class="sub">${r.age?r.age+' · ':''}${esc(r.position||'')}${r.injuries?' · <span class="badge inj">⚠ injury</span>':''}</div></td>
+        <td>${esc(r.sport)}</td>
+        <td>${esc(r.level||'—')}</td>
+        <td class="sub">${esc(goals||'—')}</td>
+        <td class="mono">${r.train_freq?r.train_freq+'d':'—'}</td>
+        <td class="mono">🔥 ${r.streak}d · ${r.xp} XP</td>
+        <td><span class="badge ${ok?'ok':'warn'}">${ok?'✓ today':(r.last_checkin||'never')}</span></td>
+        <td><button class="btn btn-ghost btn-sm" data-open="${r.id}">${openId===r.id?'Close':'Open'}</button></td>
+      </tr>${openId===r.id?`<tr class="filerow"><td colspan="8" id="fileCell">Loading file…</td></tr>`:''}`;
+    }).join('');
+
+    tb.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click', ()=>{
+      openId = openId===b.dataset.open ? null : b.dataset.open;
+      render();
+      if(openId) loadFile(openId);
+    }));
+
+    $('#foot').textContent = `Showing ${rows.length} of ${ROWS.length} athlete${ROWS.length===1?'':'s'} · Athlete OS · Powered by Lockdown Lab`;
+  }
+
+  async function loadFile(aid){
+    const cell = $('#fileCell'); if(!cell) return;
+    try{
+      const d = await api({action:'cdetail', aid});
+      const p = d.profile, g = p.goals||{};
+      cell.innerHTML = `<div class="file">
+        <div>
+          <h4>Profile</h4>
+          <div class="box">
+            <b>${esc(p.name)}</b> · ${esc(p.sport)}${p.position?' · '+esc(p.position):''}${p.age?' · '+p.age:''}<br>
+            Level: <b>${esc(p.level||'—')}</b> · ${p.train_freq?p.train_freq+'d/week':'—'} · ${esc(p.comp_schedule||'no comp set')}<br>
+            Goals: <b>${esc((g.tags||[]).join(', ')||'—')}</b>${g.note?'<br>“'+esc(g.note)+'”':''}<br>
+            ${p.injuries?'⚠ Injuries: <b>'+esc(p.injuries)+'</b><br>':''}
+            ${(p.equipment||[]).length?'Equipment: '+esc(p.equipment.join(', '))+'<br>':''}
+            ${d.contact?'Contact: <b>'+esc(d.contact)+'</b> · ':''}Status: <b>${esc(d.status)}</b>
+            <button class="btn btn-ghost btn-sm" id="stBtn" style="margin-left:8px">${d.status==='active'?'Pause':'Reactivate'}</button>
+          </div>
+          <h4>Shared with coach</h4>
+          ${(d.shared_mind||[]).slice(0,4).map(m=>`<div class="box">🧠 <b>${esc((m.data||{}).trigger||'moment')}</b> · impact ${(m.data||{}).impact||'–'}/10${(m.data||{}).plan?'<br>plan: '+esc((m.data||{}).plan):''}</div>`).join('')||'<div class="box">Nothing shared yet.</div>'}
+        </div>
+        <div>
+          <h4>Last 14 check-ins</h4>
+          <div class="box">${(d.checkins||[]).map(c=>`<div class="cirow"><span class="d">${esc(c.d)}</span><span>E${c.energy??'–'} · S${c.soreness??'–'} · ${c.sleep_h?c.sleep_h+'h':'–'} · ${c.mins||0}min</span></div>`).join('')||'No check-ins yet.'}</div>
+        </div>
+        <div class="notes">
+          <h4>🔒 Private notes — athlete never sees these</h4>
+          ${(d.notes||[]).map(n=>`<div class="box">${esc(n.text)}<div class="sub mono" style="margin-top:4px">${fmtDate(n.created_at)}</div></div>`).join('')}
+          <textarea id="noteText" placeholder="What have you noticed? Only you see this."></textarea>
+          <button class="btn btn-primary btn-sm" id="noteAdd">Add Note 🔒</button>
+        </div>
+      </div>`;
+      $('#noteAdd').addEventListener('click', async()=>{
+        const t=$('#noteText').value.trim(); if(!t) return;
+        try{ await api({action:'note_add', aid, text:t}); toast('Note locked 🔒'); loadFile(aid); }
+        catch(e){ toast('Save failed'); }
+      });
+      $('#stBtn').addEventListener('click', async()=>{
+        try{ await api({action:'status_set', aid, status:d.status==='active'?'paused':'active'}); toast('Status updated'); await load(); openId=aid; render(); loadFile(aid); }
+        catch(e){ toast('Update failed'); }
+      });
+    }catch(e){ cell.textContent = 'Could not load file — '+e.message; }
+  }
+
+  /* ---- CSV export ---- */
+  $('#exportBtn').addEventListener('click', ()=>{
+    if(!ROWS.length){ toast('Nothing to export'); return; }
+    const cols = ['created_at','status','name','sport','age','level','position','train_freq','comp_schedule','goal_tags','goal_note','injuries','equipment','location','contact','xp','streak','last_checkin'];
+    const get = (r,c)=>{
+      if(c==='goal_tags') return ((r.goals||{}).tags||[]).join(' | ');
+      if(c==='goal_note') return (r.goals||{}).note||'';
+      if(c==='equipment') return (r.equipment||[]).join(' | ');
+      return r[c];
+    };
+    const csv = [cols.join(',')].concat(ROWS.map(r=>cols.map(c=>{
+      let v = get(r,c); if(v==null) v='';
+      v = String(v).replace(/"/g,'""');
+      return /[",\n]/.test(v) ? `"${v}"` : v;
+    }).join(','))).join('\n');
+    const blob = new Blob([csv],{type:'text/csv'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'athlete-os-athletes.csv';
+    a.click(); URL.revokeObjectURL(a.href);
+    toast('CSV exported');
+  });
+
+  /* ---- auto-login if code stored ---- */
+  if(CODE){ load().then(showDash).catch(()=>{ sessionStorage.removeItem('aos_coach_code'); CODE=''; showLogin(); }); }
+})();
+</script>
+</body>
+</html>
