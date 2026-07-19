@@ -541,6 +541,8 @@ body.rmode *{animation:none!important;transition:none!important}
       <div class="jstep" data-js="2">
         <span class="ob-lbl">Your name</span>
         <input id="jName" placeholder="e.g. Marcus T." maxlength="40" autocomplete="off">
+        <span class="ob-lbl">Who are you and why do you want in? · one line, make it count</span>
+        <textarea id="jWhy" placeholder="e.g. Point guard from Bankstown, train 5 days a week, heard UNC doesn't miss." maxlength="140" style="min-height:56px"></textarea>
         <button class="btn btn-p btn-block jnext">Next →</button>
         <button class="jback" type="button">← Back</button>
       </div>
@@ -1151,7 +1153,7 @@ body.rmode *{animation:none!important;transition:none!important}
   function jaiLine(n){
     if(n===0) return 'One profile. Your whole game — reads, mind, fuel, courts, coach. Four quick steps and I\'m reading you.';
     if(n===1) return $('#jInvite').value.trim()?'Code detected — fast lane\'s open.':'No code needed. Knock, and UNC gets pinged the second you\'re done.';
-    if(n===2) return 'Name check. What do they call you on the court?';
+    if(n===2) return 'Name check. And make your case — the door doesn\'t open for just anyone.';
     if(n===3){ const nm=$('#jName').value.trim().split(/\s+/)[0]; return (nm?nm+' — locked. Now, ':'Now, ')+'where do you live on the floor?'; }
     return 'Last step. Your PIN is your key — 4 digits, nobody else\'s. Then I build.';
   }
@@ -1163,6 +1165,7 @@ body.rmode *{animation:none!important;transition:none!important}
   }
   function jValidate(n){
     if(n===2 && $('#jName').value.trim().length<2){ obErr('#jErr','Add your name first.'); return false; }
+    if(n===2 && !$('#jInvite').value.trim() && $('#jWhy').value.trim().length<3){ obErr('#jErr','Make your case — why should UNC let you in?'); return false; }
     return true;
   }
   document.querySelectorAll('.jnext').forEach(b=>b.addEventListener('click',()=>{ if(jValidate(jstep)) jGoTo(jstep+1); }));
@@ -1186,11 +1189,13 @@ body.rmode *{animation:none!important;transition:none!important}
     const pos=($('#jPos').querySelector('.pill.sel')||{}).textContent||null;
     const age=parseInt($('#jAge').value,10)||null;
     if(name.length<2){ jGoTo(2); return obErr('#jErr','Add your name first.'); }
+    const jwhy=$('#jWhy').value.trim();
+    if(!$('#jInvite').value.trim() && jwhy.length<3){ jGoTo(2); return obErr('#jErr','Make your case — why should UNC let you in?'); }
     if(!/^\d{4}$/.test(pin)) return obErr('#jErr','PIN needs to be exactly 4 digits.');
     jBuildShow();
     try{
       const [r]=await Promise.all([
-        api({action:'register',name,pos,age,pin,contact:$('#jContact').value.trim(),invite:$('#jInvite').value.trim().toUpperCase()}),
+        api({action:'register',name,pos,age,pin,why:jwhy,contact:$('#jContact').value.trim(),invite:$('#jInvite').value.trim().toUpperCase()}),
         wait(2700)
       ]);
       $('#jbarFill').style.width='100%'; $('#jbMsg').textContent='Profile live. Opening the Lab…'; await wait(500);
@@ -1920,7 +1925,7 @@ body.rmode *{animation:none!important;transition:none!important}
   function renderKnocks(){
     const list=(ROSTER&&ROSTER.knocks)||[];
     $('#knockCard').style.display=list.length?'block':'none';
-    $('#knockList').innerHTML=list.map(k=>'<div class="intelnote" style="align-items:center;flex-wrap:wrap"><span>🚪</span><span style="flex:1;min-width:130px"><b style="color:var(--text)">'+esc(k.name)+'</b> '+(k.pos?'· '+esc(k.pos):'')+(k.age?' · '+k.age:'')+'<br><span style="font-size:11px;color:var(--dim)">'+(k.contact?'reach: '+esc(k.contact):'no contact left')+'</span></span>'+contactLink(k.contact)+'<button class="btn btn-p btn-sm" data-knock-ok="'+k.id+'">Let them in ✓</button><button class="btn btn-g btn-sm" data-knock-no="'+k.id+'">✕</button></div>').join('');
+    $('#knockList').innerHTML=list.map(k=>'<div class="intelnote" style="align-items:center;flex-wrap:wrap"><span>🚪</span><span style="flex:1;min-width:130px"><b style="color:var(--text)">'+esc(k.name)+'</b> '+(k.pos?'· '+esc(k.pos):'')+(k.age?' · '+k.age:'')+(k.why?'<br><span style="font-size:11.5px;color:var(--muted)">“'+esc(k.why)+'”</span>':'')+'<br><span style="font-size:11px;color:var(--dim)">'+(k.contact?'reach: '+esc(k.contact):'no contact left')+'</span></span>'+contactLink(k.contact)+'<button class="btn btn-p btn-sm" data-knock-ok="'+k.id+'">Let them in ✓</button><button class="btn btn-g btn-sm" data-knock-no="'+k.id+'">✕</button></div>').join('');
     document.querySelectorAll('[data-knock-ok]').forEach(b=>b.addEventListener('click',async()=>{ try{ await api({action:'knock_approve',code:sess.code,pid:b.dataset.knockOk}); toast('Door opened 🔓 Their app unlocks itself.'); S.like(); haptic(12); ROSTER=await api({action:'roster',code:sess.code}); renderRoster(true); }catch(e){toast(e.message,true);} }));
     document.querySelectorAll('[data-knock-no]').forEach(b=>b.addEventListener('click',async()=>{ try{ await api({action:'knock_deny',code:sess.code,pid:b.dataset.knockNo}); toast('Turned away'); ROSTER=await api({action:'roster',code:sess.code}); renderRoster(true); }catch(e){toast(e.message,true);} }));
   }
