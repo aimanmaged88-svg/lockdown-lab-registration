@@ -407,6 +407,9 @@ header{gap:8px}
 .dentry p{font-size:13px;color:var(--muted);white-space:pre-wrap}
 /* fuel pills: junk reads red when selected */
 .pill.bad.sel{background:linear-gradient(180deg,#ff7a6e,var(--bad));color:#2a0300;box-shadow:0 6px 18px -8px rgba(255,69,58,.55)}
+/* ============ the door: single + batch code sections ============ */
+.doorseg{border:1px solid var(--line2);border-radius:14px;background:rgba(0,0,0,.2);padding:11px 12px}
+.seghd{display:block;font-family:var(--fm);font-size:9px;letter-spacing:1.4px;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
 /* ============ ON AIR brand mark ============ */
 .oa{font-family:var(--fd);color:#fff;border:2.5px solid #fff;border-radius:11px;padding:8px 10px 3px 14px;font-size:17px;letter-spacing:1.5px;line-height:1;position:relative;display:inline-block;flex:0 0 auto}
 .oa i{font-style:normal;position:absolute;top:4px;left:5px;width:5px;height:5px;background:var(--accent);border-radius:50%;box-shadow:0 0 7px var(--accent);animation:pulse 2s infinite}
@@ -794,9 +797,9 @@ body.rmode *{animation:none!important;transition:none!important}
       <span class="eyebrow">The Lab · Squad</span>
       <h1 class="page display">Community</h1>
       <p class="sub">Talk hoops, post wins, find runs. Keep it locked in.</p>
-      <a class="igcard" href="https://instagram.com/lockdownlab3" target="_blank" rel="noopener">
-        <img src="data:image/jpeg;base64,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" alt="lockdownlab3">
-        <div class="igi"><b>@lockdownlab3</b><span>66 posts · clips & drills on IG</span></div>
+      <a class="igcard" href="https://instagram.com/lockdownlablive" target="_blank" rel="noopener">
+        <img src="data:image/jpeg;base64,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" alt="lockdownlablive">
+        <div class="igi"><b>@lockdownlablive</b><span>Clips, drills & drops on IG</span></div>
         <span class="go">Follow →</span>
       </a>
       <div class="card" id="invCard">
@@ -920,12 +923,24 @@ body.rmode *{animation:none!important;transition:none!important}
         <div id="cInvList"></div>
       </div>
       <div class="card">
-        <span class="cl">🎟 The door · codes burn after 6 hours</span>
-        <div class="composer" style="margin:2px 0 8px">
-          <input id="mintLabel" placeholder="Who's this code for? (e.g. IG DM — @kid)" maxlength="40">
-          <button class="btn btn-p btn-sm" id="mintBtn">Mint code</button>
+        <span class="cl">🎟 The door · mint codes to let people in</span>
+        <div class="doorseg">
+          <span class="seghd">① Single code · one person, one use, burns in 6h</span>
+          <div class="composer" style="margin:2px 0 4px">
+            <input id="mintLabel" placeholder="Who's this code for? (e.g. IG DM — @kid)" maxlength="40">
+            <button class="btn btn-p btn-sm" id="mintBtn">Mint</button>
+          </div>
         </div>
-        <p style="color:var(--dim);font-size:11.5px;margin:0 0 8px">Every code is one-use and self-destructs 6 hours after minting. Fire it straight to WhatsApp with ▷, or hit ⋯ to share anywhere else.</p>
+        <div class="doorseg" style="margin-top:12px">
+          <span class="seghd">② Batch code · one code, many people, lasts 7 days</span>
+          <input id="batchLabel" placeholder="What's it for? (e.g. Tryout squad, IG drop)" maxlength="40" style="margin:2px 0 8px">
+          <div class="cl" style="margin:0 0 6px">How many people can use it?</div>
+          <div class="pills" id="batchUses" style="margin-bottom:8px">
+            <span class="pill sel" data-uses="10">10</span><span class="pill" data-uses="25">25</span><span class="pill" data-uses="50">50</span><span class="pill" data-uses="100">100</span>
+          </div>
+          <button class="btn btn-p btn-block btn-sm" id="batchBtn">Mint batch code 👥</button>
+        </div>
+        <p style="color:var(--dim);font-size:11.5px;margin:10px 0 8px">Fire any code to WhatsApp with ▷, or hit ⋯ to share anywhere. Batch codes let a whole team or a drop in at once.</p>
         <div id="activeCodes"></div>
       </div>
       <div id="rosterList"><p style="color:var(--dim);font-size:13px">Loading squad…</p></div>
@@ -1849,9 +1864,10 @@ body.rmode *{animation:none!important;transition:none!important}
   });
 
   /* ---------- invites: player side ---------- */
-  const CODE_TTL=6*3600*1000;
+  const CODE_TTL=6*3600*1000, BATCH_TTL=7*24*3600*1000;
+  const ttlOf=c=>((c&&c.max_uses||1)>1?BATCH_TTL:CODE_TTL);
   const codeLeft=at=>at?Math.max(0,CODE_TTL-(Date.now()-new Date(at).getTime())):0;
-  const fmtLeft=ms=>{ const h=Math.floor(ms/3600000), m=Math.floor(ms/60000)%60; return h?h+'h '+m+'m':Math.max(1,m)+'m'; };
+  const fmtLeft=ms=>{ const d=Math.floor(ms/86400000); if(d>=1){ const h=Math.floor(ms/3600000)%24; return d+'d'+(h?' '+h+'h':''); } const h=Math.floor(ms/3600000), m=Math.floor(ms/60000)%60; return h?h+'h '+m+'m':Math.max(1,m)+'m'; };
   function renderInvites(){
     if(!PST) return;
     const list=PST.invites||[];
@@ -1886,13 +1902,19 @@ body.rmode *{animation:none!important;transition:none!important}
   });
 
   /* ---------- invites: coach side ---------- */
-  const coachInvText=code=>'You’re invited to Lockdown Lab Live 🔒 Invite-only. Code: '+code+'\nJoin here: https://lockdown-lab-registration.netlify.app/app.html?code='+encodeURIComponent(code)+'\n⚠️ Heads up — this code self-destructs 6 hours after it was made. Lock it in quick.';
+  const codeMeta=code=>((ROSTER&&ROSTER.active_codes)||[]).find(c=>c.code===code)||{};
+  const coachInvText=code=>{
+    const c=codeMeta(code), batch=(c.max_uses||1)>1;
+    return 'You’re invited to Lockdown Lab Live 🔒 Invite-only. Code: '+code+'\nJoin here: https://lockdown-lab-registration.netlify.app/app.html?code='+encodeURIComponent(code)+(batch?'\n⚠️ Limited spots on this code — grab yours before it fills.':'\n⚠️ Heads up — this code self-destructs 6 hours after it was made. Lock it in quick.');
+  };
   const waLink=code=>'https://wa.me/?text='+encodeURIComponent(coachInvText(code));
   function renderActiveCodes(){
     const list=(ROSTER&&ROSTER.active_codes)||[];
     $('#activeCodes').innerHTML=list.length?list.map(c=>{
-      const left=codeLeft(c.code_at);
-      return '<div class="intelnote" style="align-items:center;flex-wrap:wrap"><span>🎟</span><span style="flex:1;min-width:130px"><b class="mono" style="color:var(--accent)">'+esc(c.code||'')+'</b> · '+esc(c.friend_name)+((c.player&&c.player.name)?' <span style="color:var(--dim);font-size:11px">(vouched by '+esc(c.player.name)+')</span>':'')+'<br><span style="font-size:11px;color:var(--dim)">⏳ '+(left>0?fmtLeft(left)+' left':'burning…')+'</span></span><a class="btn btn-sm" style="background:linear-gradient(180deg,#2fdf70,#25d366);color:#04340f;font-family:var(--fd);letter-spacing:1px" href="'+waLink(c.code||'')+'" target="_blank" rel="noopener">▷</a><button class="btn btn-g btn-sm" data-cshare="'+esc(c.code||'')+'">⋯</button></div>';
+      const mu=c.max_uses||1, batch=mu>1;
+      const left=c.code_at?Math.max(0,ttlOf(c)-(Date.now()-new Date(c.code_at).getTime())):0;
+      const meta=batch?('👥 '+(c.use_count||0)+'/'+mu+' claimed · '+(left>0?fmtLeft(left)+' left':'expiring…')):('⏳ '+(left>0?fmtLeft(left)+' left':'burning…'));
+      return '<div class="intelnote" style="align-items:center;flex-wrap:wrap"><span>'+(batch?'👥':'🎟')+'</span><span style="flex:1;min-width:130px"><b class="mono" style="color:var(--accent)">'+esc(c.code||'')+'</b> · '+esc(c.friend_name)+((c.player&&c.player.name)?' <span style="color:var(--dim);font-size:11px">(vouched by '+esc(c.player.name)+')</span>':'')+'<br><span style="font-size:11px;color:var(--dim)">'+meta+'</span></span><a class="btn btn-sm" style="background:linear-gradient(180deg,#2fdf70,#25d366);color:#04340f;font-family:var(--fd);letter-spacing:1px" href="'+waLink(c.code||'')+'" target="_blank" rel="noopener">▷</a><button class="btn btn-g btn-sm" data-cshare="'+esc(c.code||'')+'">⋯</button></div>';
     }).join('')
       :'<p style="color:var(--dim);font-size:12px">No live codes. Mint one for anyone you\'re letting in from IG — or approve a request above.</p>';
     document.querySelectorAll('[data-cshare]').forEach(b=>b.addEventListener('click',async()=>{
@@ -1911,7 +1933,18 @@ body.rmode *{animation:none!important;transition:none!important}
       $('#mintLabel').value=''; toast('Code minted: '+r.code+' 🎟 Burns in 6h'); S.like(); haptic(12);
       ROSTER=await api({action:'roster',code:sess.code}); renderActiveCodes();
     }catch(e){ toast(e.message,true); }
-    busy($('#mintBtn'),0,'Mint code');
+    busy($('#mintBtn'),0,'Mint');
+  });
+  $('#batchUses').addEventListener('click',e=>{ const p=e.target.closest('.pill'); if(!p)return; $('#batchUses').querySelectorAll('.pill').forEach(x=>x.classList.remove('sel')); p.classList.add('sel'); S.pill&&S.pill(); });
+  $('#batchBtn').addEventListener('click',async()=>{
+    const uses=parseInt(($('#batchUses').querySelector('.pill.sel')||{}).dataset?.uses||'10',10);
+    busy($('#batchBtn'),1);
+    try{
+      const r=await api({action:'invite_mint',code:sess.code,label:$('#batchLabel').value.trim(),max_uses:uses});
+      $('#batchLabel').value=''; toast('Batch code: '+r.code+' 👥 '+uses+' spots · 7 days'); S.like(); haptic(12);
+      ROSTER=await api({action:'roster',code:sess.code}); renderActiveCodes();
+    }catch(e){ toast(e.message,true); }
+    busy($('#batchBtn'),0,'Mint batch code 👥');
   });
   /* ---------- knocks: no-code sign-ups waiting on UNC ---------- */
   function contactLink(c){
