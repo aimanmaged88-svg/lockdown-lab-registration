@@ -245,7 +245,7 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
         <button class="sbi" data-sec="squad"><span>👥</span>Squad</button>
         <button class="sbi" data-sec="money"><span>💰</span>Money</button>
         <button class="sbi" data-sec="ideas"><span>💡</span>Coach's Corner</button>
-        <button class="sbi" data-sec="guide"><span>🎓</span>Guide</button>
+        <button class="sbi" data-sec="guide"><span>🎓</span>Guide<em class="bdg" id="bGuide"></em></button>
         <button class="sbi" data-sec="scout"><span>🔭</span>Scout</button>
       </nav>
       <div class="sb-foot">
@@ -606,6 +606,7 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
     document.querySelectorAll('.osec').forEach(x=>x.classList.toggle('on',x.id==='sec-'+s));
     document.querySelectorAll('.sbi').forEach(x=>x.classList.toggle('on',x.dataset.sec===s));
     if(s==='money') calcMoney();
+    if(s==='guide'){ renderNews(); paintPhone(); setTimeout(markNewsSeen,1200); }
     window.scrollTo({top:0});
   }
   document.querySelectorAll('.sbi').forEach(b=>b.addEventListener('click',()=>showSec(b.dataset.sec)));
@@ -633,14 +634,18 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
   ['#mPrice','#mSeats','#mPerWk'].forEach(s=>{ const el=$(s); if(el) el.addEventListener('input',calcMoney); });
   $('#mWeeks').addEventListener('click',e=>{ const p=e.target.closest('.pil'); if(!p)return; $('#mWeeks').querySelectorAll('.pil').forEach(x=>x.classList.remove('sel')); p.classList.add('sel'); calcMoney(); });
   /* ---- Guide: what's new + feature phone ---- */
+  /* Newest = highest id. Add a new entry (bump the id) and every coach's desk
+     badges the Guide tab + pings them the next time it's open. */
   const NEWS=[
-    {d:'19 Jul',tag:'NEW',t:'Session studio + trailer',body:'Sessions now take a description, chapters (the run of play) and a deck link. Players get a rotating “Next Up” trailer and can tap any session for the full agenda.'},
-    {d:'19 Jul',tag:'NEW',t:'Money desk',body:'Set your price and see per-session, week, month and block earnings — plus fill-the-seats scenarios. Plan a week before you run it.'},
-    {d:'19 Jul',t:'Scout preview',body:'A private, coming-soon skeleton for vetting scouts before they see your players. Only you can see it.'},
-    {d:'19 Jul',t:'Badge Vault designed',body:'55 collectible badges + a Lab Bucks money layer (money off sessions) are designed and waiting on your OK before they go in the app.'},
-    {d:'19 Jul',t:'This desk went OS-style',body:'The whole back office became a dashboard: Overview, The Door, Sessions, Codes, Squad, Coach’s Corner — and now Guide.'},
-    {d:'earlier',t:'The essentials',body:'Knock-to-join with your approval, single + batch invite codes, weekly programs, push notifications both ways, and every session shown in each player’s local time.'},
+    {id:7,d:'19 Jul',t:'Update pings',body:'The desk now badges the Guide tab and pings you whenever something new ships — so you never miss a feature.'},
+    {id:6,d:'19 Jul',t:'Session studio + trailer',body:'Sessions now take a description, chapters (the run of play) and a deck link. Players get a rotating “Next Up” trailer and can tap any session for the full agenda.'},
+    {id:5,d:'19 Jul',t:'Money desk',body:'Set your price and see per-session, week, month and block earnings — plus fill-the-seats scenarios. Plan a week before you run it.'},
+    {id:4,d:'19 Jul',t:'Scout preview',body:'A private, coming-soon skeleton for vetting scouts before they see your players. Only you can see it.'},
+    {id:3,d:'19 Jul',t:'Badge Vault designed',body:'55 collectible badges + a Lab Bucks money layer (money off sessions) are designed and waiting on your OK before they go in the app.'},
+    {id:2,d:'19 Jul',t:'This desk went OS-style',body:'The whole back office became a dashboard: Overview, The Door, Sessions, Codes, Squad, Coach’s Corner — and now Guide.'},
+    {id:1,d:'earlier',t:'The essentials',body:'Knock-to-join with your approval, single + batch invite codes, weekly programs, push notifications both ways, and every session shown in each player’s local time.'},
   ];
+  const NEWS_LATEST=Math.max.apply(null,NEWS.map(n=>n.id));
   const FEAT={
     coach:[
       {k:'intro',ic:'▶️',name:'Intro tour',what:'Your welcome walkthrough — coming soon.',how:['Your first slide deck / intro will live right here.','It’ll walk any new coach through the app step by step.','Send me the deck and I’ll wire it in.'],where:'Guide (soon)'},
@@ -668,7 +673,27 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
     ],
   };
   let vSide='coach', vView='home', vSel=null;
-  function renderNews(){ const el=$('#newsList'); if(!el)return; el.innerHTML=NEWS.map(n=>'<div class="newsitem"><div class="h"><b>'+esc(n.t)+'</b>'+(n.tag?'<span class="tg">'+esc(n.tag)+'</span>':'')+'<span class="dt">'+esc(n.d)+'</span></div><p>'+esc(n.body)+'</p></div>').join(''); }
+  const newsSeen=()=>+(localStorage.getItem('lll_news_seen')||0);
+  function renderNews(){ const el=$('#newsList'); if(!el)return; const seen=newsSeen(); el.innerHTML=NEWS.map(n=>'<div class="newsitem"><div class="h"><b>'+esc(n.t)+'</b>'+(n.id>seen?'<span class="tg">New</span>':'')+'<span class="dt">'+esc(n.d)+'</span></div><p>'+esc(n.body)+'</p></div>').join(''); }
+  function notifyNews(n){
+    if(!n)return;
+    try{
+      if('Notification' in window && Notification.permission==='granted'){
+        if(navigator.serviceWorker && navigator.serviceWorker.ready){
+          navigator.serviceWorker.ready.then(reg=>reg.showNotification('🆕 New in the Lab',{body:n.t+' — open Guide to see what changed.',icon:'/icons/icon-180.png',badge:'/favicon.png',tag:'ll-news'})).catch(()=>{ try{new Notification('🆕 New in the Lab',{body:n.t});}catch(_){} });
+        } else { new Notification('🆕 New in the Lab',{body:n.t}); }
+      }
+    }catch(_){}
+    toast('🆕 New update: '+n.t);
+  }
+  function checkNews(){
+    const bg=$('#bGuide'); const unseen=NEWS.filter(n=>n.id>newsSeen()).length;
+    if(bg){ bg.textContent=unseen||''; bg.classList.toggle('on',unseen>0); }
+    const notifiedRaw=localStorage.getItem('lll_news_notified');
+    if(notifiedRaw===null){ localStorage.setItem('lll_news_notified',String(NEWS_LATEST)); return; } /* first run: badge only, no ping */
+    if(NEWS_LATEST>+notifiedRaw){ notifyNews(NEWS.find(n=>n.id===NEWS_LATEST)); localStorage.setItem('lll_news_notified',String(NEWS_LATEST)); }
+  }
+  function markNewsSeen(){ localStorage.setItem('lll_news_seen',String(NEWS_LATEST)); const bg=$('#bGuide'); if(bg){ bg.textContent=''; bg.classList.remove('on'); } }
   function paintPhone(){
     const el=$('#vscreen'); if(!el)return;
     if(vView==='detail'&&vSel){
@@ -684,7 +709,7 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
     const bk=e.target.closest('[data-vback]'); if(bk){ vView='home'; vSel=null; paintPhone(); return; }
     const sw=e.target.closest('[data-vs]'); if(sw){ vSide=sw.dataset.vs; vView='home'; vSel=null; paintPhone(); return; }
   });
-  renderNews(); paintPhone();
+  renderNews(); paintPhone(); checkNews();
   /* ---- Coach's Corner: the idea engine ---- */
   const IDEA_SESS=[
     'The 3-Second Rule, live: everyone shares one moment they sulked mid-game, then you drill the flush-and-go on camera.',
