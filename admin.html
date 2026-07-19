@@ -167,6 +167,18 @@ input::placeholder{color:#5d5851}
 .kpi span{font-family:var(--fm);font-size:8px;letter-spacing:1.4px;text-transform:uppercase;color:var(--dim);display:block;margin-top:5px}
 #toast{position:fixed;bottom:calc(24px + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%) translateY(16px);background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:#150a00;font-family:var(--fd);text-transform:uppercase;letter-spacing:1px;font-size:14px;padding:12px 22px;border-radius:999px;opacity:0;pointer-events:none;transition:all .25s;z-index:70;white-space:nowrap}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.soon{font-family:var(--fm);font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;color:#150a00;background:var(--accent);border-radius:99px;padding:3px 9px;vertical-align:middle;margin-left:8px}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px}
+@media(max-width:560px){.mgrid{grid-template-columns:1fr}}
+.mgrid label,.flabel{font-family:var(--fm);font-size:8.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--dim);display:block}
+.mgrid label input{margin-top:5px}
+textarea{width:100%;min-height:62px;margin-top:5px;resize:vertical;font-family:var(--fb);color:var(--text);background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:13px;padding:11px 13px;font-size:14px;outline:none}
+textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
+.scen{display:flex;align-items:center;gap:12px;border:1px solid var(--line2);border-radius:14px;background:rgba(0,0,0,.25);padding:11px 14px;margin-bottom:8px}
+.scen .lab{flex:1;font-size:13.5px;color:var(--text)}
+.scen .lab small{display:block;font-size:11px;color:var(--dim)}
+.scen .amt{font-family:var(--fd);font-size:24px;letter-spacing:1px;color:var(--accent)}
+.scen.you{border-color:color-mix(in srgb,var(--accent) 45%,transparent);background:var(--accent-soft)}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -191,7 +203,9 @@ input::placeholder{color:#5d5851}
         <button class="sbi" data-sec="sessions"><span>📅</span>Sessions</button>
         <button class="sbi" data-sec="codes"><span>🎟</span>Codes</button>
         <button class="sbi" data-sec="squad"><span>👥</span>Squad</button>
+        <button class="sbi" data-sec="money"><span>💰</span>Money</button>
         <button class="sbi" data-sec="ideas"><span>💡</span>Coach's Corner</button>
+        <button class="sbi" data-sec="scout"><span>🔭</span>Scout</button>
       </nav>
       <div class="sb-foot">
         <span class="statchip"><span class="d"></span><span id="lastUpd">live</span></span>
@@ -288,6 +302,53 @@ input::placeholder{color:#5d5851}
       <p class="empty" style="margin-top:4px">Live NBA news feed is a future upgrade (needs a news API hookup) — these are evergreen so the well never runs dry.</p>
     </section>
 
+    <section class="osec" id="sec-money">
+      <h2 class="oh">Money</h2>
+      <p class="osub">What a class is worth. Set your price, see the week. Run the numbers before you run the session — even five in a class pays.</p>
+      <div class="card">
+        <span class="cl">💰 <b>Your rate</b> · everything below updates live as you type</span>
+        <div class="mgrid">
+          <label>Price per seat ($)<input id="mPrice" type="number" inputmode="decimal" min="0" step="1" value="25"></label>
+          <label>Seats in the class<input id="mSeats" type="number" inputmode="numeric" min="0" step="1" value="5"></label>
+          <label>Sessions per week<input id="mPerWk" type="number" inputmode="numeric" min="0" step="1" value="2"></label>
+          <label>Block length<span class="pills" id="mWeeks" style="margin-top:6px;display:flex"><span class="pil" data-wk="6">6 wks</span><span class="pil sel" data-wk="8">8 wks</span><span class="pil" data-wk="10">10 wks</span></span></label>
+        </div>
+      </div>
+      <div class="grid2" style="max-width:none;grid-template-columns:repeat(4,1fr)">
+        <div class="kpi"><b id="mPerSess">$0</b><span>Per session</span></div>
+        <div class="kpi"><b id="mPerWeek">$0</b><span>Per week</span></div>
+        <div class="kpi"><b id="mPerMonth">$0</b><span>Per month</span></div>
+        <div class="kpi"><b id="mPerBlock">$0</b><span>Per block</span></div>
+      </div>
+      <div class="card">
+        <span class="cl">📊 <b>If you fill the seats</b> · weekly take at your current price &amp; cadence</span>
+        <div id="mScenarios"></div>
+      </div>
+      <p class="empty">Estimates only — AUD assumed. Set aside tax and any Zoom/tooling costs. This is your motivation meter, not your accountant.</p>
+    </section>
+
+    <section class="osec" id="sec-scout">
+      <h2 class="oh">Scout <span class="soon">Coming soon</span></h2>
+      <p class="osub">Private preview — only you can see this, it isn't open to anyone. A way to vet scouts before you let them near your players.</p>
+      <div class="card" style="opacity:.82">
+        <span class="cl">🔭 <b>Scout application</b> · this is a mock-up — nothing here saves yet</span>
+        <div class="mgrid">
+          <label>Name<input placeholder="Who are they?" disabled></label>
+          <label>Years scouting / coaching<input placeholder="e.g. 6" disabled></label>
+          <label>Areas they cover<input placeholder="e.g. Western Sydney, Bankstown" disabled></label>
+          <label>Who do they scout for?<input placeholder="Team · club · program" disabled></label>
+        </div>
+        <label class="flabel" style="margin-top:10px">Players they already rate (local)<textarea placeholder="Names, positions, which courts they run…" disabled></textarea></label>
+        <label class="flabel" style="margin-top:10px">Their intention<textarea placeholder="Who are they trying to build? What's the real pitch?" disabled></textarea></label>
+        <button class="btn btn-p" disabled style="width:100%;margin-top:12px">Submit for review 🔒</button>
+      </div>
+      <div class="card">
+        <span class="cl">🧭 <b>How it'll work</b></span>
+        <div class="ideabox">Scouts pitch you with proof — years in the game, the areas they cover, players they already rate, and who they're building for. You get a read on whether they're the real thing or just a troll before they ever see a name. Approve, and they get a limited scout-only view. Stays under your coaching side, never public.</div>
+        <button class="btn btn-g" disabled style="margin-top:10px">Open the scout gate — not yet</button>
+      </div>
+    </section>
+
     </main>
   </div>
 <div id="toast"></div>
@@ -344,6 +405,7 @@ input::placeholder{color:#5d5851}
     document.querySelectorAll('[data-rok]').forEach(b=>b.onclick=async()=>{ try{ await api({action:'invite_approve',code:CODE,invite_id:b.dataset.rok}); toast('Cleared 🎟'); refresh(); }catch(e){toast(e.message)} });
     document.querySelectorAll('[data-rno]').forEach(b=>b.onclick=async()=>{ try{ await api({action:'invite_deny',code:CODE,invite_id:b.dataset.rno}); toast('Denied'); refresh(); }catch(e){toast(e.message)} });
     document.querySelectorAll('[data-cp]').forEach(b=>b.onclick=async()=>{ try{ await navigator.clipboard.writeText(shareText(b.dataset.cp)); toast('Invite copied 📋'); }catch(e){} });
+    if($('#mScenarios')) calcMoney();
   }
   /* ---- sessions: post once, whole squad sees it + gets pushed ---- */
   const sessWhen=iso=>{ const d=new Date(iso); return d.toLocaleDateString('en-AU',{timeZone:'Australia/Sydney',weekday:'short',day:'numeric',month:'short'})+' · '+d.toLocaleTimeString('en-AU',{timeZone:'Australia/Sydney',hour:'numeric',minute:'2-digit'}); };
@@ -460,10 +522,33 @@ input::placeholder{color:#5d5851}
   function showSec(s){
     document.querySelectorAll('.osec').forEach(x=>x.classList.toggle('on',x.id==='sec-'+s));
     document.querySelectorAll('.sbi').forEach(x=>x.classList.toggle('on',x.dataset.sec===s));
+    if(s==='money') calcMoney();
     window.scrollTo({top:0});
   }
   document.querySelectorAll('.sbi').forEach(b=>b.addEventListener('click',()=>showSec(b.dataset.sec)));
   document.addEventListener('click',e=>{ const g=e.target.closest('[data-go]'); if(g) showSec(g.dataset.go); });
+  /* ---- Money: the motivation meter ---- */
+  const money=n=>'$'+Math.round(n||0).toLocaleString('en-AU');
+  function calcMoney(){
+    const price=Math.max(0,parseFloat($('#mPrice').value)||0);
+    const seats=Math.max(0,parseInt($('#mSeats').value,10)||0);
+    const perWk=Math.max(0,parseInt($('#mPerWk').value,10)||0);
+    const wk=parseInt(($('#mWeeks').querySelector('.pil.sel')||{}).dataset?.wk||'8',10);
+    const perSess=price*seats, perWeek=perSess*perWk;
+    $('#mPerSess').textContent=money(perSess);
+    $('#mPerWeek').textContent=money(perWeek);
+    $('#mPerMonth').textContent=money(perWeek*4.33);
+    $('#mPerBlock').textContent=money(perWeek*wk);
+    const squadN=(R&&R.players)?R.players.length:0;
+    const rows=[{n:5,t:'A small class'},{n:10,t:'A full class'},{n:20,t:'Two classes'}];
+    if(squadN>0) rows.push({n:squadN,t:'Your whole squad',you:true});
+    $('#mScenarios').innerHTML=rows.map(r=>
+      '<div class="scen'+(r.you?' you':'')+'"><div class="lab"><b>'+r.n+' seats</b> · '+esc(r.t)+
+      '<small>'+money(price*r.n)+'/session × '+perWk+'/wk</small></div><div class="amt">'+money(price*r.n*perWk)+'<span style="font-family:var(--fm);font-size:10px;color:var(--dim);letter-spacing:1px">/wk</span></div></div>'
+    ).join('');
+  }
+  ['#mPrice','#mSeats','#mPerWk'].forEach(s=>{ const el=$(s); if(el) el.addEventListener('input',calcMoney); });
+  $('#mWeeks').addEventListener('click',e=>{ const p=e.target.closest('.pil'); if(!p)return; $('#mWeeks').querySelectorAll('.pil').forEach(x=>x.classList.remove('sel')); p.classList.add('sel'); calcMoney(); });
   /* ---- Coach's Corner: the idea engine ---- */
   const IDEA_SESS=[
     'The 3-Second Rule, live: everyone shares one moment they sulked mid-game, then you drill the flush-and-go on camera.',
