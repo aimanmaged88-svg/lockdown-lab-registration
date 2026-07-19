@@ -67,13 +67,14 @@
   color-scheme:dark;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{background:radial-gradient(80% 40% at 50% -5%, rgba(255,107,0,.14), transparent 60%),var(--bg);color:var(--text);font-family:var(--fb);-webkit-font-smoothing:antialiased;min-height:100dvh;padding:20px 16px calc(40px + env(safe-area-inset-bottom))}
+body{background:radial-gradient(80% 40% at 50% -5%, rgba(255,107,0,.14), transparent 60%),var(--bg);color:var(--text);font-family:var(--fb);-webkit-font-smoothing:antialiased;min-height:100dvh}
+#login{padding:20px 16px}
 ::selection{background:var(--accent);color:#000}
 button{font-family:inherit;color:inherit;background:none;border:none;cursor:pointer}
 input{font-family:var(--fb);color:var(--text);background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:13px;padding:12px 14px;font-size:15px;outline:none;width:100%;transition:border-color .2s, box-shadow .2s}
 input:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
 input::placeholder{color:#5d5851}
-.wrap{max-width:760px;margin:0 auto}
+.wrap{margin:0 auto}
 /* proper dashboard: two columns on desktop, single stack on mobile */
 @media(min-width:1000px){
   .wrap{max-width:1200px}
@@ -126,7 +127,40 @@ input::placeholder{color:#5d5851}
 #login p{color:var(--muted);font-size:13px;margin-bottom:18px}
 #login .err{display:none;color:#ff9a9a;font-size:12.5px;background:rgba(255,69,58,.12);border:1px solid rgba(255,69,58,.5);border-radius:12px;padding:10px;margin-top:10px}
 #desk{display:none}
-.grid2{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+#desk.on{display:flex}
+.sb{width:232px;flex:0 0 auto;position:sticky;top:0;height:100dvh;display:flex;flex-direction:column;gap:18px;padding:22px 16px;border-right:1px solid var(--line2);background:rgba(0,0,0,.28)}
+.sb-brand{display:flex;gap:10px;align-items:center}
+.sb-brand b{font-family:var(--fd);font-size:17px;letter-spacing:1px;text-transform:uppercase;display:block;line-height:1.1}
+.sb-brand small{font-family:var(--fm);font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim)}
+.sb-nav{display:flex;flex-direction:column;gap:4px}
+.sbi{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:12px;color:var(--muted);font-size:13.5px;font-weight:600;text-align:left;transition:all .15s;position:relative}
+.sbi span{font-size:16px}
+.sbi:hover{color:var(--text);background:rgba(255,255,255,.04)}
+.sbi.on{color:var(--accent);background:var(--accent-soft)}
+.bdg{font-style:normal;margin-left:auto;font-family:var(--fm);font-size:10px;background:var(--accent);color:#150a00;border-radius:99px;padding:1px 7px;display:none}
+.bdg.on{display:inline-block}
+.sb-foot{margin-top:auto;display:flex;flex-direction:column;gap:8px}
+.osmain{flex:1;min-width:0;padding:26px 24px 60px;max-width:1150px}
+.oh{font-family:var(--fd);font-size:30px;letter-spacing:1px;text-transform:uppercase;font-weight:400;margin-bottom:4px}
+.osub{color:var(--muted);font-size:13px;margin-bottom:16px}
+.osec{display:none}.osec.on{display:block;animation:orise .3s ease}
+@keyframes orise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.ovgrid{display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:1150px){.ovgrid{grid-template-columns:1fr 1fr 1fr}}
+.ideabox{font-size:13.5px;color:var(--text);line-height:1.55;border-left:2px solid var(--accent);background:var(--accent-soft);border-radius:0 12px 12px 0;padding:11px 14px}
+@media(max-width:999px){
+  #desk.on{display:block}
+  .sb{width:100%;height:auto;position:sticky;top:0;z-index:40;flex-direction:row;align-items:center;gap:8px;padding:10px 12px;border-right:none;border-bottom:1px solid var(--line2);background:rgba(5,5,6,.88);backdrop-filter:blur(20px);overflow-x:auto;scrollbar-width:none}
+  .sb::-webkit-scrollbar{display:none}
+  .sb-brand small{display:none}.sb-brand b{font-size:0}.sb-brand{gap:0}
+  .sb-nav{flex-direction:row;gap:4px}
+  .sbi{padding:8px 10px;font-size:11.5px;white-space:nowrap;gap:6px}
+  .sbi span{font-size:14px}
+  .sb-foot{margin:0 0 0 auto;flex-direction:row;align-items:center}
+  .sb-foot .statchip{display:none}
+  .osmain{padding:16px 14px 60px}
+}
+.grid2{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;max-width:760px}
 @media(max-width:520px){.grid2{grid-template-columns:1fr 1fr}}
 .kpi{border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--glass),var(--glass2));padding:13px 10px;text-align:center}
 .kpi b{font-family:var(--fd);font-size:26px;display:block;line-height:1;color:var(--accent)}
@@ -149,69 +183,113 @@ input::placeholder{color:#5d5851}
   </div>
 
   <div id="desk">
-    <div class="top">
-      <span class="oa"><i></i>LIVE</span>
-      <div><h1>The Door <i>Desk</i></h1><small>auto-refreshes · sound on new knocks</small></div>
-      <span class="statchip"><span class="d"></span><span id="lastUpd">live</span></span>
-      <button class="btn btn-g" id="aOut" style="padding:8px 14px;font-size:12px">Lock up</button>
-    </div>
-
-    <div class="grid2">
-      <div class="kpi"><b id="kKnock">0</b><span>Knocking</span></div>
-      <div class="kpi"><b id="kReq">0</b><span>Invite requests</span></div>
-      <div class="kpi"><b id="kSquad">0</b><span>In the Lab</span></div>
-      <div class="kpi"><b id="kCodes">0</b><span>Live codes</span></div>
-    </div>
-
-    <div class="grid-main">
-      <div>
-        <div class="card hot">
-          <span class="cl">🚪 <b>Knocks at the door</b> · approve and their app unlocks itself — nothing to send</span>
-          <div id="knocks"><p class="empty">Quiet at the door.</p></div>
-        </div>
-
-        <div class="card">
-          <span class="cl">🎟 <b>Invite requests</b> · vouched by your players · approving mints a 6h code they share</span>
-          <div id="reqs"><p class="empty">None waiting.</p></div>
-        </div>
-
-        <div class="card">
-          <span class="cl">🔥 <b>Mint a code</b> · fire it straight back over WhatsApp</span>
-          <div class="seg"><span class="seglbl">① Single · one person, one use, burns in 6h</span>
-            <div class="mint"><input id="mLabel" placeholder="Who's it for? (e.g. IG DM — @kid)" maxlength="40"><button class="btn btn-p" id="mGo">Mint</button></div>
-          </div>
-          <div class="seg" style="margin-top:10px"><span class="seglbl">② Batch · one code, many people, lasts 7 days</span>
-            <input id="bLabel" placeholder="What's it for? (e.g. Tryout squad, IG drop)" maxlength="40" style="margin-bottom:8px">
-            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-              <span class="pills" id="bUses"><span class="pil sel" data-uses="10">10</span><span class="pil" data-uses="25">25</span><span class="pil" data-uses="50">50</span><span class="pil" data-uses="100">100</span></span>
-              <button class="btn btn-p" id="bGo" style="margin-left:auto">Mint batch 👥</button>
-            </div>
-          </div>
-          <div id="codes" style="margin-top:12px"><p class="empty">No live codes.</p></div>
-        </div>
+    <aside class="sb">
+      <div class="sb-brand"><span class="oa"><i></i>LIVE</span><div><b>The Door Desk</b><small>Lockdown Lab Live</small></div></div>
+      <nav class="sb-nav">
+        <button class="sbi on" data-sec="over"><span>📊</span>Overview</button>
+        <button class="sbi" data-sec="door"><span>🚪</span>The Door<em class="bdg" id="bDoor"></em></button>
+        <button class="sbi" data-sec="sessions"><span>📅</span>Sessions</button>
+        <button class="sbi" data-sec="codes"><span>🎟</span>Codes</button>
+        <button class="sbi" data-sec="squad"><span>👥</span>Squad</button>
+        <button class="sbi" data-sec="ideas"><span>💡</span>Coach's Corner</button>
+      </nav>
+      <div class="sb-foot">
+        <span class="statchip"><span class="d"></span><span id="lastUpd">live</span></span>
+        <button class="btn btn-g" id="aOut" style="padding:8px 14px;font-size:12px">Lock up</button>
       </div>
+    </aside>
+    <main class="osmain">
 
-      <div>
-        <div class="card">
-          <span class="cl">📅 <b>Sessions</b> · post once, every player sees it + gets buzzed · paste your Zoom link and they join in one tap</span>
-          <input id="sTitle" placeholder="Title (e.g. Live Session · The Lab)" maxlength="60" style="margin-bottom:8px">
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
-            <input id="sWhen" type="datetime-local">
-            <input id="sLink" placeholder="Zoom link (paste here)" maxlength="300">
-          </div>
-          <input id="sNote" placeholder="Note (optional — e.g. bring a ball, cameras on)" maxlength="200" style="margin-bottom:8px">
-          <button class="btn btn-p" id="sAdd" style="width:100%">Post session 📅</button>
-          <div id="sessRows" style="margin-top:12px"><p class="empty">Nothing on the board.</p></div>
-        </div>
-        <div class="card">
-          <span class="cl">👥 <b>The squad</b> · tap reach to contact · ⭐ founding · ✎ edit (incl. PIN reset) · ✕ remove</span>
-          <div class="sqhead"><input id="sqSearch" placeholder="Search the squad…" autocomplete="off"></div>
-          <div id="squad"><p class="empty">Fresh slate.</p></div>
-        </div>
+    <section class="osec on" id="sec-over">
+      <h2 class="oh">Overview</h2>
+      <p class="osub">The whole Lab at a glance. Anything orange needs you.</p>
+      <div class="grid2">
+        <div class="kpi"><b id="kKnock">0</b><span>Knocking</span></div>
+        <div class="kpi"><b id="kReq">0</b><span>Invite requests</span></div>
+        <div class="kpi"><b id="kSquad">0</b><span>In the Lab</span></div>
+        <div class="kpi"><b id="kCodes">0</b><span>Live codes</span></div>
       </div>
-    </div>
+      <div class="ovgrid">
+        <div class="card"><span class="cl">🚪 <b>At the door</b></span><div id="ovKnocks"><p class="empty">Quiet at the door.</p></div><button class="btn btn-g" data-go="door" style="margin-top:10px">Open The Door →</button></div>
+        <div class="card"><span class="cl">📅 <b>Next up</b></span><div id="ovNext"><p class="empty">Nothing scheduled — plan the week.</p></div><button class="btn btn-g" data-go="sessions" style="margin-top:10px">Plan sessions →</button></div>
+        <div class="card"><span class="cl">💡 <b>Idea of the day</b></span><div id="ovIdea" class="ideabox"></div><button class="btn btn-g" data-go="ideas" style="margin-top:10px">More ideas →</button></div>
+      </div>
+    </section>
+
+    <section class="osec" id="sec-door">
+      <h2 class="oh">The Door</h2>
+      <p class="osub">Everyone trying to get in. Read their case, make the call.</p>
+      <div class="card hot">
+        <span class="cl">🚪 <b>Knocks at the door</b> · approve and their app unlocks itself — nothing to send</span>
+        <div id="knocks"><p class="empty">Quiet at the door.</p></div>
+      </div>
+      <div class="card">
+        <span class="cl">🎟 <b>Invite requests</b> · vouched by your players · approving mints a 6h code they share</span>
+        <div id="reqs"><p class="empty">None waiting.</p></div>
+      </div>
+    </section>
+
+    <section class="osec" id="sec-sessions">
+      <h2 class="oh">Sessions</h2>
+      <p class="osub">Post once — every player sees it in their own local time and gets buzzed. Zoom links open in one tap, anywhere on the globe.</p>
+      <div class="card">
+        <span class="cl">📅 <b>New session or program</b></span>
+        <input id="sTitle" placeholder="Title (e.g. Live Session · The Lab)" maxlength="60" style="margin-bottom:8px">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <input id="sWhen" type="datetime-local">
+          <input id="sLink" placeholder="Zoom link (paste here)" maxlength="300">
+        </div>
+        <input id="sNote" placeholder="Note (optional — e.g. cameras on, bring a ball)" maxlength="200" style="margin-bottom:10px">
+        <div class="cl" style="margin-bottom:6px">Repeat weekly?</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
+          <span class="pills" id="wUses"><span class="pil sel" data-w="1">One-off</span><span class="pil" data-w="6">6-week block</span><span class="pil" data-w="8">8 weeks</span><span class="pil" data-w="10">10 weeks</span></span>
+        </div>
+        <button class="btn btn-p" id="sAdd" style="width:100%">Post it 📅</button>
+      </div>
+      <div class="card">
+        <span class="cl">🗓 <b>On the board</b></span>
+        <div id="sessRows"><p class="empty">Nothing on the board.</p></div>
+      </div>
+    </section>
+
+    <section class="osec" id="sec-codes">
+      <h2 class="oh">Codes</h2>
+      <p class="osub">Mint keys to the door. Fire them straight back over WhatsApp.</p>
+      <div class="card">
+        <div class="seg"><span class="seglbl">① Single · one person, one use, burns in 6h</span>
+          <div class="mint"><input id="mLabel" placeholder="Who's it for? (e.g. IG DM — @kid)" maxlength="40"><button class="btn btn-p" id="mGo">Mint</button></div>
+        </div>
+        <div class="seg" style="margin-top:10px"><span class="seglbl">② Batch · one code, many people, lasts 7 days</span>
+          <input id="bLabel" placeholder="What's it for? (e.g. Tryout squad, IG drop)" maxlength="40" style="margin-bottom:8px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+            <span class="pills" id="bUses"><span class="pil sel" data-uses="10">10</span><span class="pil" data-uses="25">25</span><span class="pil" data-uses="50">50</span><span class="pil" data-uses="100">100</span></span>
+            <button class="btn btn-p" id="bGo" style="margin-left:auto">Mint batch 👥</button>
+          </div>
+        </div>
+        <div id="codes" style="margin-top:12px"><p class="empty">No live codes.</p></div>
+      </div>
+    </section>
+
+    <section class="osec" id="sec-squad">
+      <h2 class="oh">Squad</h2>
+      <p class="osub">Every player in the Lab. Tap reach to contact · ⭐ founding · ✎ edit (incl. PIN reset) · ✕ remove.</p>
+      <div class="card">
+        <div class="sqhead"><input id="sqSearch" placeholder="Search the squad…" autocomplete="off"></div>
+        <div id="squad"><p class="empty">Fresh slate.</p></div>
+      </div>
+    </section>
+
+    <section class="osec" id="sec-ideas">
+      <h2 class="oh">Coach's Corner</h2>
+      <p class="osub">Your companion for what to run and what to post. Rotates daily — hit "another" to keep digging.</p>
+      <div class="card"><span class="cl">📅 <b>Session theme</b> · run this on Zoom</span><div id="ideaSess" class="ideabox"></div><button class="btn btn-g" id="ideaSessBtn" style="margin-top:10px">Another →</button></div>
+      <div class="card"><span class="cl">📸 <b>Post idea for @lockdownlablive</b></span><div id="ideaPost" class="ideabox"></div><button class="btn btn-g" id="ideaPostBtn" style="margin-top:10px">Another →</button></div>
+      <div class="card"><span class="cl">🏀 <b>Hoops talking point</b> · drop it in the squad feed, let them argue</span><div id="ideaTalk" class="ideabox"></div><button class="btn btn-g" id="ideaTalkBtn" style="margin-top:10px">Another →</button></div>
+      <p class="empty" style="margin-top:4px">Live NBA news feed is a future upgrade (needs a news API hookup) — these are evergreen so the well never runs dry.</p>
+    </section>
+
+    </main>
   </div>
-</div>
 <div id="toast"></div>
 
 <script>
@@ -255,6 +333,11 @@ input::placeholder{color:#5d5851}
     renderSquad(players);
     renderSessions();
     $('#kCodes').textContent=codes.length;
+    const doorN=knocks.length+reqs.length;
+    const bd=$('#bDoor'); bd.textContent=doorN; bd.classList.toggle('on',doorN>0);
+    $('#ovKnocks').innerHTML=knocks.length?knocks.slice(0,3).map(k=>'<div class="row"><div class="info"><b>'+esc(k.name)+'</b>'+(k.why?'<small style="color:var(--muted)">“'+esc(k.why)+'”</small>':'')+'</div></div>').join('')+(knocks.length>3?'<p class="empty">+'+(knocks.length-3)+' more…</p>':''):'<p class="empty">Quiet at the door.</p>';
+    const nx=(R.sessions||[])[0];
+    $('#ovNext').innerHTML=nx?'<div class="row"><div class="info"><b>'+esc(nx.title)+'</b><small>'+sessWhen(nx.starts_at)+(nx.link?' · Zoom ready':'')+'</small></div></div>':'<p class="empty">Nothing scheduled — plan the week.</p>';
     $('#lastUpd').textContent=new Date().toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'});
     document.querySelectorAll('[data-ok]').forEach(b=>b.onclick=async()=>{ try{ await api({action:'knock_approve',code:CODE,pid:b.dataset.ok}); toast('Door opened 🔓'); refresh(); }catch(e){toast(e.message)} });
     document.querySelectorAll('[data-no]').forEach(b=>b.onclick=async()=>{ try{ await api({action:'knock_deny',code:CODE,pid:b.dataset.no}); toast('Turned away'); refresh(); }catch(e){toast(e.message)} });
@@ -278,9 +361,11 @@ input::placeholder{color:#5d5851}
     const when=new Date(whenRaw);
     if(!whenRaw||isNaN(when.getTime())){ toast('Pick a date and time'); return; }
     try{
-      await api({action:'session_add',code:CODE,title,starts_at:when.toISOString(),link,note});
+      const weeks=parseInt(($('#wUses').querySelector('.pil.sel')||{}).dataset?.w||'1',10);
+      if(weeks>1) await api({action:'program_add',code:CODE,title,starts_at:when.toISOString(),link,note,weeks});
+      else await api({action:'session_add',code:CODE,title,starts_at:when.toISOString(),link,note});
       $('#sTitle').value=''; $('#sWhen').value=''; $('#sLink').value=''; $('#sNote').value='';
-      toast('Posted 📅 The squad’s been buzzed'); refresh();
+      toast(weeks>1?('Program posted 📅 '+weeks+' weekly sessions on the board'):'Posted 📅 The squad’s been buzzed'); refresh();
     }catch(e){toast(e.message)}
   });
 
@@ -347,7 +432,7 @@ input::placeholder{color:#5d5851}
     }catch(e){}
   }
   async function openDesk(){
-    $('#login').style.display='none'; $('#desk').style.display='block';
+    $('#login').style.display='none'; $('#desk').classList.add('on');
     try{
       if(window.Notification&&Notification.permission==='default') Notification.requestPermission().then(p=>{ if(p==='granted') subPush(); });
       else subPush();
@@ -361,7 +446,7 @@ input::placeholder{color:#5d5851}
     catch(e){ $('#aErr').style.display='block'; }
   });
   $('#ac').addEventListener('keydown',e=>{ if(e.key==='Enter') $('#aGo').click(); });
-  $('#aOut').addEventListener('click',()=>{ localStorage.removeItem('lll_admin'); CODE=''; clearInterval(pollT); $('#desk').style.display='none'; $('#login').style.display='block'; });
+  $('#aOut').addEventListener('click',()=>{ localStorage.removeItem('lll_admin'); CODE=''; clearInterval(pollT); $('#desk').classList.remove('on'); $('#login').style.display='block'; });
   $('#mGo').addEventListener('click',async()=>{
     try{ const r=await api({action:'invite_mint',code:CODE,label:$('#mLabel').value.trim()}); $('#mLabel').value=''; toast('Minted '+r.code+' · burns in 6h'); refresh(); }catch(e){toast(e.message)}
   });
@@ -370,6 +455,79 @@ input::placeholder{color:#5d5851}
     const uses=parseInt(($('#bUses').querySelector('.pil.sel')||{}).dataset?.uses||'10',10);
     try{ const r=await api({action:'invite_mint',code:CODE,label:$('#bLabel').value.trim(),max_uses:uses}); $('#bLabel').value=''; toast('Batch '+r.code+' · '+uses+' spots · 7 days'); refresh(); }catch(e){toast(e.message)}
   });
+  $('#wUses').addEventListener('click',e=>{ const p=e.target.closest('.pil'); if(!p)return; $('#wUses').querySelectorAll('.pil').forEach(x=>x.classList.remove('sel')); p.classList.add('sel'); });
+  /* ---- OS sections ---- */
+  function showSec(s){
+    document.querySelectorAll('.osec').forEach(x=>x.classList.toggle('on',x.id==='sec-'+s));
+    document.querySelectorAll('.sbi').forEach(x=>x.classList.toggle('on',x.dataset.sec===s));
+    window.scrollTo({top:0});
+  }
+  document.querySelectorAll('.sbi').forEach(b=>b.addEventListener('click',()=>showSec(b.dataset.sec)));
+  document.addEventListener('click',e=>{ const g=e.target.closest('[data-go]'); if(g) showSec(g.dataset.go); });
+  /* ---- Coach's Corner: the idea engine ---- */
+  const IDEA_SESS=[
+    'The 3-Second Rule, live: everyone shares one moment they sulked mid-game, then you drill the flush-and-go on camera.',
+    'Film night: each player brings one clip of themselves — squad breaks down one good read and one missed read each.',
+    'Handle circuit: 20 minutes, 6 stations, phone timers on. Finish with a one-ball two-player mirror challenge.',
+    'Shooting mechanics audit: everyone films their form from the side, you correct one thing per player. One. Not five.',
+    'Defensive shell on Zoom: walk the four rotations on a whiteboard, then homework = film yourself doing the slides.',
+    'Pick & roll reads masterclass: the 4 answers (reject, snake, pocket, kick) — quiz them cold at the end.',
+    '1v1 breakdown: what actually gets you a bucket at your level — first step angles, not crossovers.',
+    'Free-throw pressure gauntlet: 10 shots on camera, squad watching, loser owes 20 pushups on next call.',
+    'Mental reset workshop: everyone writes their personal reset ritual in the Mind tab, then shares one line.',
+    'Footwork Friday: jab series, drop steps, euro finish — no ball needed, lounge-room friendly for the global boys.',
+    'Off-ball movement: cut when your man ball-watches. Show 3 NBA clips, then they find one in their own footage.',
+    'Scout yourself: each player reads their Lab AI profile aloud and says what they agree and fight with.',
+    'Conditioning ladder: 6-minute EMOM on camera — squad suffers together, streaks in the app for everyone after.',
+    'Q&A open gym: no agenda, they bring the questions, you cook. Record answers for the Coaching Panel.',
+    'Leadership session: who talks on defence? Assign every player one call-out word to own this week.',
+    'Weak-hand week kickoff: every drill mirrored. Award bonus XP homework via the app after.',
+  ];
+  const IDEA_POST=[
+    'Player shoutout: screenshot their streak from the Lab (name visible, stats big) — "consistency is a skill."',
+    'Reel: the 3-Second Rule in 15 seconds. Miss → flush → sprint back. Caption: "you get 3 seconds. Next play."',
+    'Drill demo: 30-second clip of one Lab drill, caption "this is Tuesday inside the Lab. DM LAB to get in."',
+    'Before/after: same player, 4 weeks apart, same drill. No music, just reps. Let the improvement talk.',
+    'Myth-bust carousel: "more shots ≠ better shooting" — 5 slides on deliberate practice.',
+    'Squad milestone: "the Lab just crossed [X] total check-ins." Screenshot the numbers. Proof of work.',
+    'The door post: repost a grid tile with "the board is filling. Knock while there is still room."',
+    'Poll sticker: "best handles in the squad?" — let them fight it out in your DMs.',
+    'Mic’d up: record 60 seconds of you coaching on Zoom (squad consent), raw audio over a court photo.',
+    'Founding member spotlight: one kid, three lines — why they joined, what changed, favourite Lab feature.',
+    'Story: screenshot the Sessions board (blur the Zoom link!) — "this week inside the Lab."',
+    'Ask The Coaches teaser: post one real question a player asked + the persona’s answer. "Six brains on call."',
+    'Countdown sticker to your next live session. Urgency is free.',
+    'A "what the Lab sees" post: blurred AI profile screenshot — "the app reads your game every day."',
+    'Recruitment reel: knock → buzz → tap → in. Screen-record the flow, 10 seconds, caption "the door works."',
+    'Coach confession: one thing YOU got wrong as a player and what you’d tell 15-year-old you.',
+  ];
+  const IDEA_TALK=[
+    'Is the mid-range dead, or just reserved for the ones who earned it? Drop takes below. 🏀',
+    'Defence wins championships — still true in today’s pace-and-space era, or a boomer myth?',
+    'Best handles you’ve ever seen live. Not on TV — LIVE. Go.',
+    'Does size still matter for guards, or did skill kill the height chart?',
+    'Clutch gene: real thing or just small sample size? Bring receipts.',
+    'One role player in history who mattered more than the stats said. Name them.',
+    'Would you rather have elite IQ or elite athleticism? You can’t have both.',
+    'Load management: smart career play or robbing the fans? Squad verdict.',
+    'What actually makes someone "coachable"? Wrong answers only… then real ones.',
+    'The best playoff run you ever watched — what made it different?',
+    'International players are taking over the league. Why do you think that is?',
+    'If you could steal ONE skill from any pro and paste it into your game — what and who?',
+  ];
+  const dayN=Math.floor(Date.now()/86400000);
+  let iS=0,iP=0,iT=0;
+  const pick=(arr,off)=>arr[(dayN+off)%arr.length];
+  function renderIdeas(){
+    $('#ideaSess').textContent=pick(IDEA_SESS,iS);
+    $('#ideaPost').textContent=pick(IDEA_POST,iP);
+    $('#ideaTalk').textContent=pick(IDEA_TALK,iT);
+    $('#ovIdea').textContent=pick(IDEA_POST,iP);
+  }
+  $('#ideaSessBtn').addEventListener('click',()=>{iS++;renderIdeas();});
+  $('#ideaPostBtn').addEventListener('click',()=>{iP++;renderIdeas();});
+  $('#ideaTalkBtn').addEventListener('click',()=>{iT++;renderIdeas();});
+  renderIdeas();
   if(CODE){ openDesk(); }
 })();
 </script>

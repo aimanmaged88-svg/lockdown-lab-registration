@@ -670,7 +670,7 @@ body.rmode *{animation:none!important;transition:none!important}
         <ul id="aiList"></ul>
       </div>
 
-      <span class="eyebrow secgap">Sessions · Sydney time</span>
+      <span class="eyebrow secgap">Sessions · shown in your local time</span>
       <div id="sessList"></div>
       <div class="sess"><div class="dt"><b>1·1</b><span>Book</span></div><div class="inf"><b>1-on-1 with Coach</b><span>Message coach to lock a slot</span></div><button class="btn btn-g btn-sm" id="bookBtn">Message</button></div>
       <div class="card" id="runCard" style="margin-top:16px">
@@ -1663,9 +1663,9 @@ body.rmode *{animation:none!important;transition:none!important}
     const list=PST.sessions||[];
     el.innerHTML=list.length?list.map(s=>{
       const d=new Date(s.starts_at);
-      const day=d.toLocaleDateString('en-AU',{timeZone:'Australia/Sydney',weekday:'short'}).toUpperCase();
-      const tm=d.toLocaleTimeString('en-AU',{timeZone:'Australia/Sydney',hour:'numeric',minute:'2-digit'}).replace(' ','');
-      const dt=d.toLocaleDateString('en-AU',{timeZone:'Australia/Sydney',day:'numeric',month:'short'});
+      const day=d.toLocaleDateString('en-AU',{weekday:'short'}).toUpperCase();
+      const tm=d.toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'}).replace(' ','');
+      const dt=d.toLocaleDateString('en-AU',{day:'numeric',month:'short'});
       return '<div class="sess"><div class="dt"><b>'+day+'</b><span>'+tm+'</span></div><div class="inf"><b>'+esc(s.title)+'</b><span>'+dt+(s.note?' · '+esc(s.note):(s.link?' · online — one tap to join':''))+'</span></div>'+(s.link?'<a class="btn btn-p btn-sm" href="'+esc(s.link)+'" target="_blank" rel="noopener">Join ▶</a>':'<span class="chip">Set</span>')+'</div>';
     }).join(''):'<div class="sess"><div class="inf"><b>No sessions on the board yet</b><span>UNC drops them here — your phone buzzes when one lands.</span></div></div>';
   }
