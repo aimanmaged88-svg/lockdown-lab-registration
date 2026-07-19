@@ -41,6 +41,11 @@
   .est-line b{color:var(--white)}
   .reveal-hero{max-width:520px; margin:0 auto}
   .empty{border:1px dashed var(--line-strong); border-radius:var(--r-md); padding:40px; text-align:center; color:var(--steel)}
+  .ship-opts{display:flex; flex-direction:column; gap:10px}
+  .ship-opt{display:flex; gap:12px; align-items:flex-start; cursor:pointer; border:1px solid var(--line-strong); border-radius:var(--r-md); padding:14px 16px; background:var(--surface-2); transition:border-color .13s}
+  .ship-opt:hover{border-color:var(--white)}
+  .ship-opt.on{border-color:var(--red); background:var(--red-dim)}
+  .ship-opt input{accent-color:var(--red); width:18px; height:18px; margin-top:2px; flex:none}
 </style>
 </head>
 <body data-nofooter="1">
@@ -361,18 +366,87 @@
   }
 
   /* ---------- submission wizard ---------- */
-  const wiz = { step: 1, cards: [], details: { name: DEMO.name, email: DEMO.email, phone: '0400 000 000', address: '12 Sample St, Melbourne VIC 3000' }, agreed: false };
+  const AU_STATES = ['VIC', 'NSW', 'QLD', 'SA', 'WA', 'TAS', 'NT', 'ACT'];
+  const STORES = [
+    { id: 'coburg', name: 'Hit Collectables — Coburg North', addr: '1009 Sydney Road, Coburg North VIC 3058' },
+    { id: 'melbourne', name: 'Hit Collectables — Melbourne CBD', addr: '323 Swanston Street, Melbourne VIC 3000' }
+  ];
+  const wiz = {
+    step: 1, cards: [],
+    details: { firstName: 'Jordan', lastName: 'Lee', email: DEMO.email, phone: '0400000000', streetNo: '12', street: 'Sample Street', suburb: 'Melbourne', postcode: '3000', state: 'VIC' },
+    delivery: 'mail', agreed: false
+  };
   function blankCard() { return { name: '', set: '', category: 'pokemon', declared: '', service: 'both', jobs: [], grader: 'psa', psaTier: 'regular' }; }
 
   function cardEstimate(c) {
     const v = parseFloat(c.declared) || 0;
-    const out = { inspection: HRDATA.PRICING.inspection, resto: 0, grading: 0, custom: false };
+    const out = { inspection: HRDATA.PRICING.inspection, resto: 0, restoBase: 0, restoPct: 0, pctRate: 0, grading: 0, custom: false };
     if (c.service !== 'grading') {
-      const f = HRDATA.restorationFee(v);
-      if (f === null) out.custom = true; else out.resto = f;
+      const tier = HRDATA.restorationTier(v);
+      if (tier.custom) out.custom = true;
+      else {
+        out.restoBase = tier.base;
+        out.pctRate = tier.pct;
+        out.restoPct = Math.round(v * tier.pct * 100) / 100;
+        out.resto = Math.round((out.restoBase + out.restoPct) * 100) / 100;
+      }
     }
     if (c.service !== 'restoration') out.grading = HRDATA.psaTier(c.psaTier).fee;
     return out;
+  }
+  function svcName(k) { return (HRDATA.SERVICES.find(s => s.key === k) || {}).name || k; }
+  function fullName() { return (wiz.details.firstName + ' ' + wiz.details.lastName).trim(); }
+
+  function estimateTotals() {
+    const t = { insp: 0, base: 0, pct: 0, resto: 0, grading: 0, anyCustom: false, anyGrading: false, anyResto: false };
+    wiz.cards.forEach(c => {
+      const e = cardEstimate(c);
+      t.insp += e.inspection; t.base += e.restoBase; t.pct += e.restoPct; t.resto += e.resto; t.grading += e.grading;
+      if (e.custom) t.anyCustom = true;
+      if (c.service !== 'restoration') t.anyGrading = true;
+      if (c.service !== 'grading') t.anyResto = true;
+    });
+    t.total = t.insp + t.resto + t.grading;
+    return t;
+  }
+
+  // Per-card itemised breakdown — restoration split into base + percentage
+  function estimateCardsHTML() {
+    return wiz.cards.map((c, i) => {
+      const e = cardEstimate(c);
+      const tier = HRDATA.restorationTier(parseFloat(c.declared) || 0);
+      const jobs = (c.jobs || []).map(svcName);
+      return `
+      <div class="wiz-card">
+        <div class="spread"><h4 class="mb0">${i + 1}. ${esc(c.name || 'Card ' + (i + 1))}</h4><span class="badge badge-steel">${c.service === 'both' ? 'Restore + grade' : c.service === 'grading' ? 'Grading' : 'Restoration'}</span></div>
+        <div class="mt1">
+          <div class="est-line"><span>Inspection <span class="muted">(credited if you proceed)</span></span><b>${HR.fmtAUD(e.inspection)}</b></div>
+          ${c.service !== 'grading' ? (e.custom
+            ? `<div class="est-line"><span>Restoration (value ≥ $10,000)</span><b>Custom quote</b></div>`
+            : `<div class="est-line"><span>Restoration base <span class="muted">(${tier.label} tier)</span></span><b>${HR.fmtAUD(e.restoBase)}</b></div>
+               <div class="est-line"><span>${(e.pctRate * 100)}% of declared value <span class="muted">${HR.fmtAUD(parseFloat(c.declared) || 0)}</span></span><b>${HR.fmtAUD(e.restoPct)}</b></div>
+               <div class="est-line" style="border-top:1px dashed var(--line-strong)"><span><b class="white">Restoration subtotal</b></span><b>${HR.fmtAUD(e.resto)}</b></div>
+               ${jobs.length ? `<div class="small muted" style="padding:6px 0 2px">Work requested: ${jobs.join(' · ')}</div>` : `<div class="small muted" style="padding:6px 0 2px">Work confirmed at inspection</div>`}`) : ''}
+          ${c.service !== 'restoration' ? `<div class="est-line"><span>PSA ${HRDATA.psaTier(c.psaTier).name} — all-in <span class="muted">(${HRDATA.psaTier(c.psaTier).days})</span></span><b>${HR.fmtAUD(e.grading)}</b></div>
+          <div class="est-line"><span class="muted">Only if PSA re-tiers after grading</span><span class="muted">tier difference + $20 admin</span></div>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Summary block — used on the estimate step and again at checkout
+  function estimateSummaryHTML(opts) {
+    const t = estimateTotals();
+    const n = wiz.cards.length;
+    return `
+      <h3 style="font-size:1.15rem">${(opts && opts.title) || 'Estimate'}</h3>
+      <div class="est-line"><span>Inspection <span class="muted">(${n} card${n > 1 ? 's' : ''})</span></span><b>${HR.fmtAUD(t.insp)}</b></div>
+      ${t.anyResto ? `<div class="est-line"><span>Restoration — base fees</span><b>${t.anyCustom ? 'Incl. custom' : HR.fmtAUD(t.base)}</b></div>
+      <div class="est-line"><span>Restoration — % of value</span><b>${HR.fmtAUD(t.pct)}</b></div>
+      <div class="est-line"><span><b class="white">Restoration subtotal</b></span><b>${t.anyCustom ? 'Incl. custom quote' : HR.fmtAUD(t.resto)}</b></div>` : ''}
+      ${t.anyGrading ? `<div class="est-line"><span>PSA grading (all-in)</span><b>${HR.fmtAUD(t.grading)}</b></div>` : ''}
+      <div class="est-line" style="border-top:1px solid var(--line-strong); margin-top:6px; padding-top:12px"><span><b>Estimated total → intake</b></span><span class="price-big" style="font-size:1.6rem">${HR.fmtAUD(t.total)}</span></div>
+      <p class="small muted mt2">Nothing is charged now. The $10/card inspection is charged when your cards physically arrive; your firm restoration quote follows the confirmed value and needs your approval before work starts.${t.anyGrading ? ' A tier-jump charge only applies if PSA reassesses a card into a higher tier after grading — the fee difference plus $20 admin.' : ''}</p>`;
   }
 
   function vWizard() {
@@ -451,56 +525,60 @@
     }
 
     else if (wiz.step === 2) {
+      const d = wiz.details;
       $('#view').innerHTML = head + `
-        <div class="panel panel-pad" style="max-width:620px">
+        <div class="panel panel-pad" style="max-width:640px">
           <div class="grid g2">
-            <div class="field"><label>Full name *</label><input class="input" id="dName" value="${esc(wiz.details.name)}"></div>
-            <div class="field"><label>Email *</label><input class="input" id="dEmail" value="${esc(wiz.details.email)}"></div>
-            <div class="field"><label>Phone</label><input class="input" id="dPhone" value="${esc(wiz.details.phone)}"><div class="hint">For SMS stage updates (Twilio — real build).</div></div>
-            <div class="field"><label>Return address *</label><input class="input" id="dAddr" value="${esc(wiz.details.address)}"></div>
+            <div class="field"><label>First name *</label><input class="input" id="dFirst" value="${esc(d.firstName)}" autocomplete="given-name"></div>
+            <div class="field"><label>Last name *</label><input class="input" id="dLast" value="${esc(d.lastName)}" autocomplete="family-name"></div>
+            <div class="field"><label>Email *</label><input class="input" id="dEmail" type="email" value="${esc(d.email)}" autocomplete="email"></div>
+            <div class="field"><label>Phone *</label><input class="input" id="dPhone" type="tel" inputmode="numeric" value="${esc(d.phone)}" placeholder="0400000000"><div class="hint">Numbers only, max 10 digits. For SMS stage updates (Twilio — real build).</div></div>
           </div>
+
+          <h4 class="mt2 mb1">Return address</h4>
+          <p class="small muted" style="margin-top:0">Where your cards come back to. We break it out so nothing gets lost in one long line.</p>
+          <div class="grid" style="grid-template-columns:110px 1fr; gap:14px">
+            <div class="field"><label>Street no. *</label><input class="input" id="dStreetNo" value="${esc(d.streetNo)}" placeholder="12"></div>
+            <div class="field"><label>Street name *</label><input class="input" id="dStreet" value="${esc(d.street)}" placeholder="Sydney Road" autocomplete="address-line1"></div>
+          </div>
+          <div class="field"><label>Suburb *</label><input class="input" id="dSuburb" value="${esc(d.suburb)}" placeholder="Coburg North" autocomplete="address-level2"></div>
+          <div class="grid" style="grid-template-columns:1fr 1fr; gap:14px">
+            <div class="field mb0"><label>Postcode *</label><input class="input" id="dPostcode" inputmode="numeric" value="${esc(d.postcode)}" placeholder="3058"></div>
+            <div class="field mb0"><label>State *</label><select class="select" id="dState">${AU_STATES.map(s => `<option ${d.state === s ? 'selected' : ''}>${s}</option>`).join('')}</select></div>
+          </div>
+
           <div class="row mt2"><button class="btn btn-ghost" id="back2">← Back</button><button class="btn btn-red" id="next2" style="margin-left:auto">Continue →</button></div>
         </div>`;
-      $('#back2').addEventListener('click', () => { wiz.step = 1; vWizard(); });
+      // numeric-only + digit caps (cap AFTER stripping non-digits, so pasted "0412 345 678" keeps all 10)
+      const digitsCap = (el, n) => el.addEventListener('input', () => { el.value = el.value.replace(/\D/g, '').slice(0, n); });
+      digitsCap($('#dPhone'), 10); digitsCap($('#dPostcode'), 4);
+      $('#back2').addEventListener('click', () => { collectDetails(); wiz.step = 1; vWizard(); });
+      function collectDetails() {
+        wiz.details = {
+          firstName: $('#dFirst').value.trim(), lastName: $('#dLast').value.trim(), email: $('#dEmail').value.trim(),
+          phone: $('#dPhone').value.replace(/\D/g, '').slice(0, 10),
+          streetNo: $('#dStreetNo').value.trim(), street: $('#dStreet').value.trim(),
+          suburb: $('#dSuburb').value.trim(), postcode: $('#dPostcode').value.replace(/\D/g, '').slice(0, 4), state: $('#dState').value
+        };
+      }
       $('#next2').addEventListener('click', () => {
-        wiz.details = { name: $('#dName').value, email: $('#dEmail').value, phone: $('#dPhone').value, address: $('#dAddr').value };
-        if (!wiz.details.name.trim() || !wiz.details.email.includes('@') || !wiz.details.address.trim()) { HR.toast('Name, email and return address are required'); return; }
+        collectDetails();
+        const d2 = wiz.details;
+        if (!d2.firstName || !d2.lastName) { HR.toast('First and last name are required'); return; }
+        if (!d2.email.includes('@')) { HR.toast('A valid email is required'); return; }
+        if (d2.phone.length !== 10) { HR.toast('Phone must be 10 digits'); return; }
+        if (!d2.streetNo || !d2.street || !d2.suburb) { HR.toast('Street number, street and suburb are required'); return; }
+        if (d2.postcode.length !== 4) { HR.toast('Postcode must be 4 digits'); return; }
         wiz.step = 3; vWizard(); window.scrollTo(0, 0);
       });
     }
 
     else if (wiz.step === 3) {
-      let insp = 0, resto = 0, grading = 0, anyCustom = false, anyGrading = false;
-      const lines = wiz.cards.map(c => {
-        const e = cardEstimate(c);
-        insp += e.inspection; resto += e.resto; grading += e.grading;
-        if (e.custom) anyCustom = true;
-        if (c.service !== 'restoration') anyGrading = true;
-        return { c, e };
-      });
-      const total = insp + resto + grading;
       $('#view').innerHTML = head + `
         <div class="grid" style="grid-template-columns:1.1fr .9fr; gap:22px" id="estCols">
+          <div>${estimateCardsHTML()}</div>
           <div>
-            ${lines.map(({ c, e }, i) => `
-            <div class="wiz-card">
-              <div class="spread"><h4 class="mb0">${i + 1}. ${esc(c.name)}</h4><span class="badge badge-steel">${c.service === 'both' ? 'Restore + grade' : c.service}</span></div>
-              <div class="mt1">
-                <div class="est-line"><span>Inspection (credited if you proceed)</span><b>${HR.fmtAUD(e.inspection)}</b></div>
-                ${c.service !== 'grading' ? `<div class="est-line"><span>Restoration — base + ${(HRDATA.restorationTier(parseFloat(c.declared) || 0).pct || 0) * 100}% of declared ${HR.fmtAUD(parseFloat(c.declared) || 0)}</span><b>${e.custom ? 'Custom quote' : HR.fmtAUD(e.resto)}</b></div>` : ''}
-                ${c.service !== 'restoration' ? `<div class="est-line"><span>PSA ${HRDATA.psaTier(c.psaTier).name} — all-in (${HRDATA.psaTier(c.psaTier).days})</span><b>${HR.fmtAUD(e.grading)}</b></div>
-                <div class="est-line"><span class="muted">Only if PSA re-tiers after grading</span><span class="muted">tier difference + $20 admin</span></div>` : ''}
-              </div>
-            </div>`).join('')}
-          </div>
-          <div>
-            <div class="panel panel-pad" style="position:sticky; top:120px">
-              <h3 style="font-size:1.15rem">Estimate</h3>
-              <div class="est-line"><span>Inspection (${wiz.cards.length} card${wiz.cards.length > 1 ? 's' : ''})</span><b>${HR.fmtAUD(insp)}</b></div>
-              <div class="est-line"><span>Restoration</span><b>${anyCustom ? 'Incl. custom quote' : HR.fmtAUD(resto)}</b></div>
-              ${anyGrading ? `<div class="est-line"><span>PSA grading (all-in)</span><b>${HR.fmtAUD(grading)}</b></div>` : ''}
-              <div class="est-line" style="border-top:1px solid var(--line-strong); margin-top:6px; padding-top:12px"><span><b>Estimated today → intake</b></span><span class="price-big" style="font-size:1.6rem">${HR.fmtAUD(total)}</span></div>
-              <p class="small muted mt2">Nothing is charged now. The $10/card inspection is charged when your cards physically arrive; your firm restoration quote follows the confirmed value and needs your approval before work starts.${anyGrading ? ' A tier-jump charge only applies if PSA reassesses a card into a higher tier after grading — the fee difference plus $20 admin.' : ''}</p>
+            <div class="panel panel-pad" style="position:sticky; top:120px">${estimateSummaryHTML()}
               <div class="row mt2"><button class="btn btn-ghost" id="back3">← Back</button><button class="btn btn-red" id="next3" style="flex:1">Looks right →</button></div>
             </div>
           </div>
@@ -511,23 +589,68 @@
     }
 
     else if (wiz.step === 4) {
+      const d = wiz.details;
+      const mailOpt = (id, title, sub) => `
+        <label class="ship-opt ${wiz.delivery === id ? 'on' : ''}" data-ship="${id}">
+          <input type="radio" name="ship" ${wiz.delivery === id ? 'checked' : ''}>
+          <div><b class="white">${title}</b><div class="small muted">${sub}</div></div>
+        </label>`;
       $('#view').innerHTML = head + `
-        <div class="panel panel-pad" style="max-width:640px">
-          <h3 style="font-size:1.2rem">Getting your cards to us</h3>
-          <p class="small" style="color:var(--silver)">You arrange and pay for shipping to us — tracked and insured is strongly recommended. Full packing instructions and our intake address come with your confirmation email.</p>
-          <div class="card" style="background:var(--surface-2); padding:18px">
+        <div class="grid" style="grid-template-columns:1.1fr .9fr; gap:22px" id="coCols">
+          <div>
+            <div class="panel panel-pad mb2">
+              <h3 style="font-size:1.2rem">How will your cards reach us?</h3>
+              <div class="ship-opts">
+                ${mailOpt('mail', 'Mail it in', 'Post your cards to us — tracked & insured recommended. You arrange and pay for shipping in.')}
+                ${STORES.map(s => mailOpt(s.id, 'Drop off — ' + s.name.replace('Hit Collectables — ', ''), 'In person at ' + s.addr)).join('')}
+              </div>
+              <div id="shipDetail" class="mt2"></div>
+            </div>
+
+            <label class="check"><input type="checkbox" id="agree"><span>I've read and agree to the <a href="legal.html" target="_blank" style="display:inline; text-decoration:underline">Terms & Conditions and Waiver</a> <span class="badge badge-warning">draft — pending solicitor review</span>, including that I own (or am authorised to submit) these cards, and that restoration must be disclosed if I later sell them.</span></label>
+            <div class="row mt2"><button class="btn btn-ghost" id="back4">← Back</button><button class="btn btn-red btn-lg" id="placeOrder" style="margin-left:auto">Place submission</button></div>
+            <div class="note-build">The live build emails a confirmation (Postmark/Resend) and logs the T&C acceptance timestamp against the order — the signed waiver is collected at intake (mail or in-store) per the client's process.</div>
+          </div>
+          <div>
+            <div class="panel panel-pad mb2" style="position:sticky; top:120px">
+              ${estimateSummaryHTML({ title: 'Order summary' })}
+              <div class="divider"></div>
+              <div class="small"><b class="white">Returning to</b><div class="muted">${esc(fullName())}<br>${esc(d.streetNo)} ${esc(d.street)}<br>${esc(d.suburb)} ${esc(d.state)} ${esc(d.postcode)}<br>${esc(d.phone)} · ${esc(d.email)}</div></div>
+            </div>
+          </div>
+        </div>
+        <style>@media(max-width:900px){#coCols{grid-template-columns:1fr!important}}</style>`;
+
+      function renderShipDetail() {
+        const box = $('#shipDetail');
+        if (wiz.delivery === 'mail') {
+          box.innerHTML = `<div class="card" style="background:var(--surface-2); padding:18px">
             <b class="white small">Pack it like it matters:</b>
             <ul class="small muted" style="margin:8px 0 0; padding-left:18px; line-height:1.9">
               <li>Sleeve + toploader (or card saver) per card — no loose cards.</li>
               <li>Rigid mailer or box, cards immobilised, nothing rattling.</li>
               <li>Photograph the package before sending — your record, and ours.</li>
-              <li>Ship to the intake address in your confirmation <span class="badge badge-warning">placeholder in prototype</span></li>
-            </ul>
-          </div>
-          <label class="check mt2"><input type="checkbox" id="agree"><span>I've read and agree to the <a href="legal.html" target="_blank" style="display:inline; text-decoration:underline">Terms & Conditions and Waiver</a> <span class="badge badge-warning">draft — pending solicitor review</span>, including that I own (or am authorised to submit) these cards, and that restoration must be disclosed if I later sell them.</span></label>
-          <div class="row mt2"><button class="btn btn-ghost" id="back4">← Back</button><button class="btn btn-red btn-lg" id="placeOrder" style="margin-left:auto">Place submission</button></div>
-          <div class="note-build">The live build emails a confirmation (Postmark/Resend), shows the real intake address, and logs the T&C acceptance timestamp against the order — the signed waiver is also collected at physical intake per the client's process.</div>
-        </div>`;
+              <li>Ship to the intake address in your confirmation email <span class="badge badge-warning">placeholder in prototype</span></li>
+            </ul></div>`;
+        } else {
+          const store = STORES.find(s => s.id === wiz.delivery);
+          box.innerHTML = `<div class="card" style="background:var(--surface-2); padding:18px">
+            <b class="white small">Drop off at ${esc(store.name)}</b>
+            <div class="small muted mt1">${esc(store.addr)}</div>
+            <ul class="small muted" style="margin:8px 0 0; padding-left:18px; line-height:1.9">
+              <li>Bring your cards sleeved — our team logs them in on the spot.</li>
+              <li>Quote your submission number at the counter.</li>
+              <li>Store trading hours <span class="badge badge-warning">placeholder in prototype</span></li>
+            </ul></div>`;
+        }
+      }
+      renderShipDetail();
+      document.querySelectorAll('[data-ship]').forEach(el => el.addEventListener('click', () => {
+        wiz.delivery = el.dataset.ship;
+        document.querySelectorAll('[data-ship]').forEach(x => { x.classList.toggle('on', x === el); x.querySelector('input').checked = (x === el); });
+        renderShipDetail();
+      }));
+
       $('#back4').addEventListener('click', () => { wiz.step = 3; vWizard(); });
       $('#placeOrder').addEventListener('click', () => {
         if (!$('#agree').checked) { HR.toast('Please accept the terms first'); return; }
@@ -536,12 +659,17 @@
         const now = new Date().toISOString().slice(0, 16).replace('T', ' ');
         const anyG = wiz.cards.some(c => c.service !== 'restoration');
         const allG = wiz.cards.every(c => c.service === 'grading');
+        const store = STORES.find(s => s.id === wiz.delivery);
+        const deliveryNote = store ? ('Drop-off at ' + store.name) : 'Mail-in';
         locals.push({
-          id: 'local-' + Date.now(), local: true, number: num, email: wiz.details.email, name: wiz.details.name,
+          id: 'local-' + Date.now(), local: true, number: num, email: wiz.details.email, name: fullName(),
+          phone: wiz.details.phone,
+          return_address: { streetNo: wiz.details.streetNo, street: wiz.details.street, suburb: wiz.details.suburb, postcode: wiz.details.postcode, state: wiz.details.state },
+          delivery: wiz.delivery, deliveryLabel: deliveryNote,
           service: allG ? 'grading' : anyG ? 'both' : 'restoration', created: now.slice(0, 10), status: 'submitted',
           inspection: HRDATA.PRICING.inspection * wiz.cards.length, inspectionPaid: false,
           cards: wiz.cards.map((c, i) => ({ id: 'lc-' + Date.now() + '-' + i, pos: i + 1, name: c.name, set: c.set, category: c.category, declared: parseFloat(c.declared) || 0, service: c.service, jobs: c.jobs, grader: c.service === 'restoration' ? null : 'psa', psaTier: c.service === 'restoration' ? null : c.psaTier, stage: 'submitted', reveal: false })),
-          timeline: [{ stage: 'submitted', at: now, note: 'Order created in prototype demo' }],
+          timeline: [{ stage: 'submitted', at: now, note: 'Order created in prototype demo · ' + deliveryNote }],
           messages: []
         });
         HR.store.set('localOrders', locals);
@@ -573,10 +701,22 @@
       <div class="grid g2" style="align-items:start">
         <div class="panel panel-pad">
           <h3 style="font-size:1.15rem">Profile</h3>
-          <div class="field"><label>Full name</label><input class="input" id="pfName" value="${esc(session().name)}"></div>
+          <div class="grid g2">
+            <div class="field"><label>First name</label><input class="input" id="pfFirst" value="${esc((session().name || '').split(' ')[0] || '')}"></div>
+            <div class="field"><label>Last name</label><input class="input" id="pfLast" value="${esc((session().name || '').split(' ').slice(1).join(' '))}"></div>
+          </div>
           <div class="field"><label>Email</label><input class="input" value="${esc(session().email)}" disabled><div class="hint">Sign-in email — changeable in the real build with re-verification.</div></div>
-          <div class="field"><label>Phone</label><input class="input" id="pfPhone" value="0400 000 000"></div>
-          <div class="field"><label>Default return address</label><input class="input" id="pfAddr" value="12 Sample St, Melbourne VIC 3000"></div>
+          <div class="field"><label>Phone</label><input class="input" id="pfPhone" type="tel" inputmode="numeric" value="0400000000"><div class="hint">Numbers only, max 10 digits.</div></div>
+          <h4 class="mt2 mb1">Default return address</h4>
+          <div class="grid" style="grid-template-columns:110px 1fr; gap:14px">
+            <div class="field"><label>Street no.</label><input class="input" id="pfStreetNo" value="12"></div>
+            <div class="field"><label>Street name</label><input class="input" id="pfStreet" value="Sample Street"></div>
+          </div>
+          <div class="field"><label>Suburb</label><input class="input" id="pfSuburb" value="Melbourne"></div>
+          <div class="grid" style="grid-template-columns:1fr 1fr; gap:14px">
+            <div class="field mb0"><label>Postcode</label><input class="input" id="pfPostcode" inputmode="numeric" value="3000"></div>
+            <div class="field mb0"><label>State</label><select class="select" id="pfState">${['VIC','NSW','QLD','SA','WA','TAS','NT','ACT'].map(s => `<option ${s === 'VIC' ? 'selected' : ''}>${s}</option>`).join('')}</select></div>
+          </div>
           <button class="btn btn-red" id="pfSave">Save changes</button>
         </div>
         <div>
@@ -593,6 +733,7 @@
           </div>
         </div>
       </div>`;
+    [['pfPhone', 10], ['pfPostcode', 4]].forEach(([id, n]) => { const el = $('#' + id); if (el) el.addEventListener('input', () => { el.value = el.value.replace(/\D/g, '').slice(0, n); }); });
     $('#pfSave').addEventListener('click', () => HR.toast('Saved (demo)'));
     ['nEmail', 'nSms', 'nMkt'].forEach(id => $('#' + id).addEventListener('change', () => {
       HR.store.set('prefs', { email: $('#nEmail').checked, sms: $('#nSms').checked, marketing: $('#nMkt').checked });

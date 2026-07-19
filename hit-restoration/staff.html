@@ -222,8 +222,9 @@
       <div class="crumbs"><a href="#queue">Queue</a> / ${o.number}</div>
       <div class="spread mb2">
         <div>
-          <div class="row" style="gap:10px"><h2 class="mb0" style="font-size:1.6rem">${o.number}</h2>${HR.stageChip(o.status)}</div>
-          <p class="small muted mt1 mb0">${esc(o.name || '—')} · ${esc(o.email)} ${isAdmin() ? '· lifetime value visible in Customers' : ''}</p>
+          <div class="row" style="gap:10px"><h2 class="mb0" style="font-size:1.6rem">${o.number}</h2>${HR.stageChip(o.status)}${o.deliveryLabel ? `<span class="badge ${o.delivery && o.delivery !== 'mail' ? 'badge-red' : 'badge-steel'}">${o.delivery && o.delivery !== 'mail' ? '📍 ' : '📮 '}${esc(o.deliveryLabel)}</span>` : ''}</div>
+          <p class="small muted mt1 mb0">${esc(o.name || '—')} · ${esc(o.email)}${o.phone ? ' · ' + esc(o.phone) : ''} ${isAdmin() ? '· lifetime value visible in Customers' : ''}</p>
+          ${o.return_address ? `<p class="small muted mb0" style="font-size:.78rem">Return to: ${esc(o.return_address.streetNo)} ${esc(o.return_address.street)}, ${esc(o.return_address.suburb)} ${esc(o.return_address.state)} ${esc(o.return_address.postcode)}</p>` : ''}
         </div>
         <div class="row">
           ${isAdmin() ? `
