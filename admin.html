@@ -382,6 +382,26 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
         <span class="cl">📊 <b>If you fill the seats</b> · weekly take at your current price &amp; cadence</span>
         <div id="mScenarios"></div>
       </div>
+      <div class="card hot">
+        <span class="cl">🎯 <b>The Target</b> · "I need $___ by ___" — it tells you exactly what to run</span>
+        <div class="mgrid">
+          <label>I need ($)<input id="gAmt" type="number" inputmode="numeric" min="0" step="10" value="500"></label>
+          <label>By when<span class="pills" id="gWeeks" style="margin-top:6px;display:flex;flex-wrap:wrap"><span class="pil sel" data-gw="1">This week</span><span class="pil" data-gw="2">2 wks</span><span class="pil" data-gw="4">4 wks</span><span class="pil" data-gw="0">Custom</span></span></label>
+        </div>
+        <input id="gCustom" type="number" inputmode="numeric" min="1" max="52" placeholder="How many weeks?" style="display:none;margin-top:8px">
+        <div id="gPlan" style="margin-top:12px"></div>
+      </div>
+      <div class="card">
+        <span class="cl">⚡ <b>Topic → Deck</b> · generate a topic that hits, then send it to Claude's bench</span>
+        <div class="ideabox" id="topicBox">Tap generate — powerful, youth-relevant session topics.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px">
+          <button class="btn btn-p" id="topicGen">Generate ⚡</button>
+          <button class="btn btn-g" id="topicBuild" style="display:none">Yes — build this deck 🎬</button>
+        </div>
+        <input id="topicCustom" placeholder="Or type your own topic and hit build…" maxlength="140" style="margin-top:10px">
+        <div class="cl" style="margin:14px 0 8px">🎬 <b>The deck bench</b> · Claude checks in every hour — your phone buzzes when one's ready</div>
+        <div id="deckBench"><p class="empty">Bench is empty. Generate a topic and send it over.</p></div>
+      </div>
       <p class="empty">Estimates only — AUD assumed. Set aside tax and any Zoom/tooling costs. This is your motivation meter, not your accountant.</p>
     </section>
 
@@ -466,6 +486,7 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
     $('#codes').innerHTML=codes.length?codes.map(c=>{const mu=c.max_uses||1,batch=mu>1,l=leftFor(c);const meta=batch?('👥 '+(c.use_count||0)+'/'+mu+' claimed · '+(l>0?fmt(l)+' left':'expiring…')):('⏳ '+(l>0?fmt(l)+' left':'burning…'));return '<div class="row"><div class="info"><b class="mono">'+esc(c.code||'')+'</b> '+(batch?'<span style="color:var(--accent);font-family:var(--fm);font-size:10px">BATCH</span>':'')+' · '+esc(c.friend_name)+'<small>'+meta+'</small></div><a class="btn btn-wa" href="'+wa(c.code||'')+'" target="_blank" rel="noopener">▷</a><button class="btn btn-g" data-cp="'+esc(c.code||'')+'">Copy</button></div>';}).join(''):'<p class="empty">No live codes.</p>';
     renderSquad(players);
     renderSessions();
+    if(typeof renderBench==='function') renderBench();
     $('#kCodes').textContent=codes.length;
     const doorN=knocks.length+reqs.length;
     const bd=$('#bDoor'); bd.textContent=doorN; bd.classList.toggle('on',doorN>0);
@@ -585,13 +606,16 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
     catch(e){ inp.value=text; toast(e.message); }
   }
   $('#sqSearch')&&$('#sqSearch').addEventListener('input',()=>{ if(R&&!$('#squad').querySelector('.editbox.open')) renderSquad(R.players||[],true); });
-  let prevK=-1,prevR=-1;
+  let prevK=-1,prevR=-1,prevDeck=-1;
   async function refresh(){
     try{
       const r=await api({action:'roster',code:CODE});
       R=r;
       const nk=(r.knocks||[]).length, nr=(r.invites||[]).length;
       if(prevK>=0&&(nk>prevK||nr>prevR)){ ping(); toast(nk>prevK?'🚪 New knock at the door':'🎟 New invite request'); if(document.hidden&&Notification&&Notification.permission==='granted'){ try{ new Notification('The Door Desk',{body:nk>prevK?'New knock at the door':'New invite request'}); }catch(e){} } }
+      const nd=(r.deckreqs||[]).filter(d=>d.status==='ready').length;
+      if(prevDeck>=0&&nd>prevDeck){ ping(); toast('🎬 A deck is ready — check the Money tab'); }
+      prevDeck=nd;
       prevK=nk; prevR=nr;
       render();
     }catch(e){ $('#lastUpd').textContent='retrying…'; }
@@ -664,13 +688,100 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
       '<div class="scen'+(r.you?' you':'')+'"><div class="lab"><b>'+r.n+' seats</b> · '+esc(r.t)+
       '<small>'+money(price*r.n)+'/session × '+perWk+'/wk</small></div><div class="amt">'+money(price*r.n*perWk)+'<span style="font-family:var(--fm);font-size:10px;color:var(--dim);letter-spacing:1px">/wk</span></div></div>'
     ).join('');
+    if(typeof calcGoal==='function') calcGoal();
   }
   ['#mPrice','#mSeats','#mPerWk'].forEach(s=>{ const el=$(s); if(el) el.addEventListener('input',calcMoney); });
   $('#mWeeks').addEventListener('click',e=>{ const p=e.target.closest('.pil'); if(!p)return; $('#mWeeks').querySelectorAll('.pil').forEach(x=>x.classList.remove('sel')); p.classList.add('sel'); calcMoney(); });
+  /* ---- The Target: "I need $X by Y" -> exactly what to run ---- */
+  function goalWeeks(){
+    const sel=($('#gWeeks').querySelector('.pil.sel')||{}).dataset?.gw||'1';
+    if(sel!=='0') return parseInt(sel,10);
+    return Math.max(1,Math.min(52,parseInt($('#gCustom').value,10)||1));
+  }
+  function calcGoal(){
+    const el=$('#gPlan'); if(!el) return;
+    const price=Math.max(0,parseFloat($('#mPrice').value)||0);
+    const seats=Math.max(1,parseInt($('#mSeats').value,10)||1);
+    const perWk=Math.max(0,parseInt($('#mPerWk').value,10)||0);
+    const amt=Math.max(0,parseFloat($('#gAmt').value)||0);
+    const wks=goalWeeks();
+    if(!price||!amt){ el.innerHTML='<p class="empty">Set your price per seat up top and a target amount.</p>'; return; }
+    const seatsNeed=Math.ceil(amt/price);
+    const classes=Math.ceil(seatsNeed/seats);
+    const perWeekNeed=Math.ceil(classes/wks);
+    const covers=perWk>=perWeekNeed;
+    el.innerHTML=
+      '<div class="scen"><div class="lab"><b>Fill '+seatsNeed+' seats</b> total<small>at '+money(price)+' a seat</small></div><div class="amt">'+money(seatsNeed*price)+'</div></div>'
+      +'<div class="scen"><div class="lab"><b>'+classes+' class'+(classes===1?'':'es')+'</b> of '+seats+'<small>'+perWeekNeed+' session'+(perWeekNeed===1?'':'s')+'/week for '+wks+' week'+(wks===1?'':'s')+'</small></div><div class="amt">'+perWeekNeed+'/wk</div></div>'
+      +'<div class="scen'+(covers?' you':'')+'"><div class="lab"><b>'+(covers?'Your current pace covers it 💪':'Bump to '+perWeekNeed+' sessions a week')+'</b><small>'+(covers?('you already run '+perWk+'/week — target lands on schedule'):('you run '+perWk+'/week now — add '+(perWeekNeed-perWk)+' more, or add seats'))+'</small></div><div class="amt">🎯</div></div>';
+  }
+  $('#gAmt').addEventListener('input',calcGoal);
+  $('#gCustom').addEventListener('input',calcGoal);
+  $('#gWeeks').addEventListener('click',e=>{ const p=e.target.closest('.pil'); if(!p)return; $('#gWeeks').querySelectorAll('.pil').forEach(x=>x.classList.remove('sel')); p.classList.add('sel'); $('#gCustom').style.display=p.dataset.gw==='0'?'block':'none'; calcGoal(); });
+  /* ---- Topic -> Deck: generate a session topic, send it to Claude's bench ---- */
+  const TOPICS=[
+    'The Comparison Trap — why watching everyone else\'s highlight reel is killing your game',
+    'Discipline beats motivation — what to do on the days you feel nothing',
+    'The 3-Second Rule — flushing a mistake before it becomes four',
+    'Confidence is built, not born — the rep-by-rep blueprint',
+    'Your phone is a defender — beating the scroll that eats your training hours',
+    'Fear of failure — why the scared shot is the worst shot',
+    'Benched — how to respond when the coach doesn\'t call your name',
+    'Pressure is a privilege — learning to want the last shot',
+    'Self-talk — the teammate who never leaves the court',
+    'Jealousy in the squad — when your mate levels up before you',
+    'Proving people wrong vs proving yourself right — which fuel burns cleaner',
+    'The night before — sleep, nerves, and the pre-game routine that settles both',
+    'Handling parents\' pressure — playing your game, not their dream',
+    'Coachability — why the correction is a gift and ego is a tax',
+    'Small wins — how 1% days stack into a different player by winter',
+    'Energy vampires — protecting your focus from people who drain it',
+    'Losing well — what champions do in the 24 hours after an L',
+    'The lonely work — falling in love with reps nobody sees',
+    'Trash talk — keeping your head when they\'re hunting it',
+    'Body language — what you say when you say nothing',
+    'The transfer myth — why running from hard doesn\'t make you better',
+    'Social media vs real skills — likes don\'t guard anybody',
+    'Playing scared vs playing smart — knowing the difference',
+    'Leadership when you\'re the youngest — leading without the armband',
+    'Injuries and the mind — staying a player while the body heals',
+    'Routines of killers — what the greats do daily that nobody films',
+    'The victim voice — catching "it\'s not fair" before it benches you',
+    'Big game nerves — turning the shakes into fuel',
+    'Respect is earned in the dark — the training nobody claps for',
+    'Quitting quietly — the slow fade nobody notices until it\'s done',
+    'Your circle is your ceiling — who\'s in your five?',
+    'Anger on the court — using the fire without burning the house down',
+  ];
+  let curTopic='';
+  function showTopic(t){ curTopic=t; $('#topicBox').textContent=t; $('#topicBuild').style.display=t?'inline-flex':'none'; }
+  $('#topicGen').addEventListener('click',()=>{ let t=curTopic; while(t===curTopic) t=TOPICS[Math.floor(Math.random()*TOPICS.length)]; showTopic(t); });
+  $('#topicCustom').addEventListener('input',()=>{ const v=$('#topicCustom').value.trim(); if(v) showTopic(v); });
+  $('#topicBuild').addEventListener('click',async()=>{
+    if(!curTopic) return;
+    try{
+      await api({action:'deckreq_add',code:CODE,topic:curTopic});
+      toast('🎬 On Claude\'s bench — buzz when it\'s ready');
+      $('#topicCustom').value=''; showTopic(''); $('#topicBox').textContent='Sent. Generate another any time.';
+      refresh();
+    }catch(e){toast(e.message)}
+  });
+  function renderBench(){
+    const el=$('#deckBench'); if(!el||!R) return;
+    const list=R.deckreqs||[];
+    el.innerHTML=list.length?list.map(d=>{
+      const when=new Date(d.created_at).toLocaleDateString('en-AU',{day:'numeric',month:'short'});
+      if(d.status==='ready') return '<div class="row"><div class="info"><b>✅ '+esc(d.topic)+'</b><small>ready · '+when+(d.url?'':' · no link attached')+'</small></div>'+(d.url?'<a class="btn btn-p" href="'+esc(d.url)+'" target="_blank" rel="noopener">Open 🎬</a><button class="btn btn-g" data-dcp="'+esc(d.url)+'">Copy link</button>':'')+'<button class="btn-x" data-ddel="'+d.id+'">✕</button></div>';
+      return '<div class="row"><div class="info"><b>⏳ '+esc(d.topic)+'</b><small>on the bench · Claude checks hourly</small></div><button class="btn-x" data-ddel="'+d.id+'">✕</button></div>';
+    }).join(''):'<p class="empty">Bench is empty. Generate a topic and send it over.</p>';
+    el.querySelectorAll('[data-dcp]').forEach(b=>b.onclick=async()=>{ try{ await navigator.clipboard.writeText(b.dataset.dcp); toast('Deck link copied — paste it into a session 📋'); }catch(e){} });
+    el.querySelectorAll('[data-ddel]').forEach(b=>b.onclick=async()=>{ try{ await api({action:'deckreq_del',code:CODE,rid:b.dataset.ddel}); toast('Cleared'); refresh(); }catch(e){toast(e.message)} });
+  }
   /* ---- Guide: what's new + feature phone ---- */
   /* Newest = highest id. Add a new entry (bump the id) and every coach's desk
      badges the Guide tab + pings them the next time it's open. */
   const NEWS=[
+    {id:11,d:'19 Jul',t:'The Target + Deck Bench',body:'Money tab levelled up: type "I need $500 by next week" and it tells you exactly how many seats and sessions get you there. Plus a topic generator and a Deck Bench — send a topic to Claude and a ready-made session deck comes back within the hour.'},
     {id:10,d:'19 Jul',t:'Street Vol. 2 energy',body:'Level-ups now hit like Gamebreakers, badges slap in like stickers with an impact ring, streaks catch fire at 3 days, check-ins throw up style points, and the Running Now board went full blacktop — chain-link and all.'},
     {id:9,d:'19 Jul',t:'Starter Five badges',body:'New players get thrown their first badge the second they walk in, and it branches into a five-badge journey that teaches them the app — with premium unlock animations and a welcome that settles the rookies.'},
     {id:8,d:'19 Jul',t:'Message from Squad',body:'Tap 💬 next to any player to open their thread right there — type, hit Enter, their phone buzzes. No more digging through the coach app.'},
