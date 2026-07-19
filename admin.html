@@ -222,9 +222,25 @@ input::placeholder{color:#5d5851}
       render();
     }catch(e){ $('#lastUpd').textContent='retrying…'; }
   }
+  /* true push: phone/desktop buzzes even with everything closed */
+  const VAPID_PUB='BIyZs-g6WqeAhyk4NQsAZ7rq-AoyWOTptKUZkE5z-hvvn61vVW9F1Ord5VbySnizrNu9OrLD4kOE0SMRzbcZRgI';
+  function vapidBytes(s){ const pad='='.repeat((4-s.length%4)%4); const b=atob((s+pad).replace(/-/g,'+').replace(/_/g,'/')); return Uint8Array.from(b,c=>c.charCodeAt(0)); }
+  async function subPush(){
+    try{
+      if(!('serviceWorker' in navigator)||!('PushManager' in window)||!window.Notification) return;
+      if(Notification.permission!=='granted') return;
+      const reg=await navigator.serviceWorker.register('/sw.js');
+      const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:vapidBytes(VAPID_PUB)});
+      await api({action:'push_sub',code:CODE,sub:sub.toJSON()});
+      $('#lastUpd').textContent='push armed';
+    }catch(e){}
+  }
   async function openDesk(){
     $('#login').style.display='none'; $('#desk').style.display='block';
-    try{ if(window.Notification&&Notification.permission==='default') Notification.requestPermission(); }catch(e){}
+    try{
+      if(window.Notification&&Notification.permission==='default') Notification.requestPermission().then(p=>{ if(p==='granted') subPush(); });
+      else subPush();
+    }catch(e){}
     await refresh();
     clearInterval(pollT); pollT=setInterval(refresh,12000);
   }

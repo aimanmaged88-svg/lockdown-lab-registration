@@ -1022,6 +1022,19 @@ body.rmode *{animation:none!important;transition:none!important}
   if('serviceWorker' in navigator && location.protocol.startsWith('http')){
     addEventListener('load',()=>{ navigator.serviceWorker.register('/sw.js').catch(()=>{}); });
   }
+  /* coach true-push: knocks + code requests buzz the phone even when the app is closed */
+  const VAPID_PUB='BIyZs-g6WqeAhyk4NQsAZ7rq-AoyWOTptKUZkE5z-hvvn61vVW9F1Ord5VbySnizrNu9OrLD4kOE0SMRzbcZRgI';
+  const vapidBytes=s=>{ const pad='='.repeat((4-s.length%4)%4); const b=atob((s+pad).replace(/-/g,'+').replace(/_/g,'/')); return Uint8Array.from(b,c=>c.charCodeAt(0)); };
+  async function coachPushSub(){
+    try{
+      if(!sess||sess.type!=='coach') return;
+      if(!('serviceWorker' in navigator)||!('PushManager' in window)||!window.Notification) return;
+      if(Notification.permission!=='granted'||!location.protocol.startsWith('http')) return;
+      const reg=await navigator.serviceWorker.ready;
+      const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:vapidBytes(VAPID_PUB)});
+      await api({action:'push_sub',code:sess.code,sub:sub.toJSON()});
+    }catch(e){}
+  }
 
   /* ============ NOTIFICATIONS ============ */
   const NOTIF_DEF={push:false,coach:true,player:true,announce:true,sessions:true,marketing:false,vibrate:true};
@@ -1279,7 +1292,7 @@ body.rmode *{animation:none!important;transition:none!important}
     $('#hSub').textContent=isCoach?'Coach Mode 🔐':'Founding Beta';
     $('#invCard').style.display=isCoach?'none':'block';
     ac(); S.poweron(); haptic([0,20,40,20]);
-    if(isCoach){ go('roster'); renderRoster(); } else { go('home'); renderPlayer(); stagger('[data-page="home"]'); }
+    if(isCoach){ go('roster'); renderRoster(); coachPushSub(); } else { go('home'); renderPlayer(); stagger('[data-page="home"]'); }
     requestAnimationFrame(()=>moveInd(isCoach?$('#navCoach'):$('#navPlayer')));
     clearInterval(pollT);
     pollT=setInterval(pollTick, 25000);
@@ -1822,6 +1835,7 @@ body.rmode *{animation:none!important;transition:none!important}
       if(perm!=='granted'){ toast('Notifications blocked in browser settings',true); NP.push=false; saveNP(); renderNP(); return; }
       NP.push=true; saveNP(); renderNP(); S.like(); toast('Locked in 🔔');
       try{ new Notification('Lockdown Lab Live',{body:'Notifications are on. The Lab will find you.',icon:'/icons/icon-192.png'}); }catch(e){}
+      coachPushSub();
     } else { NP.push=false; saveNP(); renderNP(); toast('Notifications off'); }
   });
   $('#npList').addEventListener('click',e=>{

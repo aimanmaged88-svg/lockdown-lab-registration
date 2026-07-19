@@ -25,11 +25,19 @@ self.addEventListener('fetch', e => {
     );
   }
 });
-/* Notification click: focus the app */
+/* Web push (payload-free ping from the Lab API): someone's at the door */
+self.addEventListener('push', e => {
+  e.waitUntil(self.registration.showNotification('\ud83d\udeaa The Door \u00b7 Lockdown Lab', {
+    body: "Someone's knocking or asking for a code. Open the Desk \u2014 bang bang.",
+    icon: '/icons/icon-192.png', badge: '/icons/icon-192.png', tag: 'll-door', renotify: true
+  }));
+});
+/* Notification click: door pings open the Desk, everything else the app */
 self.addEventListener('notificationclick', e => {
   e.notification.close();
+  const target = e.notification.tag === 'll-door' ? '/admin.html' : '/app.html';
   e.waitUntil(clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
-    for (const c of list) { if (c.url.includes('/app.html')) return c.focus(); }
-    return clients.openWindow('/app.html');
+    for (const c of list) { if (c.url.includes(target)) return c.focus(); }
+    return clients.openWindow(target);
   }));
 });
