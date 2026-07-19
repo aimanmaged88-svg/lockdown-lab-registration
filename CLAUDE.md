@@ -39,6 +39,20 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   motivation wallpaper (caged LIVE + "Build It. Every Day."). Master:
   scratchpad/wall-base.html → wall.html → wallpaper-s26.png.
 
+## Session studio + Next-Up trailer (2026-07-19)
+
+- **Edge fn now v18.** ll_sessions gained `descr text`, `chapters jsonb
+  default '[]'` (array of {t,d}), `deck text`. session_add/program_add store
+  them (deck must be http(s); chapters capped 14); upcomingSessions() +
+  player state + roster all return them. VAPID keys unchanged (re-verified).
+- **Dashboard authoring** (admin Sessions): description box (#sDescr),
+  add/remove **Chapters** builder (#sChapT/#sChapD/#sChapAdd → sChapters[]),
+  deck link (#sDeck). Board rows flag 🎬 count / 📑 deck / 📝 described.
+- **Player app**: rotating **Next Up trailer** (#sessTrailer) above the board
+  — countdown, description, chapter pills, Join + Open the deck, auto-advance
+  5.2s with dots. Every session card is expandable (.sess.rich → .open) to
+  reveal full agenda + deck. sw cache bumped lll-v2 → lll-v3.
+
 ## Parked ideas (Aiman asked to save these)
 
 - **"A.I. MAN" Instagram post** — saved 2026-07-18, for a few weeks out.
