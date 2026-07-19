@@ -670,9 +670,8 @@ body.rmode *{animation:none!important;transition:none!important}
         <ul id="aiList"></ul>
       </div>
 
-      <span class="eyebrow secgap">This Week · Sydney AEST</span>
-      <div class="sess"><div class="dt"><b>THU</b><span>7–8pm</span></div><div class="inf"><b>Live Session · The Lab</b><span>Zoom · link drops in Coach Chat</span></div><span class="chip live"><span class="d"></span>Weekly</span></div>
-      <div class="sess"><div class="dt"><b>SAT</b><span>AM</span></div><div class="inf"><b>Morning Workout Group</b><span>Details in the community feed</span></div><span class="chip">Set</span></div>
+      <span class="eyebrow secgap">Sessions · Sydney time</span>
+      <div id="sessList"></div>
       <div class="sess"><div class="dt"><b>1·1</b><span>Book</span></div><div class="inf"><b>1-on-1 with Coach</b><span>Message coach to lock a slot</span></div><button class="btn btn-g btn-sm" id="bookBtn">Message</button></div>
       <div class="card" id="runCard" style="margin-top:16px">
         <span class="cl">Live from the blacktop · clears itself after 2h</span>
@@ -1331,6 +1330,7 @@ body.rmode *{animation:none!important;transition:none!important}
         const prevInv=PST?JSON.stringify((PST.invites||[]).map(i=>i.status+(i.used_by?'u':''))):null;
         const prevAns=PST?((PST.coachq||[]).filter(q=>q.answer).length):null;
         const prevRun=PST?((PST.runs||[])[0]?runKey(PST.runs[0]):''):null;
+        const prevSess=PST?JSON.stringify((PST.sessions||[]).map(s=>s.id)):null;
         const r=await api({action:'state',pid:sess.pid,pin:sess.pin}); PST=r.state; renderPlayer(true);
         const nm=PST.messages;
         if(nm.length>prevM && nm[nm.length-1].from_coach){ S.recv(); haptic(20); toast('Coach replied 💬'); notify('coach','Coach replied 💬',nm[nm.length-1].text); }
@@ -1340,6 +1340,7 @@ body.rmode *{animation:none!important;transition:none!important}
         if(np && np.id!==prevPost && np.is_coach && prevPost){ notify('announce','The Lab 📢',np.text); }
         const nr=(PST.runs||[])[0];
         if(prevRun!==null && nr && runKey(nr)!==prevRun && nr.player && nr.player.name!==sess.name){ toast('🏀 '+nr.player.name+' is running at '+nr.court); notify('sessions','🏀 Run on','​'+nr.player.name+' is at '+nr.court+' right now. Pull up.'); }
+        if(prevSess!==null && JSON.stringify((PST.sessions||[]).map(s=>s.id))!==prevSess){ const ns=(PST.sessions||[]).find(s=>!JSON.parse(prevSess).includes(s.id)); if(ns){ toast('📅 New session: '+ns.title); notify('sessions','📅 New session posted',ns.title+' — check the board.'); } }
         if(prevInv && JSON.stringify((PST.invites||[]).map(i=>i.status+(i.used_by?'u':'')))!==prevInv){ const used=(PST.invites||[]).find(i=>i.used_by); const ap=(PST.invites||[]).find(i=>i.status==='approved'&&!i.used_by);
           if(ap){ toast('UNC approved your invite 🎟'); notify('sessions','Invite approved 🎟','Your mate '+ap.friend_name+' is cleared. Share the code.'); }
           else if(used){ toast(used.friend_name+' is in the Lab 🔓'); notify('sessions','Your mate\'s in 🔓',used.friend_name+' just used your code.'); } }
@@ -1370,7 +1371,7 @@ body.rmode *{animation:none!important;transition:none!important}
     const p=PST.profile;
     $('#heroName').textContent=p.name+(p.founding?' ⭐':'');
     if(p.founding) $('#hSub').textContent='Founding ⭐';
-    renderRuns();
+    renderRuns(); renderSessList();
     $('#avInit').textContent=p.name.split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();
     countUp($('#stXp'),p.xp); countUp($('#stLogs'),PST.checkins.length); countUp($('#stSess'),p.sessions);
     $('#streakChip').textContent=p.streak;
@@ -1648,6 +1649,19 @@ body.rmode *{animation:none!important;transition:none!important}
       busy($('#cfBtn'),0,'Find courts near me 📍');
     },()=>{ toast('Allow location to find courts near you',true); busy($('#cfBtn'),0,'Find courts near me 📍'); },{timeout:10000,maximumAge:600000});
   });
+
+  /* ---------- sessions board (UNC posts, everyone joins) ---------- */
+  function renderSessList(){
+    const el=$('#sessList'); if(!el||!PST) return;
+    const list=PST.sessions||[];
+    el.innerHTML=list.length?list.map(s=>{
+      const d=new Date(s.starts_at);
+      const day=d.toLocaleDateString('en-AU',{timeZone:'Australia/Sydney',weekday:'short'}).toUpperCase();
+      const tm=d.toLocaleTimeString('en-AU',{timeZone:'Australia/Sydney',hour:'numeric',minute:'2-digit'}).replace(' ','');
+      const dt=d.toLocaleDateString('en-AU',{timeZone:'Australia/Sydney',day:'numeric',month:'short'});
+      return '<div class="sess"><div class="dt"><b>'+day+'</b><span>'+tm+'</span></div><div class="inf"><b>'+esc(s.title)+'</b><span>'+dt+(s.note?' · '+esc(s.note):(s.link?' · online — one tap to join':''))+'</span></div>'+(s.link?'<a class="btn btn-p btn-sm" href="'+esc(s.link)+'" target="_blank" rel="noopener">Join ▶</a>':'<span class="chip">Set</span>')+'</div>';
+    }).join(''):'<div class="sess"><div class="inf"><b>No sessions on the board yet</b><span>UNC drops them here — your phone buzzes when one lands.</span></div></div>';
+  }
 
   /* ---------- I'm running here ---------- */
   const agoM=t=>Math.max(0,Math.round((Date.now()-new Date(t).getTime())/60000));

@@ -193,6 +193,17 @@ input::placeholder{color:#5d5851}
 
       <div>
         <div class="card">
+          <span class="cl">📅 <b>Sessions</b> · post once, every player sees it + gets buzzed · paste your Zoom link and they join in one tap</span>
+          <input id="sTitle" placeholder="Title (e.g. Live Session · The Lab)" maxlength="60" style="margin-bottom:8px">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+            <input id="sWhen" type="datetime-local">
+            <input id="sLink" placeholder="Zoom link (paste here)" maxlength="300">
+          </div>
+          <input id="sNote" placeholder="Note (optional — e.g. bring a ball, cameras on)" maxlength="200" style="margin-bottom:8px">
+          <button class="btn btn-p" id="sAdd" style="width:100%">Post session 📅</button>
+          <div id="sessRows" style="margin-top:12px"><p class="empty">Nothing on the board.</p></div>
+        </div>
+        <div class="card">
           <span class="cl">👥 <b>The squad</b> · tap reach to contact · ⭐ founding · ✎ edit (incl. PIN reset) · ✕ remove</span>
           <div class="sqhead"><input id="sqSearch" placeholder="Search the squad…" autocomplete="off"></div>
           <div id="squad"><p class="empty">Fresh slate.</p></div>
@@ -242,6 +253,7 @@ input::placeholder{color:#5d5851}
     $('#reqs').innerHTML=reqs.length?reqs.map(i=>'<div class="row"><div class="info"><b>'+esc(i.friend_name)+'</b><small>vouched by '+esc((i.player&&i.player.name)||'—')+'</small></div><button class="btn btn-p" data-rok="'+i.id+'">Approve ✓</button><button class="btn-x" data-rno="'+i.id+'">✕</button></div>').join(''):'<p class="empty">None waiting.</p>';
     $('#codes').innerHTML=codes.length?codes.map(c=>{const mu=c.max_uses||1,batch=mu>1,l=leftFor(c);const meta=batch?('👥 '+(c.use_count||0)+'/'+mu+' claimed · '+(l>0?fmt(l)+' left':'expiring…')):('⏳ '+(l>0?fmt(l)+' left':'burning…'));return '<div class="row"><div class="info"><b class="mono">'+esc(c.code||'')+'</b> '+(batch?'<span style="color:var(--accent);font-family:var(--fm);font-size:10px">BATCH</span>':'')+' · '+esc(c.friend_name)+'<small>'+meta+'</small></div><a class="btn btn-wa" href="'+wa(c.code||'')+'" target="_blank" rel="noopener">▷</a><button class="btn btn-g" data-cp="'+esc(c.code||'')+'">Copy</button></div>';}).join(''):'<p class="empty">No live codes.</p>';
     renderSquad(players);
+    renderSessions();
     $('#kCodes').textContent=codes.length;
     $('#lastUpd').textContent=new Date().toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'});
     document.querySelectorAll('[data-ok]').forEach(b=>b.onclick=async()=>{ try{ await api({action:'knock_approve',code:CODE,pid:b.dataset.ok}); toast('Door opened 🔓'); refresh(); }catch(e){toast(e.message)} });
@@ -250,6 +262,28 @@ input::placeholder{color:#5d5851}
     document.querySelectorAll('[data-rno]').forEach(b=>b.onclick=async()=>{ try{ await api({action:'invite_deny',code:CODE,invite_id:b.dataset.rno}); toast('Denied'); refresh(); }catch(e){toast(e.message)} });
     document.querySelectorAll('[data-cp]').forEach(b=>b.onclick=async()=>{ try{ await navigator.clipboard.writeText(shareText(b.dataset.cp)); toast('Invite copied 📋'); }catch(e){} });
   }
+  /* ---- sessions: post once, whole squad sees it + gets pushed ---- */
+  const sessWhen=iso=>{ const d=new Date(iso); return d.toLocaleDateString('en-AU',{timeZone:'Australia/Sydney',weekday:'short',day:'numeric',month:'short'})+' · '+d.toLocaleTimeString('en-AU',{timeZone:'Australia/Sydney',hour:'numeric',minute:'2-digit'}); };
+  function renderSessions(){
+    const list=(R&&R.sessions)||[];
+    $('#sessRows').innerHTML=list.length?list.map(s=>'<div class="row"><div class="info"><b>'+esc(s.title)+'</b><small>'+sessWhen(s.starts_at)+(s.note?' · '+esc(s.note):'')+'</small></div>'+(s.link?'<a class="btn btn-g" href="'+esc(s.link)+'" target="_blank" rel="noopener">Zoom ↗</a>':'')+'<button class="btn-x" data-sdel="'+s.id+'" data-st="'+esc(s.title)+'">✕</button></div>').join(''):'<p class="empty">Nothing on the board.</p>';
+    document.querySelectorAll('[data-sdel]').forEach(b=>b.onclick=async()=>{
+      if(!confirm('Take “'+b.dataset.st+'” off the board?')) return;
+      try{ await api({action:'session_del',code:CODE,sid:b.dataset.sdel}); toast('Session removed'); refresh(); }catch(e){toast(e.message)}
+    });
+  }
+  $('#sAdd').addEventListener('click',async()=>{
+    const title=$('#sTitle').value.trim(), whenRaw=$('#sWhen').value, link=$('#sLink').value.trim(), note=$('#sNote').value.trim();
+    if(title.length<2){ toast('Give the session a name'); return; }
+    const when=new Date(whenRaw);
+    if(!whenRaw||isNaN(when.getTime())){ toast('Pick a date and time'); return; }
+    try{
+      await api({action:'session_add',code:CODE,title,starts_at:when.toISOString(),link,note});
+      $('#sTitle').value=''; $('#sWhen').value=''; $('#sLink').value=''; $('#sNote').value='';
+      toast('Posted 📅 The squad’s been buzzed'); refresh();
+    }catch(e){toast(e.message)}
+  });
+
   /* ---- the squad: full roster with reach / founding / edit / delete ---- */
   function renderSquad(players,force){
     const box=$('#squad'); if(!box) return;
