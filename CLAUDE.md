@@ -64,6 +64,26 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
 - **Intro tour** tile is a placeholder for Aiman's PowerPoint intro — when he
   hands over the .pptx, wire the walkthrough into that tile (he flagged this).
 
+## Starter Five + welcome + squad DMs (2026-07-19)
+
+- **Starter Five badge journey** — LIVE in app.html. STARTER[5]: door 🔓
+  (join, instant) → light 🌅 (first check-in) → mind 🧠 → fuel 🍎 → ice 👋
+  (first squad post). Client-computed from PST, persisted per player in
+  localStorage `ll_start_<pid>` (never re-locks; veterans sync quietly with
+  only the door hero moment). Full-screen #badgeUp overlay (queue via
+  badgeUpShow/pumpBu, confetti+haptic+S.checkin), branching path card
+  #startCard on Home (nodes un/nx/lk + filling connectors + #startNext rule).
+  These 5 reuse Badge Vault names; vault v1 gains "Through the Door" (56th)
+  when it ships.
+- **Welcome moment** — #welcome overlay on first player entry (flag
+  `ll_wel_<pid>`): long-term AI companion framing, "be honest with it —
+  especially on the rough days", rookie reassurance. Badges wait for it
+  (pumpBu gated on welcome). Existing players see it once too.
+- **Squad DMs** — Door Desk Squad rows got 💬 (data-dm): inline .editbox
+  thread (loadDm via cdetail, sendDm via cmsg — pushes the player's phone),
+  Enter to send, survives refresh poll via .editbox.open guard.
+- sw cache lll-v4. NEWS ids 8-9 announce both (Aiman gets the ping).
+
 ## Parked ideas (Aiman asked to save these)
 
 - **"A.I. MAN" Instagram post** — saved 2026-07-18, for a few weeks out.
