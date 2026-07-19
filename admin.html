@@ -74,6 +74,19 @@ input{font-family:var(--fb);color:var(--text);background:rgba(255,255,255,.06);b
 input:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
 input::placeholder{color:#5d5851}
 .wrap{max-width:760px;margin:0 auto}
+/* proper dashboard: two columns on desktop, single stack on mobile */
+@media(min-width:1000px){
+  .wrap{max-width:1200px}
+  .grid-main{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+}
+.rowbtns{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.editbox{display:none;width:100%;margin-top:10px;padding:12px;border:1px dashed var(--line);border-radius:13px;background:rgba(0,0,0,.25)}
+.editbox.open{display:block}
+.editbox .er{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.editbox label{font-family:var(--fm);font-size:8.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--dim);display:block;margin-bottom:4px}
+.btn-x:hover{border-color:var(--bad);color:var(--bad)}
+.sqhead{display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.sqhead input{flex:1}
 .top{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
 .oa{font-family:var(--fd);color:#fff;border:2.5px solid #fff;border-radius:11px;padding:8px 10px 3px 14px;font-size:17px;letter-spacing:1.5px;line-height:1;position:relative;display:inline-block}
 .oa i{font-style:normal;position:absolute;top:4px;left:5px;width:5px;height:5px;background:var(--accent);border-radius:50%;box-shadow:0 0 7px var(--accent);animation:pulse 2s infinite}
@@ -113,7 +126,8 @@ input::placeholder{color:#5d5851}
 #login p{color:var(--muted);font-size:13px;margin-bottom:18px}
 #login .err{display:none;color:#ff9a9a;font-size:12.5px;background:rgba(255,69,58,.12);border:1px solid rgba(255,69,58,.5);border-radius:12px;padding:10px;margin-top:10px}
 #desk{display:none}
-.grid2{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.grid2{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+@media(max-width:520px){.grid2{grid-template-columns:1fr 1fr}}
 .kpi{border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--glass),var(--glass2));padding:13px 10px;text-align:center}
 .kpi b{font-family:var(--fd);font-size:26px;display:block;line-height:1;color:var(--accent)}
 .kpi span{font-family:var(--fm);font-size:8px;letter-spacing:1.4px;text-transform:uppercase;color:var(--dim);display:block;margin-top:5px}
@@ -146,36 +160,44 @@ input::placeholder{color:#5d5851}
       <div class="kpi"><b id="kKnock">0</b><span>Knocking</span></div>
       <div class="kpi"><b id="kReq">0</b><span>Invite requests</span></div>
       <div class="kpi"><b id="kSquad">0</b><span>In the Lab</span></div>
+      <div class="kpi"><b id="kCodes">0</b><span>Live codes</span></div>
     </div>
 
-    <div class="card hot">
-      <span class="cl">🚪 <b>Knocks at the door</b> · approve and their app unlocks itself — nothing to send</span>
-      <div id="knocks"><p class="empty">Quiet at the door.</p></div>
-    </div>
+    <div class="grid-main">
+      <div>
+        <div class="card hot">
+          <span class="cl">🚪 <b>Knocks at the door</b> · approve and their app unlocks itself — nothing to send</span>
+          <div id="knocks"><p class="empty">Quiet at the door.</p></div>
+        </div>
 
-    <div class="card">
-      <span class="cl">🎟 <b>Invite requests</b> · vouched by your players · approving mints a 6h code they share</span>
-      <div id="reqs"><p class="empty">None waiting.</p></div>
-    </div>
+        <div class="card">
+          <span class="cl">🎟 <b>Invite requests</b> · vouched by your players · approving mints a 6h code they share</span>
+          <div id="reqs"><p class="empty">None waiting.</p></div>
+        </div>
 
-    <div class="card">
-      <span class="cl">🔥 <b>Mint a code</b> · fire it straight back over WhatsApp</span>
-      <div class="seg"><span class="seglbl">① Single · one person, one use, burns in 6h</span>
-        <div class="mint"><input id="mLabel" placeholder="Who's it for? (e.g. IG DM — @kid)" maxlength="40"><button class="btn btn-p" id="mGo">Mint</button></div>
-      </div>
-      <div class="seg" style="margin-top:10px"><span class="seglbl">② Batch · one code, many people, lasts 7 days</span>
-        <input id="bLabel" placeholder="What's it for? (e.g. Tryout squad, IG drop)" maxlength="40" style="margin-bottom:8px">
-        <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
-          <span class="pills" id="bUses"><span class="pil sel" data-uses="10">10</span><span class="pil" data-uses="25">25</span><span class="pil" data-uses="50">50</span><span class="pil" data-uses="100">100</span></span>
-          <button class="btn btn-p" id="bGo" style="margin-left:auto">Mint batch 👥</button>
+        <div class="card">
+          <span class="cl">🔥 <b>Mint a code</b> · fire it straight back over WhatsApp</span>
+          <div class="seg"><span class="seglbl">① Single · one person, one use, burns in 6h</span>
+            <div class="mint"><input id="mLabel" placeholder="Who's it for? (e.g. IG DM — @kid)" maxlength="40"><button class="btn btn-p" id="mGo">Mint</button></div>
+          </div>
+          <div class="seg" style="margin-top:10px"><span class="seglbl">② Batch · one code, many people, lasts 7 days</span>
+            <input id="bLabel" placeholder="What's it for? (e.g. Tryout squad, IG drop)" maxlength="40" style="margin-bottom:8px">
+            <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+              <span class="pills" id="bUses"><span class="pil sel" data-uses="10">10</span><span class="pil" data-uses="25">25</span><span class="pil" data-uses="50">50</span><span class="pil" data-uses="100">100</span></span>
+              <button class="btn btn-p" id="bGo" style="margin-left:auto">Mint batch 👥</button>
+            </div>
+          </div>
+          <div id="codes" style="margin-top:12px"><p class="empty">No live codes.</p></div>
         </div>
       </div>
-      <div id="codes" style="margin-top:12px"><p class="empty">No live codes.</p></div>
-    </div>
 
-    <div class="card">
-      <span class="cl">👥 <b>Latest joins</b></span>
-      <div id="joins"><p class="empty">Fresh slate.</p></div>
+      <div>
+        <div class="card">
+          <span class="cl">👥 <b>The squad</b> · tap reach to contact · ⭐ founding · ✎ edit (incl. PIN reset) · ✕ remove</span>
+          <div class="sqhead"><input id="sqSearch" placeholder="Search the squad…" autocomplete="off"></div>
+          <div id="squad"><p class="empty">Fresh slate.</p></div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -219,7 +241,8 @@ input::placeholder{color:#5d5851}
     $('#knocks').innerHTML=knocks.length?knocks.map(k=>'<div class="row"><div class="info"><b>'+esc(k.name)+'</b> '+(k.pos?'· '+esc(k.pos):'')+(k.age?' · '+k.age:'')+(k.why?'<small style="color:var(--muted)">“'+esc(k.why)+'”</small>':'')+'<small>'+(k.contact?'reach: '+esc(k.contact):'no contact left')+' · knocked '+new Date(k.created_at).toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'})+'</small></div>'+contactBtns(k.contact)+'<button class="btn btn-p" data-ok="'+k.id+'">Let them in ✓</button><button class="btn-x" data-no="'+k.id+'">✕</button></div>').join(''):'<p class="empty">Quiet at the door.</p>';
     $('#reqs').innerHTML=reqs.length?reqs.map(i=>'<div class="row"><div class="info"><b>'+esc(i.friend_name)+'</b><small>vouched by '+esc((i.player&&i.player.name)||'—')+'</small></div><button class="btn btn-p" data-rok="'+i.id+'">Approve ✓</button><button class="btn-x" data-rno="'+i.id+'">✕</button></div>').join(''):'<p class="empty">None waiting.</p>';
     $('#codes').innerHTML=codes.length?codes.map(c=>{const mu=c.max_uses||1,batch=mu>1,l=leftFor(c);const meta=batch?('👥 '+(c.use_count||0)+'/'+mu+' claimed · '+(l>0?fmt(l)+' left':'expiring…')):('⏳ '+(l>0?fmt(l)+' left':'burning…'));return '<div class="row"><div class="info"><b class="mono">'+esc(c.code||'')+'</b> '+(batch?'<span style="color:var(--accent);font-family:var(--fm);font-size:10px">BATCH</span>':'')+' · '+esc(c.friend_name)+'<small>'+meta+'</small></div><a class="btn btn-wa" href="'+wa(c.code||'')+'" target="_blank" rel="noopener">▷</a><button class="btn btn-g" data-cp="'+esc(c.code||'')+'">Copy</button></div>';}).join(''):'<p class="empty">No live codes.</p>';
-    $('#joins').innerHTML=players.length?players.slice(-8).reverse().map(p=>'<div class="row"><div class="info"><b>'+esc(p.name)+(p.founding?' ⭐':'')+'</b><small>'+esc(p.pos||'—')+(p.age?' · '+p.age:'')+' · joined '+new Date(p.created_at).toLocaleDateString('en-AU',{day:'numeric',month:'short'})+'</small></div></div>').join(''):'<p class="empty">Fresh slate.</p>';
+    renderSquad(players);
+    $('#kCodes').textContent=codes.length;
     $('#lastUpd').textContent=new Date().toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'});
     document.querySelectorAll('[data-ok]').forEach(b=>b.onclick=async()=>{ try{ await api({action:'knock_approve',code:CODE,pid:b.dataset.ok}); toast('Door opened 🔓'); refresh(); }catch(e){toast(e.message)} });
     document.querySelectorAll('[data-no]').forEach(b=>b.onclick=async()=>{ try{ await api({action:'knock_deny',code:CODE,pid:b.dataset.no}); toast('Turned away'); refresh(); }catch(e){toast(e.message)} });
@@ -227,6 +250,43 @@ input::placeholder{color:#5d5851}
     document.querySelectorAll('[data-rno]').forEach(b=>b.onclick=async()=>{ try{ await api({action:'invite_deny',code:CODE,invite_id:b.dataset.rno}); toast('Denied'); refresh(); }catch(e){toast(e.message)} });
     document.querySelectorAll('[data-cp]').forEach(b=>b.onclick=async()=>{ try{ await navigator.clipboard.writeText(shareText(b.dataset.cp)); toast('Invite copied 📋'); }catch(e){} });
   }
+  /* ---- the squad: full roster with reach / founding / edit / delete ---- */
+  function renderSquad(players,force){
+    const box=$('#squad'); if(!box) return;
+    /* never re-render while UNC is typing in the search or an edit form */
+    if(!force&&(box.querySelector('.editbox.open')||document.activeElement===$('#sqSearch')||box.contains(document.activeElement))) return;
+    const q=($('#sqSearch').value||'').toLowerCase();
+    const list=(players||[]).filter(p=>!q||p.name.toLowerCase().includes(q));
+    box.innerHTML=list.length?list.map(p=>{
+      const ok=p.last_checkin===((R&&R.today)||'');
+      return '<div class="row" data-prow="'+p.id+'"><div class="info"><b>'+esc(p.name)+(p.founding?' ⭐':'')+'</b> '+(p.pos?'· '+esc(p.pos):'')+(p.age?' · '+p.age:'')
+        +'<small>'+p.xp+' XP · 🔥 '+p.streak+'d · '+p.sessions+' sessions · '+(ok?'✓ checked in today':'⚠ not today')+(p.contact?' · reach: '+esc(p.contact):'')+'</small></div>'
+        +'<div class="rowbtns">'+contactBtns(p.contact)
+        +'<button class="btn btn-g" data-star="'+p.id+'" title="Founding">'+(p.founding?'⭐':'☆')+'</button>'
+        +'<button class="btn btn-g" data-ed="'+p.id+'" title="Edit">✎</button>'
+        +'<button class="btn-x" data-del="'+p.id+'" data-nm="'+esc(p.name)+'" title="Remove">✕</button></div>'
+        +'<div class="editbox" id="ed-'+p.id+'">'
+        +'<div class="er"><span><label>Position</label><input data-f="pos" value="'+esc(p.pos||'')+'" maxlength="8"></span><span><label>Age</label><input data-f="age" type="number" min="5" max="99" value="'+(p.age||'')+'"></span></div>'
+        +'<div class="er"><span><label>Reach (IG @ / mobile)</label><input data-f="contact" value="'+esc(p.contact||'')+'" maxlength="80"></span><span><label>New PIN (only to reset)</label><input data-f="new_pin" inputmode="numeric" maxlength="4" placeholder="••••"></span></div>'
+        +'<div style="display:flex;gap:8px"><button class="btn btn-p" data-save="'+p.id+'">Save ✓</button><button class="btn btn-g" data-cancel="'+p.id+'">Cancel</button></div>'
+        +'</div></div>';
+    }).join(''):'<p class="empty">'+(q?'Nobody matches that.':'Fresh slate.')+'</p>';
+    box.querySelectorAll('[data-star]').forEach(b=>b.onclick=async()=>{ const p=(R.players||[]).find(x=>x.id===b.dataset.star); try{ await api({action:'founding_set',code:CODE,pid:b.dataset.star,founding:!(p&&p.founding)}); toast(p&&p.founding?'Star removed':'⭐ Founding locked in'); document.activeElement&&document.activeElement.blur(); refresh(); }catch(e){toast(e.message)} });
+    box.querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>{ const eb=document.getElementById('ed-'+b.dataset.ed); if(eb) eb.classList.toggle('open'); });
+    box.querySelectorAll('[data-cancel]').forEach(b=>b.onclick=()=>{ const eb=document.getElementById('ed-'+b.dataset.cancel); if(eb) eb.classList.remove('open'); document.activeElement&&document.activeElement.blur(); refresh(); });
+    box.querySelectorAll('[data-save]').forEach(b=>b.onclick=async()=>{
+      const eb=document.getElementById('ed-'+b.dataset.save); if(!eb) return;
+      const v=f=>{ const el=eb.querySelector('[data-f="'+f+'"]'); return el?el.value.trim():undefined; };
+      const body={action:'player_edit',code:CODE,pid:b.dataset.save,pos:v('pos'),age:v('age'),contact:v('contact')};
+      if(v('new_pin')) body.new_pin=v('new_pin');
+      try{ await api(body); toast('Saved ✓'+(body.new_pin?' · new PIN set':'')); eb.classList.remove('open'); document.activeElement&&document.activeElement.blur(); refresh(); }catch(e){toast(e.message)}
+    });
+    box.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{
+      if(!confirm('Remove '+b.dataset.nm+' from the Lab?\n\nThis wipes their whole file — check-ins, messages, journal, everything. There is no undo.')) return;
+      try{ await api({action:'player_delete',code:CODE,pid:b.dataset.del}); toast(b.dataset.nm+' removed'); document.activeElement&&document.activeElement.blur(); refresh(); }catch(e){toast(e.message)}
+    });
+  }
+  $('#sqSearch')&&$('#sqSearch').addEventListener('input',()=>{ if(R&&!$('#squad').querySelector('.editbox.open')) renderSquad(R.players||[],true); });
   let prevK=-1,prevR=-1;
   async function refresh(){
     try{
