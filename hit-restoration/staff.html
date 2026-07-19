@@ -527,24 +527,41 @@
       <div class="note-build">All sample numbers. Live build computes these from real order history: turnaround by stage, revenue by line item, order volume, grade-improvement stats — the exact reporting set from the scope sheet — plus CSV export for bookkeeping (the client's stated Phase-1 accounting approach).</div>`;
   }
 
-  /* ---------- brainstorm inbox (feedback Hash leaves anywhere on the site) ---------- */
+  /* ---------- brainstorm inbox — reads the LIVE database (cross-device) ---------- */
   function vBrainstorm() {
-    const list = HR.store.get('brainstorm', []).slice().reverse();
     $('#view').innerHTML = `
       <div class="spread mb2">
         <div><span class="kicker">Brainstorm inbox</span><h2 class="mb0" style="font-size:1.8rem">Ideas from Hash</h2></div>
-        <span class="badge ${list.length ? 'badge-warning' : 'badge-steel'}">${list.length} note${list.length === 1 ? '' : 's'}</span>
+        <span class="badge badge-steel" id="bsCount">loading…</span>
       </div>
-      <p class="small muted mb2">Every note Hash drops in the brainstorm box (bottom of any page) lands here. On the live site each one is also emailed to the team and saved in the Netlify dashboard — so nothing gets lost, whichever device he's on.</p>
-      ${list.length ? list.map(n => `
+      <p class="small muted mb2">Every note dropped in the brainstorm box (bottom of any page) lands here — <b class="white">live from the database</b>, whichever device it was sent from. The team also gets pinged, and the Netlify dashboard keeps a backup copy.</p>
+      <div id="bsList"><div class="lock">Loading notes…</div></div>
+      <div class="note-build">This inbox is real — notes are stored in the project's Supabase database the moment they're sent. Production build folds this into the same admin with staff-only access.</div>`;
+    fetch(HR.SUPA.url + '/rest/v1/hr_brainstorm?select=name,page,idea,created_at&order=created_at.desc&limit=100', {
+      headers: { apikey: HR.SUPA.key, Authorization: 'Bearer ' + HR.SUPA.key }
+    }).then(r => r.json()).then(rows => {
+      const local = HR.store.get('brainstorm', []);
+      const seen = new Set(rows.map(r => r.idea + '|' + (r.name || '')));
+      const merged = rows.map(r => ({ name: r.name, page: r.page, idea: r.idea, at: new Date(r.created_at).toLocaleString('en-AU') }))
+        .concat(local.filter(n => !seen.has(n.idea + '|' + (n.name || ''))).slice().reverse().map(n => Object.assign({}, n, { offline: true })));
+      $('#bsCount').textContent = merged.length + ' note' + (merged.length === 1 ? '' : 's');
+      $('#bsCount').className = 'badge ' + (merged.length ? 'badge-warning' : 'badge-steel');
+      $('#bsList').innerHTML = merged.length ? merged.map(n => `
         <div class="panel panel-pad mb2">
-          <div class="spread mb1"><b class="white">${esc(n.name || 'Hash')}</b><span class="badge badge-steel">on “${esc(n.page)}”</span></div>
+          <div class="spread mb1"><b class="white">${esc(n.name || 'Hash')}</b><span class="tag-row"><span class="badge badge-steel">on “${esc(n.page)}”</span>${n.offline ? '<span class="badge badge-warning">this browser only</span>' : '<span class="badge badge-success">live DB</span>'}</span></div>
           <p class="mb0" style="color:var(--silver)">${esc(n.idea)}</p>
           <div class="small muted mt1" style="font-size:.72rem">${esc(n.at)}</div>
         </div>`).join('') : `
         <div class="lock"><div style="font-size:1.6rem; margin-bottom:8px">💭</div><b class="white">No notes yet</b>
-        <p class="small mt1 mb0">Open any page, scroll to the brainstorm box at the bottom, and leave a note — it'll show up here.<br>(This inbox reads notes left in <b>this browser</b>; live submissions also arrive by email + in the Netlify dashboard.)</p></div>`}
-      <div class="note-build">Demo inbox reads from this browser's local storage. In the live build this is backed by the database (or the connected form service), so notes from Hash's phone, laptop — anywhere — all collect here and ping the team by email.</div>`;
+        <p class="small mt1 mb0">Open any page, scroll to the brainstorm box, leave a note — it appears here from any device.</p></div>`;
+    }).catch(() => {
+      const local = HR.store.get('brainstorm', []).slice().reverse();
+      $('#bsCount').textContent = local.length + ' (offline)';
+      $('#bsList').innerHTML = local.length ? local.map(n => `
+        <div class="panel panel-pad mb2"><div class="spread mb1"><b class="white">${esc(n.name || 'Hash')}</b><span class="badge badge-steel">on “${esc(n.page)}”</span></div>
+        <p class="mb0" style="color:var(--silver)">${esc(n.idea)}</p><div class="small muted mt1" style="font-size:.72rem">${esc(n.at)}</div></div>`).join('')
+        : '<div class="lock">Could not reach the database — notes from this browser will appear once online.</div>';
+    });
   }
 
   /* ---------- boot ---------- */

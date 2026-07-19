@@ -1,6 +1,12 @@
 /* HIT RESTORATION CO. — prototype shell: shared chrome + widgets.
    Include order on every page: brand.css, art.js, demo-data.js, shell.js */
 (function () {
+  /* Live backend for the brainstorm feedback loop (publishable key — safe to expose; RLS protects). */
+  const SUPA = {
+    url: 'https://ymuwuhvqqftgpxwhzoub.supabase.co',
+    key: 'sb_publishable_-j-P1TcLeGZ6lGspru2YwA_3RxAlucJ'
+  };
+
   const PAGES = [
     { href: 'services.html', label: 'Services' },
     { href: 'how-it-works.html', label: 'How it works' },
@@ -134,11 +140,17 @@
       const list = store.get('brainstorm', []);
       list.push({ idea, name, page, at: new Date().toISOString().slice(0, 16).replace('T', ' ') });
       store.set('brainstorm', list);
-      // Netlify Forms → captured in the Netlify dashboard + staff "Brainstorm inbox",
-      // and auto-emailed to the team via the form's Netlify email notification.
+      // 1) Netlify Forms → captured in the Netlify dashboard (backup channel)
       const body = new URLSearchParams({ 'form-name': 'brainstorm', page, name, idea, 'bot-field': '' }).toString();
       fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body })
         .catch(() => {}); // offline/local dev: local mirror still captured it
+      // 2) Supabase → the real database (publishable key; RLS allows insert only).
+      //    Powers the cross-device staff Brainstorm inbox + the team's notification check.
+      fetch(SUPA.url + '/rest/v1/hr_brainstorm', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', apikey: SUPA.key, Authorization: 'Bearer ' + SUPA.key, Prefer: 'return=minimal' },
+        body: JSON.stringify({ name: name || null, page, idea })
+      }).catch(() => {});
       document.getElementById('bsIdea').value = '';
       document.getElementById('bsName').value = '';
       const s = document.getElementById('bsStatus');
@@ -263,6 +275,6 @@
     return c.reduce((n, i) => n + i.qty, 0);
   }
 
-  window.HR = { mount, fmtAUD, toast, buildNote, stageChip, stepperHTML, miniStepper, mountReveal, store, cartCount };
+  window.HR = { mount, fmtAUD, toast, buildNote, stageChip, stepperHTML, miniStepper, mountReveal, store, cartCount, SUPA };
   document.addEventListener('DOMContentLoaded', mount);
 })();
