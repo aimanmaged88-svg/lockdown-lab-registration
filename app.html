@@ -185,6 +185,38 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 .sess .inf{flex:1;min-width:0}
 .sess .inf b{font-family:var(--fd);text-transform:uppercase;font-size:16px;letter-spacing:.5px;display:block}
 .sess .inf span{font-family:var(--fm);font-size:9.5px;letter-spacing:1px;color:var(--muted)}
+/* Next-up trailer: upcoming sessions play like teasers */
+.trailer{position:relative;border:1px solid color-mix(in srgb,var(--accent) 45%,transparent);border-radius:var(--r);overflow:hidden;margin-bottom:14px;background:linear-gradient(160deg,var(--accent-soft),var(--glass2) 62%);box-shadow:inset 0 1px 0 rgba(255,255,255,.08),0 16px 44px -24px var(--accent-glow)}
+.trailer .tinner{padding:16px 16px 12px;animation:tfade .45s ease}
+@keyframes tfade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.trailer .thead{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.trailer .teye{font-family:var(--fm);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--accent)}
+.trailer .tcount{margin-left:auto;font-family:var(--fm);font-size:9px;letter-spacing:1px;color:var(--dim)}
+.trailer .tcd{display:inline-flex;align-items:center;gap:6px;font-family:var(--fm);font-size:9.5px;letter-spacing:1px;text-transform:uppercase;color:var(--text);border:1px solid var(--line);border-radius:999px;padding:4px 10px}
+.trailer .tcd.soon{border-color:var(--good);color:var(--good);background:var(--good-soft)}
+.trailer h3.ttl{font-family:var(--fd);text-transform:uppercase;font-size:24px;letter-spacing:.5px;line-height:1;margin:8px 0 4px}
+.trailer .twhen{font-family:var(--fm);font-size:10px;letter-spacing:.5px;color:var(--muted);margin-bottom:10px}
+.trailer .tdesc{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:10px}
+.trailer .tchaps{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.trailer .tchap{font-family:var(--fm);font-size:9px;letter-spacing:.5px;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:5px 9px;background:rgba(0,0,0,.2)}
+.trailer .tchap i{font-style:normal;color:var(--accent);margin-right:5px}
+.trailer .tbtns{display:flex;gap:8px;flex-wrap:wrap}
+.trailer .tdots{display:flex;gap:6px;justify-content:center;padding:2px 0 12px}
+.trailer .tdot{width:7px;height:7px;border-radius:50%;background:var(--line);transition:all .25s;cursor:pointer}
+.trailer .tdot.on{background:var(--accent);width:20px;border-radius:4px}
+/* expandable session card */
+.sess.rich{flex-wrap:wrap;cursor:pointer}
+.sess .exp{margin-left:8px;font-size:11px;color:var(--dim);border:1px solid var(--line);border-radius:999px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex:0 0 auto;transition:transform .25s,color .2s,border-color .2s}
+.sess.open .exp{transform:rotate(180deg);color:var(--accent);border-color:var(--accent)}
+.sess .sdet{flex-basis:100%;width:100%;max-height:0;overflow:hidden;transition:max-height .32s ease}
+.sess.open .sdet{max-height:640px}
+.sess .sdet .inner{padding-top:12px;margin-top:12px;border-top:1px solid var(--line2)}
+.sess .sdet .d{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:10px}
+.sess .sdet .agenda{display:flex;flex-direction:column;gap:7px;margin-bottom:12px}
+.sess .sdet .ag{display:flex;align-items:center;gap:10px;font-size:12.5px;border:1px solid var(--line2);border-radius:10px;background:rgba(0,0,0,.22);padding:8px 11px}
+.sess .sdet .ag .n{font-family:var(--fd);font-size:15px;color:var(--accent);min-width:16px;text-align:center}
+.sess .sdet .ag b{color:var(--text);font-weight:600}
+.sess .sdet .ag small{color:var(--dim);margin-left:auto;white-space:nowrap}
 .lock{position:relative;overflow:hidden}
 .lock .overlay{position:absolute;inset:0;border-radius:var(--r);display:grid;place-items:center;background:rgba(5,5,6,.55);backdrop-filter:blur(3px)}
 
@@ -671,6 +703,7 @@ body.rmode *{animation:none!important;transition:none!important}
       </div>
 
       <span class="eyebrow secgap">Sessions · shown in your local time</span>
+      <div id="sessTrailer"></div>
       <div id="sessList"></div>
       <div class="sess"><div class="dt"><b>1·1</b><span>Book</span></div><div class="inf"><b>1-on-1 with Coach</b><span>Message coach to lock a slot</span></div><button class="btn btn-g btn-sm" id="bookBtn">Message</button></div>
       <div class="card" id="runCard" style="margin-top:16px">
@@ -1378,7 +1411,7 @@ body.rmode *{animation:none!important;transition:none!important}
     const p=PST.profile;
     $('#heroName').textContent=p.name+(p.founding?' ⭐':'');
     if(p.founding) $('#hSub').textContent='Founding ⭐';
-    renderRuns(); renderSessList();
+    renderRuns(); renderSessList(); renderSessTrailer();
     $('#avInit').textContent=p.name.split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();
     countUp($('#stXp'),p.xp); countUp($('#stLogs'),PST.checkins.length); countUp($('#stSess'),p.sessions);
     $('#streakChip').textContent=p.streak;
@@ -1658,6 +1691,42 @@ body.rmode *{animation:none!important;transition:none!important}
   });
 
   /* ---------- sessions board (UNC posts, everyone joins) ---------- */
+  let _trailI=0, _trailT=null;
+  function trailerSlides(){ return (PST&&PST.sessions)||[]; }
+  function fmtCountdown(iso){
+    const diff=new Date(iso).getTime()-Date.now();
+    if(diff<=0 && diff>-2*3600*1000) return {txt:'🔴 Live now',soon:true};
+    if(diff<=0) return {txt:'In progress',soon:true};
+    const mins=Math.floor(diff/60000), h=Math.floor(mins/60), days=Math.floor(h/24);
+    if(days>=1) return {txt:'In '+days+'d '+(h%24)+'h',soon:false};
+    if(h>=1) return {txt:'In '+h+'h '+(mins%60)+'m',soon:h<3};
+    return {txt:'In '+mins+'m',soon:true};
+  }
+  function paintTrailer(){
+    const el=$('#sessTrailer'); if(!el) return;
+    const list=trailerSlides();
+    if(!list.length){ el.innerHTML=''; if(_trailT){clearInterval(_trailT);_trailT=null;} return; }
+    if(_trailI>=list.length) _trailI=0;
+    const s=list[_trailI], cd=fmtCountdown(s.starts_at), d=new Date(s.starts_at);
+    const when=d.toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'short'})+' · '+d.toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'}).replace(' ','')+' your time';
+    const ch=s.chapters||[];
+    const chaps=ch.slice(0,4).map((c,i)=>'<span class="tchap"><i>'+(i+1)+'</i>'+esc(c.t)+(c.d?' · '+esc(c.d):'')+'</span>').join('')+(ch.length>4?'<span class="tchap">+'+(ch.length-4)+' more</span>':'');
+    const btns=(s.link?'<a class="btn btn-p btn-sm" href="'+esc(s.link)+'" target="_blank" rel="noopener">Join ▶</a>':'')+(s.deck?'<a class="btn btn-g btn-sm" href="'+esc(s.deck)+'" target="_blank" rel="noopener">📑 Open the deck</a>':'');
+    const dots=list.length>1?'<div class="tdots">'+list.map((x,i)=>'<span class="tdot'+(i===_trailI?' on':'')+'" data-td="'+i+'"></span>').join('')+'</div>':'';
+    el.innerHTML='<div class="trailer"><div class="tinner"><div class="thead"><span class="teye">🎬 Next up</span>'+(list.length>1?'<span class="tcount">'+(_trailI+1)+' / '+list.length+'</span>':'')+'</div>'+
+      '<span class="tcd'+(cd.soon?' soon':'')+'">'+cd.txt+'</span>'+
+      '<h3 class="ttl">'+esc(s.title)+'</h3><div class="twhen">'+when+'</div>'+
+      (s.descr?'<div class="tdesc">'+esc(s.descr)+'</div>':'')+
+      (chaps?'<div class="tchaps">'+chaps+'</div>':'')+
+      (btns?'<div class="tbtns">'+btns+'</div>':'')+
+      '</div>'+dots+'</div>';
+    el.querySelectorAll('[data-td]').forEach(b=>b.onclick=e=>{ e.stopPropagation(); _trailI=+b.dataset.td; paintTrailer(); restartTrailer(); });
+  }
+  function restartTrailer(){
+    if(_trailT){ clearInterval(_trailT); _trailT=null; }
+    if(trailerSlides().length>1) _trailT=setInterval(()=>{ const n=trailerSlides().length; if(!n){clearInterval(_trailT);_trailT=null;return;} _trailI=(_trailI+1)%n; paintTrailer(); },5200);
+  }
+  function renderSessTrailer(){ paintTrailer(); restartTrailer(); }
   function renderSessList(){
     const el=$('#sessList'); if(!el||!PST) return;
     const list=PST.sessions||[];
@@ -1666,8 +1735,18 @@ body.rmode *{animation:none!important;transition:none!important}
       const day=d.toLocaleDateString('en-AU',{weekday:'short'}).toUpperCase();
       const tm=d.toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'}).replace(' ','');
       const dt=d.toLocaleDateString('en-AU',{day:'numeric',month:'short'});
-      return '<div class="sess"><div class="dt"><b>'+day+'</b><span>'+tm+'</span></div><div class="inf"><b>'+esc(s.title)+'</b><span>'+dt+(s.note?' · '+esc(s.note):(s.link?' · online — one tap to join':''))+'</span></div>'+(s.link?'<a class="btn btn-p btn-sm" href="'+esc(s.link)+'" target="_blank" rel="noopener">Join ▶</a>':'<span class="chip">Set</span>')+'</div>';
+      const ch=s.chapters||[], nc=ch.length, rich=!!(s.descr||nc||s.deck);
+      const meta=dt+(nc?' · 🎬 '+nc:'')+(s.note?' · '+esc(s.note):(s.link?' · online — one tap':''));
+      const join=s.link?'<a class="btn btn-p btn-sm" href="'+esc(s.link)+'" target="_blank" rel="noopener">Join ▶</a>':'<span class="chip">Set</span>';
+      const exp=rich?'<span class="exp">▾</span>':'';
+      let det='';
+      if(rich){
+        const agenda=nc?'<div class="agenda">'+ch.map((c,i)=>'<div class="ag"><span class="n">'+(i+1)+'</span><b>'+esc(c.t)+'</b>'+(c.d?'<small>'+esc(c.d)+'</small>':'')+'</div>').join('')+'</div>':'';
+        det='<div class="sdet"><div class="inner">'+(s.descr?'<div class="d">'+esc(s.descr)+'</div>':'')+agenda+(s.deck?'<a class="btn btn-g btn-sm" href="'+esc(s.deck)+'" target="_blank" rel="noopener">📑 Open the deck</a>':'')+'</div></div>';
+      }
+      return '<div class="sess'+(rich?' rich':'')+'"><div class="dt"><b>'+day+'</b><span>'+tm+'</span></div><div class="inf"><b>'+esc(s.title)+'</b><span>'+meta+'</span></div>'+join+exp+det+'</div>';
     }).join(''):'<div class="sess"><div class="inf"><b>No sessions on the board yet</b><span>UNC drops them here — your phone buzzes when one lands.</span></div></div>';
+    el.querySelectorAll('.sess.rich').forEach(c=>c.onclick=e=>{ if(e.target.closest('a'))return; c.classList.toggle('open'); });
   }
 
   /* ---------- I'm running here ---------- */

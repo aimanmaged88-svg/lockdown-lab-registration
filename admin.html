@@ -179,6 +179,15 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
 .scen .lab small{display:block;font-size:11px;color:var(--dim)}
 .scen .amt{font-family:var(--fd);font-size:24px;letter-spacing:1px;color:var(--accent)}
 .scen.you{border-color:color-mix(in srgb,var(--accent) 45%,transparent);background:var(--accent-soft)}
+.chaplist{display:flex;flex-direction:column;gap:6px;margin-bottom:8px}
+.chaprow{display:flex;align-items:center;gap:10px;border:1px solid var(--line2);border-radius:12px;background:rgba(0,0,0,.25);padding:9px 12px}
+.chaprow .n{font-family:var(--fd);font-size:16px;color:var(--accent);min-width:18px;text-align:center}
+.chaprow b{font-size:13.5px;color:var(--text);font-weight:600}
+.chaprow small{color:var(--dim);font-size:11.5px;margin-left:auto;white-space:nowrap}
+.chaprow .rm{width:26px;height:26px;border-radius:50%;border:1px solid var(--line);color:var(--muted);font-size:12px;flex:0 0 auto}
+.chaprow .rm:hover{border-color:var(--bad);color:var(--bad)}
+.chapadd{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px}
+.chapadd input{flex:1;min-width:130px}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -254,6 +263,15 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
           <input id="sLink" placeholder="Zoom link (paste here)" maxlength="300">
         </div>
         <input id="sNote" placeholder="Note (optional — e.g. cameras on, bring a ball)" maxlength="200" style="margin-bottom:10px">
+        <textarea id="sDescr" placeholder="Description (optional) — what's this session about? The more you write, the better the trailer players see." maxlength="800" style="margin-bottom:12px"></textarea>
+        <div class="cl" style="margin-bottom:6px">🎬 <b>Chapters</b> · the run of play (optional)</div>
+        <div id="sChapList" class="chaplist"></div>
+        <div class="chapadd">
+          <input id="sChapT" placeholder="Chapter (e.g. Handle circuit)" maxlength="60" autocomplete="off">
+          <input id="sChapD" placeholder="Detail (e.g. 10 min)" maxlength="90" autocomplete="off" style="max-width:150px">
+          <button class="btn btn-g" id="sChapAdd" type="button">Add ＋</button>
+        </div>
+        <input id="sDeck" placeholder="Deck / materials link (optional — https://…)" maxlength="300" style="margin:12px 0 4px">
         <div class="cl" style="margin-bottom:6px">Repeat weekly?</div>
         <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px">
           <span class="pills" id="wUses"><span class="pil sel" data-w="1">One-off</span><span class="pil" data-w="6">6-week block</span><span class="pil" data-w="8">8 weeks</span><span class="pil" data-w="10">10 weeks</span></span>
@@ -411,22 +429,40 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
   const sessWhen=iso=>{ const d=new Date(iso); return d.toLocaleDateString('en-AU',{timeZone:'Australia/Sydney',weekday:'short',day:'numeric',month:'short'})+' · '+d.toLocaleTimeString('en-AU',{timeZone:'Australia/Sydney',hour:'numeric',minute:'2-digit'}); };
   function renderSessions(){
     const list=(R&&R.sessions)||[];
-    $('#sessRows').innerHTML=list.length?list.map(s=>'<div class="row"><div class="info"><b>'+esc(s.title)+'</b><small>'+sessWhen(s.starts_at)+(s.note?' · '+esc(s.note):'')+'</small></div>'+(s.link?'<a class="btn btn-g" href="'+esc(s.link)+'" target="_blank" rel="noopener">Zoom ↗</a>':'')+'<button class="btn-x" data-sdel="'+s.id+'" data-st="'+esc(s.title)+'">✕</button></div>').join(''):'<p class="empty">Nothing on the board.</p>';
+    $('#sessRows').innerHTML=list.length?list.map(s=>{const nc=(s.chapters&&s.chapters.length)||0;const extra=(nc?' · 🎬 '+nc+' chapters':'')+(s.deck?' · 📑 deck':'')+(s.descr?' · 📝 described':'');return '<div class="row"><div class="info"><b>'+esc(s.title)+'</b><small>'+sessWhen(s.starts_at)+(s.note?' · '+esc(s.note):'')+extra+'</small></div>'+(s.link?'<a class="btn btn-g" href="'+esc(s.link)+'" target="_blank" rel="noopener">Zoom ↗</a>':'')+'<button class="btn-x" data-sdel="'+s.id+'" data-st="'+esc(s.title)+'">✕</button></div>';}).join(''):'<p class="empty">Nothing on the board.</p>';
     document.querySelectorAll('[data-sdel]').forEach(b=>b.onclick=async()=>{
       if(!confirm('Take “'+b.dataset.st+'” off the board?')) return;
       try{ await api({action:'session_del',code:CODE,sid:b.dataset.sdel}); toast('Session removed'); refresh(); }catch(e){toast(e.message)}
     });
   }
+  /* ---- session chapters builder ---- */
+  let sChapters=[];
+  function renderChap(){
+    const box=$('#sChapList'); if(!box) return;
+    box.innerHTML=sChapters.map((c,i)=>'<div class="chaprow"><span class="n">'+(i+1)+'</span><b>'+esc(c.t)+'</b>'+(c.d?'<small>'+esc(c.d)+'</small>':'')+'<button class="rm" data-rm="'+i+'" type="button">✕</button></div>').join('');
+    box.querySelectorAll('[data-rm]').forEach(b=>b.onclick=()=>{ sChapters.splice(+b.dataset.rm,1); renderChap(); });
+  }
+  function addChap(){
+    const t=$('#sChapT').value.trim(), d=$('#sChapD').value.trim();
+    if(t.length<1){ $('#sChapT').focus(); return; }
+    if(sChapters.length>=14){ toast('14 chapters is plenty'); return; }
+    sChapters.push({t,d}); $('#sChapT').value=''; $('#sChapD').value=''; renderChap(); $('#sChapT').focus();
+  }
+  $('#sChapAdd').addEventListener('click',addChap);
+  ['#sChapT','#sChapD'].forEach(s=>$(s).addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); addChap(); } }));
   $('#sAdd').addEventListener('click',async()=>{
     const title=$('#sTitle').value.trim(), whenRaw=$('#sWhen').value, link=$('#sLink').value.trim(), note=$('#sNote').value.trim();
+    const descr=$('#sDescr').value.trim(), deck=$('#sDeck').value.trim();
     if(title.length<2){ toast('Give the session a name'); return; }
     const when=new Date(whenRaw);
     if(!whenRaw||isNaN(when.getTime())){ toast('Pick a date and time'); return; }
+    if(deck && !/^https?:\/\//i.test(deck)){ toast('Deck link needs the full https:// address'); return; }
     try{
       const weeks=parseInt(($('#wUses').querySelector('.pil.sel')||{}).dataset?.w||'1',10);
-      if(weeks>1) await api({action:'program_add',code:CODE,title,starts_at:when.toISOString(),link,note,weeks});
-      else await api({action:'session_add',code:CODE,title,starts_at:when.toISOString(),link,note});
-      $('#sTitle').value=''; $('#sWhen').value=''; $('#sLink').value=''; $('#sNote').value='';
+      const payload={code:CODE,title,starts_at:when.toISOString(),link,note,descr,deck,chapters:sChapters};
+      if(weeks>1) await api({action:'program_add',...payload,weeks});
+      else await api({action:'session_add',...payload});
+      $('#sTitle').value=''; $('#sWhen').value=''; $('#sLink').value=''; $('#sNote').value=''; $('#sDescr').value=''; $('#sDeck').value=''; sChapters=[]; renderChap();
       toast(weeks>1?('Program posted 📅 '+weeks+' weekly sessions on the board'):'Posted 📅 The squad’s been buzzed'); refresh();
     }catch(e){toast(e.message)}
   });
