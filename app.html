@@ -2001,6 +2001,8 @@ body.rmode *{animation:none!important;transition:none!important}
 
   /* prefill invite code from a shared link */
   try{ const qc=new URLSearchParams(location.search).get('code'); if(qc&&$('#jInvite')) $('#jInvite').value=qc.toUpperCase(); $('#jGo').textContent=jBtnLabel(); }catch(e){}
+  /* /app.html#login (landing's "Already in the Lab?") opens straight on the Log In tab */
+  try{ if(location.hash==='#login'){ const b=document.querySelector('.ob-tabs button[data-ob="login"]'); if(b) b.click(); } }catch(e){}
 
   /* ---------- boot ---------- */
   (async function boot(){
