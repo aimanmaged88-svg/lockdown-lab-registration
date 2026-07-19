@@ -1,6 +1,6 @@
 /* Lockdown Lab Live — service worker.
    Network-first for pages (always fresh app), cache-first for static assets. */
-const V = 'lll-v4';
+const V = 'lll-v5';
 const STATIC = ['/icons/icon-192.png', '/icons/icon-512.png', '/favicon.png', '/manifest.json'];
 
 self.addEventListener('install', e => {

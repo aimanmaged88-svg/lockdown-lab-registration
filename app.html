@@ -428,6 +428,32 @@ header{gap:8px}
 .scon.fill i{transform:scaleX(1)}
 #startNext{margin-top:10px;font-size:12.5px;color:var(--muted);border-left:2px solid var(--accent);background:var(--accent-soft);border-radius:0 12px 12px 0;padding:9px 12px;line-height:1.5}
 #startNext b{color:var(--text)}
+
+/* ---------- Street Vol.2 flavour pack — sticker slaps, gamebreakers, fire ---------- */
+@keyframes slapIn{0%{opacity:0;transform:scale(1.8) rotate(-15deg)}55%{opacity:1;transform:scale(.94) rotate(2.5deg)}78%{transform:scale(1.04) rotate(-3.5deg)}100%{opacity:1;transform:scale(1) rotate(-1.5deg)}}
+@keyframes impactRing{0%{opacity:.95;transform:scale(.35)}100%{opacity:0;transform:scale(2.1)}}
+@keyframes stShake{0%,100%{transform:scale(1) translate(0,0)}25%{transform:scale(1) translate(-3px,2px)}50%{transform:scale(1) translate(3px,-2px)}75%{transform:scale(1) translate(-2px,-1px)}}
+@keyframes gbFlash{0%{opacity:0;transform:translateY(10px) skewX(-10deg);color:#fff;text-shadow:0 0 20px #fff}55%{opacity:1;color:#fff;text-shadow:0 0 24px #fff}100%{opacity:1;color:var(--accent);text-shadow:2px 2px 0 rgba(0,0,0,.85)}}
+@keyframes fireFlick{0%,100%{opacity:1}42%{opacity:.62}48%{opacity:.95}56%{opacity:.58}62%{opacity:1}}
+@keyframes styleUp{0%{opacity:0;transform:translateY(6px) scale(1.6) rotate(-9deg)}22%{opacity:1;transform:translateY(0) scale(1) rotate(-3deg)}100%{opacity:0;transform:translateY(-52px) scale(1) rotate(-3deg)}}
+.spray{transform:rotate(-2deg);text-shadow:2.5px 2.5px 0 rgba(0,0,0,.9), 0 0 16px rgba(255,107,0,.35)}
+.tape{position:absolute;top:-8px;left:20px;width:60px;height:16px;background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,.06));transform:rotate(-4deg);border-radius:2px;box-shadow:0 2px 6px rgba(0,0,0,.4);pointer-events:none}
+.tape.r{left:auto;right:22px;transform:rotate(3deg)}
+#runCard{position:relative;overflow:hidden}
+#runCard::after{content:"";position:absolute;inset:0 0 auto 0;height:54px;opacity:.07;pointer-events:none;
+  background:repeating-linear-gradient(63deg,transparent 0 10px,#fff 10px 12.5px),repeating-linear-gradient(-63deg,transparent 0 10px,#fff 10px 12.5px)}
+.chip.live.fire{border-color:rgba(255,107,0,.65);background:var(--accent-soft);color:var(--accent-hi);animation:fireFlick 2.6s infinite}
+.chip.live.fire .d{background:var(--accent);box-shadow:0 0 8px var(--accent)}
+.runrow.st{animation:slapIn .45s both}
+#toast.show{animation:toastSlap .38s cubic-bezier(.2,1.3,.4,1) both}
+@keyframes toastSlap{0%{transform:translateX(-50%) translateY(0) scale(1.5) rotate(-6deg)}100%{transform:translateX(-50%) translateY(0) scale(1) rotate(-1.5deg)}}
+#levelup .luk i{font-style:normal;display:inline-block;animation:gbFlash .5s both}
+#levelup.show .lu{animation:lupop .6s .1s cubic-bezier(.2,1.5,.4,1) forwards, stShake .4s .8s}
+#levelup h2{text-shadow:5px 5px 0 rgba(0,0,0,.65), -2px -2px 0 rgba(255,107,0,.3)}
+#badgeUp .bu{animation:slapIn .55s cubic-bezier(.2,1.25,.35,1) both}
+#badgeUp .bring{background-image:radial-gradient(rgba(255,255,255,.10) 1.2px,transparent 1.4px),radial-gradient(circle at 50% 30%, rgba(255,255,255,.16), rgba(255,255,255,.02) 62%);background-size:13px 13px,auto}
+#badgeUp .bring .imp{position:absolute;inset:-5px;border-radius:50%;border:3px solid rgba(255,255,255,.85);animation:impactRing .55s .1s ease-out both;pointer-events:none}
+.stylepop{position:fixed;z-index:60;font-family:var(--fd);font-size:32px;letter-spacing:1px;color:var(--accent);text-shadow:3px 3px 0 rgba(0,0,0,.9);pointer-events:none;animation:styleUp 1.15s cubic-bezier(.2,.9,.3,1) both}
 #confetti{position:fixed;inset:0;z-index:79;pointer-events:none;display:none}
 #confetti.show{display:block}
 /* top loading shimmer */
@@ -725,9 +751,10 @@ body.rmode *{animation:none!important;transition:none!important}
       <div class="xpbar"><i id="xpFill" style="width:0%"></i></div>
       <div class="xplab"><span id="lvlLab">Level 1 · Rookie</span><span id="xpLab">0 XP</span></div>
 
-      <div class="card" id="startCard" style="margin-top:16px">
+      <div class="card" id="startCard" style="margin-top:16px;position:relative">
+        <span class="tape"></span><span class="tape r"></span>
         <span class="cl" id="startCl">🏅 Starter Five · 0/5 collected</span>
-        <h3 id="startTitle">Your First Five</h3>
+        <h3 id="startTitle" class="spray">Your First Five</h3>
         <div class="path" id="startPath"></div>
         <div id="startNext"></div>
       </div>
@@ -773,7 +800,7 @@ body.rmode *{animation:none!important;transition:none!important}
       <div class="sess"><div class="dt"><b>1·1</b><span>Book</span></div><div class="inf"><b>1-on-1 with Coach</b><span>Message coach to lock a slot</span></div><button class="btn btn-g btn-sm" id="bookBtn">Message</button></div>
       <div class="card" id="runCard" style="margin-top:16px">
         <span class="cl">Live from the blacktop · clears itself after 2h</span>
-        <h3>🏀 Running now</h3>
+        <h3 class="spray">🏀 Running Now</h3>
         <div id="runList"><p style="color:var(--dim);font-size:12.5px">Nobody's on the board. Next run starts with you.</p></div>
         <div class="composer" style="margin-top:10px">
           <input id="runWhere" placeholder="Where you running? e.g. Alexandria Park" maxlength="60">
@@ -1109,7 +1136,7 @@ body.rmode *{animation:none!important;transition:none!important}
 <canvas id="confetti"></canvas>
 <div id="levelup"><div class="lu"><div class="luk">Level Up</div><h2 id="luNum">2</h2><div class="lurank">You're now <b id="luRank">Sharp</b></div></div></div>
 
-<div id="badgeUp"><div class="bu"><div class="bring" id="buRing"><span id="buIco">🔓</span></div><div class="buk">Badge Unlocked</div><h2 id="buName">Through the Door</h2><p class="bum" id="buMean">You're in.</p><span class="but" id="buTier">Bronze</span><div class="buh">Tap anywhere to keep going</div></div></div>
+<div id="badgeUp"><div class="bu"><div class="bring" id="buRing"><span class="imp"></span><span id="buIco">🔓</span></div><div class="buk">Badge Unlocked</div><h2 id="buName">Through the Door</h2><p class="bum" id="buMean">You're in.</p><span class="but" id="buTier">Bronze</span><div class="buh">Tap anywhere to keep going</div></div></div>
 
 <div id="welcome"><div class="wl">
   <div class="wlock">🔒</div>
@@ -1246,7 +1273,11 @@ body.rmode *{animation:none!important;transition:none!important}
     parts=parts.filter(p=>p.y<cvs.height+40&&p.life<180); if(alive&&parts.length){ raf=requestAnimationFrame(loop); } else { raf=null; ctx.clearRect(0,0,cvs.width,cvs.height); cvs.classList.remove('show'); } }
 
   /* ============ level-up showpiece ============ */
-  function levelUpShow(n,rank){ $('#luNum').textContent=n; $('#luRank').textContent=rank; const lu=$('#levelup'); lu.classList.add('show'); S.levelup(); haptic([0,40,60,40,60,90]); burst(true); setTimeout(()=>burst(true),450); setTimeout(()=>{ lu.classList.remove('show'); },2600); }
+  function levelUpShow(n,rank){ $('#luNum').textContent=n; $('#luRank').textContent=rank;
+    /* gamebreaker: letters flash in one by one, then the number slams */
+    const k=document.querySelector('#levelup .luk');
+    if(k&&!RM) k.innerHTML='LEVEL UP'.split('').map((c,i)=>c===' '?'&nbsp;':'<i style="animation-delay:'+(i*60)+'ms">'+c+'</i>').join('');
+    const lu=$('#levelup'); lu.classList.add('show'); S.levelup(); haptic([0,40,60,40,60,90]); burst(true); setTimeout(()=>burst(true),450); setTimeout(()=>{ lu.classList.remove('show'); },2600); }
 
   /* ============ loading bar ============ */
   let lbT; function loadOn(){ const l=$('#loadbar'); l.classList.add('on'); l.style.width='72%'; }
@@ -1257,6 +1288,16 @@ body.rmode *{animation:none!important;transition:none!important}
 
   let toastT;
   function toast(m,dark){ const t=$('#toast'); t.textContent=m; t.className=dark?'show dark':'show'; clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2300); if(dark)S.err(); else S.toast(); haptic(dark?[0,120]:15); }
+  /* street style-points: text slams up off an element like a trick score */
+  function stylePop(text,anchor){
+    if(RM||!anchor) return;
+    try{
+      const r=anchor.getBoundingClientRect();
+      const el=document.createElement('div'); el.className='stylepop'; el.textContent=text;
+      el.style.left=(r.left+r.width/2-40+((Math.random()*36)-18))+'px'; el.style.top=(r.top-14)+'px';
+      document.body.appendChild(el); setTimeout(()=>el.remove(),1200);
+    }catch(e){}
+  }
   async function api(body){
     loadOn();
     try{
@@ -1557,6 +1598,7 @@ body.rmode *{animation:none!important;transition:none!important}
     $('#avInit').textContent=p.name.split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();
     countUp($('#stXp'),p.xp); countUp($('#stLogs'),PST.checkins.length); countUp($('#stSess'),p.sessions);
     $('#streakChip').textContent=p.streak;
+    $('#streakChip').parentElement.classList.toggle('fire',p.streak>=3); /* street rule: 3 straight = you're on fire */
     const L=lvl(p.xp), pct=Math.min(100,Math.round((p.xp-L.cur)/(L.next-L.cur)*100));
     $('#xpFill').style.width=pct+'%'; $('#xpRing').style.setProperty('--pct',pct+'%');
     $('#lvlLab').textContent='Level '+L.n+' · '+L.name; $('#xpLab').textContent=p.xp+' / '+L.next+' XP';
@@ -1587,7 +1629,7 @@ body.rmode *{animation:none!important;transition:none!important}
       PST=r.state;
       // success ritual
       btn.disabled=false; btn.classList.add('ok'); btn.innerHTML='✓ Locked In';
-      S.checkin(); haptic([0,30,40,30]); burst(false);
+      S.checkin(); haptic([0,30,40,30]); burst(false); stylePop('+40 XP',btn);
       renderPlayer();
       // re-trigger the checkmark draw
       const cw=$('#ciCheck'); if(cw){ const c=cw.cloneNode(true); cw.replaceWith(c); }
@@ -1893,14 +1935,16 @@ body.rmode *{animation:none!important;transition:none!important}
 
   /* ---------- I'm running here ---------- */
   const agoM=t=>Math.max(0,Math.round((Date.now()-new Date(t).getTime())/60000));
+  let prevRunN=-1;
   function renderRuns(){
     if(!PST||!$('#runList')) return;
     const list=PST.runs||[];
-    $('#runList').innerHTML=list.length?list.map(r=>{
+    const stamp=list.length!==prevRunN&&prevRunN!==-1; prevRunN=list.length; /* slap rows in only when the board changes */
+    $('#runList').innerHTML=list.length?list.map((r,i)=>{
       const n=(r.player&&r.player.name)||'Someone';
       const star=(r.player&&r.player.founding)?' ⭐':'';
       const m=agoM(r.created_at);
-      return '<div class="intelnote" style="align-items:center"><span>🏀</span><span style="flex:1"><b style="color:var(--text)">'+esc(n)+star+'</b> — '+esc(r.court)+'</span><span style="font-size:11px;color:var(--dim)">'+(m<1?'just now':m+'m ago')+'</span></div>';
+      return '<div class="intelnote runrow'+(stamp?' st':'')+'" style="align-items:center'+(stamp?';animation-delay:'+(i*80)+'ms':'')+'"><span>🏀</span><span style="flex:1"><b style="color:var(--text)">'+esc(n)+star+'</b> — '+esc(r.court)+'</span><span style="font-size:11px;color:var(--dim)">'+(m<1?'just now':m+'m ago')+'</span></div>';
     }).join(''):'<p style="color:var(--dim);font-size:12.5px">Nobody\'s on the board. Next run starts with you.</p>';
   }
   async function goRun(court){
