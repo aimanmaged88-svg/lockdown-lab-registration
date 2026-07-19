@@ -84,6 +84,21 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   Enter to send, survives refresh poll via .editbox.open guard.
 - sw cache lll-v4. NEWS ids 8-9 announce both (Aiman gets the ping).
 
+## Street Vol. 2 flavour pack (2026-07-19)
+
+- LIVE in app.html, player side only (desk untouched). Keyframes slapIn /
+  impactRing / stShake / gbFlash / fireFlick / styleUp / toastSlap.
+  Level-up = Gamebreaker (luk letterized in levelUpShow, skip when RM);
+  #badgeUp .bu slaps in + .imp white impact ring + halftone crest bg;
+  .chip.live.fire at streak≥3 (toggle in renderPlayer); #runCard chain-link
+  ::after band + .spray header, run rows .runrow.st stamp only when count
+  changes (prevRunN guard); stylePop('+40 XP',btn) on check-in success;
+  toasts slap w/ sticker tilt; #startCard tape corners + spray title.
+  All under the global prefers-reduced-motion kill. sw lll-v5. NEWS id:10.
+- Test-junk note: Aiman DENIED the SQL sweep of my ZZ Street artifacts —
+  a few "ZZ Street just joined" Lab posts + 2 spent test invites remain in
+  DB. Do not delete without his explicit go-ahead.
+
 ## Parked ideas (Aiman asked to save these)
 
 - **"A.I. MAN" Instagram post** — saved 2026-07-18, for a few weeks out.
