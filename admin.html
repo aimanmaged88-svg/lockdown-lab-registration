@@ -188,6 +188,37 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
 .chaprow .rm:hover{border-color:var(--bad);color:var(--bad)}
 .chapadd{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:4px}
 .chapadd input{flex:1;min-width:130px}
+/* Guide: what's new + feature phone */
+.newsitem{border-left:2px solid var(--accent);background:var(--accent-soft);border-radius:0 12px 12px 0;padding:11px 14px;margin-bottom:9px}
+.newsitem .h{display:flex;align-items:center;gap:8px;margin-bottom:4px;flex-wrap:wrap}
+.newsitem .h b{font-family:var(--fd);font-size:17px;letter-spacing:.5px;text-transform:uppercase}
+.newsitem .dt{margin-left:auto;font-family:var(--fm);font-size:9px;letter-spacing:1px;color:var(--dim)}
+.newsitem .tg{font-family:var(--fm);font-size:8px;letter-spacing:1px;background:var(--accent);color:#150a00;border-radius:999px;padding:2px 7px}
+.newsitem p{font-size:12.5px;color:var(--muted);line-height:1.5}
+.guidewrap{display:flex;justify-content:center;padding:8px 0 4px}
+.vphone{position:relative;width:300px;max-width:100%;height:600px;border-radius:42px;background:#000;border:2px solid rgba(255,255,255,.14);box-shadow:0 34px 80px -34px #000, inset 0 0 0 6px #0b0b0d;padding:12px;overflow:hidden}
+.vnotch{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:118px;height:22px;background:#000;border-radius:0 0 14px 14px;z-index:5}
+.vscreen{position:relative;width:100%;height:100%;border-radius:32px;overflow:hidden;background:radial-gradient(80% 40% at 50% -5%, rgba(255,107,0,.14), transparent 60%), #050506}
+.vinner{position:absolute;inset:0;overflow-y:auto;padding:36px 14px 20px;scrollbar-width:none}
+.vinner::-webkit-scrollbar{display:none}
+.vtop{display:flex;gap:5px;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:999px;padding:4px;margin-bottom:14px}
+.vtop button{flex:1;font-family:var(--fm);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:8px 4px;border-radius:999px;transition:all .15s}
+.vtop button.on{background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:#150a00}
+.vhead{font-family:var(--fd);font-size:21px;text-transform:uppercase;letter-spacing:.5px;line-height:1;margin-bottom:4px}
+.vsub{font-size:11.5px;color:var(--muted);line-height:1.5;margin-bottom:13px}
+.vgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.vtile{border:1px solid var(--line);border-radius:15px;background:linear-gradient(180deg,var(--glass),var(--glass2));padding:13px 11px;cursor:pointer;transition:transform .15s,border-color .15s}
+.vtile:hover{transform:translateY(-2px);border-color:var(--accent)}
+.vtile .ic{font-size:21px;display:block;margin-bottom:7px}
+.vtile b{font-family:var(--fd);font-size:14px;letter-spacing:.5px;text-transform:uppercase;display:block;line-height:1}
+.vtile small{font-size:10px;color:var(--dim);display:block;margin-top:4px;line-height:1.35}
+.vback{display:inline-flex;align-items:center;gap:5px;font-family:var(--fm);font-size:9.5px;letter-spacing:1px;text-transform:uppercase;color:var(--accent);margin-bottom:12px;cursor:pointer}
+.vbig{font-size:38px;margin-bottom:8px}
+.vwhat{font-size:13px;color:var(--text);line-height:1.55;margin-bottom:14px}
+.vstep{display:flex;gap:10px;font-size:12px;color:var(--muted);line-height:1.45;margin-bottom:9px}
+.vstep b{flex:0 0 auto;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#150a00;font-family:var(--fd);font-size:13px;display:grid;place-items:center}
+.vwhere{margin-top:8px;font-family:var(--fm);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);border:1px dashed var(--line);border-radius:10px;padding:9px 11px;line-height:1.4}
+.vwhere b{color:var(--accent)}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -214,6 +245,7 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
         <button class="sbi" data-sec="squad"><span>👥</span>Squad</button>
         <button class="sbi" data-sec="money"><span>💰</span>Money</button>
         <button class="sbi" data-sec="ideas"><span>💡</span>Coach's Corner</button>
+        <button class="sbi" data-sec="guide"><span>🎓</span>Guide</button>
         <button class="sbi" data-sec="scout"><span>🔭</span>Scout</button>
       </nav>
       <div class="sb-foot">
@@ -364,6 +396,21 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
         <span class="cl">🧭 <b>How it'll work</b></span>
         <div class="ideabox">Scouts pitch you with proof — years in the game, the areas they cover, players they already rate, and who they're building for. You get a read on whether they're the real thing or just a troll before they ever see a name. Approve, and they get a limited scout-only view. Stays under your coaching side, never public.</div>
         <button class="btn btn-g" disabled style="margin-top:10px">Open the scout gate — not yet</button>
+      </div>
+    </section>
+
+    <section class="osec" id="sec-guide">
+      <h2 class="oh">Guide</h2>
+      <p class="osub">Your cheat sheet. What's new, and a tap-through of every feature — get well with the app in a few minutes.</p>
+      <div class="card">
+        <span class="cl">📰 <b>What's new</b> · newest first</span>
+        <div id="newsList"></div>
+      </div>
+      <div class="card">
+        <span class="cl">📱 <b>Feature phone</b> · tap any tile to learn it in seconds</span>
+        <div class="guidewrap">
+          <div class="vphone"><div class="vnotch"></div><div class="vscreen" id="vscreen"></div></div>
+        </div>
       </div>
     </section>
 
@@ -585,6 +632,59 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
   }
   ['#mPrice','#mSeats','#mPerWk'].forEach(s=>{ const el=$(s); if(el) el.addEventListener('input',calcMoney); });
   $('#mWeeks').addEventListener('click',e=>{ const p=e.target.closest('.pil'); if(!p)return; $('#mWeeks').querySelectorAll('.pil').forEach(x=>x.classList.remove('sel')); p.classList.add('sel'); calcMoney(); });
+  /* ---- Guide: what's new + feature phone ---- */
+  const NEWS=[
+    {d:'19 Jul',tag:'NEW',t:'Session studio + trailer',body:'Sessions now take a description, chapters (the run of play) and a deck link. Players get a rotating “Next Up” trailer and can tap any session for the full agenda.'},
+    {d:'19 Jul',tag:'NEW',t:'Money desk',body:'Set your price and see per-session, week, month and block earnings — plus fill-the-seats scenarios. Plan a week before you run it.'},
+    {d:'19 Jul',t:'Scout preview',body:'A private, coming-soon skeleton for vetting scouts before they see your players. Only you can see it.'},
+    {d:'19 Jul',t:'Badge Vault designed',body:'55 collectible badges + a Lab Bucks money layer (money off sessions) are designed and waiting on your OK before they go in the app.'},
+    {d:'19 Jul',t:'This desk went OS-style',body:'The whole back office became a dashboard: Overview, The Door, Sessions, Codes, Squad, Coach’s Corner — and now Guide.'},
+    {d:'earlier',t:'The essentials',body:'Knock-to-join with your approval, single + batch invite codes, weekly programs, push notifications both ways, and every session shown in each player’s local time.'},
+  ];
+  const FEAT={
+    coach:[
+      {k:'intro',ic:'▶️',name:'Intro tour',what:'Your welcome walkthrough — coming soon.',how:['Your first slide deck / intro will live right here.','It’ll walk any new coach through the app step by step.','Send me the deck and I’ll wire it in.'],where:'Guide (soon)'},
+      {k:'overview',ic:'📊',name:'Overview',what:'The whole Lab at a glance.',how:['Four counters up top — knocking, requests, squad, live codes.','Anything orange needs you.','Jump into any area from the cards.'],where:'Sidebar › Overview'},
+      {k:'door',ic:'🚪',name:'The Door',what:'Everyone trying to get in.',how:['Read their case (the “why”) and their reach.','Tap “Let them in” — their app unlocks itself, nothing to send.','Or approve an invite request to mint a 6h code.'],where:'Sidebar › The Door'},
+      {k:'sessions',ic:'📅',name:'Sessions',what:'Post a session or a whole program.',how:['Add title, date/time and Zoom link.','Optional: description, chapters, a deck link.','Pick one-off or a 6/8/10-week block, then Post — the squad gets buzzed.'],where:'Sidebar › Sessions'},
+      {k:'codes',ic:'🎟',name:'Codes',what:'Keys to the door.',how:['Single = one person, burns in 6h.','Batch = one code for 10–100 people, lasts 7 days.','Fire it over WhatsApp with the ▷ button.'],where:'Sidebar › Codes'},
+      {k:'squad',ic:'👥',name:'Squad',what:'Every player, managed.',how:['Search the squad up top.','Tap reach to WhatsApp / IG / email them.','✎ edit position, age, contact or reset their PIN · ⭐ founding · ✕ remove.'],where:'Sidebar › Squad'},
+      {k:'money',ic:'💰',name:'Money',what:'What a class is worth.',how:['Set price per seat, seats and sessions per week.','See per-session / week / month / block instantly.','Check the fill-the-seats scenarios to plan your week.'],where:'Sidebar › Money'},
+      {k:'ideas',ic:'💡',name:'Coach’s Corner',what:'What to run and what to post.',how:['A session theme, a post idea and a talking point — daily.','Hit “Another” to keep digging.'],where:'Sidebar › Coach’s Corner'},
+      {k:'scout',ic:'🔭',name:'Scout',what:'Vet scouts — coming soon.',how:['Private preview for now — not open to anyone.','It’ll let scouts pitch you with proof before they see a name.'],where:'Sidebar › Scout'},
+    ],
+    player:[
+      {k:'join',ic:'🔑',name:'Getting in',what:'How a new player joins.',how:['They tap your link and either enter a code or “knock”.','A knock lands in your Door with their case.','You approve — their app unlocks itself.'],where:'Landing page'},
+      {k:'checkin',ic:'✅',name:'Daily check-in',what:'They log energy, confidence, minutes.',how:['They tap Check-in on Home once a day.','Slide the dials, add what they worked on.','+40 XP and their streak grows.'],where:'Player app › Home'},
+      {k:'profile',ic:'🤖',name:'Lab Profile',what:'The app reads their game daily.',how:['Auto-built from check-ins, mind and fuel logs.','Spots patterns and pushes their weak side.'],where:'Player app › Home'},
+      {k:'mind',ic:'🧠',name:'Mind',what:'Flush a bad moment, write the counter.',how:['They log what rattled them and the plan to beat it.','You can see it if they choose to share.'],where:'Player app › Mind'},
+      {k:'fuel',ic:'🥗',name:'Fuel',what:'Water + food, logged.',how:['They tick water and meals each day.','Earns XP and feeds the Lab Profile.'],where:'Player app › Fuel'},
+      {k:'squad',ic:'💬',name:'Squad feed',what:'The team wall.',how:['Players post and like.','You drop announcements — everyone gets buzzed.'],where:'Player app › Squad'},
+      {k:'ask',ic:'❓',name:'Ask the Coaches',what:'Six specialist personas on call.',how:['Players ask a question to a persona.','You answer it from your coach view — they get pinged.'],where:'Player app › Coach'},
+      {k:'psessions',ic:'🎬',name:'Sessions + trailer',what:'What you post, they see.',how:['Upcoming sessions play as a “Next Up” trailer.','Countdown, description, chapters and one-tap Join.','They can open the deck if you attached one.'],where:'Player app › Home'},
+      {k:'runs',ic:'🏀',name:'Running now',what:'Pick-up games, live.',how:['A player posts which court they’re at.','It shows the squad for 2 hours, then clears.'],where:'Player app › Home'},
+      {k:'invites',ic:'🎟',name:'Invites',what:'Players bring friends.',how:['They request to bring someone.','It lands in your Door as a vouched request.','Approve to mint them a code.'],where:'Player app › Squad'},
+      {k:'badges',ic:'🏅',name:'Badges',what:'55 collectibles + Lab Bucks.',how:['Designed and waiting on your OK.','Once live, badges pay players money off sessions.'],where:'Coming soon'},
+    ],
+  };
+  let vSide='coach', vView='home', vSel=null;
+  function renderNews(){ const el=$('#newsList'); if(!el)return; el.innerHTML=NEWS.map(n=>'<div class="newsitem"><div class="h"><b>'+esc(n.t)+'</b>'+(n.tag?'<span class="tg">'+esc(n.tag)+'</span>':'')+'<span class="dt">'+esc(n.d)+'</span></div><p>'+esc(n.body)+'</p></div>').join(''); }
+  function paintPhone(){
+    const el=$('#vscreen'); if(!el)return;
+    if(vView==='detail'&&vSel){
+      const f=(FEAT[vSide]||[]).find(x=>x.k===vSel);
+      if(f){ el.innerHTML='<div class="vinner"><span class="vback" data-vback>‹ All features</span><div class="vbig">'+f.ic+'</div><div class="vhead">'+esc(f.name)+'</div><div class="vwhat">'+esc(f.what)+'</div>'+f.how.map((s,i)=>'<div class="vstep"><b>'+(i+1)+'</b><span>'+esc(s)+'</span></div>').join('')+'<div class="vwhere">📍 <b>'+esc(f.where)+'</b></div></div>'; return; }
+    }
+    const tiles=(FEAT[vSide]||[]).map(f=>'<div class="vtile" data-vk="'+f.k+'"><span class="ic">'+f.ic+'</span><b>'+esc(f.name)+'</b><small>'+esc(f.what)+'</small></div>').join('');
+    el.innerHTML='<div class="vinner"><div class="vtop"><button data-vs="coach" class="'+(vSide==='coach'?'on':'')+'">Your desk</button><button data-vs="player" class="'+(vSide==='player'?'on':'')+'">Player app</button></div><div class="vhead">👋 '+(vSide==='coach'?'Your back office':'What players see')+'</div><div class="vsub">Tap any tile to learn it in a few seconds.</div><div class="vgrid">'+tiles+'</div></div>';
+  }
+  const vsc=$('#vscreen');
+  if(vsc) vsc.addEventListener('click',e=>{
+    const t=e.target.closest('[data-vk]'); if(t){ vSel=t.dataset.vk; vView='detail'; paintPhone(); return; }
+    const bk=e.target.closest('[data-vback]'); if(bk){ vView='home'; vSel=null; paintPhone(); return; }
+    const sw=e.target.closest('[data-vs]'); if(sw){ vSide=sw.dataset.vs; vView='home'; vSel=null; paintPhone(); return; }
+  });
+  renderNews(); paintPhone();
   /* ---- Coach's Corner: the idea engine ---- */
   const IDEA_SESS=[
     'The 3-Second Rule, live: everyone shares one moment they sulked mid-game, then you drill the flush-and-go on camera.',
