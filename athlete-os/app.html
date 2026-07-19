@@ -1,0 +1,975 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Athlete OS</title>
+<meta name="description" content="Your private performance hub — training, recovery, mindset and goals, personalised to your sport. Powered by the Lockdown Lab engine.">
+<meta name="theme-color" content="#050506">
+<link rel="stylesheet" href="fonts.css">
+<style>
+:root{
+  --bg:#050506;
+  --glass:rgba(255,255,255,.055); --glass2:rgba(255,255,255,.03);
+  --line:rgba(255,255,255,.11); --line2:rgba(255,255,255,.06);
+  --text:#f6f4f1; --muted:#a09a92; --dim:#6d6861;
+  --accent:#ff6b00; --accent-hi:#ff8a2b; --accent-soft:rgba(255,107,0,.15); --accent-glow:rgba(255,107,0,.38);
+  --good:#30d158; --good-soft:rgba(48,209,88,.14); --bad:#ff453a;
+  --fd:'Bebas Neue',"Arial Narrow",Arial,sans-serif;
+  --fb:'Manrope',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --fm:ui-monospace,"SF Mono","Roboto Mono",Menlo,monospace;
+  --r:20px;
+  color-scheme:dark;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%}
+body{background:#000;color:var(--text);font-family:var(--fb);-webkit-font-smoothing:antialiased;line-height:1.5;display:flex;justify-content:center}
+::selection{background:var(--accent);color:#000}
+button{font-family:inherit;color:inherit;background:none;border:none;cursor:pointer}
+input,textarea,select{font-family:var(--fb);color:var(--text);background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:14px;padding:13px 15px;font-size:15px;outline:none;width:100%;transition:border-color .2s, box-shadow .2s, background .2s}
+input:focus,textarea:focus,select:focus{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-soft);background:rgba(255,255,255,.08)}
+input::placeholder,textarea::placeholder{color:#5d5851}
+textarea{resize:vertical;min-height:66px}
+
+#app{width:100%;max-width:460px;min-height:100dvh;background:var(--bg);position:relative;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 0 140px rgba(0,0,0,.95)}
+@media(min-width:520px){#app{border-left:1px solid var(--line2);border-right:1px solid var(--line2)}}
+/* ambient orbs — apple-glass atmosphere */
+.orb{position:absolute;border-radius:50%;filter:blur(70px);pointer-events:none;z-index:0}
+.orb.a{width:340px;height:340px;background:rgba(255,107,0,.16);top:-120px;right:-90px}
+.orb.b{width:260px;height:260px;background:rgba(255,138,43,.07);bottom:10%;left:-120px}
+
+.display{font-family:var(--fd);text-transform:uppercase;font-weight:400;letter-spacing:.8px;line-height:.96}
+.mono{font-family:var(--fm);font-variant-numeric:tabular-nums}
+.amber{color:var(--accent)}
+
+header{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:10px;padding:14px 16px;
+  background:rgba(5,5,6,.6);backdrop-filter:blur(26px) saturate(150%);border-bottom:1px solid var(--line2)}
+.logo{width:34px;height:34px;color:#fff;flex:0 0 auto}
+header .ttl b{font-family:var(--fd);font-size:19px;letter-spacing:2px;text-transform:uppercase;font-weight:400;display:block;line-height:1}
+header .ttl b i{font-style:normal;color:var(--accent)}
+header .ttl small{font-family:var(--fm);font-size:8.5px;letter-spacing:2.5px;color:var(--dim);text-transform:uppercase}
+.hbtn{margin-left:auto;font-family:var(--fm);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:7px 13px;backdrop-filter:blur(10px);transition:all .2s}
+.hbtn:hover{border-color:var(--accent);color:var(--accent)}
+
+main{flex:1;overflow-y:auto;padding:18px 16px 110px;position:relative;z-index:1}
+.tabpage{display:none;animation:rise .32s cubic-bezier(.2,.8,.2,1)}
+.tabpage.on{display:block}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+nav{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);width:calc(100% - 28px);max-width:432px;z-index:30;
+  display:flex;background:rgba(16,16,17,.72);backdrop-filter:blur(28px) saturate(160%);border:1px solid var(--line);
+  border-radius:26px;padding:7px;box-shadow:0 20px 50px -18px rgba(0,0,0,.9)}
+nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 2px;color:var(--dim);border-radius:19px;transition:all .22s}
+nav button .ic{font-size:18px;line-height:1}
+nav button span{font-family:var(--fm);font-size:8px;letter-spacing:1.2px;text-transform:uppercase}
+nav button.on{color:var(--accent);background:var(--accent-soft)}
+
+.eyebrow{font-family:var(--fm);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.eyebrow::before{content:"";width:16px;height:1.5px;background:var(--accent)}
+h1.page{font-size:34px;margin-bottom:4px}
+.sub{color:var(--muted);font-size:13.5px;margin-bottom:18px}
+.card{border:1px solid var(--line);border-radius:var(--r);background:linear-gradient(180deg,var(--glass),var(--glass2));backdrop-filter:blur(14px);padding:17px;margin-bottom:12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.card.hot{border-color:rgba(255,107,0,.5);background:linear-gradient(180deg,var(--accent-soft),var(--glass2));box-shadow:inset 0 1px 0 rgba(255,255,255,.08), 0 14px 44px -22px var(--accent-glow)}
+.card h3{font-family:var(--fd);text-transform:uppercase;font-size:20px;letter-spacing:.6px;margin-bottom:4px}
+.card .cl{font-family:var(--fm);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);margin-bottom:10px}
+.btn{font-family:var(--fd);text-transform:uppercase;letter-spacing:1.4px;font-size:15px;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:14px 20px;border-radius:999px;transition:transform .16s, background .16s, border-color .16s, opacity .2s;user-select:none}
+.btn:active{transform:scale(.96)}
+.btn-p{background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:#150a00;box-shadow:0 10px 30px -10px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,.35)}
+.btn-g{background:var(--glass);border:1px solid var(--line);color:var(--text);backdrop-filter:blur(10px)}
+.btn-g:hover{border-color:var(--accent)}
+.btn-block{width:100%}
+.btn-sm{padding:10px 15px;font-size:13px}
+.btn[disabled]{opacity:.5;pointer-events:none}
+.chip{font-family:var(--fm);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:4px 10px;display:inline-flex;align-items:center;gap:5px}
+.chip.pro{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.chip.live{border-color:var(--good);color:var(--good);background:var(--good-soft)}
+.chip.warn{border-color:var(--bad);color:var(--bad);background:rgba(255,69,58,.12)}
+.chip .d{width:5px;height:5px;border-radius:50%;background:var(--good);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(48,209,88,.5)}70%{box-shadow:0 0 0 7px rgba(48,209,88,0)}100%{box-shadow:0 0 0 0 rgba(48,209,88,0)}}
+
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{font-family:var(--fd);font-size:14px;letter-spacing:1px;text-transform:uppercase;padding:9px 14px;border-radius:13px;border:1px solid var(--line);background:rgba(255,255,255,.05);cursor:pointer;transition:all .18s;user-select:none}
+.pill.sel{background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:#150a00;border-color:transparent;box-shadow:0 6px 18px -8px var(--accent-glow)}
+
+.slider{margin:10px 0 14px}
+.slider label{display:flex;justify-content:space-between;font-family:var(--fm);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.slider label b{color:var(--accent);font-size:12px}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:6px;border-radius:99px;background:rgba(255,255,255,.12);padding:0;border:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:linear-gradient(180deg,#fff,#e8e2da);box-shadow:0 3px 10px rgba(0,0,0,.5);cursor:pointer;border:none}
+
+.hero-row{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.av{width:60px;height:60px;border-radius:50%;position:relative;flex:0 0 auto}
+.av .ring{position:absolute;inset:-3px;border-radius:50%;background:conic-gradient(var(--accent) var(--pct,0%), rgba(255,255,255,.1) 0)}
+.av .core{position:absolute;inset:1px;border-radius:50%;background:linear-gradient(140deg,#ff9a3d,#8a3a00);display:grid;place-items:center;font-family:var(--fd);font-size:22px;color:#150a00;border:3px solid var(--bg)}
+.hero-row .hi small{font-family:var(--fm);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:3px}
+.hero-row .hi b{font-family:var(--fd);font-size:26px;letter-spacing:.5px;text-transform:uppercase;font-weight:400;line-height:1}
+.profstrip{display:flex;flex-wrap:wrap;gap:6px;margin:-6px 0 14px}
+.statrow{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin-bottom:14px}
+.stat{border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--glass),var(--glass2));padding:12px 8px;text-align:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.stat b{font-family:var(--fd);font-size:23px;display:block;line-height:1}
+.stat.hot b{color:var(--accent)}
+.stat span{font-family:var(--fm);font-size:8px;letter-spacing:1.4px;text-transform:uppercase;color:var(--dim);display:block;margin-top:5px}
+.xpbar{height:7px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden;margin-top:6px}
+.xpbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent-hi));box-shadow:0 0 14px var(--accent-glow);transition:width .7s cubic-bezier(.2,.7,.2,1)}
+.xplab{display:flex;justify-content:space-between;font-family:var(--fm);font-size:9px;letter-spacing:1.5px;color:var(--dim);text-transform:uppercase;margin-top:6px}
+
+.ai{border:1px solid rgba(255,107,0,.42);border-radius:var(--r);background:linear-gradient(180deg,var(--accent-soft),var(--glass2));backdrop-filter:blur(14px);padding:17px;margin-bottom:12px;position:relative;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.08)}
+.ai .scan{position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--accent),transparent);animation:scan 3s linear infinite}
+@keyframes scan{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+.ai h3{font-family:var(--fd);text-transform:uppercase;font-size:19px;letter-spacing:.6px}
+.ai .st{font-family:var(--fm);font-size:8.5px;letter-spacing:1.5px;color:var(--good);text-transform:uppercase;display:flex;align-items:center;gap:6px;margin:4px 0 10px}
+.ai .st .d{width:5px;height:5px;border-radius:50%;background:var(--good);animation:pulse 2s infinite}
+.ai ul{list-style:none;display:flex;flex-direction:column;gap:9px}
+.ai li{display:flex;gap:9px;font-size:13.5px}
+.ai li .k{color:var(--accent);font-family:var(--fd);font-size:15px;line-height:1.4;flex:0 0 auto}
+.ai li.intel{color:var(--accent-hi)}
+.ai .disc{font-family:var(--fm);font-size:8.5px;letter-spacing:1px;color:var(--dim);margin-top:12px;text-transform:uppercase}
+
+.sess{display:flex;gap:12px;align-items:center;border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--glass),var(--glass2));padding:13px 14px;margin-bottom:10px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+.sess .dt{text-align:center;border-right:1px solid var(--line2);padding-right:12px;min-width:52px}
+.sess .dt b{font-family:var(--fd);font-size:22px;display:block;line-height:1;color:var(--accent)}
+.sess .dt span{font-family:var(--fm);font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim)}
+.sess .inf{flex:1;min-width:0}
+.sess .inf b{font-family:var(--fd);text-transform:uppercase;font-size:16px;letter-spacing:.5px;display:block}
+.sess .inf span{font-family:var(--fm);font-size:9.5px;letter-spacing:1px;color:var(--muted)}
+.lock{position:relative;overflow:hidden}
+.lock .overlay{position:absolute;inset:0;border-radius:var(--r);display:grid;place-items:center;background:rgba(5,5,6,.55);backdrop-filter:blur(3px)}
+
+/* hydration + habits */
+.water{display:flex;align-items:center;gap:10px;margin:8px 0 4px}
+.water .wbtn{width:44px;height:44px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.05);font-size:20px;transition:all .16s}
+.water .wbtn:active{transform:scale(.92)}
+.water .wcount{flex:1;text-align:center}
+.water .wcount b{font-family:var(--fd);font-size:34px;line-height:1;color:var(--accent)}
+.water .wcount span{font-family:var(--fm);font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);display:block}
+.wtrack{display:flex;gap:4px;margin:10px 0 2px}
+.wtrack i{flex:1;height:8px;border-radius:99px;background:rgba(255,255,255,.09)}
+.wtrack i.f{background:linear-gradient(90deg,var(--accent),var(--accent-hi));box-shadow:0 0 10px var(--accent-glow)}
+
+/* library */
+.catbar{display:flex;gap:7px;overflow-x:auto;padding-bottom:6px;margin-bottom:12px;scrollbar-width:none}
+.catbar::-webkit-scrollbar{display:none}
+.catbar .pill{flex:0 0 auto;font-size:12.5px;padding:7px 12px}
+.res{border:1px solid var(--line);border-radius:16px;background:linear-gradient(180deg,var(--glass),var(--glass2));margin-bottom:10px;box-shadow:inset 0 1px 0 rgba(255,255,255,.06);overflow:hidden}
+.res summary{list-style:none;cursor:pointer;padding:14px 15px;display:flex;align-items:center;gap:10px}
+.res summary::-webkit-details-marker{display:none}
+.res summary .rc{font-family:var(--fm);font-size:8px;letter-spacing:1.2px;text-transform:uppercase;color:var(--accent);border:1px solid rgba(255,107,0,.4);border-radius:99px;padding:3px 8px;flex:0 0 auto}
+.res summary b{font-family:var(--fd);text-transform:uppercase;font-size:15.5px;letter-spacing:.5px;font-weight:400;line-height:1.2}
+.res summary .ar{margin-left:auto;color:var(--dim);font-size:12px;transition:transform .2s}
+.res[open] summary .ar{transform:rotate(90deg)}
+.res .rb{padding:0 15px 14px;color:var(--muted);font-size:13.5px}
+.res .rb p{margin-bottom:8px}
+
+.mv{flex:0 0 auto;text-align:center;border:1px solid var(--line2);border-radius:10px;padding:7px 9px;background:rgba(0,0,0,.25)}
+.mv b{font-family:var(--fd);font-size:15px;display:block;color:var(--accent)}
+.mv span{font-family:var(--fm);font-size:7.5px;letter-spacing:1px;color:var(--dim)}
+.minrow{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin:10px 0}
+
+.jnote{font-size:12.5px;color:var(--muted);padding:9px 11px;border:1px solid var(--line2);border-radius:12px;background:rgba(0,0,0,.28);margin-bottom:6px}
+.jnote b{color:var(--text)}
+.togglechip{font-family:var(--fm);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:7px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .18s}
+.togglechip.on{border-color:var(--good);color:var(--good);background:var(--good-soft)}
+
+/* ---------- onboarding ---------- */
+#onboard{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;
+  background:radial-gradient(120% 70% at 50% 0%, rgba(255,107,0,.16), #030304 60%)}
+.ob-card{width:100%;max-width:400px;border:1px solid var(--line);border-radius:28px;padding:30px 24px;margin:auto;
+  background:rgba(14,14,15,.72);backdrop-filter:blur(30px) saturate(160%);box-shadow:inset 0 1px 0 rgba(255,255,255,.09), 0 40px 90px -30px rgba(0,0,0,.9)}
+.ob-logo{width:74px;height:79px;color:#fff;display:block;margin:0 auto 10px}
+.ob-card h1{font-size:36px;text-align:center}
+.ob-card h1 i{font-style:normal;color:var(--accent)}
+.ob-sub{text-align:center;color:var(--muted);font-size:13px;margin:6px 0 20px}
+.ob-tabs{display:flex;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:999px;padding:4px;margin-bottom:18px}
+.ob-tabs button{flex:1;font-family:var(--fd);font-size:13px;letter-spacing:1.5px;text-transform:uppercase;padding:9px 4px;border-radius:999px;color:var(--muted);transition:all .2s}
+.ob-tabs button.on{background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:#150a00}
+.ob-form{display:none;flex-direction:column;gap:11px}
+.ob-form.on{display:flex}
+.ob-lbl{font-family:var(--fm);font-size:9px;letter-spacing:1.8px;text-transform:uppercase;color:var(--muted);margin:2px 0 -4px}
+.ob-err{display:none;color:#ff9a9a;font-size:12.5px;background:rgba(255,69,58,.12);border:1px solid rgba(255,69,58,.5);border-radius:12px;padding:10px 12px}
+.ob-note{font-family:var(--fm);font-size:9px;letter-spacing:1px;color:var(--dim);text-align:center;text-transform:uppercase;margin-top:4px}
+.ob-note a{color:var(--muted)}
+.obstep{display:none;flex-direction:column;gap:11px}
+.obstep.on{display:flex;animation:rise .3s cubic-bezier(.2,.8,.2,1)}
+.obdots{display:flex;gap:6px;justify-content:center;margin-bottom:14px}
+.obdots i{width:22px;height:3px;border-radius:99px;background:rgba(255,255,255,.12);transition:background .3s}
+.obdots i.on{background:var(--accent)}
+.obnav{display:flex;gap:8px;margin-top:4px}
+.obnav .btn{flex:1}
+.obback{flex:0 0 auto !important;padding-left:16px;padding-right:16px}
+.sgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.sbtn{border:1px solid var(--line);border-radius:14px;background:rgba(255,255,255,.05);padding:12px 4px;text-align:center;transition:all .16s;cursor:pointer}
+.sbtn .si{font-size:20px;display:block;margin-bottom:4px}
+.sbtn span{font-family:var(--fm);font-size:8px;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.sbtn.sel{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 6px 18px -8px var(--accent-glow)}
+.sbtn.sel span{color:var(--accent)}
+
+#toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(20px);background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:#150a00;
+  font-family:var(--fd);text-transform:uppercase;letter-spacing:1px;font-size:14px;padding:12px 22px;border-radius:999px;
+  opacity:0;pointer-events:none;transition:all .28s;z-index:70;white-space:nowrap;box-shadow:0 14px 38px -10px var(--accent-glow)}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.dark{background:rgba(28,28,30,.95);color:var(--text);border:1px solid var(--line)}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(0,0,0,.3);border-top-color:#150a00;border-radius:50%;animation:sp .7s linear infinite;vertical-align:-2px}
+@keyframes sp{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="ll" viewBox="0 0 120 128" fill="none"><g stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M47 30 v-5 a13 13 0 0 1 26 0 v5"/><path d="M38 30 H47"/><path d="M73 30 H82"/><path d="M47 30 v10 L27 88 a9 9 0 0 0 8.5 13.5 h49 a9 9 0 0 0 8.5 -13.5 L73 40 v-10"/></g><g stroke="currentColor" stroke-width="6" stroke-linecap="butt" stroke-linejoin="miter"><path d="M67 34 L58 68 H79"/><path d="M56 44 L46 84 H81"/></g></symbol></svg>
+
+<!-- ============ ONBOARDING ============ -->
+<div id="onboard">
+  <div class="ob-card">
+    <svg class="ob-logo"><use href="#ll"/></svg>
+    <h1 class="display">Athlete <i>OS</i></h1>
+    <p class="ob-sub">Your private performance hub. Any sport. Your data, your coach, nobody else.</p>
+    <div class="ob-tabs">
+      <button class="on" data-ob="join">Join</button>
+      <button data-ob="login">Log In</button>
+    </div>
+
+    <div class="ob-form on" data-obf="join">
+      <div class="obdots" id="obDots"><i class="on"></i><i></i><i></i><i></i></div>
+
+      <div class="obstep on" data-os="1">
+        <span class="ob-lbl">Your name</span>
+        <input id="jName" placeholder="e.g. Jordan R." maxlength="40" autocomplete="off">
+        <span class="ob-lbl">Age</span>
+        <input id="jAge" type="number" inputmode="numeric" min="5" max="99" placeholder="Your age">
+        <span class="ob-lbl">Create a 4-digit PIN (don't forget it)</span>
+        <input id="jPin" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off">
+        <span class="ob-lbl">Contact — email or mobile (optional, coach only)</span>
+        <input id="jContact" placeholder="So coach can reach you" maxlength="80" autocomplete="off">
+      </div>
+
+      <div class="obstep" data-os="2">
+        <span class="ob-lbl">Pick your sport — this personalises everything</span>
+        <div class="sgrid" id="jSport"></div>
+      </div>
+
+      <div class="obstep" data-os="3">
+        <span class="ob-lbl">Competition level</span>
+        <div class="pills" data-single id="jLevel"><span class="pill">Social</span><span class="pill">School</span><span class="pill">Club</span><span class="pill">Rep / Academy</span><span class="pill">Semi-Pro</span><span class="pill">Pro</span></div>
+        <span class="ob-lbl" id="jPosLbl">Position</span>
+        <div class="pills" data-single id="jPos"></div>
+        <span class="ob-lbl">Training days per week</span>
+        <div class="pills" data-single id="jFreq"><span class="pill">1</span><span class="pill">2</span><span class="pill">3</span><span class="pill">4</span><span class="pill">5</span><span class="pill">6</span><span class="pill">7</span></div>
+        <span class="ob-lbl">Competition schedule</span>
+        <div class="pills" data-single id="jComp"><span class="pill">In-season · weekly</span><span class="pill">Pre-season</span><span class="pill">Off-season</span><span class="pill">Big event coming</span><span class="pill">None yet</span></div>
+      </div>
+
+      <div class="obstep" data-os="4">
+        <span class="ob-lbl">Goals — pick up to 3</span>
+        <div class="pills" id="jGoals"><span class="pill">Make the team</span><span class="pill">Higher level</span><span class="pill">Speed</span><span class="pill">Strength</span><span class="pill">Endurance</span><span class="pill">Skills</span><span class="pill">Confidence</span><span class="pill">Consistency</span></div>
+        <span class="ob-lbl">What does winning look like for you? (optional)</span>
+        <textarea id="jGoalNote" placeholder="One honest line about where you want to be…" maxlength="500"></textarea>
+        <span class="ob-lbl">Current injuries or niggles (optional)</span>
+        <input id="jInjuries" placeholder="e.g. left ankle, tight hamstring — or leave blank" maxlength="300">
+        <span class="ob-lbl">Equipment you can use (optional)</span>
+        <div class="pills" id="jEquip"><span class="pill">Gym</span><span class="pill">Home weights</span><span class="pill">Bands</span><span class="pill">Court / Field</span><span class="pill">Pool</span><span class="pill">Bike</span></div>
+      </div>
+
+      <div class="ob-err" id="jErr"></div>
+      <div class="obnav">
+        <button class="btn btn-g obback" id="jBack" style="display:none">←</button>
+        <button class="btn btn-p" id="jNext">Continue →</button>
+      </div>
+      <div class="ob-note">Private by design — athletes never see each other</div>
+    </div>
+
+    <div class="ob-form" data-obf="login">
+      <span class="ob-lbl">Your name</span>
+      <input id="lName" placeholder="Same name you joined with" maxlength="40" autocomplete="off">
+      <span class="ob-lbl">Your PIN</span>
+      <input id="lPin" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off">
+      <div class="ob-err" id="lErr"></div>
+      <button class="btn btn-p btn-block" id="lGo">Back Into The OS →</button>
+      <div class="ob-note">Coach? <a href="coach.html">Open the coach dashboard →</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="app" style="display:none">
+  <span class="orb a"></span><span class="orb b"></span>
+  <header>
+    <svg class="logo"><use href="#ll"/></svg>
+    <div class="ttl"><b>Athlete <i>OS</i></b><small>Powered by Lockdown Lab</small></div>
+    <button class="hbtn" id="logout">Log out</button>
+  </header>
+
+  <main>
+    <!-- HOME -->
+    <section class="tabpage" data-page="home">
+      <div class="hero-row">
+        <div class="av"><span class="ring" id="xpRing"></span><span class="core" id="avInit">–</span></div>
+        <div class="hi"><small id="greet">Locked in?</small><b id="heroName">–</b></div>
+        <span class="chip live" style="margin-left:auto"><span class="d"></span><span id="streakChip">0</span>d streak</span>
+      </div>
+      <div class="profstrip" id="profStrip"></div>
+      <div class="statrow">
+        <div class="stat hot"><b id="stXp">0</b><span>XP</span></div>
+        <div class="stat"><b id="stLogs">0</b><span>Check-ins</span></div>
+        <div class="stat"><b id="stWeek">0</b><span>This week</span></div>
+      </div>
+      <div class="xpbar"><i id="xpFill" style="width:0%"></i></div>
+      <div class="xplab"><span id="lvlLab">Level 1 · Prospect</span><span id="xpLab">0 XP</span></div>
+
+      <div class="card" style="margin-top:16px">
+        <span class="cl" id="tfKicker">Today's Focus</span>
+        <h3 id="tfTitle">–</h3>
+        <p style="color:var(--muted);font-size:13.5px" id="tfBody">–</p>
+        <div style="display:flex;gap:8px;margin-top:10px" id="tfChips"></div>
+      </div>
+
+      <div class="card hot">
+        <span class="cl">Daily Accountability · Sydney time</span>
+        <h3 id="ciTitle">Today's Check-In</h3>
+        <div id="ciBody">
+          <div class="slider"><label>Energy <b id="vEnergy">7</b></label><input type="range" id="rEnergy" min="1" max="10" value="7"></div>
+          <div class="slider"><label>Sleep last night (hrs) <b id="vSleep">8</b></label><input type="range" id="rSleep" min="3" max="12" step="0.5" value="8"></div>
+          <div class="slider"><label>Muscle soreness <b id="vSore">3</b></label><input type="range" id="rSore" min="1" max="10" value="3"></div>
+          <div class="slider"><label>Minutes trained <b id="vMin">30</b></label><input type="range" id="rMin" min="0" max="240" step="15" value="30"></div>
+          <div style="margin:4px 0 12px">
+            <div class="cl" style="margin-bottom:8px">What did you work on?</div>
+            <div class="pills" id="focusPills"></div>
+          </div>
+          <textarea id="ciNote" placeholder="One honest line about today. Your OS is reading…"></textarea>
+          <button class="btn btn-p btn-block" id="ciSubmit" style="margin-top:12px">Lock It In · +40 XP</button>
+        </div>
+        <div id="ciDone" style="display:none">
+          <p style="color:var(--muted);font-size:13.5px">✅ Logged for today. Profile updated. Come back tomorrow — keep the streak alive.</p>
+        </div>
+      </div>
+
+      <div class="ai">
+        <div class="scan"></div>
+        <h3>🧠 AI Performance Coach</h3>
+        <div class="st"><span class="d"></span>AI · reading your inputs daily</div>
+        <ul id="aiList"></ul>
+        <div class="disc">Guidance only — never a substitute for a doctor or physio</div>
+      </div>
+
+      <div class="card">
+        <span class="cl">Your Mission</span>
+        <h3>🎯 Goals</h3>
+        <div class="pills" id="goalView" style="margin:6px 0 10px"></div>
+        <p style="color:var(--muted);font-size:13px" id="goalNote"></p>
+        <div id="goalEdit" style="display:none;margin-top:10px">
+          <div class="pills" id="goalPills" style="margin-bottom:10px"></div>
+          <textarea id="goalNoteEdit" placeholder="What does winning look like?" maxlength="500"></textarea>
+          <button class="btn btn-p btn-sm btn-block" id="goalSave" style="margin-top:8px">Save Goals</button>
+        </div>
+        <button class="btn btn-g btn-sm btn-block" id="goalEditBtn" style="margin-top:6px">Update Goals</button>
+      </div>
+    </section>
+
+    <!-- TRAIN -->
+    <section class="tabpage" data-page="train">
+      <span class="eyebrow" id="trainEye">Training</span>
+      <h1 class="page display">Train</h1>
+      <p class="sub" id="trainSub">Your weekly plan, built around your schedule.</p>
+      <div id="planList"></div>
+      <div class="card">
+        <span class="cl">Session Bank</span>
+        <h3 id="drillHead">Drills</h3>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:10px">Rotate through these — log what you work on in your daily check-in.</p>
+        <div id="drillList"></div>
+      </div>
+      <div class="card lock">
+        <span class="cl">Level Up</span>
+        <h3>🎥 Video Analysis</h3>
+        <p style="color:var(--muted);font-size:13px">Upload clips, get frame-by-frame AI feedback on your technique.</p>
+        <div class="overlay"><span class="chip pro">🔒 PRO · Coming Soon</span></div>
+      </div>
+      <div class="card lock">
+        <span class="cl">Connect</span>
+        <h3>⌚ Wearables</h3>
+        <p style="color:var(--muted);font-size:13px">Sync your watch — load, HR and sleep flow straight into your OS.</p>
+        <div class="overlay"><span class="chip pro">🔒 PRO · Coming Soon</span></div>
+      </div>
+    </section>
+
+    <!-- BODY -->
+    <section class="tabpage" data-page="body">
+      <span class="eyebrow">Recovery · Fuel · Sleep</span>
+      <h1 class="page display">Body</h1>
+      <p class="sub">The engine room. Recovery is where the gains land.</p>
+
+      <div class="card" id="recCard">
+        <span class="cl">Readiness</span>
+        <h3 id="recTitle">– </h3>
+        <p style="color:var(--muted);font-size:13.5px" id="recBody">Log a check-in and your OS reads your readiness daily.</p>
+      </div>
+
+      <div class="card hot">
+        <span class="cl">Hydration · today</span>
+        <h3>💧 Water</h3>
+        <div class="water">
+          <button class="wbtn" id="wMinus">−</button>
+          <div class="wcount"><b id="wCount">0</b><span>of 8 glasses · +15 XP at 8</span></div>
+          <button class="wbtn" id="wPlus">+</button>
+        </div>
+        <div class="wtrack" id="wTrack"></div>
+      </div>
+
+      <div class="card">
+        <span class="cl">Fuel · today · +20 XP first log</span>
+        <h3>🍽 Nutrition</h3>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:10px">Tick what you got in today. Honest beats perfect.</p>
+        <div class="pills" id="fuelPills"><span class="pill">Protein</span><span class="pill">Veg</span><span class="pill">Fruit</span><span class="pill">Good carbs</span><span class="pill">Water first</span><span class="pill">No junk</span></div>
+        <button class="btn btn-g btn-sm btn-block" id="fuelSave" style="margin-top:12px">Save Fuel Log</button>
+      </div>
+
+      <div class="card">
+        <span class="cl">Recovery</span>
+        <h3>😴 Sleep</h3>
+        <p style="color:var(--muted);font-size:13.5px" id="sleepBody">Log check-ins to track your sleep average.</p>
+      </div>
+
+      <div class="card">
+        <span class="cl">Move Better</span>
+        <h3>🧘 Mobility</h3>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:10px" id="mobSub">Ten minutes, most days. Your future self says thanks.</p>
+        <ul id="mobList" style="list-style:none;display:flex;flex-direction:column;gap:8px;font-size:13.5px;color:var(--muted)"></ul>
+      </div>
+    </section>
+
+    <!-- MIND -->
+    <section class="tabpage" data-page="mind">
+      <span class="eyebrow">Mental Performance</span>
+      <h1 class="page display">Mind</h1>
+      <p class="sub">Pressure is a privilege — if you train for it.</p>
+
+      <div class="card hot">
+        <span class="cl">Mental File · +30 XP</span>
+        <h3>🧠 Flush A Moment</h3>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:10px">Something rattle you at training or comp? Write it down, build the counter.</p>
+        <span class="ob-lbl" style="margin-bottom:4px">What triggered it?</span>
+        <input id="mTrigger" placeholder="e.g. coach's call, missed shot, bad ref" maxlength="40">
+        <div style="margin:10px 0 4px" class="ob-lbl">How it felt</div>
+        <div class="pills" id="mFeels"><span class="pill">Nervous</span><span class="pill">Frustrated</span><span class="pill">Angry</span><span class="pill">Flat</span><span class="pill">Doubt</span><span class="pill">Pumped</span></div>
+        <div class="slider" style="margin-top:12px"><label>How much it affected you <b id="vImpact">5</b></label><input type="range" id="rImpact" min="1" max="10" value="5"></div>
+        <textarea id="mSaid" placeholder="What happened — say it straight." maxlength="500"></textarea>
+        <textarea id="mPlan" placeholder="Next time I'll… (your counter-move)" maxlength="500" style="margin-top:8px"></textarea>
+        <div style="display:flex;gap:8px;align-items:center;margin-top:10px">
+          <span class="togglechip" id="mShare">🔒 Private</span>
+          <button class="btn btn-p btn-sm" id="mSubmit" style="flex:1">File It · +30 XP</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <span class="cl">Training Diary · +15 XP first line of the day</span>
+        <h3>📓 Diary</h3>
+        <div class="composer" style="display:flex;gap:8px">
+          <input id="dInput" placeholder="One line on today…" maxlength="240">
+          <button class="btn btn-p btn-sm" id="dBtn">Log</button>
+        </div>
+        <div id="dList" style="margin-top:10px"></div>
+      </div>
+
+      <div class="card">
+        <span class="cl">Your Mental File</span>
+        <h3>🗂 Past Moments</h3>
+        <div id="mList"><p style="color:var(--dim);font-size:13px">Nothing filed yet. That's either great news or you're holding it in.</p></div>
+      </div>
+    </section>
+
+    <!-- LIBRARY -->
+    <section class="tabpage" data-page="lib">
+      <span class="eyebrow" id="libEye">Resources</span>
+      <h1 class="page display">Library</h1>
+      <p class="sub" id="libSub">Curated for your sport. No fluff.</p>
+      <div class="catbar" id="catBar"></div>
+      <div id="resList"></div>
+    </section>
+  </main>
+
+  <nav id="navMain" style="display:none">
+    <button class="on" data-nav="home"><span class="ic">🏠</span><span>Home</span></button>
+    <button data-nav="train"><span class="ic">🏋️</span><span>Train</span></button>
+    <button data-nav="body"><span class="ic">🧬</span><span>Body</span></button>
+    <button data-nav="mind"><span class="ic">🧠</span><span>Mind</span></button>
+    <button data-nav="lib"><span class="ic">📚</span><span>Library</span></button>
+  </nav>
+</div>
+
+<div id="toast"></div>
+
+<script>
+(function(){
+  const API='https://ymuwuhvqqftgpxwhzoub.supabase.co/functions/v1/aos-api';
+  const SESS_KEY='aos_sess_v1';
+  const $=s=>document.querySelector(s);
+  const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  let sess=null; try{sess=JSON.parse(localStorage.getItem(SESS_KEY))}catch(e){}
+  let AST=null, pollT=null;
+
+  /* ---------- sport engine: one app, content swaps per sport ---------- */
+  const COMMON_RES=[
+    {c:'Recovery',t:'The 48-hour rule',b:'<p>Hard sessions create the stimulus; the 48 hours after create the adaptation. Sleep 8–10 hours, eat protein within an hour of finishing, and keep the day after a big session light — walk, swim, stretch.</p><p>Soreness above 6/10 for more than two days means the load was too big a jump. Build up, don\'t pile up.</p>'},
+    {c:'Nutrition',t:'Plate rules for athletes',b:'<p>Half the plate colourful veg, a quarter protein (palm-sized), a quarter smart carbs (rice, pasta, potatoes) — more carbs on heavy days, fewer on rest days.</p><p>Eat something with protein + carbs within 60 minutes of training. Hydrate before you feel thirsty.</p>'},
+    {c:'Sleep',t:'Sleep is a performance drug',b:'<p>Athletes sleeping 8+ hours react faster, get injured less and learn skills quicker. Same bedtime nightly, screens away 30 minutes before, room cool and dark.</p><p>Can\'t get 9 at night? A 20-minute nap before 3pm is legal doping.</p>'},
+    {c:'Hydration',t:'The bottle habit',b:'<p>Start the day with a full glass. Sip across the day — aim for 8 glasses, more in heat or heavy sessions. Pale yellow urine = on track.</p><p>Losing 2% of body weight in fluid costs you up to 10% of performance. Cramps guard nobody.</p>'},
+    {c:'Mindset',t:'Reset routines that work',b:'<p>Elite performers don\'t avoid mistakes — they recover from them in seconds. Build a physical reset: breathe out hard, say your cue word, next play.</p><p>Confidence is evidence. Log your work daily in your OS and read it back when doubt shows up.</p>'},
+  ];
+  const SPORTS={
+    basketball:{label:'Basketball',emoji:'🏀',arena:'the court',positions:['PG','SG','SF','PF','C'],
+      focus:['Shooting','Handles','Defense','Reads','Off-Ball','Conditioning'],
+      drills:[
+        {t:'Form shooting ladder',m:20,c:'Shooting',d:'50 makes moving out from under the rim. Perfect arc beats long range — never move back until you hit 8/10.'},
+        {t:'Two-ball handle circuit',m:15,c:'Handles',d:'Pound + crossover + between legs, two balls, 45s on / 15s off × 6. Eyes up the whole time.'},
+        {t:'Closeout & slide',m:15,c:'Defense',d:'Sprint-closeout to a cone, chop feet, slide to the corner. 6 reps each side. Low hips, high hands.'},
+        {t:'Film: read the help',m:20,c:'Reads',d:'Watch one quarter of any game. Every ball screen, pause: where\'s the help coming from? Say it out loud before the pass.'},
+      ]},
+    soccer:{label:'Soccer',emoji:'⚽',arena:'the pitch',positions:['GK','DEF','MID','WING','ST'],
+      focus:['First Touch','Passing','Shooting','Defending','Agility','Conditioning'],
+      drills:[
+        {t:'Wall touch pyramid',m:20,c:'First Touch',d:'Both feet against a wall: 20 one-touch, 20 two-touch, 20 thigh-control-pass. Repeat ×3. Touch away from pressure.'},
+        {t:'Passing gates',m:15,c:'Passing',d:'Set two cones a metre apart, ping passes through from 10, 15, 20m. 10 clean through each distance, both feet.'},
+        {t:'Finishing angles',m:20,c:'Shooting',d:'Five balls from the edge of the box: far post, near post, placed, driven, first-time. Repeat until 4/5 on target per set.'},
+        {t:'1v1 shadow defending',m:10,c:'Defending',d:'Mirror a partner (or cone weave) staying goal-side, low, patient. Jockey — don\'t dive in. 6 × 30s.'},
+      ]},
+    mma:{label:'MMA',emoji:'🥊',arena:'the mats',positions:['Striker','Grappler','All-Round'],
+      focus:['Striking','Grappling','Wrestling','Cardio','Strength','Film'],
+      drills:[
+        {t:'Shadow rounds with intent',m:15,c:'Striking',d:'3 × 5min shadow boxing. Round 1 footwork only, round 2 combos off the jab, round 3 visualise an opponent countering.'},
+        {t:'Solo grappling flow',m:15,c:'Grappling',d:'Shrimp, bridge, technical stand-up, sprawl — 10 each, flow between them without stopping for 3 rounds.'},
+        {t:'Sprawl & shot ladder',m:10,c:'Wrestling',d:'Level change + penetration step ×10, sprawls ×10, alternate for 4 rounds. Speed comes after clean form.'},
+        {t:'Assault intervals',m:12,c:'Cardio',d:'30s all-out (bike, sprints or burpees) / 90s easy × 6. Fights are won in the last minute of the round.'},
+      ]},
+    oztag:{label:'Oztag',emoji:'🏉',arena:'the field',positions:['Middle','Link','Wing'],
+      focus:['Speed','Acceleration','Agility','Passing','Evasion','Fitness'],
+      drills:[
+        {t:'Flying 20s',m:15,c:'Speed',d:'Build over 20m, fly through the next 20m at max. 6 reps, full recovery. Tall hips, relaxed face.'},
+        {t:'5-10-5 shuttle',m:12,c:'Agility',d:'Three cones, sprint 5m, turn, 10m, turn, 5m. 8 reps. Cut off the outside foot, stay low through the turn.'},
+        {t:'Rapid-fire passing',m:15,c:'Passing',d:'With a partner or wall: 50 passes each side off two steps, then 20 under fatigue straight after a shuttle.'},
+        {t:'Evade the channel',m:10,c:'Evasion',d:'Set a 5m channel, beat a defender (or cones) with a step off each foot. 10 reps each side — sell the fake with your eyes.'},
+      ]},
+    netball:{label:'Netball',emoji:'🏐',arena:'the court',positions:['GS','GA','WA','C','WD','GD','GK'],
+      focus:['Shooting','Passing','Footwork','Defense','Agility','Conditioning'],
+      drills:[
+        {t:'Split-landing shots',m:20,c:'Shooting',d:'Catch, split-land, shoot — 50 makes from inside the circle, moving spots every 5. Same routine every shot.'},
+        {t:'Wall pass precision',m:15,c:'Passing',d:'Chest, bounce, shoulder off a wall target — 20 each, then 20 alternating under a 30s clock.'},
+        {t:'Landing & pivot ladder',m:12,c:'Footwork',d:'Jump-stop, outside pivot, drive. 10 each direction. Clean landings save ankles and turnovers.'},
+        {t:'3-second shadow',m:10,c:'Defense',d:'Mirror a partner\'s lead for 3 seconds, recover, repeat × 10. Arms over, feet live, no contact.'},
+      ]},
+    rugby:{label:'Rugby',emoji:'🏉',arena:'the field',positions:['Forward','Half','Centre','Back'],
+      focus:['Tackling','Passing','Kicking','Speed','Strength','Conditioning'],
+      drills:[
+        {t:'Tackle tech on a bag',m:15,c:'Tackling',d:'Shoulder height, cheek to cheek, leg drive through contact. 10 each shoulder × 3 sets. Technique before collision.'},
+        {t:'Spiral & pop ladder',m:15,c:'Passing',d:'20 spirals each side at 10m, then 20 pop passes on the run. Hands up, catch early, pass in one motion.'},
+        {t:'Grubber & bomb reps',m:15,c:'Kicking',d:'10 grubbers to a target zone, 10 up-and-unders caught by you. Drop the ball on the sweet spot, follow through low or high.'},
+        {t:'Repeat-effort shuttles',m:12,c:'Conditioning',d:'Down-up + 20m sprint + jog back × 10. Rugby fitness is getting up and going again.'},
+      ]},
+    afl:{label:'AFL',emoji:'🏈',arena:'the field',positions:['Defender','Midfielder','Ruck','Forward'],
+      focus:['Kicking','Marking','Handball','Running','Tackling','Conditioning'],
+      drills:[
+        {t:'Drop punt precision',m:20,c:'Kicking',d:'20 kicks each foot at a target 30m out. Ball drop straight, guide hand off late. 15/20 inside the zone before you move back.'},
+        {t:'Overhead mark reps',m:15,c:'Marking',d:'Throw high off a wall or partner — attack at the highest point, eyes on it, strong hands. 20 contested-style takes.'},
+        {t:'Handball walls',m:10,c:'Handball',d:'25 each hand off a wall, then 20 alternating on the move. Flat, punchy, hit the target\'s chest.'},
+        {t:'Gut-running 300s',m:15,c:'Running',d:'300m at 80% + 60s rest × 5. Midfield engines are built between the arcs.'},
+      ]},
+    tennis:{label:'Tennis',emoji:'🎾',arena:'the court',positions:['Baseliner','All-Court','Serve & Volley'],
+      focus:['Serve','Forehand','Backhand','Footwork','Volleys','Conditioning'],
+      drills:[
+        {t:'Serve buckets by zone',m:20,c:'Serve',d:'A basket to each zone: wide, body, T. 10 per zone per side. Track your % — targets beat power.'},
+        {t:'Cross-court heavy 50',m:20,c:'Forehand',d:'50 cross-court forehands (wall or partner) with height and spin, recover to centre between every ball.'},
+        {t:'Split-step ladder',m:10,c:'Footwork',d:'Split on every "hit" cue, first step explosive. Shadow 6 × 30s patterns: corner, short ball, recover.'},
+        {t:'First volley catch',m:10,c:'Volleys',d:'Serve-and-move-in shadow: split, punch a volley (no backswing), recover. 20 each side, soft hands.'},
+      ]},
+    swimming:{label:'Swimming',emoji:'🏊',arena:'the pool',positions:['Free','Back','Breast','Fly','IM'],
+      focus:['Technique','Starts','Turns','Sprint','Endurance','Dryland'],
+      drills:[
+        {t:'Catch-up + fist sets',m:20,c:'Technique',d:'4×50 catch-up drill, 4×50 fist swim, 4×50 build. Feel the water with your forearm, long line off every stroke.'},
+        {t:'Turn tempo reps',m:15,c:'Turns',d:'10 flip turns off the wall at race speed: tight tuck, streamline to the flags, 3 dolphin kicks minimum.'},
+        {t:'Sprint 25s',m:15,c:'Sprint',d:'8×25 max effort, 60s rest. Hold your stroke together — speed with sloppy technique trains sloppy.'},
+        {t:'Dryland core circuit',m:12,c:'Dryland',d:'Plank 45s, streamline superman ×12, flutter kicks 30s, band pull-aparts ×15 — 3 rounds.'},
+      ]},
+    running:{label:'Running',emoji:'🏃',arena:'the track',positions:['Sprints','Middle Distance','Distance'],
+      focus:['Speed','Tempo','Long Run','Form','Strength','Mobility'],
+      drills:[
+        {t:'Stride-outs',m:15,c:'Speed',d:'6 × 80m building to 90%, walk-back recovery. Tall posture, quick ground contact, relaxed shoulders.'},
+        {t:'Tempo blocks',m:25,c:'Tempo',d:'3 × 5min at "comfortably hard" (can say 3–4 words), 2min float between. The pace that moves your threshold.'},
+        {t:'A-skip & B-skip circuit',m:10,c:'Form',d:'2 × 20m each: A-skip, B-skip, high knees, butt kicks. Drills are where fast form is coded.'},
+        {t:'Hill repeats',m:20,c:'Strength',d:'8 × 30s uphill strong, jog down. Strength work disguised as running.'},
+      ]},
+    volleyball:{label:'Volleyball',emoji:'🏐',arena:'the court',positions:['Setter','Outside','Middle','Opposite','Libero'],
+      focus:['Serving','Passing','Setting','Attacking','Blocking','Conditioning'],
+      drills:[
+        {t:'Target serving 30',m:15,c:'Serving',d:'30 serves at zones 1, 5 and 6 (10 each). Same toss every time — routine builds pressure-proof serves.'},
+        {t:'Wall platform control',m:15,c:'Passing',d:'50 controlled forearm passes to yourself against a wall, platform angled, feet beating the ball to the spot.'},
+        {t:'Setter square',m:15,c:'Setting',d:'Set to targets front and back from a square of cones — 20 each. Hands high, feet to the ball first.'},
+        {t:'Approach & snap',m:12,c:'Attacking',d:'Three-step approach reps into a jump and arm snap (ball optional): 4 × 8. Big last two steps, full swing.'},
+      ]},
+    general:{label:'Other / Multi',emoji:'⚡',arena:'training',positions:[],
+      focus:['Strength','Speed','Skill','Endurance','Mobility','Recovery'],
+      drills:[
+        {t:'Big-5 strength circuit',m:25,c:'Strength',d:'Squat, push, pull, hinge, carry — 3 rounds of 8–10 quality reps each with whatever kit you have.'},
+        {t:'Acceleration 10s',m:12,c:'Speed',d:'8 × 10m starts from different positions (standing, kneeling, lying). First three steps win most sports.'},
+        {t:'Skill block',m:20,c:'Skill',d:'20 focused minutes on YOUR sport\'s core skill. Film 3 reps on your phone and compare to one pro clip.'},
+        {t:'Engine builder',m:20,c:'Endurance',d:'20min: 40s work / 20s easy, any mode (run, bike, row). Score = rounds at honest effort.'},
+      ]},
+  };
+  const MOBILITY={
+    basketball:['Ankle rockers × 15 each — springs live in the ankles','90/90 hip switches × 10 — open hips, better slides','Couch stretch 60s each — undo the sitting','Thoracic rotations × 8 each — see the floor better'],
+    soccer:['Adductor rock-backs × 12 — groins hate surprises','Hip flexor stretch 60s each — longer stride, harder shot','Hamstring flossing × 10 each — sprint insurance','Calf raises + stretch × 15 — first touch starts with balance'],
+    mma:['Deep squat hold 90s — your guard lives here','Shoulder CARs × 8 each — punch and post safely','Neck bridges (easy) 30s — protect the computer','Wrist circles & stretches — 2min, every session'],
+    swimming:['Streamline wall slides × 12 — shoulders that rotate, not grind','Thoracic extensions on a roller 90s','Ankle point/flex × 20 — flexible feet are fins','Band shoulder external rotations × 15'],
+    running:['Calf + soleus stretch 60s each — mileage armour','Hip flexor lunge stretch 60s each','Glute bridge + march × 12 — wake the engine','Foam roll quads/ITB 2min'],
+    general:['World\'s greatest stretch × 6 each side','Deep squat hold 60s','Shoulder pass-throughs × 12','Hip airplanes × 6 each — balance + hips in one'],
+  };
+  const sport=()=>SPORTS[(AST&&AST.profile.sport)||'general']||SPORTS.general;
+  const mob=()=>MOBILITY[(AST&&AST.profile.sport)]||MOBILITY.general;
+
+  let toastT;
+  function toast(m,dark){ const t=$('#toast'); t.textContent=m; t.className=dark?'show dark':'show'; clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2300); }
+  async function api(body){
+    const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    const j=await r.json().catch(()=>({error:'Connection issue'}));
+    if(!r.ok) throw new Error(j.error||('HTTP '+r.status));
+    return j;
+  }
+  function busy(btn,on,label){ if(!btn)return; if(on){btn.dataset.l=btn.innerHTML;btn.innerHTML='<span class="spin"></span>';btn.disabled=true;} else {btn.innerHTML=label||btn.dataset.l;btn.disabled=false;} }
+  const rel=iso=>{ const s=(Date.now()-new Date(iso).getTime())/1e3; if(s<60)return'now'; if(s<3600)return Math.floor(s/60)+'m'; if(s<86400)return Math.floor(s/3600)+'h'; return Math.floor(s/86400)+'d'; };
+  const doy=()=>Math.floor((Date.now()-new Date(new Date().getFullYear(),0,0))/864e5);
+
+  /* ---------- onboarding ---------- */
+  document.querySelectorAll('.ob-tabs button').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('.ob-tabs button').forEach(x=>x.classList.toggle('on',x===b));
+    document.querySelectorAll('.ob-form').forEach(f=>f.classList.toggle('on',f.dataset.obf===b.dataset.ob));
+  }));
+  function obErr(id,msg){ const el=$(id); el.textContent=msg; el.style.display='block'; }
+  function obClear(){ document.querySelectorAll('.ob-err').forEach(e=>e.style.display='none'); }
+
+  // sport grid
+  $('#jSport').innerHTML=Object.entries(SPORTS).map(([k,s])=>'<div class="sbtn" data-sport="'+k+'"><span class="si">'+s.emoji+'</span><span>'+esc(s.label)+'</span></div>').join('');
+  $('#jSport').addEventListener('click',e=>{
+    const b=e.target.closest('.sbtn'); if(!b)return;
+    document.querySelectorAll('#jSport .sbtn').forEach(x=>x.classList.toggle('sel',x===b));
+    const sp=SPORTS[b.dataset.sport];
+    $('#jPosLbl').style.display=sp.positions.length?'block':'none';
+    $('#jPos').style.display=sp.positions.length?'flex':'none';
+    $('#jPos').innerHTML=sp.positions.map(p=>'<span class="pill">'+esc(p)+'</span>').join('');
+  });
+  // single-select pill groups
+  document.querySelectorAll('[data-single]').forEach(g=>g.addEventListener('click',e=>{
+    const p=e.target.closest('.pill'); if(!p)return;
+    g.querySelectorAll('.pill').forEach(x=>x.classList.remove('sel')); p.classList.add('sel');
+  }));
+  // multi-select (goals max 3, equipment)
+  $('#jGoals').addEventListener('click',e=>{ const p=e.target.closest('.pill'); if(!p)return;
+    if(!p.classList.contains('sel')&&$('#jGoals').querySelectorAll('.pill.sel').length>=3) return toast('Three goals max — focus wins',true);
+    p.classList.toggle('sel'); });
+  $('#jEquip').addEventListener('click',e=>{ const p=e.target.closest('.pill'); if(p)p.classList.toggle('sel'); });
+
+  let obStep=1;
+  function obRender(){
+    document.querySelectorAll('.obstep').forEach(s=>s.classList.toggle('on',+s.dataset.os===obStep));
+    document.querySelectorAll('#obDots i').forEach((d,i)=>d.classList.toggle('on',i<obStep));
+    $('#jBack').style.display=obStep>1?'inline-flex':'none';
+    $('#jNext').textContent=obStep<4?'Continue →':'Build My OS ⚡';
+  }
+  $('#jBack').addEventListener('click',()=>{ if(obStep>1){obStep--;obRender();} });
+  $('#jNext').addEventListener('click',async()=>{
+    obClear();
+    if(obStep===1){
+      const name=$('#jName').value.trim(), pin=$('#jPin').value.trim();
+      if(name.length<2) return obErr('#jErr','Add your name first.');
+      if(!/^\d{4}$/.test(pin)) return obErr('#jErr','PIN needs to be exactly 4 digits.');
+      obStep=2; return obRender();
+    }
+    if(obStep===2){
+      if(!$('#jSport .sbtn.sel')) return obErr('#jErr','Pick your sport — it drives everything.');
+      obStep=3; return obRender();
+    }
+    if(obStep===3){ obStep=4; return obRender(); }
+    // final — register
+    const sel=g=>{const p=$(g).querySelector('.pill.sel');return p?p.textContent:null;};
+    const multi=g=>[...document.querySelectorAll(g+' .pill.sel')].map(x=>x.textContent);
+    const payload={
+      action:'register',
+      name:$('#jName').value.trim(), pin:$('#jPin').value.trim(),
+      age:parseInt($('#jAge').value,10)||null,
+      contact:$('#jContact').value.trim()||null,
+      sport:$('#jSport .sbtn.sel').dataset.sport,
+      level:sel('#jLevel'), position:sel('#jPos'),
+      train_freq:parseInt(sel('#jFreq'),10)||null,
+      comp_schedule:sel('#jComp'),
+      goal_tags:multi('#jGoals'), goal_note:$('#jGoalNote').value.trim(),
+      injuries:$('#jInjuries').value.trim(), equipment:multi('#jEquip'),
+    };
+    busy($('#jNext'),1);
+    try{
+      const r=await api(payload);
+      sess={aid:r.aid,pin:payload.pin,name:payload.name}; localStorage.setItem(SESS_KEY,JSON.stringify(sess));
+      AST=r.state; enterApp(); toast('Welcome to your OS ⚡');
+    }catch(e){ obErr('#jErr',e.message); }
+    busy($('#jNext'),0,'Build My OS ⚡');
+  });
+  $('#lGo').addEventListener('click',async()=>{
+    obClear();
+    const name=$('#lName').value.trim(), pin=$('#lPin').value.trim();
+    if(!name||!pin) return obErr('#lErr','Name and PIN, champ.');
+    busy($('#lGo'),1);
+    try{
+      const r=await api({action:'login',name,pin});
+      sess={aid:r.aid,pin,name}; localStorage.setItem(SESS_KEY,JSON.stringify(sess));
+      AST=r.state; enterApp(); toast('Back in your OS');
+    }catch(e){ obErr('#lErr',e.message); }
+    busy($('#lGo'),0,'Back Into The OS →');
+  });
+
+  /* ---------- shell ---------- */
+  const pages=[...document.querySelectorAll('.tabpage')];
+  function go(name){
+    pages.forEach(p=>p.classList.toggle('on',p.dataset.page===name));
+    document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.nav===name));
+    document.querySelector('main').scrollTop=0;
+  }
+  document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>go(b.dataset.nav)));
+  $('#logout').addEventListener('click',()=>{
+    localStorage.removeItem(SESS_KEY); sess=null; AST=null;
+    clearInterval(pollT);
+    $('#app').style.display='none'; $('#onboard').style.display='flex';
+  });
+  function enterApp(){
+    $('#onboard').style.display='none'; $('#app').style.display='flex';
+    $('#navMain').style.display='flex';
+    go('home'); renderAll();
+    clearInterval(pollT);
+    pollT=setInterval(pollTick, 30000);
+  }
+  async function pollTick(){
+    try{
+      if(!sess) return;
+      const r=await api({action:'state',aid:sess.aid,pin:sess.pin});
+      AST=r.state; renderAll(true);
+    }catch(e){ /* silent */ }
+  }
+
+  /* ---------- render ---------- */
+  const LEVELS=[[0,'Prospect'],[250,'Committed'],[600,'Locked In'],[1100,'Elite Habits'],[1800,'Franchise']];
+  function lvl(xp){ let i=0; LEVELS.forEach((l,x)=>{if(xp>=l[0])i=x}); const c=LEVELS[i],n=LEVELS[i+1]||[c[0]+700,'Legend']; return{n:i+1,name:c[1],cur:c[0],next:n[0]}; }
+
+  function renderAll(soft){
+    if(!AST) return;
+    const p=AST.profile, sp=sport();
+    /* home */
+    $('#heroName').textContent=p.name;
+    $('#avInit').textContent=p.name.split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    $('#stXp').textContent=p.xp; $('#stLogs').textContent=AST.checkins.length;
+    const week=AST.checkins.filter(c=>(Date.now()-new Date(c.d).getTime())<7*864e5).length;
+    $('#stWeek').textContent=week+(p.train_freq?'/'+p.train_freq:'');
+    $('#streakChip').textContent=p.streak;
+    const L=lvl(p.xp), pct=Math.min(100,Math.round((p.xp-L.cur)/(L.next-L.cur)*100));
+    $('#xpFill').style.width=pct+'%'; $('#xpRing').style.setProperty('--pct',pct+'%');
+    $('#lvlLab').textContent='Level '+L.n+' · '+L.name; $('#xpLab').textContent=p.xp+' / '+L.next+' XP';
+    const h=new Date().getHours();
+    $('#greet').textContent=h<12?'Morning grind,':(h<18?'Afternoon,':'Night shift,');
+    $('#profStrip').innerHTML=
+      '<span class="chip pro">'+sp.emoji+' '+esc(sp.label)+'</span>'
+      +(p.position?'<span class="chip">'+esc(p.position)+'</span>':'')
+      +(p.level?'<span class="chip">'+esc(p.level)+'</span>':'')
+      +(p.train_freq?'<span class="chip">'+p.train_freq+'d / week</span>':'')
+      +(p.injuries?'<span class="chip warn">⚠ managing injury</span>':'');
+    /* today's focus — deterministic rotation through the sport's drill bank */
+    const drill=sp.drills[doy()%sp.drills.length];
+    $('#tfKicker').textContent="Today's Focus · "+sp.label;
+    $('#tfTitle').textContent=drill.t;
+    $('#tfBody').textContent=drill.d;
+    $('#tfChips').innerHTML='<span class="chip pro">'+esc(drill.c)+'</span><span class="chip">'+drill.m+' min</span>';
+    /* check-in */
+    const done=p.last_checkin===AST.today;
+    $('#ciBody').style.display=done?'none':'block';
+    $('#ciDone').style.display=done?'block':'none';
+    $('#ciTitle').textContent=done?'Checked In ✓':"Today's Check-In";
+    if(!soft) $('#focusPills').innerHTML=sp.focus.map(f=>'<span class="pill">'+esc(f)+'</span>').join('');
+    /* AI */
+    $('#aiList').innerHTML=AST.ai.map(([k,t])=>'<li class="'+(k==='◆'?'intel':'')+'"><span class="k">'+k+'</span><span>'+esc(t)+'</span></li>').join('');
+    /* goals */
+    const g=p.goals||{};
+    $('#goalView').innerHTML=(g.tags&&g.tags.length)?g.tags.map(t=>'<span class="pill sel" style="cursor:default">'+esc(t)+'</span>').join(''):'<span style="color:var(--dim);font-size:13px">No goals set yet — that\'s the first rep.</span>';
+    $('#goalNote').textContent=g.note||'';
+    /* train */
+    $('#trainEye').textContent='Training · '+sp.label;
+    $('#trainSub').textContent=p.train_freq?('Built for your '+p.train_freq+'-day week on '+sp.arena+'.'):('Your plan on '+sp.arena+' — set training days in onboarding.');
+    renderPlan(p,sp);
+    $('#drillHead').textContent=sp.label+' drills';
+    $('#drillList').innerHTML=sp.drills.map(d=>
+      '<div class="sess"><div class="dt"><b>'+d.m+'</b><span>min</span></div><div class="inf"><b>'+esc(d.t)+'</b><span>'+esc(d.d)+'</span></div><span class="chip" style="flex:0 0 auto">'+esc(d.c)+'</span></div>').join('');
+    /* body */
+    renderBody(soft);
+    /* mind */
+    renderMind();
+    /* library */
+    if(!soft) renderLib('All');
+  }
+
+  function renderPlan(p,sp){
+    const days=['MON','TUE','WED','THU','FRI','SAT','SUN'];
+    const n=Math.min(p.train_freq||3,7);
+    const idx=[0,2,4,5,1,3,6].slice(0,n).sort((a,b)=>a-b); // spread across the week
+    $('#planList').innerHTML=idx.map((di,i)=>{
+      const d=sp.drills[(doy()+i)%sp.drills.length];
+      return '<div class="sess"><div class="dt"><b>'+days[di]+'</b><span>'+d.m+'min</span></div><div class="inf"><b>'+esc(d.t)+'</b><span>'+esc(d.c)+' · log it in your check-in</span></div>'+(i===0?'<span class="chip live" style="flex:0 0 auto"><span class="d"></span>Next</span>':'')+'</div>';
+    }).join('')
+    +'<div class="sess"><div class="dt"><b>＋</b><span>daily</span></div><div class="inf"><b>Mobility · 10 min</b><span>See the Body tab — non-negotiable</span></div></div>';
+  }
+
+  function renderBody(soft){
+    const cs=AST.checkins||[];
+    const last=cs[0];
+    if(last){
+      const score=(+last.energy||5)+(10-(+last.soreness||3))+Math.min(10,((+last.sleep_h||8)/9)*10);
+      const st=score>=22?['🟢 Ready to push','Energy, sleep and soreness all say go. Attack today\'s focus.']
+        :score>=15?['🟡 Manage the load','You\'re okay — but keep quality over volume today and protect sleep tonight.']
+        :['🔴 Recover on purpose','Body\'s waving a flag. Mobility, fuel, early night. Recovery IS training.'];
+      $('#recTitle').textContent=st[0]; $('#recBody').textContent=st[1];
+    }
+    const sl=cs.filter(c=>c.sleep_h).slice(0,7);
+    if(sl.length){
+      const avg=Math.round(sl.reduce((a,c)=>a+ +c.sleep_h,0)/sl.length*10)/10;
+      $('#sleepBody').innerHTML='Averaging <b style="color:var(--accent)">'+avg+'h</b> over your last '+sl.length+' check-in'+(sl.length>1?'s':'')+'. '+(avg>=8?'Elite recovery window — keep the routine.':'Champions are made between 8 and 10 hours. Wind down 30 minutes earlier tonight.');
+    }
+    const f=AST.fuel_today&&AST.fuel_today.data||{};
+    if(wT==null){ wLocal=f.water||0; renderWater(); }
+    if(!soft){
+      document.querySelectorAll('#fuelPills .pill').forEach(p=>p.classList.toggle('sel',(f.pills||[]).includes(p.textContent)));
+    }
+    $('#mobList').innerHTML=mob().map(m=>'<li>🔸 '+esc(m)+'</li>').join('');
+  }
+  let wLocal=0, wT=null;
+  function renderWater(){
+    $('#wCount').textContent=wLocal;
+    $('#wTrack').innerHTML=Array.from({length:8},(_,i)=>'<i class="'+(i<wLocal?'f':'')+'"></i>').join('');
+  }
+  function pushWater(){
+    clearTimeout(wT);
+    wT=setTimeout(async()=>{
+      try{ const r=await api({action:'fuel',aid:sess.aid,pin:sess.pin,water:wLocal}); if(r.gained)toast('+'+r.gained+' XP · hydrated ⚡'); AST=r.state; }
+      catch(e){ toast(e.message,true); }
+      wT=null;
+    },600);
+  }
+  $('#wPlus').addEventListener('click',()=>{ if(wLocal<12){wLocal++;renderWater();pushWater();} });
+  $('#wMinus').addEventListener('click',()=>{ if(wLocal>0){wLocal--;renderWater();pushWater();} });
+  $('#fuelPills').addEventListener('click',e=>{ const p=e.target.closest('.pill'); if(p)p.classList.toggle('sel'); });
+  $('#fuelSave').addEventListener('click',async()=>{
+    const pills=[...document.querySelectorAll('#fuelPills .pill.sel')].map(x=>x.textContent);
+    busy($('#fuelSave'),1);
+    try{ const r=await api({action:'fuel',aid:sess.aid,pin:sess.pin,pills,water:wLocal}); AST=r.state; toast(r.gained?('+'+r.gained+' XP · fuelled 🍽'):'Fuel log saved'); }
+    catch(e){ toast(e.message,true); }
+    busy($('#fuelSave'),0,'Save Fuel Log');
+  });
+
+  function renderMind(){
+    $('#mList').innerHTML=(AST.mind||[]).map(m=>{
+      const d=m.data||{};
+      return '<div class="jnote"><b>'+esc(d.trigger||'Moment')+'</b> · impact '+(d.impact||'–')+'/10 · '+rel(m.created_at)
+        +(d.plan?'<br>↳ plan: '+esc(d.plan):'')+'</div>';
+    }).join('')||'<p style="color:var(--dim);font-size:13px">Nothing filed yet. That\'s either great news or you\'re holding it in.</p>';
+    $('#dList').innerHTML=(AST.diary||[]).map(j=>'<div class="jnote"><b>'+esc(j.d)+'</b> · '+esc((j.data||{}).text||'')+'</div>').join('');
+  }
+  $('#mFeels').addEventListener('click',e=>{ const p=e.target.closest('.pill'); if(p)p.classList.toggle('sel'); });
+  $('#rImpact').addEventListener('input',e=>$('#vImpact').textContent=e.target.value);
+  $('#mShare').addEventListener('click',()=>{ const t=$('#mShare'); t.classList.toggle('on'); t.textContent=t.classList.contains('on')?'👁 Shared with coach':'🔒 Private'; });
+  $('#mSubmit').addEventListener('click',async()=>{
+    const body={action:'mind',aid:sess.aid,pin:sess.pin,
+      trigger:$('#mTrigger').value.trim(), said:$('#mSaid').value.trim(), plan:$('#mPlan').value.trim(),
+      feelings:[...document.querySelectorAll('#mFeels .pill.sel')].map(x=>x.textContent),
+      impact:+$('#rImpact').value, share_coach:$('#mShare').classList.contains('on')};
+    if(!body.trigger&&!body.said&&!body.plan) return toast('Give it something to file',true);
+    busy($('#mSubmit'),1);
+    try{
+      const r=await api(body); AST=r.state; renderMind();
+      ['#mTrigger','#mSaid','#mPlan'].forEach(s=>$(s).value='');
+      document.querySelectorAll('#mFeels .pill.sel').forEach(x=>x.classList.remove('sel'));
+      toast(r.gained?('+'+r.gained+' XP · filed 🧠'):'Filed 🧠');
+    }catch(e){ toast(e.message,true); }
+    busy($('#mSubmit'),0,'File It · +30 XP');
+  });
+  $('#dBtn').addEventListener('click',async()=>{
+    const v=$('#dInput').value.trim(); if(!v)return;
+    busy($('#dBtn'),1);
+    try{ const r=await api({action:'diary',aid:sess.aid,pin:sess.pin,text:v}); AST=r.state; renderMind(); $('#dInput').value=''; toast(r.gained?('+'+r.gained+' XP · logged 📓'):'Logged 📓'); }
+    catch(e){ toast(e.message,true); }
+    busy($('#dBtn'),0,'Log');
+  });
+
+  /* goals */
+  const GOALS=['Make the team','Higher level','Speed','Strength','Endurance','Skills','Confidence','Consistency'];
+  $('#goalEditBtn').addEventListener('click',()=>{
+    const g=AST.profile.goals||{};
+    $('#goalPills').innerHTML=GOALS.map(t=>'<span class="pill'+((g.tags||[]).includes(t)?' sel':'')+'">'+t+'</span>').join('');
+    $('#goalNoteEdit').value=g.note||'';
+    $('#goalEdit').style.display='block'; $('#goalEditBtn').style.display='none';
+  });
+  $('#goalPills').addEventListener('click',e=>{ const p=e.target.closest('.pill'); if(!p)return;
+    if(!p.classList.contains('sel')&&$('#goalPills').querySelectorAll('.pill.sel').length>=3) return toast('Three goals max — focus wins',true);
+    p.classList.toggle('sel'); });
+  $('#goalSave').addEventListener('click',async()=>{
+    busy($('#goalSave'),1);
+    try{
+      const r=await api({action:'goals_set',aid:sess.aid,pin:sess.pin,
+        goal_tags:[...document.querySelectorAll('#goalPills .pill.sel')].map(x=>x.textContent),
+        goal_note:$('#goalNoteEdit').value.trim()});
+      AST=r.state; renderAll(true); toast('Goals locked 🎯');
+      $('#goalEdit').style.display='none'; $('#goalEditBtn').style.display='block';
+    }catch(e){ toast(e.message,true); }
+    busy($('#goalSave'),0,'Save Goals');
+  });
+
+  /* library */
+  function libItems(){
+    const sp=sport();
+    return sp.drills.map(d=>({c:'Training',t:d.t,b:'<p>'+esc(d.d)+'</p><p class="mono" style="font-size:11px;color:var(--dim)">'+d.m+' MIN · '+esc(d.c.toUpperCase())+'</p>'}))
+      .concat(COMMON_RES)
+      .concat([{c:'Mindset',t:'Pre-competition routine',b:'<p>Same warm-up, same music, same self-talk — routines tell your nervous system "we\'ve been here before". Write yours down in the Mind tab and run it every time.</p>'}]);
+  }
+  function renderLib(cat){
+    const items=libItems();
+    const cats=['All',...new Set(items.map(i=>i.c))];
+    $('#libEye').textContent='Resources · '+sport().label;
+    $('#libSub').textContent='Curated for '+sport().label.toLowerCase()+'. No fluff.';
+    $('#catBar').innerHTML=cats.map(c=>'<span class="pill'+(c===cat?' sel':'')+'" data-cat="'+c+'">'+c+'</span>').join('');
+    $('#resList').innerHTML=items.filter(i=>cat==='All'||i.c===cat).map(i=>
+      '<details class="res"><summary><span class="rc">'+esc(i.c)+'</span><b>'+esc(i.t)+'</b><span class="ar">▶</span></summary><div class="rb">'+i.b+'</div></details>').join('');
+  }
+  $('#catBar').addEventListener('click',e=>{ const p=e.target.closest('[data-cat]'); if(p)renderLib(p.dataset.cat); });
+
+  /* check-in */
+  [['rEnergy','vEnergy'],['rSleep','vSleep'],['rSore','vSore'],['rMin','vMin']].forEach(([r,v])=>$('#'+r).addEventListener('input',e=>$('#'+v).textContent=e.target.value));
+  $('#focusPills').addEventListener('click',e=>{const p=e.target.closest('.pill');if(p)p.classList.toggle('sel')});
+  $('#ciSubmit').addEventListener('click',async()=>{
+    const focus=[...document.querySelectorAll('#focusPills .pill.sel')].map(x=>x.textContent);
+    busy($('#ciSubmit'),1);
+    try{
+      const r=await api({action:'checkin',aid:sess.aid,pin:sess.pin,
+        energy:+$('#rEnergy').value,sleep_h:+$('#rSleep').value,soreness:+$('#rSore').value,
+        mins:+$('#rMin').value,focus,note:$('#ciNote').value.trim()});
+      AST=r.state; renderAll(); toast('+40 XP · your OS is reading 🧠');
+    }catch(e){ toast(e.message,true); }
+    busy($('#ciSubmit'),0,'Lock It In · +40 XP');
+  });
+
+  /* enter-to-send */
+  [['dInput','dBtn'],['jPin','jNext'],['lPin','lGo']].forEach(([i,b])=>{
+    const el=$('#'+i); if(el) el.addEventListener('keydown',e=>{ if(e.key==='Enter'){e.preventDefault();$('#'+b).click();} });
+  });
+
+  /* ---------- boot ---------- */
+  (async function boot(){
+    if(!sess){ $('#onboard').style.display='flex'; return; }
+    try{
+      const r=await api({action:'state',aid:sess.aid,pin:sess.pin});
+      AST=r.state; enterApp();
+    }catch(e){
+      localStorage.removeItem(SESS_KEY); sess=null; $('#onboard').style.display='flex';
+    }
+  })();
+})();
+</script>
+</body>
+</html>

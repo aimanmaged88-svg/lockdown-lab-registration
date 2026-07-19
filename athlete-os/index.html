@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Athlete OS — Your Private Performance Hub</title>
+<meta name="description" content="One private performance OS for any sport. Daily check-ins, AI coaching, recovery, nutrition, mindset and goals — personalised to you. Powered by the Lockdown Lab engine.">
+<meta name="theme-color" content="#050506">
+<link rel="stylesheet" href="fonts.css">
+<style>
+:root{
+  --bg:#050506;
+  --glass:rgba(255,255,255,.055); --glass2:rgba(255,255,255,.028);
+  --line:rgba(255,255,255,.11); --line2:rgba(255,255,255,.06);
+  --text:#f6f4f1; --muted:#a09a92; --dim:#6d6861;
+  --accent:#ff6b00; --accent-hi:#ff8a2b; --accent-soft:rgba(255,107,0,.15); --accent-glow:rgba(255,107,0,.38);
+  --good:#30d158; --good-soft:rgba(48,209,88,.14);
+  --fd:'Bebas Neue',"Arial Narrow",Arial,sans-serif;
+  --fb:'Manrope',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --fm:ui-monospace,"SF Mono","Roboto Mono",Menlo,monospace;
+  --r:22px;
+  color-scheme:dark;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--fb);line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;
+  background-image:radial-gradient(120% 60% at 50% -8%, rgba(255,107,0,.13), transparent 58%),
+                   radial-gradient(70% 40% at 100% 30%, rgba(255,107,0,.05), transparent 55%);
+  background-attachment:fixed}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--accent);color:#000}
+.wrap{max-width:1020px;margin:0 auto;padding:0 20px}
+.display{font-family:var(--fd);text-transform:uppercase;font-weight:400;letter-spacing:.8px;line-height:.95;text-wrap:balance}
+.mono{font-family:var(--fm);font-variant-numeric:tabular-nums}
+.amber{color:var(--accent)}
+.eyebrow{font-family:var(--fm);font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--accent);display:inline-flex;align-items:center;gap:9px}
+.eyebrow::before{content:"";width:20px;height:1.5px;background:var(--accent)}
+.btn{font-family:var(--fd);text-transform:uppercase;letter-spacing:1.5px;font-size:16px;display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  padding:15px 28px;border-radius:999px;transition:transform .16s, background .16s, border-color .16s;cursor:pointer;user-select:none}
+.btn:active{transform:scale(.96)}
+.btn-p{background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:#150a00;box-shadow:0 12px 34px -10px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,.35)}
+.btn-p:hover{transform:translateY(-2px)}
+.btn-g{background:var(--glass);border:1px solid var(--line);backdrop-filter:blur(12px)}
+.btn-g:hover{border-color:var(--accent)}
+.chip{font-family:var(--fm);font-size:9.5px;letter-spacing:1.6px;text-transform:uppercase;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:5px 12px;display:inline-flex;align-items:center;gap:6px}
+.chip .d{width:6px;height:6px;border-radius:50%;background:var(--good);animation:pulse 2s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 rgba(48,209,88,.5)}70%{box-shadow:0 0 0 8px rgba(48,209,88,0)}100%{box-shadow:0 0 0 0 rgba(48,209,88,0)}}
+
+/* nav */
+nav{position:sticky;top:0;z-index:40;border-bottom:1px solid var(--line2);background:rgba(5,5,6,.62);backdrop-filter:blur(26px) saturate(150%)}
+nav .row{display:flex;align-items:center;gap:11px;height:66px}
+nav .lg{width:36px;height:36px;color:#fff}
+nav b{font-family:var(--fd);font-size:19px;letter-spacing:2px;text-transform:uppercase;font-weight:400}
+nav b i{font-style:normal;color:var(--accent)}
+nav .sp{flex:1}
+nav .btn{padding:11px 22px;font-size:14px}
+nav .navlinks{display:flex;gap:22px;margin-right:14px}
+nav .navlinks a{font-size:13px;color:var(--muted);transition:color .18s}
+nav .navlinks a:hover{color:var(--text)}
+@media(max-width:760px){nav .navlinks{display:none}}
+
+/* hero */
+header{padding:76px 0 50px;position:relative}
+.hero-grid{display:grid;grid-template-columns:1.1fr .9fr;gap:44px;align-items:center}
+@media(max-width:860px){.hero-grid{grid-template-columns:1fr}}
+h1.hero{font-size:clamp(52px,9vw,96px);margin:20px 0 0}
+.hero-sub{color:var(--muted);font-size:clamp(15px,2vw,18px);max-width:520px;margin-top:20px}
+.hero-sub b{color:var(--text)}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:30px}
+.trust{display:flex;gap:18px;flex-wrap:wrap;margin-top:24px;font-family:var(--fm);font-size:10.5px;letter-spacing:1px;color:var(--dim);text-transform:uppercase}
+
+/* performance file card */
+.dossier{border:1px solid var(--line);border-radius:26px;background:linear-gradient(165deg,rgba(255,255,255,.075),rgba(255,255,255,.02));
+  backdrop-filter:blur(20px);padding:26px 24px;position:relative;overflow:hidden;transform:rotate(1.6deg);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1), 0 50px 100px -40px rgba(0,0,0,.9), 0 0 70px -30px var(--accent-glow);transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.dossier:hover{transform:rotate(0)}
+.dossier .stamp{position:absolute;top:18px;right:-34px;background:var(--accent);color:#150a00;font-family:var(--fm);font-weight:800;font-size:10px;
+  letter-spacing:2px;padding:6px 44px;transform:rotate(35deg);text-transform:uppercase}
+.dossier .dh{font-family:var(--fm);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent);display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.dossier .dh::after{content:"";flex:1;height:1px;background:var(--line)}
+.drow{display:flex;justify-content:space-between;align-items:baseline;padding:9px 0;border-bottom:1px dashed var(--line2)}
+.drow .k{font-family:var(--fm);font-size:10px;letter-spacing:1.8px;text-transform:uppercase;color:var(--dim)}
+.drow .v{font-family:var(--fd);font-size:21px;letter-spacing:1px;text-transform:uppercase}
+.dbar{margin-top:16px}
+.dbar .lb{display:flex;justify-content:space-between;font-family:var(--fm);font-size:9px;letter-spacing:1.6px;text-transform:uppercase;color:var(--dim);margin-bottom:7px}
+.dbar .tr{height:7px;border-radius:99px;background:rgba(255,255,255,.09);overflow:hidden}
+.dbar .tr i{display:block;height:100%;width:0;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent-hi));box-shadow:0 0 14px var(--accent-glow);animation:fill 2.4s 1s cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes fill{to{width:82%}}
+.dfoot{margin-top:18px;font-family:var(--fm);font-size:9.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--dim)}
+.dfoot b{color:var(--accent)}
+
+/* sections */
+section{padding:74px 0;position:relative}
+.sec-head{max-width:660px;margin-bottom:40px}
+.sec-head h2{font-size:clamp(34px,5vw,54px);margin-top:14px}
+.sec-head p{color:var(--muted);margin-top:14px;font-size:16px}
+
+/* how it works */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+@media(max-width:860px){.steps{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.steps{grid-template-columns:1fr}}
+.step{border:1px solid var(--line);border-radius:var(--r);background:linear-gradient(180deg,var(--glass),var(--glass2));backdrop-filter:blur(12px);
+  padding:22px 20px;position:relative;overflow:hidden;transition:transform .25s,border-color .25s;box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.step:hover{transform:translateY(-5px);border-color:var(--accent)}
+.step .n{font-family:var(--fm);font-size:10px;letter-spacing:2px;color:var(--accent)}
+.step h3{font-family:var(--fd);text-transform:uppercase;font-size:24px;letter-spacing:.6px;margin:12px 0 7px;line-height:1}
+.step p{color:var(--muted);font-size:13.5px}
+.step .big{position:absolute;right:-4px;bottom:-20px;font-family:var(--fd);font-size:96px;color:rgba(255,255,255,.035);line-height:1;pointer-events:none}
+
+/* inside grid */
+.expect{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:860px){.expect{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.expect{grid-template-columns:1fr}}
+.ex{border:1px solid var(--line);border-radius:var(--r);background:linear-gradient(180deg,var(--glass),var(--glass2));backdrop-filter:blur(12px);
+  padding:22px 20px;transition:transform .25s,border-color .25s;box-shadow:inset 0 1px 0 rgba(255,255,255,.07)}
+.ex:hover{transform:translateY(-5px);border-color:var(--accent)}
+.ex .ico{width:44px;height:44px;border-radius:14px;background:var(--accent-soft);display:grid;place-items:center;font-size:20px;margin-bottom:14px}
+.ex h3{font-family:var(--fd);text-transform:uppercase;font-size:21px;letter-spacing:.6px;margin-bottom:6px;line-height:1}
+.ex p{color:var(--muted);font-size:13.5px}
+.ex .tag{float:right;font-family:var(--fm);font-size:8.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);border-radius:99px;padding:3px 8px}
+
+/* sports cloud */
+.sports{display:flex;flex-wrap:wrap;gap:10px;max-width:820px}
+.spill{font-family:var(--fd);font-size:18px;letter-spacing:1px;text-transform:uppercase;border:1px solid var(--line);border-radius:16px;
+  background:linear-gradient(180deg,var(--glass),var(--glass2));backdrop-filter:blur(10px);padding:13px 18px;display:inline-flex;align-items:center;gap:9px;
+  transition:transform .2s,border-color .2s}
+.spill:hover{transform:translateY(-3px);border-color:var(--accent)}
+.spill .e{font-size:19px}
+.sports-note{margin-top:22px;color:var(--muted);font-size:14.5px;max-width:620px}
+.sports-note b{color:var(--text)}
+
+/* private by design */
+.deal{border:1px solid rgba(255,107,0,.5);border-radius:28px;background:linear-gradient(170deg,var(--accent-soft),var(--glass2));backdrop-filter:blur(16px);
+  padding:34px 30px;position:relative;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.1), 0 30px 80px -40px var(--accent-glow)}
+.deal .dtag{font-family:var(--fm);font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--accent);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.deal h2{font-size:clamp(32px,5vw,50px);margin-bottom:10px}
+.deal>p{color:var(--muted);font-size:16px;max-width:560px;margin-bottom:24px}
+.deal>p b{color:var(--text)}
+.rules{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:700px){.rules{grid-template-columns:1fr}}
+.rule{display:flex;gap:13px;align-items:flex-start;border:1px solid var(--line);border-radius:16px;background:rgba(0,0,0,.28);padding:15px 16px}
+.rule .rn{font-family:var(--fd);font-size:22px;color:var(--accent);line-height:1.1;flex:0 0 auto}
+.rule b{display:block;font-size:14.5px;margin-bottom:2px}
+.rule span{color:var(--muted);font-size:13px}
+.deal .sign{margin-top:24px;font-family:var(--fm);font-size:10px;letter-spacing:1.6px;text-transform:uppercase;color:var(--dim)}
+.deal .sign b{color:var(--accent)}
+
+/* faq */
+.faq{max-width:760px}
+details{border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,var(--glass),var(--glass2));backdrop-filter:blur(12px);
+  margin-bottom:10px;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
+summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:12px;padding:18px 20px;font-family:var(--fd);text-transform:uppercase;font-size:19px;letter-spacing:.7px;transition:color .2s}
+summary::-webkit-details-marker{display:none}
+summary .q{color:var(--accent);font-family:var(--fm);font-size:11px;letter-spacing:2px;flex:0 0 auto}
+summary .ar{margin-left:auto;color:var(--dim);transition:transform .25s;font-size:13px}
+details[open] .ar{transform:rotate(45deg);color:var(--accent)}
+details .a{padding:0 20px 18px 20px;color:var(--muted);font-size:14.5px}
+details .a b{color:var(--text)}
+
+/* final cta */
+.final{border:1px solid var(--line);border-radius:32px;text-align:center;padding:60px 26px;position:relative;overflow:hidden;
+  background:radial-gradient(120% 100% at 50% 0%, rgba(255,107,0,.2), var(--glass2) 60%);backdrop-filter:blur(16px);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.12), 0 40px 100px -50px var(--accent-glow)}
+.final .lg{width:76px;height:81px;color:#fff;margin:0 auto 14px;display:block}
+.final h2{font-size:clamp(38px,6vw,64px)}
+.final p{color:var(--muted);margin:14px auto 26px;max-width:440px}
+footer{border-top:1px solid var(--line2);padding:34px 0 46px;margin-top:30px}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;color:var(--dim);font-size:12.5px}
+.foot .fm{font-family:var(--fm);letter-spacing:1px;font-size:10px;text-transform:uppercase}
+.foot a:hover{color:var(--text)}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="ll" viewBox="0 0 120 128" fill="none"><g stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M47 30 v-5 a13 13 0 0 1 26 0 v5"/><path d="M38 30 H47"/><path d="M73 30 H82"/><path d="M47 30 v10 L27 88 a9 9 0 0 0 8.5 13.5 h49 a9 9 0 0 0 8.5 -13.5 L73 40 v-10"/></g><g stroke="currentColor" stroke-width="6" stroke-linecap="butt" stroke-linejoin="miter"><path d="M67 34 L58 68 H79"/><path d="M56 44 L46 84 H81"/></g></symbol></svg>
+
+<nav>
+  <div class="wrap row">
+    <svg class="lg"><use href="#ll"/></svg>
+    <b>Athlete <i>OS</i></b>
+    <span class="sp"></span>
+    <div class="navlinks">
+      <a href="#how">How it works</a>
+      <a href="#inside">Inside the OS</a>
+      <a href="#sports">Sports</a>
+      <a href="#private">Privacy</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <a class="btn btn-p" href="app.html">Open App →</a>
+  </div>
+</nav>
+
+<header>
+  <div class="wrap hero-grid">
+    <div>
+      <span class="chip"><span class="d"></span>One engine · Every sport · Private by design</span>
+      <h1 class="hero display">Your whole game.<br><span class="amber">One private OS.</span></h1>
+      <p class="hero-sub">Training, recovery, nutrition, sleep, mindset and goals — read daily by an <b>AI performance coach</b> that speaks your sport. Athletes never see each other. Only you and your coach see your file.</p>
+      <div class="hero-cta">
+        <a class="btn btn-p" href="app.html">Build My OS — Free ⚡</a>
+        <a class="btn btn-g" href="#how">How it works</a>
+      </div>
+      <div class="trust"><span>⚡ Multi-sport</span><span>🧠 AI coach</span><span>🔒 Private by design</span><span>🔬 Powered by Lockdown Lab</span></div>
+    </div>
+    <div class="dossier">
+      <span class="stamp">Private</span>
+      <div class="dh">Performance File · #001</div>
+      <div class="drow"><span class="k">Sport</span><span class="v amber">Yours</span></div>
+      <div class="drow"><span class="k">Dashboard</span><span class="v">Personalised</span></div>
+      <div class="drow"><span class="k">Visibility</span><span class="v">You + Coach</span></div>
+      <div class="drow"><span class="k">AI Coach</span><span class="v amber">Reading Daily</span></div>
+      <div class="dbar">
+        <div class="lb"><span>Season readiness</span><span class="amber">building…</span></div>
+        <div class="tr"><i></i></div>
+      </div>
+      <div class="dfoot">Athlete OS · <b>Your eyes + coach only</b> · No public feed</div>
+    </div>
+  </div>
+</header>
+
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">How it works</span>
+      <h2 class="display">Four steps to a<br>personal performance hub</h2>
+    </div>
+    <div class="steps">
+      <div class="step"><span class="n">STEP 01</span><h3>Tell it your game</h3><p>Sport, level, position, goals, injuries, schedule, kit. Two minutes, once.</p><span class="big">01</span></div>
+      <div class="step"><span class="n">STEP 02</span><h3>Get your OS</h3><p>The dashboard, drills, metrics and library reshape around your sport — same engine, your content.</p><span class="big">02</span></div>
+      <div class="step"><span class="n">STEP 03</span><h3>Check in daily</h3><p>Energy, sleep, soreness, minutes trained. 30 seconds a day feeds your AI coach and builds your streak.</p><span class="big">03</span></div>
+      <div class="step"><span class="n">STEP 04</span><h3>Coach in the loop</h3><p>Your coach sees the whole roster and your trends — you stay private from every other athlete.</p><span class="big">04</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="inside" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Inside the OS</span>
+      <h2 class="display">Everything that moves<br>the needle. Nothing else.</h2>
+      <p>The proven Lockdown Lab engine — rebuilt as a private hub for every athlete, in every sport.</p>
+    </div>
+    <div class="expect">
+      <div class="ex"><span class="ico">🎯</span><h3>Today's Focus</h3><p>One clear priority every day, rotated through your sport's session bank.</p></div>
+      <div class="ex"><span class="ico">✅</span><h3>Daily Check-In</h3><p>Energy, sleep, soreness, minutes. Streaks and XP make accountability addictive.</p></div>
+      <div class="ex"><span class="ico">🧠</span><h3>AI Performance Coach</h3><p>Reads your inputs daily — trends, flags and next moves in your sport's language. Educates, never diagnoses.</p></div>
+      <div class="ex"><span class="ico">🏋️</span><h3>Train</h3><p>A weekly plan built from your training frequency, plus a drill bank for your sport.</p></div>
+      <div class="ex"><span class="ico">🧬</span><h3>Body</h3><p>Readiness, hydration tracker, fuel log, sleep trends and a daily mobility routine.</p></div>
+      <div class="ex"><span class="ico">🧘</span><h3>Mind</h3><p>File the moments that rattle you, write the counter, build a pre-comp routine.</p></div>
+      <div class="ex"><span class="ico">📈</span><h3>Goals & Progress</h3><p>Three goals, one mission line, XP levels from Prospect to Franchise.</p></div>
+      <div class="ex"><span class="ico">📚</span><h3>Library</h3><p>Drills, recovery, nutrition and mindset guides — filtered to your sport.</p></div>
+      <div class="ex"><span class="tag">Coach</span><span class="ico">🗂</span><h3>Coach Dashboard</h3><p>Every athlete, searchable and filterable by sport, level, goals and injury — with private notes and CSV export.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="sports" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">Multi-sport engine</span>
+      <h2 class="display">Pick your arena</h2>
+    </div>
+    <div class="sports">
+      <span class="spill"><span class="e">🏀</span>Basketball</span>
+      <span class="spill"><span class="e">⚽</span>Soccer</span>
+      <span class="spill"><span class="e">🥊</span>MMA</span>
+      <span class="spill"><span class="e">🏉</span>Oztag</span>
+      <span class="spill"><span class="e">🏐</span>Netball</span>
+      <span class="spill"><span class="e">🏉</span>Rugby</span>
+      <span class="spill"><span class="e">🏈</span>AFL</span>
+      <span class="spill"><span class="e">🎾</span>Tennis</span>
+      <span class="spill"><span class="e">🏊</span>Swimming</span>
+      <span class="spill"><span class="e">🏃</span>Running</span>
+      <span class="spill"><span class="e">🏐</span>Volleyball</span>
+      <span class="spill"><span class="e">⚡</span>Other / Multi</span>
+    </div>
+    <p class="sports-note">One shared engine — <b>the screens stay the same, the content changes.</b> Basketball gets shooting and reads. MMA gets striking and grappling. Soccer gets first touch and passing. Oztag gets speed and evasion. New sports drop in without rebuilding a thing.</p>
+  </div>
+</section>
+
+<section id="private" style="padding-top:0">
+  <div class="wrap">
+    <div class="deal">
+      <div class="dtag">🔒 The Difference</div>
+      <h2 class="display">Private by design</h2>
+      <p>Lockdown Lab Live is a squad. <b>Athlete OS is a vault.</b> Every athlete gets their own hub — no feed, no comparison, no noise.</p>
+      <div class="rules">
+        <div class="rule"><span class="rn">01</span><div><b>Athletes never see each other</b><span>No leaderboards against strangers, no public posts. Your file is yours.</span></div></div>
+        <div class="rule"><span class="rn">02</span><div><b>Coach sees the whole picture</b><span>One dashboard across every athlete — trends, flags, private notes.</span></div></div>
+        <div class="rule"><span class="rn">03</span><div><b>AI guides, never diagnoses</b><span>It educates and motivates from your data. Injuries belong to professionals.</span></div></div>
+        <div class="rule"><span class="rn">04</span><div><b>You choose what's shared</b><span>Mental-file entries stay private unless you flip the switch to your coach.</span></div></div>
+      </div>
+      <div class="sign">Signed: <b>Athlete OS</b> · Powered by the Lockdown Lab engine</div>
+    </div>
+  </div>
+</section>
+
+<section id="faq" style="padding-top:0">
+  <div class="wrap">
+    <div class="sec-head">
+      <span class="eyebrow">FAQ</span>
+      <h2 class="display">Straight answers</h2>
+    </div>
+    <div class="faq">
+      <details>
+        <summary><span class="q">Q01</span>What sports does it cover?<span class="ar">＋</span></summary>
+        <div class="a">Basketball, soccer, MMA, oztag, netball, rugby, AFL, tennis, swimming, running, volleyball — plus an <b>Other / Multi</b> mode for everything else. The engine is sport-agnostic; content packs swap in.</div>
+      </details>
+      <details>
+        <summary><span class="q">Q02</span>Is my data really private?<span class="ar">＋</span></summary>
+        <div class="a"><b>Athletes can never see each other.</b> There is no feed and no shared leaderboard. Only you and the coach can see your file, and your mental-file entries stay private unless you explicitly share them.</div>
+      </details>
+      <details>
+        <summary><span class="q">Q03</span>What does the AI coach actually do?<span class="ar">＋</span></summary>
+        <div class="a">It reads your daily check-ins — energy, sleep, soreness, minutes, focus — and turns them into trends, flags and next moves in your sport's language. It <b>educates and motivates</b>; it never diagnoses injuries or replaces a doctor, physio or your real coach.</div>
+      </details>
+      <details>
+        <summary><span class="q">Q04</span>Does it replace my coach?<span class="ar">＋</span></summary>
+        <div class="a">No — it arms them. Your coach gets a live dashboard of every athlete with search, filters and private notes, so the humans coach and the OS handles the accountability.</div>
+      </details>
+      <details>
+        <summary><span class="q">Q05</span>What does it cost?<span class="ar">＋</span></summary>
+        <div class="a"><b>Free while we build.</b> Pro features — video analysis, wearables, online programs — will come later. Early athletes lock in founding treatment.</div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="final">
+      <svg class="lg"><use href="#ll"/></svg>
+      <h2 class="display">Build your OS<br><span class="amber">tonight</span></h2>
+      <p>Two minutes of onboarding. A performance hub for life. Free for early athletes.</p>
+      <a class="btn btn-p" href="app.html">Start My Onboarding ⚡</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot">
+    <span>© <span id="yr">2026</span> Athlete OS · Powered by the Lockdown Lab engine</span>
+    <span class="fm"><a href="../index.html">Lockdown Lab Live</a> · <a href="../academy.html">IQ Academy</a> · <a href="coach.html">Coach Login</a></span>
+  </div>
+</footer>
+
+<script>document.getElementById('yr').textContent=new Date().getFullYear();</script>
+</body>
+</html>

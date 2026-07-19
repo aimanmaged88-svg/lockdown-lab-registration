@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PokéTrade — Project & Security Brief</title>
+<style>
+  :root {
+    --bg: #0f1226; --panel: #181c3a; --panel-2: #21264d; --ink: #eef0ff;
+    --muted: #9aa0cf; --accent: #ffcb05; --accent-2: #3d7dff; --danger: #ee1515;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: radial-gradient(1000px 500px at 80% -10%, #2a2f66 0, var(--bg) 55%);
+    color: var(--ink); line-height: 1.65; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 32px 22px 80px; }
+
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; margin-bottom: 26px; }
+  .poke { width: 22px; height: 22px; border-radius: 50%;
+    background: linear-gradient(var(--danger) 0 50%, #fff 50% 100%);
+    border: 2px solid #1a1a1a; position: relative; flex: none; }
+  .poke::after { content: ""; position: absolute; inset: 0; margin: auto; width: 7px; height: 7px;
+    background: #fff; border: 2px solid #1a1a1a; border-radius: 50%; }
+
+  h1 { font-size: clamp(28px, 6vw, 40px); line-height: 1.1; margin: 0 0 8px; }
+  .sub { color: var(--muted); font-size: 17px; margin: 0 0 26px; }
+
+  .cta { display: flex; gap: 12px; flex-wrap: wrap; margin: 0 0 40px; }
+  .btn { display: inline-block; background: var(--accent); color: #1a1a1a; font-weight: 800;
+    padding: 14px 24px; border-radius: 999px; text-decoration: none; font-size: 16px; }
+  .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--panel-2); }
+
+  h2 { font-size: 21px; margin: 40px 0 10px; padding-top: 22px; border-top: 1px solid var(--panel-2); }
+  h2:first-of-type { border-top: 0; padding-top: 0; }
+  h3 { font-size: 16px; margin: 20px 0 6px; color: var(--accent); }
+  p { margin: 8px 0; }
+  ul { margin: 8px 0; padding-left: 22px; }
+  li { margin: 6px 0; }
+  .muted { color: var(--muted); }
+  .card { background: var(--panel); border: 1px solid var(--panel-2); border-radius: 14px; padding: 16px 18px; margin: 14px 0; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 620px) { .grid2 { grid-template-columns: 1fr; } }
+  .tagline { font-weight: 700; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 10px 0; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--panel-2); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; }
+  footer { margin-top: 48px; color: var(--muted); font-size: 13px; border-top: 1px solid var(--panel-2); padding-top: 18px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="brand"><span class="poke"></span> PokéTrade</div>
+
+  <h1>Project &amp; Security Brief</h1>
+  <p class="sub">A location-aware Pokémon trading app: see trainers near you, see what they're
+     offering, and set up a trade in a couple of taps.</p>
+
+  <div class="cta">
+    <a class="btn" href="app.html">👉 Click here to open the app</a>
+    <a class="btn ghost" href="guide.html">📖 Player's Guide &amp; FAQs</a>
+  </div>
+
+  <h2>1 · What it is</h2>
+  <p><span class="tagline">The pitch:</span> with the current Pokémon craze, people want to trade —
+     but finding someone nearby who has what you want (and wants what you have) is word-of-mouth
+     and luck. PokéTrade puts trainers on a map, shows each person's <em>offers</em> and
+     <em>wants</em>, and matches trades locally.</p>
+  <div class="grid2">
+    <div class="card"><h3 style="margin-top:0">🗺️ Nearby map</h3>
+      See trainers around you with approximate distance — never an exact address.</div>
+    <div class="card"><h3 style="margin-top:0">🔁 Trade board</h3>
+      Every trainer lists what they offer and what they want. Propose a trade in one tap.</div>
+    <div class="card"><h3 style="margin-top:0">💬 Trade requests</h3>
+      A proposal opens a chat thread to agree on the swap and a meeting spot.</div>
+    <div class="card"><h3 style="margin-top:0">⭐ Reputation</h3>
+      Ratings after each completed trade keep the community trustworthy.</div>
+  </div>
+
+  <h2>2 · What you're looking at today</h2>
+  <p>The link above is a <strong>live v1</strong> — real accounts, a real map, real trades.
+     It's deliberately lightweight: loads instantly from a link on any phone, no install needed.</p>
+  <ul>
+    <li><strong>Sign in with just your email</strong> — we send a 6-digit code, no password to remember.</li>
+    <li><strong>Live map</strong> (OpenStreetMap) showing trainers who chose to share their
+        approximate area, sorted by distance.</li>
+    <li><strong>Real trade flow:</strong> propose → accept/decline → chat → mark completed.</li>
+    <li>Prefer to look first? Tap <em>"Try the demo"</em> on the sign-in screen for a tour with
+        sample trainers — no account, no permissions, nothing collected.</li>
+  </ul>
+
+  <h2>3 · How we'll make it work</h2>
+  <table>
+    <tr><th>Piece</th><th>Plan</th></tr>
+    <tr><td><strong>Accounts</strong></td>
+        <td>Supabase Auth (email code or Google/Apple sign-in). Every trainer gets a profile:
+            display name, avatar, offers/wants lists.</td></tr>
+    <tr><td><strong>Location</strong></td>
+        <td>Browser geolocation (opt-in) → we store a <em>rounded</em> grid cell, not exact
+            coordinates. The map (Leaflet + OpenStreetMap) shows trainers by area.</td></tr>
+    <tr><td><strong>Database</strong></td>
+        <td>Supabase Postgres: <code>profiles</code>, <code>listings</code> (offers/wants),
+            <code>trades</code>, <code>messages</code>, <code>ratings</code>. We already run this
+            stack in production for the Lockdown Lab registration site.</td></tr>
+    <tr><td><strong>Live updates</strong></td>
+        <td>Supabase Realtime pushes new nearby trades and chat messages instantly.</td></tr>
+    <tr><td><strong>Trade flow</strong></td>
+        <td>Propose → accept/decline → chat → mark completed → both sides rate each other.</td></tr>
+    <tr><td><strong>Distribution</strong></td>
+        <td>Progressive Web App: works from a link on any phone (as it does now), installable to
+            the home screen — no app-store gatekeeping to launch. Native wrappers can come later.</td></tr>
+  </table>
+
+  <h2>4 · Security &amp; privacy</h2>
+  <p class="muted">A location app lives or dies on trust, so this is designed in from day one —
+     the same model already protecting our registration platform.</p>
+
+  <h3>Location privacy (the big one)</h3>
+  <ul>
+    <li><strong>Approximate by design:</strong> we never store or show exact coordinates — the
+        server keeps only a rounded grid cell (~500 m). "0.4 km away", never a pin on a house.</li>
+    <li><strong>Opt-in and reversible:</strong> location sharing is off until the user turns it
+        on, and can be paused (ghost mode) any time.</li>
+    <li><strong>Fresh, not historical:</strong> only the latest area is kept — no movement
+        history, no location trail to leak.</li>
+  </ul>
+
+  <h3>Data protection</h3>
+  <ul>
+    <li><strong>Row-Level Security on every table:</strong> the database itself enforces who can
+        read what. Anonymous visitors can read nothing personal; users see only what's meant to be
+        public (name, offers/wants, approximate area) — never emails or contact details.</li>
+    <li><strong>No secrets in the browser:</strong> the client uses only a publishable key that
+        RLS constrains. Privileged operations run server-side in edge functions holding the
+        service-role key — the same split our current admin dashboard uses.</li>
+    <li><strong>HTTPS everywhere</strong>, minimal data collected, delete-account = data removed.</li>
+  </ul>
+
+  <h3>People safety</h3>
+  <ul>
+    <li><strong>In-app contact only:</strong> chat opens after a trade is accepted — no phone
+        numbers or emails exposed.</li>
+    <li><strong>Report &amp; block</strong> on every profile; blocked users vanish from your map.</li>
+    <li><strong>Reputation:</strong> ratings and trade history make bad actors visible fast.</li>
+    <li><strong>Safe-meet guidance:</strong> the app suggests public meeting spots when a trade is
+        agreed.</li>
+    <li><strong>Age gate</strong> at sign-up; community guidelines enforced by the report flow.</li>
+  </ul>
+
+  <h3>Abuse prevention</h3>
+  <ul>
+    <li>Rate limiting on sign-ups, proposals and messages (edge functions).</li>
+    <li>Server-side validation of every write — the client is never trusted.</li>
+    <li>Audit trail on trades and reports for dispute resolution.</li>
+  </ul>
+
+  <h2>5 · Rollout</h2>
+  <ul>
+    <li><strong>Phase 1:</strong> skeleton — validate the concept and the flow. ✅</li>
+    <li><strong>Phase 2:</strong> accounts, real profiles, offers/wants, trade proposals. ✅ <em>live</em></li>
+    <li><strong>Phase 3:</strong> real map + approximate location, chat. ✅ <em>live</em> · ratings next</li>
+    <li><strong>Phase 4:</strong> polish, installable PWA, ratings, invite-based local launch.</li>
+  </ul>
+
+  <div class="cta" style="margin-top:34px">
+    <a class="btn" href="app.html">👉 Click here to open the app</a>
+  </div>
+
+  <footer>PokéTrade · concept brief · fan project, not affiliated with Nintendo / The Pokémon
+    Company / Niantic. Questions: aimanmaged88@gmail.com</footer>
+</div>
+</body>
+</html>
