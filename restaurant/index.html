@@ -1,0 +1,850 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Ember &amp; Oak — Experience Dining Before You Arrive</title>
+<meta name="description" content="A premium restaurant experience platform. Explore the story, the menu and the atmosphere — and book your table before you arrive." />
+<style>
+/* ============================================================
+   Ember & Oak — Restaurant Experience Platform (demo prototype)
+   White-label: change --accent + the RESTAURANT config in JS.
+   Fully self-contained: no external fonts, images or scripts.
+   ============================================================ */
+:root{
+  --bg:#080706;
+  --bg-2:#0f0d0b;
+  --panel:rgba(255,255,255,.045);
+  --panel-2:rgba(255,255,255,.03);
+  --line:rgba(255,255,255,.09);
+  --text:#f5efe6;
+  --muted:#9d968b;
+  --faint:#6a655d;
+  --accent:#c8962e;        /* warm gold */
+  --accent-hi:#e9b64c;
+  --accent-deep:#8a6216;
+  --good:#4cc98a;
+  --r:20px;
+  --r-lg:30px;
+  --maxw:1180px;
+  --serif:'Iowan Old Style','Palatino Linotype','Palatino','Book Antiqua',Georgia,'Times New Roman',serif;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:var(--sans);line-height:1.6;letter-spacing:.005em;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+body.noscroll{overflow:hidden}
+h1,h2,h3,h4{font-family:var(--serif);font-weight:600;line-height:1.08;letter-spacing:-.01em;margin:0}
+a{color:inherit;text-decoration:none}
+img{max-width:100%}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+.eyebrow{font-family:var(--sans);font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--accent-hi);font-weight:600}
+.muted{color:var(--muted)}
+.center{text-align:center}
+section{position:relative}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:.55em;font-family:var(--sans);font-weight:600;
+  font-size:15px;padding:14px 26px;border-radius:100px;border:1px solid transparent;cursor:pointer;
+  transition:transform .25s cubic-bezier(.2,.7,.3,1),background .25s,box-shadow .25s,border-color .25s;
+  background:transparent;color:var(--text);white-space:nowrap}
+.btn:hover{transform:translateY(-2px)}
+.btn:active{transform:translateY(0)}
+.btn-p{background:linear-gradient(120deg,var(--accent-hi),var(--accent));color:#1a1205;
+  box-shadow:0 10px 30px -8px rgba(200,150,46,.55)}
+.btn-p:hover{box-shadow:0 16px 40px -8px rgba(200,150,46,.7)}
+.btn-g{border-color:var(--line);background:var(--panel);backdrop-filter:blur(10px)}
+.btn-g:hover{border-color:rgba(255,255,255,.24);background:rgba(255,255,255,.07)}
+.btn-sm{padding:10px 18px;font-size:13.5px}
+
+/* nav */
+header.nav{position:fixed;top:0;left:0;right:0;z-index:60;transition:background .4s,border-color .4s,backdrop-filter .4s;
+  border-bottom:1px solid transparent}
+header.nav.solid{background:rgba(8,7,6,.72);backdrop-filter:blur(16px) saturate(1.4);border-bottom-color:var(--line)}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:70px}
+.brand{display:flex;align-items:center;gap:11px;font-family:var(--serif);font-size:21px;letter-spacing:.02em}
+.brand .mark{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;flex:0 0 auto;
+  background:linear-gradient(150deg,var(--accent-hi),var(--accent-deep));color:#140d02;font-weight:700;
+  font-family:var(--sans);font-size:17px;box-shadow:inset 0 1px 1px rgba(255,255,255,.4)}
+.nav-links{display:flex;gap:30px;align-items:center}
+.nav-links a{font-size:14px;color:var(--muted);font-weight:500;transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+.nav-cta{display:flex;gap:12px;align-items:center}
+.nav-links.mobile,.hamb{display:none}
+@media(max-width:900px){
+  .nav-links{display:none}
+  .nav-cta .btn-g{display:none}
+}
+
+/* hero */
+.hero{min-height:100svh;display:flex;align-items:center;position:relative;overflow:hidden;padding:110px 0 70px}
+.hero-video{position:absolute;inset:0;z-index:0}
+.hero-video::before{content:"";position:absolute;inset:0;
+  background:
+    radial-gradient(120% 90% at 78% 18%,rgba(200,150,46,.28),transparent 55%),
+    radial-gradient(90% 80% at 12% 92%,rgba(120,40,20,.35),transparent 60%),
+    linear-gradient(180deg,#1a120a 0%,#0b0806 55%,#080706 100%)}
+/* animated "flame/ember" cinematic layer */
+.hero-video .ember{position:absolute;border-radius:50%;filter:blur(48px);opacity:.55;
+  background:radial-gradient(circle,var(--accent-hi),transparent 70%);animation:drift 14s ease-in-out infinite}
+.hero-video .e1{width:420px;height:420px;left:60%;top:8%;animation-delay:0s}
+.hero-video .e2{width:300px;height:300px;left:8%;top:55%;background:radial-gradient(circle,#c24a1e,transparent 70%);animation-delay:-5s}
+.hero-video .e3{width:220px;height:220px;left:44%;top:70%;animation-delay:-9s}
+@keyframes drift{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(-24px,-34px) scale(1.12)}}
+.hero-video::after{content:"";position:absolute;inset:0;
+  background:linear-gradient(90deg,rgba(8,7,6,.78) 0%,rgba(8,7,6,.35) 45%,transparent 75%);}
+.hero-grain{position:absolute;inset:0;z-index:1;opacity:.05;mix-blend-mode:overlay;pointer-events:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>")}
+.hero-in{position:relative;z-index:2;max-width:720px}
+.hero h1{font-size:clamp(42px,7.2vw,88px);letter-spacing:-.02em}
+.hero .sub{font-size:clamp(16px,2vw,20px);color:var(--muted);margin:26px 0 36px;max-width:540px}
+.hero-cta{display:flex;gap:14px;flex-wrap:wrap}
+.hero-meta{display:flex;gap:30px;margin-top:56px;flex-wrap:wrap}
+.hero-meta .m{border-left:2px solid var(--accent);padding-left:14px}
+.hero-meta .m b{font-family:var(--serif);font-size:24px;display:block;font-weight:600}
+.hero-meta .m span{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+.scrollcue{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);z-index:2;color:var(--faint);
+  font-size:11px;letter-spacing:.28em;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;gap:8px}
+.scrollcue .bar{width:1px;height:38px;background:linear-gradient(var(--accent),transparent);animation:cue 2.2s ease-in-out infinite}
+@keyframes cue{0%,100%{opacity:.3;transform:scaleY(.5);transform-origin:top}50%{opacity:1;transform:scaleY(1)}}
+
+/* generic section spacing */
+.sec{padding:110px 0}
+.sec-head{max-width:640px;margin-bottom:56px}
+.sec-head.center{margin-left:auto;margin-right:auto}
+.sec-head h2{font-size:clamp(30px,4.4vw,50px);margin:14px 0 0}
+.sec-head p{color:var(--muted);font-size:17px;margin:18px 0 0}
+
+/* reveal on scroll */
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .8s cubic-bezier(.2,.7,.3,1),transform .8s cubic-bezier(.2,.7,.3,1)}
+.reveal.in{opacity:1;transform:none}
+
+/* about */
+.about-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:56px;align-items:center}
+@media(max-width:860px){.about-grid{grid-template-columns:1fr;gap:36px}}
+.about-copy p{color:var(--muted);font-size:16.5px;margin:16px 0}
+.chef{display:flex;gap:18px;align-items:center;margin-top:30px;padding-top:26px;border-top:1px solid var(--line)}
+.chef .avatar{width:62px;height:62px;border-radius:50%;flex:0 0 auto;
+  background:linear-gradient(150deg,#3a2a18,#1a120a);border:1px solid var(--line);display:grid;place-items:center;font-size:26px}
+.chef .n{font-family:var(--serif);font-size:19px}
+.chef .r{font-size:13px;color:var(--faint);letter-spacing:.04em}
+.photo-stack{position:relative;aspect-ratio:4/5;border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--line)}
+.photo-stack .ph{position:absolute;inset:0}
+.awards{display:flex;gap:14px;flex-wrap:wrap;margin-top:34px}
+.award{display:flex;align-items:center;gap:10px;padding:12px 16px;border:1px solid var(--line);border-radius:14px;background:var(--panel-2)}
+.award .s{font-size:20px}
+.award b{font-size:13.5px;display:block}
+.award span{font-size:11.5px;color:var(--faint)}
+
+/* gallery */
+.gallery{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:60px}
+.gallery .g{aspect-ratio:1;border-radius:16px;overflow:hidden;border:1px solid var(--line);position:relative;
+  transition:transform .4s;cursor:pointer}
+.gallery .g:hover{transform:scale(1.03)}
+.gallery .g.tall{grid-row:span 2;aspect-ratio:auto}
+@media(max-width:700px){.gallery{grid-template-columns:repeat(2,1fr)}.gallery .g.tall{grid-row:span 1;aspect-ratio:1}}
+
+/* menu */
+.menu-tabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:40px}
+.tab{padding:10px 20px;border-radius:100px;border:1px solid var(--line);background:var(--panel-2);
+  font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;transition:all .25s}
+.tab:hover{color:var(--text)}
+.tab.on{background:linear-gradient(120deg,var(--accent-hi),var(--accent));color:#1a1205;border-color:transparent}
+.menu-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+@media(max-width:900px){.menu-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.menu-grid{grid-template-columns:1fr}}
+.dish{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--panel-2);cursor:pointer;
+  transition:transform .4s cubic-bezier(.2,.7,.3,1),border-color .3s,box-shadow .4s;display:flex;flex-direction:column}
+.dish:hover{transform:translateY(-6px);border-color:rgba(200,150,46,.4);box-shadow:0 24px 50px -22px rgba(0,0,0,.8)}
+.dish .img{aspect-ratio:16/11;position:relative;overflow:hidden}
+.dish .img .tag{position:absolute;top:12px;left:12px;z-index:2;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  font-weight:700;padding:5px 10px;border-radius:8px;background:rgba(8,7,6,.7);backdrop-filter:blur(6px);color:var(--accent-hi)}
+.dish .body{padding:18px 20px 22px}
+.dish .body .top{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.dish h3{font-size:20px}
+.dish .price{font-family:var(--serif);color:var(--accent-hi);font-size:19px;flex:0 0 auto}
+.dish .desc{color:var(--muted);font-size:14px;margin-top:8px}
+.dish .more{margin-top:14px;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);
+  display:flex;align-items:center;gap:6px}
+.dish:hover .more{color:var(--accent-hi)}
+
+/* experience */
+.xp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+@media(max-width:860px){.xp-grid{grid-template-columns:1fr}}
+.xp{border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--panel-2);position:relative;min-height:340px;
+  display:flex;flex-direction:column;justify-content:flex-end;padding:26px;transition:transform .4s,border-color .3s}
+.xp:hover{transform:translateY(-6px);border-color:rgba(200,150,46,.4)}
+.xp .bg{position:absolute;inset:0;z-index:0}
+.xp .bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,rgba(8,7,6,.55) 62%,rgba(8,7,6,.94))}
+.xp .c{position:relative;z-index:1}
+.xp .ic{font-size:26px;margin-bottom:auto}
+.xp h3{font-size:22px;margin-top:14px}
+.xp p{color:var(--muted);font-size:14.5px;margin:10px 0 0}
+.tour{margin-top:22px;border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;position:relative;
+  aspect-ratio:21/9;display:grid;place-items:center;background:linear-gradient(135deg,#17110a,#0a0706)}
+@media(max-width:700px){.tour{aspect-ratio:4/3}}
+.tour .play{width:78px;height:78px;border-radius:50%;display:grid;place-items:center;cursor:pointer;
+  background:rgba(255,255,255,.08);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.2);
+  transition:transform .3s,background .3s}
+.tour .play:hover{transform:scale(1.08);background:rgba(200,150,46,.9);color:#140d02}
+.tour .play svg{margin-left:4px}
+.tour .lbl{position:absolute;bottom:22px;left:24px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+
+/* testimonials */
+.reviews{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+@media(max-width:860px){.reviews{grid-template-columns:1fr}}
+.review{border:1px solid var(--line);border-radius:var(--r);padding:26px;background:var(--panel-2)}
+.review .stars{color:var(--accent-hi);letter-spacing:3px;font-size:14px}
+.review p{font-size:15.5px;margin:14px 0 20px;line-height:1.7}
+.review .who{display:flex;align-items:center;gap:12px}
+.review .who .av{width:42px;height:42px;border-radius:50%;background:linear-gradient(150deg,#3a2a18,#1a120a);
+  border:1px solid var(--line);display:grid;place-items:center;font-size:16px;flex:0 0 auto}
+.review .who b{font-size:14.5px;display:block}
+.review .who span{font-size:12.5px;color:var(--faint)}
+.insta{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:44px}
+@media(max-width:700px){.insta{grid-template-columns:repeat(3,1fr)}}
+.insta .p{aspect-ratio:1;border-radius:14px;overflow:hidden;border:1px solid var(--line);position:relative;cursor:pointer;transition:transform .35s}
+.insta .p:hover{transform:scale(1.05)}
+.insta .p .h{position:absolute;inset:0;display:grid;place-items:center;font-size:20px;opacity:0;transition:opacity .3s;background:rgba(8,7,6,.4)}
+.insta .p:hover .h{opacity:1}
+
+/* booking */
+.book{background:linear-gradient(180deg,var(--bg-2),var(--bg))}
+.book-card{max-width:760px;margin:0 auto;border:1px solid var(--line);border-radius:var(--r-lg);
+  background:var(--panel);backdrop-filter:blur(14px);overflow:hidden}
+.book-steps{display:flex;border-bottom:1px solid var(--line)}
+.book-steps .st{flex:1;padding:16px 12px;text-align:center;font-size:12.5px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--faint);position:relative;transition:color .3s}
+.book-steps .st.on{color:var(--accent-hi)}
+.book-steps .st.done{color:var(--muted)}
+.book-steps .st::after{content:"";position:absolute;bottom:-1px;left:0;right:0;height:2px;background:var(--accent);
+  transform:scaleX(0);transition:transform .4s}
+.book-steps .st.on::after,.book-steps .st.done::after{transform:scaleX(1)}
+.book-body{padding:34px}
+.field{margin-bottom:20px}
+.field label{display:block;font-size:13px;letter-spacing:.04em;color:var(--muted);margin-bottom:9px;font-weight:600}
+.field input,.field select,.field textarea{width:100%;background:rgba(0,0,0,.28);border:1px solid var(--line);
+  border-radius:12px;padding:13px 15px;color:var(--text);font-family:var(--sans);font-size:15px;transition:border-color .25s}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent)}
+.field textarea{resize:vertical;min-height:88px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:520px){.row2{grid-template-columns:1fr}}
+.choices{display:flex;gap:10px;flex-wrap:wrap}
+.choice{padding:11px 18px;border:1px solid var(--line);border-radius:100px;background:rgba(0,0,0,.25);cursor:pointer;
+  font-size:14px;font-weight:600;transition:all .2s;user-select:none}
+.choice:hover{border-color:rgba(255,255,255,.28)}
+.choice.on{background:linear-gradient(120deg,var(--accent-hi),var(--accent));color:#1a1205;border-color:transparent}
+.book-foot{display:flex;justify-content:space-between;align-items:center;margin-top:14px;gap:14px}
+.book-foot .back{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;font-weight:600;font-family:var(--sans)}
+.book-foot .back:hover{color:var(--text)}
+.confirm{text-align:center;padding:20px 10px}
+.confirm .check{width:80px;height:80px;border-radius:50%;margin:0 auto 22px;display:grid;place-items:center;
+  background:linear-gradient(150deg,var(--accent-hi),var(--accent-deep));font-size:38px;color:#140d02;
+  animation:pop .6s cubic-bezier(.2,1.4,.4,1)}
+@keyframes pop{0%{transform:scale(0)}100%{transform:scale(1)}}
+.confirm h3{font-size:30px;margin-bottom:12px}
+.confirm .summary{display:inline-flex;flex-direction:column;gap:8px;text-align:left;margin:24px auto;
+  border:1px solid var(--line);border-radius:16px;padding:22px 26px;background:rgba(0,0,0,.25)}
+.confirm .summary div{display:flex;justify-content:space-between;gap:34px;font-size:14.5px}
+.confirm .summary div span:first-child{color:var(--faint)}
+
+/* footer */
+footer{border-top:1px solid var(--line);padding:64px 0 40px;background:var(--bg-2)}
+.foot-grid{display:grid;grid-template-columns:1.6fr 1fr 1fr 1fr;gap:30px}
+@media(max-width:760px){.foot-grid{grid-template-columns:1fr 1fr}}
+footer h4{font-family:var(--sans);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--faint);margin-bottom:16px}
+footer .lk{display:block;font-size:14.5px;color:var(--muted);margin-bottom:10px;transition:color .2s}
+footer .lk:hover{color:var(--text)}
+.foot-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:48px;padding-top:26px;
+  border-top:1px solid var(--line);color:var(--faint);font-size:13px;flex-wrap:wrap;gap:12px}
+.wl-note{display:inline-flex;align-items:center;gap:8px;padding:7px 14px;border:1px solid var(--line);border-radius:100px;font-size:12px;color:var(--muted)}
+
+/* dish modal */
+.modal-mask{position:fixed;inset:0;z-index:100;background:rgba(4,3,2,.75);backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;padding:24px;opacity:0;pointer-events:none;transition:opacity .35s}
+.modal-mask.open{opacity:1;pointer-events:auto}
+.modal{max-width:940px;width:100%;max-height:90svh;overflow:auto;border:1px solid var(--line);border-radius:var(--r-lg);
+  background:var(--bg-2);transform:translateY(26px) scale(.98);transition:transform .4s cubic-bezier(.2,.7,.3,1);
+  display:grid;grid-template-columns:1fr 1fr}
+.modal-mask.open .modal{transform:none}
+@media(max-width:760px){.modal{grid-template-columns:1fr}}
+.modal .m-img{position:relative;min-height:320px}
+.modal .m-img .close{position:absolute;top:16px;right:16px;width:38px;height:38px;border-radius:50%;
+  background:rgba(8,7,6,.6);backdrop-filter:blur(8px);border:1px solid var(--line);display:grid;place-items:center;
+  cursor:pointer;font-size:18px;color:var(--text);z-index:3}
+.modal .m-img .close:hover{background:rgba(200,150,46,.9);color:#140d02}
+.modal .m-img .vtag{position:absolute;bottom:18px;left:18px;display:flex;align-items:center;gap:9px;z-index:2;
+  font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--text);padding:8px 14px;border-radius:100px;
+  background:rgba(8,7,6,.55);backdrop-filter:blur(8px);border:1px solid var(--line);cursor:pointer}
+.modal .m-body{padding:34px}
+.modal .m-body .pl{display:flex;justify-content:space-between;align-items:baseline;gap:16px}
+.modal .m-body h2{font-size:32px}
+.modal .m-body .price{font-family:var(--serif);font-size:26px;color:var(--accent-hi)}
+.modal .m-body .lead{color:var(--muted);font-size:15.5px;margin:14px 0 0;line-height:1.7}
+.m-block{margin-top:26px;padding-top:22px;border-top:1px solid var(--line)}
+.m-block .h{font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-hi);font-weight:700;margin-bottom:12px}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip{font-size:13px;padding:7px 13px;border:1px solid var(--line);border-radius:100px;background:var(--panel-2);color:var(--muted)}
+.m-note{font-size:14.5px;color:var(--text);line-height:1.7;font-style:italic;opacity:.9}
+.pair{display:flex;align-items:center;gap:14px;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--panel-2)}
+.pair .g{width:44px;height:44px;border-radius:10px;background:linear-gradient(150deg,#5a1d2a,#2a0d14);flex:0 0 auto;display:grid;place-items:center;font-size:20px}
+.pair b{font-size:14.5px;display:block}
+.pair span{font-size:13px;color:var(--faint)}
+.nutri{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.nutri .n{border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center;background:var(--panel-2)}
+.nutri .n b{font-family:var(--serif);font-size:20px;display:block}
+.nutri .n span{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+
+/* toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translate(-50%,120%);z-index:120;background:var(--bg-2);
+  border:1px solid var(--line);border-radius:100px;padding:13px 22px;font-size:14px;box-shadow:0 20px 50px -20px #000;
+  transition:transform .45s cubic-bezier(.2,.7,.3,1);display:flex;align-items:center;gap:10px}
+.toast.show{transform:translate(-50%,0)}
+.toast .d{color:var(--accent-hi)}
+
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;scroll-behavior:auto!important}
+  .reveal{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<header class="nav" id="nav">
+  <div class="wrap nav-in">
+    <a class="brand" href="#top"><span class="mark" id="brandMark">E</span><span id="brandName">Ember &amp; Oak</span></a>
+    <nav class="nav-links">
+      <a href="#about">Story</a>
+      <a href="#menu">Menu</a>
+      <a href="#experience">Experience</a>
+      <a href="#reviews">Reviews</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn btn-g btn-sm" href="#experience">Explore</a>
+      <a class="btn btn-p btn-sm" href="#book">Book a Table</a>
+    </div>
+  </div>
+</header>
+
+<!-- ============ HERO ============ -->
+<section class="hero" id="top">
+  <div class="hero-video" aria-hidden="true">
+    <span class="ember e1"></span><span class="ember e2"></span><span class="ember e3"></span>
+  </div>
+  <div class="hero-grain" aria-hidden="true"></div>
+  <div class="wrap hero-in">
+    <div class="eyebrow">Fire-kissed · Seasonal · Unforgettable</div>
+    <h1>Experience Dining<br>Before You Arrive.</h1>
+    <p class="sub">Step inside the story, the flavours and the atmosphere of <b id="heroName">Ember &amp; Oak</b> — then reserve your table in moments. The night begins the second you tap play.</p>
+    <div class="hero-cta">
+      <a class="btn btn-p" href="#book">Book a Table
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <button class="btn btn-g" onclick="openTour()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        Explore the Experience
+      </button>
+    </div>
+    <div class="hero-meta">
+      <div class="m"><b>★ 4.9</b><span>1,240 reviews</span></div>
+      <div class="m"><b>Est. 2016</b><span>Wood-fired kitchen</span></div>
+      <div class="m"><b>2 ★</b><span>Michelin guide</span></div>
+    </div>
+  </div>
+  <div class="scrollcue" aria-hidden="true"><span class="bar"></span>Scroll</div>
+</section>
+
+<!-- ============ ABOUT ============ -->
+<section class="sec" id="about">
+  <div class="wrap">
+    <div class="about-grid">
+      <div class="about-copy reveal">
+        <div class="eyebrow">Our Story</div>
+        <h2 style="font-size:clamp(30px,4.4vw,50px);margin-top:14px">Cooked over live fire,<br>rooted in the seasons.</h2>
+        <p>Ember &amp; Oak began with a single hearth and a simple belief: that great food is an event, not a transaction. Every plate that leaves our kitchen has met flame, smoke and patience — coaxed to its peak by hands that have cooked this way for a lifetime.</p>
+        <p>We work with a tight circle of farmers, foragers and fishers, letting the calendar write the menu. What you taste tonight may never appear in quite the same way again.</p>
+        <div class="chef">
+          <div class="avatar">👨‍🍳</div>
+          <div>
+            <div class="n">Chef Marco Rendell</div>
+            <div class="r">Executive Chef · formerly Noma, The Ledbury</div>
+          </div>
+        </div>
+        <div class="awards">
+          <div class="award"><span class="s">⭐</span><div><b>Michelin</b><span>Two stars · 2021–24</span></div></div>
+          <div class="award"><span class="s">🏆</span><div><b>World's 50 Best</b><span>No. 18 · 2023</span></div></div>
+          <div class="award"><span class="s">🌿</span><div><b>Green Star</b><span>Sustainability</span></div></div>
+        </div>
+      </div>
+      <div class="reveal">
+        <div class="photo-stack">
+          <div class="ph" id="chefPhoto"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- gallery -->
+    <div class="eyebrow reveal" style="margin-top:80px">Signature Moments</div>
+    <div class="gallery">
+      <div class="g reveal" data-g="0"></div>
+      <div class="g tall reveal" data-g="1"></div>
+      <div class="g reveal" data-g="2"></div>
+      <div class="g reveal" data-g="3"></div>
+      <div class="g reveal" data-g="4"></div>
+      <div class="g reveal" data-g="5"></div>
+      <div class="g reveal" data-g="6"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ MENU ============ -->
+<section class="sec" id="menu" style="background:linear-gradient(180deg,var(--bg),var(--bg-2),var(--bg))">
+  <div class="wrap">
+    <div class="sec-head center reveal">
+      <div class="eyebrow">The Menu</div>
+      <h2>Every dish, an experience</h2>
+      <p>Browse by course. Tap any plate to explore its origin, the chef's notes and the perfect pairing.</p>
+    </div>
+    <div class="menu-tabs reveal" id="menuTabs"></div>
+    <div class="menu-grid" id="menuGrid"></div>
+  </div>
+</section>
+
+<!-- ============ EXPERIENCE ============ -->
+<section class="sec" id="experience">
+  <div class="wrap">
+    <div class="sec-head reveal">
+      <div class="eyebrow">The Experience</div>
+      <h2>Choose how you gather</h2>
+      <p>From an intimate booth by the fire to a private room for your closest twenty — every corner of Ember &amp; Oak tells its own story.</p>
+    </div>
+    <div class="xp-grid">
+      <div class="xp reveal" data-x="0"><div class="bg"></div><div class="c"><div class="ic">🔥</div><h3>The Hearth Room</h3><p>Front-row seats to the open fire, where the theatre of the kitchen becomes your evening's entertainment.</p></div></div>
+      <div class="xp reveal" data-x="1"><div class="bg"></div><div class="c"><div class="ic">🥂</div><h3>Private Dining</h3><p>A hidden room for 8–20 guests, with a dedicated chef, sommelier and a menu written just for your table.</p></div></div>
+      <div class="xp reveal" data-x="2"><div class="bg"></div><div class="c"><div class="ic">🎉</div><h3>Events &amp; Functions</h3><p>Full buy-outs, launches and celebrations — the whole restaurant, and its story, becomes yours for the night.</p></div></div>
+    </div>
+    <div class="tour reveal">
+      <div class="play" onclick="openTour()" role="button" aria-label="Play virtual tour">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      </div>
+      <div class="lbl">▸ 360° Virtual Tour · 2 min walkthrough</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ TESTIMONIALS ============ -->
+<section class="sec" id="reviews" style="background:linear-gradient(180deg,var(--bg),var(--bg-2))">
+  <div class="wrap">
+    <div class="sec-head center reveal">
+      <div class="eyebrow">Guest Stories</div>
+      <h2>Loved by 1,240 diners</h2>
+      <p>The night stays with you long after the last plate is cleared.</p>
+    </div>
+    <div class="reviews">
+      <div class="review reveal"><div class="stars">★★★★★</div><p>"The most theatrical meal of our lives. Watching the fire from the Hearth Room while the dishes arrived one by one — pure cinema. We booked our anniversary before we'd even left."</p><div class="who"><span class="av">🌸</span><div><b>Amara &amp; Josh</b><span>Anniversary · London</span></div></div></div>
+      <div class="review reveal"><div class="stars">★★★★★</div><p>"I explored the whole menu on the app on the train over — by the time I sat down I knew exactly what wine I wanted. Genuinely the best hospitality tech I've used."</p><div class="who"><span class="av">🍷</span><div><b>Priya N.</b><span>Regular · 14 visits</span></div></div></div>
+      <div class="review reveal"><div class="stars">★★★★★</div><p>"Booked a private room for my father's 60th. The pre-visit planning made it feel effortless and personal. Staff knew every dietary note before we arrived."</p><div class="who"><span class="av">🎩</span><div><b>Daniel F.</b><span>Private dining · 18 guests</span></div></div></div>
+    </div>
+    <div class="eyebrow reveal center" style="margin-top:60px">As seen on Instagram · @emberoak</div>
+    <div class="insta" id="instaGrid"></div>
+  </div>
+</section>
+
+<!-- ============ BOOKING ============ -->
+<section class="sec book" id="book">
+  <div class="wrap">
+    <div class="sec-head center reveal">
+      <div class="eyebrow">Reservations</div>
+      <h2>Reserve your table</h2>
+      <p>A few taps, and the night is yours.</p>
+    </div>
+    <div class="book-card reveal">
+      <div class="book-steps" id="bookSteps">
+        <div class="st on">1 · Date &amp; Guests</div>
+        <div class="st">2 · Details</div>
+        <div class="st">3 · Confirm</div>
+      </div>
+      <div class="book-body" id="bookBody"><!-- injected --></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FOOTER ============ -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <a class="brand" href="#top"><span class="mark">E</span>Ember &amp; Oak</a>
+        <p class="muted" style="font-size:14px;margin-top:16px;max-width:280px">A wood-fired dining house. Selling the experience before you ever walk through the door.</p>
+        <div class="wl-note" style="margin-top:18px">⚙️ White-label ready — steakhouse · café · winery · hotel</div>
+      </div>
+      <div>
+        <h4>Visit</h4>
+        <a class="lk" href="#about">Our Story</a>
+        <a class="lk" href="#menu">The Menu</a>
+        <a class="lk" href="#experience">Private Dining</a>
+        <a class="lk" href="#book">Book a Table</a>
+      </div>
+      <div>
+        <h4>Hours</h4>
+        <div class="muted" style="font-size:14px;line-height:2">Tue–Thu · 6–11pm<br>Fri–Sat · 5–late<br>Sun · 12–9pm<br>Mon · Closed</div>
+      </div>
+      <div>
+        <h4>Find Us</h4>
+        <div class="muted" style="font-size:14px;line-height:2">42 Kiln Street<br>Shoreditch, London<br>+44 20 7946 0100</div>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© 2026 Ember &amp; Oak · Restaurant Experience Platform</span>
+      <span>Prototype demo · Design + UX concept</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============ DISH MODAL ============ -->
+<div class="modal-mask" id="modalMask" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modalCard"><!-- injected --></div>
+</div>
+
+<div class="toast" id="toast"><span class="d">●</span><span id="toastMsg"></span></div>
+
+<script>
+/* =====================================================================
+   White-label config — swap these + --accent to rebrand for any venue.
+   ===================================================================== */
+const RESTAURANT = { name:'Ember & Oak', mark:'E' };
+
+/* ---- palette generators (CSS-only "photography") ---- */
+const GRAD = [
+  'linear-gradient(150deg,#3a1e10,#6b2f16,#c2531f)',
+  'linear-gradient(150deg,#4a2a12,#8a5a1e,#e0a03a)',
+  'linear-gradient(150deg,#2a1810,#5a2a1a,#a83a22)',
+  'linear-gradient(150deg,#1a2418,#3a5230,#7a9a4a)',
+  'linear-gradient(150deg,#301a24,#6a2a3a,#b04a58)',
+  'linear-gradient(150deg,#1a1e2a,#2a3a52,#4a6a8a)',
+  'linear-gradient(150deg,#2a1a2e,#4a2a52,#7a4a8a)',
+];
+function foodBg(seed){
+  const g = GRAD[seed % GRAD.length];
+  return `background:${g};position:relative`;
+}
+function sheen(el){
+  el.insertAdjacentHTML('beforeend',
+    `<div style="position:absolute;inset:0;background:radial-gradient(120% 80% at 30% 15%,rgba(255,255,255,.22),transparent 55%),radial-gradient(80% 60% at 80% 90%,rgba(0,0,0,.4),transparent)"></div>`);
+}
+
+/* =====================================================================
+   MENU DATA
+   ===================================================================== */
+const CATS = ['Signatures','Starters','From the Fire','Sea','Desserts'];
+const DISHES = [
+  { cat:'From the Fire', seed:0, name:'45-Day Aged Ribeye', price:'£48', tag:'Chef\'s Cut', emoji:'🥩',
+    desc:'Dry-aged over oak, seared on the open flame, rested on burnt-butter bone marrow.',
+    lead:'A 400g bone-in ribeye from native-breed cattle, aged 45 days in our Himalayan-salt chamber to concentrate flavour and tenderise the grain. Finished over white-hot oak embers for a deep, smoky crust.',
+    origin:'Native Longhorn · Yorkshire Dales, UK', cook:'Reverse-seared · finished on the flame · rested 8 min',
+    ingredients:['45-day aged ribeye','Bone marrow','Burnt butter','Oak smoke','Fermented pepper','Sea salt flakes'],
+    note:'"Ask for it medium-rare and let the fat do the talking. The marrow is meant to be spread across every bite." — Chef Marco',
+    pair:{g:'🍷',n:'Barolo, Piedmont 2016',s:'Bold tannins to match the char'},
+    nutri:[['720','kcal'],['52g','protein'],['3g','carbs'],['58g','fat']] },
+  { cat:'Signatures', seed:2, name:'Ember-Roasted Beetroot', price:'£16', tag:'Signature', emoji:'🫐',
+    desc:'Whole beets buried in coals, aged goat curd, hazelnut, elderberry.',
+    lead:'Heritage beetroots roasted whole in the dying embers for six hours until jammy and sweet, then dressed with cultured goat curd and a sharp elderberry glaze.',
+    origin:'Organic · our own kitchen garden', cook:'Coal-buried · 6 hours · finished with cold-pressed oil',
+    ingredients:['Heritage beetroot','Aged goat curd','Toasted hazelnut','Elderberry','Nasturtium'],
+    note:'"People forget a vegetable can be the star. This one silences the table every time." — Chef Marco',
+    pair:{g:'🍷',n:'Assyrtiko, Santorini',s:'Mineral edge, bright acidity'},
+    nutri:[['280','kcal'],['9g','protein'],['22g','carbs'],['16g','fat']] },
+  { cat:'Sea', seed:5, name:'Fire-Licked Cornish Turbot', price:'£38', tag:'Day Boat', emoji:'🐟',
+    desc:'Line-caught turbot, brown-butter mussels, sea herbs, charred lemon.',
+    lead:'A thick tranche of day-boat turbot grilled on the bone for sweetness, lifted with a brown-butter and mussel emulsion and a scatter of foraged sea herbs.',
+    origin:'Line-caught · Newlyn, Cornwall', cook:'On-the-bone · flame-grilled · basted in brown butter',
+    ingredients:['Cornish turbot','Rope-grown mussels','Brown butter','Sea purslane','Charred lemon'],
+    note:'"Turbot on the bone is the finest fish there is. We barely touch it — just fire and butter." — Chef Marco',
+    pair:{g:'🥂',n:'Chablis 1er Cru 2020',s:'Flinty, saline, precise'},
+    nutri:[['410','kcal'],['44g','protein'],['4g','carbs'],['24g','fat']] },
+  { cat:'Starters', seed:3, name:'Smoked Heritage Tomatoes', price:'£14', tag:'Summer', emoji:'🍅',
+    desc:'Cold-smoked tomatoes, whipped ricotta, basil oil, sourdough crumb.',
+    lead:'Ripe heritage tomatoes gently cold-smoked to deepen their sweetness, over a cloud of house-whipped ricotta with a vivid basil oil.',
+    origin:'Isle of Wight · peak-season only', cook:'Cold-smoked over applewood · 40 min',
+    ingredients:['Heritage tomato','Whipped ricotta','Basil oil','Sourdough crumb','Aged balsamic'],
+    note:'"On the menu for eight weeks a year. When the tomatoes are gone, they\'re gone." — Chef Marco',
+    pair:{g:'🥂',n:'Provence Rosé',s:'Crisp and floral'},
+    nutri:[['240','kcal'],['11g','protein'],['14g','carbs'],['15g','fat']] },
+  { cat:'From the Fire', seed:0, name:'Lamb Shoulder, Coal-Roasted', price:'£34', tag:'To Share', emoji:'🍖',
+    desc:'12-hour lamb shoulder, wild garlic, ember-baked flatbread.',
+    lead:'Whole shoulder rubbed in fermented chilli and slow-roasted beside the coals for twelve hours until it falls from the bone. Served to share with charred flatbread.',
+    origin:'Salt-marsh lamb · Romney, Kent', cook:'Coal-adjacent · 12 hours · pulled at the table',
+    ingredients:['Salt-marsh lamb','Fermented chilli','Wild garlic','Ember flatbread','Pickled onion'],
+    note:'"This is our Sunday-with-family dish. Order it, tear the bread, share it loudly." — Chef Marco',
+    pair:{g:'🍷',n:'Northern Rhône Syrah',s:'Peppery and generous'},
+    nutri:[['640','kcal'],['46g','protein'],['28g','carbs'],['38g','fat']] },
+  { cat:'Desserts', seed:4, name:'Burnt Honey &amp; Oak Cream', price:'£12', tag:'Signature', emoji:'🍮',
+    desc:'Torched honey custard, oak-smoked cream, honeycomb shards.',
+    lead:'Our signature finish: a silky custard of burnt local honey under a lid of oak-smoked cream, topped with brittle honeycomb from our rooftop hives.',
+    origin:'Honey from our own rooftop apiary', cook:'Torched to order · smoked cream folded tableside',
+    ingredients:['Burnt honey','Oak-smoked cream','Honeycomb','Vanilla bean','Sea salt'],
+    note:'"The smoke and the sweet — that\'s the whole restaurant in one spoon." — Chef Marco',
+    pair:{g:'🥃',n:'Pedro Ximénez Sherry',s:'Raisined, decadent'},
+    nutri:[['380','kcal'],['6g','protein'],['34g','carbs'],['24g','fat']] },
+  { cat:'Signatures', seed:1, name:'Charred Hispi Cabbage', price:'£15', tag:'Signature', emoji:'🥬',
+    desc:'Blackened cabbage, miso-brown butter, toasted seeds, chilli.',
+    lead:'A whole pointed cabbage charred hard over flame until the outer leaves blacken and the heart turns sweet and silky, glazed in miso-brown butter.',
+    origin:'Regenerative farm · Hampshire', cook:'Flame-charred whole · basted in miso butter',
+    ingredients:['Hispi cabbage','White miso','Brown butter','Toasted seeds','Fermented chilli'],
+    note:'"Doubters become believers. Fire turns a humble cabbage into something you crave." — Chef Marco',
+    pair:{g:'🍶',n:'Junmai Sake',s:'Umami echo, clean finish'},
+    nutri:[['260','kcal'],['7g','protein'],['16g','carbs'],['19g','fat']] },
+  { cat:'Sea', seed:5, name:'Hand-Dived Scallops', price:'£22', tag:'Starter', emoji:'🐚',
+    desc:'Seared scallops, ember leek, brown shrimp butter, apple.',
+    lead:'Plump hand-dived scallops seared hard for a caramel crust, set on sweet ember-cooked leeks with a warm brown-shrimp butter.',
+    origin:'Hand-dived · Isle of Skye', cook:'Seared 60 seconds a side · basted',
+    ingredients:['Diver scallops','Ember leek','Brown shrimp','Cultured butter','Green apple'],
+    note:'"Sixty seconds a side, no more. A scallop should melt, not chew." — Chef Marco',
+    pair:{g:'🥂',n:'Champagne Blanc de Blancs',s:'Fine bubbles, brioche notes'},
+    nutri:[['300','kcal'],['24g','protein'],['9g','carbs'],['18g','fat']] },
+];
+
+/* =====================================================================
+   RENDER: menu tabs + grid
+   ===================================================================== */
+const tabsEl = document.getElementById('menuTabs');
+const gridEl = document.getElementById('menuGrid');
+let activeCat = 'Signatures';
+
+['Signatures',...CATS.filter(c=>c!=='Signatures')].forEach((c,i)=>{
+  const t = document.createElement('button');
+  t.className = 'tab' + (i===0?' on':'');
+  t.textContent = c;
+  t.onclick = ()=>{ activeCat=c; document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on')); t.classList.add('on'); renderMenu(); };
+  tabsEl.appendChild(t);
+});
+
+function renderMenu(){
+  const list = activeCat==='Signatures'
+    ? DISHES.filter(d=>d.tag.includes('Signature')||d.cat==='Signatures'||['45-Day Aged Ribeye','Burnt Honey &amp; Oak Cream'].includes(d.name.replace('&','&amp;')))
+    : DISHES.filter(d=>d.cat===activeCat);
+  const show = list.length? list : DISHES.filter(d=>d.cat===activeCat);
+  gridEl.innerHTML='';
+  show.forEach((d)=>{
+    const idx = DISHES.indexOf(d);
+    const card = document.createElement('div');
+    card.className='dish';
+    card.onclick=()=>openDish(idx);
+    card.innerHTML = `
+      <div class="img" style="${foodBg(d.seed)}">
+        <span class="tag">${d.tag}</span>
+        <div style="position:absolute;inset:0;display:grid;place-items:center;font-size:64px;filter:drop-shadow(0 8px 20px rgba(0,0,0,.5))">${d.emoji}</div>
+      </div>
+      <div class="body">
+        <div class="top"><h3>${d.name}</h3><span class="price">${d.price}</span></div>
+        <p class="desc">${d.desc}</p>
+        <div class="more">Explore dish
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+      </div>`;
+    gridEl.appendChild(card);
+    sheen(card.querySelector('.img'));
+  });
+}
+renderMenu();
+
+/* =====================================================================
+   DISH MODAL
+   ===================================================================== */
+const mask = document.getElementById('modalMask');
+const modalCard = document.getElementById('modalCard');
+function openDish(i){
+  const d = DISHES[i];
+  modalCard.innerHTML = `
+    <div class="m-img" style="${foodBg(d.seed)}">
+      <div class="close" onclick="closeModal()">✕</div>
+      <div style="position:absolute;inset:0;display:grid;place-items:center;font-size:110px;filter:drop-shadow(0 12px 30px rgba(0,0,0,.55))">${d.emoji}</div>
+      <div class="vtag" onclick="toast('▶ Cooking video — demo placeholder')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg> Watch it cooked
+      </div>
+    </div>
+    <div class="m-body">
+      <div class="pl"><h2>${d.name}</h2><span class="price">${d.price}</span></div>
+      <p class="lead">${d.lead}</p>
+
+      <div class="m-block">
+        <div class="h">Origin</div>
+        <div style="font-size:14.5px">${d.origin}</div>
+        <div class="h" style="margin-top:18px">Cooking guide</div>
+        <div style="font-size:14.5px;color:var(--muted)">${d.cook}</div>
+      </div>
+
+      <div class="m-block">
+        <div class="h">Ingredient breakdown</div>
+        <div class="chips">${d.ingredients.map(x=>`<span class="chip">${x}</span>`).join('')}</div>
+      </div>
+
+      <div class="m-block">
+        <div class="h">Chef's notes</div>
+        <p class="m-note">${d.note}</p>
+      </div>
+
+      <div class="m-block">
+        <div class="h">Perfect pairing</div>
+        <div class="pair"><div class="g">${d.pair.g}</div><div><b>${d.pair.n}</b><span>${d.pair.s}</span></div></div>
+      </div>
+
+      <div class="m-block">
+        <div class="h">Nutrition &amp; allergens</div>
+        <div class="nutri">${d.nutri.map(n=>`<div class="n"><b>${n[0]}</b><span>${n[1]}</span></div>`).join('')}</div>
+        <div class="chips" style="margin-top:12px"><span class="chip">Contains dairy</span><span class="chip">Gluten on request</span><span class="chip">GF adaptable</span></div>
+      </div>
+
+      <button class="btn btn-p" style="margin-top:26px;width:100%;justify-content:center" onclick="closeModal();document.getElementById('book').scrollIntoView()">Reserve to taste this</button>
+    </div>`;
+  const img = modalCard.querySelector('.m-img'); sheen(img);
+  mask.classList.add('open'); document.body.classList.add('noscroll');
+}
+function closeModal(){ mask.classList.remove('open'); document.body.classList.remove('noscroll'); }
+document.addEventListener('keydown',e=>{ if(e.key==='Escape'){closeModal(); if(document.body.classList.contains('noscroll'))document.body.classList.remove('noscroll');} });
+
+/* =====================================================================
+   GALLERY + INSTA + EXPERIENCE backgrounds (CSS-only)
+   ===================================================================== */
+document.querySelectorAll('.gallery .g').forEach((g)=>{
+  const s = +g.dataset.g;
+  const emojis=['🔥','🍷','🥩','🌿','🕯️','🥂','🍽️'];
+  g.style.cssText += foodBg(s)+';display:grid;place-items:center;font-size:44px';
+  g.innerHTML=`<span style="position:relative;filter:drop-shadow(0 6px 16px rgba(0,0,0,.5))">${emojis[s]}</span>`;
+  sheen(g);
+  g.onclick=()=>toast('📷 Gallery — full lightbox in production');
+});
+const insta = document.getElementById('instaGrid');
+['🔥','🥩','🍷','🍮','🐟','🕯️','🥂','🍅','🍖','🌿','🐚','🥬'].forEach((e,i)=>{
+  const p=document.createElement('div'); p.className='p';
+  p.style.cssText=foodBg(i)+';display:grid;place-items:center;font-size:30px';
+  p.innerHTML=`<span style="position:relative">${e}</span><div class="h">♥</div>`;
+  sheen(p);
+  p.onclick=()=>toast('📸 @emberoak on Instagram');
+  insta.appendChild(p);
+});
+document.querySelectorAll('.xp .bg').forEach((b,i)=>{ b.style.cssText+=';'+foodBg([0,6,4][i]); sheen(b); });
+document.getElementById('chefPhoto').style.cssText += 'background:linear-gradient(160deg,#2a1a10,#6b3a1e,#0a0706);display:grid;place-items:center;font-size:100px';
+document.getElementById('chefPhoto').innerHTML='<span style="filter:drop-shadow(0 10px 26px rgba(0,0,0,.5))">👨‍🍳</span>';
+
+/* =====================================================================
+   VIRTUAL TOUR (placeholder)
+   ===================================================================== */
+function openTour(){ toast('▶ 360° virtual tour — cinematic video in production'); document.getElementById('experience').scrollIntoView(); }
+
+/* =====================================================================
+   BOOKING WIZARD
+   ===================================================================== */
+const booking = { date:'', time:'', guests:2, occasion:'None', name:'', email:'', requests:'', diet:[] };
+let step = 0;
+const stepsEl = document.getElementById('bookSteps').children;
+const body = document.getElementById('bookBody');
+const TIMES=['5:30','6:00','6:30','7:00','7:30','8:00','8:30','9:00'];
+const OCCASIONS=['None','Birthday','Anniversary','Date night','Business','Celebration'];
+const DIETS=['Vegetarian','Vegan','Gluten-free','Dairy-free','Nut allergy','Shellfish allergy','Pescatarian','Halal'];
+
+function today(){ const d=new Date(); return d.toISOString().split('T')[0]; }
+
+function renderStep(){
+  [...stepsEl].forEach((s,i)=>{ s.classList.toggle('on',i===step); s.classList.toggle('done',i<step); });
+  if(step===0){
+    body.innerHTML = `
+      <div class="row2">
+        <div class="field"><label>Date</label><input type="date" id="f_date" min="${today()}" value="${booking.date||today()}"></div>
+        <div class="field"><label>Time</label>
+          <div class="choices" id="timeCh">${TIMES.map(t=>`<span class="choice ${booking.time===t?'on':''}" data-t="${t}">${t} pm</span>`).join('')}</div>
+        </div>
+      </div>
+      <div class="field"><label>How many guests?</label>
+        <div class="choices" id="guestCh">${[1,2,3,4,5,6,'7+'].map(g=>`<span class="choice ${booking.guests==g?'on':''}" data-g="${g}">${g}</span>`).join('')}</div>
+      </div>
+      <div class="field"><label>Occasion (optional)</label>
+        <div class="choices" id="occCh">${OCCASIONS.map(o=>`<span class="choice ${booking.occasion===o?'on':''}" data-o="${o}">${o}</span>`).join('')}</div>
+      </div>
+      <div class="book-foot"><span></span><button class="btn btn-p" onclick="next()">Continue →</button></div>`;
+    body.querySelector('#timeCh').onclick=e=>{ const t=e.target.dataset.t; if(!t)return; booking.time=t; pick('#timeCh',e.target); };
+    body.querySelector('#guestCh').onclick=e=>{ const g=e.target.dataset.g; if(!g)return; booking.guests=g; pick('#guestCh',e.target); };
+    body.querySelector('#occCh').onclick=e=>{ const o=e.target.dataset.o; if(!o)return; booking.occasion=o; pick('#occCh',e.target); };
+    body.querySelector('#f_date').onchange=e=>booking.date=e.target.value;
+  }
+  else if(step===1){
+    body.innerHTML = `
+      <div class="row2">
+        <div class="field"><label>Full name</label><input id="f_name" placeholder="Your name" value="${booking.name}"></div>
+        <div class="field"><label>Email</label><input id="f_email" type="email" placeholder="you@email.com" value="${booking.email}"></div>
+      </div>
+      <div class="field"><label>Dietary requirements</label>
+        <div class="choices" id="dietCh">${DIETS.map(d=>`<span class="choice ${booking.diet.includes(d)?'on':''}" data-d="${d}">${d}</span>`).join('')}</div>
+      </div>
+      <div class="field"><label>Special requests</label>
+        <textarea id="f_req" placeholder="Window table, high chair, a candle for dessert…">${booking.requests}</textarea></div>
+      <div class="book-foot"><button class="back" onclick="prev()">← Back</button><button class="btn btn-p" onclick="next()">Review booking →</button></div>`;
+    body.querySelector('#dietCh').onclick=e=>{ const d=e.target.dataset.d; if(!d)return;
+      const i=booking.diet.indexOf(d); if(i>-1)booking.diet.splice(i,1); else booking.diet.push(d);
+      e.target.classList.toggle('on'); };
+    body.querySelector('#f_name').oninput=e=>booking.name=e.target.value;
+    body.querySelector('#f_email').oninput=e=>booking.email=e.target.value;
+    body.querySelector('#f_req').oninput=e=>booking.requests=e.target.value;
+  }
+  else {
+    body.innerHTML = `
+      <div class="confirm">
+        <div class="check">✓</div>
+        <h3>You're booked in.</h3>
+        <p class="muted">A confirmation is on its way to <b>${booking.email||'your inbox'}</b>. We can't wait to host you.</p>
+        <div class="summary">
+          <div><span>Date</span><span>${fmtDate(booking.date||today())}</span></div>
+          <div><span>Time</span><span>${booking.time||'7:00'} pm</span></div>
+          <div><span>Guests</span><span>${booking.guests}</span></div>
+          <div><span>Occasion</span><span>${booking.occasion}</span></div>
+          <div><span>Name</span><span>${booking.name||'Guest'}</span></div>
+          ${booking.diet.length?`<div><span>Dietary</span><span>${booking.diet.join(', ')}</span></div>`:''}
+          ${booking.requests?`<div><span>Requests</span><span>${booking.requests}</span></div>`:''}
+        </div>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:8px">
+          <button class="btn btn-g" onclick="addCal()">＋ Add to calendar</button>
+          <button class="btn btn-p" onclick="resetBooking()">Make another booking</button>
+        </div>
+        <p class="muted" style="font-size:12.5px;margin-top:22px">Prototype demo — no live reservation is created.</p>
+      </div>`;
+  }
+}
+function pick(sel,el){ body.querySelector(sel).querySelectorAll('.choice').forEach(c=>c.classList.remove('on')); el.classList.add('on'); }
+function next(){
+  if(step===0 && !booking.time){ toast('Please choose a time'); return; }
+  if(step===1 && (!booking.name || !booking.email)){ toast('Please add your name and email'); return; }
+  step=Math.min(2,step+1); renderStep(); document.getElementById('book').scrollIntoView();
+}
+function prev(){ step=Math.max(0,step-1); renderStep(); }
+function resetBooking(){ Object.assign(booking,{date:'',time:'',guests:2,occasion:'None',name:'',email:'',requests:'',diet:[]}); step=0; renderStep(); document.getElementById('book').scrollIntoView(); }
+function addCal(){ toast('📅 Calendar invite — connects to your calendar in production'); }
+function fmtDate(s){ try{ return new Date(s+'T00:00').toLocaleDateString(undefined,{weekday:'short',day:'numeric',month:'long'}); }catch(e){ return s; } }
+renderStep();
+
+/* =====================================================================
+   TOAST
+   ===================================================================== */
+let toastT;
+function toast(msg){ const t=document.getElementById('toast'); document.getElementById('toastMsg').textContent=msg;
+  t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2600); }
+
+/* =====================================================================
+   NAV solidify + scroll reveal
+   ===================================================================== */
+const nav=document.getElementById('nav');
+addEventListener('scroll',()=>{ nav.classList.toggle('solid', scrollY>40); },{passive:true});
+const io=new IntersectionObserver((es)=>{ es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } }); },{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+/* apply white-label config */
+document.getElementById('brandName').textContent=RESTAURANT.name;
+document.getElementById('brandMark').textContent=RESTAURANT.mark;
+</script>
+</body>
+</html>
