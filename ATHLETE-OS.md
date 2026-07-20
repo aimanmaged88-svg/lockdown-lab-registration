@@ -61,6 +61,51 @@ audience. Lives in `athlete-os/` and deploys with the rest of the static site
   rate teammates from the **Squad** section of the Coach tab; the coach sees each
   athlete's peer average in their file and assigns teams there.
 
+## V2 experience layer (design system)
+
+- **Two themes, instant toggle.** A shared token system drives dark (default:
+  bg `#090909`, cards `#121212`, accent `#FF7A00`, secondary `#9B9B9B`) and a
+  full Apple-Settings light theme. Toggle in every page header; choice persists
+  in `localStorage['aos_theme']` with a no-flash `<head>` script. Everything
+  uses `var()` tokens, so the flip is instant and complete.
+- **Motion tokens** (`--dur*`, `--ease*`, 150–260ms) power fades, hover-lift,
+  drawer slide, count-ups, skeletons — all disabled under
+  `prefers-reduced-motion`. Focus-visible rings + 44px touch targets throughout.
+- **Coach dashboard V2** (`coach.html`): KPI rail (real metrics + honest dashed
+  "set-up" tiles for anything needing new data — never a fake `0`), colour-coded
+  **Team Health** card (Attendance / Morale / Injuries / Consistency + composite,
+  all computed client-side from check-ins & ratings), **Quick Actions** (Send
+  Announcement is live via looped `cmsg`; Add Athlete shares the join link; the
+  rest open a "coming soon" sheet naming the data they need), **card-based
+  athletes** (replacing the table), and a **slide-in athlete drawer** with tabs
+  (Overview / Health / Performance* / Attendance* / Comms / Notes / Timeline /
+  Settings; `*` = interim proxy + coming-soon). The **Timeline** is built purely
+  from existing `cdetail` data (join, check-ins, messages, rating, notes, shared
+  mind). Mobile: cards reflow to one column, drawer becomes a bottom sheet, and a
+  fixed bottom action bar appears.
+- **Scope of this layer:** presentational + client-computed only — no `aos-api`
+  changes. Metrics needing new data (true attendance %, fixtures, wellness
+  rollup, read receipts) are honest set-up placeholders, sequenced in the
+  roadmap below.
+
+## Roadmap (staged, non-breaking)
+
+1. **Roster-lite** edge patch (`checkins_7d`, `last_energy/soreness/sleep_h`,
+   `awaiting_reply`) — promotes 4 placeholders (wellness, training completion,
+   awaiting-reply, Team-Health Readiness) to real. No new tables.
+2. Server `broadcast` action (one call instead of the client `cmsg` loop).
+3. Calendar / fixtures (`aos_events`, `aos_sessions`, `aos_attendance`) → real
+   attendance %, upcoming games, Schedule Training / Record Attendance.
+4. Rich comms (message `read_at` → true unread, attachments, typing).
+5. File library (storage + `aos_documents`). 6. Training planner (`aos_drills`).
+7. Performance metrics (`aos_perf`: PBs, tests, wearables).
+8. **Organisation hierarchy** — Org → Association → Club → Season → Age Group →
+   Team → Coach → Athlete. Designed as an additive, nullable-FK migration with a
+   backfilled default org/club/season so current flat teams keep working; scoped
+   coach accounts (`aos_coaches`) layer in before any hierarchy UI. Ships last
+   unless a multi-club customer pulls it forward.
+9. Notifications + global search.
+
 ## Backend (Supabase project `lockdown-lab`, ref `ymuwuhvqqftgpxwhzoub`)
 
 - **Edge function `aos-api`** (source: `supabase/functions/aos-api/index.ts`)
