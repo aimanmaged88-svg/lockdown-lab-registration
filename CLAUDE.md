@@ -161,6 +161,16 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
 - **First coach "Dre"** seeded as editable template (username dre, PIN 1234
   — Aiman resets). index.html: coaching-staff + admin entry links. sw
   unchanged (network-first serves coach.html fine).
+- **Edge fn now v22 + admin notify (2026-07-20).** Coach codes are now
+  one-time and live **6 hours** (COACH_CODE_TTL_MS = 6h, was 14 days);
+  register expiry error says "they only live 6 hours". roster now returns
+  `coach_reqs` (pending, oldest first) so the admin's 15s poll catches new
+  requests off-tab. admin.html: 🧑‍🏫 Coaches sidebar badge `#bCoaches`
+  (lit from coach_reqs count), and refresh() pings+toasts (+ desktop
+  notification when hidden) on a new request via `prevCReq` — mirrors the
+  door-knock `#bDoor`/prevK pattern. Coach-codes card copy now "6 hours".
+  Need-a-code flow: coach submits IG in coach.html → coach_request →
+  lands in admin Coaches tab + buzzes. Have-a-code: enter code → profile.
 
 ## Google Drive structure (2026-07-20)
 
