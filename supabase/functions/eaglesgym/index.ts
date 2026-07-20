@@ -8,7 +8,7 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const ADMIN_USER = (Deno.env.get("EAGLES_ADMIN_USER") || "eagle").trim().toLowerCase();
-const ADMIN_PASS = Deno.env.get("EAGLES_ADMIN_PASS") || "jim2196";
+const ADMIN_PASS = Deno.env.get("EAGLES_ADMIN_PASS") || "gym2196";
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
