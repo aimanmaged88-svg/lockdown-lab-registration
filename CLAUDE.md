@@ -172,6 +172,32 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   Need-a-code flow: coach submits IG in coach.html → coach_request →
   lands in admin Coaches tab + buzzes. Have-a-code: enter code → profile.
 
+## Loud notifications push (2026-07-20)
+
+- **Goal (Aiman):** make sure everyone knows about + turns on notifications,
+  and that they land LOUD — otherwise the app looks dead.
+- **Player app** (app2-base.html): replaced the subtle one-shot nudge with a
+  LOUD full-width primer overlay `#ntfLoud` (pulsing bell, value rows: coach
+  replies / new sessions / badges / squad, big "Yes — ping me"). Re-offers
+  every session until enabled unless "Don't ask again" (`ll_ntfnever`);
+  "Not now" snoozes 18h (`ll_ntfsnooze`). Persistent ringing header bell
+  `#ntfBell` (`.ntfoff` shake + dot) shows whenever pings are off — tap to
+  open the primer. Shared `enableNotifs()` used by primer, bell AND the
+  settings switch; fires a loud confirm via SW showNotification (vibrate).
+  `refreshBell()` on login + in renderNP. iOS non-standalone routes to
+  install first. notifNudge now fires 11s post-login (was 16s).
+- **Coach portal** (coach-base.html): previously had NO service worker / no
+  permission ask at all. Now registers /sw.js, stamps ll-role=coach, has the
+  same loud primer `#cNtf` + sidebar bell `#cBell`, `enableCoachNtf()`
+  (localStorage `ll_coach_ntf`), and a 30s `coachPoll()` that buzzes a loud
+  local notification on a newly assigned session (compares session ids).
+  NOTE: staff-coach *server* push (closed-app) still needs an edge endpoint
+  (coach_state auth is cid/pin; push_sub is coach-CODE only) — local pings
+  work while the portal runs; true closed push is the follow-up.
+- **Service worker** bumped lll-v5 → **lll-v6**: push handler now
+  `vibrate:[260,90,260,90,420]` + `requireInteraction:true` so delivered
+  pushes buzz hard and stay on screen until tapped.
+
 ## Google Drive structure (2026-07-20)
 
 - Master folder **🔒 Lockdown Lab Live** (15V20Gh_e1Oh9Ldsd3wmjpkDIxJvXa6T7)

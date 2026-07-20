@@ -211,6 +211,23 @@ textarea{min-height:70px;resize:vertical}
   .osmain{padding:16px 14px 70px}
 }
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+/* loud notifications: sidebar bell + primer */
+.cbell{margin-left:auto;font-size:16px;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--glass,rgba(255,255,255,.05));display:grid;place-items:center;position:relative;flex:0 0 auto;cursor:pointer}
+.cbell.on{border-color:var(--accent);color:var(--accent);background:rgba(255,107,0,.14);animation:bellRing 1.8s ease-in-out infinite}
+.cbell.on::after{content:"";position:absolute;top:3px;right:3px;width:8px;height:8px;background:var(--accent);border-radius:50%;box-shadow:0 0 8px var(--accent);animation:pulse 1.6s infinite}
+@keyframes bellRing{0%,72%,100%{transform:rotate(0)}76%{transform:rotate(13deg)}80%{transform:rotate(-11deg)}84%{transform:rotate(9deg)}88%{transform:rotate(-6deg)}92%{transform:rotate(3deg)}}
+#cNtf{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;background:rgba(4,4,6,.74);backdrop-filter:blur(6px);padding:16px}
+#cNtf.on{display:flex}
+#cNtf .sheet{width:100%;max-width:430px;border:1px solid rgba(255,107,0,.5);border-radius:24px;padding:26px 22px 20px;text-align:center;position:relative;
+  background:radial-gradient(120% 80% at 50% -10%,rgba(255,107,0,.22),transparent 60%),linear-gradient(180deg,#141416,#0c0c0d);box-shadow:0 30px 80px -20px rgba(0,0,0,.9)}
+#cNtf .big{font-size:52px;display:inline-block;animation:bellRing 1.4s ease-in-out infinite}
+#cNtf h3{font-family:var(--fd);font-size:30px;letter-spacing:1px;text-transform:uppercase;margin:10px 0 6px}
+#cNtf h3 span{color:var(--accent)}
+#cNtf p{color:var(--muted);font-size:13px;line-height:1.55;max-width:330px;margin:0 auto 16px}
+#cNtf .go{width:100%;font-family:var(--fd);font-size:20px;letter-spacing:1.5px;text-transform:uppercase;padding:15px;border-radius:15px;color:#150a00;
+  background:linear-gradient(180deg,var(--accent-hi),var(--accent));box-shadow:0 14px 40px -12px rgba(255,107,0,.6)}
+#cNtf .later{margin-top:12px;display:flex;gap:16px;justify-content:center}
+#cNtf .later button{font-family:var(--fm);font-size:10.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--dim);padding:6px}
 </style>
 </head>
 <body>
@@ -267,7 +284,7 @@ textarea{min-height:70px;resize:vertical}
 
 <div id="portal">
   <aside class="sb">
-    <div class="sb-brand"><span class="oa"><i></i>LIVE</span><div><b>Coach Portal</b><small>Lockdown Lab Live</small></div></div>
+    <div class="sb-brand"><span class="oa"><i></i>LIVE</span><div><b>Coach Portal</b><small>Lockdown Lab Live</small></div><button class="cbell" id="cBell" aria-label="Notifications" style="display:none">🔔</button></div>
     <nav class="sb-nav" id="nav"></nav>
     <div class="sb-foot">
       <div class="tmrow" id="testToggle" style="display:none"><span>🧪</span>Test mode<span class="sw"></span></div>
@@ -279,6 +296,14 @@ textarea{min-height:70px;resize:vertical}
     <div id="secWrap"></div>
   </main>
 </div>
+
+<div id="cNtf"><div class="sheet">
+  <span class="big">🔔</span>
+  <h3>Never miss <span>an assignment</span></h3>
+  <p>Turn notifications on and the platform pings you the second UNC assigns you a session or a player needs you. Coaches who show up fast get rated highest.</p>
+  <button class="go" id="cnGo">🔔 Turn them on</button>
+  <div class="later"><button id="cnLater">Not now</button><button id="cnNever">Don't ask again</button></div>
+</div></div>
 
 <div id="toast"></div>
 
@@ -546,6 +571,7 @@ textarea{min-height:70px;resize:vertical}
     if(TEST&&!can('canUseTestMode')){ TEST=false; localStorage.setItem('ll_coach_test','0'); }
     paintTest(); show('dash');
     maybeWelcome(fresh);
+    try{ refreshCBell(); startCoachPoll(); setTimeout(coachNudge, fresh?2600:1400); }catch(e){}
   }
   function maybeWelcome(fresh){
     if(!C||!sess) return;
@@ -595,6 +621,61 @@ textarea{min-height:70px;resize:vertical}
   $('#cuPin').addEventListener('keydown',e=>{ if(e.key==='Enter') doLogin(); });
   $('#cOut').onclick=()=>{ localStorage.removeItem('ll_coach_sess'); sess=null; C=null; location.reload(); };
 
+  /* ===== LOUD notifications (coach side) ===== */
+  const iOSdev=/iphone|ipad|ipod/i.test(navigator.userAgent||'');
+  const isStandalone=()=>window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
+  function haptic(p){ try{ navigator.vibrate&&navigator.vibrate(p); }catch(e){} }
+  function ntfOn(){ return ('Notification' in window)&&Notification.permission==='granted'&&localStorage.getItem('ll_coach_ntf')==='1'; }
+  function ntfBlocked(){ return ('Notification' in window)&&Notification.permission==='denied'; }
+  async function enableCoachNtf(){
+    if(!('Notification' in window)){ toast("This browser can't do notifications",true); return false; }
+    if(iOSdev && !isStandalone()){ closeCNtf(); toast('Add the portal to your home screen first 📲'); return false; }
+    let perm=Notification.permission;
+    if(perm==='default'){ try{ perm=await Notification.requestPermission(); }catch(e){ perm=Notification.permission; } }
+    if(perm==='granted'){
+      localStorage.setItem('ll_coach_ntf','1'); haptic(30);
+      try{ const reg=await navigator.serviceWorker.ready; reg.showNotification('🔔 You\'re locked in',{body:'Notifications are ON. The platform will ping you on every new assignment.',icon:'/icons/icon-192.png',badge:'/icons/icon-96.png',vibrate:[220,90,220,90,320],tag:'llc-on',renotify:true}); }
+      catch(e){ try{ new Notification('🔔 You\'re locked in',{body:'Notifications are ON.',icon:'/icons/icon-192.png'}); }catch(_){}}
+      toast('Notifications ON 🔔'); refreshCBell(); return true;
+    }
+    if(perm==='denied') toast('Blocked in your settings — turn it back on there',true);
+    refreshCBell(); return false;
+  }
+  function refreshCBell(){ const b=$('#cBell'); if(!b) return; if(!sess||!('Notification' in window)){ b.style.display='none'; return; }
+    if(ntfOn()){ b.style.display='none'; b.classList.remove('on'); return; } b.style.display='grid'; b.classList.add('on');
+    b.title=ntfBlocked()?'Notifications blocked — tap':'Notifications off — tap to turn on'; }
+  function openCNtf(){ const o=$('#cNtf'); if(o&&!o.classList.contains('on')){ o.classList.add('on'); haptic(18); } }
+  function closeCNtf(){ const o=$('#cNtf'); if(o)o.classList.remove('on'); }
+  function coachNudge(){
+    refreshCBell();
+    if(!sess||localStorage.getItem('ll_coach_ntfnever')==='1') return;
+    if(!('Notification' in window)||Notification.permission!=='default'||ntfOn()) return;
+    if($('#cwelcome')&&$('#cwelcome').classList.contains('on')){ setTimeout(coachNudge,3500); return; }
+    const snz=+(localStorage.getItem('ll_coach_ntfsnz')||0);
+    if(snz && (Date.now()-snz)<18*3600*1000) return;
+    openCNtf();
+  }
+  $('#cnGo')&&($('#cnGo').onclick=async()=>{ const ok=await enableCoachNtf(); if(ok) closeCNtf(); });
+  $('#cnLater')&&($('#cnLater').onclick=()=>{ localStorage.setItem('ll_coach_ntfsnz',Date.now()); closeCNtf(); toast('Tap the 🔔 up top anytime'); refreshCBell(); });
+  $('#cnNever')&&($('#cnNever').onclick=()=>{ localStorage.setItem('ll_coach_ntfnever','1'); closeCNtf(); refreshCBell(); });
+  $('#cBell')&&($('#cBell').onclick=()=>{ if(ntfBlocked()){ toast('Notifications are blocked in your browser/phone settings — turn them back on there',true); return; } localStorage.removeItem('ll_coach_ntfnever'); localStorage.removeItem('ll_coach_ntfsnz'); openCNtf(); });
+  // local pings: while the portal runs, buzz on a newly assigned session
+  let cSeen=null, cPoll=null;
+  function seedSeen(){ try{ cSeen=new Set((S||[]).map(s=>s.id)); }catch(e){ cSeen=new Set(); } }
+  async function coachPoll(){
+    if(!sess||TEST) return;
+    try{
+      const r=await api({action:'coach_state',cid:sess.cid,pin:sess.pin});
+      C=r.coach; const ns=r.sessions||[];
+      if(cSeen){ const fresh=ns.filter(s=>!cSeen.has(s.id)); ns.forEach(s=>cSeen.add(s.id));
+        if(fresh.length && ntfOn() && document.hidden){ try{ const reg=await navigator.serviceWorker.ready; reg.showNotification('📅 New session assigned',{body:esc(fresh[0].title||'A session')+' — open your portal.',icon:'/icons/icon-192.png',badge:'/icons/icon-96.png',vibrate:[260,90,260,90,420],tag:'llc-assign',renotify:true,requireInteraction:true}); }catch(e){} }
+        if(fresh.length){ haptic(20); toast('📅 New session assigned'); }
+      }
+      S=ns; if(cur==='schedule'||cur==='dash') show(cur);
+    }catch(e){}
+  }
+  function startCoachPoll(){ seedSeen(); clearInterval(cPoll); cPoll=setInterval(coachPoll, 30000); }
+
   async function resume(){
     if(!sess||!sess.cid){ return; }
     try{
@@ -602,6 +683,7 @@ textarea{min-height:70px;resize:vertical}
       C=r.coach; S=r.sessions||[]; enter();
     }catch(e){ localStorage.removeItem('ll_coach_sess'); sess=null; /* show login */ }
   }
+  if('serviceWorker' in navigator){ addEventListener('load',()=>{ navigator.serviceWorker.register('/sw.js').then(()=>{ try{ caches.open('ll-meta').then(c=>c.put('/ll-role',new Response('coach'))); }catch(e){} }).catch(()=>{}); }); }
   resume();
 })();
 </script>

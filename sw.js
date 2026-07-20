@@ -1,6 +1,6 @@
 /* Lockdown Lab Live — service worker.
    Network-first for pages (always fresh app), cache-first for static assets. */
-const V = 'lll-v5';
+const V = 'lll-v6';
 const STATIC = ['/icons/icon-192.png', '/icons/icon-512.png', '/favicon.png', '/manifest.json'];
 
 self.addEventListener('install', e => {
@@ -38,7 +38,9 @@ self.addEventListener('push', e => {
         body: coach ? "Someone's knocking or asking for a code. Open the Desk \u2014 bang bang."
                     : "Something's landed for you \u2014 coach might've replied. Tap in.",
         icon: '/icons/icon-192.png', badge: '/icons/icon-192.png',
-        tag: coach ? 'll-door' : 'll-lab', renotify: true
+        tag: coach ? 'll-door' : 'll-lab', renotify: true,
+        // loud + sticky: buzz hard and stay on screen until they tap
+        vibrate: [260, 90, 260, 90, 420], requireInteraction: true
       }
     );
   })());

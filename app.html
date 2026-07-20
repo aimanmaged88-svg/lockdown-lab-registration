@@ -348,6 +348,32 @@ nav button.on .ic{animation:navpop .4s cubic-bezier(.2,1.6,.4,1)}
 /* sound toggle */
 .sndbtn{margin-left:8px;font-size:16px;width:38px;height:38px;border-radius:50%;border:1px solid var(--line);display:grid;place-items:center;transition:all .2s;flex:0 0 auto;background:var(--glass);backdrop-filter:blur(10px)}
 .sndbtn:active{transform:scale(.9)}
+#ntfBell.ntfoff{border-color:var(--accent);color:var(--accent);background:rgba(255,107,0,.14);animation:bellRing 1.8s ease-in-out infinite}
+#ntfBell.ntfoff::after{content:"";position:absolute;top:5px;right:5px;width:8px;height:8px;background:var(--accent);border-radius:50%;box-shadow:0 0 8px var(--accent);animation:pulse 1.6s infinite}
+#ntfBell{position:relative}
+@keyframes bellRing{0%,72%,100%{transform:rotate(0)}76%{transform:rotate(13deg)}80%{transform:rotate(-11deg)}84%{transform:rotate(9deg)}88%{transform:rotate(-6deg)}92%{transform:rotate(3deg)}}
+/* LOUD notifications primer */
+#ntfLoud{position:fixed;inset:0;z-index:60;display:none;align-items:flex-end;justify-content:center;background:rgba(4,4,6,.72);backdrop-filter:blur(6px);padding:0 14px calc(env(safe-area-inset-bottom,0px) + 20px)}
+#ntfLoud.on{display:flex;animation:nlFade .25s ease}
+@keyframes nlFade{from{opacity:0}to{opacity:1}}
+#ntfLoud .sheet{width:100%;max-width:440px;border:1px solid rgba(255,107,0,.5);border-radius:24px;padding:26px 22px 20px;text-align:center;position:relative;
+  background:radial-gradient(120% 80% at 50% -10%,rgba(255,107,0,.22),transparent 60%),linear-gradient(180deg,#141416,#0c0c0d);
+  box-shadow:0 -10px 60px -12px rgba(255,107,0,.4),0 30px 80px -20px rgba(0,0,0,.9);animation:nlUp .3s cubic-bezier(.2,.9,.3,1.2)}
+@keyframes nlUp{from{transform:translateY(40px);opacity:.4}to{transform:translateY(0);opacity:1}}
+#ntfLoud .big{font-size:56px;line-height:1;display:inline-block;animation:bellRing 1.4s ease-in-out infinite;filter:drop-shadow(0 6px 18px rgba(255,107,0,.5))}
+#ntfLoud h3{font-family:var(--fd);font-size:32px;letter-spacing:1px;text-transform:uppercase;margin:12px 0 6px;line-height:.95}
+#ntfLoud h3 span{color:var(--accent)}
+#ntfLoud .lead{color:var(--muted);font-size:13.5px;line-height:1.55;max-width:340px;margin:0 auto 16px}
+#ntfLoud .rows{text-align:left;display:flex;flex-direction:column;gap:9px;margin:0 auto 20px;max-width:320px}
+#ntfLoud .rw{display:flex;align-items:center;gap:11px;font-size:13px;color:var(--text)}
+#ntfLoud .rw span{font-size:19px;flex:0 0 auto}
+#ntfLoud .rw small{color:var(--dim);display:block;font-size:11px}
+#ntfLoud .go{width:100%;font-family:var(--fd);font-size:21px;letter-spacing:1.5px;text-transform:uppercase;padding:16px;border-radius:16px;
+  background:linear-gradient(180deg,var(--accent-hi,#ff8a2b),var(--accent));color:#150a00;box-shadow:0 14px 40px -12px rgba(255,107,0,.6),inset 0 1px 0 rgba(255,255,255,.35)}
+#ntfLoud .go:active{transform:scale(.98)}
+#ntfLoud .later{margin-top:12px;display:flex;gap:16px;justify-content:center}
+#ntfLoud .later button{font-family:var(--fm);font-size:10.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--dim);padding:6px}
+#ntfLoud .later button:hover{color:var(--muted)}
 /* header layout tweak */
 header{gap:8px}
 .hbtn{margin-left:0}
@@ -730,6 +756,7 @@ body.rmode *{animation:none!important;transition:none!important}
   <header>
     <span class="oa" aria-label="Live — on air"><i></i>LIVE</span>
     <div class="ttl"><b>Lockdown Lab <i>Live</i></b><small id="hSub">Founding Beta</small></div>
+    <button class="sndbtn" id="ntfBell" aria-label="Notifications" style="display:none">🔔</button>
     <button class="sndbtn" id="setBtn" aria-label="Make it yours">⚙️</button>
     <button class="sndbtn" id="sndToggle" aria-label="Sound">🔊</button>
     <button class="hbtn" id="logout">Log out</button>
@@ -1148,6 +1175,20 @@ body.rmode *{animation:none!important;transition:none!important}
   <button class="btn btn-p btn-block" id="wGo">Let's go 🔒</button>
 </div></div>
 
+<div id="ntfLoud"><div class="sheet">
+  <span class="big">🔔</span>
+  <h3>Turn on <span>the pings</span></h3>
+  <p class="lead">This is where the Lab lives. Turn notifications on so nothing slips past you — <b>everyone in here has them on.</b></p>
+  <div class="rows">
+    <div class="rw"><span>🧑‍🏫</span><div><b>Coach replies &amp; answers</b><small>the second UNC gets back to you</small></div></div>
+    <div class="rw"><span>📅</span><div><b>New sessions drop</b><small>grab your seat before the board fills</small></div></div>
+    <div class="rw"><span>🏅</span><div><b>Badges &amp; level-ups</b><small>every time you unlock something</small></div></div>
+    <div class="rw"><span>💬</span><div><b>Squad &amp; door activity</b><small>your people, your Lab, live</small></div></div>
+  </div>
+  <button class="go" id="nlGo">🔔 Yes — ping me</button>
+  <div class="later"><button id="nlLater">Not now</button><button id="nlNever">Don't ask again</button></div>
+</div></div>
+
 <script>
 (function(){
   const API='https://ymuwuhvqqftgpxwhzoub.supabase.co/functions/v1/app-api';
@@ -1473,11 +1514,12 @@ body.rmode *{animation:none!important;transition:none!important}
     ac(); S.poweron(); haptic([0,20,40,20]);
     if(isCoach){ go('roster'); renderRoster(); } else { go('home'); renderPlayer(); stagger('[data-page="home"]'); maybeWelcome(); }
     pushSubAny();
+    try{ refreshBell(); }catch(e){}
     requestAnimationFrame(()=>moveInd(isCoach?$('#navCoach'):$('#navPlayer')));
     clearInterval(pollT);
     pollT=setInterval(pollTick, 25000);
     setTimeout(updInstBar, 2500);
-    setTimeout(notifNudge, 16000);
+    setTimeout(notifNudge, 11000);
   }
   async function pollTick(){
     try{
@@ -2031,24 +2073,56 @@ body.rmode *{animation:none!important;transition:none!important}
         +'<li>Confirm — done. Real app, our logo.</li></ol>';
     }
   }
-  /* one-time notifications nudge — fires once, only when it can actually work */
-  function notifNudge(){
-    if(!sess||localStorage.getItem('ll_ntfdis')==='1') return;
-    if(!('Notification' in window)||Notification.permission!=='default'||NP.push) return;
-    if($('#ntfBar')||$('#instBar')) return; // one banner at a time — install nudge wins
-    const bar=document.createElement('div'); bar.id='ntfBar';
-    bar.style.cssText='position:fixed;bottom:84px;left:50%;transform:translateX(-50%);width:calc(100% - 28px);max-width:432px;z-index:29;display:flex;align-items:center;gap:10px;background:rgba(16,16,17,.85);backdrop-filter:blur(20px);border:1px solid var(--line);border-radius:18px;padding:10px 14px;box-shadow:0 14px 40px -16px rgba(0,0,0,.9)';
-    bar.innerHTML='<span style="font-size:18px">🔔</span><span style="flex:1;font-size:12px;color:var(--muted)"><b style="color:var(--text)">Coach replies. Homework drops.</b> Get pinged when it happens.</span><button class="btn btn-p btn-sm" id="ntfGo" style="font-size:12px;padding:8px 13px">Turn on</button><button style="color:var(--dim);font-size:15px;padding:4px" id="ntfX">✕</button>';
-    document.body.appendChild(bar);
-    $('#ntfGo').addEventListener('click',async()=>{
-      const perm=await Notification.requestPermission();
-      if(perm==='granted'){ NP.push=true; saveNP(); toast('Locked in 🔔'); S.like(); haptic(12);
-        try{ new Notification('Lockdown Lab Live',{body:'Notifications are on. The Lab will find you.',icon:'/icons/icon-192.png'}); }catch(e){}
-      } else toast('Blocked — flip it later in ⚙️ settings',true);
-      bar.remove();
-    });
-    $('#ntfX').addEventListener('click',()=>{ localStorage.setItem('ll_ntfdis','1'); bar.remove(); });
+  /* ===== LOUD notifications: primer overlay + header bell ===== */
+  const iOSdev=/iphone|ipad|ipod/i.test(navigator.userAgent||'');
+  function notifsOn(){ return ('Notification' in window)&&Notification.permission==='granted'&&NP.push; }
+  function notifsBlocked(){ return ('Notification' in window)&&Notification.permission==='denied'; }
+  // shared enable flow — used by primer, header bell and the settings switch
+  async function enableNotifs(){
+    if(!('Notification' in window)){ toast("This browser can't do notifications",true); return false; }
+    // iOS only allows web push once the app is installed to the home screen
+    if(iOSdev && !isStandalone()){ closeLoud(); toast('Add the Lab to your home screen first 📲'); $('#setBtn')&&$('#setBtn').click(); setTimeout(()=>{ const c=$('#installCard'); if(c)c.scrollIntoView({behavior:'smooth'}); },350); return false; }
+    let perm=Notification.permission;
+    if(perm==='default'){ try{ perm=await Notification.requestPermission(); }catch(e){ perm=Notification.permission; } }
+    if(perm==='granted'){
+      NP.push=true; saveNP(); try{renderNP&&renderNP();}catch(e){}
+      S&&S.like&&S.like(); haptic(30);
+      try{ const reg=await navigator.serviceWorker.ready; reg.showNotification('🔔 You\'re locked in',{body:'Notifications are ON. The Lab will find you — every rep, every reply.',icon:'/icons/icon-192.png',badge:'/icons/icon-96.png',vibrate:[220,90,220,90,320],tag:'lll-on',renotify:true}); }
+      catch(e){ try{ new Notification('🔔 You\'re locked in',{body:'Notifications are ON. The Lab will find you.',icon:'/icons/icon-192.png'}); }catch(_){} }
+      pushSubAny(); toast('Notifications ON 🔔'); refreshBell(); return true;
+    }
+    if(perm==='denied'){ toast('Blocked in your browser settings — turn it back on there',true); }
+    NP.push=false; saveNP(); refreshBell(); return false;
   }
+  // header bell: visible + ringing whenever pings are off (loud, always-there cue)
+  function refreshBell(){
+    const b=$('#ntfBell'); if(!b) return;
+    if(!sess||!('Notification' in window)){ b.style.display='none'; return; }
+    if(notifsOn()){ b.style.display='none'; b.classList.remove('ntfoff'); return; }
+    b.style.display='grid'; b.classList.add('ntfoff');
+    b.title=notifsBlocked()?'Notifications blocked — tap':'Notifications off — tap to turn on';
+  }
+  // LOUD primer — re-offers every session until they enable or say "don't ask again"
+  function notifNudge(){
+    if(!sess){ return; }
+    refreshBell();
+    if(localStorage.getItem('ll_ntfnever')==='1') return;
+    if(!('Notification' in window)||Notification.permission!=='default'||NP.push) return;
+    // hold if the welcome moment or a badge overlay is on screen — let them land first
+    if(($('#welcome')&&$('#welcome').classList.contains('on'))||($('#badgeUp')&&$('#badgeUp').classList.contains('on'))){ setTimeout(notifNudge,4000); return; }
+    const snz=+(localStorage.getItem('ll_ntfsnooze')||0);
+    if(snz && (Date.now()-snz) < 18*3600*1000) return; // snoozed recently
+    openLoud();
+  }
+  function openLoud(){ const o=$('#ntfLoud'); if(!o||o.classList.contains('on')) return; o.classList.add('on'); haptic(18); }
+  function closeLoud(){ const o=$('#ntfLoud'); if(o)o.classList.remove('on'); }
+  (function wireLoud(){
+    const go=$('#nlGo'),later=$('#nlLater'),never=$('#nlNever'),bell=$('#ntfBell');
+    go&&go.addEventListener('click',async()=>{ const ok=await enableNotifs(); if(ok) closeLoud(); });
+    later&&later.addEventListener('click',()=>{ localStorage.setItem('ll_ntfsnooze',Date.now()); closeLoud(); toast('No stress — tap the 🔔 up top anytime'); refreshBell(); });
+    never&&never.addEventListener('click',()=>{ localStorage.setItem('ll_ntfnever','1'); closeLoud(); refreshBell(); });
+    bell&&bell.addEventListener('click',()=>{ if(notifsBlocked()){ toast('Notifications are blocked in your browser/phone settings — turn them back on there',true); return; } localStorage.removeItem('ll_ntfnever'); localStorage.removeItem('ll_ntfsnooze'); openLoud(); });
+  })();
 
   /* one-time nudge banner above the nav */
   function updInstBar(){
@@ -2132,20 +2206,11 @@ body.rmode *{animation:none!important;transition:none!important}
     $('#npPush').classList.toggle('on',NP.push&&('Notification' in window)&&Notification.permission==='granted');
     document.querySelectorAll('#npList .sharerow').forEach(r=>r.classList.toggle('on',!!NP[r.dataset.np]));
     $('#npList').style.opacity=NP.push?'1':'.45';
+    try{ refreshBell(); }catch(e){}
   }
   $('#npPush').addEventListener('click',async()=>{
-    if(!('Notification' in window)){
-      if(isIOS&&!isStandalone()){ toast('Install the app first — then this switch works 📲',true); const c=$('#installCard'); if(c)c.scrollIntoView({behavior:'smooth'}); }
-      else toast('This browser can\'t do notifications',true);
-      return;
-    }
-    if(!NP.push){
-      const perm=await Notification.requestPermission();
-      if(perm!=='granted'){ toast('Notifications blocked in browser settings',true); NP.push=false; saveNP(); renderNP(); return; }
-      NP.push=true; saveNP(); renderNP(); S.like(); toast('Locked in 🔔');
-      try{ new Notification('Lockdown Lab Live',{body:'Notifications are on. The Lab will find you.',icon:'/icons/icon-192.png'}); }catch(e){}
-      pushSubAny();
-    } else { NP.push=false; saveNP(); renderNP(); toast('Notifications off'); }
+    if(!NP.push){ await enableNotifs(); }
+    else { NP.push=false; saveNP(); renderNP(); refreshBell(); toast('Notifications off'); }
   });
   $('#npList').addEventListener('click',e=>{
     const r=e.target.closest('.sharerow'); if(!r)return;
