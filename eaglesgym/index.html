@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Eagles Gym · Timetable</title>
 <meta name="description" content="Eagles Gym weekly class timetable — Punchbowl, Sydney.">
 <meta name="theme-color" content="#14161a">
@@ -25,67 +25,91 @@
     --safe-b:env(safe-area-inset-bottom,0px);
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-  html,body{height:100%}
+  html,body{min-height:100%}
   body{background:#0c0d10;color:var(--ink);font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
   h1,h2,h3,.dsp{font-family:'Oswald',sans-serif;text-transform:uppercase;font-weight:700;letter-spacing:.02em;line-height:1}
   button{font-family:inherit;cursor:pointer}
   img{display:block;max-width:100%}
+  .desk{display:none} .mob{display:block}
 
-  /* Phone shell — full screen on mobile, centered card on desktop */
+  /* ===== MOBILE (default): phone-app shell ===== */
   .app{display:flex;flex-direction:column;height:100dvh;max-width:var(--shell);margin:0 auto;background:var(--bg);position:relative;overflow:hidden}
-  @media(min-width:520px){
-    body{display:flex;align-items:center;justify-content:center;padding:20px}
-    .app{height:min(880px,94dvh);border-radius:30px;box-shadow:0 30px 90px rgba(0,0,0,.5);border:1px solid #23262d}
-  }
-
-  /* App bar */
   .bar{background:var(--ink);color:#fff;padding:calc(var(--safe-t) + 12px) 16px 12px;display:flex;align-items:center;gap:12px;flex-shrink:0}
   .bar .logo{height:26px;width:auto}
   .bar .sp{margin-left:auto;display:flex;gap:8px;align-items:center}
   .icobtn{width:38px;height:38px;border-radius:11px;border:1px solid #2b2f37;background:#1b1e24;color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.05rem}
   .icobtn:active{background:#23272f}
+  .btn-admin{width:auto;padding:0 14px;gap:7px;font-family:'Oswald';text-transform:uppercase;font-size:.8rem;letter-spacing:.05em}
 
-  /* Sub header */
   .sub{background:var(--ink);color:#fff;padding:0 16px 16px;flex-shrink:0}
   .sub .t{font-family:'Oswald';text-transform:uppercase;letter-spacing:.02em;font-size:1.55rem;line-height:1}
   .sub .m{color:#aab0ba;font-size:.8rem;margin-top:5px;display:flex;gap:14px;flex-wrap:wrap}
   .sub .m b{color:#fff;font-weight:600}
 
-  /* Day strip */
   .days{display:flex;gap:8px;overflow-x:auto;padding:12px 16px;background:var(--ink);flex-shrink:0;scrollbar-width:none;border-bottom:3px solid var(--red)}
   .days::-webkit-scrollbar{display:none}
   .day{flex:0 0 auto;min-width:54px;text-align:center;padding:9px 6px;border-radius:13px;background:#1c1f26;color:#cdd2da;border:1px solid transparent;transition:.12s}
-  .day .d{font-family:'Oswald';font-weight:600;font-size:.92rem;text-transform:uppercase;letter-spacing:.02em}
+  .day .d{font-family:'Oswald';font-weight:600;font-size:.92rem;text-transform:uppercase}
   .day .n{font-size:.6rem;letter-spacing:.1em;color:#7b818c;text-transform:uppercase;margin-top:2px;font-weight:600}
   .day.active{background:var(--red);color:#fff}
   .day.active .n{color:#ffd6d6}
 
-  /* List */
   .scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px calc(20px + var(--safe-b))}
-  .daylabel{font-family:'Oswald';text-transform:uppercase;font-size:.78rem;letter-spacing:.12em;color:var(--muted);margin:2px 4px 12px;display:flex;justify-content:space-between;align-items:center}
+  .daylabel{font-family:'Oswald';text-transform:uppercase;font-size:.78rem;letter-spacing:.12em;color:var(--muted);margin:2px 4px 12px;display:flex;justify-content:space-between}
   .daylabel .cnt{color:var(--red)}
-  .cls{display:flex;align-items:stretch;gap:0;background:var(--card);border:1px solid var(--line);border-radius:15px;overflow:hidden;margin-bottom:10px;box-shadow:0 1px 2px rgba(20,22,26,.04)}
-  .cls .tm{flex:0 0 76px;background:var(--ink);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 4px;text-align:center}
+  .cls{display:flex;background:var(--card);border:1px solid var(--line);border-radius:15px;overflow:hidden;margin-bottom:10px;box-shadow:0 1px 2px rgba(20,22,26,.04)}
+  .cls .tm{flex:0 0 76px;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;padding:12px 4px;text-align:center}
   .cls .tm b{font-family:'Oswald';font-size:.96rem;line-height:1.05}
-  .cls .tm .ampm{display:none}
   .cls .bd{padding:12px 14px;display:flex;flex-direction:column;justify-content:center;gap:5px;min-width:0}
-  .cls .nm{font-family:'Oswald';text-transform:uppercase;font-weight:600;font-size:1.05rem;letter-spacing:.01em}
+  .cls .nm{font-family:'Oswald';text-transform:uppercase;font-weight:600;font-size:1.05rem}
   .cls .meta{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:.82rem;color:var(--muted)}
   .cls .coach{color:var(--ink);font-weight:600;display:flex;align-items:center;gap:5px}
   .lvl{font-size:.62rem;font-family:'Oswald';letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:20px;background:#fff0f0;color:var(--red);border:1px solid #ffdada}
-  .empty{text-align:center;color:var(--muted);padding:50px 20px;font-family:'Oswald';letter-spacing:.06em;text-transform:uppercase}
-  .empty .big{font-size:2.4rem;margin-bottom:8px}
-  .foot{ text-align:center;color:var(--muted);font-size:.72rem;padding:14px 10px 4px;line-height:1.6}
+  .empty{text-align:center;color:var(--muted);padding:44px 20px;font-family:'Oswald';letter-spacing:.06em;text-transform:uppercase}
+  .empty .big{font-size:2.2rem;margin-bottom:6px}
+  .foot{text-align:center;color:var(--muted);font-size:.72rem;padding:16px 10px 4px;line-height:1.7}
   .foot b{color:var(--ink)}
 
-  /* Bottom sheet / modal */
-  .ov{position:fixed;inset:0;background:rgba(8,9,12,.6);backdrop-filter:blur(3px);display:none;align-items:flex-end;justify-content:center;z-index:70}
-  @media(min-width:520px){.ov{align-items:center}}
+  /* ===== DESKTOP ===== */
+  @media(min-width:820px){
+    body{background:var(--bg)}
+    .desk{display:block} .mob{display:none}
+    .app{height:auto;min-height:100dvh;max-width:1160px;overflow:visible}
+    .bar{padding:16px 34px;gap:16px}
+    .bar .logo{height:34px}
+    .sub{padding:0 34px 22px;display:flex;align-items:flex-end;justify-content:space-between;gap:20px}
+    .sub .t{font-size:2.4rem}
+    .sub .m{font-size:.9rem;margin-top:0}
+    .scroll{overflow:visible;padding:26px 34px 50px}
+    .icobtn{width:auto;height:42px;border-radius:11px;padding:0 16px}
+
+    .weekhead{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:16px}
+    .weekhead h2{font-size:1.5rem}
+    .weekhead .today{font-size:.85rem;color:var(--muted)}
+    .week{display:grid;grid-template-columns:repeat(7,1fr);gap:12px;align-items:start}
+    .wcol{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;min-height:80px}
+    .whead{background:var(--ink);color:#fff;padding:11px 10px;text-align:center;font-family:'Oswald';text-transform:uppercase;letter-spacing:.04em;font-size:.92rem;position:relative}
+    .whead.today{background:var(--red)}
+    .whead small{display:block;font-family:'Inter';text-transform:none;letter-spacing:0;font-size:.64rem;font-weight:600;opacity:.75;margin-top:2px}
+    .wbody{padding:9px;display:flex;flex-direction:column;gap:8px}
+    .wc{border:1px solid var(--line);border-left:3px solid var(--red);border-radius:9px;padding:8px 9px;background:#fff}
+    .wc .wt{font-family:'Oswald';font-weight:700;font-size:.82rem;color:var(--ink)}
+    .wc .wn{font-family:'Oswald';text-transform:uppercase;font-weight:600;font-size:.9rem;margin-top:1px;line-height:1.1}
+    .wc .wm{font-size:.74rem;color:var(--muted);margin-top:3px}
+    .wc .wm .wco{color:var(--ink);font-weight:600}
+    .wc .wlvl{display:inline-block;font-size:.58rem;font-family:'Oswald';letter-spacing:.05em;text-transform:uppercase;padding:1px 6px;border-radius:20px;background:#fff0f0;color:var(--red);border:1px solid #ffdada;margin-top:4px}
+    .wempty{color:#c2c6cd;text-align:center;font-family:'Oswald';padding:14px 4px;font-size:1.1rem}
+    .foot{font-size:.78rem;padding-top:26px}
+  }
+
+  /* ===== Login sheet ===== */
+  .ov{position:fixed;inset:0;background:rgba(8,9,12,.6);backdrop-filter:blur(3px);display:none;align-items:flex-end;justify-content:center;z-index:80}
+  @media(min-width:560px){.ov{align-items:center}}
   .ov.open{display:flex}
-  .sheet{background:#fff;width:100%;max-width:var(--shell);border-radius:22px 22px 0 0;padding:22px 20px calc(24px + var(--safe-b));box-shadow:0 -10px 40px rgba(0,0,0,.3);animation:up .22s ease}
-  @media(min-width:520px){.sheet{border-radius:20px;max-width:400px;animation:none}}
-  @keyframes up{from{transform:translateY(30px);opacity:.6}to{transform:none;opacity:1}}
+  .sheet{background:#fff;width:100%;max-width:var(--shell);border-radius:22px 22px 0 0;padding:22px 20px calc(24px + var(--safe-b));box-shadow:0 -10px 40px rgba(0,0,0,.3)}
+  @media(min-width:560px){.sheet{border-radius:18px;max-width:400px}}
   .grab{width:40px;height:4px;border-radius:4px;background:#dcdfe4;margin:0 auto 16px}
+  @media(min-width:560px){.grab{display:none}}
   .sheet h3{font-size:1.4rem}
   .sheet .s{color:var(--muted);font-size:.86rem;margin:3px 0 16px}
   .fld{margin-bottom:12px}
@@ -94,88 +118,127 @@
   .fld input:focus,.fld select:focus{outline:none;border-color:var(--red)}
   .msg{font-size:.82rem;min-height:18px;margin-top:2px}
   .msg.err{color:var(--red)} .msg.ok{color:#0a7d3c}
-  .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:'Oswald';text-transform:uppercase;letter-spacing:.05em;font-weight:600;font-size:.9rem;padding:13px 16px;border-radius:12px;border:1px solid transparent;background:none;width:100%}
-  .btn-red{background:var(--red);color:#fff} .btn-red:active{background:var(--red-d)}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:'Oswald';text-transform:uppercase;letter-spacing:.05em;font-weight:600;font-size:.9rem;padding:13px 16px;border-radius:12px;border:1px solid transparent;background:none}
+  .btn-red{background:var(--red);color:#fff} .btn-red:active{background:var(--red-d)} .btn-red:hover{background:var(--red-d)}
   .btn-ink{background:var(--ink);color:#fff}
   .btn-ghost{border-color:var(--line);color:var(--ink)}
   .rowbtns{display:flex;gap:10px;margin-top:8px}
+  .rowbtns .btn{flex:1}
 
-  /* Admin editor (full-screen over app) */
-  .editor{position:absolute;inset:0;background:var(--bg);display:none;flex-direction:column;z-index:60}
+  /* ===== Admin editor (responsive: table on desktop, cards on mobile) ===== */
+  .editor{position:fixed;inset:0;background:rgba(8,9,12,.55);display:none;justify-content:center;align-items:stretch;z-index:70}
   .editor.open{display:flex}
-  .ebar{background:var(--ink);color:#fff;padding:calc(var(--safe-t) + 12px) 14px 12px;display:flex;align-items:center;gap:10px;flex-shrink:0;border-bottom:3px solid var(--red)}
-  .ebar .tt{font-family:'Oswald';text-transform:uppercase;letter-spacing:.04em;font-size:1.05rem}
+  .ewrap{width:100%;max-width:1040px;background:var(--bg);display:flex;flex-direction:column;height:100dvh}
+  @media(min-width:820px){.ewrap{height:min(94dvh,860px);margin:auto;border-radius:16px;overflow:hidden;box-shadow:0 30px 90px rgba(0,0,0,.5)}}
+  .ebar{background:var(--ink);color:#fff;padding:calc(var(--safe-t) + 12px) 16px 12px;display:flex;align-items:center;gap:10px;flex-shrink:0;border-bottom:3px solid var(--red)}
+  @media(min-width:820px){.ebar{padding:14px 20px}}
+  .ebar .tt{font-family:'Oswald';text-transform:uppercase;letter-spacing:.04em;font-size:1.1rem}
   .ebar .tt small{display:block;font-family:'Inter';text-transform:none;letter-spacing:0;color:#ff8a8a;font-size:.66rem;font-weight:600}
   .ebar .x{margin-left:auto}
-  .escroll{flex:1;overflow-y:auto;padding:14px 14px 12px}
-  .ec{background:#fff;border:1px solid var(--line);border-radius:15px;padding:13px;margin-bottom:11px}
-  .ec .r{display:flex;gap:8px;margin-bottom:8px}
-  .ec .r:last-child{margin-bottom:0}
-  .ec .f{flex:1;min-width:0}
-  .ec .f.small{flex:0 0 40%}
-  .ec label{font-family:'Oswald';text-transform:uppercase;font-size:.6rem;letter-spacing:.08em;color:var(--muted);display:block;margin-bottom:3px}
-  .ec input,.ec select{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 10px;font-family:inherit;font-size:.92rem;background:#fff;color:var(--ink)}
-  .ec input:focus,.ec select:focus{outline:none;border-color:var(--red)}
-  .ec .del{margin-top:2px;background:none;border:none;color:var(--red);font-family:'Oswald';text-transform:uppercase;font-size:.68rem;letter-spacing:.06em;padding:4px 0}
-  .addbtn{width:100%;border:1.5px dashed #cfd3da;background:#fff;color:var(--ink);border-radius:13px;padding:13px;font-family:'Oswald';text-transform:uppercase;letter-spacing:.05em;font-size:.86rem;margin-bottom:8px}
-  .addbtn:active{border-color:var(--red);color:var(--red)}
-  .ebottom{flex-shrink:0;padding:12px 14px calc(14px + var(--safe-b));background:#fff;border-top:1px solid var(--line);display:flex;gap:10px;align-items:center}
-  .ebottom .st{font-size:.74rem;color:var(--muted);font-family:'Oswald';text-transform:uppercase;letter-spacing:.04em;flex:1}
-  .ebottom .btn{width:auto;flex:0 0 auto;padding:12px 18px}
+  .escroll{flex:1;overflow-y:auto;padding:16px}
+  @media(min-width:820px){.escroll{padding:20px}}
+  .addbtn{width:100%;border:1.5px dashed #cfd3da;background:#fff;color:var(--ink);border-radius:13px;padding:13px;font-family:'Oswald';text-transform:uppercase;letter-spacing:.05em;font-size:.86rem;margin-bottom:12px}
+  .addbtn:hover{border-color:var(--red);color:var(--red)}
+
+  table.etable{width:100%;border-collapse:collapse}
+  .etable thead th{font-family:'Oswald';text-transform:uppercase;font-size:.66rem;letter-spacing:.09em;color:var(--muted);text-align:left;padding:6px 8px;white-space:nowrap}
+  .etable td{padding:5px 6px;vertical-align:middle}
+  .etable input,.etable select{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 10px;font-family:inherit;font-size:.9rem;background:#fff;color:var(--ink)}
+  .etable input:focus,.etable select:focus{outline:none;border-color:var(--red)}
+  .col-day{width:120px}.col-time{width:110px}.col-lvl{width:140px}.col-del{width:44px}
+  .del{border:1px solid var(--line);background:#fff;color:var(--red);border-radius:9px;width:36px;height:36px;font-size:1rem;line-height:1}
+  .del:hover{background:var(--red);color:#fff;border-color:var(--red)}
+
+  /* Mobile: stack the table into cards */
+  @media(max-width:819px){
+    .etable,.etable tbody,.etable tr,.etable td{display:block;width:100%}
+    .etable thead{display:none}
+    .etable tr{background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px;margin-bottom:11px}
+    .etable td{padding:5px 0}
+    .etable td::before{content:attr(data-label);display:block;font-family:'Oswald';text-transform:uppercase;font-size:.6rem;letter-spacing:.08em;color:var(--muted);margin-bottom:3px}
+    .etable td.col-del{padding-top:8px}
+    .etable td.col-del::before{display:none}
+    .etable .del{width:100%;height:auto;padding:9px;font-family:'Oswald';text-transform:uppercase;font-size:.7rem;letter-spacing:.05em}
+    .etable .two{display:flex;gap:8px}
+    .etable .two>div{flex:1}
+  }
+  @media(min-width:820px){ .etable .two{display:contents} }
+
+  .ebottom{flex-shrink:0;padding:12px 16px calc(14px + var(--safe-b));background:#fff;border-top:1px solid var(--line);display:flex;gap:10px;align-items:center}
+  @media(min-width:820px){.ebottom{padding:14px 20px}}
+  .ebottom .st{font-size:.76rem;color:var(--muted);font-family:'Oswald';text-transform:uppercase;letter-spacing:.04em;flex:1}
+  .ebottom .btn{padding:12px 20px}
 </style>
 </head>
 <body>
 <div class="app">
-
-  <!-- App bar -->
   <div class="bar">
     <img class="logo" src="logo-wordmark.png" alt="Eagles Gym">
     <div class="sp">
-      <button class="icobtn" id="adminBtn" aria-label="Admin" title="Admin">🔒</button>
+      <button class="icobtn btn-admin" id="adminBtn">🔒 <span class="desk">Admin</span></button>
     </div>
   </div>
   <div class="sub">
-    <div class="t">Class Timetable</div>
-    <div class="m">
-      <span>📍 <b>Punchbowl, Sydney</b></span>
-      <span>🕕 <b>5:30am–11pm daily</b></span>
+    <div>
+      <div class="t">Class Timetable</div>
+      <div class="m">
+        <span>📍 <b>268 The Boulevarde, Punchbowl NSW</b></span>
+        <span>🕕 <b>5:30am – 11pm daily</b></span>
+        <span class="desk">📞 <b>0499 922 334</b></span>
+      </div>
     </div>
   </div>
 
-  <!-- Day strip -->
-  <div class="days" id="days"></div>
+  <!-- Mobile day strip -->
+  <div class="days mob" id="days"></div>
 
-  <!-- Class list -->
   <div class="scroll">
-    <div class="daylabel"><span id="dayName"></span><span class="cnt" id="dayCount"></span></div>
-    <div id="list"></div>
+    <!-- Mobile single-day list -->
+    <div class="mob">
+      <div class="daylabel"><span id="dayName"></span><span class="cnt" id="dayCount"></span></div>
+      <div id="list"></div>
+    </div>
+
+    <!-- Desktop full-week grid -->
+    <div class="desk">
+      <div class="weekhead"><h2>This Week</h2><span class="today" id="weekToday"></span></div>
+      <div class="week" id="weekGrid"></div>
+    </div>
+
     <div class="foot">
-      <b>Eagles Gym</b> · 268 The Boulevarde, Punchbowl NSW 2196<br>
-      📞 0499 922 334 · <span id="updated"></span>
+      <b>Eagles Gym</b> · 268 The Boulevarde, Punchbowl NSW 2196 · 📞 0499 922 334<br>
+      <span id="updated"></span>
     </div>
   </div>
 
   <!-- Admin editor -->
   <div class="editor" id="editor">
-    <div class="ebar">
-      <div class="tt">Edit Timetable<small>Changes go live instantly</small></div>
-      <button class="icobtn x" id="edClose" aria-label="Close">✕</button>
-    </div>
-    <div class="escroll">
-      <button class="addbtn" id="edAdd">＋ Add a class</button>
-      <div id="edList"></div>
-      <button class="addbtn" id="edAdd2">＋ Add a class</button>
-    </div>
-    <div class="ebottom">
-      <span class="st" id="edSt"></span>
-      <button class="btn btn-ghost" id="edCancel" style="width:auto">Cancel</button>
-      <button class="btn btn-red" id="edSave" style="width:auto">Save &amp; Publish</button>
+    <div class="ewrap">
+      <div class="ebar">
+        <div class="tt">Edit Timetable<small>Changes go live instantly</small></div>
+        <button class="icobtn x" id="edClose" aria-label="Close">✕</button>
+      </div>
+      <div class="escroll">
+        <button class="addbtn" id="edAdd">＋ Add a class</button>
+        <table class="etable">
+          <thead><tr>
+            <th class="col-day">Day</th><th class="col-time">Time</th>
+            <th>Class</th><th>Coach</th><th class="col-lvl">Level</th><th class="col-del"></th>
+          </tr></thead>
+          <tbody id="edRows"></tbody>
+        </table>
+        <button class="addbtn" id="edAdd2" style="margin-top:12px">＋ Add a class</button>
+      </div>
+      <div class="ebottom">
+        <span class="st" id="edSt"></span>
+        <button class="btn btn-ghost" id="edCancel">Cancel</button>
+        <button class="btn btn-red" id="edSave">Save &amp; Publish</button>
+      </div>
     </div>
   </div>
-
 </div>
 
-<!-- Login sheet -->
+<!-- Login -->
 <div class="ov" id="loginOv">
   <div class="sheet">
     <div class="grab"></div>
@@ -194,14 +257,13 @@
 </div>
 
 <script>
-/* ===== Config ===== */
 const FN="https://ymuwuhvqqftgpxwhzoub.supabase.co/functions/v1/eaglesgym";
 const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltdXd1aHZxcWZ0Z3B4d2h6b3ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NjUyMzgsImV4cCI6MjA5OTI0MTIzOH0.sOkWQpulWj_ZSqMNSV7YP55T70UFSm2mP5e5xapQyQo";
 const DAYS=[["Mon","Monday"],["Tue","Tuesday"],["Wed","Wednesday"],["Thu","Thursday"],["Fri","Friday"],["Sat","Saturday"],["Sun","Sunday"]];
 const DK=DAYS.map(d=>d[0]);
 const FALLBACK={title:"Weekly Class Timetable",classes:[
-  {id:"c01",day:"Mon",time:"6:00am",name:"Boxing",coach:"Coach Ali",level:"All levels"},
-  {id:"c05",day:"Mon",time:"6:30pm",name:"MMA",coach:"Coach Ali",level:"Intermediate"}
+  {id:"c01",day:"Mon",time:"6:00am",name:"Boxing",coach:"",level:"All levels"},
+  {id:"c05",day:"Mon",time:"6:30pm",name:"MMA",coach:"",level:"Intermediate"}
 ]};
 
 let STATE={title:"",classes:[],updated_at:null};
@@ -211,23 +273,24 @@ const $=s=>document.querySelector(s), el=(t,c)=>{const e=document.createElement(
 function sydDay(){try{const w=new Date().toLocaleDateString("en-US",{timeZone:"Australia/Sydney",weekday:"short"});return DK.includes(w)?w:"Mon";}catch(e){return "Mon";}}
 function mins(t){const m=String(t||"").trim().toLowerCase().match(/^(\d{1,2}):?(\d{2})?\s*(am|pm)?/);if(!m)return 9999;let h=+m[1];const mm=m[2]?+m[2]:0,ap=m[3];if(ap==="pm"&&h!==12)h+=12;if(ap==="am"&&h===12)h=0;return h*60+mm;}
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));}
+function dayItems(k){return (STATE.classes||[]).filter(c=>c.day===k).sort((a,b)=>mins(a.time)-mins(b.time));}
 async function api(action,p={}){const r=await fetch(FN,{method:"POST",headers:{"content-type":"application/json","apikey":ANON,"Authorization":"Bearer "+ANON},body:JSON.stringify({action,...p})});const j=await r.json().catch(()=>({error:"Network error"}));if(!r.ok)throw new Error(j.error||("HTTP "+r.status));return j;}
 
-/* ===== Public ===== */
+/* ---- Mobile ---- */
 function buildDays(){
   const w=$("#days");w.innerHTML="";
   DAYS.forEach(([k,full])=>{
     const b=el("button","day"+(k===activeDay?" active":""));
     b.innerHTML=`<div class="d">${k}</div><div class="n">${k===sydDay()?"Today":full.slice(0,3)}</div>`;
-    b.onclick=()=>{activeDay=k;buildDays();render();$(".scroll").scrollTop=0;};
+    b.onclick=()=>{activeDay=k;buildDays();renderList();$(".scroll").scrollTop=0;};
     w.appendChild(b);
   });
   const a=w.querySelector(".day.active");if(a)a.scrollIntoView({inline:"center",block:"nearest"});
 }
-function render(){
+function renderList(){
   const host=$("#list");host.innerHTML="";
   const full=(DAYS.find(d=>d[0]===activeDay)||["","",])[1];
-  const items=(STATE.classes||[]).filter(c=>c.day===activeDay).sort((a,b)=>mins(a.time)-mins(b.time));
+  const items=dayItems(activeDay);
   $("#dayName").textContent=full;
   $("#dayCount").textContent=items.length?`${items.length} class${items.length===1?"":"es"}`:"";
   if(!items.length){host.innerHTML=`<div class="empty"><div class="big">🦅</div>No classes ${full}</div>`;return;}
@@ -235,18 +298,41 @@ function render(){
     const card=el("div","cls");
     card.innerHTML=`<div class="tm"><b>${esc(c.time||"—")}</b></div>
       <div class="bd"><div class="nm">${esc(c.name||"Class")}</div>
-      <div class="meta"><span class="coach">👤 ${esc(c.coach||"TBA")}</span>${c.level?`<span class="lvl">${esc(c.level)}</span>`:""}</div></div>`;
+      <div class="meta">${c.coach?`<span class="coach">👤 ${esc(c.coach)}</span>`:""}${c.level?`<span class="lvl">${esc(c.level)}</span>`:""}</div></div>`;
     host.appendChild(card);
   });
 }
+/* ---- Desktop week grid ---- */
+function renderWeek(){
+  const g=$("#weekGrid");g.innerHTML="";
+  const today=sydDay();
+  $("#weekToday").textContent=(DAYS.find(d=>d[0]===today)||["","",])[1]+" today";
+  DAYS.forEach(([k,full])=>{
+    const col=el("div","wcol");
+    const head=el("div","whead"+(k===today?" today":""));
+    const items=dayItems(k);
+    head.innerHTML=`${full}<small>${items.length} class${items.length===1?"":"es"}</small>`;
+    const body=el("div","wbody");
+    if(!items.length){body.innerHTML=`<div class="wempty">—</div>`;}
+    else items.forEach(c=>{
+      const wc=el("div","wc");
+      wc.innerHTML=`<div class="wt">${esc(c.time||"—")}</div><div class="wn">${esc(c.name||"Class")}</div>
+        <div class="wm">${c.coach?`<span class="wco">${esc(c.coach)}</span>`:""}</div>
+        ${c.level?`<span class="wlvl">${esc(c.level)}</span>`:""}`;
+      body.appendChild(wc);
+    });
+    col.appendChild(head);col.appendChild(body);g.appendChild(col);
+  });
+}
 function renderUpdated(){const u=STATE.updated_at;$("#updated").textContent=u?"Updated "+new Date(u).toLocaleDateString("en-AU",{day:"numeric",month:"short",timeZone:"Australia/Sydney"}):"";}
+function renderAll(){buildDays();renderList();renderWeek();renderUpdated();}
 async function load(){
   try{const j=await api("get");STATE={title:j.data?.title||"Weekly Class Timetable",classes:j.data?.classes||[],updated_at:j.updated_at};}
   catch(e){STATE={...FALLBACK,updated_at:null};}
-  buildDays();render();renderUpdated();
+  renderAll();
 }
 
-/* ===== Login ===== */
+/* ---- Login ---- */
 function openLogin(){$("#loginMsg").textContent="";$("#loginForm").reset();$("#loginOv").classList.add("open");setTimeout(()=>$("#lu").focus(),60);}
 function closeLogin(){$("#loginOv").classList.remove("open");}
 $("#adminBtn").onclick=openLogin;
@@ -261,33 +347,29 @@ $("#loginForm").addEventListener("submit",async e=>{
   finally{$("#loginBtn").textContent="Log in";}
 });
 
-/* ===== Editor ===== */
+/* ---- Editor ---- */
 function openEditor(){edit=JSON.parse(JSON.stringify(STATE.classes||[]));if(!edit.length)addRow(false);renderEdit();setSt("");$("#editor").classList.add("open");$(".escroll").scrollTop=0;}
 function closeEditor(){$("#editor").classList.remove("open");}
 function newId(){return "c"+Date.now().toString(36)+Math.floor(Math.random()*1e3);}
 function addRow(r=true){edit.push({id:newId(),day:activeDay,time:"",name:"",coach:"",level:""});if(r){renderEdit();const s=$(".escroll");s.scrollTop=s.scrollHeight;}}
 function setSt(t){$("#edSt").textContent=t;}
 function renderEdit(){
-  const host=$("#edList");host.innerHTML="";
+  const tb=$("#edRows");tb.innerHTML="";
   edit.sort((a,b)=>DK.indexOf(a.day)-DK.indexOf(b.day)||mins(a.time)-mins(b.time));
   edit.forEach((c,i)=>{
-    const card=el("div","ec");
+    const tr=el("tr");
     const days=DAYS.map(([k,f])=>`<option value="${k}"${k===c.day?" selected":""}>${f}</option>`).join("");
-    card.innerHTML=`
-      <div class="r">
-        <div class="f small"><label>Day</label><select data-i="${i}" data-k="day">${days}</select></div>
-        <div class="f small"><label>Time</label><input data-i="${i}" data-k="time" value="${esc(c.time||"")}" placeholder="6:00am"></div>
-      </div>
-      <div class="r"><div class="f"><label>Class</label><input data-i="${i}" data-k="name" value="${esc(c.name||"")}" placeholder="Class name"></div></div>
-      <div class="r">
-        <div class="f"><label>Coach</label><input data-i="${i}" data-k="coach" value="${esc(c.coach||"")}" placeholder="Coach"></div>
-        <div class="f"><label>Level</label><input data-i="${i}" data-k="level" value="${esc(c.level||"")}" placeholder="All levels"></div>
-      </div>
-      <button class="del" data-del="${i}">🗑 Remove class</button>`;
-    host.appendChild(card);
+    tr.innerHTML=`
+      <td class="col-day" data-label="Day"><select data-i="${i}" data-k="day">${days}</select></td>
+      <td class="col-time" data-label="Time"><input data-i="${i}" data-k="time" value="${esc(c.time||"")}" placeholder="6:00am"></td>
+      <td data-label="Class"><input data-i="${i}" data-k="name" value="${esc(c.name||"")}" placeholder="Class name"></td>
+      <td data-label="Coach"><input data-i="${i}" data-k="coach" value="${esc(c.coach||"")}" placeholder="Coach name"></td>
+      <td class="col-lvl" data-label="Level"><input data-i="${i}" data-k="level" value="${esc(c.level||"")}" placeholder="All levels"></td>
+      <td class="col-del"><button class="del" title="Remove" data-del="${i}">✕</button></td>`;
+    tb.appendChild(tr);
   });
-  host.querySelectorAll("input,select").forEach(inp=>inp.addEventListener("input",e=>{const i=+e.target.dataset.i,k=e.target.dataset.k;if(edit[i])edit[i][k]=e.target.value;}));
-  host.querySelectorAll(".del").forEach(b=>b.onclick=()=>{edit.splice(+b.dataset.del,1);renderEdit();});
+  tb.querySelectorAll("input,select").forEach(inp=>inp.addEventListener("input",e=>{const i=+e.target.dataset.i,k=e.target.dataset.k;if(edit[i])edit[i][k]=e.target.value;}));
+  tb.querySelectorAll(".del").forEach(b=>b.onclick=()=>{edit.splice(+b.dataset.del,1);renderEdit();});
 }
 $("#edAdd").onclick=()=>addRow(true);
 $("#edAdd2").onclick=()=>addRow(true);
@@ -300,13 +382,12 @@ $("#edSave").onclick=async()=>{
   try{
     const j=await api("save",{username:CRED.username,password:CRED.password,data:{title:STATE.title||"Weekly Class Timetable",classes:clean}});
     STATE={title:j.data?.title||STATE.title,classes:j.data?.classes||clean,updated_at:j.updated_at};
-    setSt("✓ Published");buildDays();render();renderUpdated();
-    setTimeout(closeEditor,450);
+    setSt("✓ Published");renderAll();
+    setTimeout(closeEditor,500);
   }catch(err){setSt("⚠ "+(err.message||"Save failed"));}
   finally{$("#edSave").textContent="Save & Publish";}
 };
 
-/* ===== Init ===== */
 load();
 </script>
 </body>
