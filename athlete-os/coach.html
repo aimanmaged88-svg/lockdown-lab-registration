@@ -328,6 +328,8 @@
     <div class="sechead"><h2>Team health</h2><span class="hint">Live — computed from athlete check-ins &amp; ratings</span></div>
     <div id="healthWrap"></div>
 
+    <div id="sportReqWrap"></div>
+
     <div class="sechead"><h2>Quick actions</h2></div>
     <div class="qas" id="qas"></div>
 
@@ -381,7 +383,7 @@
 (function(){
   const FN = 'https://ymuwuhvqqftgpxwhzoub.supabase.co/functions/v1/aos-api';
   let CODE = sessionStorage.getItem('aos_coach_code') || '';
-  let ROWS = [], TEAMS = [], TODAY = '', CUR = null, curId = null, lastFocus = null;
+  let ROWS = [], TEAMS = [], TODAY = '', SPORT_REQS = [], CUR = null, curId = null, lastFocus = null;
   const REDUCE = matchMedia('(prefers-reduced-motion:reduce)').matches;
 
   const $ = s => document.querySelector(s);
@@ -427,7 +429,7 @@
   /* ---- data ---- */
   async function load(){
     const r = await api({ action:'roster' });
-    ROWS = r.athletes || []; TEAMS = r.teams || []; TODAY = r.today || '';
+    ROWS = r.athletes || []; TEAMS = r.teams || []; TODAY = r.today || ''; SPORT_REQS = r.sport_requests || [];
     buildFilters(); render();
   }
   ['refreshBtn','refreshBtn2'].forEach(id=>{ const b=$('#'+id); if(b)b.addEventListener('click', ()=> load().then(()=>toast('Refreshed'))); });
@@ -459,7 +461,25 @@
     });
   }
 
-  function render(){ renderKPIs(); renderHealth(); renderQuick(); renderGroups(); renderCards(); }
+  function render(){ renderKPIs(); renderHealth(); renderSportReqs(); renderQuick(); renderGroups(); renderCards(); }
+
+  function renderSportReqs(){
+    const w=$('#sportReqWrap');
+    if(!SPORT_REQS.length){ w.innerHTML=''; return; }
+    w.innerHTML=`<div class="sechead"><h2>Sport requests</h2><span class="hint">New sports your athletes added — approve to keep it, reject to remove it</span></div>
+      <div class="health" style="padding:16px">
+        ${SPORT_REQS.map(s=>`<div class="kv" style="align-items:center">
+          <span class="k" style="color:var(--text)"><b>${esc(s.sport)}</b> · added by ${esc(s.athlete_name||'an athlete')}</span>
+          <span class="v" style="display:flex;gap:6px"><button class="btn btn-primary btn-sm" data-appr="${s.id}">Approve</button><button class="btn btn-ghost btn-sm" data-rej="${s.id}">Reject</button></span>
+        </div>`).join('')}
+      </div>`;
+    w.querySelectorAll('[data-appr]').forEach(b=>b.addEventListener('click',()=>resolveSport(b.dataset.appr,'approved')));
+    w.querySelectorAll('[data-rej]').forEach(b=>b.addEventListener('click',()=>resolveSport(b.dataset.rej,'rejected')));
+  }
+  async function resolveSport(id,status){
+    try{ await api({action:'sport_resolve',req_id:id,status}); toast('Sport '+status); await load(); }
+    catch(e){ toast('Failed'); }
+  }
 
   /* ---- KPIs ---- */
   function renderKPIs(){
@@ -555,7 +575,7 @@
     $('#cards').innerHTML=rows.map(r=>{
       const ok=r.last_checkin===TODAY, w=recW(r.last_checkin);
       const rc=w>=1?'var(--good)':w>=.5?'var(--amber)':w>0?'var(--bad)':'var(--track)';
-      const meta=[r.sport,r.position,r.age?r.age+'y':''].filter(Boolean).join(' · ');
+      const meta=[(r.sport_label||r.sport),r.position,r.age?r.age+'y':''].filter(Boolean).join(' · ');
       const goalTags=((r.goals||{}).tags||[]).slice(0,2);
       const tn=teamName(r.team_id);
       return `<button class="acard" data-open="${r.id}" aria-haspopup="dialog" aria-label="Open ${esc(r.name)}'s file">
@@ -596,7 +616,7 @@
   function paintHead(){
     const p=CUR.profile;
     $('#dwName').id='dwName'; $('#dwName').textContent=p.name;
-    const bits=[p.sport,p.position,p.age?p.age+'y':'',p.level].filter(Boolean).join(' · ');
+    const bits=[(p.sport_label||p.sport),p.position,p.age?p.age+'y':'',p.level].filter(Boolean).join(' · ');
     $('#dwSub').innerHTML=esc(bits)+(CUR.status==='paused'?' · <span style="color:var(--amber)">paused</span>':'');
   }
   const TABS=[['overview','Overview'],['health','Health'],['performance','Performance'],['attendance','Attendance'],['comm','Comms'],['notes','Notes'],['timeline','Timeline'],['settings','Settings']];
@@ -628,7 +648,7 @@
       const tn=teamName(p.team_id);
       b.innerHTML=`
       <div class="box">
-        <div class="kv"><span class="k">Sport</span><span class="v">${esc(p.sport)}${p.position?' · '+esc(p.position):''}</span></div>
+        <div class="kv"><span class="k">Sport</span><span class="v">${esc(p.sport_label||p.sport)}${p.position?' · '+esc(p.position):''}</span></div>
         <div class="kv"><span class="k">Level</span><span class="v">${esc(p.level||'—')}</span></div>
         <div class="kv"><span class="k">Training</span><span class="v">${p.train_freq?p.train_freq+' days/week':'—'} · ${esc(p.comp_schedule||'no comp set')}</span></div>
         <div class="kv"><span class="k">Team</span><span class="v">${tn?esc(tn):'—'}</span></div>

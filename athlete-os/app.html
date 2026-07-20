@@ -265,6 +265,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 :where(a,button,input,textarea,select,summary,[tabindex]):focus-visible{outline:2px solid var(--accent);outline-offset:2px;box-shadow:0 0 0 4px var(--accent-soft);border-radius:10px}
 :focus:not(:focus-visible){outline:none}
 @media (pointer:coarse){nav button{min-height:48px}.rbtn{min-width:40px;min-height:40px}.wbtn{min-width:44px;min-height:44px}}
+#tut{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;padding:22px;background:var(--scrim);backdrop-filter:blur(8px)}
+.tut-card{width:100%;max-width:380px;border:1px solid var(--line);border-radius:26px;padding:30px 24px;text-align:center;background:var(--sheet-bg);backdrop-filter:blur(30px) saturate(160%);box-shadow:var(--shadow-lg);animation:rise .3s cubic-bezier(.2,.8,.2,1)}
+.tut-emoji{font-size:46px;margin-bottom:12px;line-height:1}
+.tut-card h2{font-family:var(--fd);text-transform:uppercase;letter-spacing:.5px;font-size:27px;margin-bottom:8px}
+.tut-card p{color:var(--muted);font-size:14px;line-height:1.55;margin-bottom:18px}
+.tut-dots{display:flex;gap:6px;justify-content:center;margin-bottom:18px}
+.tut-dots i{width:20px;height:3px;border-radius:99px;background:var(--track);transition:background .3s}
+.tut-dots i.on{background:var(--accent)}
+.tut-nav{display:flex;gap:8px}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 </style>
 </head>
@@ -300,6 +309,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
       <div class="obstep" data-os="2">
         <span class="ob-lbl">Pick your sport — this personalises everything</span>
         <div class="sgrid" id="jSport"></div>
+        <input id="jSportCustom" placeholder="Type your sport — e.g. Padel" maxlength="40" autocomplete="off" style="display:none;margin-top:8px">
       </div>
 
       <div class="obstep" data-os="3">
@@ -350,7 +360,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
   <header>
     <svg class="logo"><use href="#ll"/></svg>
     <div class="ttl"><b>Athlete <i>OS</i></b><small>Powered by Lockdown Lab</small></div>
-    <button class="theme-toggle" id="themeToggle" style="margin-left:auto" aria-label="Switch theme">☾</button>
+    <button class="theme-toggle" id="tutOpen" style="margin-left:auto" aria-label="Show tutorial">?</button>
+    <button class="theme-toggle" id="themeToggle" style="margin-left:8px" aria-label="Switch theme">☾</button>
     <button class="hbtn" id="logout" style="margin-left:8px">Log out</button>
   </header>
 
@@ -586,6 +597,19 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
   </nav>
 </div>
 
+<div id="tut">
+  <div class="tut-card">
+    <div class="tut-emoji" id="tutEmoji">👋</div>
+    <h2 id="tutTitle" class="display">Welcome</h2>
+    <p id="tutBody"></p>
+    <div class="tut-dots" id="tutDots"></div>
+    <div class="tut-nav">
+      <button class="btn btn-g btn-sm" id="tutSkip">Skip</button>
+      <button class="btn btn-p" id="tutNext" style="flex:1">Next →</button>
+    </div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -596,6 +620,18 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
   const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
   let sess=null; try{sess=JSON.parse(localStorage.getItem(SESS_KEY))}catch(e){}
   let AST=null, pollT=null;
+
+  /* ---- custom-sport recognition (adds felt "we found your sport" UX; unknowns queue for coach approval) ---- */
+  let CUSTOM_SPORT=null;
+  const PACK_SYN={basketball:['basketball','bball','hoops'],soccer:['soccer','football','futbol'],mma:['mma','muay thai','kickboxing','ufc'],oztag:['oztag','oz tag','touch football','touch'],netball:['netball'],rugby:['rugby','rugby union','rugby league'],afl:['afl','aussie rules','australian football','footy'],tennis:['tennis'],swimming:['swimming','swim','swimmer'],running:['running','run','track','athletics','sprinting','cross country','distance running'],volleyball:['volleyball','volley','beach volleyball']};
+  const KNOWN_SPORTS=('padel,pickleball,squash,badminton,cricket,hockey,field hockey,ice hockey,water polo,lacrosse,rowing,cycling,bmx,mountain biking,skateboarding,surfing,boxing,judo,karate,taekwondo,jiu jitsu,brazilian jiu jitsu,bjj,wrestling,gymnastics,triathlon,golf,baseball,softball,handball,table tennis,ping pong,futsal,gaelic football,hurling,rock climbing,climbing,bouldering,skiing,snowboarding,sailing,kayaking,canoeing,fencing,archery,weightlifting,powerlifting,olympic weightlifting,crossfit,dancing,dance,cheerleading,calisthenics,rugby sevens,touch rugby,dodgeball,ultimate frisbee,polo,horse riding,equestrian,motocross,karting,diving,water skiing,wakeboarding,kitesurfing,rollerblading,speed skating,figure skating,curling,darts,snooker,billiards,esports,rock climbing,orienteering,rounders,korfball,sepak takraw').split(',');
+  const titlecase=s=>String(s).replace(/\w\S*/g,w=>w[0].toUpperCase()+w.slice(1));
+  function recognizeSport(text){
+    const n=text.trim().toLowerCase();
+    for(const k in PACK_SYN){ if(PACK_SYN[k].includes(n)) return {pack:k,label:SPORTS[k].label,pending:false,matched:true}; }
+    if(KNOWN_SPORTS.includes(n)) return {pack:'general',label:titlecase(n),pending:false,matched:true};
+    return {pack:'general',label:titlecase(text.trim()),pending:true,matched:false};
+  }
 
   /* ---------- sport engine: one app, content swaps per sport ---------- */
   const COMMON_RES=[
@@ -734,12 +770,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
   function obErr(id,msg){ const el=$(id); el.textContent=msg; el.style.display='block'; }
   function obClear(){ document.querySelectorAll('.ob-err').forEach(e=>e.style.display='none'); }
 
-  // sport grid
-  $('#jSport').innerHTML=Object.entries(SPORTS).map(([k,s])=>'<div class="sbtn" data-sport="'+k+'"><span class="si">'+s.emoji+'</span><span>'+esc(s.label)+'</span></div>').join('');
+  // sport grid (+ "My sport" tile for anything not listed)
+  $('#jSport').innerHTML=Object.entries(SPORTS).map(([k,s])=>'<div class="sbtn" data-sport="'+k+'"><span class="si">'+s.emoji+'</span><span>'+esc(s.label)+'</span></div>').join('')
+    +'<div class="sbtn" data-sport="__custom"><span class="si">＋</span><span>My sport</span></div>';
   $('#jSport').addEventListener('click',e=>{
     const b=e.target.closest('.sbtn'); if(!b)return;
     document.querySelectorAll('#jSport .sbtn').forEach(x=>x.classList.toggle('sel',x===b));
-    const sp=SPORTS[b.dataset.sport];
+    const custom=b.dataset.sport==='__custom';
+    $('#jSportCustom').style.display=custom?'block':'none';
+    if(custom) setTimeout(()=>$('#jSportCustom').focus(),60);
+    const sp=SPORTS[b.dataset.sport]||{positions:[]};
     $('#jPosLbl').style.display=sp.positions.length?'block':'none';
     $('#jPos').style.display=sp.positions.length?'flex':'none';
     $('#jPos').innerHTML=sp.positions.map(p=>'<span class="pill">'+esc(p)+'</span>').join('');
@@ -772,7 +812,20 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
       obStep=2; return obRender();
     }
     if(obStep===2){
-      if(!$('#jSport .sbtn.sel')) return obErr('#jErr','Pick your sport — it drives everything.');
+      const selSport=$('#jSport .sbtn.sel');
+      if(!selSport) return obErr('#jErr','Pick your sport — it drives everything.');
+      if(selSport.dataset.sport==='__custom'){
+        const txt=$('#jSportCustom').value.trim();
+        if(txt.length<2) return obErr('#jErr','Type your sport so we can set it up.');
+        busy($('#jNext'),1); toast('🔎 Checking “'+txt+'”…',true);
+        CUSTOM_SPORT=recognizeSport(txt);
+        await new Promise(r=>setTimeout(r,950));
+        busy($('#jNext'),0,'Continue →');
+        toast(CUSTOM_SPORT.pending
+          ? 'New one! We’ll set “'+CUSTOM_SPORT.label+'” up & send it to your coach ✓'
+          : 'Found it — '+CUSTOM_SPORT.label+' ✓');
+        $('#jPosLbl').style.display='none'; $('#jPos').style.display='none';
+      } else { CUSTOM_SPORT=null; }
       obStep=3; return obRender();
     }
     if(obStep===3){ obStep=4; return obRender(); }
@@ -784,7 +837,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
       name:$('#jName').value.trim(), pin:$('#jPin').value.trim(),
       age:parseInt($('#jAge').value,10)||null,
       contact:$('#jContact').value.trim()||null,
-      sport:$('#jSport .sbtn.sel').dataset.sport,
+      sport: CUSTOM_SPORT?CUSTOM_SPORT.pack:$('#jSport .sbtn.sel').dataset.sport,
+      sport_label: CUSTOM_SPORT?CUSTOM_SPORT.label:null,
+      sport_pending: CUSTOM_SPORT?CUSTOM_SPORT.pending:false,
       level:sel('#jLevel'), position:sel('#jPos'),
       train_freq:parseInt(sel('#jFreq'),10)||null,
       comp_schedule:sel('#jComp'),
@@ -831,7 +886,28 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
     go('home'); renderAll();
     clearInterval(pollT);
     pollT=setInterval(pollTick, 30000);
+    if(!localStorage.getItem('aos_tutorial_done')) setTimeout(showTut,450);
   }
+
+  /* ---------- first-run tutorial ---------- */
+  const TUT=[
+    ['👋','Welcome to Athlete OS','Your private performance hub. Everything here is personalised to your sport — and only you and your coach ever see it.'],
+    ['✅','Check in daily','On Home, log energy, sleep, soreness and minutes trained. It builds your streak, earns XP, and feeds your AI coach.'],
+    ['🧠','Your AI coach','It reads your check-ins and tells you what to work on next — in your sport’s language. It guides and motivates; it never diagnoses.'],
+    ['🧬','Train · Body · Mind','A weekly plan, recovery + hydration + nutrition, and a mental file to flush the moments that rattle you. Tabs along the bottom.'],
+    ['💬','Talk to your coach','The Coach tab is your direct line — message them, see your rating, and (if you’re on a team) rate your squad.'],
+    ['🚀','You’re set','Hit “Lock It In” on today’s check-in to start your streak. Tap ? in the header any time to see this again.'],
+  ];
+  let tutI=0;
+  function showTut(){ tutI=0; $('#tut').style.display='flex'; paintTut(); }
+  function paintTut(){ const s=TUT[tutI]; $('#tutEmoji').textContent=s[0]; $('#tutTitle').textContent=s[1]; $('#tutBody').textContent=s[2];
+    $('#tutDots').innerHTML=TUT.map((_,i)=>'<i class="'+(i<=tutI?'on':'')+'"></i>').join('');
+    $('#tutSkip').style.display=tutI<TUT.length-1?'inline-flex':'none';
+    $('#tutNext').textContent=tutI<TUT.length-1?'Next →':'Start ⚡'; }
+  function closeTut(){ $('#tut').style.display='none'; try{localStorage.setItem('aos_tutorial_done','1');}catch(e){} }
+  $('#tutNext').addEventListener('click',()=>{ if(tutI<TUT.length-1){tutI++;paintTut();} else closeTut(); });
+  $('#tutSkip').addEventListener('click',closeTut);
+  $('#tutOpen').addEventListener('click',showTut);
   async function pollTick(){
     try{
       if(!sess) return;
@@ -860,7 +936,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
     const h=new Date().getHours();
     $('#greet').textContent=h<12?'Morning grind,':(h<18?'Afternoon,':'Night shift,');
     $('#profStrip').innerHTML=
-      '<span class="chip pro">'+sp.emoji+' '+esc(sp.label)+'</span>'
+      '<span class="chip pro">'+sp.emoji+' '+esc(p.sport_label||sp.label)+'</span>'
       +(p.position?'<span class="chip">'+esc(p.position)+'</span>':'')
       +(p.level?'<span class="chip">'+esc(p.level)+'</span>':'')
       +(p.train_freq?'<span class="chip">'+p.train_freq+'d / week</span>':'')
