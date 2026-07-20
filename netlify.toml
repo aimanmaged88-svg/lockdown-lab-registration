@@ -1,2 +1,20 @@
 [build]
   publish = "."
+
+# --- NOVA Rewards (giveaway) ---------------------------------------------
+# publish stays "." so the existing site root and other products are
+# untouched; the config below is scoped to /giveaway/ only.
+
+# Clean path: /giveaway (no trailing slash) → canonical folder.
+[[redirects]]
+  from = "/giveaway"
+  to = "/giveaway/"
+  status = 301
+
+# Security headers for the giveaway app.
+[[headers]]
+  for = "/giveaway/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
