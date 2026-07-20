@@ -24,8 +24,23 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
 - **Scout section** — SHIPPED as a PRIVATE coming-soon skeleton (sidebar 🔭
   Scout, disabled mock: name/years/areas/who-they-scout-for/players-they-rate/
   intention). Coach-only, never public. Vets scouts vs trolls later.
-- **Badge Vault (55 badges)** — DESIGNED, awaiting Aiman's approval BEFORE
-  app wiring. Artifact: https://claude.ai/code/artifact/84185e58-5b8a-44b5-a493-c4f883b7dc70
+- **Badge Vault (55 badges) — SHIPPED into app.html (2026-07-20).** Full-screen
+  `#vault` overlay opened from the Home Starter card button `#openVault`
+  (label live-updates "N/55 · LB"). VCATS[12 categories]→VFLAT[55]; each badge
+  `[id,name,ico,tier,how,earnFn]` (earnFn null = coach/manual). Client-computed
+  from PST (xp/streak/sessions/founding/messages/invites) + localStorage action
+  counters `ll_bstat_<pid>` (mind/diary/fuel/post/ask/run) bumped at the single
+  `api()` choke point (`bumpStat`), plus flags (install/notif/theme/profile).
+  Earned map persisted `ll_vault_<pid>` (never re-locks); `evalVault()` runs in
+  renderPlayer + after each action, 2 passes so Hall of Fame settles, fires the
+  `#badgeUp` overlay (now shows tier chip) for new earns — SILENT for the 4
+  Starter-Five dupes. **Gate enforced:** founding ⭐ earn all 55; non-founding
+  earn only the 10-badge bronze TASTER shelf, the other 45 render ⭐"Founding
+  only" (look-don't-touch). 5 coach/manual badges (On Camera, OG, Player of
+  Week, Most Improved, The Lockdown) show "Coach awards this" (Phase 2). Lab
+  Bucks tally shown (earned/505); wallet+redeem still Phase 2. Verified E2E
+  (founding→12 earned/65 LB; non-founding→4 earned/8 LB, 39 founding-locked).
+  Design artifact: https://claude.ai/code/artifact/84185e58-5b8a-44b5-a493-c4f883b7dc70
   Master: scratchpad/badges-base.html (fonts injected → badges.html).
   6 tiers (Bronze/Silver/Gold/Elite/Founding/Legend) across 12 categories,
   all client-computable from existing metrics EXCEPT 3 coach-picks

@@ -640,6 +640,47 @@ html.big #app{zoom:1.09}
 body.rmode *{animation:none!important;transition:none!important}
 
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}#levelup .lu,.checkwrap circle,.checkwrap path{transform:none;stroke-dashoffset:0;opacity:1}}
+/* ===== THE BADGE VAULT ===== */
+#vault{position:fixed;inset:0;z-index:55;display:none;flex-direction:column;background:var(--bg)}
+#vault.on{display:flex}
+#vault .vhead{position:sticky;top:0;z-index:2;padding:16px 16px 12px;background:linear-gradient(180deg,rgba(5,5,6,.97),rgba(5,5,6,.86));backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+#vault .vtop{display:flex;align-items:center;gap:10px}
+#vault .vtop h2{font-family:var(--fd);font-size:27px;letter-spacing:1px;text-transform:uppercase;flex:1;line-height:1}
+#vault .vx{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--glass);color:var(--text);font-size:15px;display:grid;place-items:center;flex:0 0 auto}
+#vault .vx:active{transform:scale(.92)}
+#vault .vsub{font-family:var(--fm);font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-top:6px}
+#vault .lbbar{display:flex;align-items:center;gap:12px;margin-top:11px;background:linear-gradient(90deg,rgba(255,107,0,.18),transparent);border:1px solid rgba(255,107,0,.38);border-radius:13px;padding:10px 13px}
+#vault .lbbar .lbn{font-family:var(--fd);font-size:30px;color:var(--accent);line-height:.9;flex:0 0 auto}
+#vault .lbbar small{color:var(--muted);font-size:10.5px;line-height:1.4}
+#vault .lbbar small b{color:var(--text)}
+#vault .gate{margin-top:10px;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:12px;line-height:1.5;color:var(--muted);background:var(--glass2)}
+#vault .gate b{color:var(--text)}
+#vault .vbody{flex:1;overflow-y:auto;padding:14px 14px 40px;-webkit-overflow-scrolling:touch}
+#vault .vcat{margin-top:22px}
+#vault .vcat:first-child{margin-top:4px}
+#vault .vcath{font-family:var(--fm);font-size:10px;letter-spacing:1.6px;text-transform:uppercase;color:var(--muted);display:flex;align-items:center;gap:7px;margin-bottom:11px}
+#vault .vcath .n{color:var(--dim);margin-left:auto;letter-spacing:.5px}
+#vault .vgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(98px,1fr));gap:9px}
+#vault .vb{position:relative;border:1px solid var(--line);border-radius:14px;padding:13px 8px 11px;text-align:center;background:var(--glass2);overflow:hidden}
+#vault .vb .vcrest{font-size:27px;display:block;line-height:1;filter:grayscale(1);opacity:.34}
+#vault .vb b{display:block;font-size:10.5px;margin-top:6px;line-height:1.15;color:var(--muted)}
+#vault .vb .vhow{display:block;font-size:8.5px;color:var(--dim);margin-top:3px;line-height:1.25;min-height:20px}
+#vault .vb .vtier{display:inline-block;font-family:var(--fm);font-size:7px;letter-spacing:1px;text-transform:uppercase;color:var(--tc);border:1px solid var(--tc);border-radius:99px;padding:1px 5px;margin-top:6px;opacity:.5}
+#vault .vb .vlb{display:block;font-family:var(--fm);font-size:8px;color:var(--dim);margin-top:4px}
+#vault .vb .vlock{position:absolute;top:7px;right:8px;font-size:11px;opacity:.6}
+#vault .vb.found{border-style:dashed}
+#vault .vb.earned{border-color:var(--tc);background:linear-gradient(180deg,color-mix(in srgb,var(--tc) 16%,var(--glass2)),var(--glass2))}
+#vault .vb.earned .vcrest{filter:none;opacity:1}
+#vault .vb.earned b{color:var(--text)}
+#vault .vb.earned .vtier{opacity:1}
+#vault .vb.earned .vlb{color:var(--tc)}
+#vault .vb.earned .vlock{opacity:1;color:var(--tc)}
+#vault .t-bronze{--tc:#c47b3d}
+#vault .t-silver{--tc:#b9c0c8}
+#vault .t-gold{--tc:#e6b422}
+#vault .t-elite{--tc:#7cc4ff}
+#vault .t-found{--tc:#ff8a2b}
+#vault .t-legend{--tc:#c77dff}
 </style>
 </head>
 <body>
@@ -784,6 +825,7 @@ body.rmode *{animation:none!important;transition:none!important}
         <h3 id="startTitle" class="spray">Your First Five</h3>
         <div class="path" id="startPath"></div>
         <div id="startNext"></div>
+        <button class="btn btn-g btn-block" id="openVault" style="margin-top:13px">🏅 The Badge Vault · all 55 →</button>
       </div>
 
       <div class="card hot" style="margin-top:16px">
@@ -1165,6 +1207,16 @@ body.rmode *{animation:none!important;transition:none!important}
 
 <div id="badgeUp"><div class="bu"><div class="bring" id="buRing"><span class="imp"></span><span id="buIco">🔓</span></div><div class="buk">Badge Unlocked</div><h2 id="buName">Through the Door</h2><p class="bum" id="buMean">You're in.</p><span class="but" id="buTier">Bronze</span><div class="buh">Tap anywhere to keep going</div></div></div>
 
+<div id="vault">
+  <div class="vhead">
+    <div class="vtop"><h2>The <span style="color:var(--accent)">Vault</span></h2><button class="vx" id="vaultX">✕</button></div>
+    <div class="vsub" id="vaultSub">0 of 55 unlocked</div>
+    <div class="lbbar"><span class="lbn" id="vaultLB">0</span><small id="vaultLBnote"></small></div>
+    <div class="gate" id="vaultGate"></div>
+  </div>
+  <div class="vbody" id="vaultBody"></div>
+</div>
+
 <div id="welcome"><div class="wl">
   <div class="wlock">🔒</div>
   <div class="wk">You're in · Founding Squad</div>
@@ -1345,6 +1397,7 @@ body.rmode *{animation:none!important;transition:none!important}
       const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+ANON,'apikey':ANON},body:JSON.stringify(body)});
       const j=await r.json().catch(()=>({error:'Connection issue'}));
       if(!r.ok) throw new Error(j.error||('HTTP '+r.status));
+      if(j&&!j.error&&body&&body.action){ try{ bumpStat(body.action); }catch(e){} }
       return j;
     } finally { loadOff(); }
   }
@@ -1584,6 +1637,7 @@ body.rmode *{animation:none!important;transition:none!important}
     const w=$('#welcome'); if(w&&w.classList.contains('on')) return; /* welcome first, badges after */
     const bd=buQ.shift(); buOn=true;
     $('#buIco').textContent=bd.ic; $('#buName').textContent=bd.name; $('#buMean').textContent=bd.meaning;
+    const bt=$('#buTier'); if(bt){ bt.textContent=bd.tier||''; bt.style.display=bd.tier?'inline-block':'none'; }
     const el=$('#badgeUp'); el.classList.add('on');
     try{S.checkin()}catch(e){} haptic([0,30,60,30,90]); burst(false); setTimeout(()=>burst(false),380);
     const close=()=>{ el.classList.remove('on'); buOn=false; renderStarter(); setTimeout(pumpBu,480); };
@@ -1616,9 +1670,176 @@ body.rmode *{animation:none!important;transition:none!important}
         +'<div class="snode '+cls+'"><span class="crest">'+b.ic+'</span><b>'+b.name+'</b><small>'+sub+'</small></div>';
     }).join('');
     $('#startNext').innerHTML=nextIdx<0
-      ?'<b>All five collected.</b> You know the Lab now — and the full vault is coming: 55 badges to be known for. Keep stacking.'
+      ?'<b>All five collected.</b> You know the Lab now — the full vault is open below: 55 badges to be known for. Keep stacking.'
       :'<b>Next badge:</b> '+esc(STARTER[nextIdx].rule)+'. Every badge is a rep — these five teach you the whole Lab.';
   }
+  /* ============ THE BADGE VAULT (55) ============ */
+  const VTIER={bronze:['Bronze',2],silver:['Silver',5],gold:['Gold',10],elite:['Elite',20],found:['Founding',15],legend:['Legend',25]};
+  /* non-founding earn only this 10-badge bronze taster shelf (Starter Five live inside it) */
+  const TASTER=new Set(['first-light','warm-up','rookie-report','clear-head','dear-diary','first-fuel','icebreaker','curious','prospect','locked-in']);
+  /* [id,name,ico,tier,how, earnFn]  — earnFn null = coach/manual award (Phase 2) */
+  const VCATS=[
+    {ico:'🔥',name:'Streak',b:[
+      ['first-light','First Light','🌅','bronze','First check-in', x=>x.streak>=1],
+      ['warm-up','Warm Up','🔆','bronze','3-day streak', x=>x.streak>=3],
+      ['on-fire','On Fire','🔥','silver','7-day streak', x=>x.streak>=7],
+      ['relentless','Relentless','⚡','silver','14-day streak', x=>x.streak>=14],
+      ['unbreakable','Unbreakable','🛡️','gold','30-day streak', x=>x.streak>=30],
+      ['iron-habit','Iron Habit','⛓️','gold','60-day streak', x=>x.streak>=60],
+      ['the-standard','The Standard','👑','elite','100-day streak', x=>x.streak>=100],
+    ]},
+    {ico:'🏀',name:'Court & Sessions',b:[
+      ['rookie-report','Rookie Report','📋','bronze','First live session', x=>x.sessions>=1],
+      ['regular','Regular','🎟️','silver','5 sessions', x=>x.sessions>=5],
+      ['gym-rat','Gym Rat','🐀','silver','15 sessions', x=>x.sessions>=15],
+      ['cornerstone','Cornerstone','🧱','gold','30 sessions', x=>x.sessions>=30],
+      ['franchise','Franchise','🏛️','elite','50 sessions', x=>x.sessions>=50],
+      ['first-run','First Run','📍','bronze','Post a run', x=>x.c.run>=1],
+      ['court-plug','Court Plug','🗺️','silver','Post 10 runs', x=>x.c.run>=10],
+      ['on-camera','On Camera','🎥','gold','Show up on cam', null],
+    ]},
+    {ico:'🧠',name:'Mind',b:[
+      ['clear-head','Clear Head','🧠','bronze','First Mind entry', x=>x.c.mind>=1],
+      ['reset-ritual','Reset Ritual','🔄','bronze','Reset after a rough one', x=>x.c.mind>=2],
+      ['deep-work','Deep Work','📖','silver','10 Mind entries', x=>x.c.mind>=10],
+      ['mental-reps','Mental Reps','🧘','gold','25 Mind entries', x=>x.c.mind>=25],
+      ['zen-master','Zen Master','🕊️','elite','50 Mind entries', x=>x.c.mind>=50],
+    ]},
+    {ico:'📓',name:'Diary',b:[
+      ['dear-diary','Dear Diary','📓','bronze','First diary entry', x=>x.c.diary>=1],
+      ['open-book','Open Book','📚','silver','10 diary entries', x=>x.c.diary>=10],
+      ['the-archive','The Archive','🗄️','gold','30 diary entries', x=>x.c.diary>=30],
+    ]},
+    {ico:'🥗',name:'Fuel',b:[
+      ['first-fuel','First Fuel','🍎','bronze','Log fuel once', x=>x.c.fuel>=1],
+      ['clean-tank','Clean Tank','🥗','silver','10 fuel logs', x=>x.c.fuel>=10],
+      ['dialed-in','Dialed In','⛽','gold','30 fuel logs', x=>x.c.fuel>=30],
+    ]},
+    {ico:'💬',name:'Squad',b:[
+      ['icebreaker','Icebreaker','👋','bronze','First squad post', x=>x.c.post>=1],
+      ['voice','Voice','🗣️','silver','10 posts', x=>x.c.post>=10],
+      ['loud','Loud','📣','gold','25 posts', x=>x.c.post>=25],
+      ['culture-setter','Culture Setter','🎭','elite','50 posts', x=>x.c.post>=50],
+      ['first-word','First Word','✉️','bronze','Message the coach', x=>x.msg>=1],
+      ['always-talking','Always Talking','💬','silver','25 coach messages', x=>x.msg>=25],
+    ]},
+    {ico:'❓',name:'Ask the Coaches',b:[
+      ['curious','Curious','❓','bronze','Ask your first question', x=>x.c.ask>=1],
+      ['student','Student of the Game','🎓','silver','10 questions', x=>x.c.ask>=10],
+      ['sponge','Sponge','🧽','gold','25 questions', x=>x.c.ask>=25],
+    ]},
+    {ico:'🎟️',name:'Recruiting',b:[
+      ['recruiter','Recruiter','🤝','silver','1 approved invite', x=>x.invA>=1],
+      ['plug','Plug','🔌','gold','3 approved invites', x=>x.invA>=3],
+      ['kingmaker','Kingmaker','♟️','elite','5 approved invites', x=>x.invA>=5],
+    ]},
+    {ico:'⚡',name:'Level',b:[
+      ['prospect','Prospect','🌱','bronze','Hit 100 XP', x=>x.xp>=100],
+      ['baller','Baller','🏀','silver','Hit 500 XP', x=>x.xp>=500],
+      ['bucket','Bucket','🪣','gold','Hit 1,000 XP', x=>x.xp>=1000],
+      ['elite-xp','Elite','💎','elite','Hit 2,500 XP', x=>x.xp>=2500],
+      ['legend-xp','Legend','🐐','legend','Hit 5,000 XP', x=>x.xp>=5000],
+    ]},
+    {ico:'⚙️',name:'Commitment',b:[
+      ['locked-in','Locked In','📲','bronze','Install the app', x=>x.f.install],
+      ['always-on','Always On','🔔','bronze','Turn notifications on', x=>x.f.notif],
+      ['made-it-mine','Made It Mine','🎨','bronze','Pick your own theme', x=>x.f.theme],
+      ['full-profile','Full Profile','🪪','silver','Complete your profile', x=>x.f.profile],
+      ['face','Face of the Lab','📸','silver','Add a profile photo', null],
+    ]},
+    {ico:'⭐',name:'Founding & Identity',b:[
+      ['founding-member','Founding Member','⭐','found','Marked founding by the coach', x=>x.founding],
+      ['day-one','Day One','🗓️','found','Here in launch week', x=>x.founding],
+      ['og','OG','🏅','found','First 10 in the Lab', null],
+    ]},
+    {ico:'🏆',name:'Rare · Coach Picks',b:[
+      ['potw','Player of the Week','🏆','legend','Coach pick — owned the week', null],
+      ['most-improved','Most Improved','📈','legend','Coach pick — biggest jump', null],
+      ['the-lockdown','The Lockdown','🔒','legend','Coach pick — earned on defence', null],
+      ['hall-of-fame','Hall of Fame','🏛️','legend','Unlock every other badge', x=>x.earnedCount>=54],
+    ]},
+  ];
+  const VFLAT=[]; VCATS.forEach(c=>c.b.forEach(r=>VFLAT.push({id:r[0],name:r[1],ico:r[2],tier:r[3],how:r[4],earn:r[5],cat:c.name,catico:c.ico})));
+  function vBstat(){ try{ return JSON.parse(localStorage.getItem('ll_bstat_'+sess.pid)||'{}'); }catch(e){ return {}; } }
+  function bumpStat(action){
+    if(!sess||sess.type!=='player'||!sess.pid) return;
+    const map={mind:'mind',diary:'diary',post:'post',askcoach:'ask',run_add:'run'};
+    const s=vBstat();
+    if(action==='fuel'){ const d=(PST&&PST.today)||new Date().toISOString().slice(0,10); if(s._fd===d) return; s._fd=d; s.fuel=(s.fuel||0)+1; }
+    else if(map[action]){ s[map[action]]=(s[map[action]]||0)+1; }
+    else return;
+    try{ localStorage.setItem('ll_bstat_'+sess.pid,JSON.stringify(s)); }catch(e){}
+    try{ evalVault(); }catch(e){}
+  }
+  function vaultCtx(){
+    const p=(PST&&PST.profile)||{}; const s=vBstat();
+    const msg=((PST&&PST.messages)||[]).filter(m=>!m.from_coach).length;
+    const invA=((PST&&PST.invites)||[]).filter(i=>i.status==='approved'||i.status==='used'||i.used_by).length;
+    const theme=(localStorage.getItem('ll_theme')||'#ff6b00')!=='#ff6b00';
+    return { xp:p.xp||0, streak:p.streak||0, sessions:p.sessions||0, founding:!!p.founding, msg, invA,
+      c:{mind:s.mind||0,diary:s.diary||0,fuel:s.fuel||0,post:s.post||0,ask:s.ask||0,run:s.run||0},
+      f:{ install:(typeof isStandalone==='function'&&isStandalone()), notif:!!(typeof NP!=='undefined'&&NP.push), theme, profile:!!(p.pos&&p.age) },
+      earnedCount:0 };
+  }
+  function vaultEarned(){ try{ return JSON.parse(localStorage.getItem('ll_vault_'+sess.pid)||'{}'); }catch(e){ return {}; } }
+  const canEarnV=(b,founding)=> founding || TASTER.has(b.id);
+  /* Starter Five already gives these their moment — vault earns them silently */
+  const VSILENT=new Set(['first-light','clear-head','first-fuel','icebreaker']);
+  function vaultMeaning(b){ return '+'+VTIER[b.tier][1]+' Lab Bucks banked · '+b.how; }
+  function evalVault(){
+    if(!PST||!sess||sess.type!=='player') return;
+    const key='ll_vault_'+sess.pid;
+    const firstSync=!localStorage.getItem(key);
+    const earned=vaultEarned(); const ctx=vaultCtx();
+    ctx.earnedCount=VFLAT.filter(b=>earned[b.id]).length;
+    let changed=false;
+    for(let pass=0;pass<2;pass++){ /* 2 passes so Hall of Fame settles */
+      VFLAT.forEach(b=>{
+        if(earned[b.id]||!b.earn||!canEarnV(b,ctx.founding)) return;
+        if(b.earn(ctx)){ earned[b.id]=Date.now(); changed=true; ctx.earnedCount++; if(!firstSync&&!VSILENT.has(b.id)) badgeUpShow({ic:b.ico,name:b.name,meaning:vaultMeaning(b),tier:VTIER[b.tier][0]}); }
+      });
+    }
+    if(changed||firstSync){ try{ localStorage.setItem(key,JSON.stringify(earned)); }catch(e){} }
+    updateVaultTease();
+    if($('#vault')&&$('#vault').classList.contains('on')) renderVault();
+  }
+  function updateVaultTease(){
+    const btn=$('#openVault'); if(!btn||!sess) return;
+    const earned=vaultEarned(); let n=0,lb=0;
+    VFLAT.forEach(b=>{ if(earned[b.id]){ n++; lb+=VTIER[b.tier][1]; } });
+    btn.innerHTML='🏅 The Badge Vault · '+n+'/55 · '+lb+' LB →';
+  }
+  function renderVault(){
+    if(!sess) return;
+    const earned=vaultEarned(); const ctx=vaultCtx(); const founding=ctx.founding;
+    let eLB=0,tLB=0,eN=0;
+    VFLAT.forEach(b=>{ const lb=VTIER[b.tier][1]; tLB+=lb; if(earned[b.id]){ eLB+=lb; eN++; } });
+    $('#vaultSub').textContent=eN+' of 55 unlocked';
+    $('#vaultLB').textContent=eLB;
+    $('#vaultLBnote').innerHTML='Lab Bucks banked <b style="color:var(--dim)">/ '+tLB+' in the vault</b><br>1 LB = $1 off a session · wallet coming soon';
+    $('#vaultGate').innerHTML=founding
+      ? '⭐ <b>Founding member</b> — the whole vault is yours to earn. All 55.'
+      : '<b>You’re on the Starter shelf.</b> Earn the 10 bronze tasters free. The other 45 light up when you go <b style="color:var(--accent)">Founding ⭐</b> — look all you want.';
+    $('#vaultBody').innerHTML=VCATS.map(c=>{
+      const got=c.b.filter(r=>earned[r[0]]).length;
+      const cells=c.b.map(r=>{
+        const b={id:r[0],name:r[1],ico:r[2],tier:r[3],how:r[4],earn:r[5]};
+        const isGot=!!earned[b.id], coach=!b.earn, gated=!isGot&&!coach&&!canEarnV(b,founding);
+        const lock=isGot?'✓':coach?'🔒':gated?'⭐':'';
+        const sub=isGot?'Unlocked':coach?'Coach awards this':gated?'Founding only':b.how;
+        return '<div class="vb t-'+b.tier+(isGot?' earned':'')+(gated?' found':'')+'">'
+          +(lock?'<span class="vlock">'+lock+'</span>':'')
+          +'<span class="vcrest">'+b.ico+'</span><b>'+esc(b.name)+'</b>'
+          +'<span class="vhow">'+esc(sub)+'</span>'
+          +'<span class="vtier">'+VTIER[b.tier][0]+'</span><span class="vlb">+'+VTIER[b.tier][1]+' LB</span></div>';
+      }).join('');
+      return '<div class="vcat"><div class="vcath">'+c.ico+' '+c.name.toUpperCase()+'<span class="n">'+got+'/'+c.b.length+'</span></div><div class="vgrid">'+cells+'</div></div>';
+    }).join('');
+  }
+  function openVault(){ if(!$('#vault')) return; renderVault(); $('#vault').classList.add('on'); haptic(12); }
+  $('#openVault')&&$('#openVault').addEventListener('click',openVault);
+  $('#vaultX')&&$('#vaultX').addEventListener('click',()=>$('#vault').classList.remove('on'));
+
   /* first-entry welcome: the why, before the first badge drops */
   function maybeWelcome(){
     if(!sess||sess.type!=='player') return;
@@ -1636,7 +1857,7 @@ body.rmode *{animation:none!important;transition:none!important}
     const p=PST.profile;
     $('#heroName').textContent=p.name+(p.founding?' ⭐':'');
     if(p.founding) $('#hSub').textContent='Founding ⭐';
-    renderRuns(); renderSessList(); renderSessTrailer(); renderStarter();
+    renderRuns(); renderSessList(); renderSessTrailer(); renderStarter(); try{ evalVault(); }catch(e){}
     $('#avInit').textContent=p.name.split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();
     countUp($('#stXp'),p.xp); countUp($('#stLogs'),PST.checkins.length); countUp($('#stSess'),p.sessions);
     $('#streakChip').textContent=p.streak;
