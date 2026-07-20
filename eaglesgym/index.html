@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eagles Gym · Classes & Timetable — Punchbowl, Sydney</title>
+<meta name="description" content="Weekly class timetable for Eagles Gym — Sydney's home of elite combat sports & strength. Boxing, Muay Thai, BJJ, Wrestling & MMA plus Kids and Juniors. Book your first class in Punchbowl NSW.">
+<meta property="og:title" content="Eagles Gym · Classes & Timetable">
+<meta property="og:description" content="15+ classes daily. Boxing, Muay Thai, BJJ, Wrestling & MMA, Strength. Punchbowl, Sydney. Train Harder. Fight Smarter.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0b;
+    --bg-2:#111114;
+    --bg-3:#17171b;
+    --line:#26262c;
+    --text:#f4f4f5;
+    --muted:#a1a1aa;
+    --gold:#e7b23c;
+    --gold-2:#f5c95a;
+    --red:#e23b2e;
+    --green:#3ecf8e;
+    --radius:14px;
+    --max:1180px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  a{color:inherit;text-decoration:none}
+  h1,h2,h3,.display{font-family:'Anton',Impact,sans-serif;font-weight:400;letter-spacing:.5px;line-height:1}
+  .kicker{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.28em;font-size:.72rem;font-weight:600;color:var(--gold)}
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 22px}
+  section{padding:84px 0}
+  .muted{color:var(--muted)}
+
+  /* NAV */
+  header.nav{position:sticky;top:0;z-index:50;background:rgba(10,10,11,.82);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:66px}
+  .brand{display:flex;align-items:center;gap:10px;font-family:'Anton',sans-serif;font-size:1.35rem;letter-spacing:1px}
+  .brand .mark{font-size:1.5rem;filter:drop-shadow(0 0 8px rgba(231,178,60,.5))}
+  .brand span{color:var(--gold)}
+  .nav-links{display:flex;gap:30px;align-items:center}
+  .nav-links a{font-family:'Oswald',sans-serif;text-transform:uppercase;font-size:.82rem;letter-spacing:.12em;color:var(--muted);transition:color .2s}
+  .nav-links a:hover{color:var(--text)}
+  .btn{display:inline-flex;align-items:center;gap:8px;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-weight:600;font-size:.85rem;padding:11px 20px;border-radius:9px;cursor:pointer;border:none;transition:transform .15s,box-shadow .2s,background .2s}
+  .btn-gold{background:linear-gradient(180deg,var(--gold-2),var(--gold));color:#1a1205;box-shadow:0 6px 20px rgba(231,178,60,.28)}
+  .btn-gold:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(231,178,60,.42)}
+  .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--text)}
+  .btn-ghost:hover{border-color:var(--gold);color:var(--gold)}
+  .nav-toggle{display:none;background:none;border:1px solid var(--line);color:var(--text);border-radius:8px;padding:7px 10px;font-size:1.1rem;cursor:pointer}
+
+  /* HERO */
+  .hero{position:relative;padding:96px 0 80px;overflow:hidden}
+  .hero::before{content:"";position:absolute;inset:0;background:
+    radial-gradient(900px 500px at 80% -10%,rgba(231,178,60,.14),transparent 60%),
+    radial-gradient(700px 500px at 0% 110%,rgba(226,59,46,.12),transparent 55%);}
+  .hero-grid{position:relative;display:grid;grid-template-columns:1.15fr .85fr;gap:40px;align-items:center}
+  .hero h1{font-size:clamp(3rem,7vw,5.6rem);text-transform:uppercase}
+  .hero h1 em{font-style:normal;color:var(--gold);display:block}
+  .hero p.lead{font-size:1.12rem;color:var(--muted);max-width:34ch;margin:20px 0 30px}
+  .hero-cta{display:flex;gap:14px;flex-wrap:wrap}
+  .hero-stats{display:flex;gap:30px;margin-top:38px;flex-wrap:wrap}
+  .hero-stats .s{display:flex;flex-direction:column}
+  .hero-stats .n{font-family:'Anton',sans-serif;font-size:2rem;color:var(--text);line-height:1}
+  .hero-stats .l{font-family:'Oswald',sans-serif;text-transform:uppercase;font-size:.7rem;letter-spacing:.15em;color:var(--muted);margin-top:6px}
+  .hero-card{background:linear-gradient(160deg,var(--bg-3),var(--bg-2));border:1px solid var(--line);border-radius:20px;padding:26px;position:relative;overflow:hidden}
+  .hero-card::after{content:"🦅";position:absolute;right:-14px;bottom:-24px;font-size:9rem;opacity:.06}
+  .hero-card h3{font-size:1.3rem;text-transform:uppercase;margin-bottom:4px}
+  .hero-card .today-list{margin-top:16px;display:flex;flex-direction:column;gap:10px}
+  .mini-class{display:flex;align-items:center;gap:12px;padding:10px 12px;background:var(--bg);border:1px solid var(--line);border-radius:10px}
+  .mini-class .t{font-family:'Oswald',sans-serif;font-weight:600;color:var(--gold);min-width:64px;font-size:.9rem}
+  .mini-class .nm{font-weight:600;font-size:.92rem}
+  .mini-class .cw{margin-left:auto;font-size:.74rem;color:var(--muted)}
+
+  /* SECTION HEADER */
+  .sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:20px;margin-bottom:34px;flex-wrap:wrap}
+  .sec-head h2{font-size:clamp(2rem,4.5vw,3.2rem);text-transform:uppercase}
+  .sec-head p{color:var(--muted);max-width:46ch}
+
+  /* TIMETABLE */
+  #timetable{background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .day-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:26px}
+  .day-tab{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.08em;font-size:.86rem;font-weight:600;padding:10px 16px;border-radius:10px;border:1px solid var(--line);background:var(--bg-3);color:var(--muted);cursor:pointer;transition:all .18s}
+  .day-tab:hover{color:var(--text);border-color:#3a3a42}
+  .day-tab.active{background:linear-gradient(180deg,var(--gold-2),var(--gold));color:#1a1205;border-color:transparent}
+  .day-tab small{display:block;font-size:.62rem;letter-spacing:.12em;opacity:.7;font-weight:500}
+  .filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px;align-items:center}
+  .filters .flabel{font-family:'Oswald',sans-serif;text-transform:uppercase;font-size:.7rem;letter-spacing:.14em;color:var(--muted);margin-right:4px}
+  .chip{font-size:.76rem;font-family:'Oswald',sans-serif;letter-spacing:.05em;text-transform:uppercase;padding:6px 12px;border-radius:20px;border:1px solid var(--line);background:transparent;color:var(--muted);cursor:pointer;transition:all .16s}
+  .chip:hover{color:var(--text)}
+  .chip.active{background:var(--text);color:var(--bg);border-color:var(--text)}
+
+  .class-list{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  .class-row{display:grid;grid-template-columns:92px 1fr auto;gap:16px;align-items:center;padding:16px 18px;background:var(--bg-3);border:1px solid var(--line);border-radius:12px;transition:border-color .18s,transform .18s;border-left:3px solid var(--tag,var(--gold))}
+  .class-row:hover{border-color:#3a3a42;transform:translateY(-2px)}
+  .class-row .time{font-family:'Oswald',sans-serif;font-weight:700;font-size:1.02rem}
+  .class-row .time small{display:block;font-size:.68rem;color:var(--muted);font-weight:500;letter-spacing:.08em}
+  .class-row .nm{font-family:'Oswald',sans-serif;font-weight:600;font-size:1.05rem;text-transform:uppercase;letter-spacing:.02em}
+  .class-row .meta{font-size:.78rem;color:var(--muted);margin-top:2px;display:flex;gap:10px;flex-wrap:wrap}
+  .class-row .lvl{display:inline-flex;align-items:center;gap:5px}
+  .badge{font-size:.62rem;font-family:'Oswald',sans-serif;letter-spacing:.1em;text-transform:uppercase;padding:3px 8px;border-radius:6px;color:#0a0a0b;font-weight:600;white-space:nowrap}
+  .book-mini{font-family:'Oswald',sans-serif;text-transform:uppercase;font-size:.72rem;letter-spacing:.08em;color:var(--gold);border:1px solid var(--line);padding:7px 12px;border-radius:8px;cursor:pointer;background:transparent;transition:all .16s;white-space:nowrap}
+  .book-mini:hover{background:var(--gold);color:#1a1205;border-color:var(--gold)}
+  .empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:40px;font-family:'Oswald',sans-serif;letter-spacing:.05em}
+
+  /* DISCIPLINES */
+  .disc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .disc{background:linear-gradient(160deg,var(--bg-3),var(--bg-2));border:1px solid var(--line);border-radius:var(--radius);padding:26px;position:relative;overflow:hidden;transition:transform .2s,border-color .2s}
+  .disc:hover{transform:translateY(-4px);border-color:#3a3a42}
+  .disc .ic{font-size:2rem;margin-bottom:14px}
+  .disc h3{font-size:1.25rem;text-transform:uppercase;margin-bottom:8px}
+  .disc p{font-size:.9rem;color:var(--muted)}
+  .disc .tags{margin-top:14px;display:flex;gap:6px;flex-wrap:wrap}
+  .disc .tags span{font-size:.66rem;font-family:'Oswald',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);padding:3px 8px;border-radius:20px}
+
+  /* COACHES */
+  #coaches{background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .coach-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+  .coach{background:var(--bg-3);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;transition:transform .2s}
+  .coach:hover{transform:translateY(-4px)}
+  .coach .ph{height:150px;display:flex;align-items:center;justify-content:center;font-size:3.4rem;background:linear-gradient(160deg,#1d1d22,#131317)}
+  .coach .body{padding:18px}
+  .coach h3{font-size:1.15rem;text-transform:uppercase}
+  .coach .role{font-family:'Oswald',sans-serif;text-transform:uppercase;font-size:.72rem;letter-spacing:.1em;color:var(--gold);margin:4px 0 8px}
+  .coach p{font-size:.84rem;color:var(--muted)}
+
+  /* PRICING */
+  .price-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .price{background:var(--bg-3);border:1px solid var(--line);border-radius:var(--radius);padding:30px 26px;position:relative;display:flex;flex-direction:column}
+  .price.pop{border-color:var(--gold);box-shadow:0 0 0 1px var(--gold),0 20px 50px rgba(231,178,60,.14)}
+  .price .pop-tag{position:absolute;top:-12px;left:26px;background:var(--gold);color:#1a1205;font-family:'Oswald',sans-serif;text-transform:uppercase;font-size:.66rem;letter-spacing:.12em;font-weight:600;padding:4px 12px;border-radius:20px}
+  .price h3{font-size:1.3rem;text-transform:uppercase}
+  .price .amt{font-family:'Anton',sans-serif;font-size:2.8rem;margin:12px 0 2px}
+  .price .amt small{font-size:1rem;color:var(--muted);font-family:'Oswald',sans-serif}
+  .price ul{list-style:none;margin:20px 0 24px;display:flex;flex-direction:column;gap:10px}
+  .price li{font-size:.9rem;color:var(--muted);display:flex;gap:9px;align-items:flex-start}
+  .price li::before{content:"✓";color:var(--green);font-weight:700}
+  .price .btn{margin-top:auto;justify-content:center}
+
+  /* CTA / CONTACT */
+  #book{background:linear-gradient(160deg,#141410,#0d0d0e);border-top:1px solid var(--line)}
+  .book-grid{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+  .info-list{display:flex;flex-direction:column;gap:18px;margin-top:24px}
+  .info-list .row{display:flex;gap:14px;align-items:flex-start}
+  .info-list .ic{font-size:1.3rem;width:26px}
+  .info-list .row strong{display:block;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.05em;font-size:.85rem}
+  .info-list .row span{color:var(--muted);font-size:.92rem}
+  form{background:var(--bg-3);border:1px solid var(--line);border-radius:16px;padding:26px}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-family:'Oswald',sans-serif;text-transform:uppercase;font-size:.72rem;letter-spacing:.1em;color:var(--muted);margin-bottom:6px}
+  .field input,.field select,.field textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:11px 13px;color:var(--text);font-family:inherit;font-size:.94rem}
+  .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--gold)}
+  .field.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  form .btn{width:100%;justify-content:center;margin-top:6px}
+  .form-note{font-size:.78rem;color:var(--muted);margin-top:12px;text-align:center}
+  .form-success{display:none;text-align:center;padding:20px;color:var(--green);font-family:'Oswald',sans-serif;letter-spacing:.05em}
+
+  /* FOOTER */
+  footer{border-top:1px solid var(--line);padding:44px 0 32px;background:var(--bg)}
+  .foot-grid{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+  .foot-links{display:flex;gap:22px;flex-wrap:wrap}
+  .foot-links a{font-family:'Oswald',sans-serif;text-transform:uppercase;font-size:.78rem;letter-spacing:.08em;color:var(--muted)}
+  .foot-links a:hover{color:var(--gold)}
+  .copy{color:var(--muted);font-size:.8rem;margin-top:20px}
+
+  @media(max-width:900px){
+    .hero-grid{grid-template-columns:1fr}
+    .hero-card{order:-1}
+    .disc-grid,.coach-grid{grid-template-columns:repeat(2,1fr)}
+    .price-grid{grid-template-columns:1fr}
+    .class-list{grid-template-columns:1fr}
+    .book-grid{grid-template-columns:1fr}
+    .nav-links{position:fixed;inset:66px 0 auto 0;flex-direction:column;background:var(--bg-2);border-bottom:1px solid var(--line);padding:20px;gap:18px;transform:translateY(-140%);transition:transform .25s;z-index:40}
+    .nav-links.open{transform:translateY(0)}
+    .nav-toggle{display:inline-block}
+  }
+  @media(max-width:560px){
+    .disc-grid,.coach-grid{grid-template-columns:1fr}
+    .field.row2{grid-template-columns:1fr}
+    section{padding:60px 0}
+  }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="wrap nav-inner">
+    <a href="#top" class="brand"><span class="mark">🦅</span>EAGLES<span>GYM</span></a>
+    <nav class="nav-links" id="navLinks">
+      <a href="#timetable">Timetable</a>
+      <a href="#disciplines">Classes</a>
+      <a href="#coaches">Coaches</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#book" class="btn btn-gold">Book a Class</a>
+    </nav>
+    <button class="nav-toggle" id="navToggle" aria-label="Menu">☰</button>
+  </div>
+</header>
+
+<a id="top"></a>
+<section class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="kicker">Punchbowl · Sydney NSW</p>
+      <h1 style="margin-top:14px">Train Harder.<em>Fight Smarter.</em></h1>
+      <p class="lead">Sydney's home of elite combat sports &amp; strength. 15+ classes every day — boxing, Muay Thai, BJJ, wrestling &amp; MMA. All levels welcome.</p>
+      <div class="hero-cta">
+        <a href="#book" class="btn btn-gold">Book Your First Class →</a>
+        <a href="#timetable" class="btn btn-ghost">View Timetable</a>
+      </div>
+      <div class="hero-stats">
+        <div class="s"><span class="n">8</span><span class="l">Disciplines</span></div>
+        <div class="s"><span class="n">15+</span><span class="l">Classes / Day</span></div>
+        <div class="s"><span class="n">5:30–11</span><span class="l">Open Daily</span></div>
+        <div class="s"><span class="n">No</span><span class="l">Lock-in Contract</span></div>
+      </div>
+    </div>
+    <div class="hero-card">
+      <p class="kicker">On the mats today</p>
+      <h3 id="heroDay">Today's Sessions</h3>
+      <div class="today-list" id="heroToday"></div>
+      <a href="#timetable" class="btn btn-ghost" style="margin-top:18px;width:100%;justify-content:center">See full week</a>
+    </div>
+  </div>
+</section>
+
+<section id="timetable">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <p class="kicker">Weekly Class Timetable</p>
+        <h2>When We Train</h2>
+      </div>
+      <p>Pick a day, filter by discipline, and reserve your spot. Timetable current for the 2026 season — subject to public holiday changes.</p>
+    </div>
+
+    <div class="day-tabs" id="dayTabs"></div>
+
+    <div class="filters" id="filters">
+      <span class="flabel">Filter</span>
+      <button class="chip active" data-f="all">All</button>
+      <button class="chip" data-f="Boxing">Boxing</button>
+      <button class="chip" data-f="Muay Thai">Muay Thai</button>
+      <button class="chip" data-f="BJJ">BJJ</button>
+      <button class="chip" data-f="Wrestling & MMA">Wrestling &amp; MMA</button>
+      <button class="chip" data-f="Strength">Strength</button>
+      <button class="chip" data-f="Kids & Juniors">Kids &amp; Juniors</button>
+    </div>
+
+    <div class="class-list" id="classList"></div>
+  </div>
+</section>
+
+<section id="disciplines">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <p class="kicker">What You'll Learn</p>
+        <h2>The Disciplines</h2>
+      </div>
+      <p>From your first jab to fight camp — structured programs for every level, taught by coaches who've done it.</p>
+    </div>
+    <div class="disc-grid" id="discGrid"></div>
+  </div>
+</section>
+
+<section id="coaches">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <p class="kicker">Your Corner</p>
+        <h2>Meet The Coaches</h2>
+      </div>
+      <p>Championship experience, real-world credentials, and a genuine care for getting you better every session.</p>
+    </div>
+    <div class="coach-grid" id="coachGrid"></div>
+  </div>
+</section>
+
+<section id="pricing">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <p class="kicker">Membership</p>
+        <h2>Simple Pricing</h2>
+      </div>
+      <p>Every membership includes access to all classes on the timetable. No lock-in, cancel anytime.</p>
+    </div>
+    <div class="price-grid">
+      <div class="price">
+        <h3>Casual</h3>
+        <div class="amt">$25<small>/visit</small></div>
+        <p class="muted" style="font-size:.86rem">Drop in whenever it suits you.</p>
+        <ul>
+          <li>Any single class</li>
+          <li>All disciplines</li>
+          <li>No commitment</li>
+          <li>Gloves &amp; gear loan available</li>
+        </ul>
+        <a href="#book" class="btn btn-ghost">Get Started</a>
+      </div>
+      <div class="price pop">
+        <span class="pop-tag">Most Popular</span>
+        <h3>Unlimited</h3>
+        <div class="amt">$49<small>/week</small></div>
+        <p class="muted" style="font-size:.86rem">Train as often as you like.</p>
+        <ul>
+          <li>Unlimited classes</li>
+          <li>All disciplines &amp; open mats</li>
+          <li>Recovery zone access</li>
+          <li>Free technique seminars</li>
+          <li>No lock-in contract</li>
+        </ul>
+        <a href="#book" class="btn btn-gold">Join Now</a>
+      </div>
+      <div class="price">
+        <h3>Fighter</h3>
+        <div class="amt">$69<small>/week</small></div>
+        <p class="muted" style="font-size:.86rem">For competitors in camp.</p>
+        <ul>
+          <li>Everything in Unlimited</li>
+          <li>Sparring &amp; fight-team sessions</li>
+          <li>1× private / month</li>
+          <li>Strength &amp; conditioning plan</li>
+          <li>Corner support on fight night</li>
+        </ul>
+        <a href="#book" class="btn btn-ghost">Apply</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="book">
+  <div class="wrap book-grid">
+    <div>
+      <p class="kicker">Book / Enquire</p>
+      <h2 style="font-size:clamp(2rem,4.5vw,3rem);text-transform:uppercase;margin-top:10px">Your First Class Is On Us</h2>
+      <p class="muted" style="margin-top:14px;max-width:44ch">New to Eagles Gym? Your first session is free. Fill in the form and we'll confirm your spot by text — or just walk in.</p>
+      <div class="info-list">
+        <div class="row"><span class="ic">📍</span><div><strong>Location</strong><span>268 The Boulevarde, Punchbowl NSW 2196</span></div></div>
+        <div class="row"><span class="ic">🕕</span><div><strong>Hours</strong><span>Open daily · 5:30am – 11:00pm</span></div></div>
+        <div class="row"><span class="ic">📞</span><div><strong>Phone</strong><span><a href="tel:0499922334">0499 922 334</a></span></div></div>
+        <div class="row"><span class="ic">✉️</span><div><strong>Email</strong><span><a href="mailto:info@eaglesgym.com.au">info@eaglesgym.com.au</a></span></div></div>
+        <div class="row"><span class="ic">📸</span><div><strong>Instagram</strong><span><a href="https://instagram.com/eaglesgym2196" target="_blank" rel="noopener">@eaglesgym2196</a></span></div></div>
+      </div>
+    </div>
+    <form id="bookForm" name="class-booking" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+      <input type="hidden" name="form-name" value="class-booking">
+      <p style="display:none"><label>Don't fill this out: <input name="bot-field"></label></p>
+      <div class="field row2">
+        <div><label for="fn">First name</label><input id="fn" name="first-name" required></div>
+        <div><label for="ln">Last name</label><input id="ln" name="last-name" required></div>
+      </div>
+      <div class="field row2">
+        <div><label for="ph">Mobile</label><input id="ph" name="phone" type="tel" placeholder="04xx xxx xxx" required></div>
+        <div><label for="em">Email</label><input id="em" name="email" type="email"></div>
+      </div>
+      <div class="field">
+        <label for="cl">Which class?</label>
+        <select id="cl" name="class">
+          <option>Not sure yet — help me choose</option>
+          <option>Boxing</option>
+          <option>Muay Thai</option>
+          <option>Brazilian Jiu-Jitsu (BJJ)</option>
+          <option>Wrestling & MMA</option>
+          <option>Strength & Conditioning</option>
+          <option>Kids & Juniors</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="exp">Experience level</label>
+        <select id="exp" name="experience">
+          <option>Complete beginner</option>
+          <option>Some experience</option>
+          <option>Experienced / competing</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="msg">Anything we should know? (optional)</label>
+        <textarea id="msg" name="message" rows="2" placeholder="Injuries, goals, preferred days…"></textarea>
+      </div>
+      <button type="submit" class="btn btn-gold">Claim My Free Class 🦅</button>
+      <p class="form-note">We'll text you to confirm. No spam, ever.</p>
+      <div class="form-success" id="formSuccess">✓ Thanks! We've got your request — we'll text you shortly to lock in your first session.</div>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <a href="#top" class="brand"><span class="mark">🦅</span>EAGLES<span>GYM</span></a>
+      <nav class="foot-links">
+        <a href="#timetable">Timetable</a>
+        <a href="#disciplines">Classes</a>
+        <a href="#coaches">Coaches</a>
+        <a href="#pricing">Pricing</a>
+        <a href="#book">Book</a>
+        <a href="tel:0499922334">0499 922 334</a>
+      </nav>
+    </div>
+    <p class="copy">© 2026 Eagles Gym · 268 The Boulevarde, Punchbowl NSW 2196 · Train Harder. Fight Smarter.</p>
+  </div>
+</footer>
+
+<script>
+/* ---------- Data ---------- */
+const TAGS = {
+  'Boxing':        '#e23b2e',
+  'Muay Thai':     '#e7b23c',
+  'BJJ':           '#4f8cff',
+  'Wrestling & MMA':'#a855f7',
+  'Strength':      '#3ecf8e',
+  'Kids & Juniors':'#f472b6'
+};
+const LVL_COLOR = {'All levels':'#a1a1aa','Beginner':'#3ecf8e','Intermediate':'#e7b23c','Advanced':'#e23b2e','Fighters':'#e23b2e','Kids':'#f472b6','Teens':'#4f8cff'};
+
+// c=discipline, n=name, coach, lvl, dur(mins)
+function C(time,c,n,coach,lvl,dur){return {time,c,n,coach,lvl,dur};}
+const SCHEDULE = {
+  Mon:[
+    C('6:00am','Boxing','Boxing Fundamentals','Coach Ali','Beginner',60),
+    C('7:00am','Strength','Strength Floor','Coach Dee','All levels',60),
+    C('9:30am','Muay Thai','Muay Thai Technique','Coach Sam','All levels',60),
+    C('4:00pm','Kids & Juniors','Kids Boxing (7-12)','Coach Ali','Kids',45),
+    C('5:30pm','BJJ','BJJ Gi Fundamentals','Coach Leo','Beginner',75),
+    C('6:00pm','Boxing','Boxing Conditioning','Coach Ali','All levels',60),
+    C('7:00pm','Muay Thai','Muay Thai Sparring','Coach Sam','Intermediate',75),
+    C('8:15pm','Wrestling & MMA','MMA Skills','Coach Ali','Intermediate',60),
+  ],
+  Tue:[
+    C('6:00am','Muay Thai','Muay Thai Fitness','Coach Sam','All levels',60),
+    C('9:30am','BJJ','BJJ No-Gi','Coach Leo','All levels',75),
+    C('12:00pm','Strength','Lunch Conditioning','Coach Dee','All levels',45),
+    C('4:00pm','Kids & Juniors','Kids BJJ (7-12)','Coach Leo','Kids',45),
+    C('5:00pm','Kids & Juniors','Teens MMA (13-16)','Coach Ali','Teens',60),
+    C('6:00pm','Boxing','Boxing Fundamentals','Coach Ali','Beginner',60),
+    C('7:00pm','Wrestling & MMA','Wrestling Basics','Coach Ali','All levels',75),
+    C('8:15pm','BJJ','Open Mat','Coach Leo','All levels',60),
+  ],
+  Wed:[
+    C('6:00am','Boxing','Boxing Conditioning','Coach Ali','All levels',60),
+    C('7:00am','Strength','Strength Floor','Coach Dee','All levels',60),
+    C('9:30am','Muay Thai','Muay Thai Technique','Coach Sam','All levels',60),
+    C('4:00pm','Kids & Juniors','Kids Boxing (7-12)','Coach Ali','Kids',45),
+    C('5:30pm','BJJ','BJJ Gi Fundamentals','Coach Leo','Beginner',75),
+    C('6:00pm','Muay Thai','Muay Thai Clinch','Coach Sam','Intermediate',60),
+    C('7:00pm','Boxing','Boxing Sparring','Coach Ali','Advanced',75),
+    C('8:15pm','Wrestling & MMA','MMA Skills','Coach Ali','Intermediate',60),
+  ],
+  Thu:[
+    C('6:00am','Muay Thai','Muay Thai Fitness','Coach Sam','All levels',60),
+    C('9:30am','BJJ','BJJ No-Gi','Coach Leo','All levels',75),
+    C('12:00pm','Strength','Lunch Conditioning','Coach Dee','All levels',45),
+    C('4:00pm','Kids & Juniors','Kids Wrestling (7-12)','Coach Ali','Kids',45),
+    C('5:00pm','Kids & Juniors','Teens BJJ (13-16)','Coach Leo','Teens',60),
+    C('6:00pm','Boxing','Boxing Fundamentals','Coach Ali','Beginner',60),
+    C('7:00pm','Muay Thai','Muay Thai Sparring','Coach Sam','Advanced',75),
+    C('8:15pm','Wrestling & MMA','Wrestling & MMA','Coach Ali','Intermediate',75),
+  ],
+  Fri:[
+    C('6:00am','Boxing','Boxing Fundamentals','Coach Ali','Beginner',60),
+    C('7:00am','Strength','Strength Floor','Coach Dee','All levels',60),
+    C('9:30am','Muay Thai','Muay Thai Technique','Coach Sam','All levels',60),
+    C('4:00pm','Kids & Juniors','Kids Boxing (7-12)','Coach Ali','Kids',45),
+    C('5:30pm','BJJ','BJJ Gi','Coach Leo','All levels',75),
+    C('6:00pm','Wrestling & MMA','MMA Sparring','Coach Ali','Fighters',75),
+    C('7:15pm','Boxing','Fight Team','Coach Ali','Fighters',90),
+  ],
+  Sat:[
+    C('8:00am','Strength','Strength & Conditioning','Coach Dee','All levels',60),
+    C('9:00am','Boxing','Boxing Open Session','Coach Ali','All levels',75),
+    C('10:30am','BJJ','BJJ Open Mat','Coach Leo','All levels',90),
+    C('11:00am','Kids & Juniors','Kids All-Rounder (7-12)','Coach Sam','Kids',60),
+    C('12:00pm','Muay Thai','Muay Thai Community Class','Coach Sam','All levels',60),
+  ],
+  Sun:[
+    C('9:00am','Muay Thai','Muay Thai Fundamentals','Coach Sam','Beginner',60),
+    C('10:00am','Wrestling & MMA','MMA Open Roll','Coach Ali','Intermediate',90),
+    C('11:30am','Strength','Recovery & Mobility','Coach Dee','All levels',45),
+  ]
+};
+const DAYS = [['Mon','Monday'],['Tue','Tuesday'],['Wed','Wednesday'],['Thu','Thursday'],['Fri','Friday'],['Sat','Saturday'],['Sun','Sunday']];
+
+const DISCIPLINES = [
+  {ic:'🥊',n:'Boxing',d:'Footwork, defence and combinations. From your first wrap to the fight team.',t:['Beginner','Conditioning','Sparring','Fight Team']},
+  {ic:'🦵',n:'Muay Thai',d:'The art of eight limbs — punches, kicks, elbows, knees and the clinch.',t:['Technique','Clinch','Fitness','Sparring']},
+  {ic:'🥋',n:'Brazilian Jiu-Jitsu',d:'Gi and no-gi grappling. Leverage over strength, control over chaos.',t:['Gi','No-Gi','Open Mat']},
+  {ic:'🤼',n:'Wrestling & MMA',d:'Takedowns, scrambles and cage skills that tie every discipline together.',t:['Wrestling','MMA','Fighters']},
+  {ic:'🏋️',n:'Strength & Conditioning',d:'Build the engine. Strength floor and conditioning to back your skills.',t:['Strength','Conditioning','Mobility']},
+  {ic:'🧒',n:'Kids & Juniors',d:'Confidence, discipline and fitness for ages 7–16 in a safe, fun environment.',t:['Ages 7-12','Teens 13-16']},
+];
+
+const COACHES = [
+  {e:'🥊',n:'Coach Ali',r:'Head Boxing / MMA',b:'15+ years on the pads. Leads the fight team and the fundamentals that got them there.'},
+  {e:'🦵',n:'Coach Sam',r:'Muay Thai',b:'Multiple-time title holder. Brings authentic Thai technique to every level.'},
+  {e:'🥋',n:'Coach Leo',r:'Brazilian Jiu-Jitsu',b:'BJJ black belt. Patient, detailed coaching for gi and no-gi grapplers.'},
+  {e:'🏋️',n:'Coach Dee',r:'Strength & Conditioning',b:'S&C specialist keeping fighters strong, mobile and injury-free.'},
+];
+
+/* ---------- Render ---------- */
+const $ = s=>document.querySelector(s);
+let activeDay = (()=>{const idx=[6,0,1,2,3,4,5]; /* not used */ return 'Mon';})();
+let activeFilter = 'all';
+
+// pick a sensible default day label ("today") without Date dependency issues
+const dayTabs = $('#dayTabs');
+DAYS.forEach(([k,full])=>{
+  const b=document.createElement('button');
+  b.className='day-tab'+(k===activeDay?' active':'');
+  b.dataset.day=k;
+  b.innerHTML=`${k}<small>${full.slice(0,3).toUpperCase()}</small>`;
+  b.innerHTML=`${full.slice(0,3)}<small>${k==='Sat'||k==='Sun'?'WEEKEND':'CLASSES'}</small>`;
+  b.onclick=()=>{activeDay=k;document.querySelectorAll('.day-tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');renderClasses();};
+  dayTabs.appendChild(b);
+});
+
+function classRow(cl){
+  const color=TAGS[cl.c]||'#e7b23c';
+  const lvlc=LVL_COLOR[cl.lvl]||'#a1a1aa';
+  const row=document.createElement('div');
+  row.className='class-row';
+  row.style.setProperty('--tag',color);
+  row.innerHTML=`
+    <div class="time">${cl.time}<small>${cl.dur} min</small></div>
+    <div>
+      <div class="nm">${cl.n}</div>
+      <div class="meta">
+        <span class="lvl">👤 ${cl.coach}</span>
+        <span class="lvl" style="color:${lvlc}">● ${cl.lvl}</span>
+        <span style="color:${color}">${cl.c}</span>
+      </div>
+    </div>
+    <button class="book-mini" data-cls="${cl.n}">Book</button>`;
+  row.querySelector('.book-mini').onclick=()=>{
+    const sel=$('#cl');
+    const map={'Boxing':'Boxing','Muay Thai':'Muay Thai','BJJ':'Brazilian Jiu-Jitsu (BJJ)','Wrestling & MMA':'Wrestling & MMA','Strength':'Strength & Conditioning','Kids & Juniors':'Kids & Juniors'};
+    if(sel){[...sel.options].forEach(o=>{if(o.value===map[cl.c])sel.value=o.value;});}
+    document.getElementById('book').scrollIntoView({behavior:'smooth'});
+  };
+  return row;
+}
+
+function renderClasses(){
+  const list=$('#classList');
+  list.innerHTML='';
+  let items=SCHEDULE[activeDay]||[];
+  if(activeFilter!=='all')items=items.filter(c=>c.c===activeFilter);
+  if(!items.length){list.innerHTML='<div class="empty">No '+(activeFilter==='all'?'':activeFilter+' ')+'classes this day — try another day or filter.</div>';return;}
+  items.forEach(c=>list.appendChild(classRow(c)));
+}
+
+// filters
+document.querySelectorAll('#filters .chip').forEach(ch=>{
+  ch.onclick=()=>{
+    document.querySelectorAll('#filters .chip').forEach(x=>x.classList.remove('active'));
+    ch.classList.add('active');
+    activeFilter=ch.dataset.f;
+    renderClasses();
+  };
+});
+
+// hero "today" mini-list — show Monday's evening highlights as a teaser
+(function heroToday(){
+  const wrap=$('#heroToday');
+  const picks=SCHEDULE['Mon'].filter(c=>parseInt(c.time)>=5||c.time.includes('pm')).slice(-4);
+  const sample=SCHEDULE['Mon'].filter(c=>c.time.includes('pm')).slice(0,4);
+  (sample.length?sample:SCHEDULE['Mon'].slice(0,4)).forEach(c=>{
+    const d=document.createElement('div');d.className='mini-class';
+    d.innerHTML=`<span class="t">${c.time}</span><span class="nm">${c.n}</span><span class="cw">${c.coach}</span>`;
+    wrap.appendChild(d);
+  });
+  $('#heroDay').textContent='Monday · Evening';
+})();
+
+// disciplines
+(function(){const g=$('#discGrid');DISCIPLINES.forEach(d=>{
+  const el=document.createElement('div');el.className='disc';
+  el.innerHTML=`<div class="ic">${d.ic}</div><h3>${d.n}</h3><p>${d.d}</p><div class="tags">${d.t.map(t=>`<span>${t}</span>`).join('')}</div>`;
+  g.appendChild(el);
+});})();
+
+// coaches
+(function(){const g=$('#coachGrid');COACHES.forEach(c=>{
+  const el=document.createElement('div');el.className='coach';
+  el.innerHTML=`<div class="ph">${c.e}</div><div class="body"><h3>${c.n}</h3><div class="role">${c.r}</div><p>${c.b}</p></div>`;
+  g.appendChild(el);
+});})();
+
+// nav toggle
+$('#navToggle').onclick=()=>$('#navLinks').classList.toggle('open');
+document.querySelectorAll('#navLinks a').forEach(a=>a.onclick=()=>$('#navLinks').classList.remove('open'));
+
+// form (progressive enhancement — still posts to Netlify Forms if enabled)
+$('#bookForm').addEventListener('submit',function(e){
+  // let Netlify capture it; show inline success if JS handling desired
+  if(!window.location.host.includes('netlify')){
+    e.preventDefault();
+  }
+  const btn=this.querySelector('button[type=submit]');
+  btn.textContent='Sending…';
+});
+
+renderClasses();
+</script>
+</body>
+</html>
