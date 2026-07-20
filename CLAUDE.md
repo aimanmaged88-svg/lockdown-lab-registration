@@ -197,6 +197,18 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
 - **Service worker** bumped lll-v5 → **lll-v6**: push handler now
   `vibrate:[260,90,260,90,420]` + `requireInteraction:true` so delivered
   pushes buzz hard and stay on screen until tapped.
+- **Closed-app coach push — SHIPPED (edge v23, sw lll-v7, 2026-07-20).**
+  ll_push reuses its `player_id` column (no FK) to hold the coach id under a
+  new role `staffcoach`. Edge: `push_sub_coach` (cid/pin auth) stores the
+  device sub; `pushStaffCoach(cid)` sends to that coach; `coach_assign_session`
+  now calls it so the assigned coach is buzzed even with the app fully closed.
+  VAPID keys re-verified byte-for-byte after deploy (exact-match check).
+  coach.html: `pushSubCoach()` subscribes via VAPID on enable + on load when
+  already granted; SW role stamp changed 'coach' → **'staffcoach'**. sw.js
+  push handler branches by role: player→Lab, staffcoach→"new session/update →
+  portal" (tag ll-coach → click opens /coach.html), else admin door. Verified
+  end-to-end (temp coach → subscribe → assign → staffcoach row stored → push
+  fired; all test data deleted).
 
 ## Google Drive structure (2026-07-20)
 

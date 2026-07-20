@@ -1,6 +1,6 @@
 /* Lockdown Lab Live — service worker.
    Network-first for pages (always fresh app), cache-first for static assets. */
-const V = 'lll-v6';
+const V = 'lll-v7';
 const STATIC = ['/icons/icon-192.png', '/icons/icon-512.png', '/favicon.png', '/manifest.json'];
 
 self.addEventListener('install', e => {
@@ -31,24 +31,34 @@ self.addEventListener('push', e => {
   e.waitUntil((async () => {
     let role = 'coach';
     try { const c = await caches.open('ll-meta'); const r = await c.match('/ll-role'); if (r) role = (await r.text()) || 'coach'; } catch (err) {}
-    const coach = role !== 'player';
-    await self.registration.showNotification(
-      coach ? '\ud83d\udeaa The Door \u00b7 Lockdown Lab' : '\ud83d\udd12 The Lab \u00b7 Lockdown Lab Live',
-      {
-        body: coach ? "Someone's knocking or asking for a code. Open the Desk \u2014 bang bang."
-                    : "Something's landed for you \u2014 coach might've replied. Tap in.",
-        icon: '/icons/icon-192.png', badge: '/icons/icon-192.png',
-        tag: coach ? 'll-door' : 'll-lab', renotify: true,
-        // loud + sticky: buzz hard and stay on screen until they tap
-        vibrate: [260, 90, 260, 90, 420], requireInteraction: true
-      }
-    );
+    let title, body, tag;
+    if (role === 'player') {
+      title = '\ud83d\udd12 The Lab \u00b7 Lockdown Lab Live';
+      body = "Something's landed for you \u2014 coach might've replied. Tap in.";
+      tag = 'll-lab';
+    } else if (role === 'staffcoach') {
+      title = '\ud83d\udcc5 Lockdown Lab \u00b7 Coach';
+      body = "You've got a new session or update \u2014 open your portal.";
+      tag = 'll-coach';
+    } else {
+      title = '\ud83d\udeaa The Door \u00b7 Lockdown Lab';
+      body = "Someone's knocking or asking for a code. Open the Desk \u2014 bang bang.";
+      tag = 'll-door';
+    }
+    await self.registration.showNotification(title, {
+      body, icon: '/icons/icon-192.png', badge: '/icons/icon-192.png',
+      tag, renotify: true,
+      // loud + sticky: buzz hard and stay on screen until they tap
+      vibrate: [260, 90, 260, 90, 420], requireInteraction: true
+    });
   })());
 });
-/* Notification click: door pings open the Desk, everything else the app */
+/* Notification click: route by tag \u2014 door -> Desk, coach -> portal, else app */
 self.addEventListener('notificationclick', e => {
   e.notification.close();
-  const target = e.notification.tag === 'll-door' ? '/admin.html' : '/app.html';
+  const target = e.notification.tag === 'll-door' ? '/admin.html'
+               : e.notification.tag === 'll-coach' ? '/coach.html'
+               : '/app.html';
   e.waitUntil(clients.matchAll({ type: 'window', includeUncontrolled: true }).then(list => {
     for (const c of list) { if (c.url.includes(target)) return c.focus(); }
     return clients.openWindow(target);

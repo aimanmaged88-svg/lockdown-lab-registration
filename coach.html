@@ -571,7 +571,7 @@ textarea{min-height:70px;resize:vertical}
     if(TEST&&!can('canUseTestMode')){ TEST=false; localStorage.setItem('ll_coach_test','0'); }
     paintTest(); show('dash');
     maybeWelcome(fresh);
-    try{ refreshCBell(); startCoachPoll(); setTimeout(coachNudge, fresh?2600:1400); }catch(e){}
+    try{ refreshCBell(); startCoachPoll(); setTimeout(coachNudge, fresh?2600:1400); if(ntfOn()) setTimeout(pushSubCoach, 1200); }catch(e){}
   }
   function maybeWelcome(fresh){
     if(!C||!sess) return;
@@ -625,6 +625,19 @@ textarea{min-height:70px;resize:vertical}
   const iOSdev=/iphone|ipad|ipod/i.test(navigator.userAgent||'');
   const isStandalone=()=>window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
   function haptic(p){ try{ navigator.vibrate&&navigator.vibrate(p); }catch(e){} }
+  const VAPID_PUB='BIyZs-g6WqeAhyk4NQsAZ7rq-AoyWOTptKUZkE5z-hvvn61vVW9F1Ord5VbySnizrNu9OrLD4kOE0SMRzbcZRgI';
+  const vapidBytes=s=>{ const pad='='.repeat((4-s.length%4)%4); const b=atob((s+pad).replace(/-/g,'+').replace(/_/g,'/')); return Uint8Array.from(b,c=>c.charCodeAt(0)); };
+  // real closed-app push: register this device's subscription against the coach id
+  async function pushSubCoach(){
+    try{
+      if(!sess||!sess.cid) return;
+      if(!('serviceWorker' in navigator)||!('PushManager' in window)||!window.Notification) return;
+      if(Notification.permission!=='granted'||!location.protocol.startsWith('http')) return;
+      const reg=await navigator.serviceWorker.ready;
+      const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:vapidBytes(VAPID_PUB)});
+      await api({action:'push_sub_coach',cid:sess.cid,pin:sess.pin,sub:sub.toJSON()});
+    }catch(e){}
+  }
   function ntfOn(){ return ('Notification' in window)&&Notification.permission==='granted'&&localStorage.getItem('ll_coach_ntf')==='1'; }
   function ntfBlocked(){ return ('Notification' in window)&&Notification.permission==='denied'; }
   async function enableCoachNtf(){
@@ -636,7 +649,7 @@ textarea{min-height:70px;resize:vertical}
       localStorage.setItem('ll_coach_ntf','1'); haptic(30);
       try{ const reg=await navigator.serviceWorker.ready; reg.showNotification('🔔 You\'re locked in',{body:'Notifications are ON. The platform will ping you on every new assignment.',icon:'/icons/icon-192.png',badge:'/icons/icon-96.png',vibrate:[220,90,220,90,320],tag:'llc-on',renotify:true}); }
       catch(e){ try{ new Notification('🔔 You\'re locked in',{body:'Notifications are ON.',icon:'/icons/icon-192.png'}); }catch(_){}}
-      toast('Notifications ON 🔔'); refreshCBell(); return true;
+      pushSubCoach(); toast('Notifications ON 🔔'); refreshCBell(); return true;
     }
     if(perm==='denied') toast('Blocked in your settings — turn it back on there',true);
     refreshCBell(); return false;
@@ -683,7 +696,7 @@ textarea{min-height:70px;resize:vertical}
       C=r.coach; S=r.sessions||[]; enter();
     }catch(e){ localStorage.removeItem('ll_coach_sess'); sess=null; /* show login */ }
   }
-  if('serviceWorker' in navigator){ addEventListener('load',()=>{ navigator.serviceWorker.register('/sw.js').then(()=>{ try{ caches.open('ll-meta').then(c=>c.put('/ll-role',new Response('coach'))); }catch(e){} }).catch(()=>{}); }); }
+  if('serviceWorker' in navigator){ addEventListener('load',()=>{ navigator.serviceWorker.register('/sw.js').then(()=>{ try{ caches.open('ll-meta').then(c=>c.put('/ll-role',new Response('staffcoach'))); }catch(e){} }).catch(()=>{}); }); }
   resume();
 })();
 </script>
