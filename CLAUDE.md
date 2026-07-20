@@ -129,6 +129,48 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   Routine must never touch app/admin/index/sw/edge or push main.
 - Optional later: mirror decks into Netlify assets for prettier URLs.
 
+## Coach platform V1 (2026-07-20)
+
+- **Edge fn now v21.** New tables: ll_coaches (display_name, username,
+  pin_hash [sha username:pin:lockdownlabcoach], profile fields, session_rate,
+  status, permissions jsonb, completed_sessions), ll_coach_codes
+  (COACH-xxxx, 14-day, one signup), ll_coach_reqs (access requests).
+  ll_sessions gained coach_id/player_count/status — coach-assigned sessions
+  have coach_id set and upcomingSessions() filters coach_id=is.null so they
+  NEVER hit the player board. DEFAULT_COACH_PERMS = 14 toggles.
+- **Public actions:** coach_login, coach_register (needs a code), coach_request
+  (no-code access request → pushCoach), coach_state, coach_profile_edit,
+  coach_session_complete. **Admin actions** (coach code): coach_list (returns
+  coaches+requests+codes), coach_add, coach_edit, coach_set_status,
+  coach_set_perms, coach_delete, coach_assign_session, coach_unassign_session,
+  coach_code_mint, coach_code_del, coach_req_approve (mints a code),
+  coach_req_deny. VAPID keys unchanged (re-verified).
+- **coach.html** (NEW, master coach-base.html) — staff coach portal. Onboard
+  chooser (I've got a code / Log in / Need a code), coach_register + welcome
+  overlay #cwelcome ("Everyone's Accountable" — AI reads their honesty,
+  players rate them). Permission-gated OS dashboard: dash/schedule/perf/
+  profile/earnings(gated canViewEarnings, calc inputs gated
+  canUseEarningsCalculator)/players/resources/notifs/coming-soon. Test mode
+  (canUseTestMode) with fake data. Session storage ll_coach_sess; welcome
+  once per cid (ll_coach_wel_<cid>).
+- **admin.html** — new 🧑‍🏫 Coaches sidebar section: access requests
+  (approve→mint code), coach codes (mint/copy/del), add coach, and per-coach
+  cards with live permission toggles (PERM_DEFS[14]), assign/unassign
+  sessions, edit (bio/rate/specialties/PIN/notes), pause/activate, delete.
+  loadCoaches() on section show. NEWS id:12.
+- **First coach "Dre"** seeded as editable template (username dre, PIN 1234
+  — Aiman resets). index.html: coaching-staff + admin entry links. sw
+  unchanged (network-first serves coach.html fine).
+
+## Google Drive structure (2026-07-20)
+
+- Master folder **🔒 Lockdown Lab Live** (15V20Gh_e1Oh9Ldsd3wmjpkDIxJvXa6T7)
+  with subfolders: 01 Social Media, 02 Brand & Wallpaper, 03 Docs & Guides,
+  04 Launch Grid. Native docs copied in (Handbook, Master Sheet → Docs;
+  Teaser Run → Social). Each folder has a tap-to-download index doc pointing
+  at the Netlify-hosted /assets/ PNGs (binaries not uploaded — base64-inline
+  only, so links instead). ⭐ START HERE doc at master root.
+
 ## Parked ideas (Aiman asked to save these)
 
 - **"A.I. MAN" Instagram post** — saved 2026-07-18, for a few weeks out.
