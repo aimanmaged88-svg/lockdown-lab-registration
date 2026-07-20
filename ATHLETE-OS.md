@@ -42,6 +42,20 @@ audience. Lives in `athlete-os/` and deploys with the rest of the static site
 - **Check-in is athlete-generic**: energy, sleep hours, soreness, minutes
   trained, sport-specific focus tags, note. Feeds readiness + AI insights.
 
+## Two-way accountability (messaging + ratings)
+
+- **Direct messages** between each athlete and the coach — private 1:1 thread
+  (`aos_messages`). Athlete sends via the **Coach** tab (`msg` action); coach
+  replies from inside the athlete file (`cmsg`). No athlete sees another's thread.
+- **Coach rating** of each athlete, 1–10 with an optional note (`rate` action,
+  stored on `aos_athletes.coach_rating`). Shown to the athlete on the Coach tab
+  and surfaced in their AI insights; shown to the coach in the roster + file.
+- **Logo**: Athlete OS has its own mark — a performance ring with an ascending
+  "A" (`athlete-os/favicon.svg`, and the inline `#ll` symbol in `app.html`/
+  `index.html`). It no longer reuses the Lockdown Lab flask logo.
+- *Peer ratings are intentionally not built yet* — they conflict with the
+  "athletes never see each other" rule and need a product decision first.
+
 ## Backend (Supabase project `lockdown-lab`, ref `ymuwuhvqqftgpxwhzoub`)
 
 - **Edge function `aos-api`** (source: `supabase/functions/aos-api/index.ts`)

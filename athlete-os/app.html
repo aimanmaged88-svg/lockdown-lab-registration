@@ -6,6 +6,7 @@
 <title>Athlete OS</title>
 <meta name="description" content="Your private performance hub — training, recovery, mindset and goals, personalised to your sport. Powered by the Lockdown Lab engine.">
 <meta name="theme-color" content="#050506">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="stylesheet" href="fonts.css">
 <style>
 :root{
@@ -170,6 +171,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 .jnote b{color:var(--text)}
 .togglechip{font-family:var(--fm);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:7px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;transition:all .18s}
 .togglechip.on{border-color:var(--good);color:var(--good);background:var(--good-soft)}
+.thread{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;min-height:140px}
+.msg{max-width:82%;padding:10px 14px;border-radius:17px;font-size:13.5px;line-height:1.45}
+.msg.them{align-self:flex-start;background:var(--glass);border:1px solid var(--line2);border-bottom-left-radius:6px;backdrop-filter:blur(8px)}
+.msg.me{align-self:flex-end;background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:#150a00;border-bottom-right-radius:6px;font-weight:600;box-shadow:0 6px 18px -8px var(--accent-glow)}
+.msg .mt{display:block;font-family:var(--fm);font-size:8px;letter-spacing:1px;opacity:.6;margin-top:3px}
+.composer{display:flex;gap:8px;margin-bottom:14px}
+.composer input{flex:1}
+.ratewrap{display:flex;align-items:center;gap:14px}
+.ratebig{font-family:var(--fd);font-size:42px;line-height:1;color:var(--accent);flex:0 0 auto}
 
 /* ---------- onboarding ---------- */
 #onboard{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;
@@ -216,7 +226,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 </head>
 <body>
 
-<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="ll" viewBox="0 0 120 128" fill="none"><g stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M47 30 v-5 a13 13 0 0 1 26 0 v5"/><path d="M38 30 H47"/><path d="M73 30 H82"/><path d="M47 30 v10 L27 88 a9 9 0 0 0 8.5 13.5 h49 a9 9 0 0 0 8.5 -13.5 L73 40 v-10"/></g><g stroke="currentColor" stroke-width="6" stroke-linecap="butt" stroke-linejoin="miter"><path d="M67 34 L58 68 H79"/><path d="M56 44 L46 84 H81"/></g></symbol></svg>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="ll" viewBox="0 0 120 120" fill="none"><circle cx="60" cy="60" r="50" stroke="currentColor" stroke-width="7"/><path d="M34 92 L60 24 L86 92" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><path d="M45 70 H75" stroke="currentColor" stroke-width="7" stroke-linecap="round"/></symbol></svg>
 
 <!-- ============ ONBOARDING ============ -->
 <div id="onboard">
@@ -484,6 +494,26 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
       <div class="catbar" id="catBar"></div>
       <div id="resList"></div>
     </section>
+
+    <!-- COACH MESSAGES -->
+    <section class="tabpage" data-page="msgs">
+      <span class="eyebrow">Two-Way Accountability</span>
+      <h1 class="page display">Coach</h1>
+      <p class="sub">Your direct line. They hold you to it — you hold them to it.</p>
+      <div class="card hot" id="rateCard" style="display:none">
+        <span class="cl">Your coach rating</span>
+        <div class="ratewrap">
+          <span class="ratebig" id="rateVal">–</span>
+          <div><b class="display" style="font-size:20px" id="rateLbl">Not rated yet</b><p style="color:var(--muted);font-size:12.5px;margin-top:2px" id="rateNote"></p></div>
+        </div>
+      </div>
+      <div class="thread" id="thread"></div>
+      <div class="composer">
+        <input id="mMsgInput" placeholder="Message your coach…" maxlength="600">
+        <button class="btn btn-p btn-sm" id="mMsgBtn">Send</button>
+      </div>
+      <div class="filternote" style="font-family:var(--fm);font-size:9px;letter-spacing:1px;color:var(--dim);text-transform:uppercase">🔒 Private — only you and your coach see this</div>
+    </section>
   </main>
 
   <nav id="navMain" style="display:none">
@@ -491,6 +521,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
     <button data-nav="train"><span class="ic">🏋️</span><span>Train</span></button>
     <button data-nav="body"><span class="ic">🧬</span><span>Body</span></button>
     <button data-nav="mind"><span class="ic">🧠</span><span>Mind</span></button>
+    <button data-nav="msgs"><span class="ic">💬</span><span>Coach</span></button>
     <button data-nav="lib"><span class="ic">📚</span><span>Library</span></button>
   </nav>
 </div>
@@ -803,9 +834,31 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
     renderBody(soft);
     /* mind */
     renderMind();
+    /* coach messages */
+    renderMsgs();
     /* library */
     if(!soft) renderLib('All');
   }
+
+  function renderMsgs(){
+    const p=AST.profile, r=p.coach_rating;
+    $('#rateCard').style.display=r?'block':'none';
+    if(r){
+      $('#rateVal').textContent=r+'/10';
+      $('#rateLbl').textContent=r>=8?'Coach loves your work':r>=5?'Solid — keep climbing':'Coach wants more';
+      $('#rateNote').textContent=p.coach_rating_note?('“'+p.coach_rating_note+'”'):'Set by your coach';
+    }
+    $('#thread').innerHTML=(AST.messages||[]).map(m=>'<div class="msg '+(m.from_coach?'them':'me')+'">'+esc(m.text)+'<span class="mt">'+(m.from_coach?'Coach':'You')+' · '+rel(m.created_at)+'</span></div>').join('')
+      ||'<p style="color:var(--dim);font-size:13px">No messages yet. Say what\'s up — your coach reads everything here.</p>';
+    const th=$('#thread'); th.scrollTop=th.scrollHeight;
+  }
+  $('#mMsgBtn').addEventListener('click',async()=>{
+    const v=$('#mMsgInput').value.trim(); if(!v)return;
+    busy($('#mMsgBtn'),1);
+    try{ const r=await api({action:'msg',aid:sess.aid,pin:sess.pin,text:v}); AST.messages=r.messages; renderMsgs(); $('#mMsgInput').value=''; }
+    catch(e){ toast(e.message,true); }
+    busy($('#mMsgBtn'),0,'Send');
+  });
 
   function renderPlan(p,sp){
     const days=['MON','TUE','WED','THU','FRI','SAT','SUN'];
@@ -955,7 +1008,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
   });
 
   /* enter-to-send */
-  [['dInput','dBtn'],['jPin','jNext'],['lPin','lGo']].forEach(([i,b])=>{
+  [['dInput','dBtn'],['mMsgInput','mMsgBtn'],['jPin','jNext'],['lPin','lGo']].forEach(([i,b])=>{
     const el=$('#'+i); if(el) el.addEventListener('keydown',e=>{ if(e.key==='Enter'){e.preventDefault();$('#'+b).click();} });
   });
 

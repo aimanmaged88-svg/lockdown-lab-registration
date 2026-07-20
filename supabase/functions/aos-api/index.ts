@@ -4,6 +4,8 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 // all DB access is server-side (service role), athletes authenticate with
 // athlete_id + PIN, the coach with a coach code. Unlike the Lab there is no
 // community layer — every athlete is private; only the coach sees the roster.
+// Two-way accountability: athlete <-> coach direct messages, and a coach
+// rating of each athlete.
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const COACH_CODE = (Deno.env.get("AOS_COACH_CODE") || "OS-COACH").toUpperCase();
@@ -57,6 +59,7 @@ async function auth(aid: string, pin: string) {
   const h = await pinHash(p.name_key, String(pin || ""));
   return h === p.pin_hash ? p : null;
 }
+const msgsFor = (aid: string) => db(`aos_messages?athlete_id=eq.${aid}&select=id,from_coach,text,created_at&order=created_at.asc&limit=100`);
 
 function profile(p: any) {
   return {
@@ -64,6 +67,7 @@ function profile(p: any) {
     goals: p.goals || {}, injuries: p.injuries, train_freq: p.train_freq, comp_schedule: p.comp_schedule,
     equipment: p.equipment || [], xp: p.xp, streak: p.streak, last_checkin: p.last_checkin,
     prefs: p.prefs || {}, created_at: p.created_at,
+    coach_rating: p.coach_rating ?? null, coach_rating_note: p.coach_rating_note || null, coach_rating_at: p.coach_rating_at || null,
   };
 }
 
@@ -118,19 +122,20 @@ function buildAI(p: any, checkins: any[], journal: any[]) {
     out.push(aw >= 6 ? ["⬢", `Hydration averaging ${Math.round(aw)}/8 — your engine runs clean.`]
       : ["⬢", `Water averaging ${Math.round(aw)}/8. Fatigue loves dehydration — keep the bottle moving.`]);
   }
+  if (p.coach_rating) out.push(["★", `Your coach rates you ${p.coach_rating}/10 right now.${p.coach_rating_note ? " “" + p.coach_rating_note + "”" : ""} Message them in the Coach tab.`]);
   if (p.injuries) out.push(["◆", "Injury noted on file. Train around it, not through it — and keep your health professional in the loop."]);
   return out;
 }
 
 async function athleteState(p: any) {
-  const [checkins, journal, notesCount] = await Promise.all([
+  const [checkins, journal, messages] = await Promise.all([
     db(`aos_checkins?athlete_id=eq.${p.id}&select=d,energy,sleep_h,water,soreness,mins,focus,note&order=d.desc&limit=14`),
     db(`aos_journal?athlete_id=eq.${p.id}&select=id,kind,d,data,share_coach,created_at&order=created_at.desc&limit=40`),
-    Promise.resolve(null), // athletes never see coach notes — reserved
+    msgsFor(p.id),
   ]);
   const today = sydToday();
   return {
-    profile: profile(p), checkins,
+    profile: profile(p), checkins, messages,
     ai: buildAI(p, checkins, journal),
     mind: journal.filter((j: any) => j.kind === "mind").slice(0, 10),
     diary: journal.filter((j: any) => j.kind === "diary").slice(0, 10),
@@ -182,12 +187,19 @@ Deno.serve(async (req) => {
       return J({ ok: true, aid: p.id, state: await athleteState(p) });
     }
 
-    if (["state", "checkin", "mind", "diary", "fuel", "goals_set", "profile_set"].includes(a)) {
+    if (["state", "checkin", "mind", "diary", "fuel", "goals_set", "profile_set", "msg"].includes(a)) {
       const p = await auth(b.aid, b.pin);
       if (!p) return J({ error: "unauthorized" }, 401);
       const today = sydToday();
 
       if (a === "state") return J({ ok: true, state: await athleteState(p) });
+
+      if (a === "msg") {
+        const text = priv(b.text, 600);
+        if (!text) return J({ error: "empty" }, 400);
+        await db("aos_messages", { method: "POST", body: JSON.stringify({ athlete_id: p.id, from_coach: false, text }) });
+        return J({ ok: true, messages: await msgsFor(p.id) });
+      }
 
       if (a === "checkin") {
         if (p.last_checkin === today) return J({ error: "Already checked in today." }, 409);
@@ -271,24 +283,39 @@ Deno.serve(async (req) => {
       }
     }
 
-    if (["roster", "cdetail", "note_add", "status_set"].includes(a)) {
+    if (["roster", "cdetail", "note_add", "status_set", "cmsg", "rate"].includes(a)) {
       if (String(b.code || "").toUpperCase() !== COACH_CODE) return J({ error: "bad coach code" }, 401);
 
       if (a === "roster") {
-        const athletes = await db("aos_athletes?select=id,name,sport,age,level,position,goals,injuries,train_freq,comp_schedule,equipment,location,contact,xp,streak,last_checkin,status,created_at&order=created_at.asc");
+        const athletes = await db("aos_athletes?select=id,name,sport,age,level,position,goals,injuries,train_freq,comp_schedule,equipment,location,contact,xp,streak,last_checkin,status,created_at,coach_rating,coach_rating_at&order=created_at.asc");
         return J({ ok: true, today: sydToday(), athletes });
       }
       if (a === "cdetail") {
         const p = await getAthlete(b.aid);
         if (!p) return J({ error: "no athlete" }, 404);
-        const [checkins, notes, journal] = await Promise.all([
+        const [checkins, notes, journal, messages] = await Promise.all([
           db(`aos_checkins?athlete_id=eq.${p.id}&select=d,energy,sleep_h,water,soreness,mins,focus,note&order=d.desc&limit=14`),
           db(`aos_notes?athlete_id=eq.${p.id}&select=id,text,created_at&order=created_at.asc`),
           db(`aos_journal?athlete_id=eq.${p.id}&share_coach=eq.true&select=kind,d,data,created_at&order=created_at.desc&limit=15`),
+          msgsFor(p.id),
         ]);
-        return J({ ok: true, profile: profile(p), contact: p.contact || null, status: p.status, checkins, notes,
+        return J({ ok: true, profile: profile(p), contact: p.contact || null, status: p.status, checkins, notes, messages,
           shared_mind: journal.filter((j: any) => j.kind === "mind"),
           fuel: journal.filter((j: any) => j.kind === "fuel").slice(0, 7) });
+      }
+      if (a === "cmsg") {
+        const text = priv(b.text, 600);
+        if (!text) return J({ error: "empty" }, 400);
+        if (!(await getAthlete(b.aid))) return J({ error: "no athlete" }, 404);
+        await db("aos_messages", { method: "POST", body: JSON.stringify({ athlete_id: b.aid, from_coach: true, text }) });
+        return J({ ok: true, messages: await msgsFor(b.aid) });
+      }
+      if (a === "rate") {
+        const score = num(b.score, 1, 10, 0);
+        if (!score) return J({ error: "Pick a rating from 1 to 10." }, 400);
+        if (!(await getAthlete(b.aid))) return J({ error: "no athlete" }, 404);
+        await db(`aos_athletes?id=eq.${b.aid}`, { method: "PATCH", body: JSON.stringify({ coach_rating: score, coach_rating_note: priv(b.note, 200) || null, coach_rating_at: new Date().toISOString() }) });
+        return J({ ok: true });
       }
       if (a === "note_add") {
         const text = String(b.text || "").trim().slice(0, 300);
