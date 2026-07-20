@@ -342,6 +342,15 @@
             <input id="rateNote" placeholder="Optional note the athlete will see" maxlength="200" style="margin-bottom:8px" value="${esc(p.coach_rating_note||'')}">
             <button class="btn btn-primary btn-sm" id="rateSave">Save rating ⭐</button>
           </div>
+          <h4>👥 Team &amp; peer rating</h4>
+          <div class="box">
+            Peer rating: <b>${d.peer&&d.peer.count?d.peer.avg+'/10 · '+d.peer.count+' peer'+(d.peer.count>1?'s':''):'none yet'}</b>
+            <div style="display:flex;gap:6px;margin-top:8px">
+              <select id="teamSel" style="flex:1"><option value="">No team</option>${(d.teams||[]).map(t=>`<option value="${t.id}" ${p.team_id===t.id?'selected':''}>${esc(t.name)}</option>`).join('')}</select>
+              <button class="btn btn-ghost btn-sm" id="teamNew">＋ New</button>
+            </div>
+            <div class="sub" style="margin-top:6px">Teammates on the same team can rate each other (anonymous).</div>
+          </div>
         </div>
         <div>
           <h4>Last 14 check-ins</h4>
@@ -386,6 +395,15 @@
       };
       $('#cMsgBtn').addEventListener('click', sendCMsg);
       $('#cMsgInput').addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); sendCMsg(); } });
+      $('#teamSel').addEventListener('change', async()=>{
+        try{ await api({action:'team_assign', aid, team_id:$('#teamSel').value||null}); toast('Team updated'); await load(); openId=aid; render(); loadFile(aid); }
+        catch(e){ toast('Update failed'); }
+      });
+      $('#teamNew').addEventListener('click', async()=>{
+        const name=prompt('New team name:'); if(!name) return;
+        try{ const r=await api({action:'team_create', name}); if(r&&r.team){ await api({action:'team_assign', aid, team_id:r.team.id}); } toast('Team created'); await load(); openId=aid; render(); loadFile(aid); }
+        catch(e){ toast('Create failed'); }
+      });
     }catch(e){ cell.textContent = 'Could not load file — '+e.message; }
   }
 

@@ -53,8 +53,13 @@ audience. Lives in `athlete-os/` and deploys with the rest of the static site
 - **Logo**: Athlete OS has its own mark — a performance ring with an ascending
   "A" (`athlete-os/favicon.svg`, and the inline `#ll` symbol in `app.html`/
   `index.html`). It no longer reuses the Lockdown Lab flask logo.
-- *Peer ratings are intentionally not built yet* — they conflict with the
-  "athletes never see each other" rule and need a product decision first.
+- **Team-based peer ratings**: the coach creates teams (`aos_teams`) and assigns
+  athletes (`team_assign`). Only athletes on the **same team** can see and rate
+  each other (`peer_rate`), shown to everyone as an **anonymous aggregate**
+  (`aos_peer_ratings` → avg + count). Athletes with no team stay fully private —
+  the core "athletes never see each other" rule holds outside a team. Athletes
+  rate teammates from the **Squad** section of the Coach tab; the coach sees each
+  athlete's peer average in their file and assigns teams there.
 
 ## Backend (Supabase project `lockdown-lab`, ref `ymuwuhvqqftgpxwhzoub`)
 
