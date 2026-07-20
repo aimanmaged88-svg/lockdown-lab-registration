@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex,nofollow" />
+<title>NOVA · My Account</title>
+<link rel="stylesheet" href="theme.css" />
+<style>
+  header.top{position:sticky;top:0;z-index:20;border-bottom:1px solid var(--line2);background:rgba(10,11,15,.72);backdrop-filter:blur(14px)}
+  header.top .bar{display:flex;align-items:center;gap:14px;height:60px}
+  header.top .sp{flex:1}
+  .login{min-height:76vh;display:grid;place-items:center;padding:22px}
+  .login .card{max-width:400px;width:100%;text-align:center}
+  .login h1{font-size:26px;margin:10px 0 6px}
+  .login p{color:var(--muted);font-size:14px;margin-bottom:20px}
+  .hint{font-size:12px;color:var(--dim);margin-top:14px;line-height:1.6}
+  .hint code{background:rgba(255,255,255,.06);padding:2px 6px;border-radius:6px;font-family:var(--fm)}
+
+  #app{display:none;padding:26px 0 60px}
+  .hello{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;margin-bottom:22px}
+  .hello h1{font-size:30px}
+  .stat-hero{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:14px;margin-bottom:22px}
+  @media(max-width:820px){.stat-hero{grid-template-columns:1fr 1fr}}
+  .sh{border:1px solid var(--line);border-radius:16px;background:var(--panel);padding:20px}
+  .sh.total{background:linear-gradient(160deg,var(--gold-soft),var(--panel));border-color:rgba(245,196,81,.4)}
+  .sh .n{font-family:var(--fm);font-size:36px;font-weight:800;font-variant-numeric:tabular-nums;line-height:1}
+  .sh.total .n{color:var(--gold);font-size:44px}
+  .sh .l{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--dim);margin-top:8px}
+  .cols{display:grid;grid-template-columns:1.4fr 1fr;gap:18px}
+  @media(max-width:820px){.cols{grid-template-columns:1fr}}
+  .card h3{font-size:16px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+  .kv{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line2);font-size:14px}
+  .kv:last-child{border-bottom:none}
+  .kv .k{color:var(--muted)}
+  .ledger .li{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line2);font-size:13px}
+  .ledger .li:last-child{border-bottom:none}
+  .ledger .li .d{color:var(--muted);font-size:12px}
+  .ledger .li .amt{font-family:var(--fm);font-weight:600}
+  .ledger .li .amt.pos{color:var(--emerald)} .ledger .li .amt.neg{color:var(--danger)}
+  .order{display:flex;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid var(--line2);font-size:13.5px}
+  .order:last-child{border-bottom:none}
+  .order .meta{color:var(--dim);font-size:12px}
+  .err{display:none;margin-top:14px;color:#ff9a9a;font-size:13px;background:var(--danger-soft);border:1px solid var(--danger);border-radius:10px;padding:10px 12px}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap bar">
+    <a class="logo" href="index.html"><span class="mark">N</span> NOVA</a>
+    <div class="sp"></div>
+    <a class="btn btn-ghost btn-sm" href="index.html#packages">Get more entries</a>
+    <button class="btn btn-ghost btn-sm" id="logoutBtn" style="display:none">Log out</button>
+  </div>
+</header>
+
+<!-- LOGIN -->
+<div class="login" id="login">
+  <div class="card">
+    <div class="logo" style="justify-content:center"><span class="mark">N</span> NOVA</div>
+    <h1>Your account</h1>
+    <p>Log in with the email or Customer ID on your account.</p>
+    <div class="field"><input id="loginId" placeholder="Email or Customer ID" autocomplete="email" /></div>
+    <button class="btn btn-gold btn-block" id="loginBtn">View my entries →</button>
+    <div class="err" id="loginErr"></div>
+    <div class="hint">Demo accounts: <code>john@example.com</code> · <code>mia@example.com</code><br>
+      or any email you used at checkout.</div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="app">
+  <div class="wrap">
+    <div class="hello">
+      <div>
+        <div class="eyebrow">My account</div>
+        <h1 id="uName">—</h1>
+      </div>
+      <div class="sp" style="flex:1"></div>
+      <span class="pill" id="uId"></span>
+      <span class="badge" id="uMember"></span>
+    </div>
+
+    <div class="stat-hero">
+      <div class="sh total"><div class="n" id="tTotal">0</div><div class="l">Total entries · this draw</div></div>
+      <div class="sh"><div class="n" id="tBonus">0</div><div class="l">Bonus entries</div></div>
+      <div class="sh"><div class="n" id="tMonthly">0</div><div class="l">Membership entries</div></div>
+      <div class="sh"><div class="n" id="tManual">0</div><div class="l">Manual / promo</div></div>
+    </div>
+
+    <div class="cols">
+      <div class="stack">
+        <div class="card">
+          <h3>🎟️ Entry activity</h3>
+          <div class="ledger" id="ledger"></div>
+        </div>
+        <div class="card">
+          <h3>📦 Previous orders</h3>
+          <div id="orders"></div>
+        </div>
+      </div>
+
+      <div class="stack">
+        <div class="card">
+          <h3>💳 Subscription</h3>
+          <div class="kv"><span class="k">Status</span><span id="subStatus">—</span></div>
+          <div class="kv"><span class="k">Plan</span><span id="subPlan">—</span></div>
+          <div class="kv"><span class="k">Monthly entries</span><span id="subEntries">—</span></div>
+          <div id="subCta" style="margin-top:14px"></div>
+        </div>
+        <div class="card">
+          <h3>👤 Account details</h3>
+          <div class="kv"><span class="k">Full name</span><span id="dName">—</span></div>
+          <div class="kv"><span class="k">Email</span><span id="dEmail">—</span></div>
+          <div class="kv"><span class="k">Phone</span><span id="dPhone">—</span></div>
+          <div class="kv"><span class="k">Customer ID</span><span class="mono" id="dId">—</span></div>
+          <div class="kv"><span class="k">Package</span><span id="dPkg">—</span></div>
+          <div class="kv"><span class="k">Lifetime entries</span><span class="mono" id="dLife">—</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="engine.js"></script>
+<script>
+(function(){
+  var $=function(s){return document.querySelector(s);};
+  var toast=function(m){var t=$('#toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},1800);};
+  var esc=function(s){return (s==null?'':String(s)).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});};
+  function fmtDate(s){try{var d=new Date(s);return d.toLocaleDateString(undefined,{month:'short',day:'numeric'})+' '+d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});}catch(e){return s;}}
+
+  function show(c){
+    $('#login').style.display='none'; $('#app').style.display='block'; $('#logoutBtn').style.display='inline-flex';
+    $('#uName').textContent=c.fullName;
+    $('#uId').innerHTML='ID <b>'+esc(c.id)+'</b>';
+    var mem=$('#uMember');
+    if(c.membershipStatus==='active'){mem.className='badge on';mem.textContent='Member · Active';}
+    else if(c.membershipStatus==='cancelled'){mem.className='badge off';mem.textContent='Member · Cancelled';}
+    else {mem.className='badge';mem.textContent='Not a member';}
+
+    $('#tTotal').textContent=c.totalEntries.toLocaleString();
+    $('#tBonus').textContent=c.bonusEntries.toLocaleString();
+    $('#tMonthly').textContent=c.membershipEntries.toLocaleString();
+    $('#tManual').textContent=c.manualEntries.toLocaleString();
+
+    // ledger
+    $('#ledger').innerHTML = (c.ledger||[]).length ? c.ledger.map(function(e){
+      var pos=e.delta>=0;
+      return '<div class="li"><div><div>'+esc(e.reason)+'</div><div class="d">'+fmtDate(e.at)+' · '+e.bucket+'</div></div>'
+        +'<div class="amt '+(pos?'pos':'neg')+'">'+(pos?'+':'')+e.delta.toLocaleString()+'</div></div>';
+    }).join('') : '<p class="muted" style="font-size:13px">No activity yet.</p>';
+
+    // orders
+    $('#orders').innerHTML = (c.orders||[]).length ? c.orders.map(function(o){
+      return '<div class="order"><div><div>'+esc(o.item)+(o.coupon?' · '+esc(o.coupon):'')+'</div>'
+        +'<div class="meta">'+fmtDate(o.at)+' · '+o.entries.toLocaleString()+' entries · '+o.multiplier+'×</div></div>'
+        +'<div class="mono">$'+o.total.toFixed(2)+'</div></div>';
+    }).join('') : '<p class="muted" style="font-size:13px">No orders yet.</p>';
+
+    // subscription
+    var mem2=GV.MEMBERSHIP;
+    $('#subStatus').innerHTML = c.membershipStatus==='active'
+      ? '<span class="badge on">Active · renews monthly</span>'
+      : (c.membershipStatus==='cancelled'?'<span class="badge off">Cancelled</span>':'<span class="badge">None</span>');
+    $('#subPlan').textContent = c.membershipStatus==='active' ? '$'+mem2.price+'/month' : '—';
+    $('#subEntries').textContent = c.membershipStatus==='active' ? mem2.monthlyEntries+' / month' : '—';
+    var cta=$('#subCta');
+    if(c.membershipStatus==='active'){
+      cta.innerHTML='<button class="btn btn-ghost btn-block btn-sm" id="cancelSub">Cancel subscription</button>';
+      $('#cancelSub').addEventListener('click',function(){ c.membershipStatus='cancelled'; GV.save(); show(c); toast('Subscription cancelled'); });
+    } else {
+      cta.innerHTML='<a class="btn btn-emerald btn-block btn-sm" href="index.html#packages">Become a member</a>';
+    }
+
+    // details
+    $('#dName').textContent=c.fullName; $('#dEmail').textContent=c.email;
+    $('#dPhone').textContent=c.phone||'—'; $('#dId').textContent=c.id;
+    $('#dPkg').textContent=c.package||'—'; $('#dLife').textContent=(c.lifetimeEntries||0).toLocaleString();
+  }
+
+  function attempt(idOrEmail){
+    var c=GV.findCustomer(idOrEmail);
+    if(!c){ var e=$('#loginErr'); e.style.display='block'; e.textContent='No account found for that email or ID.'; return; }
+    sessionStorage.setItem('nova_customer', c.id); show(c);
+  }
+  $('#loginBtn').addEventListener('click',function(){ attempt($('#loginId').value.trim()); });
+  $('#loginId').addEventListener('keydown',function(e){ if(e.key==='Enter') attempt($('#loginId').value.trim()); });
+  $('#logoutBtn').addEventListener('click',function(){ sessionStorage.removeItem('nova_customer'); location.reload(); });
+
+  // auto-login from checkout / previous session
+  var saved=sessionStorage.getItem('nova_customer');
+  if(saved){ var c=GV.customers().find(function(x){return x.id===saved;}); if(c) show(c); }
+})();
+</script>
+</body>
+</html>
