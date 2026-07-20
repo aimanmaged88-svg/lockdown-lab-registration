@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="robots" content="noindex,nofollow" />
+<title>NOVA · Admin Console</title>
+<link rel="stylesheet" href="theme.css" />
+<style>
+  header.top{position:sticky;top:0;z-index:40;border-bottom:1px solid var(--line2);background:rgba(10,11,15,.8);backdrop-filter:blur(14px)}
+  header.top .bar{display:flex;align-items:center;gap:14px;height:60px}
+  header.top .sp{flex:1}
+  .multctl{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;padding:4px 6px 4px 14px;background:var(--panel)}
+  .multctl label{margin:0;font-size:10px}
+  .multctl select{width:auto;padding:6px 8px;border-radius:999px;font-size:13px;background:rgba(0,0,0,.4)}
+  .tabs{display:flex;gap:4px;border-bottom:1px solid var(--line2);margin:0;overflow-x:auto}
+  .tab{padding:14px 16px;font-size:14px;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+  .tab:hover{color:var(--text)}
+  .tab.active{color:var(--gold);border-bottom-color:var(--gold)}
+  .view{display:none;padding:24px 0 60px} .view.active{display:block}
+
+  .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:20px}
+  @media(max-width:900px){.kpis{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:520px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpi{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:15px}
+  .kpi .n{font-family:var(--fm);font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1}
+  .kpi.gold .n{color:var(--gold)}
+  .kpi .l{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--dim);margin-top:7px}
+
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+  .toolbar input,.toolbar select{max-width:280px}
+  .toolbar .sp{flex:1}
+
+  .player{font-weight:600;font-size:15px}
+  .sub{color:var(--muted);font-size:12px}
+  .num{font-family:var(--fm);font-variant-numeric:tabular-nums}
+  .rowbtn{cursor:pointer}
+  .rowbtn:hover td{background:rgba(245,196,81,.04)}
+
+  /* drawer */
+  .drawer-bg{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);z-index:120;display:none}
+  .drawer-bg.show{display:block}
+  .drawer{position:fixed;top:0;right:0;height:100%;width:min(520px,100%);background:var(--bg2);border-left:1px solid var(--line);
+    z-index:130;transform:translateX(100%);transition:transform .25s;overflow-y:auto;padding:24px}
+  .drawer.show{transform:translateX(0)}
+  .drawer .x{position:absolute;top:18px;right:20px;font-size:22px;cursor:pointer;color:var(--muted)}
+  .dgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0}
+  .dbucket{border:1px solid var(--line);border-radius:12px;background:var(--panel2);padding:12px}
+  .dbucket .n{font-family:var(--fm);font-size:22px;font-weight:700}
+  .dbucket .l{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--dim);margin-top:4px}
+  .adjust{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:16px;margin:16px 0}
+  .adjust .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .noteitem{font-size:13px;padding:9px 0;border-bottom:1px solid var(--line2)}
+  .noteitem:last-child{border-bottom:none}
+  .noteitem .m{color:var(--dim);font-size:11px}
+
+  .cardgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px}
+  .minicard{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:18px}
+  .minicard h4{font-size:16px;display:flex;align-items:center;gap:8px;justify-content:space-between}
+  .minicard .meta{font-size:12.5px;color:var(--muted);margin:8px 0}
+  .minicard .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .code{font-family:var(--fm);font-weight:700;letter-spacing:1px;color:var(--gold)}
+
+  .login{min-height:80vh;display:grid;place-items:center;padding:22px}
+  .login .card{max-width:400px;width:100%;text-align:center}
+  .login h1{font-size:24px;margin:8px 0 6px}
+  .login p{color:var(--muted);font-size:14px;margin-bottom:18px}
+  .err{display:none;margin-top:12px;color:#ff9a9a;font-size:13px;background:var(--danger-soft);border:1px solid var(--danger);border-radius:10px;padding:10px}
+  .hint{font-size:12px;color:var(--dim);margin-top:14px}
+  .hint code{background:rgba(255,255,255,.06);padding:2px 6px;border-radius:6px;font-family:var(--fm)}
+  .campimg{width:100%;height:120px;border-radius:12px;background:linear-gradient(145deg,#171a22,#0d0f15);display:grid;place-items:center;font-size:44px;margin-bottom:12px}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login" id="login">
+  <div class="card">
+    <div class="logo" style="justify-content:center"><span class="mark">N</span> NOVA</div>
+    <h1>Admin Console</h1>
+    <p>Enter your admin token to manage entries, campaigns, coupons &amp; affiliates.</p>
+    <div class="field"><input type="password" id="token" placeholder="Admin token" autocomplete="off" /></div>
+    <button class="btn btn-gold btn-block" id="loginBtn">Enter console →</button>
+    <div class="err" id="loginErr"></div>
+    <div class="hint">Demo token: <code>nova-admin</code></div>
+  </div>
+</div>
+
+<!-- CONSOLE -->
+<div id="console" style="display:none">
+  <header class="top">
+    <div class="wrap bar">
+      <a class="logo" href="index.html"><span class="mark">N</span> NOVA</a>
+      <span class="pill">Admin console</span>
+      <div class="sp"></div>
+      <div class="multctl" title="Global entry multiplier (Req 4)">
+        <label>Multiplier</label>
+        <select id="multSelect"></select>
+      </div>
+      <button class="btn btn-ghost btn-sm" id="logoutBtn">Log out</button>
+    </div>
+    <div class="wrap">
+      <div class="tabs">
+        <div class="tab active" data-view="customers">Customers &amp; Entries</div>
+        <div class="tab" data-view="orders">Orders</div>
+        <div class="tab" data-view="coupons">Coupons</div>
+        <div class="tab" data-view="affiliates">Affiliates</div>
+        <div class="tab" data-view="campaigns">Giveaways</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+
+    <!-- ===== CUSTOMERS & ENTRIES (Req 3, 6, 12) ===== -->
+    <div class="view active" id="view-customers">
+      <div class="kpis" id="kpis"></div>
+      <div class="toolbar">
+        <input type="search" id="custSearch" placeholder="Search name, email, phone, ID…" />
+        <select id="custFilter">
+          <option value="">All customers</option>
+          <option value="active">Members only</option>
+          <option value="none">Non-members</option>
+        </select>
+        <div class="sp"></div>
+        <button class="btn btn-ghost btn-sm" id="addCust">+ New customer</button>
+        <button class="btn btn-ghost btn-sm" id="exportCust">Export CSV</button>
+      </div>
+      <div class="tablewrap"><div class="scroll">
+        <table>
+          <thead><tr>
+            <th>Customer</th><th>Contact</th><th>ID</th><th>Membership</th><th>Package</th>
+            <th>Total</th><th>Bonus</th><th>Member</th><th>Manual</th><th>Lifetime</th>
+          </tr></thead>
+          <tbody id="custBody"></tbody>
+        </table>
+      </div></div>
+    </div>
+
+    <!-- ===== ORDERS (Req 12) ===== -->
+    <div class="view" id="view-orders">
+      <div class="toolbar">
+        <input type="search" id="ordSearch" placeholder="Search orders by customer, item, coupon…" />
+        <div class="sp"></div>
+        <span class="pill" id="ordTotal"></span>
+      </div>
+      <div class="tablewrap"><div class="scroll">
+        <table>
+          <thead><tr><th>Date</th><th>Customer</th><th>Item</th><th>Coupon</th><th>Entries</th><th>Paid</th><th>Status</th><th></th></tr></thead>
+          <tbody id="ordBody"></tbody>
+        </table>
+      </div></div>
+    </div>
+
+    <!-- ===== COUPONS (Req 7) ===== -->
+    <div class="view" id="view-coupons">
+      <div class="toolbar">
+        <h3 style="font-size:18px">Promotional codes</h3>
+        <div class="sp"></div>
+        <button class="btn btn-gold btn-sm" id="newCoupon">+ New coupon</button>
+      </div>
+      <div class="cardgrid" id="couponGrid"></div>
+    </div>
+
+    <!-- ===== AFFILIATES (Req 8) ===== -->
+    <div class="view" id="view-affiliates">
+      <div class="toolbar">
+        <h3 style="font-size:18px">Affiliate program</h3>
+        <div class="sp"></div>
+        <button class="btn btn-ghost btn-sm" id="exportAff">Export report</button>
+        <button class="btn btn-gold btn-sm" id="newAff">+ Add affiliate</button>
+      </div>
+      <div class="tablewrap"><div class="scroll">
+        <table>
+          <thead><tr><th>Affiliate</th><th>Ref link</th><th>Status</th><th>Clicks</th><th>Sales</th><th>Revenue</th><th>Rate</th><th>Commission</th><th>Actions</th></tr></thead>
+          <tbody id="affBody"></tbody>
+        </table>
+      </div></div>
+    </div>
+
+    <!-- ===== GIVEAWAYS (Req 13) ===== -->
+    <div class="view" id="view-campaigns">
+      <div class="toolbar">
+        <h3 style="font-size:18px">Giveaway campaigns</h3>
+        <div class="sp"></div>
+        <button class="btn btn-gold btn-sm" id="newCamp">+ New giveaway</button>
+      </div>
+      <div class="cardgrid" id="campGrid"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- CUSTOMER DRAWER -->
+<div class="drawer-bg" id="drawerBg"></div>
+<div class="drawer" id="drawer">
+  <span class="x" id="drawerX">✕</span>
+  <div id="drawerBody"></div>
+</div>
+
+<!-- GENERIC MODAL -->
+<div class="modal-bg" id="modalBg"><div class="modal" id="modalBox"></div></div>
+
+<div class="toast" id="toast"></div>
+
+<script src="engine.js"></script>
+<script>
+(function(){
+  var TOKEN_KEY='nova_admin_token', VALID='nova-admin';
+  var $=function(s){return document.querySelector(s);};
+  var esc=function(s){return (s==null?'':String(s)).replace(/[&<>"]/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});};
+  var toast=function(m){var t=$('#toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},1800);};
+  var n=function(x){return (x||0).toLocaleString();};
+  function fmtDate(s){try{var d=new Date(s);return d.toLocaleDateString(undefined,{month:'short',day:'numeric'})+' '+d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});}catch(e){return s;}}
+  function fmtDay(s){try{return new Date(s).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'});}catch(e){return s;}}
+
+  /* ---- auth (client-side gate; production checks server-side, see README) ---- */
+  function login(t){ if(t!==VALID){var e=$('#loginErr');e.style.display='block';e.textContent='Token not accepted.';return;}
+    sessionStorage.setItem(TOKEN_KEY,t); $('#login').style.display='none'; $('#console').style.display='block'; boot(); }
+  $('#loginBtn').addEventListener('click',function(){login($('#token').value.trim());});
+  $('#token').addEventListener('keydown',function(e){if(e.key==='Enter')login($('#token').value.trim());});
+  $('#logoutBtn').addEventListener('click',function(){sessionStorage.removeItem(TOKEN_KEY);location.reload();});
+
+  /* ---- tabs ---- */
+  document.querySelectorAll('.tab').forEach(function(t){
+    t.addEventListener('click',function(){
+      document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active');});
+      document.querySelectorAll('.view').forEach(function(x){x.classList.remove('active');});
+      t.classList.add('active'); $('#view-'+t.dataset.view).classList.add('active');
+      renderAll();
+    });
+  });
+
+  /* ---- multiplier control (Req 4) ---- */
+  function paintMult(){
+    var cur=GV.settings().multiplier;
+    var opts=GV.MULTIPLIERS.map(function(m){return '<option value="'+m+'" '+(m===cur?'selected':'')+'>'+m+'×</option>';}).join('');
+    opts+='<option value="custom">Custom…</option>';
+    $('#multSelect').innerHTML=opts;
+  }
+  $('#multSelect').addEventListener('change',function(){
+    var v=$('#multSelect').value;
+    if(v==='custom'){ var c=prompt('Enter custom multiplier (e.g. 15):', GV.settings().multiplier); if(c===null){paintMult();return;} v=Math.max(1,parseInt(c,10)||1); }
+    GV.setMultiplier(v); paintMult(); toast('Multiplier set to '+GV.settings().multiplier+'×'); renderAll();
+  });
+
+  /* ================= CUSTOMERS ================= */
+  function renderKpis(){
+    var s=GV.stats();
+    $('#kpis').innerHTML=[
+      ['gold',n(s.totalEntries),'Total entries'],['gold','$'+n(Math.round(s.revenue)),'Revenue'],
+      ['',n(s.customers),'Customers'],['',n(s.members),'Members'],
+      ['',n(s.orders),'Orders'],['',n(s.affiliates),'Affiliates']
+    ].map(function(k){return '<div class="kpi '+k[0]+'"><div class="n">'+k[1]+'</div><div class="l">'+k[2]+'</div></div>';}).join('');
+  }
+  function renderCustomers(){
+    var q=$('#custSearch').value, f=$('#custFilter').value;
+    var rows=GV.searchCustomers(q).filter(function(c){
+      if(f==='active') return c.membershipStatus==='active';
+      if(f==='none') return c.membershipStatus!=='active';
+      return true;
+    });
+    var mb=function(c){
+      if(c.membershipStatus==='active')return '<span class="badge on">Active</span>';
+      if(c.membershipStatus==='cancelled')return '<span class="badge off">Cancelled</span>';
+      return '<span class="badge">None</span>';
+    };
+    $('#custBody').innerHTML = rows.length ? rows.map(function(c){
+      return '<tr class="rowbtn" data-id="'+c.id+'">'
+        +'<td><div class="player">'+esc(c.fullName)+'</div></td>'
+        +'<td><div>'+esc(c.email)+'</div><div class="sub">'+esc(c.phone||'')+'</div></td>'
+        +'<td class="num sub">'+esc(c.id)+'</td>'
+        +'<td>'+mb(c)+'</td>'
+        +'<td class="sub">'+esc(c.package||'—')+'</td>'
+        +'<td class="num" style="color:var(--gold);font-weight:700">'+n(c.totalEntries)+'</td>'
+        +'<td class="num">'+n(c.bonusEntries)+'</td>'
+        +'<td class="num">'+n(c.membershipEntries)+'</td>'
+        +'<td class="num">'+n(c.manualEntries)+'</td>'
+        +'<td class="num sub">'+n(c.lifetimeEntries)+'</td>'
+        +'</tr>';
+    }).join('') : '<tr><td colspan="10" style="padding:40px;text-align:center;color:var(--muted)">No customers match.</td></tr>';
+    $('#custBody').querySelectorAll('.rowbtn').forEach(function(r){
+      r.addEventListener('click',function(){ openDrawer(r.dataset.id); });
+    });
+  }
+  $('#custSearch').addEventListener('input',renderCustomers);
+  $('#custFilter').addEventListener('change',renderCustomers);
+  $('#exportCust').addEventListener('click',function(){
+    var csv=GV.exportCustomersCSV(); var a=document.createElement('a');
+    a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download='nova-customers.csv'; a.click(); URL.revokeObjectURL(a.href);
+    toast('Customer CSV exported');
+  });
+  $('#addCust').addEventListener('click',function(){
+    modal('<h2 style="margin-bottom:14px">New customer</h2>'
+      +'<div class="field"><label>Full name</label><input id="ncName"></div>'
+      +'<div class="field"><label>Email</label><input id="ncEmail"></div>'
+      +'<div class="field"><label>Phone</label><input id="ncPhone"></div>'
+      +'<button class="btn btn-gold btn-block" id="ncSave">Create</button>');
+    $('#ncSave').addEventListener('click',function(){
+      var name=$('#ncName').value.trim(); if(!name){toast('Name required');return;}
+      var c=GV.createCustomer({fullName:name,email:$('#ncEmail').value.trim(),phone:$('#ncPhone').value.trim()});
+      closeModal(); renderAll(); openDrawer(c.id); toast('Customer created');
+    });
+  });
+
+  /* ---- customer drawer + manual entry management (Req 6) ---- */
+  function openDrawer(id){
+    var c=GV.customers().find(function(x){return x.id===id;}); if(!c)return;
+    var mb = c.membershipStatus==='active'?'<span class="badge on">Member · Active</span>'
+      :(c.membershipStatus==='cancelled'?'<span class="badge off">Member · Cancelled</span>':'<span class="badge">Not a member</span>');
+    $('#drawerBody').innerHTML =
+      '<div class="eyebrow">Customer</div>'
+      +'<h2 style="margin:4px 0">'+esc(c.fullName)+'</h2>'
+      +'<div class="row" style="margin-bottom:6px">'+mb+' <span class="pill mono">'+esc(c.id)+'</span></div>'
+      +'<div class="sub">'+esc(c.email)+' · '+esc(c.phone||'—')+'</div>'
+      +'<div class="dgrid">'
+        +'<div class="dbucket" style="border-color:rgba(245,196,81,.4)"><div class="n" style="color:var(--gold)">'+n(c.totalEntries)+'</div><div class="l">Total entries</div></div>'
+        +'<div class="dbucket"><div class="n">'+n(c.bonusEntries)+'</div><div class="l">Bonus</div></div>'
+        +'<div class="dbucket"><div class="n">'+n(c.membershipEntries)+'</div><div class="l">Membership</div></div>'
+        +'<div class="dbucket"><div class="n">'+n(c.manualEntries)+'</div><div class="l">Manual</div></div>'
+      +'</div>'
+      +'<div class="adjust">'
+        +'<h4 style="font-size:14px;margin-bottom:10px">Adjust entries</h4>'
+        +'<div class="row2">'
+          +'<div class="field" style="margin:0"><label>Amount (±)</label><input id="adjAmt" type="number" placeholder="e.g. 100 or -50"></div>'
+          +'<div class="field" style="margin:0"><label>Bucket</label><select id="adjBucket">'
+            +'<option value="manual">Manual entries</option><option value="membership">Membership entries</option><option value="bonus">Bonus (permanent)</option>'
+          +'</select></div>'
+        +'</div>'
+        +'<div class="field" style="margin:10px 0"><label>Reason / note</label><input id="adjReason" placeholder="Promotion, compensation, correction…"></div>'
+        +'<div class="row"><button class="btn btn-gold btn-sm" data-preset="add">Add</button>'
+          +'<button class="btn btn-ghost btn-sm" data-preset="remove">Remove</button>'
+          +'<button class="btn btn-ghost btn-sm" id="noteOnly">Note only</button></div>'
+      +'</div>'
+      +'<h4 style="font-size:14px;margin:16px 0 8px">Notes</h4>'
+      +'<div id="dNotes">'+ (c.notes.length?c.notes.map(function(nt){return '<div class="noteitem">'+esc(nt.text)+(nt.delta?' <b class="'+(nt.delta>0?'':'')+'">('+(nt.delta>0?'+':'')+nt.delta+')</b>':'')+'<div class="m">'+fmtDate(nt.at)+' · '+esc(nt.by)+'</div></div>';}).join(''):'<p class="sub">No notes.</p>') +'</div>'
+      +'<h4 style="font-size:14px;margin:16px 0 8px">Entry ledger</h4>'
+      +'<div>'+ (c.ledger.length?c.ledger.slice(0,12).map(function(e){return '<div class="noteitem"><span class="num" style="color:'+(e.delta>=0?'var(--emerald)':'var(--danger)')+'">'+(e.delta>=0?'+':'')+n(e.delta)+'</span> '+esc(e.reason)+'<div class="m">'+fmtDate(e.at)+' · '+e.bucket+' · balance '+n(e.balance)+'</div></div>';}).join(''):'<p class="sub">No activity.</p>') +'</div>'
+      +'<h4 style="font-size:14px;margin:16px 0 8px">Orders</h4>'
+      +'<div>'+ (c.orders.length?c.orders.map(function(o){return '<div class="noteitem">'+esc(o.item)+' · <span class="num">$'+o.total.toFixed(2)+'</span> · '+n(o.entries)+' entries<div class="m">'+fmtDate(o.at)+(o.coupon?' · '+esc(o.coupon):'')+'</div></div>';}).join(''):'<p class="sub">No orders.</p>') +'</div>';
+
+    function doAdjust(sign){
+      var amt=parseInt($('#adjAmt').value,10); if(!amt){toast('Enter an amount');return;}
+      amt=Math.abs(amt)*sign;
+      var r=GV.manualAdjust(c.id,{amount:amt,bucket:$('#adjBucket').value,reason:$('#adjReason').value.trim()||'Manual adjustment'});
+      if(r.error){toast(r.error);return;}
+      toast((sign>0?'Added ':'Removed ')+Math.abs(amt)+' entries'); openDrawer(c.id); renderAll();
+    }
+    $('#drawerBody').querySelectorAll('[data-preset]').forEach(function(b){
+      b.addEventListener('click',function(){ doAdjust(b.dataset.preset==='add'?1:-1); });
+    });
+    $('#noteOnly').addEventListener('click',function(){
+      var txt=$('#adjReason').value.trim(); if(!txt){toast('Write a note first');return;}
+      GV.addNote(c.id,txt); toast('Note added'); openDrawer(c.id);
+    });
+    $('#drawer').classList.add('show'); $('#drawerBg').classList.add('show');
+  }
+  function closeDrawer(){$('#drawer').classList.remove('show');$('#drawerBg').classList.remove('show');}
+  $('#drawerX').addEventListener('click',closeDrawer);
+  $('#drawerBg').addEventListener('click',closeDrawer);
+
+  /* ================= ORDERS ================= */
+  function renderOrders(){
+    var q=($('#ordSearch').value||'').toLowerCase();
+    var all=[];
+    GV.customers().forEach(function(c){ c.orders.forEach(function(o){ all.push(Object.assign({cust:c},o)); }); });
+    all.sort(function(a,b){return new Date(b.at)-new Date(a.at);});
+    var rows=all.filter(function(o){ return !q || [o.cust.fullName,o.cust.email,o.item,o.coupon].some(function(v){return (v||'').toLowerCase().indexOf(q)!==-1;}); });
+    $('#ordTotal').textContent=rows.length+' orders · $'+n(Math.round(rows.reduce(function(a,o){return a+o.total;},0)))+' total';
+    $('#ordBody').innerHTML = rows.length ? rows.map(function(o){
+      return '<tr><td class="sub">'+fmtDate(o.at)+'</td>'
+        +'<td><div>'+esc(o.cust.fullName)+'</div><div class="sub">'+esc(o.cust.email)+'</div></td>'
+        +'<td>'+esc(o.item)+'</td><td class="sub">'+(o.coupon?esc(o.coupon):'—')+'</td>'
+        +'<td class="num">'+n(o.entries)+'</td><td class="num">$'+o.total.toFixed(2)+'</td>'
+        +'<td><span class="badge on">'+esc(o.status)+'</span></td>'
+        +'<td><button class="btn btn-ghost btn-sm" data-refund="'+o.id+'" data-c="'+o.cust.id+'">Refund</button></td></tr>';
+    }).join('') : '<tr><td colspan="8" style="padding:40px;text-align:center;color:var(--muted)">No orders.</td></tr>';
+    $('#ordBody').querySelectorAll('[data-refund]').forEach(function(b){
+      b.addEventListener('click',function(){
+        var c=GV.customers().find(function(x){return x.id===b.dataset.c;});
+        var o=c&&c.orders.find(function(x){return x.id===b.dataset.refund;});
+        if(o){o.status='refunded'; GV.save(); toast('Order refunded'); renderOrders();}
+      });
+    });
+  }
+  $('#ordSearch').addEventListener('input',renderOrders);
+
+  /* ================= COUPONS (Req 7) ================= */
+  function couponSummary(cp){
+    if(cp.kind==='multiplier')return cp.multiplier+'× entries';
+    if(cp.kind==='bonus')return '+'+cp.bonus+' bonus entries';
+    if(cp.kind==='percent')return cp.percent+'% off';
+    if(cp.kind==='amount')return '$'+cp.amount+' off';
+    if(cp.kind==='shipping')return 'Free shipping';
+    return cp.kind;
+  }
+  function renderCoupons(){
+    $('#couponGrid').innerHTML=GV.coupons().map(function(cp){
+      var expired=cp.expiry&&new Date(cp.expiry)<new Date();
+      var st=!cp.active?'<span class="badge off">Off</span>':(expired?'<span class="badge off">Expired</span>':'<span class="badge on">Active</span>');
+      return '<div class="minicard"><h4><span class="code">'+esc(cp.code)+'</span> '+st+'</h4>'
+        +'<div class="meta">'+couponSummary(cp)+'<br>'+esc(cp.note||'')+'</div>'
+        +'<div class="sub">Used '+cp.used+(cp.usageLimit?'/'+cp.usageLimit:'')+' · '
+          +(cp.perCustomer?'1/customer · ':'')+(cp.memberOnly?'members only · ':'')
+          +'expires '+fmtDay(cp.expiry)+'</div>'
+        +'<div class="acts"><button class="btn btn-ghost btn-sm" data-edit="'+cp.code+'">Edit</button>'
+          +'<button class="btn btn-ghost btn-sm" data-toggle="'+cp.code+'">'+(cp.active?'Disable':'Enable')+'</button>'
+          +'<button class="btn btn-ghost btn-sm" data-del="'+cp.code+'">Delete</button></div></div>';
+    }).join('');
+    $('#couponGrid').querySelectorAll('[data-edit]').forEach(function(b){b.addEventListener('click',function(){couponForm(b.dataset.edit);});});
+    $('#couponGrid').querySelectorAll('[data-toggle]').forEach(function(b){b.addEventListener('click',function(){
+      var cp=GV.coupons().find(function(x){return x.code===b.dataset.toggle;}); GV.upsertCoupon({code:cp.code,active:!cp.active}); renderCoupons();
+    });});
+    $('#couponGrid').querySelectorAll('[data-del]').forEach(function(b){b.addEventListener('click',function(){
+      if(confirm('Delete coupon '+b.dataset.del+'?')){GV.deleteCoupon(b.dataset.del);renderCoupons();toast('Coupon deleted');}
+    });});
+  }
+  $('#newCoupon').addEventListener('click',function(){couponForm(null);});
+  function couponForm(code){
+    var cp=code?GV.coupons().find(function(x){return x.code===code;}):{code:'',kind:'multiplier',multiplier:10,bonus:100,percent:10,amount:10,note:'',expiry:'',usageLimit:0,perCustomer:false,memberOnly:false};
+    var sel=function(k){return cp.kind===k?'selected':'';};
+    modal('<h2 style="margin-bottom:14px">'+(code?'Edit coupon':'New coupon')+'</h2>'
+      +'<div class="field"><label>Code</label><input id="cfCode" value="'+esc(cp.code)+'" '+(code?'disabled':'')+' style="text-transform:uppercase"></div>'
+      +'<div class="field"><label>Type</label><select id="cfKind">'
+        +'<option value="multiplier" '+sel('multiplier')+'>Entry multiplier</option>'
+        +'<option value="bonus" '+sel('bonus')+'>Fixed bonus entries</option>'
+        +'<option value="percent" '+sel('percent')+'>Percentage discount</option>'
+        +'<option value="amount" '+sel('amount')+'>Dollar discount</option>'
+        +'<option value="shipping" '+sel('shipping')+'>Free shipping</option></select></div>'
+      +'<div class="field" id="cfValWrap"><label id="cfValLbl">Value</label><input id="cfVal" type="number"></div>'
+      +'<div class="field"><label>Description</label><input id="cfNote" value="'+esc(cp.note)+'"></div>'
+      +'<div class="row2" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
+        +'<div class="field"><label>Expiry</label><input id="cfExp" type="date" value="'+(cp.expiry?cp.expiry.slice(0,10):'')+'"></div>'
+        +'<div class="field"><label>Usage limit (0=∞)</label><input id="cfLimit" type="number" value="'+(cp.usageLimit||0)+'"></div>'
+      +'</div>'
+      +'<div class="row" style="margin-bottom:14px"><label style="margin:0"><input type="checkbox" id="cfPer" style="width:auto" '+(cp.perCustomer?'checked':'')+'> One use per customer</label></div>'
+      +'<div class="row" style="margin-bottom:14px"><label style="margin:0"><input type="checkbox" id="cfMem" style="width:auto" '+(cp.memberOnly?'checked':'')+'> Members only</label></div>'
+      +'<button class="btn btn-gold btn-block" id="cfSave">Save coupon</button>');
+    function syncVal(){
+      var k=$('#cfKind').value; var lbl={multiplier:'Multiplier (×)',bonus:'Bonus entries',percent:'Percent %',amount:'Dollars $',shipping:'—'}[k];
+      $('#cfValLbl').textContent=lbl; $('#cfValWrap').style.display=k==='shipping'?'none':'block';
+      $('#cfVal').value = k==='multiplier'?cp.multiplier:k==='bonus'?cp.bonus:k==='percent'?cp.percent:cp.amount;
+    }
+    $('#cfKind').addEventListener('change',syncVal); syncVal();
+    $('#cfSave').addEventListener('click',function(){
+      var codeVal=(code||$('#cfCode').value.trim().toUpperCase()); if(!codeVal){toast('Code required');return;}
+      var k=$('#cfKind').value, val=parseFloat($('#cfVal').value)||0;
+      var o={code:codeVal,kind:k,note:$('#cfNote').value.trim(),
+        expiry:$('#cfExp').value?new Date($('#cfExp').value).toISOString():'',
+        usageLimit:parseInt($('#cfLimit').value,10)||0,perCustomer:$('#cfPer').checked,memberOnly:$('#cfMem').checked,active:true};
+      if(k==='multiplier')o.multiplier=val; else if(k==='bonus')o.bonus=val; else if(k==='percent')o.percent=val; else if(k==='amount')o.amount=val;
+      GV.upsertCoupon(o); closeModal(); renderCoupons(); toast('Coupon saved');
+    });
+  }
+
+  /* ================= AFFILIATES (Req 8) ================= */
+  function renderAffiliates(){
+    var base=location.origin+location.pathname.replace(/admin\.html$/,'index.html');
+    $('#affBody').innerHTML=GV.affiliates().map(function(a){
+      var stb=a.status==='approved'?'<span class="badge on">Approved</span>':a.status==='rejected'?'<span class="badge off">Rejected</span>':'<span class="badge warn">Pending</span>';
+      var acts=[];
+      if(a.status!=='approved')acts.push('<button class="btn btn-ghost btn-sm" data-app="'+a.id+'">Approve</button>');
+      if(a.status!=='rejected')acts.push('<button class="btn btn-ghost btn-sm" data-rej="'+a.id+'">Reject</button>');
+      acts.push('<button class="btn btn-ghost btn-sm" data-rate="'+a.id+'">Rate</button>');
+      acts.push('<button class="btn btn-ghost btn-sm" data-pay="'+a.id+'">Pay</button>');
+      var link=base+'?ref='+a.ref;
+      return '<tr><td><div class="player">'+esc(a.name)+'</div><div class="sub">'+esc(a.email)+'</div>'
+          + (a.payouts.length?'<div class="sub">Paid: '+a.payouts.map(function(p){return '$'+p.amount;}).join(', ')+'</div>':'')+'</td>'
+        +'<td class="sub" style="max-width:200px"><span class="mono">?ref='+esc(a.ref)+'</span><br><a href="'+esc(link)+'" target="_blank" style="color:var(--blue);font-size:11px">open ↗</a></td>'
+        +'<td>'+stb+'</td><td class="num">'+n(a.clicks)+'</td><td class="num">'+n(a.sales)+'</td>'
+        +'<td class="num">$'+n(Math.round(a.revenue))+'</td><td class="num">'+Math.round(a.rate*100)+'%</td>'
+        +'<td class="num" style="color:var(--gold)">$'+a.commission.toFixed(2)+'</td>'
+        +'<td><div class="row" style="gap:6px">'+acts.join('')+'</div></td></tr>';
+    }).join('')||'<tr><td colspan="9" style="padding:40px;text-align:center;color:var(--muted)">No affiliates.</td></tr>';
+    var b=$('#affBody');
+    b.querySelectorAll('[data-app]').forEach(function(x){x.addEventListener('click',function(){GV.setAffiliateStatus(x.dataset.app,'approved');renderAffiliates();toast('Affiliate approved');});});
+    b.querySelectorAll('[data-rej]').forEach(function(x){x.addEventListener('click',function(){GV.setAffiliateStatus(x.dataset.rej,'rejected');renderAffiliates();toast('Affiliate rejected');});});
+    b.querySelectorAll('[data-rate]').forEach(function(x){x.addEventListener('click',function(){var a=GV.affiliates().find(function(y){return y.id===x.dataset.rate;});var r=prompt('Commission rate % for '+a.name+':',Math.round(a.rate*100));if(r!==null){GV.setAffiliateRate(a.id,(parseFloat(r)||0)/100);renderAffiliates();toast('Rate updated');}});});
+    b.querySelectorAll('[data-pay]').forEach(function(x){x.addEventListener('click',function(){var a=GV.affiliates().find(function(y){return y.id===x.dataset.pay;});var amt=prompt('Payout amount for '+a.name+':',a.commission.toFixed(2));if(amt!==null){GV.payAffiliate(a.id,parseFloat(amt)||0);renderAffiliates();toast('Payout recorded');}});});
+  }
+  $('#newAff').addEventListener('click',function(){
+    modal('<h2 style="margin-bottom:14px">Add affiliate</h2>'
+      +'<div class="field"><label>Name</label><input id="afName"></div>'
+      +'<div class="field"><label>Email</label><input id="afEmail"></div>'
+      +'<div class="field"><label>Handle (for ref link)</label><input id="afHandle"></div>'
+      +'<button class="btn btn-gold btn-block" id="afSave">Register</button>');
+    $('#afSave').addEventListener('click',function(){
+      var name=$('#afName').value.trim(); if(!name){toast('Name required');return;}
+      GV.registerAffiliate({name:name,email:$('#afEmail').value.trim(),handle:$('#afHandle').value.trim()});
+      closeModal(); renderAffiliates(); toast('Affiliate added');
+    });
+  });
+  $('#exportAff').addEventListener('click',function(){
+    var cols=['name','email','ref','status','clicks','sales','revenue','rate','commission'];
+    var csv=[cols.join(',')].concat(GV.affiliates().map(function(a){return cols.map(function(k){return a[k];}).join(',');})).join('\n');
+    var el=document.createElement('a'); el.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); el.download='nova-affiliates.csv'; el.click(); URL.revokeObjectURL(el.href);
+    toast('Affiliate report exported');
+  });
+
+  /* ================= GIVEAWAYS (Req 13) ================= */
+  function renderCampaigns(){
+    $('#campGrid').innerHTML=GV.campaigns().map(function(c){
+      var st=c.status==='live'?'<span class="badge on">Live</span>':c.status==='ended'?'<span class="badge off">Ended</span>':'<span class="badge warn">Draft</span>';
+      return '<div class="minicard"><div class="campimg">'+(c.prizeImage?'<img src="'+esc(c.prizeImage)+'" style="width:100%;height:100%;object-fit:cover;border-radius:12px">':'🏆')+'</div>'
+        +'<h4>'+esc(c.name)+' '+st+'</h4>'
+        +'<div class="meta">'+esc(c.prize||'No prize set')+'</div>'
+        +'<div class="sub">'+c.multiplier+'× · ends '+fmtDay(c.endsAt)+'<br>'+esc(c.banner||'')+'</div>'
+        +'<div class="acts">'
+          +'<button class="btn btn-ghost btn-sm" data-cedit="'+c.id+'">Edit</button>'
+          +(c.status!=='live'?'<button class="btn btn-gold btn-sm" data-clive="'+c.id+'">Make live</button>':'<button class="btn btn-ghost btn-sm" data-cend="'+c.id+'">End</button>')
+          +'<button class="btn btn-ghost btn-sm" data-cdup="'+c.id+'">Duplicate</button>'
+        +'</div></div>';
+    }).join('');
+    var g=$('#campGrid');
+    g.querySelectorAll('[data-cedit]').forEach(function(b){b.addEventListener('click',function(){campForm(b.dataset.cedit);});});
+    g.querySelectorAll('[data-clive]').forEach(function(b){b.addEventListener('click',function(){GV.updateCampaign(b.dataset.clive,{status:'live'});paintMult();renderAll();toast('Campaign is live');});});
+    g.querySelectorAll('[data-cend]').forEach(function(b){b.addEventListener('click',function(){GV.endCampaign(b.dataset.cend);renderCampaigns();toast('Campaign ended');});});
+    g.querySelectorAll('[data-cdup]').forEach(function(b){b.addEventListener('click',function(){GV.duplicateCampaign(b.dataset.cdup);renderCampaigns();toast('Campaign duplicated');});});
+  }
+  $('#newCamp').addEventListener('click',function(){var c=GV.createCampaign({});campForm(c.id);renderCampaigns();});
+  function campForm(id){
+    var c=GV.campaigns().find(function(x){return x.id===id;});
+    modal('<h2 style="margin-bottom:14px">Edit giveaway</h2>'
+      +'<div class="field"><label>Name</label><input id="gfName" value="'+esc(c.name)+'"></div>'
+      +'<div class="field"><label>Prize</label><input id="gfPrize" value="'+esc(c.prize)+'" placeholder="e.g. Tesla Model 3 + $5,000"></div>'
+      +'<div class="field"><label>Prize image URL (optional)</label><input id="gfImg" value="'+esc(c.prizeImage||'')+'"></div>'
+      +'<div class="field"><label>Promo banner</label><input id="gfBanner" value="'+esc(c.banner||'')+'"></div>'
+      +'<div class="row2" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
+        +'<div class="field"><label>Ends</label><input id="gfEnds" type="date" value="'+(c.endsAt?c.endsAt.slice(0,10):'')+'"></div>'
+        +'<div class="field"><label>Multiplier</label><input id="gfMult" type="number" value="'+c.multiplier+'"></div>'
+      +'</div>'
+      +'<button class="btn btn-gold btn-block" id="gfSave">Save giveaway</button>');
+    $('#gfSave').addEventListener('click',function(){
+      GV.updateCampaign(id,{name:$('#gfName').value.trim(),prize:$('#gfPrize').value.trim(),prizeImage:$('#gfImg').value.trim(),
+        banner:$('#gfBanner').value.trim(),endsAt:$('#gfEnds').value?new Date($('#gfEnds').value).toISOString():c.endsAt,
+        multiplier:parseInt($('#gfMult').value,10)||1});
+      closeModal(); renderCampaigns(); toast('Giveaway saved');
+    });
+  }
+
+  /* ---- modal helpers ---- */
+  function modal(html){$('#modalBox').innerHTML=html+'<button class="btn btn-ghost btn-block" id="__mClose" style="margin-top:10px">Close</button>';$('#modalBg').classList.add('show');$('#__mClose').addEventListener('click',closeModal);}
+  function closeModal(){$('#modalBg').classList.remove('show');}
+  $('#modalBg').addEventListener('click',function(e){if(e.target===$('#modalBg'))closeModal();});
+
+  /* ---- render router ---- */
+  function renderAll(){
+    renderKpis(); renderCustomers(); renderOrders(); renderCoupons(); renderAffiliates(); renderCampaigns();
+  }
+  function boot(){ paintMult(); renderAll(); }
+
+  if(sessionStorage.getItem(TOKEN_KEY)===VALID){ $('#login').style.display='none'; $('#console').style.display='block'; boot(); }
+})();
+</script>
+</body>
+</html>
