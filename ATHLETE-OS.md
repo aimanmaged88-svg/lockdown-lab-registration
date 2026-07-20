@@ -106,6 +106,23 @@ audience. Lives in `athlete-os/` and deploys with the rest of the static site
    unless a multi-club customer pulls it forward.
 9. Notifications + global search.
 
+## V2.1 — test-ready
+
+- **First-run tutorial** in the athlete app: a 6-step welcome walkthrough on
+  first open (localStorage `aos_tutorial_done`), replayable via the header `?`.
+- **Custom sport flow**: onboarding has a **＋ My sport** tile. Typing a sport
+  recognises it against a built-in dictionary (packs + synonyms + ~90 real
+  sports incl. padel, pickleball, etc.). Recognised → accepted instantly with a
+  "Found it ✓" confirm; unknown → accepted on a general plan **and queued to the
+  coach for approval** (`aos_sport_requests`, `sport_label` column). The coach
+  dashboard shows a **Sport requests** panel to approve/reject (`sport_resolve`).
+  *Note: recognition is a built-in list, not a live web search — wiring an
+  edge-function LLM/web lookup is a small future add.*
+- **Seed data** (in the live DB): team **Lockdown Ballers** with 10 basketball
+  athletes (PIN `1234`) — varied streaks, XP, ratings, an injury, check-in
+  history, peer ratings and messages — plus **Aiman** (PIN `0088`,
+  aimanmaged88@gmail.com) on the team. Coach code `OS-COACH`.
+
 ## Backend (Supabase project `lockdown-lab`, ref `ymuwuhvqqftgpxwhzoub`)
 
 - **Edge function `aos-api`** (source: `supabase/functions/aos-api/index.ts`)

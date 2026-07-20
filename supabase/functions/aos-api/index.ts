@@ -69,7 +69,7 @@ async function peerAgg(aid: string) {
 
 function profile(p: any) {
   return {
-    id: p.id, name: p.name, sport: p.sport, age: p.age, level: p.level, position: p.position,
+    id: p.id, name: p.name, sport: p.sport, sport_label: p.sport_label || null, age: p.age, level: p.level, position: p.position,
     goals: p.goals || {}, injuries: p.injuries, train_freq: p.train_freq, comp_schedule: p.comp_schedule,
     equipment: p.equipment || [], xp: p.xp, streak: p.streak, last_checkin: p.last_checkin,
     prefs: p.prefs || {}, created_at: p.created_at, team_id: p.team_id || null,
@@ -177,6 +177,7 @@ Deno.serve(async (req) => {
       const dup = await db(`aos_athletes?name_key=eq.${encodeURIComponent(key)}&select=id`);
       if (dup.length) return J({ error: "That name is taken — log in instead, or add a last initial." }, 409);
       const sport = SPORTS.includes(String(b.sport || "").toLowerCase()) ? String(b.sport).toLowerCase() : "general";
+      const sportLabel = priv(b.sport_label, 40) || null;
       const goals = {
         tags: Array.isArray(b.goal_tags) ? b.goal_tags.slice(0, 6).map((g: unknown) => priv(g, 40)) : [],
         note: priv(b.goal_note, 500),
@@ -184,7 +185,7 @@ Deno.serve(async (req) => {
       const rows = await db("aos_athletes", { method: "POST", headers: { Prefer: "return=representation" },
         body: JSON.stringify({
           name, name_key: key, pin_hash: await pinHash(key, pin),
-          sport, age: b.age ? num(b.age, 5, 99, 0) || null : null,
+          sport, sport_label: sportLabel, age: b.age ? num(b.age, 5, 99, 0) || null : null,
           level: priv(b.level, 40) || null, position: priv(b.position, 40) || null,
           goals, injuries: priv(b.injuries, 300) || null,
           train_freq: b.train_freq ? num(b.train_freq, 1, 7, 3) : null,
@@ -193,6 +194,9 @@ Deno.serve(async (req) => {
           location: priv(b.location, 80) || null, contact: priv(b.contact, 80) || null,
         }) });
       const p = rows[0];
+      if (b.sport_pending && sportLabel) {
+        await db("aos_sport_requests", { method: "POST", body: JSON.stringify({ athlete_id: p.id, athlete_name: name, sport: sportLabel }) });
+      }
       return J({ ok: true, aid: p.id, state: await athleteState(p) });
     }
 
@@ -315,14 +319,15 @@ Deno.serve(async (req) => {
       }
     }
 
-    if (["roster", "cdetail", "note_add", "status_set", "cmsg", "rate", "team_create", "team_assign"].includes(a)) {
+    if (["roster", "cdetail", "note_add", "status_set", "cmsg", "rate", "team_create", "team_assign", "sport_resolve"].includes(a)) {
       if (String(b.code || "").toUpperCase() !== COACH_CODE) return J({ error: "bad coach code" }, 401);
 
       if (a === "roster") {
-        const [athletes, teams, peers] = await Promise.all([
-          db("aos_athletes?select=id,name,sport,age,level,position,goals,injuries,train_freq,comp_schedule,equipment,location,contact,xp,streak,last_checkin,status,created_at,team_id,coach_rating,coach_rating_at&order=created_at.asc"),
+        const [athletes, teams, peers, sportReqs] = await Promise.all([
+          db("aos_athletes?select=id,name,sport,sport_label,age,level,position,goals,injuries,train_freq,comp_schedule,equipment,location,contact,xp,streak,last_checkin,status,created_at,team_id,coach_rating,coach_rating_at&order=created_at.asc"),
           teamsList(),
           db("aos_peer_ratings?select=ratee_id,score"),
+          db("aos_sport_requests?status=eq.pending&select=id,athlete_name,sport,created_at&order=created_at.desc"),
         ]);
         const pmap: Record<string, number[]> = {};
         (peers || []).forEach((r: any) => { (pmap[r.ratee_id] = pmap[r.ratee_id] || []).push(r.score); });
@@ -331,7 +336,12 @@ Deno.serve(async (req) => {
           x.peer_avg = arr && arr.length ? Math.round(arr.reduce((s: number, v: number) => s + v, 0) / arr.length * 10) / 10 : null;
           x.peer_count = arr ? arr.length : 0;
         });
-        return J({ ok: true, today: sydToday(), athletes, teams: teams || [] });
+        return J({ ok: true, today: sydToday(), athletes, teams: teams || [], sport_requests: sportReqs || [] });
+      }
+      if (a === "sport_resolve") {
+        const status = ["approved", "rejected"].includes(String(b.status)) ? String(b.status) : "approved";
+        await db(`aos_sport_requests?id=eq.${b.req_id}`, { method: "PATCH", body: JSON.stringify({ status, resolved_at: new Date().toISOString() }) });
+        return J({ ok: true });
       }
       if (a === "cdetail") {
         const p = await getAthlete(b.aid);
