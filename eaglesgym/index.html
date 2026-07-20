@@ -2,231 +2,190 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Eagles Gym · Class Timetable — Punchbowl, Sydney</title>
-<meta name="description" content="Eagles Gym weekly class timetable — Boxing, Muay Thai, BJJ, Wrestling & MMA and Kids classes in Punchbowl, Sydney. Live and always up to date.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<title>Eagles Gym · Timetable</title>
+<meta name="description" content="Eagles Gym weekly class timetable — Punchbowl, Sydney.">
+<meta name="theme-color" content="#14161a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Eagles Gym">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --red:#c8102e; --red-d:#a20b24;
-    --ink:#14161a; --bg:#ffffff; --bg2:#f5f6f8; --bg3:#eceef1;
-    --line:#e4e6ea; --muted:#6b7280;
-    --max:1080px;
+    --red:#ff0000; --red-d:#d40000;
+    --ink:#14161a; --ink2:#1e2127;
+    --bg:#f4f5f7; --card:#ffffff; --line:#e7e9ee; --muted:#767b85;
+    --shell:460px;
+    --safe-t:env(safe-area-inset-top,0px);
+    --safe-b:env(safe-area-inset-bottom,0px);
   }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
-  body{background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased}
-  a{color:inherit;text-decoration:none}
-  h1,h2,h3,.dsp{font-family:'Oswald',sans-serif;text-transform:uppercase;font-weight:700;letter-spacing:.02em;line-height:1.02}
-  .wrap{max-width:var(--max);margin:0 auto;padding:0 20px}
-  .muted{color:var(--muted)}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{background:#0c0d10;color:var(--ink);font-family:'Inter',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased}
+  h1,h2,h3,.dsp{font-family:'Oswald',sans-serif;text-transform:uppercase;font-weight:700;letter-spacing:.02em;line-height:1}
+  button{font-family:inherit;cursor:pointer}
+  img{display:block;max-width:100%}
 
-  /* NAV */
-  header.nav{position:sticky;top:0;z-index:40;background:#fff;border-bottom:1px solid var(--line)}
-  .nav-in{display:flex;align-items:center;justify-content:space-between;height:64px}
-  .brand{display:flex;align-items:center;gap:9px;font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase;font-size:1.35rem;letter-spacing:.03em}
-  .brand .m{font-size:1.5rem}
-  .brand em{font-style:normal;color:var(--red)}
-  .nav-right{display:flex;align-items:center;gap:14px}
-  .nav-right .loc{font-family:'Oswald',sans-serif;text-transform:uppercase;font-size:.72rem;letter-spacing:.14em;color:var(--muted)}
-  .btn{display:inline-flex;align-items:center;gap:7px;font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.06em;font-weight:600;font-size:.82rem;padding:9px 16px;border-radius:6px;cursor:pointer;border:1px solid transparent;transition:.15s;background:none}
-  .btn-red{background:var(--red);color:#fff}
-  .btn-red:hover{background:var(--red-d)}
-  .btn-dark{background:var(--ink);color:#fff}
-  .btn-dark:hover{opacity:.86}
-  .btn-ghost{border-color:var(--line);color:var(--ink)}
-  .btn-ghost:hover{border-color:var(--red);color:var(--red)}
-  .btn-sm{padding:7px 12px;font-size:.74rem}
+  /* Phone shell — full screen on mobile, centered card on desktop */
+  .app{display:flex;flex-direction:column;height:100dvh;max-width:var(--shell);margin:0 auto;background:var(--bg);position:relative;overflow:hidden}
+  @media(min-width:520px){
+    body{display:flex;align-items:center;justify-content:center;padding:20px}
+    .app{height:min(880px,94dvh);border-radius:30px;box-shadow:0 30px 90px rgba(0,0,0,.5);border:1px solid #23262d}
+  }
 
-  /* HERO */
-  .hero{background:var(--ink);color:#fff;position:relative;overflow:hidden}
-  .hero::before{content:"";position:absolute;top:0;left:0;height:100%;width:6px;background:var(--red)}
-  .hero::after{content:"🦅";position:absolute;right:-10px;bottom:-30px;font-size:12rem;opacity:.05}
-  .hero-in{padding:52px 0 46px}
-  .hero .tag{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.32em;font-size:.72rem;color:var(--red);font-weight:600}
-  .hero h1{font-size:clamp(2.6rem,7vw,4.4rem);margin:10px 0 14px}
-  .hero .sub{display:flex;gap:26px;flex-wrap:wrap;color:#cbd0d8;font-size:.94rem}
-  .hero .sub b{color:#fff;font-weight:600}
-  .hero .sub span{display:flex;align-items:center;gap:8px}
+  /* App bar */
+  .bar{background:var(--ink);color:#fff;padding:calc(var(--safe-t) + 12px) 16px 12px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+  .bar .logo{height:26px;width:auto}
+  .bar .sp{margin-left:auto;display:flex;gap:8px;align-items:center}
+  .icobtn{width:38px;height:38px;border-radius:11px;border:1px solid #2b2f37;background:#1b1e24;color:#fff;display:flex;align-items:center;justify-content:center;font-size:1.05rem}
+  .icobtn:active{background:#23272f}
 
-  /* CONTROLS */
-  .bar{background:var(--bg2);border-bottom:1px solid var(--line);position:sticky;top:64px;z-index:30}
-  .bar-in{display:flex;align-items:center;gap:10px;padding:14px 0;flex-wrap:wrap}
-  .days{display:flex;gap:6px;flex-wrap:wrap}
-  .day{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.05em;font-weight:600;font-size:.82rem;padding:9px 14px;border-radius:6px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;transition:.15s}
-  .day:hover{border-color:#c9ccd2}
-  .day.active{background:var(--red);color:#fff;border-color:var(--red)}
-  .day small{display:block;font-size:.58rem;letter-spacing:.1em;opacity:.75;font-weight:500}
-  .updated{margin-left:auto;font-size:.74rem;color:var(--muted);font-family:'Oswald',sans-serif;letter-spacing:.06em;text-transform:uppercase}
+  /* Sub header */
+  .sub{background:var(--ink);color:#fff;padding:0 16px 16px;flex-shrink:0}
+  .sub .t{font-family:'Oswald';text-transform:uppercase;letter-spacing:.02em;font-size:1.55rem;line-height:1}
+  .sub .m{color:#aab0ba;font-size:.8rem;margin-top:5px;display:flex;gap:14px;flex-wrap:wrap}
+  .sub .m b{color:#fff;font-weight:600}
 
-  /* TIMETABLE */
-  main{padding:30px 0 60px;min-height:40vh}
-  .day-title{font-size:1.5rem;margin-bottom:16px;display:flex;align-items:baseline;gap:12px}
-  .day-title span{font-family:'Inter';font-size:.85rem;color:var(--muted);text-transform:none;letter-spacing:0;font-weight:500}
-  .classes{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .cls{display:grid;grid-template-columns:96px 1fr;gap:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#fff;transition:.15s}
-  .cls:hover{border-color:#d3d6dc;box-shadow:0 6px 18px rgba(20,22,26,.06)}
-  .cls .tm{background:var(--ink);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:14px 6px;text-align:center}
-  .cls .tm b{font-family:'Oswald',sans-serif;font-size:1.02rem;letter-spacing:.02em;line-height:1.1}
-  .cls .bd{padding:13px 16px;display:flex;flex-direction:column;gap:4px;justify-content:center}
-  .cls .nm{font-family:'Oswald',sans-serif;text-transform:uppercase;font-weight:600;font-size:1.06rem;letter-spacing:.01em}
-  .cls .meta{font-size:.82rem;color:var(--muted);display:flex;gap:12px;flex-wrap:wrap;align-items:center}
-  .cls .coach{color:var(--ink);font-weight:500}
-  .tagl{font-size:.64rem;font-family:'Oswald',sans-serif;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:20px;border:1px solid var(--line);color:var(--muted)}
-  .empty{grid-column:1/-1;text-align:center;color:var(--muted);padding:46px;font-family:'Oswald',sans-serif;letter-spacing:.06em;text-transform:uppercase;border:1px dashed var(--line);border-radius:10px}
+  /* Day strip */
+  .days{display:flex;gap:8px;overflow-x:auto;padding:12px 16px;background:var(--ink);flex-shrink:0;scrollbar-width:none;border-bottom:3px solid var(--red)}
+  .days::-webkit-scrollbar{display:none}
+  .day{flex:0 0 auto;min-width:54px;text-align:center;padding:9px 6px;border-radius:13px;background:#1c1f26;color:#cdd2da;border:1px solid transparent;transition:.12s}
+  .day .d{font-family:'Oswald';font-weight:600;font-size:.92rem;text-transform:uppercase;letter-spacing:.02em}
+  .day .n{font-size:.6rem;letter-spacing:.1em;color:#7b818c;text-transform:uppercase;margin-top:2px;font-weight:600}
+  .day.active{background:var(--red);color:#fff}
+  .day.active .n{color:#ffd6d6}
 
-  /* FOOTER */
-  footer{border-top:1px solid var(--line);background:var(--bg2);padding:30px 0}
-  .foot{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
-  .foot .info{font-size:.84rem;color:var(--muted)}
-  .foot .info b{color:var(--ink)}
+  /* List */
+  .scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px calc(20px + var(--safe-b))}
+  .daylabel{font-family:'Oswald';text-transform:uppercase;font-size:.78rem;letter-spacing:.12em;color:var(--muted);margin:2px 4px 12px;display:flex;justify-content:space-between;align-items:center}
+  .daylabel .cnt{color:var(--red)}
+  .cls{display:flex;align-items:stretch;gap:0;background:var(--card);border:1px solid var(--line);border-radius:15px;overflow:hidden;margin-bottom:10px;box-shadow:0 1px 2px rgba(20,22,26,.04)}
+  .cls .tm{flex:0 0 76px;background:var(--ink);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 4px;text-align:center}
+  .cls .tm b{font-family:'Oswald';font-size:.96rem;line-height:1.05}
+  .cls .tm .ampm{display:none}
+  .cls .bd{padding:12px 14px;display:flex;flex-direction:column;justify-content:center;gap:5px;min-width:0}
+  .cls .nm{font-family:'Oswald';text-transform:uppercase;font-weight:600;font-size:1.05rem;letter-spacing:.01em}
+  .cls .meta{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:.82rem;color:var(--muted)}
+  .cls .coach{color:var(--ink);font-weight:600;display:flex;align-items:center;gap:5px}
+  .lvl{font-size:.62rem;font-family:'Oswald';letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:20px;background:#fff0f0;color:var(--red);border:1px solid #ffdada}
+  .empty{text-align:center;color:var(--muted);padding:50px 20px;font-family:'Oswald';letter-spacing:.06em;text-transform:uppercase}
+  .empty .big{font-size:2.4rem;margin-bottom:8px}
+  .foot{ text-align:center;color:var(--muted);font-size:.72rem;padding:14px 10px 4px;line-height:1.6}
+  .foot b{color:var(--ink)}
 
-  /* MODAL */
-  .ov{position:fixed;inset:0;background:rgba(15,17,21,.55);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:60;padding:20px}
+  /* Bottom sheet / modal */
+  .ov{position:fixed;inset:0;background:rgba(8,9,12,.6);backdrop-filter:blur(3px);display:none;align-items:flex-end;justify-content:center;z-index:70}
+  @media(min-width:520px){.ov{align-items:center}}
   .ov.open{display:flex}
-  .modal{background:#fff;border-radius:14px;width:100%;max-width:380px;padding:26px;box-shadow:0 30px 80px rgba(0,0,0,.35)}
-  .modal h3{font-size:1.35rem}
-  .modal p.s{color:var(--muted);font-size:.86rem;margin:4px 0 18px}
-  .fld{margin-bottom:13px}
-  .fld label{display:block;font-family:'Oswald',sans-serif;text-transform:uppercase;font-size:.7rem;letter-spacing:.1em;color:var(--muted);margin-bottom:5px}
-  .fld input,.fld select{width:100%;border:1px solid var(--line);border-radius:8px;padding:10px 12px;font-family:inherit;font-size:.95rem;color:var(--ink);background:#fff}
+  .sheet{background:#fff;width:100%;max-width:var(--shell);border-radius:22px 22px 0 0;padding:22px 20px calc(24px + var(--safe-b));box-shadow:0 -10px 40px rgba(0,0,0,.3);animation:up .22s ease}
+  @media(min-width:520px){.sheet{border-radius:20px;max-width:400px;animation:none}}
+  @keyframes up{from{transform:translateY(30px);opacity:.6}to{transform:none;opacity:1}}
+  .grab{width:40px;height:4px;border-radius:4px;background:#dcdfe4;margin:0 auto 16px}
+  .sheet h3{font-size:1.4rem}
+  .sheet .s{color:var(--muted);font-size:.86rem;margin:3px 0 16px}
+  .fld{margin-bottom:12px}
+  .fld label{display:block;font-family:'Oswald';text-transform:uppercase;font-size:.68rem;letter-spacing:.1em;color:var(--muted);margin-bottom:5px}
+  .fld input,.fld select{width:100%;border:1px solid var(--line);border-radius:11px;padding:12px 13px;font-family:inherit;font-size:1rem;color:var(--ink);background:#fff}
   .fld input:focus,.fld select:focus{outline:none;border-color:var(--red)}
-  .msg{font-size:.82rem;margin-top:4px;min-height:18px}
-  .msg.err{color:var(--red)}
-  .msg.ok{color:#0a7d3c}
-  .modal .row{display:flex;gap:10px;margin-top:8px}
-  .modal .row .btn{flex:1;justify-content:center}
+  .msg{font-size:.82rem;min-height:18px;margin-top:2px}
+  .msg.err{color:var(--red)} .msg.ok{color:#0a7d3c}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:'Oswald';text-transform:uppercase;letter-spacing:.05em;font-weight:600;font-size:.9rem;padding:13px 16px;border-radius:12px;border:1px solid transparent;background:none;width:100%}
+  .btn-red{background:var(--red);color:#fff} .btn-red:active{background:var(--red-d)}
+  .btn-ink{background:var(--ink);color:#fff}
+  .btn-ghost{border-color:var(--line);color:var(--ink)}
+  .rowbtns{display:flex;gap:10px;margin-top:8px}
 
-  /* ADMIN EDITOR */
-  .admin-bar{background:var(--ink);color:#fff;position:sticky;top:64px;z-index:30;border-bottom:3px solid var(--red)}
-  .admin-bar-in{display:flex;align-items:center;gap:12px;padding:12px 0;flex-wrap:wrap}
-  .admin-bar .lbl{font-family:'Oswald',sans-serif;text-transform:uppercase;letter-spacing:.1em;font-size:.82rem;font-weight:600}
-  .admin-bar .lbl .dot{color:var(--red)}
-  .admin-bar .sp{margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-  .admin-bar .st{font-size:.76rem;color:#b9bec7;font-family:'Oswald';letter-spacing:.05em;text-transform:uppercase}
-  .edit-wrap{padding:22px 0 70px}
-  .edit-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;flex-wrap:wrap}
-  .edit-head h2{font-size:1.5rem}
-  table.grid{width:100%;border-collapse:separate;border-spacing:0;font-size:.9rem}
-  table.grid th{font-family:'Oswald',sans-serif;text-transform:uppercase;font-size:.68rem;letter-spacing:.09em;color:var(--muted);text-align:left;padding:6px 8px}
-  table.grid td{padding:4px 6px;vertical-align:middle}
-  table.grid input,table.grid select{width:100%;border:1px solid var(--line);border-radius:7px;padding:8px 9px;font-family:inherit;font-size:.88rem;background:#fff;color:var(--ink)}
-  table.grid input:focus,table.grid select:focus{outline:none;border-color:var(--red)}
-  .row-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
-  .del{border:1px solid var(--line);background:#fff;color:var(--red);border-radius:7px;width:34px;height:34px;cursor:pointer;font-size:1rem;line-height:1}
-  .del:hover{background:var(--red);color:#fff;border-color:var(--red)}
-  .col-day{width:110px}.col-time{width:110px}.col-lvl{width:130px}.col-del{width:44px}
-  .hint{font-size:.8rem;color:var(--muted);margin-top:10px}
-
-  @media(max-width:760px){
-    .classes{grid-template-columns:1fr}
-    .bar,.admin-bar{position:static}
-    .nav-right .loc{display:none}
-  }
+  /* Admin editor (full-screen over app) */
+  .editor{position:absolute;inset:0;background:var(--bg);display:none;flex-direction:column;z-index:60}
+  .editor.open{display:flex}
+  .ebar{background:var(--ink);color:#fff;padding:calc(var(--safe-t) + 12px) 14px 12px;display:flex;align-items:center;gap:10px;flex-shrink:0;border-bottom:3px solid var(--red)}
+  .ebar .tt{font-family:'Oswald';text-transform:uppercase;letter-spacing:.04em;font-size:1.05rem}
+  .ebar .tt small{display:block;font-family:'Inter';text-transform:none;letter-spacing:0;color:#ff8a8a;font-size:.66rem;font-weight:600}
+  .ebar .x{margin-left:auto}
+  .escroll{flex:1;overflow-y:auto;padding:14px 14px 12px}
+  .ec{background:#fff;border:1px solid var(--line);border-radius:15px;padding:13px;margin-bottom:11px}
+  .ec .r{display:flex;gap:8px;margin-bottom:8px}
+  .ec .r:last-child{margin-bottom:0}
+  .ec .f{flex:1;min-width:0}
+  .ec .f.small{flex:0 0 40%}
+  .ec label{font-family:'Oswald';text-transform:uppercase;font-size:.6rem;letter-spacing:.08em;color:var(--muted);display:block;margin-bottom:3px}
+  .ec input,.ec select{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px 10px;font-family:inherit;font-size:.92rem;background:#fff;color:var(--ink)}
+  .ec input:focus,.ec select:focus{outline:none;border-color:var(--red)}
+  .ec .del{margin-top:2px;background:none;border:none;color:var(--red);font-family:'Oswald';text-transform:uppercase;font-size:.68rem;letter-spacing:.06em;padding:4px 0}
+  .addbtn{width:100%;border:1.5px dashed #cfd3da;background:#fff;color:var(--ink);border-radius:13px;padding:13px;font-family:'Oswald';text-transform:uppercase;letter-spacing:.05em;font-size:.86rem;margin-bottom:8px}
+  .addbtn:active{border-color:var(--red);color:var(--red)}
+  .ebottom{flex-shrink:0;padding:12px 14px calc(14px + var(--safe-b));background:#fff;border-top:1px solid var(--line);display:flex;gap:10px;align-items:center}
+  .ebottom .st{font-size:.74rem;color:var(--muted);font-family:'Oswald';text-transform:uppercase;letter-spacing:.04em;flex:1}
+  .ebottom .btn{width:auto;flex:0 0 auto;padding:12px 18px}
 </style>
 </head>
 <body>
+<div class="app">
 
-<header class="nav">
-  <div class="wrap nav-in">
-    <a href="#" class="brand"><span class="m">🦅</span>EAGLES <em>GYM</em></a>
-    <div class="nav-right">
-      <span class="loc">Punchbowl · Sydney</span>
-      <button class="btn btn-ghost btn-sm" id="adminTop">Admin</button>
-    </div>
-  </div>
-</header>
-
-<!-- ADMIN TOOLBAR (hidden until logged in) -->
-<div class="admin-bar" id="adminBar" style="display:none">
-  <div class="wrap admin-bar-in">
-    <span class="lbl"><span class="dot">●</span> Admin mode — editing timetable</span>
-    <div class="sp">
-      <span class="st" id="adminSt"></span>
-      <button class="btn btn-ghost btn-sm" id="btnAdd" style="color:#fff;border-color:#3a3d44">+ Add class</button>
-      <button class="btn btn-red btn-sm" id="btnSave">Save &amp; Publish</button>
-      <button class="btn btn-ghost btn-sm" id="btnCancel" style="color:#fff;border-color:#3a3d44">Cancel</button>
-      <button class="btn btn-ghost btn-sm" id="btnLogout" style="color:#fff;border-color:#3a3d44">Log out</button>
-    </div>
-  </div>
-</div>
-
-<!-- PUBLIC VIEW -->
-<div id="publicView">
-  <section class="hero">
-    <div class="wrap hero-in">
-      <p class="tag">Unleash Your Potential</p>
-      <h1>Class Timetable</h1>
-      <div class="sub">
-        <span>📍 <b>268 The Boulevarde, Punchbowl NSW</b></span>
-        <span>🕕 <b>Open daily 5:30am – 11:00pm</b></span>
-        <span>📞 <b>0499 922 334</b></span>
-      </div>
-    </div>
-  </section>
-
+  <!-- App bar -->
   <div class="bar">
-    <div class="wrap bar-in">
-      <div class="days" id="days"></div>
-      <span class="updated" id="updated"></span>
+    <img class="logo" src="logo-wordmark.png" alt="Eagles Gym">
+    <div class="sp">
+      <button class="icobtn" id="adminBtn" aria-label="Admin" title="Admin">🔒</button>
+    </div>
+  </div>
+  <div class="sub">
+    <div class="t">Class Timetable</div>
+    <div class="m">
+      <span>📍 <b>Punchbowl, Sydney</b></span>
+      <span>🕕 <b>5:30am–11pm daily</b></span>
     </div>
   </div>
 
-  <main>
-    <div class="wrap">
-      <div class="day-title" id="dayTitle"></div>
-      <div class="classes" id="classes"></div>
+  <!-- Day strip -->
+  <div class="days" id="days"></div>
+
+  <!-- Class list -->
+  <div class="scroll">
+    <div class="daylabel"><span id="dayName"></span><span class="cnt" id="dayCount"></span></div>
+    <div id="list"></div>
+    <div class="foot">
+      <b>Eagles Gym</b> · 268 The Boulevarde, Punchbowl NSW 2196<br>
+      📞 0499 922 334 · <span id="updated"></span>
     </div>
-  </main>
+  </div>
+
+  <!-- Admin editor -->
+  <div class="editor" id="editor">
+    <div class="ebar">
+      <div class="tt">Edit Timetable<small>Changes go live instantly</small></div>
+      <button class="icobtn x" id="edClose" aria-label="Close">✕</button>
+    </div>
+    <div class="escroll">
+      <button class="addbtn" id="edAdd">＋ Add a class</button>
+      <div id="edList"></div>
+      <button class="addbtn" id="edAdd2">＋ Add a class</button>
+    </div>
+    <div class="ebottom">
+      <span class="st" id="edSt"></span>
+      <button class="btn btn-ghost" id="edCancel" style="width:auto">Cancel</button>
+      <button class="btn btn-red" id="edSave" style="width:auto">Save &amp; Publish</button>
+    </div>
+  </div>
+
 </div>
 
-<!-- ADMIN EDIT VIEW -->
-<div id="editView" style="display:none">
-  <div class="edit-wrap">
-    <div class="wrap">
-      <div class="edit-head">
-        <h2>Edit Timetable</h2>
-        <span class="hint">Change the coach, time, class or day for any session. Nothing is set in stone — hit <b>Save &amp; Publish</b> and it goes live instantly.</span>
-      </div>
-      <div class="row-wrap">
-        <table class="grid">
-          <thead>
-            <tr>
-              <th class="col-day">Day</th>
-              <th class="col-time">Time</th>
-              <th>Class</th>
-              <th>Coach</th>
-              <th class="col-lvl">Level</th>
-              <th class="col-del"></th>
-            </tr>
-          </thead>
-          <tbody id="editRows"></tbody>
-        </table>
-      </div>
-      <p class="hint">Tip: use times like <b>6:00am</b>, <b>5:30pm</b> so the day sorts correctly. Leave Level blank if it doesn't apply.</p>
-    </div>
-  </div>
-</div>
-
-<footer>
-  <div class="wrap foot">
-    <div class="info">© <span id="yr"></span> <b>Eagles Gym</b> · 268 The Boulevarde, Punchbowl NSW 2196 · <b>0499 922 334</b></div>
-    <button class="btn btn-dark btn-sm" id="adminBottom">🔒 Admin Login</button>
-  </div>
-</footer>
-
-<!-- LOGIN MODAL -->
+<!-- Login sheet -->
 <div class="ov" id="loginOv">
-  <div class="modal">
+  <div class="sheet">
+    <div class="grab"></div>
     <h3>Admin Login</h3>
     <p class="s">Log in to edit the class timetable.</p>
     <form id="loginForm">
       <div class="fld"><label>Username</label><input id="lu" autocomplete="username" autocapitalize="none" required></div>
       <div class="fld"><label>Password</label><input id="lp" type="password" autocomplete="current-password" required></div>
       <div class="msg err" id="loginMsg"></div>
-      <div class="row">
+      <div class="rowbtns">
         <button type="button" class="btn btn-ghost" id="loginCancel">Cancel</button>
         <button type="submit" class="btn btn-red" id="loginBtn">Log in</button>
       </div>
@@ -236,179 +195,118 @@
 
 <script>
 /* ===== Config ===== */
-const FN = "https://ymuwuhvqqftgpxwhzoub.supabase.co/functions/v1/eaglesgym";
-const ANON = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltdXd1aHZxcWZ0Z3B4d2h6b3ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NjUyMzgsImV4cCI6MjA5OTI0MTIzOH0.sOkWQpulWj_ZSqMNSV7YP55T70UFSm2mP5e5xapQyQo";
-const DAYS = [["Mon","Monday"],["Tue","Tuesday"],["Wed","Wednesday"],["Thu","Thursday"],["Fri","Friday"],["Sat","Saturday"],["Sun","Sunday"]];
-const DAYKEYS = DAYS.map(d=>d[0]);
-
-/* Fallback so the page is never blank if the network hiccups. */
-const FALLBACK = {title:"Weekly Class Timetable",classes:[
+const FN="https://ymuwuhvqqftgpxwhzoub.supabase.co/functions/v1/eaglesgym";
+const ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltdXd1aHZxcWZ0Z3B4d2h6b3ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NjUyMzgsImV4cCI6MjA5OTI0MTIzOH0.sOkWQpulWj_ZSqMNSV7YP55T70UFSm2mP5e5xapQyQo";
+const DAYS=[["Mon","Monday"],["Tue","Tuesday"],["Wed","Wednesday"],["Thu","Thursday"],["Fri","Friday"],["Sat","Saturday"],["Sun","Sunday"]];
+const DK=DAYS.map(d=>d[0]);
+const FALLBACK={title:"Weekly Class Timetable",classes:[
   {id:"c01",day:"Mon",time:"6:00am",name:"Boxing",coach:"Coach Ali",level:"All levels"},
-  {id:"c04",day:"Mon",time:"5:30pm",name:"BJJ Fundamentals",coach:"Coach Leo",level:"Beginner"},
   {id:"c05",day:"Mon",time:"6:30pm",name:"MMA",coach:"Coach Ali",level:"Intermediate"}
 ]};
 
-/* ===== State ===== */
-let STATE = {title:"",classes:[]};
-let CRED = null;                 // {username,password} while logged in
-let activeDay = sydDay();
-let edit = [];                   // working copy while editing
+let STATE={title:"",classes:[],updated_at:null};
+let CRED=null, activeDay=sydDay(), edit=[];
+const $=s=>document.querySelector(s), el=(t,c)=>{const e=document.createElement(t);if(c)e.className=c;return e;};
 
-const $ = s=>document.querySelector(s);
-const el = (t,c)=>{const e=document.createElement(t);if(c)e.className=c;return e;};
+function sydDay(){try{const w=new Date().toLocaleDateString("en-US",{timeZone:"Australia/Sydney",weekday:"short"});return DK.includes(w)?w:"Mon";}catch(e){return "Mon";}}
+function mins(t){const m=String(t||"").trim().toLowerCase().match(/^(\d{1,2}):?(\d{2})?\s*(am|pm)?/);if(!m)return 9999;let h=+m[1];const mm=m[2]?+m[2]:0,ap=m[3];if(ap==="pm"&&h!==12)h+=12;if(ap==="am"&&h===12)h=0;return h*60+mm;}
+function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));}
+async function api(action,p={}){const r=await fetch(FN,{method:"POST",headers:{"content-type":"application/json","apikey":ANON,"Authorization":"Bearer "+ANON},body:JSON.stringify({action,...p})});const j=await r.json().catch(()=>({error:"Network error"}));if(!r.ok)throw new Error(j.error||("HTTP "+r.status));return j;}
 
-function sydDay(){
-  try{
-    const w = new Date().toLocaleDateString("en-US",{timeZone:"Australia/Sydney",weekday:"short"});
-    return DAYKEYS.includes(w)? w : "Mon";
-  }catch(e){return "Mon";}
-}
-function timeMins(t){
-  const m=String(t||"").trim().toLowerCase().match(/^(\d{1,2}):?(\d{2})?\s*(am|pm)?/);
-  if(!m) return 9999;
-  let h=+m[1]; const mm=m[2]?+m[2]:0; const ap=m[3];
-  if(ap==="pm"&&h!==12)h+=12; if(ap==="am"&&h===12)h=0;
-  return h*60+mm;
-}
-async function api(action,payload={}){
-  const r = await fetch(FN,{method:"POST",headers:{"content-type":"application/json","apikey":ANON,"Authorization":"Bearer "+ANON},body:JSON.stringify({action,...payload})});
-  const j = await r.json().catch(()=>({error:"Network error"}));
-  if(!r.ok) throw new Error(j.error||("HTTP "+r.status));
-  return j;
-}
-
-/* ===== Public render ===== */
+/* ===== Public ===== */
 function buildDays(){
-  const wrap=$("#days"); wrap.innerHTML="";
+  const w=$("#days");w.innerHTML="";
   DAYS.forEach(([k,full])=>{
     const b=el("button","day"+(k===activeDay?" active":""));
-    b.innerHTML=`${full.slice(0,3)}<small>${k===activeDay?"TODAY":(k==="Sat"||k==="Sun"?"WEEKEND":"")}</small>`;
-    b.onclick=()=>{activeDay=k;buildDays();renderClasses();};
-    wrap.appendChild(b);
+    b.innerHTML=`<div class="d">${k}</div><div class="n">${k===sydDay()?"Today":full.slice(0,3)}</div>`;
+    b.onclick=()=>{activeDay=k;buildDays();render();$(".scroll").scrollTop=0;};
+    w.appendChild(b);
   });
+  const a=w.querySelector(".day.active");if(a)a.scrollIntoView({inline:"center",block:"nearest"});
 }
-function renderClasses(){
-  const host=$("#classes"); host.innerHTML="";
+function render(){
+  const host=$("#list");host.innerHTML="";
   const full=(DAYS.find(d=>d[0]===activeDay)||["","",])[1];
-  const items=(STATE.classes||[]).filter(c=>c.day===activeDay).sort((a,b)=>timeMins(a.time)-timeMins(b.time));
-  $("#dayTitle").innerHTML=`${full} <span>${items.length} class${items.length===1?"":"es"}</span>`;
-  if(!items.length){host.innerHTML=`<div class="empty">No classes scheduled ${full} — check another day.</div>`;return;}
+  const items=(STATE.classes||[]).filter(c=>c.day===activeDay).sort((a,b)=>mins(a.time)-mins(b.time));
+  $("#dayName").textContent=full;
+  $("#dayCount").textContent=items.length?`${items.length} class${items.length===1?"":"es"}`:"";
+  if(!items.length){host.innerHTML=`<div class="empty"><div class="big">🦅</div>No classes ${full}</div>`;return;}
   items.forEach(c=>{
     const card=el("div","cls");
-    const tm=el("div","tm"); tm.innerHTML=`<b>${esc(c.time||"—")}</b>`;
-    const bd=el("div","bd");
-    bd.innerHTML=`<div class="nm">${esc(c.name||"Class")}</div>
-      <div class="meta"><span class="coach">👤 ${esc(c.coach||"TBA")}</span>${c.level?`<span class="tagl">${esc(c.level)}</span>`:""}</div>`;
-    card.appendChild(tm); card.appendChild(bd); host.appendChild(card);
+    card.innerHTML=`<div class="tm"><b>${esc(c.time||"—")}</b></div>
+      <div class="bd"><div class="nm">${esc(c.name||"Class")}</div>
+      <div class="meta"><span class="coach">👤 ${esc(c.coach||"TBA")}</span>${c.level?`<span class="lvl">${esc(c.level)}</span>`:""}</div></div>`;
+    host.appendChild(card);
   });
 }
-function renderUpdated(){
-  const u=STATE.updated_at;
-  $("#updated").textContent = u ? "Updated "+new Date(u).toLocaleDateString("en-AU",{day:"numeric",month:"short",timeZone:"Australia/Sydney"}) : "";
-}
-function esc(s){return String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));}
-
+function renderUpdated(){const u=STATE.updated_at;$("#updated").textContent=u?"Updated "+new Date(u).toLocaleDateString("en-AU",{day:"numeric",month:"short",timeZone:"Australia/Sydney"}):"";}
 async function load(){
-  try{
-    const j=await api("get");
-    STATE={title:j.data?.title||"Weekly Class Timetable",classes:j.data?.classes||[],updated_at:j.updated_at};
-  }catch(e){
-    STATE={...FALLBACK,updated_at:null};
-  }
-  buildDays(); renderClasses(); renderUpdated();
+  try{const j=await api("get");STATE={title:j.data?.title||"Weekly Class Timetable",classes:j.data?.classes||[],updated_at:j.updated_at};}
+  catch(e){STATE={...FALLBACK,updated_at:null};}
+  buildDays();render();renderUpdated();
 }
 
 /* ===== Login ===== */
-function openLogin(){ $("#loginMsg").textContent=""; $("#loginForm").reset(); $("#loginOv").classList.add("open"); setTimeout(()=>$("#lu").focus(),40); }
-function closeLogin(){ $("#loginOv").classList.remove("open"); }
-$("#adminTop").onclick=openLogin;
-$("#adminBottom").onclick=openLogin;
+function openLogin(){$("#loginMsg").textContent="";$("#loginForm").reset();$("#loginOv").classList.add("open");setTimeout(()=>$("#lu").focus(),60);}
+function closeLogin(){$("#loginOv").classList.remove("open");}
+$("#adminBtn").onclick=openLogin;
 $("#loginCancel").onclick=closeLogin;
-$("#loginOv").onclick=e=>{ if(e.target===$("#loginOv")) closeLogin(); };
-
+$("#loginOv").onclick=e=>{if(e.target===$("#loginOv"))closeLogin();};
 $("#loginForm").addEventListener("submit",async e=>{
   e.preventDefault();
-  const username=$("#lu").value.trim(), password=$("#lp").value;
-  const msg=$("#loginMsg"); msg.className="msg err"; msg.textContent="";
-  $("#loginBtn").textContent="Checking…";
-  try{
-    await api("login",{username,password});
-    CRED={username,password};
-    closeLogin();
-    enterEdit();
-  }catch(err){ msg.textContent=err.message||"Login failed."; }
-  finally{ $("#loginBtn").textContent="Log in"; }
+  const username=$("#lu").value.trim(),password=$("#lp").value,msg=$("#loginMsg");
+  msg.className="msg err";msg.textContent="";$("#loginBtn").textContent="Checking…";
+  try{await api("login",{username,password});CRED={username,password};closeLogin();openEditor();}
+  catch(err){msg.textContent=err.message||"Login failed.";}
+  finally{$("#loginBtn").textContent="Log in";}
 });
 
-/* ===== Admin edit ===== */
-function enterEdit(){
-  edit=JSON.parse(JSON.stringify(STATE.classes||[]));
-  if(!edit.length) addRow(false);
-  $("#publicView").style.display="none";
-  $("#editView").style.display="block";
-  $("#adminBar").style.display="block";
-  setSt("");
-  renderEdit();
-  window.scrollTo(0,0);
-}
-function exitEdit(){
-  $("#editView").style.display="none";
-  $("#adminBar").style.display="none";
-  $("#publicView").style.display="block";
-}
+/* ===== Editor ===== */
+function openEditor(){edit=JSON.parse(JSON.stringify(STATE.classes||[]));if(!edit.length)addRow(false);renderEdit();setSt("");$("#editor").classList.add("open");$(".escroll").scrollTop=0;}
+function closeEditor(){$("#editor").classList.remove("open");}
 function newId(){return "c"+Date.now().toString(36)+Math.floor(Math.random()*1e3);}
-function addRow(render=true){
-  edit.push({id:newId(),day:activeDay,time:"",name:"",coach:"",level:""});
-  if(render){renderEdit(); const rows=$("#editRows"); rows.lastElementChild?.querySelector("input")?.focus();}
-}
+function addRow(r=true){edit.push({id:newId(),day:activeDay,time:"",name:"",coach:"",level:""});if(r){renderEdit();const s=$(".escroll");s.scrollTop=s.scrollHeight;}}
+function setSt(t){$("#edSt").textContent=t;}
 function renderEdit(){
-  const tb=$("#editRows"); tb.innerHTML="";
-  // keep a stable, readable order: by day then time
-  edit.sort((a,b)=> DAYKEYS.indexOf(a.day)-DAYKEYS.indexOf(b.day) || timeMins(a.time)-timeMins(b.time));
+  const host=$("#edList");host.innerHTML="";
+  edit.sort((a,b)=>DK.indexOf(a.day)-DK.indexOf(b.day)||mins(a.time)-mins(b.time));
   edit.forEach((c,i)=>{
-    const tr=el("tr");
-    const daySel=DAYS.map(([k,f])=>`<option value="${k}"${k===c.day?" selected":""}>${f}</option>`).join("");
-    tr.innerHTML=`
-      <td class="col-day"><select data-i="${i}" data-k="day">${daySel}</select></td>
-      <td class="col-time"><input data-i="${i}" data-k="time" value="${esc(c.time||"")}" placeholder="6:00am"></td>
-      <td><input data-i="${i}" data-k="name" value="${esc(c.name||"")}" placeholder="Class name"></td>
-      <td><input data-i="${i}" data-k="coach" value="${esc(c.coach||"")}" placeholder="Coach"></td>
-      <td class="col-lvl"><input data-i="${i}" data-k="level" value="${esc(c.level||"")}" placeholder="All levels"></td>
-      <td class="col-del"><button class="del" title="Delete" data-del="${i}">✕</button></td>`;
-    tb.appendChild(tr);
+    const card=el("div","ec");
+    const days=DAYS.map(([k,f])=>`<option value="${k}"${k===c.day?" selected":""}>${f}</option>`).join("");
+    card.innerHTML=`
+      <div class="r">
+        <div class="f small"><label>Day</label><select data-i="${i}" data-k="day">${days}</select></div>
+        <div class="f small"><label>Time</label><input data-i="${i}" data-k="time" value="${esc(c.time||"")}" placeholder="6:00am"></div>
+      </div>
+      <div class="r"><div class="f"><label>Class</label><input data-i="${i}" data-k="name" value="${esc(c.name||"")}" placeholder="Class name"></div></div>
+      <div class="r">
+        <div class="f"><label>Coach</label><input data-i="${i}" data-k="coach" value="${esc(c.coach||"")}" placeholder="Coach"></div>
+        <div class="f"><label>Level</label><input data-i="${i}" data-k="level" value="${esc(c.level||"")}" placeholder="All levels"></div>
+      </div>
+      <button class="del" data-del="${i}">🗑 Remove class</button>`;
+    host.appendChild(card);
   });
-  tb.querySelectorAll("input,select").forEach(inp=>{
-    inp.addEventListener("input",e=>{ const i=+e.target.dataset.i, k=e.target.dataset.k; if(edit[i]) edit[i][k]=e.target.value; });
-  });
-  tb.querySelectorAll(".del").forEach(b=>{
-    b.onclick=()=>{ edit.splice(+b.dataset.del,1); renderEdit(); };
-  });
+  host.querySelectorAll("input,select").forEach(inp=>inp.addEventListener("input",e=>{const i=+e.target.dataset.i,k=e.target.dataset.k;if(edit[i])edit[i][k]=e.target.value;}));
+  host.querySelectorAll(".del").forEach(b=>b.onclick=()=>{edit.splice(+b.dataset.del,1);renderEdit();});
 }
-function setSt(t){ $("#adminSt").textContent=t; }
-
-$("#btnAdd").onclick=()=>addRow(true);
-$("#btnCancel").onclick=()=>{ exitEdit(); };
-$("#btnLogout").onclick=()=>{ CRED=null; exitEdit(); };
-
-$("#btnSave").onclick=async ()=>{
-  if(!CRED) return;
-  const clean=edit
-    .map(c=>({id:c.id||newId(),day:DAYKEYS.includes(c.day)?c.day:"Mon",time:(c.time||"").trim(),name:(c.name||"").trim(),coach:(c.coach||"").trim(),level:(c.level||"").trim()}))
-    .filter(c=>c.name||c.coach||c.time);
-  setSt("Saving…"); $("#btnSave").textContent="Saving…";
+$("#edAdd").onclick=()=>addRow(true);
+$("#edAdd2").onclick=()=>addRow(true);
+$("#edClose").onclick=closeEditor;
+$("#edCancel").onclick=closeEditor;
+$("#edSave").onclick=async()=>{
+  if(!CRED)return;
+  const clean=edit.map(c=>({id:c.id||newId(),day:DK.includes(c.day)?c.day:"Mon",time:(c.time||"").trim(),name:(c.name||"").trim(),coach:(c.coach||"").trim(),level:(c.level||"").trim()})).filter(c=>c.name||c.coach||c.time);
+  setSt("Saving…");$("#edSave").textContent="Saving…";
   try{
     const j=await api("save",{username:CRED.username,password:CRED.password,data:{title:STATE.title||"Weekly Class Timetable",classes:clean}});
     STATE={title:j.data?.title||STATE.title,classes:j.data?.classes||clean,updated_at:j.updated_at};
-    setSt("✓ Published");
-    buildDays(); renderClasses(); renderUpdated();
-    setTimeout(()=>{ exitEdit(); },500);
-  }catch(err){
-    setSt("⚠ "+(err.message||"Save failed"));
-  }finally{ $("#btnSave").textContent="Save & Publish"; }
+    setSt("✓ Published");buildDays();render();renderUpdated();
+    setTimeout(closeEditor,450);
+  }catch(err){setSt("⚠ "+(err.message||"Save failed"));}
+  finally{$("#edSave").textContent="Save & Publish";}
 };
 
 /* ===== Init ===== */
-$("#yr").textContent = String(new Date().getFullYear());
 load();
 </script>
 </body>
