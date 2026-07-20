@@ -227,6 +227,33 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
 .vstep b{flex:0 0 auto;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#150a00;font-family:var(--fd);font-size:13px;display:grid;place-items:center}
 .vwhere{margin-top:8px;font-family:var(--fm);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);border:1px dashed var(--line);border-radius:10px;padding:9px 11px;line-height:1.4}
 .vwhere b{color:var(--accent)}
+/* Coach management */
+.coachcard{border:1px solid var(--line);border-radius:18px;background:linear-gradient(180deg,var(--glass),var(--glass2));padding:16px;margin-bottom:12px}
+.coachcard.off{opacity:.66}
+.chead{display:flex;align-items:center;gap:13px;flex-wrap:wrap}
+.cav{width:46px;height:46px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;font-family:var(--fd);font-size:20px;color:#150a00;background:linear-gradient(180deg,var(--accent-hi),var(--accent))}
+.chead .ci{flex:1;min-width:140px}
+.chead .ci b{font-family:var(--fd);font-size:19px;letter-spacing:.5px;text-transform:uppercase}
+.chead .ci small{display:block;font-family:var(--fm);font-size:10.5px;color:var(--dim)}
+.cstat{border-color:color-mix(in srgb,var(--good) 45%,transparent);color:var(--good);background:var(--good-soft)}
+.cstat.off{border-color:var(--line);color:var(--muted);background:transparent}
+.cmini{display:flex;gap:14px;margin:12px 0;flex-wrap:wrap}
+.cmini div{font-family:var(--fm);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--dim)}
+.cmini b{font-family:var(--fd);font-size:20px;color:var(--accent);display:block;letter-spacing:.5px}
+.cpanel{display:none;margin-top:12px;padding-top:12px;border-top:1px solid var(--line2)}
+.cpanel.open{display:block;animation:orise .25s ease}
+.permgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+@media(max-width:640px){.permgrid{grid-template-columns:1fr}}
+.permrow{display:flex;align-items:center;gap:10px;border:1px solid var(--line2);border-radius:12px;background:rgba(0,0,0,.22);padding:10px 12px;cursor:pointer;font-size:12.5px;color:var(--text)}
+.permrow small{display:block;font-size:10px;color:var(--dim);margin-top:1px}
+.permrow .sw{margin-left:auto;width:36px;height:20px;border-radius:999px;background:rgba(255,255,255,.15);position:relative;transition:background .2s;flex:0 0 auto}
+.permrow .sw::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .2s}
+.permrow.on .sw{background:var(--accent)}
+.permrow.on .sw::after{left:18px}
+.csess{display:flex;align-items:center;gap:10px;border:1px solid var(--line2);border-radius:12px;background:rgba(0,0,0,.22);padding:9px 12px;margin-bottom:7px}
+.csess .ci{flex:1;min-width:0}
+.csess b{font-size:13px;color:var(--text)}
+.csess small{display:block;font-size:11px;color:var(--dim)}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -251,6 +278,7 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
         <button class="sbi" data-sec="sessions"><span>📅</span>Sessions</button>
         <button class="sbi" data-sec="codes"><span>🎟</span>Codes</button>
         <button class="sbi" data-sec="squad"><span>👥</span>Squad</button>
+        <button class="sbi" data-sec="coaches"><span>🧑‍🏫</span>Coaches</button>
         <button class="sbi" data-sec="money"><span>💰</span>Money</button>
         <button class="sbi" data-sec="ideas"><span>💡</span>Coach's Corner</button>
         <button class="sbi" data-sec="guide"><span>🎓</span>Guide<em class="bdg" id="bGuide"></em></button>
@@ -358,6 +386,22 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
       <div class="card"><span class="cl">📸 <b>Post idea for @lockdownlablive</b></span><div id="ideaPost" class="ideabox"></div><button class="btn btn-g" id="ideaPostBtn" style="margin-top:10px">Another →</button></div>
       <div class="card"><span class="cl">🏀 <b>Hoops talking point</b> · drop it in the squad feed, let them argue</span><div id="ideaTalk" class="ideabox"></div><button class="btn btn-g" id="ideaTalkBtn" style="margin-top:10px">Another →</button></div>
       <p class="empty" style="margin-top:4px">Live NBA news feed is a future upgrade (needs a news API hookup) — these are evergreen so the well never runs dry.</p>
+    </section>
+
+    <section class="osec" id="sec-coaches">
+      <h2 class="oh">Coaches</h2>
+      <p class="osub">Your coaching platform. Add a coach, assign their sessions, control exactly what they can see and do — all in real time.</p>
+      <div class="card hot">
+        <span class="cl">➕ <b>Add a coach</b> · they log in at <b>/coach.html</b> with this username + PIN</span>
+        <div class="mgrid">
+          <label>Display name<input id="coName" placeholder="e.g. Dre" maxlength="40"></label>
+          <label>Username<input id="coUser" placeholder="e.g. dre" maxlength="24" autocomplete="off" style="text-transform:lowercase"></label>
+          <label>4-digit PIN<input id="coPin" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off"></label>
+          <label>&nbsp;<button class="btn btn-p" id="coAdd" style="width:100%">Create coach 🧑‍🏫</button></label>
+        </div>
+        <p class="empty" style="margin-top:6px">Onboarding a coach takes under a minute: name, username, PIN — done. New coaches start locked down; you switch on what they need.</p>
+      </div>
+      <div id="coachList"><p class="empty">Loading coaches…</p></div>
     </section>
 
     <section class="osec" id="sec-money">
@@ -665,6 +709,7 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
     document.querySelectorAll('.sbi').forEach(x=>x.classList.toggle('on',x.dataset.sec===s));
     if(s==='money') calcMoney();
     if(s==='guide'){ renderNews(); paintPhone(); setTimeout(markNewsSeen,1200); }
+    if(s==='coaches') loadCoaches();
     window.scrollTo({top:0});
   }
   document.querySelectorAll('.sbi').forEach(b=>b.addEventListener('click',()=>showSec(b.dataset.sec)));
@@ -781,6 +826,7 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
   /* Newest = highest id. Add a new entry (bump the id) and every coach's desk
      badges the Guide tab + pings them the next time it's open. */
   const NEWS=[
+    {id:12,d:'20 Jul',t:'Coach platform is live',body:'Lockdown Lab is now a coaching platform. New 🧑‍🏫 Coaches tab: coaches sign up at /coach.html with a code you mint (or request one you approve), get their own dashboard, and you control exactly what each can see and do — earnings, sessions, everything — with live permission toggles.'},
     {id:11,d:'19 Jul',t:'The Target + Deck Bench',body:'Money tab levelled up: type "I need $500 by next week" and it tells you exactly how many seats and sessions get you there. Plus a topic generator and a Deck Bench — send a topic to Claude and a ready-made session deck comes back within the hour.'},
     {id:10,d:'19 Jul',t:'Street Vol. 2 energy',body:'Level-ups now hit like Gamebreakers, badges slap in like stickers with an impact ring, streaks catch fire at 3 days, check-ins throw up style points, and the Running Now board went full blacktop — chain-link and all.'},
     {id:9,d:'19 Jul',t:'Starter Five badges',body:'New players get thrown their first badge the second they walk in, and it branches into a five-badge journey that teaches them the app — with premium unlock animations and a welcome that settles the rookies.'},
@@ -858,6 +904,87 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
     const sw=e.target.closest('[data-vs]'); if(sw){ vSide=sw.dataset.vs; vView='home'; vSel=null; paintPhone(); return; }
   });
   renderNews(); paintPhone(); checkNews();
+  /* ---- Coach management (the platform) ---- */
+  const PERM_DEFS=[
+    ['canViewEarnings','View earnings','Show the earnings section + tiles'],
+    ['canUseEarningsCalculator','Use calculator','Let them change the calc inputs'],
+    ['canViewPayments','View payments','Payment summary + revenue'],
+    ['canEditProfile','Edit profile','Change their own bio, specialties…'],
+    ['canJoinSessions','Join sessions','Open Zoom + complete sessions'],
+    ['canAccessResources','Access resources','See the Resources tab'],
+    ['canViewPlayers','View players','See the My Players tab'],
+    ['canUseTestMode','Use test mode','Try the portal with fake data'],
+    ['canReceiveNotifications','Notifications','Show the notifications panel'],
+    ['canCreateSessions','Create sessions','(future) make their own sessions'],
+    ['canUploadResources','Upload resources','(future) add drills/decks'],
+    ['canAccessAnalytics','Analytics','Deeper performance analytics'],
+    ['canAccessCoachChat','Coach chat','(future) chat with other coaches'],
+    ['canAccessScoutPortal','Scout portal','(future) scouting tools'],
+  ];
+  let COACHES=null;
+  async function loadCoaches(){
+    const el=$('#coachList'); if(!el) return;
+    try{ COACHES=await api({action:'coach_list',code:CODE}); renderCoaches(); }
+    catch(e){ el.innerHTML='<p class="empty">Couldn’t load coaches — '+esc(e.message)+'</p>'; }
+  }
+  function renderCoaches(){
+    const el=$('#coachList'); if(!el||!COACHES) return;
+    const reqs=COACHES.requests||[], codes=COACHES.codes||[], coaches=COACHES.coaches||[];
+    let h='';
+    h+='<div class="card'+(reqs.length?' hot':'')+'"><span class="cl">🙋 <b>Access requests</b> · approve to mint a code, then send it to them</span>';
+    h+= reqs.length? reqs.map(r=>'<div class="row"><div class="info"><b>'+esc(r.name)+'</b><small>'+(r.contact?'reach: '+esc(r.contact)+' · ':'')+'“'+esc(r.why)+'”</small></div>'+contactBtns(r.contact)+'<button class="btn btn-p" data-reqok="'+r.id+'" data-nm="'+esc(r.name)+'">Approve → code</button><button class="btn-x" data-reqno="'+r.id+'">✕</button></div>').join('') : '<p class="empty">No requests waiting.</p>';
+    h+='</div>';
+    h+='<div class="card"><span class="cl">🎟 <b>Coach codes</b> · mint one, send it — good for 14 days, one signup each</span>';
+    h+='<div class="mint" style="margin-bottom:10px"><input id="ccLabel" placeholder="Who’s it for? (e.g. Dre — Bankstown)" maxlength="40"><button class="btn btn-p" id="ccMint">Mint code</button></div>';
+    h+= codes.length? codes.map(c=>'<div class="row"><div class="info"><b class="mono">'+esc(c.code)+'</b> · '+esc(c.label||'Coach code')+'</div><button class="btn btn-g" data-cccopy="'+esc(c.code)+'">Copy</button><button class="btn-x" data-ccdel="'+c.id+'">✕</button></div>').join('') : '<p class="empty">No open codes.</p>';
+    h+='</div>';
+    h+='<div class="card"><span class="cl">🧑‍🏫 <b>Your coaches</b> · '+coaches.length+' · they log in at /coach.html</span>';
+    h+= coaches.length? coaches.map(coachCard).join('') : '<p class="empty">No coaches yet. Mint a code, or add one directly above.</p>';
+    h+='</div>';
+    el.innerHTML=h; wireCoaches();
+  }
+  function coachCard(c){
+    const init=c.display_name.split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const up=(c.sessions||[]).filter(s=>s.status!=='completed').length, done=(c.sessions||[]).filter(s=>s.status==='completed').length;
+    const on=c.status==='active';
+    return '<div class="coachcard'+(on?'':' off')+'">'
+      +'<div class="chead"><div class="cav">'+init+'</div><div class="ci"><b>'+esc(c.display_name)+'</b><small>@'+esc(c.username)+(c.specialties&&c.specialties.length?' · '+esc(c.specialties.slice(0,3).join(' · ')):'')+'</small></div><span class="pill cstat'+(on?'':' off')+'">'+(on?'Active':'Paused')+'</span></div>'
+      +'<div class="cmini"><div><b>'+up+'</b>Upcoming</div><div><b>'+done+'</b>Done</div><div><b>$'+(c.session_rate||0)+'</b>Rate</div><div><b>'+(c.permissions.canViewEarnings?'On':'Off')+'</b>Earnings</div></div>'
+      +'<div class="rowbtns"><button class="btn btn-g" data-cpanel="assign" data-id="'+c.id+'">📅 Assign</button><button class="btn btn-g" data-cpanel="perms" data-id="'+c.id+'">🎛 Permissions</button><button class="btn btn-g" data-cpanel="edit" data-id="'+c.id+'">✎ Edit</button><button class="btn btn-g" data-cstatus="'+c.id+'" data-to="'+(on?'inactive':'active')+'">'+(on?'Pause':'Activate')+'</button><button class="btn-x" data-cdel="'+c.id+'" data-nm="'+esc(c.display_name)+'">✕</button></div>'
+      +'<div class="cpanel" id="cp-assign-'+c.id+'">'+assignPanel(c)+'</div>'
+      +'<div class="cpanel" id="cp-perms-'+c.id+'"><div class="permgrid">'+PERM_DEFS.map(p=>'<div class="permrow'+(c.permissions[p[0]]?' on':'')+'" data-perm="'+p[0]+'" data-id="'+c.id+'"><div>'+p[1]+'<small>'+p[2]+'</small></div><span class="sw"></span></div>').join('')+'</div></div>'
+      +'<div class="cpanel" id="cp-edit-'+c.id+'">'+editPanel(c)+'</div>'
+      +'</div>';
+  }
+  function assignPanel(c){
+    let h='<div class="mgrid"><label>Session title<input id="as-t-'+c.id+'" placeholder="e.g. Guard Skills · Live" maxlength="60"></label><label>Date &amp; time<input id="as-w-'+c.id+'" type="datetime-local"></label><label>Zoom link<input id="as-l-'+c.id+'" placeholder="https://zoom.us/…" maxlength="300"></label><label>Players<input id="as-p-'+c.id+'" type="number" min="0" value="6"></label></div><button class="btn btn-p" data-assign="'+c.id+'" style="margin-top:8px">Assign to '+esc(c.display_name.split(' ')[0])+' 📅</button>';
+    const s=c.sessions||[];
+    h+= s.length? '<div style="margin-top:12px">'+s.map(x=>'<div class="csess"><div class="ci"><b>'+esc(x.title)+'</b><small>'+sessWhen(x.starts_at)+' · 👥 '+(x.player_count||0)+' · '+esc(x.status)+'</small></div>'+(x.link?'<a class="btn btn-g" href="'+esc(x.link)+'" target="_blank" rel="noopener">Zoom ↗</a>':'')+'<button class="btn-x" data-sundel="'+x.id+'">✕</button></div>').join('')+'</div>' : '<p class="empty" style="margin-top:10px">No sessions assigned yet.</p>';
+    return h;
+  }
+  function editPanel(c){
+    return '<div class="mgrid"><label>Display name<input id="ed-name-'+c.id+'" value="'+esc(c.display_name)+'" maxlength="40"></label><label>Session rate ($)<input id="ed-rate-'+c.id+'" type="number" min="0" value="'+(c.session_rate||15)+'"></label><label>Specialties (comma sep)<input id="ed-spec-'+c.id+'" value="'+esc((c.specialties||[]).join(', '))+'" maxlength="120"></label><label>Reset PIN (optional)<input id="ed-pin-'+c.id+'" inputmode="numeric" maxlength="4" placeholder="••••"></label></div><div class="flabel" style="margin-top:8px">Bio</div><textarea id="ed-bio-'+c.id+'" maxlength="600">'+esc(c.bio||'')+'</textarea><div class="flabel" style="margin-top:8px">Private notes (only you see these)</div><textarea id="ed-notes-'+c.id+'" maxlength="600">'+esc(c.notes||'')+'</textarea><button class="btn btn-p" data-cedit="'+c.id+'" style="margin-top:8px">Save ✓</button>';
+  }
+  function wireCoaches(){
+    const q=s=>document.querySelectorAll(s);
+    q('[data-reqok]').forEach(b=>b.onclick=async()=>{ try{ const r=await api({action:'coach_req_approve',code:CODE,rid:b.dataset.reqok,label:b.dataset.nm}); try{await navigator.clipboard.writeText(r.code);}catch(_){}; toast('Approved · '+r.code+' copied — send it'); loadCoaches(); }catch(e){toast(e.message)} });
+    q('[data-reqno]').forEach(b=>b.onclick=async()=>{ try{ await api({action:'coach_req_deny',code:CODE,rid:b.dataset.reqno}); toast('Request declined'); loadCoaches(); }catch(e){toast(e.message)} });
+    if($('#ccMint')) $('#ccMint').onclick=async()=>{ try{ const r=await api({action:'coach_code_mint',code:CODE,label:$('#ccLabel').value.trim()}); try{await navigator.clipboard.writeText(r.code);}catch(_){}; toast(r.code+' copied — send it to your coach'); loadCoaches(); }catch(e){toast(e.message)} };
+    q('[data-cccopy]').forEach(b=>b.onclick=async()=>{ try{ await navigator.clipboard.writeText(b.dataset.cccopy); toast('Copied 📋'); }catch(e){} });
+    q('[data-ccdel]').forEach(b=>b.onclick=async()=>{ try{ await api({action:'coach_code_del',code:CODE,ccid:b.dataset.ccdel}); loadCoaches(); }catch(e){toast(e.message)} });
+    q('[data-cpanel]').forEach(b=>b.onclick=()=>{ const p=document.getElementById('cp-'+b.dataset.cpanel+'-'+b.dataset.id); if(p) p.classList.toggle('open'); });
+    q('[data-cstatus]').forEach(b=>b.onclick=async()=>{ try{ await api({action:'coach_set_status',code:CODE,coach_id:b.dataset.cstatus,status:b.dataset.to}); toast(b.dataset.to==='active'?'Coach activated':'Coach paused'); loadCoaches(); }catch(e){toast(e.message)} });
+    q('[data-cdel]').forEach(b=>b.onclick=async()=>{ if(!confirm('Remove '+b.dataset.nm+'?\n\nThis deletes their coach account and unassigns their sessions. No undo.')) return; try{ await api({action:'coach_delete',code:CODE,coach_id:b.dataset.cdel}); toast(b.dataset.nm+' removed'); loadCoaches(); }catch(e){toast(e.message)} });
+    q('[data-perm]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.id,key=b.dataset.perm,nowOn=!b.classList.contains('on'); b.classList.toggle('on',nowOn); try{ await api({action:'coach_set_perms',code:CODE,coach_id:id,permissions:{[key]:nowOn}}); const c=(COACHES.coaches||[]).find(x=>x.id===id); if(c)c.permissions[key]=nowOn; toast('Saved — live in their portal'); }catch(e){ b.classList.toggle('on',!nowOn); toast(e.message); } });
+    q('[data-assign]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.assign,t=$('#as-t-'+id).value.trim(),w=$('#as-w-'+id).value,l=$('#as-l-'+id).value.trim(),pc=$('#as-p-'+id).value; if(!t||!w){ toast('Add a title and time'); return; } if(l&&!/^https?:\/\//i.test(l)){ toast('Zoom link needs https://'); return; } try{ await api({action:'coach_assign_session',code:CODE,coach_id:id,title:t,starts_at:new Date(w).toISOString(),link:l,player_count:pc}); toast('Session assigned 📅'); loadCoaches(); }catch(e){toast(e.message)} });
+    q('[data-sundel]').forEach(b=>b.onclick=async()=>{ try{ await api({action:'coach_unassign_session',code:CODE,sid:b.dataset.sundel}); loadCoaches(); }catch(e){toast(e.message)} });
+    q('[data-cedit]').forEach(b=>b.onclick=async()=>{ const id=b.dataset.cedit,specs=$('#ed-spec-'+id).value.split(',').map(x=>x.trim()).filter(Boolean),body={action:'coach_edit',code:CODE,coach_id:id,display_name:$('#ed-name-'+id).value.trim(),session_rate:$('#ed-rate-'+id).value,specialties:specs,bio:$('#ed-bio-'+id).value.trim(),notes:$('#ed-notes-'+id).value.trim()}; const np=$('#ed-pin-'+id).value.trim(); if(np) body.new_pin=np; try{ await api(body); toast('Saved ✓'); loadCoaches(); }catch(e){toast(e.message)} });
+  }
+  $('#coAdd')&&$('#coAdd').addEventListener('click',async()=>{
+    const name=$('#coName').value.trim(), user=$('#coUser').value.trim().toLowerCase(), pin=$('#coPin').value.trim();
+    if(name.length<2||user.length<2||!/^\d{4}$/.test(pin)){ toast('Name, username and a 4-digit PIN'); return; }
+    try{ await api({action:'coach_add',code:CODE,display_name:name,username:user,pin}); $('#coName').value='';$('#coUser').value='';$('#coPin').value=''; toast('Coach created 🧑‍🏫'); loadCoaches(); }catch(e){toast(e.message)}
+  });
   /* ---- Coach's Corner: the idea engine ---- */
   const IDEA_SESS=[
     'The 3-Second Rule, live: everyone shares one moment they sulked mid-game, then you drill the flush-and-go on camera.',
