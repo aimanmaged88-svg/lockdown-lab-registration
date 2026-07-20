@@ -278,7 +278,7 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
         <button class="sbi" data-sec="sessions"><span>📅</span>Sessions</button>
         <button class="sbi" data-sec="codes"><span>🎟</span>Codes</button>
         <button class="sbi" data-sec="squad"><span>👥</span>Squad</button>
-        <button class="sbi" data-sec="coaches"><span>🧑‍🏫</span>Coaches</button>
+        <button class="sbi" data-sec="coaches"><span>🧑‍🏫</span>Coaches<em class="bdg" id="bCoaches"></em></button>
         <button class="sbi" data-sec="money"><span>💰</span>Money</button>
         <button class="sbi" data-sec="ideas"><span>💡</span>Coach's Corner</button>
         <button class="sbi" data-sec="guide"><span>🎓</span>Guide<em class="bdg" id="bGuide"></em></button>
@@ -534,6 +534,7 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
     $('#kCodes').textContent=codes.length;
     const doorN=knocks.length+reqs.length;
     const bd=$('#bDoor'); bd.textContent=doorN; bd.classList.toggle('on',doorN>0);
+    const cq=(R.coach_reqs||[]).length, bc=$('#bCoaches'); if(bc){ bc.textContent=cq; bc.classList.toggle('on',cq>0); }
     $('#ovKnocks').innerHTML=knocks.length?knocks.slice(0,3).map(k=>'<div class="row"><div class="info"><b>'+esc(k.name)+'</b>'+(k.why?'<small style="color:var(--muted)">“'+esc(k.why)+'”</small>':'')+'</div></div>').join('')+(knocks.length>3?'<p class="empty">+'+(knocks.length-3)+' more…</p>':''):'<p class="empty">Quiet at the door.</p>';
     const nx=(R.sessions||[])[0];
     $('#ovNext').innerHTML=nx?'<div class="row"><div class="info"><b>'+esc(nx.title)+'</b><small>'+sessWhen(nx.starts_at)+(nx.link?' · Zoom ready':'')+'</small></div></div>':'<p class="empty">Nothing scheduled — plan the week.</p>';
@@ -650,7 +651,7 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
     catch(e){ inp.value=text; toast(e.message); }
   }
   $('#sqSearch')&&$('#sqSearch').addEventListener('input',()=>{ if(R&&!$('#squad').querySelector('.editbox.open')) renderSquad(R.players||[],true); });
-  let prevK=-1,prevR=-1,prevDeck=-1;
+  let prevK=-1,prevR=-1,prevDeck=-1,prevCReq=-1;
   async function refresh(){
     try{
       const r=await api({action:'roster',code:CODE});
@@ -660,6 +661,9 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
       const nd=(r.deckreqs||[]).filter(d=>d.status==='ready').length;
       if(prevDeck>=0&&nd>prevDeck){ ping(); toast('🎬 A deck is ready — check the Money tab'); }
       prevDeck=nd;
+      const ncq=(r.coach_reqs||[]).length;
+      if(prevCReq>=0&&ncq>prevCReq){ ping(); toast('🧑‍🏫 A coach wants in — check the Coaches tab'); if(document.hidden&&Notification&&Notification.permission==='granted'){ try{ new Notification('The Door Desk',{body:'A coach requested access'}); }catch(e){} } }
+      prevCReq=ncq;
       prevK=nk; prevR=nr;
       render();
     }catch(e){ $('#lastUpd').textContent='retrying…'; }
@@ -934,7 +938,7 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
     h+='<div class="card'+(reqs.length?' hot':'')+'"><span class="cl">🙋 <b>Access requests</b> · approve to mint a code, then send it to them</span>';
     h+= reqs.length? reqs.map(r=>'<div class="row"><div class="info"><b>'+esc(r.name)+'</b><small>'+(r.contact?'reach: '+esc(r.contact)+' · ':'')+'“'+esc(r.why)+'”</small></div>'+contactBtns(r.contact)+'<button class="btn btn-p" data-reqok="'+r.id+'" data-nm="'+esc(r.name)+'">Approve → code</button><button class="btn-x" data-reqno="'+r.id+'">✕</button></div>').join('') : '<p class="empty">No requests waiting.</p>';
     h+='</div>';
-    h+='<div class="card"><span class="cl">🎟 <b>Coach codes</b> · mint one, send it — good for 14 days, one signup each</span>';
+    h+='<div class="card"><span class="cl">🎟 <b>Coach codes</b> · mint one, send it — good for 6 hours, one signup each</span>';
     h+='<div class="mint" style="margin-bottom:10px"><input id="ccLabel" placeholder="Who’s it for? (e.g. Dre — Bankstown)" maxlength="40"><button class="btn btn-p" id="ccMint">Mint code</button></div>';
     h+= codes.length? codes.map(c=>'<div class="row"><div class="info"><b class="mono">'+esc(c.code)+'</b> · '+esc(c.label||'Coach code')+'</div><button class="btn btn-g" data-cccopy="'+esc(c.code)+'">Copy</button><button class="btn-x" data-ccdel="'+c.id+'">✕</button></div>').join('') : '<p class="empty">No open codes.</p>';
     h+='</div>';
