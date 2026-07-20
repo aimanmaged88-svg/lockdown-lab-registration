@@ -180,6 +180,9 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 .composer input{flex:1}
 .ratewrap{display:flex;align-items:center;gap:14px}
 .ratebig{font-family:var(--fd);font-size:42px;line-height:1;color:var(--accent);flex:0 0 auto}
+.raterow{display:flex;flex-wrap:wrap;gap:4px;margin-top:8px}
+.rbtn{width:27px;height:27px;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.05);color:var(--text);font-family:var(--fm);font-size:11px;cursor:pointer;transition:all .14s}
+.rbtn.sel{background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:#150a00;border-color:transparent}
 
 /* ---------- onboarding ---------- */
 #onboard{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;
@@ -513,6 +516,21 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
         <button class="btn btn-p btn-sm" id="mMsgBtn">Send</button>
       </div>
       <div class="filternote" style="font-family:var(--fm);font-size:9px;letter-spacing:1px;color:var(--dim);text-transform:uppercase">🔒 Private — only you and your coach see this</div>
+
+      <div class="card" id="peerCard" style="display:none">
+        <span class="cl">Team rating of you</span>
+        <div class="ratewrap">
+          <span class="ratebig" id="peerVal">–</span>
+          <div><b class="display" style="font-size:18px">Peer respect</b><p style="color:var(--muted);font-size:12.5px;margin-top:2px" id="peerNote"></p></div>
+        </div>
+      </div>
+
+      <div class="card" id="squadCard" style="display:none">
+        <span class="cl" id="squadTeam">Your Team</span>
+        <h3>🤝 Squad — rate your teammates</h3>
+        <p style="color:var(--muted);font-size:12.5px;margin-bottom:6px">Anonymous & aggregated. Hold each other to the standard.</p>
+        <div id="squadList"></div>
+      </div>
     </section>
   </main>
 
@@ -851,6 +869,28 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
     $('#thread').innerHTML=(AST.messages||[]).map(m=>'<div class="msg '+(m.from_coach?'them':'me')+'">'+esc(m.text)+'<span class="mt">'+(m.from_coach?'Coach':'You')+' · '+rel(m.created_at)+'</span></div>').join('')
       ||'<p style="color:var(--dim);font-size:13px">No messages yet. Say what\'s up — your coach reads everything here.</p>';
     const th=$('#thread'); th.scrollTop=th.scrollHeight;
+    /* peer rating of me */
+    const pr=AST.peer||{};
+    $('#peerCard').style.display=(pr.count>=1)?'block':'none';
+    if(pr.count>=1){ $('#peerVal').textContent=(pr.avg!=null?pr.avg:'–')+'/10'; $('#peerNote').textContent=pr.count+' teammate'+(pr.count>1?'s':'')+' rated you'; }
+    /* squad — rate teammates */
+    const tm=AST.team, mates=AST.teammates||[];
+    $('#squadCard').style.display=tm?'block':'none';
+    if(tm){
+      $('#squadTeam').textContent=tm.name;
+      $('#squadList').innerHTML=mates.length?mates.map(m=>
+        '<div class="post"><div class="who"><b>'+esc(m.name)+'</b>'+(m.position?'<span class="cbadge" style="font-family:var(--fm);font-size:8px;letter-spacing:1px;color:var(--accent);border:1px solid var(--accent);border-radius:99px;padding:1px 6px">'+esc(m.position)+'</span>':'')+'<span class="t" style="margin-left:auto;font-family:var(--fm);font-size:9px;color:var(--dim)">'+(m.my_rating?'you rated '+m.my_rating+'/10':'tap to rate')+'</span></div>'+
+        '<div class="raterow" data-mate="'+m.id+'">'+Array.from({length:10},(_,i)=>i+1).map(n=>'<button class="rbtn'+(m.my_rating===n?' sel':'')+'" data-r="'+n+'">'+n+'</button>').join('')+'</div></div>'
+      ).join(''):'<p style="color:var(--dim);font-size:13px">No teammates yet — your coach adds people to your team.</p>';
+      document.querySelectorAll('#squadList .raterow').forEach(row=>{
+        row.querySelectorAll('.rbtn').forEach(bn=>bn.addEventListener('click',async()=>{
+          const ratee=row.dataset.mate, score=+bn.dataset.r;
+          row.querySelectorAll('.rbtn').forEach(x=>x.classList.toggle('sel',x===bn));
+          try{ const r=await api({action:'peer_rate',aid:sess.aid,pin:sess.pin,ratee,score}); AST=r.state; toast('Teammate rated ⭐'); }
+          catch(e){ toast(e.message,true); }
+        }));
+      });
+    }
   }
   $('#mMsgBtn').addEventListener('click',async()=>{
     const v=$('#mMsgInput').value.trim(); if(!v)return;
