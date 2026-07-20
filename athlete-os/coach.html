@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="robots" content="noindex,nofollow" />
 <title>Athlete OS · Coach</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <style>
   :root{
     --bg:#070707; --panel:rgba(255,255,255,.04); --panel2:rgba(255,255,255,.02);
@@ -111,6 +112,15 @@
   .cirow .d{color:var(--text);font-family:var(--fm)}
   .notes .box{margin-bottom:6px}
   .file textarea{min-height:64px;resize:vertical;font-size:13px;margin-bottom:8px}
+  .cthread{display:flex;flex-direction:column;gap:6px;max-height:230px;overflow-y:auto;margin-bottom:8px;padding-right:2px}
+  .cmsg{max-width:85%;padding:8px 11px;border-radius:12px;font-size:12.5px;line-height:1.4}
+  .cmsg.them{align-self:flex-start;background:var(--panel2);border:1px solid var(--line2)}
+  .cmsg.me{align-self:flex-end;background:var(--accent);color:#0a0500;font-weight:600}
+  .cmsg .mt{display:block;font-size:8.5px;opacity:.65;margin-top:2px;font-family:var(--fm)}
+  .raterow{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0}
+  .rbtn{width:30px;height:30px;border:1px solid var(--line);border-radius:8px;background:var(--panel2);color:var(--text);font-family:var(--fm);font-size:12px;cursor:pointer;transition:all .12s}
+  .rbtn:hover{border-color:var(--accent)}
+  .rbtn.sel{background:var(--accent);color:#0a0500;border-color:var(--accent)}
 </style>
 </head>
 <body>
@@ -325,10 +335,23 @@
           </div>
           <h4>Shared with coach</h4>
           ${(d.shared_mind||[]).slice(0,4).map(m=>`<div class="box">🧠 <b>${esc((m.data||{}).trigger||'moment')}</b> · impact ${(m.data||{}).impact||'–'}/10${(m.data||{}).plan?'<br>plan: '+esc((m.data||{}).plan):''}</div>`).join('')||'<div class="box">Nothing shared yet.</div>'}
+          <h4>⭐ Coach rating</h4>
+          <div class="box">
+            Current: <b>${p.coach_rating?p.coach_rating+'/10':'not rated yet'}</b>${p.coach_rating_note?' · “'+esc(p.coach_rating_note)+'”':''}
+            <div class="raterow" id="rateRow">${Array.from({length:10},(_,i)=>i+1).map(n=>`<button class="rbtn ${p.coach_rating===n?'sel':''}" data-r="${n}">${n}</button>`).join('')}</div>
+            <input id="rateNote" placeholder="Optional note the athlete will see" maxlength="200" style="margin-bottom:8px" value="${esc(p.coach_rating_note||'')}">
+            <button class="btn btn-primary btn-sm" id="rateSave">Save rating ⭐</button>
+          </div>
         </div>
         <div>
           <h4>Last 14 check-ins</h4>
           <div class="box">${(d.checkins||[]).map(c=>`<div class="cirow"><span class="d">${esc(c.d)}</span><span>E${c.energy??'–'} · S${c.soreness??'–'} · ${c.sleep_h?c.sleep_h+'h':'–'} · ${c.mins||0}min</span></div>`).join('')||'No check-ins yet.'}</div>
+          <h4>💬 Messages — two-way</h4>
+          <div class="cthread" id="cThread">${(d.messages||[]).map(m=>`<div class="cmsg ${m.from_coach?'me':'them'}">${esc(m.text)}<span class="mt">${m.from_coach?'You':esc(p.name)} · ${fmtDate(m.created_at)}</span></div>`).join('')||'<span class="sub">No messages yet — start the conversation.</span>'}</div>
+          <div style="display:flex;gap:6px">
+            <input id="cMsgInput" placeholder="Message ${esc(p.name)}…" maxlength="600" style="flex:1">
+            <button class="btn btn-primary btn-sm" id="cMsgBtn">Send</button>
+          </div>
         </div>
         <div class="notes">
           <h4>🔒 Private notes — athlete never sees these</h4>
@@ -346,6 +369,23 @@
         try{ await api({action:'status_set', aid, status:d.status==='active'?'paused':'active'}); toast('Status updated'); await load(); openId=aid; render(); loadFile(aid); }
         catch(e){ toast('Update failed'); }
       });
+      let pickedRate = p.coach_rating||0;
+      document.querySelectorAll('#rateRow .rbtn').forEach(bn=>bn.addEventListener('click',()=>{
+        pickedRate=+bn.dataset.r;
+        document.querySelectorAll('#rateRow .rbtn').forEach(x=>x.classList.toggle('sel',x===bn));
+      }));
+      $('#rateSave').addEventListener('click', async()=>{
+        if(!pickedRate) return toast('Pick 1–10 first');
+        try{ await api({action:'rate', aid, score:pickedRate, note:$('#rateNote').value.trim()}); toast('Rating saved ⭐'); await load(); openId=aid; render(); loadFile(aid); }
+        catch(e){ toast('Save failed'); }
+      });
+      const sendCMsg = async()=>{
+        const t=$('#cMsgInput').value.trim(); if(!t) return;
+        try{ await api({action:'cmsg', aid, text:t}); loadFile(aid); }
+        catch(e){ toast('Send failed'); }
+      };
+      $('#cMsgBtn').addEventListener('click', sendCMsg);
+      $('#cMsgInput').addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); sendCMsg(); } });
     }catch(e){ cell.textContent = 'Could not load file — '+e.message; }
   }
 
