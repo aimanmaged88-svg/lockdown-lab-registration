@@ -37,6 +37,7 @@ export function MobileTabBar() {
     arrivals: "Arrivals",
     budgets: "Budget",
     incidents: "Incidents",
+    sites: "Homes",
     "review-ready": "Review",
     wellbeing: "Pulse",
     compliance: "Comply",
