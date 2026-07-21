@@ -267,10 +267,9 @@ const KB = [
     'Wet-floor signs must be out whenever mopping.'
   ]},
   {t:'Membership Pricing', icon:'💲', body:[
+    'SIGN-UP RULE — Cash: paid 3 months in advance.',
+    'SIGN-UP RULE — Direct debit: billed month by month.',
     'Casual visit: $20 day pass.',
-    'Weekly membership: $25 / week direct debit.',
-    'Monthly (no lock-in): $110 / month.',
-    'Annual upfront: $999 / year (best value).',
     'Student & concession: 15% off with valid ID.',
     'Joining fee: $49 (waived on annual upfront).',
     'Always confirm current pricing on the POS before quoting.'
@@ -683,7 +682,7 @@ function viewReception(){
   ${card(`<div class="p-5">
     <h3 class="font-bold text-lg mb-3">🆕 New member</h3>
     <div class="space-y-2">
-      ${['Tour facility','Explain memberships','Explain staffed hours','Explain access','Complete GymMaster signup']
+      ${['Tour facility','Explain memberships','Explain staffed hours','Explain access','Confirm payment — cash: 3 months up front · direct debit: monthly','Complete GymMaster signup']
         .map((s,i)=>sopStep(i+1,s)).join('')}
     </div>
     <button data-go="guide" class="mt-4 text-sm font-semibold text-brand-400">→ Open the GymMaster signup guide</button>
@@ -703,6 +702,23 @@ function viewMemberships(){
   const ci = GUIDES.find(g=>g.cat==='Check In');
   return `
   ${sectionHead('💳','Memberships','Everything for creating, changing and billing memberships in GymMaster.')}
+  ${card(`<div class="p-5">
+    <h3 class="font-bold text-lg mb-3 flex items-center gap-2">📝 Sign-up rules</h3>
+    <div class="grid sm:grid-cols-2 gap-3">
+      <div class="bg-ink-800 border border-ink-700 rounded-2xl p-4">
+        <div class="text-2xl mb-1">💵</div>
+        <div class="font-bold">Paying by cash</div>
+        <div class="text-brand-400 font-semibold text-[15px] mt-0.5">3 months in advance</div>
+        <p class="text-xs text-neutral-400 mt-1">Take the full 3 months up front at sign-up.</p>
+      </div>
+      <div class="bg-ink-800 border border-ink-700 rounded-2xl p-4">
+        <div class="text-2xl mb-1">💳</div>
+        <div class="font-bold">Paying by direct debit</div>
+        <div class="text-brand-400 font-semibold text-[15px] mt-0.5">Month by month</div>
+        <p class="text-xs text-neutral-400 mt-1">Set up recurring monthly billing in GymMaster.</p>
+      </div>
+    </div>
+  </div>`,'mb-4')}
   ${guideCatCard(m)}
   ${guideCatCard(ci)}
   ${guideCatCard(dd)}
