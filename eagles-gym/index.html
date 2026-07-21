@@ -80,7 +80,7 @@
 
 <!-- ===================== STAFF GATE ===================== -->
 <div id="gate" class="fixed inset-0 z-50 bg-ink-900 flex items-center justify-center p-6">
-  <div class="w-full max-w-sm bg-ink-850 rounded-3xl shadow-card border border-ink-700 p-7 animate-fadeUp">
+  <div id="gateCard" class="w-full max-w-sm bg-ink-850 rounded-3xl shadow-card border border-ink-700 p-7 animate-fadeUp">
     <div class="text-center mb-6">
       <img src="logo.png" alt="Eagles Gym" class="h-9 w-auto mx-auto mb-3" style="height:36px;width:auto;max-width:80%" />
       <p class="text-brand-500 font-semibold tracking-[0.25em] text-sm">STAFF HUB</p>
@@ -2326,7 +2326,15 @@ function tickClock(){
    ============================================================ */
 const SB_URL='https://ymuwuhvqqftgpxwhzoub.supabase.co';
 const SB_KEY='sb_publishable_-j-P1TcLeGZ6lGspru2YwA_3RxAlucJ';
+const GYM_JOIN_CODE='eaglesteam'; // needed to create a staff account (boss can change)
 var SB=null, applyingRemote=false;
+function ensureSB(){
+  if(SB) return SB;
+  if(window.supabase && window.supabase.createClient){
+    SB=window.supabase.createClient(SB_URL, SB_KEY, {auth:{persistSession:true, autoRefreshToken:true}});
+  }
+  return SB;
+}
 const SYNC_KEYS=new Set(['calls','teamlog','issues','equipReports','saved_ideas',
   'onshift','roster','reminders','reminders_on','closingTime','prices',
   'checklists','cleaning','equipment_list']);
@@ -2383,9 +2391,8 @@ function updateSyncDot(on){
   d.classList.toggle('bg-neutral-600', !on);
 }
 async function syncBoot(){
-  if(!window.supabase || !window.supabase.createClient) return; // offline / CDN blocked
+  if(!ensureSB()) return; // offline / CDN blocked
   try{
-    SB=window.supabase.createClient(SB_URL, SB_KEY, {auth:{persistSession:false}});
     const {data,error}=await SB.from('eg_kv').select('k,v');
     if(!error && Array.isArray(data)){
       const cloud=new Set();
@@ -2444,8 +2451,13 @@ $('#whoBtn').addEventListener('click',()=>{
         ${ROSTER.slice().reverse().slice(0,8).map(n=>`<button data-switch="${esc(n)}" class="w-full text-left bg-ink-800 hover:bg-ink-700 border border-ink-700 rounded-2xl px-4 py-3 font-semibold flex items-center gap-3">
           <span class="w-8 h-8 rounded-full bg-gradient-to-br from-brand-500 to-brand-600 grid place-items-center text-xs font-bold text-white">${initials(n)}</span>${esc(n)}</button>`).join('')}
       </div>`:''}
-      <button onclick="closeModal()" class="mt-5 w-full bg-ink-700 text-neutral-200 font-semibold py-3 rounded-2xl">Cancel</button>
+      ${STAFF.email?`<div class="mt-5 pt-4 border-t border-ink-700">
+        <p class="text-[11px] text-neutral-500 mb-2">Signed in as <b class="text-neutral-300">${esc(STAFF.email)}</b></p>
+        <button id="logoutBtn" class="w-full bg-ink-800 border border-red-500/30 text-red-400 font-semibold py-3 rounded-2xl active:scale-95 transition">Log out</button>
+      </div>`:''}
+      <button onclick="closeModal()" class="mt-3 w-full bg-ink-700 text-neutral-200 font-semibold py-3 rounded-2xl">Cancel</button>
     </div>`);
+  $('#logoutBtn')?.addEventListener('click',()=>{ if(confirm('Log out of this device?')) logout(); });
   const doSwitch=(name)=>{
     name=(name||'').trim(); if(!name) return;
     STAFF={name}; store.set('staff',STAFF); rememberName(name);
@@ -2479,10 +2491,87 @@ function initGate(){
 }
 
 /* ============================================================
+   STAFF LOGIN (Supabase Auth) — data is private to logged-in staff
+   ============================================================ */
+function setStaffFromUser(u){
+  const name=(u.user_metadata && u.user_metadata.name) || (u.email? u.email.split('@')[0] : 'Staff');
+  STAFF={ name, email:u.email||'', uid:u.id };
+  store.set('staff',STAFF);
+}
+async function logout(){
+  try{ if(SB) await SB.auth.signOut(); }catch(e){}
+  store.del('staff');
+  location.reload();
+}
+function showAuthGate(){
+  const card=$('#gateCard'); if(!card) return;
+  let mode='login';
+  const draw=()=>{
+    card.innerHTML=`
+      <div class="text-center mb-6">
+        <img src="logo.png" alt="Eagles Gym" class="h-9 w-auto mx-auto mb-3" style="height:36px;width:auto;max-width:80%" />
+        <p class="text-brand-500 font-semibold tracking-[0.25em] text-sm">STAFF HUB</p>
+        <p class="text-neutral-400 text-sm mt-3">${mode==='login'?'Log in to your staff account.':'Create your staff account to join the team.'}</p>
+      </div>
+      ${mode==='signup'?`<input id="auName" type="text" placeholder="Your name" class="w-full mb-3 bg-ink-800 border border-ink-600 rounded-2xl px-4 py-3 text-base focus:border-brand-500 focus:ring-2 focus:ring-brand-500/40 outline-none" />`:''}
+      <input id="auEmail" type="email" inputmode="email" autocomplete="email" placeholder="Email" class="w-full mb-3 bg-ink-800 border border-ink-600 rounded-2xl px-4 py-3 text-base focus:border-brand-500 focus:ring-2 focus:ring-brand-500/40 outline-none" />
+      <input id="auPass" type="password" autocomplete="${mode==='login'?'current-password':'new-password'}" placeholder="Password" class="w-full mb-3 bg-ink-800 border border-ink-600 rounded-2xl px-4 py-3 text-base focus:border-brand-500 focus:ring-2 focus:ring-brand-500/40 outline-none" />
+      ${mode==='signup'?`<input id="auCode" type="text" placeholder="Gym join code" class="w-full mb-3 bg-ink-800 border border-ink-600 rounded-2xl px-4 py-3 text-base focus:border-brand-500 focus:ring-2 focus:ring-brand-500/40 outline-none" />`:''}
+      <p id="auErr" class="hidden text-red-400 text-xs text-center mb-3"></p>
+      <button id="auGo" class="w-full bg-gradient-to-br from-brand-500 to-brand-600 text-white font-bold py-3.5 rounded-2xl text-base active:scale-95 transition shadow-glow">${mode==='login'?'Log in':'Create account'} →</button>
+      <button id="auToggle" class="w-full text-center text-xs font-semibold text-brand-400 mt-4">${mode==='login'?"New here? Create a staff account":'Have an account? Log in'}</button>
+      <p class="text-center text-[11px] text-neutral-600 mt-3">🔒 Your team's data is private to logged-in staff.</p>`;
+    $('#auToggle').addEventListener('click',()=>{ mode=mode==='login'?'signup':'login'; draw(); });
+    $('#auGo').addEventListener('click',submit);
+    card.querySelectorAll('input').forEach(inp=>inp.addEventListener('keydown',e=>{ if(e.key==='Enter') submit(); }));
+    setTimeout(()=>{ const f=card.querySelector('input'); if(f) f.focus(); },50);
+  };
+  const err=(m)=>{ const e=$('#auErr'); if(e){ e.textContent=m; e.classList.remove('hidden'); } };
+  const busy=(on)=>{ const g=$('#auGo'); if(g){ g.disabled=on; g.style.opacity=on?'0.6':'1'; g.textContent=on?'…':(mode==='login'?'Log in →':'Create account →'); } };
+  async function submit(){
+    if(!ensureSB()){ err('Can\'t reach the server. Check your connection.'); return; }
+    const email=$('#auEmail').value.trim(); const pass=$('#auPass').value;
+    if(!email || !pass){ err('Enter your email and password.'); return; }
+    busy(true);
+    try{
+      if(mode==='signup'){
+        const name=$('#auName').value.trim(); const code=$('#auCode').value.trim();
+        if(!name){ err('Enter your name.'); busy(false); return; }
+        if(code!==GYM_JOIN_CODE){ err('Wrong gym join code — ask your manager.'); busy(false); return; }
+        if(pass.length<6){ err('Password needs at least 6 characters.'); busy(false); return; }
+        const { data, error } = await SB.auth.signUp({ email, password:pass, options:{ data:{ name } } });
+        if(error){ err(error.message||'Could not create account.'); busy(false); return; }
+        if(!data.session){ err('Account created — now log in.'); mode='login'; draw(); return; }
+        setStaffFromUser(data.user); bootApp();
+      } else {
+        const { data, error } = await SB.auth.signInWithPassword({ email, password:pass });
+        if(error){ err('Wrong email or password.'); busy(false); return; }
+        setStaffFromUser(data.user); bootApp();
+      }
+    }catch(e){ err('Network error — try again.'); busy(false); }
+  }
+  draw();
+  $('#gate').style.display='flex';
+}
+
+/* ============================================================
    START
    ============================================================ */
-if(STAFF && STAFF.name){ bootApp(); }
-else { initGate(); }
+async function startup(){
+  ensureSB();
+  if(SB){
+    try{
+      const { data:{ session } } = await SB.auth.getSession();
+      SB.auth.onAuthStateChange((event)=>{ if(event==='SIGNED_OUT') location.reload(); });
+      if(session && session.user){ setStaffFromUser(session.user); bootApp(); }
+      else showAuthGate();
+      return;
+    }catch(e){ /* offline — fall through to local mode */ }
+  }
+  // No Supabase (offline / CDN blocked): local-only fallback (no cloud data exposed)
+  if(STAFF && STAFF.name){ bootApp(); } else { initGate(); }
+}
+startup();
 
 // register service worker for offline (optional, safe if missing)
 if('serviceWorker' in navigator){
