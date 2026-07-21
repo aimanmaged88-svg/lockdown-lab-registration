@@ -8,6 +8,11 @@
 <meta name="description" content="One private performance OS for any sport. Daily check-ins, AI coaching, recovery, nutrition, mindset and goals — personalised to you. Powered by the Lockdown Lab engine.">
 <meta name="theme-color" content="#090909">
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Athlete OS">
 <link rel="stylesheet" href="fonts.css">
 <style>
 :root{
@@ -382,6 +387,9 @@ footer{border-top:1px solid var(--line2);padding:34px 0 46px;margin-top:30px}
   sync();
   document.addEventListener('click',function(e){ var t=e.target.closest&&e.target.closest('#themeToggle'); if(!t)return; var light=root.getAttribute('data-theme')==='light'; root.setAttribute('data-theme',light?'dark':'light'); try{localStorage.setItem('aos_theme',light?'dark':'light');}catch(_){} sync(); });
 })();
+</script>
+<script>
+if('serviceWorker' in navigator){ window.addEventListener('load',function(){ navigator.serviceWorker.register('sw.js').catch(function(){}); }); }
 </script>
 </body>
 </html>

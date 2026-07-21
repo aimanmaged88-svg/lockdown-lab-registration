@@ -140,6 +140,36 @@ audience. Lives in `athlete-os/` and deploys with the rest of the static site
 - Seeded: 4 events on **Lockdown Ballers** (team training, skills session, game
   vs Northside Hawks, parent + coach meeting).
 
+## V2.3 — Installable app, themes, notifications (shipped)
+
+- **Installable PWA**: `manifest.webmanifest` + `sw.js` service worker + real PNG
+  icons (192/512/maskable/apple-touch). The whole `/athlete-os/` scope installs
+  to the home screen and runs full-screen (`display: standalone`). Offline shell
+  cached; API calls always hit the network.
+- **In-app install guide**: header ⚙ → **Install**. On Android it fires the
+  native `beforeinstallprompt` (one-tap install); on iOS it shows the Safari
+  *Share → Add to Home Screen* steps. A segmented iPhone/Android guide covers
+  both, plus a one-time "Install Athlete OS" nudge banner after login and a
+  tutorial step.
+- **Notifications**: ⚙ → **Turn on** requests permission, confirms with a
+  welcome notification, and schedules a best-effort daily check-in nudge (6pm
+  local, once/day, while the app is open). The service worker already implements
+  `push` + `notificationclick`, so true background push is a drop-in server add
+  (VAPID) later. If the user previously blocked, the sheet shows how to re-enable.
+- **5 themes** with a swatch picker (⚙ → Theme): **Dark** (default), **Light**,
+  **Midnight** (navy/blue), **Forest** (emerald), **Grape** (violet). Stored in
+  `localStorage.aos_theme`; a no-flash head script applies it before paint;
+  `theme-color` meta updates per theme. Accent-driven UI (orbs, avatar, AI card,
+  "hot" cards) now flows through tokens so every theme is cohesive.
+
+## Launchpad (`/hub`)
+
+A private, phone-friendly one-pager at
+`lockdown-lab-registration.netlify.app/hub` for the owner: each product (Athlete
+OS, Lockdown Lab, 2026 one-pager) with big tap-to-open links, tap-to-copy codes,
+a "who needs what / who doesn't" split, and a "what to say" script — plus an
+owner-only section (Netlify, Supabase, full access hub) marked never-share.
+
 ## Backend (Supabase project `lockdown-lab`, ref `ymuwuhvqqftgpxwhzoub`)
 
 - **Edge function `aos-api`** (source: `supabase/functions/aos-api/index.ts`)
