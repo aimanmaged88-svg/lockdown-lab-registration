@@ -189,6 +189,31 @@ Real web push that fires even when the app is closed — VAPID + service worker.
   a **Push reach** KPI (count + % of squad reachable), and a push-status line in
   the athlete drawer — the coach can see at a glance who will actually get alerts.
 
+## V2.5 — Organisation hierarchy, admin, athlete photos (staged)
+
+- **Hierarchy** (additive, nullable FKs): `aos_orgs → aos_clubs → aos_seasons →
+  aos_age_groups`, and `aos_teams.age_group_id` links teams in. Existing flat
+  teams keep working (they show as "Unassigned"). `aos_athletes.avatar_url` added;
+  public `aos-avatars` storage bucket created.
+- **Admin page** `athlete-os/admin.html` (coach-code gated, desktop-first): a
+  nested tree with create / rename / delete at every level, per-team member
+  counts, an "Unassigned teams" section with an age-group dropdown to slot teams
+  in, and **bulk import** — paste `Org, Club, Season, Age Group, Team` CSV rows
+  (header optional; existing names reused, safe to re-run). Linked from the coach
+  dashboard header (🏛 Org). *Live import from other orgs' systems isn't possible;
+  export their structure to CSV and paste it.*
+- **Edge fn actions** (coach-auth): `org_tree`, `org_node` (create/rename/delete/
+  assign), `org_import`; `team_create` accepts `age_group_id`.
+- **Athlete photos**: optional avatar. In the app's ⚙ Settings → Profile photo,
+  the image is cropped square + resized to 256px client-side (canvas) and sent as
+  base64 to `avatar_set`, which stores it in the bucket via service role. Shown on
+  the app Home hero, and on coach roster cards. `avatar_clear` removes it.
+- **Tutorial**: added a truthfulness/accountability beat — "log the truth; inflate
+  your numbers and the gap shows up on the court, and your coach sees your
+  performance too."
+- **Deploy note**: DB migration + bucket are applied; the **edge function (v9)
+  carrying these actions is staged in source and deploys on request**.
+
 ## Projects dashboard (`/hub`) — *personal, not part of Athlete OS*
 
 `lockdown-lab-registration.netlify.app/hub` — **"Projects Aiman's Working On"**,

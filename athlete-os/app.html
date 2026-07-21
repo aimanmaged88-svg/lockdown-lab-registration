@@ -208,6 +208,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 .av{width:60px;height:60px;border-radius:50%;position:relative;flex:0 0 auto}
 .av .ring{position:absolute;inset:-3px;border-radius:50%;background:conic-gradient(var(--accent) var(--pct,0%), var(--track) 0)}
 .av .core{position:absolute;inset:1px;border-radius:50%;background:linear-gradient(140deg,var(--accent-hi),var(--accent));display:grid;place-items:center;font-family:var(--fd);font-size:22px;color:var(--on-accent);border:3px solid var(--bg)}
+.av .av-img{position:absolute;inset:1px;width:calc(100% - 2px);height:calc(100% - 2px);border-radius:50%;object-fit:cover;border:3px solid var(--bg)}
 .hero-row .hi small{font-family:var(--fm);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:3px}
 .hero-row .hi b{font-family:var(--fd);font-size:26px;letter-spacing:.5px;text-transform:uppercase;font-weight:400;line-height:1}
 .profstrip{display:flex;flex-wrap:wrap;gap:6px;margin:-6px 0 14px}
@@ -362,6 +363,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 .gs-txt b{font-size:14.5px;font-weight:650;display:block}
 .gs-txt span{font-size:12px;color:var(--dim);display:block;margin-top:2px;line-height:1.4}
 .gs-row .btn{flex:0 0 auto;white-space:nowrap}
+.pf-prev{flex:0 0 auto;width:52px;height:52px;border-radius:50%;overflow:hidden;background:linear-gradient(140deg,var(--accent-hi),var(--accent));display:grid;place-items:center;font-family:var(--fd);font-size:19px;color:var(--on-accent);position:relative}
+.pf-prev img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .gs-pill{flex:0 0 auto;font-family:var(--fm);font-size:10px;letter-spacing:.6px;text-transform:uppercase;color:var(--good);border:1px solid var(--good);background:var(--good-soft);border-radius:99px;padding:7px 12px}
 .gs-guide{margin-top:10px;border:1px solid var(--line);border-radius:14px;background:var(--sunken);padding:0;overflow:hidden;display:none}
 .gs-guide.show{display:block}
@@ -490,7 +493,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
     <!-- HOME -->
     <section class="tabpage" data-page="home">
       <div class="hero-row">
-        <div class="av"><span class="ring" id="xpRing"></span><span class="core" id="avInit">–</span></div>
+        <div class="av"><span class="ring" id="xpRing"></span><span class="core" id="avInit">–</span><img id="avImg" class="av-img" alt="" style="display:none"></div>
         <div class="hi"><small id="greet">Locked in?</small><b id="heroName">–</b></div>
         <span class="chip live" style="margin-left:auto"><span class="d"></span><span id="streakChip">0</span>d streak</span>
       </div>
@@ -741,6 +744,17 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
   <div class="gs-card">
     <div class="gs-grab"></div>
     <h2 class="display">Settings</h2>
+
+    <div class="gs-sec">
+      <div class="gs-lbl">Profile photo</div>
+      <div class="gs-row">
+        <span class="pf-prev" id="pfPrev"><span id="pfInit">–</span></span>
+        <div class="gs-txt"><b id="pfTit">Add a photo</b><span>Optional — put a face to your name. Your coach &amp; teammates will see it.</span></div>
+        <button class="btn btn-p btn-sm" id="pfPick">Add</button>
+        <button class="btn btn-g btn-sm" id="pfRemove" style="display:none">Remove</button>
+      </div>
+      <input type="file" id="pfFile" accept="image/*" style="display:none">
+    </div>
 
     <div class="gs-sec">
       <div class="gs-lbl">Theme</div>
@@ -1073,7 +1087,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
     ['🧠','Your AI coach','It reads your check-ins and tells you what to work on next — in your sport’s language. It guides and motivates; it never diagnoses.'],
     ['🧬','Train · Body · Mind','A weekly plan, recovery + hydration + nutrition, and a mental file to flush the moments that rattle you. Tabs along the bottom.'],
     ['💬','Talk to your coach','The Coach tab is your direct line — message them, see your rating, and (if you’re on a team) rate your squad.'],
-    ['📲','Install it + turn on alerts','Tap the ⚙ in the header → Install to add Athlete OS to your home screen like a real app, and switch on reminders so you never miss a check-in or session.'],
+    ['🤝','Be honest — it’s the whole point','This only works if you log the truth. Real energy, real sleep, real effort. Inflate your numbers and the gap shows up where it counts — on the court, on the field, in the game. Your coach sees your performance too. Truth in here = growth out there.'],
+    ['📲','Install it + turn on alerts','Tap the ⚙ in the header → Install to add Athlete OS to your home screen like a real app, and switch on reminders so you never miss a check-in or session. Add a profile photo there too if you want.'],
     ['🚀','You’re set','Hit “Lock It In” on today’s check-in to start your streak. Tap ? in the header any time to see this again.'],
   ];
   let tutI=0;
@@ -1104,6 +1119,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
     /* home */
     $('#heroName').textContent=p.name;
     $('#avInit').textContent=p.name.split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    (function(){ const im=$('#avImg'); if(p.avatar_url){ im.src=p.avatar_url; im.style.display='block'; } else { im.removeAttribute('src'); im.style.display='none'; } })();
     $('#stXp').textContent=p.xp; $('#stLogs').textContent=AST.checkins.length;
     const week=AST.checkins.filter(c=>(Date.now()-new Date(c.d).getTime())<7*864e5).length;
     $('#stWeek').textContent=week+(p.train_freq?'/'+p.train_freq:'');
@@ -1423,7 +1439,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 
   /* ---------- gear open / close ---------- */
   var sheet=$('#gearSheet');
-  function openGear(){ renderThemes(); refreshInstall(); refreshNotif(); sheet.classList.add('open'); }
+  function openGear(){ renderThemes(); refreshInstall(); refreshNotif(); refreshPhoto(); sheet.classList.add('open'); }
   function closeGear(){ sheet.classList.remove('open'); }
   document.addEventListener('click',function(e){
     if(e.target.closest&&e.target.closest('#gearBtn')) return openGear();
@@ -1484,6 +1500,49 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
       if(!sub) sub=await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:urlB64ToU8(VAPID_PUB) });
       await fetch(FN,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ action:'push_subscribe', aid:sess.aid, pin:sess.pin, sub:sub.toJSON(), ua:(navigator.userAgent||'').slice(0,180) }) });
     }catch(e){ /* subscription is best-effort */ }
+  }
+
+  /* ---------- Profile photo ---------- */
+  function toastMsg(m){ var t=document.getElementById('toast'); if(!t)return; t.textContent=m; t.className='show'; setTimeout(function(){t.classList.remove('show');},2000); }
+  function refreshPhoto(){
+    var im=document.getElementById('avImg'), prev=$('#pfPrev'), init=$('#pfInit'), tit=$('#pfTit'), pick=$('#pfPick'), rem=$('#pfRemove');
+    if(!prev)return;
+    var has=im && im.getAttribute('src') && im.style.display!=='none';
+    init.textContent=(document.getElementById('avInit')||{}).textContent||'–';
+    var old=prev.querySelector('img'); if(old)old.remove();
+    if(has){ var img=document.createElement('img'); img.src=im.src; img.alt=''; prev.appendChild(img); tit.textContent='Your photo'; pick.textContent='Change'; rem.style.display=''; }
+    else { tit.textContent='Add a photo'; pick.textContent='Add'; rem.style.display='none'; }
+  }
+  function applyPhoto(url){
+    var im=document.getElementById('avImg');
+    if(url){ im.src=url; im.style.display='block'; } else { im.removeAttribute('src'); im.style.display='none'; }
+    refreshPhoto();
+  }
+  function resizeImg(file, size, cb){
+    var url=URL.createObjectURL(file), img=new Image();
+    img.onload=function(){ var s=Math.min(img.width,img.height), sx=(img.width-s)/2, sy=(img.height-s)/2;
+      var cv=document.createElement('canvas'); cv.width=size; cv.height=size;
+      var ctx=cv.getContext('2d'); ctx.drawImage(img,sx,sy,s,s,0,0,size,size);
+      URL.revokeObjectURL(url); try{ cb(cv.toDataURL('image/jpeg',0.85)); }catch(e){ cb(null); } };
+    img.onerror=function(){ URL.revokeObjectURL(url); cb(null); };
+    img.src=url;
+  }
+  document.addEventListener('click',function(e){
+    if(e.target.closest&&e.target.closest('#pfPick')){ var f=$('#pfFile'); if(f)f.click(); }
+    if(e.target.closest&&e.target.closest('#pfRemove')){ removePhoto(); }
+  });
+  (function(){ var f=$('#pfFile'); if(f) f.addEventListener('change',function(){ var file=f.files&&f.files[0]; f.value=''; if(!file)return;
+    var sess=getSess(); if(!sess){ toastMsg('Log in first'); return; }
+    $('#pfPick').textContent='Uploading…';
+    resizeImg(file,256,function(dataUrl){ if(!dataUrl){ toastMsg('Could not read that image'); refreshPhoto(); return; }
+      fetch(FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'avatar_set',aid:sess.aid,pin:sess.pin,data:dataUrl})})
+        .then(function(r){return r.json();}).then(function(j){ if(j&&j.avatar_url){ applyPhoto(j.avatar_url); toastMsg('Photo updated 📸'); } else { toastMsg((j&&j.error)||'Upload failed'); refreshPhoto(); } })
+        .catch(function(){ toastMsg('Upload failed'); refreshPhoto(); });
+    });
+  }); })();
+  function removePhoto(){ var sess=getSess(); if(!sess)return;
+    fetch(FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'avatar_clear',aid:sess.aid,pin:sess.pin})})
+      .then(function(r){return r.json();}).then(function(){ applyPhoto(null); toastMsg('Photo removed'); }).catch(function(){ toastMsg('Failed'); });
   }
   function notifOn(){ return ('Notification' in window) && Notification.permission==='granted' && localStorage.getItem(NOTES_KEY)==='1'; }
   function refreshNotif(){
