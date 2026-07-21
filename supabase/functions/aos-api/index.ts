@@ -32,10 +32,10 @@ function sydYesterday() {
   return d.toLocaleDateString("en-CA", { timeZone: "Australia/Sydney" });
 }
 
-const SPORTS = ["basketball", "mma", "soccer", "oztag", "netball", "rugby", "afl", "tennis", "swimming", "running", "volleyball", "general"];
+const SPORTS = ["basketball", "mma", "boxing", "bjj", "soccer", "oztag", "netball", "rugby", "afl", "tennis", "swimming", "running", "volleyball", "general"];
 // Light terminology map so AI insights speak the athlete's language.
 const SPORT_WORD: Record<string, string> = {
-  basketball: "on the court", mma: "on the mats", soccer: "on the pitch", oztag: "on the field",
+  basketball: "on the court", mma: "on the mats", boxing: "in the ring", bjj: "on the mats", soccer: "on the pitch", oztag: "on the field",
   netball: "on the court", rugby: "on the field", afl: "on the field", tennis: "on the court",
   swimming: "in the pool", running: "on the track", volleyball: "on the court", general: "in training",
 };
