@@ -45,6 +45,7 @@ export function MobileTabBar() {
     marketplace: "Find",
     "support-circle": "Circle",
     assistant: "Assistant",
+    comms: "Inbox",
     learning: "Learn",
     community: "Places",
     reports: "Reports",
