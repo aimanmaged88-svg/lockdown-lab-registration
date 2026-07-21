@@ -1,2 +1,29 @@
 [build]
   publish = "."
+
+# --- Athlete OS -----------------------------------------------------------
+# Clean short entry: /os → the Athlete OS landing (real folder, no loop).
+# One-hop 302 to the real /athlete-os/ directory (which serves index.html
+# and resolves relative assets correctly). No self-referential redirect.
+[[redirects]]
+  from = "/os"
+  to = "/athlete-os/"
+  status = 302
+
+# --- NOVA Rewards (giveaway) ---------------------------------------------
+# publish stays "." so the existing site root and other products are
+# untouched; the config below is scoped to /giveaway/ only.
+
+# Clean path: /giveaway (no trailing slash) → canonical folder.
+[[redirects]]
+  from = "/giveaway"
+  to = "/giveaway/"
+  status = 301
+
+# Security headers for the giveaway app.
+[[headers]]
+  for = "/giveaway/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"

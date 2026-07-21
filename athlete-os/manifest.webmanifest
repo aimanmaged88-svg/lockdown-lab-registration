@@ -1,0 +1,24 @@
+{
+  "name": "Athlete OS — Performance Hub",
+  "short_name": "Athlete OS",
+  "description": "Your private performance hub — training, recovery, mindset and goals, personalised to your sport.",
+  "id": "/athlete-os/",
+  "start_url": "./app.html?src=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#090909",
+  "theme_color": "#090909",
+  "categories": ["sports", "health", "lifestyle", "productivity"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" },
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ],
+  "shortcuts": [
+    { "name": "Daily check-in", "short_name": "Check-in", "url": "./app.html?go=home", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] },
+    { "name": "Message my coach", "short_name": "Coach", "url": "./app.html?go=msgs", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] }
+  ]
+}

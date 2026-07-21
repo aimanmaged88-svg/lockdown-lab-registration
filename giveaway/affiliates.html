@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NOVA · Affiliate Program</title>
+<link rel="stylesheet" href="theme.css" />
+<style>
+  header.top{position:sticky;top:0;z-index:20;border-bottom:1px solid var(--line2);background:rgba(10,11,15,.72);backdrop-filter:blur(14px)}
+  header.top .bar{display:flex;align-items:center;gap:14px;height:60px}
+  header.top .sp{flex:1}
+  .hero{padding:40px 0 24px;max-width:640px}
+  .hero h1{font-size:clamp(28px,5vw,40px)}
+  .hero p{color:var(--muted);font-size:17px;margin-top:12px}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding-bottom:60px}
+  @media(max-width:760px){.split{grid-template-columns:1fr}}
+  .card h3{font-size:18px;margin-bottom:14px}
+  .stat-hero{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
+  .sh{border:1px solid var(--line);border-radius:12px;background:var(--panel2);padding:14px}
+  .sh .n{font-family:var(--fm);font-size:26px;font-weight:700}
+  .sh .l{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--dim);margin-top:5px}
+  .linkbox{display:flex;gap:8px;margin-top:6px}
+  .linkbox input{font-family:var(--fm);font-size:13px}
+  .payout{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line2);font-size:13px}
+  .err{display:none;margin-top:12px;color:#ff9a9a;font-size:13px;background:var(--danger-soft);border:1px solid var(--danger);border-radius:10px;padding:10px}
+  .statusline{margin:10px 0}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap bar">
+    <a class="logo" href="index.html"><span class="mark">N</span> NOVA</a>
+    <div class="sp"></div>
+    <a class="btn btn-ghost btn-sm" href="index.html">Store</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="hero">
+    <div class="eyebrow">Partner with NOVA</div>
+    <h1>Earn commission promoting the Rewards Draw</h1>
+    <p>Share your unique link, drive sign-ups, and earn on every sale. Track your clicks, conversions and payouts in real time.</p>
+  </div>
+
+  <div class="split">
+    <!-- Register -->
+    <div class="card">
+      <h3>Become an affiliate</h3>
+      <div class="field"><label>Name / brand</label><input id="rName" placeholder="Your name or company"></div>
+      <div class="field"><label>Email</label><input id="rEmail" type="email" placeholder="you@example.com"></div>
+      <div class="field"><label>Preferred handle</label><input id="rHandle" placeholder="e.g. yourname"></div>
+      <button class="btn btn-gold btn-block" id="regBtn">Apply to join →</button>
+      <p class="dim" style="font-size:12px;margin-top:12px">Applications are reviewed by our team. You'll start earning
+        once approved. Default commission is 15% of referred sales.</p>
+      <div class="err" id="regErr"></div>
+    </div>
+
+    <!-- Portal / stats -->
+    <div class="card">
+      <h3>Affiliate dashboard</h3>
+      <div id="lookup">
+        <div class="field"><label>Your ref code or email</label><input id="lkId" placeholder="e.g. coastline"></div>
+        <button class="btn btn-ghost btn-block" id="lkBtn">View my stats</button>
+        <div class="err" id="lkErr"></div>
+      </div>
+      <div id="portal" style="display:none">
+        <div class="statusline" id="pStatus"></div>
+        <label>Your referral link</label>
+        <div class="linkbox"><input id="pLink" readonly><button class="btn btn-ghost btn-sm" id="copyLink">Copy</button></div>
+        <div class="stat-hero">
+          <div class="sh"><div class="n" id="pClicks">0</div><div class="l">Clicks</div></div>
+          <div class="sh"><div class="n" id="pSales">0</div><div class="l">Sales</div></div>
+          <div class="sh"><div class="n" id="pRev">$0</div><div class="l">Referred revenue</div></div>
+          <div class="sh"><div class="n" id="pComm" style="color:var(--gold)">$0</div><div class="l">Commission earned</div></div>
+        </div>
+        <h4 style="font-size:14px;margin:8px 0">Payout history</h4>
+        <div id="pPayouts"></div>
+        <button class="btn btn-ghost btn-block btn-sm" id="lkOut" style="margin-top:14px">Look up another</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="engine.js"></script>
+<script>
+(function(){
+  var $=function(s){return document.querySelector(s);};
+  var toast=function(m){var t=$('#toast');t.textContent=m;t.classList.add('show');setTimeout(function(){t.classList.remove('show');},1800);};
+  var base=location.origin+location.pathname.replace(/affiliates\.html$/,'index.html');
+
+  $('#regBtn').addEventListener('click',function(){
+    var name=$('#rName').value.trim(); if(!name){var e=$('#regErr');e.style.display='block';e.textContent='Please enter a name.';return;}
+    var a=GV.registerAffiliate({name:name,email:$('#rEmail').value.trim(),handle:$('#rHandle').value.trim()});
+    toast('Application submitted!'); showPortal(a);
+  });
+
+  function showPortal(a){
+    $('#lookup').style.display='none'; $('#portal').style.display='block';
+    var st=a.status==='approved'?'<span class="badge on">Approved · earning</span>':a.status==='rejected'?'<span class="badge off">Not approved</span>':'<span class="badge warn">Pending review</span>';
+    $('#pStatus').innerHTML='Status: '+st+(a.status==='pending'?' — your link works once approved.':'');
+    $('#pLink').value=base+'?ref='+a.ref;
+    $('#pClicks').textContent=a.clicks.toLocaleString();
+    $('#pSales').textContent=a.sales.toLocaleString();
+    $('#pRev').textContent='$'+Math.round(a.revenue).toLocaleString();
+    $('#pComm').textContent='$'+a.commission.toFixed(2);
+    $('#pPayouts').innerHTML = a.payouts.length ? a.payouts.map(function(p){
+      return '<div class="payout"><span>'+new Date(p.at).toLocaleDateString()+'</span><span class="mono">$'+p.amount.toFixed(2)+'</span></div>';
+    }).join('') : '<p class="dim" style="font-size:13px">No payouts yet.</p>';
+  }
+  $('#lkBtn').addEventListener('click',function(){
+    var q=$('#lkId').value.trim().toLowerCase();
+    var a=GV.affiliates().find(function(x){return x.ref===q||x.email.toLowerCase()===q||x.name.toLowerCase()===q;});
+    if(!a){var e=$('#lkErr');e.style.display='block';e.textContent='No affiliate found. Try your ref code or the email you applied with.';return;}
+    showPortal(a);
+  });
+  $('#copyLink').addEventListener('click',function(){$('#pLink').select();try{document.execCommand('copy');}catch(e){} toast('Link copied');});
+  $('#lkOut').addEventListener('click',function(){$('#portal').style.display='none';$('#lookup').style.display='block';$('#lkId').value='';});
+})();
+</script>
+</body>
+</html>

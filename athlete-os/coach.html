@@ -2,127 +2,328 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<script>(function(){try{document.documentElement.setAttribute('data-theme',localStorage.getItem('aos_theme')||'dark');}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
 <meta name="robots" content="noindex,nofollow" />
+<meta name="theme-color" content="#090909" />
 <title>Athlete OS · Coach</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
 <style>
   :root{
-    --bg:#070707; --panel:rgba(255,255,255,.04); --panel2:rgba(255,255,255,.02);
-    --line:rgba(255,255,255,.10); --line2:rgba(255,255,255,.06);
-    --text:#f4f2ef; --muted:#9b968f; --dim:#6a655e;
-    --accent:#ff6b00; --accent-hi:#ff8a2b; --accent-soft:rgba(255,107,0,.14);
-    --good:#22c55e; --good-soft:rgba(34,197,94,.14); --bad:#ff5252;
+    --bg:#090909; --panel:#121212; --panel2:#0F0F0F;
+    --line:rgba(255,255,255,.08); --line2:rgba(255,255,255,.05);
+    --text:#F5F5F5; --muted:#9B9B9B; --dim:#7C7C7C;
+    --accent:#FF7A00; --accent-hi:#FF9A45; --accent-soft:rgba(255,122,0,.14); --accent-glow:rgba(255,122,0,.34);
+    --good:#30D158; --good-soft:rgba(48,209,88,.14); --amber:#FFB020; --amber-soft:rgba(255,176,32,.14); --bad:#FF453A; --bad-soft:rgba(255,69,58,.12);
     --fd:"Arial Narrow",Helvetica,Arial,system-ui,sans-serif;
     --fb:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
     --fm:ui-monospace,"SF Mono","Roboto Mono",Menlo,monospace;
+    --accent-text:#FF7A00; --on-accent:#1A0E00;
+    --surface:#121212; --surface-2:#181818;
+    --fill:rgba(255,255,255,.05); --fill-hi:rgba(255,255,255,.08);
+    --sunken:rgba(0,0,0,.28); --field:rgba(255,255,255,.05); --field-hi:rgba(255,255,255,.08);
+    --track:rgba(255,255,255,.10); --hover:rgba(255,255,255,.03); --sheen:rgba(255,255,255,.06);
+    --header-bg:rgba(9,9,9,.72); --sheet-bg:rgba(16,16,16,.96); --scrim:rgba(0,0,0,.55);
+    --page-tint:rgba(255,122,0,.08);
+    --shadow-sm:0 1px 2px rgba(0,0,0,.4); --shadow-md:0 8px 24px -12px rgba(0,0,0,.6);
+    --shadow-lg:0 28px 64px -28px rgba(0,0,0,.78); --lift:0 12px 34px -14px rgba(0,0,0,.5);
+    --r-sm:10px; --r-md:14px; --r-lg:20px; --r-xl:28px; --r-pill:999px;
+    --dur-fast:150ms; --dur:210ms; --dur-slow:260ms;
+    --ease:cubic-bezier(.2,.8,.2,1); --ease-out:cubic-bezier(.16,1,.3,1);
+    --ease-spring:cubic-bezier(.34,1.56,.64,1); --ease-press:cubic-bezier(.4,0,.2,1);
     color-scheme:dark;
   }
+  :root[data-theme="light"]{
+    --bg:#F2F2F7; --panel:#FFFFFF; --panel2:#F7F7FA;
+    --line:rgba(0,0,0,.09); --line2:rgba(0,0,0,.055);
+    --text:#1D1D1F; --muted:#6E6E73; --dim:#8E8E93;
+    --accent:#FF7A00; --accent-hi:#FF9A45; --accent-soft:rgba(255,122,0,.12); --accent-glow:rgba(255,122,0,.26);
+    --good:#1E874B; --good-soft:rgba(30,135,75,.12); --amber:#B25E00; --amber-soft:rgba(178,94,0,.12); --bad:#D70015; --bad-soft:rgba(215,0,21,.10);
+    --accent-text:#C2410C; --on-accent:#1A0E00;
+    --surface:#FFFFFF; --surface-2:#FFFFFF;
+    --fill:rgba(0,0,0,.035); --fill-hi:rgba(0,0,0,.06);
+    --sunken:rgba(0,0,0,.03); --field:#FFFFFF; --field-hi:#FFFFFF;
+    --track:rgba(0,0,0,.08); --hover:rgba(0,0,0,.025); --sheen:rgba(255,255,255,.7);
+    --header-bg:rgba(255,255,255,.72); --sheet-bg:rgba(255,255,255,.97); --scrim:rgba(0,0,0,.28);
+    --page-tint:rgba(255,122,0,.06);
+    --shadow-sm:0 1px 2px rgba(0,0,0,.06); --shadow-md:0 6px 20px -8px rgba(0,0,0,.10);
+    --shadow-lg:0 24px 56px -24px rgba(0,0,0,.16); --lift:0 10px 28px -12px rgba(0,0,0,.14);
+    color-scheme:light;
+  }
   *{margin:0;padding:0;box-sizing:border-box}
+  html,body{overscroll-behavior-y:none}
   body{background:var(--bg);color:var(--text);font-family:var(--fb);-webkit-font-smoothing:antialiased;
-    background-image:radial-gradient(110% 60% at 50% -10%, rgba(255,107,0,.08), transparent 55%);min-height:100vh}
+    background-image:radial-gradient(120% 55% at 50% -10%, var(--page-tint), transparent 55%);min-height:100vh;
+    transition:background var(--dur) var(--ease),color var(--dur) var(--ease)}
   a{color:inherit}
-  .wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 24px}
   .mono{font-family:var(--fm);font-variant-numeric:tabular-nums}
+  .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 
-  /* login */
-  .login{min-height:100vh;display:grid;place-items:center;padding:22px}
-  .login-card{width:100%;max-width:380px;border:1px solid var(--line);border-radius:20px;background:var(--panel);
-    backdrop-filter:blur(12px);padding:34px 28px;text-align:center}
-  .brand{display:inline-flex;align-items:center;gap:11px;margin-bottom:22px}
-  .brand b{font-family:var(--fd);text-transform:uppercase;letter-spacing:2.5px;font-weight:700;font-size:18px}
-  .brand b i{font-style:normal;color:var(--accent)}
-  .login-card h1{font-family:var(--fd);text-transform:uppercase;letter-spacing:1px;font-size:26px;margin-bottom:6px}
-  .login-card p{color:var(--muted);font-size:13px;margin-bottom:22px}
-  input,select,textarea{width:100%;background:rgba(0,0,0,.4);border:1px solid var(--line);border-radius:11px;padding:12px 14px;
-    color:var(--text);font-size:15px;font-family:var(--fb);outline:none;transition:border-color .15s,box-shadow .15s}
-  input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
-  .btn{font-family:var(--fd);text-transform:uppercase;letter-spacing:1.5px;font-weight:700;font-size:14px;cursor:pointer;
-    display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 20px;border-radius:999px;border:1px solid transparent;
-    transition:transform .15s,background .15s,border-color .15s}
-  .btn:active{transform:scale(.97)}
-  .btn-primary{background:var(--accent);color:#0a0500}
+  /* ---- controls ---- */
+  input,select,textarea{width:100%;background:var(--field);border:1px solid var(--line);border-radius:var(--r-md);padding:12px 14px;
+    color:var(--text);font-size:15px;font-family:var(--fb);outline:none;transition:border-color var(--dur-fast) var(--ease),box-shadow var(--dur-fast) var(--ease),background var(--dur-fast) var(--ease)}
+  input::placeholder,textarea::placeholder{color:var(--dim)}
+  .btn{font-family:var(--fb);font-weight:650;font-size:13.5px;cursor:pointer;letter-spacing:.2px;
+    display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 16px;border-radius:var(--r-pill);border:1px solid transparent;
+    transition:transform var(--dur-fast) var(--ease-press),background var(--dur-fast) var(--ease),border-color var(--dur-fast) var(--ease),box-shadow var(--dur-fast) var(--ease)}
+  .btn:active{transform:scale(.96)}
+  .btn-primary{background:var(--accent);color:var(--on-accent);box-shadow:0 8px 22px -12px var(--accent-glow)}
   .btn-primary:hover{background:var(--accent-hi)}
-  .btn-ghost{background:var(--panel);border-color:var(--line);color:var(--text)}
-  .btn-ghost:hover{border-color:var(--accent)}
+  .btn-ghost{background:var(--fill);border-color:var(--line);color:var(--text)}
+  .btn-ghost:hover{border-color:var(--accent);color:var(--accent-text)}
   .btn-block{width:100%;margin-top:14px}
-  .btn-sm{padding:8px 14px;font-size:12px}
-  .err{display:none;margin-top:14px;color:#ff9a9a;font-size:13px;background:rgba(255,82,82,.12);border:1px solid #ff5252;border-radius:10px;padding:10px 12px}
+  .btn-sm{padding:8px 13px;font-size:12.5px}
+  :where(a,button,input,select,textarea,summary,[tabindex],.dw-tab,.gpill,.qa,.acard):focus-visible{outline:2px solid var(--accent);outline-offset:2px;box-shadow:0 0 0 4px var(--accent-soft);border-radius:10px}
+  :focus:not(:focus-visible){outline:none}
+  .err{display:none;margin-top:14px;color:var(--bad);font-size:13px;background:var(--bad-soft);border:1px solid var(--bad);border-radius:var(--r-md);padding:10px 12px}
+  .theme-toggle{width:38px;height:38px;flex:0 0 auto;display:grid;place-items:center;border-radius:var(--r-pill);border:1px solid var(--line);background:var(--fill);color:var(--muted);font-size:16px;cursor:pointer;transition:all var(--dur-fast) var(--ease)}
+  .theme-toggle:hover{color:var(--accent-text);border-color:var(--accent)}
+  .theme-toggle:active{transform:scale(.92)}
 
-  /* dashboard */
-  #dash{display:none}
-  header.top{position:sticky;top:0;z-index:10;border-bottom:1px solid var(--line2);
-    background:rgba(7,7,7,.7);backdrop-filter:blur(14px)}
-  header.top .row{display:flex;align-items:center;gap:16px;height:62px}
-  header.top .brand{margin:0}
-  header.top .spacer{flex:1}
-  .pill{font-family:var(--fm);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);
-    border:1px solid var(--line);border-radius:999px;padding:6px 12px}
-  .pill b{color:var(--accent)}
-  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin:26px 0 14px}
-  @media(max-width:760px){.kpis{grid-template-columns:repeat(2,1fr)}}
-  .kpi{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:16px}
-  .kpi .n{font-family:var(--fd);font-size:30px;line-height:1;font-variant-numeric:tabular-nums}
-  .kpi .l{font-family:var(--fm);font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--dim);margin-top:8px}
-  .kpi.accent .n{color:var(--accent)}
+  /* ---- login ---- */
+  .login{min-height:100vh;display:grid;place-items:center;padding:22px}
+  .login-card{width:100%;max-width:390px;border:1px solid var(--line);border-radius:var(--r-xl);background:var(--surface);
+    box-shadow:var(--shadow-lg);padding:38px 30px;text-align:center;animation:aos-rise var(--dur-slow) var(--ease-out)}
+  .brand{display:inline-flex;align-items:center;gap:10px}
+  .brand .lg{width:30px;height:30px;color:var(--accent)}
+  .brand b{font-family:var(--fd);text-transform:uppercase;letter-spacing:2px;font-weight:700;font-size:19px}
+  .brand b i{font-style:normal;color:var(--accent-text)}
+  .login-card h1{font-family:var(--fd);text-transform:uppercase;letter-spacing:1px;font-size:27px;margin:20px 0 6px}
+  .login-card p{color:var(--muted);font-size:13.5px;margin-bottom:22px;line-height:1.5}
 
-  /* auto-categories */
-  .groups{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
-  .gpill{font-family:var(--fm);font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);cursor:pointer;
-    border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:var(--panel2);transition:all .15s}
-  .gpill b{color:var(--accent);margin-left:5px}
-  .gpill:hover,.gpill.on{border-color:var(--accent);color:var(--text)}
+  /* ---- header ---- */
+  #dash{display:none;animation:aos-fade var(--dur) var(--ease)}
+  header.top{position:sticky;top:0;z-index:20;border-bottom:1px solid var(--line2);
+    background:var(--header-bg);backdrop-filter:blur(18px) saturate(160%)}
+  header.top .row{display:flex;align-items:center;gap:14px;height:64px}
+  .pill{font-family:var(--fm);font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);
+    border:1px solid var(--line);border-radius:var(--r-pill);padding:6px 12px}
+  .pill b{color:var(--accent-text)}
+  header .spacer{flex:1}
 
-  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
-  .toolbar input{max-width:260px}
-  .toolbar select{max-width:170px;width:auto}
+  /* ---- section heads ---- */
+  .sechead{display:flex;align-items:baseline;gap:10px;margin:30px 0 14px}
+  .sechead .spacer{flex:1}
+  /* schedule / agenda */
+  .agenda{display:grid;gap:10px}
+  .ev{display:flex;align-items:center;gap:14px;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface);padding:13px 15px;box-shadow:var(--shadow-sm)}
+  .ev .evd{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:52px;padding:6px 8px;border-radius:12px;background:var(--surface-2,rgba(255,255,255,.04));border:1px solid var(--line)}
+  .ev .evd .mo{font-family:var(--fm);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--dim)}
+  .ev .evd .dy{font-family:var(--fd);font-size:22px;line-height:1;color:var(--text)}
+  .ev .evmain{flex:1;min-width:0}
+  .ev .evtit{font-weight:650;font-size:14.5px;display:flex;align-items:center;gap:8px}
+  .ev .evmeta{font-size:12px;color:var(--dim);margin-top:3px}
+  .ev .evtype{font-family:var(--fm);font-size:9.5px;letter-spacing:.8px;text-transform:uppercase;padding:3px 7px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+  .ev .evtype.game{color:var(--accent-text);border-color:var(--accent)}
+  .ev .evtype.meeting{color:var(--amber,#e0a92e)}
+  .ev .evdel{background:none;border:none;color:var(--dim);cursor:pointer;font-size:16px;padding:6px;border-radius:8px}
+  .ev .evdel:hover{color:var(--bad);background:rgba(255,80,80,.08)}
+  .ev.soon{border-color:var(--accent)}
+  .sechead h2{font-family:var(--fd);text-transform:uppercase;letter-spacing:.6px;font-size:15px;color:var(--muted);font-weight:700}
+  .sechead .hint{font-size:12px;color:var(--dim)}
+
+  /* ---- KPI rail ---- */
+  .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}
+  @media(max-width:1000px){.kpis{grid-template-columns:repeat(3,1fr)}}
+  @media(max-width:640px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpi{border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface);padding:16px 16px 14px;box-shadow:var(--shadow-sm);
+    transition:transform var(--dur) var(--ease),box-shadow var(--dur) var(--ease)}
+  @media(hover:hover){.kpi:hover{transform:translateY(-3px);box-shadow:var(--lift)}}
+  .kpi .n{font-family:var(--fd);font-size:32px;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:.5px}
+  .kpi .l{font-family:var(--fm);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--dim);margin-top:9px}
+  .kpi .s{font-size:11px;color:var(--muted);margin-top:3px}
+  .kpi.accent .n{color:var(--accent-text)}
+  .kpi.bad .n{color:var(--bad)}
+  .kpi.setup{border-style:dashed;border-color:var(--line);background:transparent;cursor:pointer;display:flex;flex-direction:column;justify-content:center;min-height:96px}
+  .kpi.setup .n{font-size:24px;color:var(--dim)}
+  .kpi.setup:hover{border-color:var(--accent);color:var(--accent-text)}
+
+  /* ---- team health ---- */
+  .health{border:1px solid var(--line);border-radius:var(--r-xl);background:var(--surface);box-shadow:var(--shadow-md);padding:22px;margin-top:12px}
+  .health-top{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+  .score-ring{width:76px;height:76px;border-radius:50%;display:grid;place-items:center;flex:0 0 auto;position:relative;
+    background:conic-gradient(var(--ring-c) calc(var(--ring)*1%), var(--track) 0)}
+  .score-ring::after{content:"";position:absolute;inset:7px;border-radius:50%;background:var(--surface)}
+  .score-ring b{position:relative;z-index:1;font-family:var(--fd);font-size:26px;color:var(--ring-c);font-variant-numeric:tabular-nums}
+  .health-top .ht-tit{font-family:var(--fd);text-transform:uppercase;letter-spacing:.5px;font-size:22px}
+  .health-top .ht-sub{color:var(--muted);font-size:13px;margin-top:2px}
+  .bars{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+  @media(max-width:820px){.bars{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:420px){.bars{grid-template-columns:1fr}}
+  .bar .bl{display:flex;justify-content:space-between;align-items:baseline;font-family:var(--fm);font-size:10px;letter-spacing:.6px;text-transform:uppercase;color:var(--dim);margin-bottom:7px}
+  .bar .bv{font-size:12px;color:var(--text)}
+  .bar .tr{height:7px;border-radius:99px;background:var(--track);overflow:hidden}
+  .bar .tr i{display:block;height:100%;border-radius:99px;width:0;transition:width .8s var(--ease)}
+  .bar.setup .tr i{background:repeating-linear-gradient(45deg,var(--line),var(--line) 5px,transparent 5px,transparent 10px);width:100%!important}
+  .bar.setup .bv{color:var(--dim)}
+  .g{color:var(--good)} .a{color:var(--amber)} .r{color:var(--bad)}
+  .gb{background:var(--good)} .ab{background:var(--amber)} .rb{background:var(--bad)}
+
+  /* ---- quick actions ---- */
+  .qas{display:grid;grid-template-columns:repeat(7,1fr);gap:10px}
+  @media(max-width:900px){.qas{grid-template-columns:repeat(4,1fr)}}
+  @media(max-width:520px){.qas{grid-template-columns:repeat(3,1fr)}}
+  .qa{border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface);padding:14px 8px;text-align:center;cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;gap:7px;transition:transform var(--dur-fast) var(--ease),border-color var(--dur-fast) var(--ease),box-shadow var(--dur) var(--ease)}
+  @media(hover:hover){.qa:hover{transform:translateY(-3px);border-color:var(--accent);box-shadow:var(--lift)}}
+  .qa:active{transform:scale(.96)}
+  .qa .qi{font-size:20px}
+  .qa span{font-size:11px;color:var(--muted);line-height:1.25}
+  .qa .live{position:absolute;top:8px;right:8px;width:6px;height:6px;border-radius:50%;background:var(--good)}
+  .qa{position:relative}
+
+  /* ---- toolbar + groups ---- */
+  .toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:14px 0}
+  .toolbar .field{position:relative;flex:1;min-width:200px;max-width:320px}
+  .toolbar .field input{padding-left:36px}
+  .toolbar .field .ic{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--dim);font-size:14px;pointer-events:none}
+  .toolbar select{max-width:160px;width:auto}
   .toolbar .spacer{flex:1}
+  .groups{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+  .gpill{font-family:var(--fm);font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);cursor:pointer;
+    border:1px solid var(--line);border-radius:var(--r-pill);padding:7px 13px;background:var(--surface);transition:all var(--dur-fast) var(--ease)}
+  .gpill b{color:var(--accent-text);margin-left:6px}
+  .gpill:hover,.gpill.on{border-color:var(--accent);color:var(--text)}
+  .gpill.on{background:var(--accent-soft)}
 
-  .tablewrap{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--panel2)}
-  .scroll{overflow-x:auto}
-  table{width:100%;border-collapse:collapse;min-width:900px}
-  thead th{font-family:var(--fm);font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--dim);
-    text-align:left;padding:13px 14px;border-bottom:1px solid var(--line);white-space:nowrap;background:var(--panel)}
-  tbody td{padding:12px 14px;border-bottom:1px solid var(--line2);font-size:14px;vertical-align:top}
-  tbody tr:last-child td{border-bottom:none}
-  tbody tr.arow:hover{background:rgba(255,255,255,.02)}
-  .player{font-family:var(--fd);text-transform:uppercase;letter-spacing:.5px;font-size:17px}
-  .sub{color:var(--muted);font-size:12px}
-  .badge{display:inline-block;font-family:var(--fm);font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:3px 9px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
-  .badge.ok{border-color:var(--good);color:var(--good);background:var(--good-soft)}
-  .badge.warn{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
-  .badge.inj{border-color:var(--bad);color:#ff9a9a;background:rgba(255,82,82,.10)}
-  .empty{padding:60px 20px;text-align:center;color:var(--muted)}
+  /* ---- athlete cards ---- */
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+  @media(max-width:640px){.cards{grid-template-columns:1fr}}
+  .acard{border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface);box-shadow:var(--shadow-sm);padding:16px;cursor:pointer;text-align:left;
+    display:flex;flex-direction:column;gap:12px;transition:transform var(--dur) var(--ease),box-shadow var(--dur) var(--ease),border-color var(--dur) var(--ease)}
+  @media(hover:hover){.acard:hover{transform:translateY(-3px);box-shadow:var(--lift);border-color:var(--line)}}
+  .acard:active{transform:scale(.99)}
+  .ac-top{display:flex;align-items:center;gap:12px}
+  .mono-av{width:46px;height:46px;border-radius:50%;flex:0 0 auto;position:relative;display:grid;place-items:center;
+    background:conic-gradient(var(--rc) calc(var(--rp)*1%), var(--track) 0)}
+  .mono-av::after{content:"";position:absolute;inset:2px;border-radius:50%;background:var(--surface)}
+  .mono-av b{position:relative;z-index:1;font-family:var(--fd);font-size:17px;letter-spacing:.5px}
+  .ac-id{min-width:0;flex:1}
+  .ac-id .nm{display:block;font-family:var(--fd);text-transform:uppercase;letter-spacing:.4px;font-size:18px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ac-id .meta{display:block;font-size:12px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ac-stats{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{font-family:var(--fm);font-size:10px;letter-spacing:.4px;text-transform:uppercase;border:1px solid var(--line);color:var(--muted);border-radius:var(--r-pill);padding:4px 9px;display:inline-flex;align-items:center;gap:5px}
+  .chip.ok{border-color:var(--good);color:var(--good);background:var(--good-soft)}
+  .chip.warn{border-color:var(--amber);color:var(--amber);background:var(--amber-soft)}
+  .chip.inj{border-color:var(--bad);color:var(--bad);background:var(--bad-soft)}
+  .chip.acc{border-color:var(--accent);color:var(--accent-text);background:var(--accent-soft)}
+  .chip.off{border-color:var(--line);color:var(--dim);opacity:.75}
+  .ac-foot{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--dim);font-family:var(--fm)}
+  .ac-foot .dot{margin-left:auto;color:var(--accent-text);font-family:var(--fb);font-weight:650}
+  .empty{padding:70px 20px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:var(--r-lg)}
   .empty b{display:block;font-family:var(--fd);text-transform:uppercase;font-size:22px;color:var(--text);margin-bottom:8px}
   .foot{color:var(--dim);font-size:12px;text-align:center;padding:26px 0 40px;font-family:var(--fm)}
-  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--accent);color:#0a0500;
-    font-family:var(--fd);text-transform:uppercase;letter-spacing:1px;font-size:13px;padding:11px 18px;border-radius:999px;
-    opacity:0;transition:opacity .25s;pointer-events:none;z-index:50}
-  .toast.show{opacity:1}
 
-  /* athlete file (expanded row) */
-  tr.filerow td{background:rgba(0,0,0,.25);padding:18px 16px}
-  .file{display:grid;grid-template-columns:1.2fr 1fr 1fr;gap:18px}
-  @media(max-width:900px){.file{grid-template-columns:1fr}}
-  .file h4{font-family:var(--fm);font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--accent);margin-bottom:9px}
-  .file .box{border:1px solid var(--line2);border-radius:12px;background:var(--panel2);padding:12px;margin-bottom:8px;font-size:13px;color:var(--muted)}
-  .file .box b{color:var(--text)}
-  .cirow{display:flex;justify-content:space-between;gap:10px;padding:6px 0;border-bottom:1px solid var(--line2);font-size:12.5px}
-  .cirow:last-child{border-bottom:none}
-  .cirow .d{color:var(--text);font-family:var(--fm)}
-  .notes .box{margin-bottom:6px}
-  .file textarea{min-height:64px;resize:vertical;font-size:13px;margin-bottom:8px}
+  /* ---- toast ---- */
+  .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--surface-2);color:var(--text);border:1px solid var(--line);
+    font-size:13.5px;font-weight:600;padding:12px 18px;border-radius:var(--r-pill);box-shadow:var(--shadow-lg);
+    opacity:0;transition:opacity var(--dur) var(--ease),transform var(--dur) var(--ease-spring);pointer-events:none;z-index:80}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* ---- drawer ---- */
+  .scrim{position:fixed;inset:0;background:var(--scrim);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:opacity var(--dur) var(--ease);z-index:60}
+  .scrim.open{opacity:1;pointer-events:auto}
+  .drawer{position:fixed;top:0;right:0;height:100dvh;width:min(520px,94vw);background:var(--surface);border-left:1px solid var(--line);box-shadow:var(--shadow-lg);
+    z-index:70;transform:translateX(100%);transition:transform var(--dur-slow) var(--ease-out);display:flex;flex-direction:column;overflow:hidden}
+  .drawer.open{transform:none}
+  .dw-head{padding:20px 20px 0;position:relative;flex:0 0 auto;
+    background:radial-gradient(120% 80% at 100% 0%, var(--accent-soft), transparent 60%)}
+  .dw-head .x{position:absolute;top:16px;right:16px;width:34px;height:34px;border-radius:var(--r-pill);border:1px solid var(--line);background:var(--fill);color:var(--muted);font-size:16px;cursor:pointer}
+  .dw-head .x:hover{color:var(--text);border-color:var(--accent)}
+  .dw-name{font-family:var(--fd);text-transform:uppercase;letter-spacing:.5px;font-size:28px;line-height:1;padding-right:40px}
+  .dw-sub{color:var(--muted);font-size:13px;margin-top:5px}
+  .dw-tabs{display:flex;gap:4px;overflow-x:auto;padding:14px 20px 0;flex:0 0 auto;scrollbar-width:none}
+  .dw-tabs::-webkit-scrollbar{display:none}
+  .dw-tab{font-family:var(--fm);font-size:11px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);background:none;border:none;cursor:pointer;
+    padding:9px 4px;white-space:nowrap;border-bottom:2px solid transparent;transition:color var(--dur-fast) var(--ease)}
+  .dw-tab.on{color:var(--accent-text);border-bottom-color:var(--accent)}
+  .dw-body{flex:1;overflow-y:auto;padding:18px 20px 28px;-webkit-overflow-scrolling:touch}
+  .dw-body h4{font-family:var(--fm);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--accent-text);margin:16px 0 9px}
+  .dw-body h4:first-child{margin-top:0}
+  .box{border:1px solid var(--line2);border-radius:var(--r-md);background:var(--panel2);padding:13px;font-size:13.5px;color:var(--muted);line-height:1.55}
+  .box + .box{margin-top:8px}
+  .box b{color:var(--text)}
+  .kv{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--line2);font-size:13px}
+  .kv:last-child{border-bottom:none}
+  .kv .k{color:var(--dim)} .kv .v{color:var(--text);text-align:right}
+  .cthread{display:flex;flex-direction:column;gap:7px;max-height:300px;overflow-y:auto;margin-bottom:10px;padding-right:2px}
+  .cmsg{max-width:86%;padding:9px 12px;border-radius:var(--r-md);font-size:13px;line-height:1.45}
+  .cmsg.them{align-self:flex-start;background:var(--panel2);border:1px solid var(--line2)}
+  .cmsg.me{align-self:flex-end;background:var(--accent);color:var(--on-accent);font-weight:600}
+  .cmsg .mt{display:block;font-size:9px;opacity:.7;margin-top:2px;font-family:var(--fm)}
+  .composer{display:flex;gap:8px}
+  .raterow{display:flex;flex-wrap:wrap;gap:5px;margin:8px 0}
+  .rbtn{width:34px;height:34px;border:1px solid var(--line);border-radius:var(--r-sm);background:var(--fill);color:var(--text);font-family:var(--fm);font-size:12px;cursor:pointer;transition:all var(--dur-fast) var(--ease)}
+  .rbtn:hover{border-color:var(--accent)}
+  .rbtn.sel{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+  .tl{position:relative;padding-left:20px}
+  .tl::before{content:"";position:absolute;left:5px;top:4px;bottom:4px;width:1px;background:var(--line)}
+  .tl .day{font-family:var(--fm);font-size:10px;letter-spacing:.6px;text-transform:uppercase;color:var(--dim);margin:14px 0 8px}
+  .tl .ev{position:relative;padding:0 0 12px}
+  .tl .ev::before{content:"";position:absolute;left:-18px;top:4px;width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px var(--surface)}
+  .tl .ev .et{font-size:13px;color:var(--text)}
+  .tl .ev .em{font-size:11.5px;color:var(--muted);margin-top:1px}
+  .spark{display:block;width:100%;height:40px;margin-top:6px}
+  .emptytab{color:var(--dim);font-size:13px;text-align:center;padding:22px 10px;border:1px dashed var(--line);border-radius:var(--r-md)}
+  .soon{display:inline-block;font-family:var(--fm);font-size:9.5px;letter-spacing:.6px;text-transform:uppercase;color:var(--accent-text);border:1px solid var(--accent);border-radius:var(--r-pill);padding:2px 8px;margin-left:6px}
+
+  /* ---- sheet (modal) ---- */
+  .sheet-scrim{position:fixed;inset:0;background:var(--scrim);backdrop-filter:blur(4px);display:none;place-items:center;padding:20px;z-index:90}
+  .sheet-scrim.open{display:grid}
+  .sheet{width:100%;max-width:440px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-xl);box-shadow:var(--shadow-lg);padding:24px;animation:aos-pop var(--dur) var(--ease-out)}
+  .sheet h3{font-family:var(--fd);text-transform:uppercase;letter-spacing:.5px;font-size:22px;margin-bottom:6px}
+  .sheet p{color:var(--muted);font-size:13.5px;line-height:1.55;margin-bottom:14px}
+  .sheet .row{display:flex;gap:8px;margin-top:14px}
+  .sheet .fld{display:block;margin-top:12px}
+  .sheet .fld>span{display:block;font-family:var(--fm);font-size:10.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+  .sheet .fld input,.sheet .fld select{margin:0}
+
+  /* ---- skeleton ---- */
+  .skel{position:relative;overflow:hidden;background:var(--fill);border-radius:var(--r-md)}
+  .skel::after{content:"";position:absolute;inset:0;transform:translateX(-100%);
+    background:linear-gradient(90deg,transparent,var(--fill-hi),transparent);animation:sheen 1.2s infinite}
+  @keyframes sheen{100%{transform:translateX(100%)}}
+
+  /* ---- motion ---- */
+  @keyframes aos-fade{from{opacity:0}to{opacity:1}}
+  @keyframes aos-rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  @keyframes aos-pop{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:none}}
+  .aos-stagger>*{animation:aos-rise var(--dur) var(--ease-out) both}
+  .aos-stagger>*:nth-child(1){animation-delay:20ms}.aos-stagger>*:nth-child(2){animation-delay:50ms}
+  .aos-stagger>*:nth-child(3){animation-delay:80ms}.aos-stagger>*:nth-child(4){animation-delay:110ms}
+  .aos-stagger>*:nth-child(5){animation-delay:140ms}.aos-stagger>*:nth-child(6){animation-delay:170ms}
+
+  /* ---- mobile bottom action bar ---- */
+  .abar{position:fixed;bottom:0;left:0;right:0;z-index:40;display:none;gap:8px;padding:10px 16px calc(10px + env(safe-area-inset-bottom));
+    background:var(--header-bg);backdrop-filter:blur(18px);border-top:1px solid var(--line2)}
+  .abar .btn{flex:1;min-height:46px}
+  @media(max-width:640px){
+    .wrap{padding:0 16px}
+    header.top .hide-sm{display:none}
+    .abar{display:flex}
+    #dash .wrap{padding-bottom:80px}
+    .drawer{width:100%;top:auto;bottom:0;height:88dvh;border-left:none;border-top:1px solid var(--line);border-radius:var(--r-xl) var(--r-xl) 0 0;transform:translateY(100%)}
+    .drawer.open{transform:none}
+    .drawer .grab{width:38px;height:4px;border-radius:99px;background:var(--track);margin:8px auto 0}
+  }
+  @media(min-width:641px){.drawer .grab{display:none}}
+  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+  @media (pointer:coarse){.rbtn{min-width:44px;min-height:44px}.gpill{min-height:40px}.qa{min-height:84px}}
 </style>
 </head>
 <body>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="ll" viewBox="0 0 120 120" fill="none"><circle cx="60" cy="60" r="50" stroke="currentColor" stroke-width="7"/><path d="M34 92 L60 24 L86 92" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><path d="M45 70 H75" stroke="currentColor" stroke-width="7" stroke-linecap="round"/></symbol></svg>
+
 <!-- LOGIN -->
 <div class="login" id="login">
   <div class="login-card">
-    <div class="brand"><b>Athlete <i>OS</i></b></div>
+    <div class="brand"><svg class="lg"><use href="#ll"/></svg><b>Athlete <i>OS</i></b></div>
     <h1>Coach Access</h1>
     <p>Enter your coach code to open the athlete database. Athletes never see this side.</p>
-    <input type="password" id="token" placeholder="Coach code" autocomplete="off" style="text-transform:uppercase" />
-    <button class="btn btn-primary btn-block" id="loginBtn">Open The Dashboard →</button>
+    <input type="password" id="token" placeholder="Coach code" autocomplete="off" style="text-transform:uppercase;text-align:center" />
+    <button class="btn btn-primary btn-block" id="loginBtn">Open the dashboard →</button>
     <div class="err" id="loginErr"></div>
   </div>
 </div>
@@ -131,248 +332,565 @@
 <div id="dash">
   <header class="top">
     <div class="wrap row">
-      <div class="brand"><b>Athlete <i>OS</i></b></div>
-      <span class="pill">Coach · <b>All Athletes</b></span>
+      <div class="brand"><svg class="lg" style="width:26px;height:26px;color:var(--accent)"><use href="#ll"/></svg><b>Athlete <i>OS</i></b></div>
+      <span class="pill hide-sm">Coach · <b>All Athletes</b></span>
       <div class="spacer"></div>
-      <button class="btn btn-ghost" id="exportBtn">Export CSV</button>
+      <button class="theme-toggle" id="themeToggle" aria-label="Switch theme">☾</button>
+      <button class="btn btn-ghost hide-sm" id="exportBtn">Export CSV</button>
       <button class="btn btn-ghost" id="logoutBtn">Log out</button>
     </div>
   </header>
 
   <div class="wrap">
-    <div class="kpis" id="kpis"></div>
-    <div class="groups" id="groups"></div>
+    <div class="sechead"><h2>Team overview</h2><span class="hint" id="ovHint"></span></div>
+    <div class="kpis aos-stagger" id="kpis"></div>
 
+    <div class="sechead"><h2>Team health</h2><span class="hint">Live — computed from athlete check-ins &amp; ratings</span></div>
+    <div id="healthWrap"></div>
+
+    <div id="sportReqWrap"></div>
+
+    <div class="sechead"><h2>Quick actions</h2></div>
+    <div class="qas" id="qas"></div>
+
+    <div class="sechead" id="schedHead"><h2>Schedule</h2><span class="hint">Training, games &amp; meetings — athletes see these on their Home</span><div class="spacer"></div><button class="btn btn-primary btn-sm" id="newEventBtn">＋ New event</button></div>
+    <div id="scheduleWrap"></div>
+
+    <div class="sechead"><h2>Athletes</h2><span class="hint" id="rosterHint"></span></div>
     <div class="toolbar">
-      <input type="search" id="search" placeholder="Search name, goals, location…" />
-      <select id="sportFilter"><option value="">All sports</option></select>
-      <select id="levelFilter"><option value="">All levels</option></select>
-      <select id="freqFilter">
-        <option value="">Any frequency</option>
-        <option value="1">1–2 days/wk</option>
-        <option value="3">3–4 days/wk</option>
-        <option value="5">5+ days/wk</option>
-      </select>
-      <select id="injFilter">
+      <label class="field"><span class="ic">⌕</span><input type="search" id="search" placeholder="Search name, goals, location…" aria-label="Search athletes" /></label>
+      <select id="sportFilter" aria-label="Filter by sport"><option value="">All sports</option></select>
+      <select id="levelFilter" aria-label="Filter by level"><option value="">All levels</option></select>
+      <select id="teamFilter" aria-label="Filter by team"><option value="">All teams</option></select>
+      <select id="injFilter" aria-label="Filter by injury">
         <option value="">Injury: any</option>
         <option value="yes">Managing injury</option>
         <option value="no">No injury</option>
       </select>
       <div class="spacer"></div>
-      <button class="btn btn-ghost" id="refreshBtn">Refresh</button>
+      <button class="btn btn-ghost hide-sm" id="refreshBtn">Refresh</button>
     </div>
-
-    <div class="tablewrap">
-      <div class="scroll">
-        <table>
-          <thead>
-            <tr>
-              <th>Athlete</th><th>Sport</th><th>Level</th><th>Goals</th>
-              <th>Freq</th><th>Streak · XP</th><th>Check-in</th><th>File</th>
-            </tr>
-          </thead>
-          <tbody id="tbody"></tbody>
-        </table>
-      </div>
-      <div class="empty" id="empty" style="display:none"><b>No athletes yet</b>Share the app link — they hit Join, pick their sport, done.</div>
-    </div>
+    <div class="groups" id="groups"></div>
+    <div class="cards" id="cards"></div>
+    <div class="empty" id="empty" style="display:none"><b>No athletes yet</b>Share the app link — they hit Join, pick their sport, done.</div>
 
     <div class="foot" id="foot"></div>
   </div>
+
+  <div class="abar">
+    <button class="btn btn-ghost" id="refreshBtn2">↻ Refresh</button>
+    <button class="btn btn-ghost" id="exportBtn2">Export</button>
+    <button class="btn btn-primary" id="announceBtn2">Announce</button>
+  </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<!-- DRAWER -->
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="dwName">
+  <div class="grab"></div>
+  <div class="dw-head">
+    <button class="x" id="dwClose" aria-label="Close">✕</button>
+    <div class="dw-name" id="dwName">–</div>
+    <div class="dw-sub" id="dwSub"></div>
+  </div>
+  <div class="dw-tabs" id="dwTabs" role="tablist"></div>
+  <div class="dw-body" id="dwBody"></div>
+</aside>
+
+<!-- SHEET -->
+<div class="sheet-scrim" id="sheetScrim"><div class="sheet" id="sheet"></div></div>
+
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <script>
 (function(){
   const FN = 'https://ymuwuhvqqftgpxwhzoub.supabase.co/functions/v1/aos-api';
   let CODE = sessionStorage.getItem('aos_coach_code') || '';
-  let ROWS = [], TODAY = '', openId = null;
+  let ROWS = [], TEAMS = [], TODAY = '', SPORT_REQS = [], EVENTS = [], CUR = null, curId = null, lastFocus = null;
+  const REDUCE = matchMedia('(prefers-reduced-motion:reduce)').matches;
 
   const $ = s => document.querySelector(s);
-  const toast = (m)=>{ const t=$('#toast'); t.textContent=m; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),1800); };
-  function esc(s){ return (s==null?'':String(s)).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+  const esc = s => (s==null?'':String(s)).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  let toastT;
+  const toast = (m)=>{ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2000); };
   function fmtDate(s){ try{ const d=new Date(s); return d.toLocaleDateString(undefined,{month:'short',day:'numeric'})+' '+d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'}); }catch(e){ return s; } }
+  function fmtDay(s){ try{ return new Date(s).toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'}); }catch(e){ return s; } }
+  function dayDiff(d){ if(!d) return 999; const a=new Date(TODAY+'T00:00:00'), b=new Date(d+'T00:00:00'); return Math.round((a-b)/86400000); }
+  function recW(d){ const n=dayDiff(d); if(n<=0)return 1; if(n===1)return .8; if(n<=3)return .5; if(n<=6)return .2; return 0; }
+  const initials = n => esc(String(n||'?').split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase());
+  const bandC = v => v>=70?'g':v>=50?'a':'r';
+  const bandCB = v => v>=70?'gb':v>=50?'ab':'rb';
 
   async function api(payload){
-    const res = await fetch(FN, {
-      method:'POST',
-      headers:{ 'Content-Type':'application/json' },
-      body: JSON.stringify(Object.assign({code:CODE}, payload))
-    });
+    const res = await fetch(FN, { method:'POST', headers:{ 'Content-Type':'application/json' }, body: JSON.stringify(Object.assign({code:CODE}, payload)) });
     const j = await res.json().catch(()=>({}));
     if(res.status===401) throw new Error('unauthorized');
     if(!res.ok) throw new Error(j.error||('HTTP '+res.status));
     return j;
   }
+  function countUp(el){
+    const to=+el.dataset.to||0; if(REDUCE||to===0){el.textContent=el.dataset.suffix?to+el.dataset.suffix:to;return;}
+    const dur=650, t0=performance.now(), dec=el.dataset.dec==='1';
+    (function step(t){ const p=Math.min(1,(t-t0)/dur); const e=1-Math.pow(1-p,3); const v=to*e;
+      el.textContent=(dec?v.toFixed(1):Math.round(v))+(el.dataset.suffix||''); if(p<1)requestAnimationFrame(step); })(t0);
+  }
 
   /* ---- login ---- */
   function showDash(){ $('#login').style.display='none'; $('#dash').style.display='block'; }
   function showLogin(){ $('#dash').style.display='none'; $('#login').style.display='grid'; }
-
   $('#loginBtn').addEventListener('click', doLogin);
   $('#token').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
   async function doLogin(){
-    const t = $('#token').value.trim().toUpperCase();
-    if(!t){ return; }
+    const t = $('#token').value.trim().toUpperCase(); if(!t) return;
     CODE = t;
-    try{
-      await load();
-      sessionStorage.setItem('aos_coach_code', CODE);
-      showDash();
-    }catch(e){
-      const err = $('#loginErr'); err.style.display='block';
-      err.textContent = e.message==='unauthorized' || /coach code/.test(e.message) ? 'That code was not accepted. Check and try again.' : 'Could not connect. Try again.';
-    }
+    try{ await load(); sessionStorage.setItem('aos_coach_code', CODE); showDash(); }
+    catch(e){ const err=$('#loginErr'); err.style.display='block';
+      err.textContent = e.message==='unauthorized'||/coach code/.test(e.message) ? 'That code was not accepted. Check and try again.' : 'Could not connect. Try again.'; }
   }
   $('#logoutBtn').addEventListener('click', ()=>{ sessionStorage.removeItem('aos_coach_code'); CODE=''; $('#token').value=''; showLogin(); });
 
   /* ---- data ---- */
   async function load(){
     const r = await api({ action:'roster' });
-    ROWS = r.athletes || []; TODAY = r.today || '';
+    ROWS = r.athletes || []; TEAMS = r.teams || []; TODAY = r.today || ''; SPORT_REQS = r.sport_requests || []; EVENTS = r.events || [];
     buildFilters(); render();
   }
-  $('#refreshBtn').addEventListener('click', ()=> load().then(()=>toast('Refreshed')));
-  $('#search').addEventListener('input', render);
-  ['sportFilter','levelFilter','freqFilter','injFilter'].forEach(id=>$('#'+id).addEventListener('change', render));
+  ['refreshBtn','refreshBtn2'].forEach(id=>{ const b=$('#'+id); if(b)b.addEventListener('click', ()=> load().then(()=>toast('Refreshed'))); });
+  $('#search').addEventListener('input', renderCards);
+  ['sportFilter','levelFilter','teamFilter','injFilter'].forEach(id=>$('#'+id).addEventListener('change', renderCards));
 
   function buildFilters(){
-    const opt=(v)=>`<option value="${esc(v)}">${esc(v)}</option>`;
+    const opt=(v,t)=>`<option value="${esc(v)}">${esc(t||v)}</option>`;
     const sports=[...new Set(ROWS.map(r=>r.sport).filter(Boolean))].sort();
     const levels=[...new Set(ROWS.map(r=>r.level).filter(Boolean))].sort();
-    $('#sportFilter').innerHTML='<option value="">All sports</option>'+sports.map(opt).join('');
-    $('#levelFilter').innerHTML='<option value="">All levels</option>'+levels.map(opt).join('');
+    $('#sportFilter').innerHTML='<option value="">All sports</option>'+sports.map(s=>opt(s)).join('');
+    $('#levelFilter').innerHTML='<option value="">All levels</option>'+levels.map(s=>opt(s)).join('');
+    $('#teamFilter').innerHTML='<option value="">All teams</option>'+TEAMS.map(t=>opt(t.id,t.name)).join('')+'<option value="__none">No team</option>';
   }
+  const teamName = id => (TEAMS.find(t=>t.id===id)||{}).name || null;
 
   function filtered(){
-    const q = $('#search').value.trim().toLowerCase();
-    const sf = $('#sportFilter').value, lf = $('#levelFilter').value;
-    const ff = $('#freqFilter').value, jf = $('#injFilter').value;
+    const q=$('#search').value.trim().toLowerCase(), sf=$('#sportFilter').value, lf=$('#levelFilter').value, tf=$('#teamFilter').value, jf=$('#injFilter').value;
     return ROWS.filter(r=>{
       if(sf && r.sport!==sf) return false;
       if(lf && r.level!==lf) return false;
-      if(ff){ const f=+r.train_freq||0; if(ff==='1'&&f>2) return false; if(ff==='3'&&(f<3||f>4)) return false; if(ff==='5'&&f<5) return false; }
+      if(tf==='__none' && r.team_id) return false;
+      if(tf && tf!=='__none' && r.team_id!==tf) return false;
       if(jf==='yes' && !r.injuries) return false;
       if(jf==='no' && r.injuries) return false;
       if(!q) return true;
-      const goals=((r.goals||{}).tags||[]).join(' ')+' '+((r.goals||{}).note||'');
-      return [r.name,r.sport,r.level,r.position,goals,r.location,r.comp_schedule].some(v=> (v||'').toLowerCase().includes(q));
+      const g=((r.goals||{}).tags||[]).join(' ')+' '+((r.goals||{}).note||'');
+      return [r.name,r.sport,r.level,r.position,g,r.location,r.comp_schedule].some(v=>(v||'').toLowerCase().includes(q));
     });
   }
 
-  function render(){
-    const rows = filtered();
-    const inToday = ROWS.filter(r=>r.last_checkin===TODAY).length;
-    $('#kpis').innerHTML = [
-      ['Athletes', ROWS.length, 'accent'],
-      ['Checked in today', inToday, ''],
-      ['Streak 3d+', ROWS.filter(r=>r.streak>=3).length, ''],
-      ['Sports', new Set(ROWS.map(r=>r.sport)).size, ''],
-      ['Managing injury', ROWS.filter(r=>r.injuries).length, '']
-    ].map(([l,n,c])=>`<div class="kpi ${c}"><div class="n">${n}</div><div class="l">${l}</div></div>`).join('');
+  function render(){ renderKPIs(); renderHealth(); renderSportReqs(); renderQuick(); renderSchedule(); renderGroups(); renderCards(); }
 
-    /* auto-categories: one pill per sport, click to filter */
-    const bySport={}; ROWS.forEach(r=>bySport[r.sport]=(bySport[r.sport]||0)+1);
-    $('#groups').innerHTML=Object.entries(bySport).sort((a,b)=>b[1]-a[1])
-      .map(([s,n])=>`<span class="gpill ${$('#sportFilter').value===s?'on':''}" data-g="${esc(s)}">${esc(s)}<b>${n}</b></span>`).join('');
-    document.querySelectorAll('.gpill').forEach(g=>g.addEventListener('click',()=>{
-      $('#sportFilter').value = $('#sportFilter').value===g.dataset.g ? '' : g.dataset.g; render();
-    }));
-
-    const tb = $('#tbody');
-    $('#empty').style.display = rows.length ? 'none' : 'block';
-    tb.innerHTML = rows.map(r=>{
-      const ok = r.last_checkin===TODAY;
-      const goals = ((r.goals||{}).tags||[]).slice(0,3).join(', ');
-      return `<tr class="arow">
-        <td><div class="player">${esc(r.name)}</div><div class="sub">${r.age?r.age+' · ':''}${esc(r.position||'')}${r.injuries?' · <span class="badge inj">⚠ injury</span>':''}</div></td>
-        <td>${esc(r.sport)}</td>
-        <td>${esc(r.level||'—')}</td>
-        <td class="sub">${esc(goals||'—')}</td>
-        <td class="mono">${r.train_freq?r.train_freq+'d':'—'}</td>
-        <td class="mono">🔥 ${r.streak}d · ${r.xp} XP</td>
-        <td><span class="badge ${ok?'ok':'warn'}">${ok?'✓ today':(r.last_checkin||'never')}</span></td>
-        <td><button class="btn btn-ghost btn-sm" data-open="${r.id}">${openId===r.id?'Close':'Open'}</button></td>
-      </tr>${openId===r.id?`<tr class="filerow"><td colspan="8" id="fileCell">Loading file…</td></tr>`:''}`;
-    }).join('');
-
-    tb.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click', ()=>{
-      openId = openId===b.dataset.open ? null : b.dataset.open;
-      render();
-      if(openId) loadFile(openId);
-    }));
-
-    $('#foot').textContent = `Showing ${rows.length} of ${ROWS.length} athlete${ROWS.length===1?'':'s'} · Athlete OS · Powered by Lockdown Lab`;
-  }
-
-  async function loadFile(aid){
-    const cell = $('#fileCell'); if(!cell) return;
-    try{
-      const d = await api({action:'cdetail', aid});
-      const p = d.profile, g = p.goals||{};
-      cell.innerHTML = `<div class="file">
-        <div>
-          <h4>Profile</h4>
-          <div class="box">
-            <b>${esc(p.name)}</b> · ${esc(p.sport)}${p.position?' · '+esc(p.position):''}${p.age?' · '+p.age:''}<br>
-            Level: <b>${esc(p.level||'—')}</b> · ${p.train_freq?p.train_freq+'d/week':'—'} · ${esc(p.comp_schedule||'no comp set')}<br>
-            Goals: <b>${esc((g.tags||[]).join(', ')||'—')}</b>${g.note?'<br>“'+esc(g.note)+'”':''}<br>
-            ${p.injuries?'⚠ Injuries: <b>'+esc(p.injuries)+'</b><br>':''}
-            ${(p.equipment||[]).length?'Equipment: '+esc(p.equipment.join(', '))+'<br>':''}
-            ${d.contact?'Contact: <b>'+esc(d.contact)+'</b> · ':''}Status: <b>${esc(d.status)}</b>
-            <button class="btn btn-ghost btn-sm" id="stBtn" style="margin-left:8px">${d.status==='active'?'Pause':'Reactivate'}</button>
-          </div>
-          <h4>Shared with coach</h4>
-          ${(d.shared_mind||[]).slice(0,4).map(m=>`<div class="box">🧠 <b>${esc((m.data||{}).trigger||'moment')}</b> · impact ${(m.data||{}).impact||'–'}/10${(m.data||{}).plan?'<br>plan: '+esc((m.data||{}).plan):''}</div>`).join('')||'<div class="box">Nothing shared yet.</div>'}
-        </div>
-        <div>
-          <h4>Last 14 check-ins</h4>
-          <div class="box">${(d.checkins||[]).map(c=>`<div class="cirow"><span class="d">${esc(c.d)}</span><span>E${c.energy??'–'} · S${c.soreness??'–'} · ${c.sleep_h?c.sleep_h+'h':'–'} · ${c.mins||0}min</span></div>`).join('')||'No check-ins yet.'}</div>
-        </div>
-        <div class="notes">
-          <h4>🔒 Private notes — athlete never sees these</h4>
-          ${(d.notes||[]).map(n=>`<div class="box">${esc(n.text)}<div class="sub mono" style="margin-top:4px">${fmtDate(n.created_at)}</div></div>`).join('')}
-          <textarea id="noteText" placeholder="What have you noticed? Only you see this."></textarea>
-          <button class="btn btn-primary btn-sm" id="noteAdd">Add Note 🔒</button>
-        </div>
+  function renderSportReqs(){
+    const w=$('#sportReqWrap');
+    if(!SPORT_REQS.length){ w.innerHTML=''; return; }
+    w.innerHTML=`<div class="sechead"><h2>Sport requests</h2><span class="hint">New sports your athletes added — approve to keep it, reject to remove it</span></div>
+      <div class="health" style="padding:16px">
+        ${SPORT_REQS.map(s=>`<div class="kv" style="align-items:center">
+          <span class="k" style="color:var(--text)"><b>${esc(s.sport)}</b> · added by ${esc(s.athlete_name||'an athlete')}</span>
+          <span class="v" style="display:flex;gap:6px"><button class="btn btn-primary btn-sm" data-appr="${s.id}">Approve</button><button class="btn btn-ghost btn-sm" data-rej="${s.id}">Reject</button></span>
+        </div>`).join('')}
       </div>`;
-      $('#noteAdd').addEventListener('click', async()=>{
-        const t=$('#noteText').value.trim(); if(!t) return;
-        try{ await api({action:'note_add', aid, text:t}); toast('Note locked 🔒'); loadFile(aid); }
-        catch(e){ toast('Save failed'); }
-      });
-      $('#stBtn').addEventListener('click', async()=>{
-        try{ await api({action:'status_set', aid, status:d.status==='active'?'paused':'active'}); toast('Status updated'); await load(); openId=aid; render(); loadFile(aid); }
-        catch(e){ toast('Update failed'); }
-      });
-    }catch(e){ cell.textContent = 'Could not load file — '+e.message; }
+    w.querySelectorAll('[data-appr]').forEach(b=>b.addEventListener('click',()=>resolveSport(b.dataset.appr,'approved')));
+    w.querySelectorAll('[data-rej]').forEach(b=>b.addEventListener('click',()=>resolveSport(b.dataset.rej,'rejected')));
+  }
+  async function resolveSport(id,status){
+    try{ await api({action:'sport_resolve',req_id:id,status}); toast('Sport '+status); await load(); }
+    catch(e){ toast('Failed'); }
   }
 
-  /* ---- CSV export ---- */
-  $('#exportBtn').addEventListener('click', ()=>{
-    if(!ROWS.length){ toast('Nothing to export'); return; }
-    const cols = ['created_at','status','name','sport','age','level','position','train_freq','comp_schedule','goal_tags','goal_note','injuries','equipment','location','contact','xp','streak','last_checkin'];
-    const get = (r,c)=>{
-      if(c==='goal_tags') return ((r.goals||{}).tags||[]).join(' | ');
-      if(c==='goal_note') return (r.goals||{}).note||'';
-      if(c==='equipment') return (r.equipment||[]).join(' | ');
-      return r[c];
-    };
-    const csv = [cols.join(',')].concat(ROWS.map(r=>cols.map(c=>{
-      let v = get(r,c); if(v==null) v='';
-      v = String(v).replace(/"/g,'""');
-      return /[",\n]/.test(v) ? `"${v}"` : v;
-    }).join(','))).join('\n');
-    const blob = new Blob([csv],{type:'text/csv'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'athlete-os-athletes.csv';
-    a.click(); URL.revokeObjectURL(a.href);
-    toast('CSV exported');
-  });
+  /* ---- KPIs ---- */
+  function renderKPIs(){
+    const A=ROWS.filter(r=>r.status==='active');
+    const inToday=ROWS.filter(r=>r.last_checkin===TODAY).length;
+    const rated=ROWS.filter(r=>r.coach_rating!=null);
+    const avgRating=rated.length?(rated.reduce((s,r)=>s+r.coach_rating,0)/rated.length):0;
+    const injured=A.filter(r=>r.injuries).length;
+    const rate=A.length?Math.round(inToday/A.length*100):0;
+    const pushCount=ROWS.filter(r=>r.push_on).length;
+    const pushPct=ROWS.length?Math.round(pushCount/ROWS.length*100):0;
+    const now=Date.now();
+    const upcomingGames=EVENTS.filter(e=>e.type==='game' && new Date(e.starts_at).getTime()>=now).length;
+    const nextGame=EVENTS.filter(e=>e.type==='game' && new Date(e.starts_at).getTime()>=now).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at))[0];
+    const kpis=[
+      {n:ROWS.length,l:'Athletes',cls:'accent'},
+      {n:inToday,l:'Checked in today',s:A.length?rate+'% of active':''},
+      {n:ROWS.filter(r=>r.streak>=3).length,l:'On a 3d+ streak'},
+      {n:injured,l:'Managing injury',cls:injured>0?'bad':''},
+      {n:avgRating,l:'Avg coach rating',dec:1,suffix:'/10',s:rated.length?rated.length+' rated':'none rated'},
+      {n:upcomingGames,l:'Upcoming games',cls:upcomingGames>0?'accent':'',s:nextGame?('next '+fmtDay(nextGame.starts_at)):'none scheduled'},
+      {n:pushCount,l:'Push reach',cls:pushCount>0?'accent':'',s:ROWS.length?pushPct+'% get alerts':'none yet'},
+    ];
+    const setups=[
+      {t:'Attendance %',need:'training sessions'},
+      {t:'Avg wellness',need:'daily wellness rollup'},
+      {t:'Unread messages',need:'message read receipts'},
+    ];
+    $('#kpis').innerHTML =
+      kpis.map(k=>`<div class="kpi ${k.cls||''}"><div class="n"><span class="mono" data-to="${k.n}" ${k.dec?'data-dec="1"':''} ${k.suffix?`data-suffix="${k.suffix}"`:''}>0</span></div><div class="l">${k.l}</div>${k.s?`<div class="s">${esc(k.s)}</div>`:''}</div>`).join('') +
+      setups.map(s=>`<button class="kpi setup" data-soon="${esc(s.t)}" data-need="${esc(s.need)}"><div class="n">+</div><div class="l">${esc(s.t)}</div><div class="s">Set up</div></button>`).join('');
+    $('#kpis').querySelectorAll('.mono[data-to]').forEach(countUp);
+    $('#kpis').querySelectorAll('.setup').forEach(b=>b.addEventListener('click',()=>comingSoon(b.dataset.soon,b.dataset.need)));
+    $('#ovHint').textContent = ROWS.length? `${ROWS.length} athlete${ROWS.length>1?'s':''} · ${new Set(ROWS.map(r=>r.sport)).size} sport${new Set(ROWS.map(r=>r.sport)).size>1?'s':''}` : '';
+  }
 
-  /* ---- auto-login if code stored ---- */
+  /* ---- Team Health ---- */
+  function renderHealth(){
+    const A=ROWS.filter(r=>r.status==='active'), n=A.length;
+    if(!n){ $('#healthWrap').innerHTML=`<div class="empty" style="margin-top:12px">No active athletes yet — health lights up once your squad starts checking in.</div>`; return; }
+    const attendance=Math.round(A.reduce((s,r)=>s+recW(r.last_checkin),0)/n*100);
+    const injuries=Math.round((1-A.filter(r=>r.injuries).length/n)*100);
+    const consistency=Math.round(A.reduce((s,r)=>s+Math.min(r.streak||0,7)/7,0)/n*100);
+    const moraleVals=A.map(r=>{const v=[];if(r.coach_rating!=null)v.push(r.coach_rating);if(r.peer_avg!=null)v.push(r.peer_avg);return v.length?v.reduce((a,b)=>a+b,0)/v.length:null}).filter(v=>v!=null);
+    const morale=moraleVals.length?Math.round(moraleVals.reduce((a,b)=>a+b,0)/moraleVals.length/10*100):0;
+    const moraleLow=moraleVals.length/n<0.3;
+    const bars=[
+      {k:'Attendance',v:attendance,note:'check-in recency'},
+      {k:'Morale',v:morale,note:moraleLow?`low confidence (${moraleVals.length}/${n} rated)`:'coach + peer ratings'},
+      {k:'Injuries',v:injuries,note:A.filter(r=>r.injuries).length+' managing'},
+      {k:'Consistency',v:consistency,note:'streak depth'},
+    ];
+    const W={Attendance:.30,Injuries:.25,Morale:.20,Consistency:.25};
+    const composite=Math.round(bars.reduce((s,b)=>s+b.v*W[b.k],0)/(W.Attendance+W.Injuries+W.Morale+W.Consistency));
+    const worst=bars.slice().sort((a,b)=>a.v-b.v)[0];
+    const rc=composite>=70?'var(--good)':composite>=50?'var(--amber)':'var(--bad)';
+    $('#healthWrap').innerHTML=`<div class="health">
+      <div class="health-top">
+        <div class="score-ring" style="--ring:${composite};--ring-c:${rc}"><b>${composite}</b></div>
+        <div><div class="ht-tit">${composite>=70?'Squad is firing':composite>=50?'Holding steady':'Needs attention'}</div>
+        <div class="ht-sub">Composite readiness across ${n} active athlete${n>1?'s':''}. ${composite<70?`Watch: ${worst.k.toLowerCase()}.`:'Keep the standard.'}</div></div>
+      </div>
+      <div class="bars">
+        ${bars.map(b=>`<div class="bar"><div class="bl"><span>${b.k}</span><span class="bv ${bandC(b.v)}">${b.v}</span></div><div class="tr"><i class="${bandCB(b.v)}" style="width:${b.v}%"></i></div><div class="bl" style="margin:6px 0 0"><span>${esc(b.note)}</span></div></div>`).join('')}
+        <div class="bar setup"><div class="bl"><span>Readiness</span><span class="bv">soon</span></div><div class="tr"><i></i></div><div class="bl" style="margin:6px 0 0"><span>needs wellness rollup</span></div></div>
+      </div>
+    </div>`;
+  }
+
+  /* ---- Quick actions ---- */
+  const QA=[
+    {i:'📣',t:'Send Announcement',fn:announce,live:true},
+    {i:'➕',t:'Add Athlete',fn:addAthlete},
+    {i:'📅',t:'Schedule Training',fn:()=>openEventSheet('training'),live:true},
+    {i:'✅',t:'Record Attendance',need:'a sessions + attendance model'},
+    {i:'🎯',t:'Create Drill',need:'a drill library'},
+    {i:'📎',t:'Upload File',need:'a file storage bucket'},
+    {i:'📊',t:'Start Team Poll',need:'a polls model'},
+  ];
+  function renderQuick(){
+    $('#qas').innerHTML=QA.map((q,i)=>`<button class="qa" data-qa="${i}">${q.live?'<span class="live"></span>':''}<span class="qi">${q.i}</span><span>${esc(q.t)}</span></button>`).join('');
+    $('#qas').querySelectorAll('[data-qa]').forEach(b=>b.addEventListener('click',()=>{ const q=QA[+b.dataset.qa]; q.fn?q.fn():comingSoon(q.t,q.need); }));
+  }
+  const abtn=$('#announceBtn2'); if(abtn)abtn.addEventListener('click',announce);
+  $('#newEventBtn').addEventListener('click',()=>openEventSheet('training'));
+
+  /* ---- schedule / calendar ---- */
+  const EV_ICON={training:'🏀',game:'🏆',meeting:'👥',other:'📌'};
+  function renderSchedule(){
+    const w=$('#scheduleWrap'); const now=Date.now();
+    const up=EVENTS.filter(e=>new Date(e.starts_at).getTime()>=now-6*3600*1000).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at));
+    if(!up.length){ w.innerHTML=`<div class="empty" style="margin-top:0">Nothing scheduled yet — tap <b>＋ New event</b> to add a training, game or meeting. Your athletes will see it on their Home.</div>`; return; }
+    w.innerHTML=`<div class="agenda">${up.map(e=>{
+      const d=new Date(e.starts_at), soon=(d.getTime()-now)<36*3600*1000 && d.getTime()>=now-6*3600*1000;
+      const mo=d.toLocaleDateString(undefined,{month:'short'}), dy=d.getDate();
+      const time=d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
+      const tm=e.team_id?teamName(e.team_id):'All athletes';
+      return `<div class="ev ${soon?'soon':''}">
+        <div class="evd"><span class="mo">${esc(mo)}</span><span class="dy">${dy}</span></div>
+        <div class="evmain">
+          <div class="evtit"><span>${EV_ICON[e.type]||'📌'}</span><span>${esc(e.title)}</span><span class="evtype ${esc(e.type)}">${esc(e.type)}</span></div>
+          <div class="evmeta">${esc(fmtDay(e.starts_at))} · ${esc(time)}${e.location?' · '+esc(e.location):''} · ${esc(tm)}${e.note?' · '+esc(e.note):''}</div>
+        </div>
+        <button class="evdel" data-del="${esc(e.id)}" title="Delete event" aria-label="Delete event">✕</button>
+      </div>`;
+    }).join('')}</div>`;
+    w.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>deleteEvent(b.dataset.del)));
+  }
+  function pad(n){return String(n).padStart(2,'0');}
+  function defaultWhen(){ const d=new Date(Date.now()+24*3600*1000); d.setMinutes(0,0,0); d.setHours(18); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+  function openEventSheet(preType){
+    const types=[['training','🏀 Training'],['game','🏆 Game'],['meeting','👥 Meeting'],['other','📌 Other']];
+    openSheet(`<h3>New event</h3><p>Adds it to the team schedule. Athletes see upcoming events on their Home screen.</p>
+      <label class="fld"><span>Title</span><input id="evTitle" placeholder="e.g. Team Training · Defense focus" maxlength="80"></label>
+      <div class="row" style="gap:10px">
+        <label class="fld" style="flex:1"><span>Type</span><select id="evType">${types.map(t=>`<option value="${t[0]}" ${t[0]===preType?'selected':''}>${t[1]}</option>`).join('')}</select></label>
+        <label class="fld" style="flex:1"><span>When</span><input id="evWhen" type="datetime-local" value="${defaultWhen()}"></label>
+      </div>
+      <div class="row" style="gap:10px">
+        <label class="fld" style="flex:1"><span>Location</span><input id="evLoc" placeholder="e.g. Main Court" maxlength="80"></label>
+        <label class="fld" style="flex:1"><span>Team</span><select id="evTeam"><option value="">All athletes</option>${TEAMS.map(t=>`<option value="${esc(t.id)}">${esc(t.name)}</option>`).join('')}</select></label>
+      </div>
+      <label class="fld"><span>Note (optional)</span><input id="evNote" placeholder="e.g. Bring both jerseys" maxlength="200"></label>
+      <div class="row"><button class="btn btn-ghost" style="flex:1" id="shClose">Cancel</button><button class="btn btn-primary" style="flex:1" id="evSave">Add to schedule</button></div>
+      <div class="err" id="evErr" style="display:none"></div>`);
+    $('#shClose').addEventListener('click',closeSheet);
+    setTimeout(()=>{ const i=$('#evTitle'); if(i)i.focus(); },50);
+    $('#evSave').addEventListener('click',async()=>{
+      const title=$('#evTitle').value.trim(), when=$('#evWhen').value, type=$('#evType').value;
+      const err=$('#evErr'); err.style.display='none';
+      if(title.length<2){ err.textContent='Give the event a title.'; err.style.display='block'; return; }
+      if(!when){ err.textContent='Pick a date & time.'; err.style.display='block'; return; }
+      const btn=$('#evSave'); btn.disabled=true; btn.textContent='Adding…';
+      try{
+        await api({action:'event_create',title,type,starts_at:new Date(when).toISOString(),location:$('#evLoc').value.trim(),team_id:$('#evTeam').value||null,note:$('#evNote').value.trim()});
+        closeSheet(); await load(); toast('Event added');
+        const sh=$('#schedHead'); if(sh)sh.scrollIntoView({behavior:REDUCE?'auto':'smooth',block:'center'});
+      }catch(e){ btn.disabled=false; btn.textContent='Add to schedule'; err.textContent=e.message||'Could not add event'; err.style.display='block'; }
+    });
+  }
+  async function deleteEvent(id){
+    const ev=EVENTS.find(e=>e.id===id);
+    openSheet(`<h3>Delete event?</h3><p>${ev?`Remove <b>${esc(ev.title)}</b> from the schedule.`:'Remove this event.'} Athletes will no longer see it. This can't be undone.</p>
+      <div class="row"><button class="btn btn-ghost" style="flex:1" id="shClose">Keep it</button><button class="btn btn-primary" style="flex:1;background:var(--bad);border-color:var(--bad)" id="evDelYes">Delete</button></div>`);
+    $('#shClose').addEventListener('click',closeSheet);
+    $('#evDelYes').addEventListener('click',async()=>{
+      try{ await api({action:'event_delete',id}); closeSheet(); await load(); toast('Event deleted'); }
+      catch(e){ toast('Failed'); }
+    });
+  }
+
+  /* ---- groups + cards ---- */
+  function renderGroups(){
+    const by={}; ROWS.forEach(r=>by[r.sport]=(by[r.sport]||0)+1);
+    const cur=$('#sportFilter').value;
+    $('#groups').innerHTML=Object.entries(by).sort((a,b)=>b[1]-a[1]).map(([s,n])=>`<span class="gpill ${cur===s?'on':''}" data-g="${esc(s)}">${esc(s)}<b>${n}</b></span>`).join('');
+    $('#groups').querySelectorAll('.gpill').forEach(g=>g.addEventListener('click',()=>{ $('#sportFilter').value=$('#sportFilter').value===g.dataset.g?'':g.dataset.g; renderGroups(); renderCards(); }));
+  }
+  function renderCards(){
+    const rows=filtered();
+    $('#empty').style.display=rows.length?'none':'block';
+    $('#cards').style.display=rows.length?'grid':'none';
+    $('#cards').className='cards aos-stagger';
+    $('#cards').innerHTML=rows.map(r=>{
+      const ok=r.last_checkin===TODAY, w=recW(r.last_checkin);
+      const rc=w>=1?'var(--good)':w>=.5?'var(--amber)':w>0?'var(--bad)':'var(--track)';
+      const meta=[(r.sport_label||r.sport),r.position,r.age?r.age+'y':''].filter(Boolean).join(' · ');
+      const goalTags=((r.goals||{}).tags||[]).slice(0,2);
+      const tn=teamName(r.team_id);
+      return `<button class="acard" data-open="${r.id}" aria-haspopup="dialog" aria-label="Open ${esc(r.name)}'s file">
+        <div class="ac-top">
+          <span class="mono-av" style="--rc:${rc};--rp:${Math.round(Math.min(r.xp||0,1200)/1200*100)}"><b>${initials(r.name)}</b></span>
+          <span class="ac-id"><span class="nm">${esc(r.name)}</span><span class="meta">${esc(meta||'—')}${tn?' · '+esc(tn):''}</span></span>
+        </div>
+        <div class="ac-stats">
+          <span class="chip ${ok?'ok':(w>0?'warn':'')}">${ok?'✓ Today':(r.last_checkin?fmtDay(r.last_checkin):'No check-in')}</span>
+          ${r.push_on?'<span class="chip ok" title="Push notifications on — this athlete gets your messages live">🔔 Push</span>':'<span class="chip off" title="No push yet — they haven\'t installed + enabled notifications">🔕 No push</span>'}
+          ${r.injuries?'<span class="chip inj">⚠ Injury</span>':''}
+          ${r.coach_rating!=null?`<span class="chip acc">★ ${r.coach_rating}/10</span>`:'<span class="chip">Rate →</span>'}
+          ${r.peer_count?`<span class="chip">◈ ${r.peer_avg}/10 · ${r.peer_count}</span>`:''}
+          ${goalTags.map(t=>`<span class="chip">${esc(t)}</span>`).join('')}
+        </div>
+        <div class="ac-foot"><span>🔥 ${r.streak||0}d</span><span>${(r.xp||0)} XP</span>${r.level?`<span>${esc(r.level)}</span>`:''}<span class="dot">Open ▸</span></div>
+      </button>`;
+    }).join('');
+    $('#cards').querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>openDrawer(b.dataset.open,b)));
+    $('#rosterHint').textContent = rows.length!==ROWS.length ? `${rows.length} of ${ROWS.length} shown` : '';
+    $('#foot').textContent=`${rows.length} of ${ROWS.length} athlete${ROWS.length===1?'':'s'} · Athlete OS · Powered by Lockdown Lab`;
+  }
+
+  /* ---- drawer ---- */
+  const scrim=$('#scrim'), drawer=$('#drawer');
+  function openDrawer(id,btn){
+    curId=id; lastFocus=btn||document.activeElement; CUR=null;
+    scrim.classList.add('open'); drawer.classList.add('open'); document.body.style.overflow='hidden';
+    $('#dwName').textContent='Loading…'; $('#dwSub').textContent=''; $('#dwTabs').innerHTML='';
+    $('#dwBody').innerHTML='<div class="skel" style="height:80px;margin-bottom:10px"></div><div class="skel" style="height:120px;margin-bottom:10px"></div><div class="skel" style="height:200px"></div>';
+    requestAnimationFrame(()=>$('#dwClose').focus());
+    api({action:'cdetail',aid:id}).then(d=>{ if(curId!==id)return; CUR=d; paintHead(); paintTabs(); renderTab('overview'); }).catch(e=>{ $('#dwBody').innerHTML=`<div class="emptytab">Could not load — ${esc(e.message)}</div>`; });
+  }
+  function closeDrawer(){ scrim.classList.remove('open'); drawer.classList.remove('open'); document.body.style.overflow=''; curId=null; if(lastFocus&&lastFocus.focus)lastFocus.focus(); }
+  scrim.addEventListener('click',closeDrawer); $('#dwClose').addEventListener('click',closeDrawer);
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ if($('#sheetScrim').classList.contains('open'))closeSheet(); else if(drawer.classList.contains('open'))closeDrawer(); } });
+  async function refreshDrawer(){ if(!curId)return; try{ CUR=await api({action:'cdetail',aid:curId}); paintHead(); }catch(e){} }
+
+  function paintHead(){
+    const p=CUR.profile;
+    $('#dwName').id='dwName'; $('#dwName').textContent=p.name;
+    const bits=[(p.sport_label||p.sport),p.position,p.age?p.age+'y':'',p.level].filter(Boolean).join(' · ');
+    $('#dwSub').innerHTML=esc(bits)+(CUR.status==='paused'?' · <span style="color:var(--amber)">paused</span>':'');
+  }
+  const TABS=[['overview','Overview'],['health','Health'],['performance','Performance'],['attendance','Attendance'],['comm','Comms'],['notes','Notes'],['timeline','Timeline'],['settings','Settings']];
+  let activeTab='overview';
+  function paintTabs(){
+    $('#dwTabs').innerHTML=TABS.map(([k,l])=>`<button class="dw-tab ${k===activeTab?'on':''}" role="tab" data-tab="${k}">${l}</button>`).join('');
+    $('#dwTabs').querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>renderTab(b.dataset.tab)));
+  }
+  function renderTab(k){
+    activeTab=k;
+    $('#dwTabs').querySelectorAll('.dw-tab').forEach(t=>t.classList.toggle('on',t.dataset.tab===k));
+    const body=$('#dwBody'); body.scrollTop=0; body.style.animation='none'; requestAnimationFrame(()=>body.style.animation='aos-fade var(--dur) var(--ease)');
+    (TAB[k]||TAB.overview)(body, CUR);
+  }
+
+  /* ---- sparkline ---- */
+  function spark(vals,min,max){
+    vals=vals.filter(v=>v!=null); if(vals.length<2) return '<div class="emptytab">Not enough data yet</div>';
+    const w=260,h=40,pad=3; const lo=min, hi=max;
+    const pts=vals.map((v,i)=>{ const x=pad+i*(w-2*pad)/(vals.length-1); const y=h-pad-((v-lo)/(hi-lo))*(h-2*pad); return x.toFixed(1)+','+Math.max(pad,Math.min(h-pad,y)).toFixed(1); }).join(' ');
+    return `<svg class="spark" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none"><polyline points="${pts}" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  }
+
+  /* ---- tab renderers ---- */
+  const TAB={
+    overview(b,d){
+      const p=d.profile, g=p.goals||{}, cs=d.checkins||[];
+      const last5=cs.slice(0,5); const avg=k=>last5.length?(last5.reduce((s,c)=>s+(+c[k]||0),0)/last5.length).toFixed(1):'—';
+      const tn=teamName(p.team_id);
+      b.innerHTML=`
+      <div class="box">
+        <div class="kv"><span class="k">Sport</span><span class="v">${esc(p.sport_label||p.sport)}${p.position?' · '+esc(p.position):''}</span></div>
+        <div class="kv"><span class="k">Level</span><span class="v">${esc(p.level||'—')}</span></div>
+        <div class="kv"><span class="k">Training</span><span class="v">${p.train_freq?p.train_freq+' days/week':'—'} · ${esc(p.comp_schedule||'no comp set')}</span></div>
+        <div class="kv"><span class="k">Team</span><span class="v">${tn?esc(tn):'—'}</span></div>
+        <div class="kv"><span class="k">Contact</span><span class="v">${d.contact?esc(d.contact):'—'}</span></div>
+        <div class="kv"><span class="k">Push alerts</span><span class="v">${d.push_on?`<span style="color:var(--good)">🔔 On</span>${d.push_count>1?' · '+d.push_count+' devices':''}`:'<span style="color:var(--dim)">🔕 Off — not installed / not enabled</span>'}</span></div>
+      </div>
+      <h4>Goals</h4>
+      <div class="box">${(g.tags||[]).length?(g.tags||[]).map(t=>`<span class="chip acc" style="margin:0 5px 5px 0">${esc(t)}</span>`).join(''):'<span style="color:var(--dim)">No goals set</span>'}${g.note?`<div style="margin-top:8px">“${esc(g.note)}”</div>`:''}</div>
+      <h4>Snapshot</h4>
+      <div class="box">
+        <div class="kv"><span class="k">XP · Streak</span><span class="v">${p.xp||0} XP · 🔥 ${p.streak||0}d</span></div>
+        <div class="kv"><span class="k">Coach rating</span><span class="v">${p.coach_rating!=null?p.coach_rating+'/10':'not rated'}</span></div>
+        <div class="kv"><span class="k">Peer rating</span><span class="v">${d.peer&&d.peer.count?d.peer.avg+'/10 · '+d.peer.count+' peers':'—'}</span></div>
+        <div class="kv"><span class="k">Last 5 check-ins</span><span class="v">E ${avg('energy')} · sleep ${avg('sleep_h')}h · sore ${avg('soreness')}</span></div>
+      </div>
+      ${p.injuries?`<h4>Injury</h4><div class="box" style="border-color:var(--bad);color:var(--text)">⚠ ${esc(p.injuries)}</div>`:''}`;
+    },
+    health(b,d){
+      const cs=(d.checkins||[]).slice().reverse();
+      const last5=(d.checkins||[]).slice(0,5); const avg=k=>last5.length?(last5.reduce((s,c)=>s+(+c[k]||0),0)/last5.length).toFixed(1):'—';
+      const sore=last5.length?last5.reduce((s,c)=>s+(+c.soreness||0),0)/last5.length:0;
+      b.innerHTML=`
+      <h4>Energy — last ${cs.length}</h4><div class="box">${spark(cs.map(c=>+c.energy||null),1,10)}<div class="kv" style="border:none;padding-top:8px"><span class="k">avg</span><span class="v">${avg('energy')}/10</span></div></div>
+      <h4>Sleep</h4><div class="box">${spark(cs.map(c=>c.sleep_h!=null?+c.sleep_h:null),3,12)}<div class="kv" style="border:none;padding-top:8px"><span class="k">avg</span><span class="v">${avg('sleep_h')}h</span></div></div>
+      <h4>Soreness</h4><div class="box">${spark(cs.map(c=>+c.soreness||null),1,10)}<div class="kv" style="border:none;padding-top:8px"><span class="k">avg</span><span class="v ${sore>=6?'r':''}">${avg('soreness')}/10</span></div>${sore>=6?'<div style="color:var(--bad);margin-top:6px">High soreness — consider a lighter session. If pain persists, refer to a professional.</div>':''}</div>
+      ${d.injuries||d.profile.injuries?`<h4>Injury</h4><div class="box" style="border-color:var(--bad);color:var(--text)">⚠ ${esc(d.profile.injuries)}</div>`:''}
+      <h4>Shared mental notes</h4>${(d.shared_mind||[]).length?(d.shared_mind||[]).map(m=>`<div class="box">🧠 <b>${esc((m.data||{}).trigger||'moment')}</b> · impact ${(m.data||{}).impact||'–'}/10${(m.data||{}).plan?'<br>plan: '+esc((m.data||{}).plan):''}</div>`).join(''):'<div class="emptytab">Nothing shared</div>'}`;
+    },
+    performance(b,d){
+      const cs=d.checkins||[]; const mins=cs.reduce((s,c)=>s+(+c.mins||0),0);
+      const fc={}; cs.forEach(c=>(c.focus||[]).forEach(f=>fc[f]=(fc[f]||0)+1));
+      const top=Object.entries(fc).sort((a,b)=>b[1]-a[1]);
+      b.innerHTML=`<div class="emptytab">Full performance metrics <span class="soon">Coming soon</span><br><span style="color:var(--muted)">Games, minutes, PBs and sport-specific stats need a performance model.</span></div>
+      <h4>Interim — training load</h4>
+      <div class="box"><div class="kv"><span class="k">Minutes logged (14)</span><span class="v">${mins} min</span></div>
+      <div class="kv"><span class="k">Sessions logged</span><span class="v">${cs.length}</span></div></div>
+      <h4>Focus mix</h4><div class="box">${top.length?top.map(([f,n])=>`<div class="kv"><span class="k">${esc(f)}</span><span class="v">${n}×</span></div>`).join(''):'<span style="color:var(--dim)">No focus logged yet</span>'}</div>`;
+    },
+    attendance(b,d){
+      const cs=d.checkins||[], p=d.profile; const days=new Set(cs.map(c=>c.d)).size;
+      const target=p.train_freq?Math.min(p.train_freq*2,14):14;
+      const pct=Math.round(Math.min(days/target,1)*100);
+      b.innerHTML=`<div class="emptytab">RSVP attendance <span class="soon">Coming soon</span><br><span style="color:var(--muted)">Present/Late/Excused/Absent needs a sessions + attendance model.</span></div>
+      <h4>Interim — check-in cadence (last 14 days)</h4>
+      <div class="box"><div class="bl"><span>days with a check-in</span><span class="bv ${bandC(pct)}">${days}/${target}</span></div><div class="tr"><i class="${bandCB(pct)}" style="width:${pct}%"></i></div></div>`;
+    },
+    comm(b,d){
+      b.innerHTML=`<div class="cthread" id="cThread">${(d.messages||[]).map(m=>`<div class="cmsg ${m.from_coach?'me':'them'}">${esc(m.text)}<span class="mt">${m.from_coach?'You':esc(d.profile.name)} · ${fmtDate(m.created_at)}</span></div>`).join('')||'<div class="emptytab">No messages yet — start the conversation.</div>'}</div>
+      <div class="composer"><input id="cMsgInput" placeholder="Message ${esc(d.profile.name)}…" maxlength="600"><button class="btn btn-primary btn-sm" id="cMsgBtn">Send</button></div>`;
+      const th=$('#cThread'); if(th)th.scrollTop=th.scrollHeight;
+      const send=async()=>{ const t=$('#cMsgInput').value.trim(); if(!t)return; try{ const r=await api({action:'cmsg',aid:curId,text:t}); CUR.messages=r.messages; renderTab('comm'); load(); }catch(e){ toast('Send failed'); } };
+      $('#cMsgBtn').addEventListener('click',send);
+      $('#cMsgInput').addEventListener('keydown',e=>{ if(e.key==='Enter'){e.preventDefault();send();} });
+    },
+    notes(b,d){
+      b.innerHTML=`<div style="color:var(--dim);font-size:12px;margin-bottom:10px">🔒 Private — the athlete never sees these.</div>
+      ${(d.notes||[]).map(n=>`<div class="box">${esc(n.text)}<div style="color:var(--dim);font-family:var(--fm);font-size:10px;margin-top:5px">${fmtDate(n.created_at)}</div></div>`).join('')||'<div class="emptytab">No notes yet</div>'}
+      <div style="margin-top:10px"><textarea id="noteText" placeholder="What have you noticed? Only you see this." style="min-height:70px"></textarea><button class="btn btn-primary btn-sm btn-block" id="noteAdd">Add note 🔒</button></div>`;
+      $('#noteAdd').addEventListener('click',async()=>{ const t=$('#noteText').value.trim(); if(!t)return; try{ await api({action:'note_add',aid:curId,text:t}); toast('Note locked'); CUR=await api({action:'cdetail',aid:curId}); renderTab('notes'); }catch(e){ toast('Save failed'); } });
+    },
+    timeline(b,d){
+      const ev=[]; const p=d.profile;
+      if(p.created_at) ev.push({t:new Date(p.created_at),ic:'🔓',ti:'Joined Athlete OS',me:p.sport});
+      (d.checkins||[]).forEach(c=>ev.push({t:new Date(c.d+'T09:00:00'),ic:'✅',ti:'Daily check-in',me:`Energy ${c.energy??'–'} · sleep ${c.sleep_h??'–'}h · sore ${c.soreness??'–'} · ${c.mins||0}min`,dateOnly:true}));
+      (d.messages||[]).forEach(m=>ev.push({t:new Date(m.created_at),ic:m.from_coach?'📨':'💬',ti:m.from_coach?'You messaged':'Athlete messaged',me:m.text.slice(0,80)}));
+      if(p.coach_rating_at) ev.push({t:new Date(p.coach_rating_at),ic:'★',ti:`Coach rating set to ${p.coach_rating}/10`,me:p.coach_rating_note||''});
+      (d.notes||[]).forEach(n=>ev.push({t:new Date(n.created_at),ic:'🔒',ti:'Private note added',me:n.text.slice(0,80)}));
+      (d.shared_mind||[]).forEach(m=>ev.push({t:new Date(m.created_at),ic:'🧠',ti:'Mental file shared',me:(m.data||{}).trigger||''}));
+      ev.sort((a,b)=>b.t-a.t);
+      const pinned=d.peer&&d.peer.count?`<div class="ev" style="padding-bottom:14px"><div class="et">◈ Peer rating ${d.peer.avg}/10</div><div class="em">${d.peer.count} teammate${d.peer.count>1?'s':''} · aggregate</div></div>`:'';
+      if(!ev.length&&!pinned){ b.innerHTML='<div class="emptytab">No activity yet</div>'; return; }
+      let html='<div class="tl">'+pinned, lastDay='';
+      ev.forEach(e=>{ const day=e.t.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'}); if(day!==lastDay){ html+=`<div class="day">${day}</div>`; lastDay=day; }
+        const time=e.dateOnly?'':' · '+e.t.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
+        html+=`<div class="ev"><div class="et">${e.ic} ${esc(e.ti)}</div><div class="em">${esc(e.me)}${time}</div></div>`; });
+      html+='</div>'; b.innerHTML=html;
+    },
+    settings(b,d){
+      const p=d.profile;
+      b.innerHTML=`
+      <h4>Status</h4><div class="box"><div class="kv" style="border:none;padding:0"><span class="k">Currently <b>${esc(d.status)}</b></span><button class="btn btn-ghost btn-sm" id="stBtn">${d.status==='active'?'Pause':'Reactivate'}</button></div></div>
+      <h4>Coach rating</h4>
+      <div class="box">Current: <b>${p.coach_rating?p.coach_rating+'/10':'not rated'}</b>${p.coach_rating_note?' · “'+esc(p.coach_rating_note)+'”':''}
+        <div class="raterow" id="rateRow">${Array.from({length:10},(_,i)=>i+1).map(v=>`<button class="rbtn ${p.coach_rating===v?'sel':''}" data-r="${v}">${v}</button>`).join('')}</div>
+        <input id="rateNote" placeholder="Optional note the athlete sees" maxlength="200" value="${esc(p.coach_rating_note||'')}" style="margin-bottom:8px">
+        <button class="btn btn-primary btn-sm" id="rateSave">Save rating ⭐</button></div>
+      <h4>Team &amp; peer rating</h4>
+      <div class="box">Peer rating: <b>${d.peer&&d.peer.count?d.peer.avg+'/10 · '+d.peer.count+' peers':'none yet'}</b>
+        <div class="composer" style="margin-top:8px"><select id="teamSel"><option value="">No team</option>${(d.teams||[]).map(t=>`<option value="${t.id}" ${p.team_id===t.id?'selected':''}>${esc(t.name)}</option>`).join('')}</select><button class="btn btn-ghost btn-sm" id="teamNew">＋ New</button></div>
+        <div style="color:var(--dim);font-size:12px;margin-top:6px">Teammates on the same team can rate each other (anonymous).</div></div>`;
+      $('#stBtn').addEventListener('click',async()=>{ try{ await api({action:'status_set',aid:curId,status:d.status==='active'?'paused':'active'}); toast('Status updated'); CUR=await api({action:'cdetail',aid:curId}); paintHead(); renderTab('settings'); load(); }catch(e){ toast('Update failed'); } });
+      let picked=p.coach_rating||0;
+      $('#rateRow').querySelectorAll('.rbtn').forEach(bn=>bn.addEventListener('click',()=>{ picked=+bn.dataset.r; $('#rateRow').querySelectorAll('.rbtn').forEach(x=>x.classList.toggle('sel',x===bn)); }));
+      $('#rateSave').addEventListener('click',async()=>{ if(!picked)return toast('Pick 1–10'); try{ await api({action:'rate',aid:curId,score:picked,note:$('#rateNote').value.trim()}); toast('Rating saved ⭐'); CUR=await api({action:'cdetail',aid:curId}); renderTab('settings'); load(); }catch(e){ toast('Save failed'); } });
+      $('#teamSel').addEventListener('change',async()=>{ try{ await api({action:'team_assign',aid:curId,team_id:$('#teamSel').value||null}); toast('Team updated'); CUR=await api({action:'cdetail',aid:curId}); renderTab('settings'); load(); }catch(e){ toast('Update failed'); } });
+      $('#teamNew').addEventListener('click',async()=>{ const name=prompt('New team name:'); if(!name)return; try{ const r=await api({action:'team_create',name}); if(r&&r.team){ await api({action:'team_assign',aid:curId,team_id:r.team.id}); } toast('Team created'); CUR=await api({action:'cdetail',aid:curId}); renderTab('settings'); load(); }catch(e){ toast('Create failed'); } });
+    }
+  };
+
+  /* ---- sheets ---- */
+  const sheetScrim=$('#sheetScrim');
+  function openSheet(html){ $('#sheet').innerHTML=html; sheetScrim.classList.add('open'); }
+  function closeSheet(){ sheetScrim.classList.remove('open'); }
+  sheetScrim.addEventListener('click',e=>{ if(e.target===sheetScrim)closeSheet(); });
+  function comingSoon(title,need){
+    openSheet(`<h3>${esc(title)}</h3><p>This unlocks once we add ${esc(need||'the underlying data')}. It's on the roadmap — the dashboard is built to slot it in without a redesign.</p><div class="row"><button class="btn btn-ghost" style="flex:1" id="shClose">Close</button></div>`);
+    $('#shClose').addEventListener('click',closeSheet);
+  }
+  function addAthlete(){
+    const url=location.origin+location.pathname.replace(/coach\.html$/,'app.html');
+    openSheet(`<h3>Add an athlete</h3><p>Athletes self-register — no manual entry. Share this link; they tap <b>Join</b>, pick their sport and a 4-digit PIN, and they appear here instantly.</p>
+      <input id="shareUrl" readonly value="${esc(url)}" style="text-align:center">
+      <div class="row"><button class="btn btn-ghost" style="flex:1" id="shCopy">Copy link</button><button class="btn btn-primary" style="flex:1" id="shClose">Done</button></div>
+      <p style="margin:14px 0 0;font-size:12px">A one-tap invite code with pre-filled details is on the roadmap.</p>`);
+    $('#shCopy').addEventListener('click',()=>{ const i=$('#shareUrl'); i.select(); try{navigator.clipboard.writeText(i.value);}catch(e){document.execCommand&&document.execCommand('copy');} toast('Link copied'); });
+    $('#shClose').addEventListener('click',closeSheet);
+  }
+  function announce(){
+    const aud=filtered().filter(r=>r.status==='active');
+    openSheet(`<h3>Send announcement</h3><p>Sends a direct message to <b>${aud.length}</b> athlete${aud.length===1?'':'s'} currently in view${$('#sportFilter').value?` (${esc($('#sportFilter').value)})`:''}. They'll see it in their Coach tab.</p>
+      <textarea id="annText" placeholder="e.g. Training moved to 6pm Thursday — reply if you can't make it." style="min-height:90px"></textarea>
+      <div class="row"><button class="btn btn-ghost" style="flex:1" id="shClose">Cancel</button><button class="btn btn-primary" style="flex:1" id="annSend" ${aud.length?'':'disabled'}>Send to ${aud.length}</button></div>`);
+    $('#shClose').addEventListener('click',closeSheet);
+    $('#annSend').addEventListener('click',async()=>{
+      const text=$('#annText').value.trim(); if(!text)return toast('Write a message first');
+      const btn=$('#annSend'); btn.disabled=true; let sent=0;
+      for(const a of aud){ try{ await api({action:'cmsg',aid:a.id,text}); }catch(e){} sent++; btn.textContent=`Sent ${sent}/${aud.length}`; }
+      toast(`Announcement sent to ${sent}`); closeSheet();
+    });
+  }
+
+  /* ---- export ---- */
+  function exportCSV(){
+    if(!ROWS.length){ toast('Nothing to export'); return; }
+    const cols=['created_at','status','name','sport','age','level','position','team','train_freq','comp_schedule','goal_tags','goal_note','injuries','equipment','location','contact','xp','streak','last_checkin','coach_rating','peer_avg','peer_count'];
+    const get=(r,c)=>{ if(c==='goal_tags')return((r.goals||{}).tags||[]).join(' | '); if(c==='goal_note')return(r.goals||{}).note||''; if(c==='equipment')return(r.equipment||[]).join(' | '); if(c==='team')return teamName(r.team_id)||''; return r[c]; };
+    const csv=[cols.join(',')].concat(ROWS.map(r=>cols.map(c=>{ let v=get(r,c); if(v==null)v=''; v=String(v).replace(/"/g,'""'); return /[",\n]/.test(v)?`"${v}"`:v; }).join(','))).join('\n');
+    const blob=new Blob([csv],{type:'text/csv'}); const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='athlete-os-athletes.csv'; a.click(); URL.revokeObjectURL(a.href); toast('CSV exported');
+  }
+  ['exportBtn','exportBtn2'].forEach(id=>{ const b=$('#'+id); if(b)b.addEventListener('click',exportCSV); });
+
+  /* ---- theme toggle ---- */
+  (function(){ var root=document.documentElement, tc=document.querySelector('meta[name="theme-color"]');
+    function sync(){ var light=root.getAttribute('data-theme')==='light'; var b=$('#themeToggle'); if(b)b.textContent=light?'☀':'☾'; if(tc)tc.setAttribute('content',light?'#F2F2F7':'#090909'); }
+    sync(); document.addEventListener('click',function(e){ var t=e.target.closest&&e.target.closest('#themeToggle'); if(!t)return; var light=root.getAttribute('data-theme')==='light'; root.setAttribute('data-theme',light?'dark':'light'); try{localStorage.setItem('aos_theme',light?'dark':'light');}catch(_){} sync(); }); })();
+
+  /* ---- boot ---- */
   if(CODE){ load().then(showDash).catch(()=>{ sessionStorage.removeItem('aos_coach_code'); CODE=''; showLogin(); }); }
 })();
 </script>

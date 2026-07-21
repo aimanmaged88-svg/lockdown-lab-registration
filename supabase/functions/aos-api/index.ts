@@ -1,16 +1,19 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import webpush from "npm:web-push@3.6.7";
 
 // Athlete OS — app API. Sister product of LockDownLab Live, same engine:
 // all DB access is server-side (service role), athletes authenticate with
-// athlete_id + PIN, the coach with a coach code. Unlike the Lab there is no
-// community layer — every athlete is private; only the coach sees the roster.
+// athlete_id + PIN, the coach with a coach code. Every athlete is private;
+// the only cross-athlete visibility is inside a coach-created TEAM, where
+// teammates can rate each other (shown as an anonymous aggregate).
+// Two-way accountability: athlete <-> coach direct messages + a coach rating.
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const COACH_CODE = (Deno.env.get("AOS_COACH_CODE") || "OS-COACH").toUpperCase();
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, content-type, apikey",
+  "Access-Control-Allow-Headers": "authorization, content-type, apikey, x-cron-secret",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 const J = (o: unknown, s = 200) => new Response(JSON.stringify(o), { status: s, headers: { ...cors, "Content-Type": "application/json" } });
@@ -57,19 +60,60 @@ async function auth(aid: string, pin: string) {
   const h = await pinHash(p.name_key, String(pin || ""));
   return h === p.pin_hash ? p : null;
 }
+const msgsFor = (aid: string) => db(`aos_messages?athlete_id=eq.${aid}&select=id,from_coach,text,created_at&order=created_at.asc&limit=100`);
+const teamsList = () => db("aos_teams?select=id,name&order=name.asc");
+async function peerAgg(aid: string) {
+  const rows = await db(`aos_peer_ratings?ratee_id=eq.${aid}&select=score`);
+  const n = rows?.length || 0;
+  return { avg: n ? Math.round(rows.reduce((a: number, r: any) => a + r.score, 0) / n * 10) / 10 : null, count: n };
+}
+
+// ---- Web push (VAPID keys live in aos_config so no secret-setting needed) ----
+let vapidReady = false;
+async function ensureVapid() {
+  if (vapidReady) return true;
+  try {
+    const rows = await db(`aos_config?key=in.(vapid_public,vapid_private,vapid_subject)&select=key,value`);
+    const m: Record<string, string> = {};
+    (rows || []).forEach((r: any) => { m[r.key] = r.value; });
+    if (!m.vapid_public || !m.vapid_private) return false;
+    webpush.setVapidDetails(m.vapid_subject || "mailto:admin@athleteos.app", m.vapid_public, m.vapid_private);
+    vapidReady = true;
+    return true;
+  } catch (_) { return false; }
+}
+// Fire-and-forget: never let a push failure break the main action.
+async function pushToAthlete(aid: string, payload: { title: string; body: string; url?: string; tag?: string }) {
+  try {
+    if (!aid || !(await ensureVapid())) return;
+    const subs = await db(`aos_push_subs?athlete_id=eq.${aid}&select=id,endpoint,p256dh,auth`);
+    if (!subs || !subs.length) return;
+    const data = JSON.stringify(payload);
+    await Promise.all(subs.map(async (s: any) => {
+      try {
+        await webpush.sendNotification({ endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, data);
+        await db(`aos_push_subs?id=eq.${s.id}`, { method: "PATCH", body: JSON.stringify({ last_notified: new Date().toISOString() }) });
+      } catch (e: any) {
+        const code = e?.statusCode || e?.status;
+        if (code === 404 || code === 410) await db(`aos_push_subs?id=eq.${s.id}`, { method: "DELETE" });
+      }
+    }));
+  } catch (_) { /* swallow */ }
+}
 
 function profile(p: any) {
   return {
-    id: p.id, name: p.name, sport: p.sport, age: p.age, level: p.level, position: p.position,
+    id: p.id, name: p.name, sport: p.sport, sport_label: p.sport_label || null, age: p.age, level: p.level, position: p.position,
     goals: p.goals || {}, injuries: p.injuries, train_freq: p.train_freq, comp_schedule: p.comp_schedule,
     equipment: p.equipment || [], xp: p.xp, streak: p.streak, last_checkin: p.last_checkin,
-    prefs: p.prefs || {}, created_at: p.created_at,
+    prefs: p.prefs || {}, created_at: p.created_at, team_id: p.team_id || null,
+    coach_rating: p.coach_rating ?? null, coach_rating_note: p.coach_rating_note || null, coach_rating_at: p.coach_rating_at || null,
   };
 }
 
 // Rule-driven AI Performance Coach — reads the athlete's own inputs and
 // speaks in their sport's terms. Educates and motivates; never diagnoses.
-function buildAI(p: any, checkins: any[], journal: any[]) {
+function buildAI(p: any, checkins: any[], journal: any[], peer: any) {
   const out: [string, string][] = [];
   const where = SPORT_WORD[p.sport] || SPORT_WORD.general;
   if (!checkins.length) {
@@ -118,20 +162,35 @@ function buildAI(p: any, checkins: any[], journal: any[]) {
     out.push(aw >= 6 ? ["⬢", `Hydration averaging ${Math.round(aw)}/8 — your engine runs clean.`]
       : ["⬢", `Water averaging ${Math.round(aw)}/8. Fatigue loves dehydration — keep the bottle moving.`]);
   }
+  if (p.coach_rating) out.push(["★", `Your coach rates you ${p.coach_rating}/10 right now.${p.coach_rating_note ? " “" + p.coach_rating_note + "”" : ""} Message them in the Coach tab.`]);
+  if (peer && peer.count >= 2) out.push(["◈", `Your teammates rate you ${peer.avg}/10 (${peer.count} peers). Respect is earned in reps.`]);
   if (p.injuries) out.push(["◆", "Injury noted on file. Train around it, not through it — and keep your health professional in the loop."]);
   return out;
 }
 
 async function athleteState(p: any) {
-  const [checkins, journal, notesCount] = await Promise.all([
+  const [checkins, journal, messages, peer] = await Promise.all([
     db(`aos_checkins?athlete_id=eq.${p.id}&select=d,energy,sleep_h,water,soreness,mins,focus,note&order=d.desc&limit=14`),
     db(`aos_journal?athlete_id=eq.${p.id}&select=id,kind,d,data,share_coach,created_at&order=created_at.desc&limit=40`),
-    Promise.resolve(null), // athletes never see coach notes — reserved
+    msgsFor(p.id),
+    peerAgg(p.id),
   ]);
+  let team = null, teammates: any[] = [];
+  if (p.team_id) {
+    team = (await db(`aos_teams?id=eq.${p.team_id}&select=id,name`))?.[0] || null;
+    const [mates, mine] = await Promise.all([
+      db(`aos_athletes?team_id=eq.${p.team_id}&id=neq.${p.id}&status=eq.active&select=id,name,position,sport&order=name.asc`),
+      db(`aos_peer_ratings?rater_id=eq.${p.id}&select=ratee_id,score`),
+    ]);
+    const myMap: Record<string, number> = Object.fromEntries((mine || []).map((r: any) => [r.ratee_id, r.score]));
+    teammates = (mates || []).map((m: any) => ({ id: m.id, name: m.name, position: m.position, my_rating: myMap[m.id] || null }));
+  }
+  const evFilter = p.team_id ? `or=(team_id.eq.${p.team_id},team_id.is.null)` : `team_id=is.null`;
+  const events = await db(`aos_events?starts_at=gte.${encodeURIComponent(new Date().toISOString())}&${evFilter}&select=id,title,type,starts_at,location,note&order=starts_at.asc&limit=6`);
   const today = sydToday();
   return {
-    profile: profile(p), checkins,
-    ai: buildAI(p, checkins, journal),
+    profile: profile(p), checkins, messages, peer, team, teammates, events,
+    ai: buildAI(p, checkins, journal, peer),
     mind: journal.filter((j: any) => j.kind === "mind").slice(0, 10),
     diary: journal.filter((j: any) => j.kind === "diary").slice(0, 10),
     fuel_today: journal.find((j: any) => j.kind === "fuel" && j.d === today) || null,
@@ -145,6 +204,31 @@ Deno.serve(async (req) => {
     const b = await req.json().catch(() => ({} as any));
     const a = b.action;
 
+    // Public VAPID key so the client can subscribe (safe to expose).
+    if (a === "push_key") {
+      const rows = await db(`aos_config?key=eq.vapid_public&select=value`);
+      return J({ ok: true, key: rows?.[0]?.value || null });
+    }
+
+    // Daily reminder sweep — called by pg_cron with the shared secret header.
+    if (a === "push_cron") {
+      const secret = req.headers.get("x-cron-secret") || b.secret || "";
+      const cfg = await db(`aos_config?key=eq.push_cron_secret&select=value`);
+      if (!cfg?.length || secret !== cfg[0].value) return J({ error: "forbidden" }, 403);
+      if (!(await ensureVapid())) return J({ error: "vapid not configured" }, 500);
+      const today = sydToday();
+      const subs = await db(`aos_push_subs?select=athlete_id`);
+      const ids = [...new Set((subs || []).map((s: any) => s.athlete_id).filter(Boolean))];
+      let sent = 0;
+      for (const id of ids) {
+        const ath = await getAthlete(id);
+        if (!ath || ath.status !== "active" || ath.last_checkin === today) continue;
+        await pushToAthlete(id, { title: "Time to check in 🏀", body: "Log today’s check-in to keep your streak alive.", url: "./app.html?go=home", tag: "daily" });
+        sent++;
+      }
+      return J({ ok: true, sent, candidates: ids.length });
+    }
+
     if (a === "register") {
       const name = String(b.name || "").trim().slice(0, 40);
       const pin = String(b.pin || "").trim();
@@ -154,6 +238,7 @@ Deno.serve(async (req) => {
       const dup = await db(`aos_athletes?name_key=eq.${encodeURIComponent(key)}&select=id`);
       if (dup.length) return J({ error: "That name is taken — log in instead, or add a last initial." }, 409);
       const sport = SPORTS.includes(String(b.sport || "").toLowerCase()) ? String(b.sport).toLowerCase() : "general";
+      const sportLabel = priv(b.sport_label, 40) || null;
       const goals = {
         tags: Array.isArray(b.goal_tags) ? b.goal_tags.slice(0, 6).map((g: unknown) => priv(g, 40)) : [],
         note: priv(b.goal_note, 500),
@@ -161,7 +246,7 @@ Deno.serve(async (req) => {
       const rows = await db("aos_athletes", { method: "POST", headers: { Prefer: "return=representation" },
         body: JSON.stringify({
           name, name_key: key, pin_hash: await pinHash(key, pin),
-          sport, age: b.age ? num(b.age, 5, 99, 0) || null : null,
+          sport, sport_label: sportLabel, age: b.age ? num(b.age, 5, 99, 0) || null : null,
           level: priv(b.level, 40) || null, position: priv(b.position, 40) || null,
           goals, injuries: priv(b.injuries, 300) || null,
           train_freq: b.train_freq ? num(b.train_freq, 1, 7, 3) : null,
@@ -170,6 +255,9 @@ Deno.serve(async (req) => {
           location: priv(b.location, 80) || null, contact: priv(b.contact, 80) || null,
         }) });
       const p = rows[0];
+      if (b.sport_pending && sportLabel) {
+        await db("aos_sport_requests", { method: "POST", body: JSON.stringify({ athlete_id: p.id, athlete_name: name, sport: sportLabel }) });
+      }
       return J({ ok: true, aid: p.id, state: await athleteState(p) });
     }
 
@@ -182,12 +270,49 @@ Deno.serve(async (req) => {
       return J({ ok: true, aid: p.id, state: await athleteState(p) });
     }
 
-    if (["state", "checkin", "mind", "diary", "fuel", "goals_set", "profile_set"].includes(a)) {
+    if (["state", "checkin", "mind", "diary", "fuel", "goals_set", "profile_set", "msg", "peer_rate", "push_subscribe", "push_unsubscribe"].includes(a)) {
       const p = await auth(b.aid, b.pin);
       if (!p) return J({ error: "unauthorized" }, 401);
       const today = sydToday();
 
       if (a === "state") return J({ ok: true, state: await athleteState(p) });
+
+      if (a === "push_subscribe") {
+        const sub = b.sub || {};
+        const endpoint = String(sub.endpoint || "");
+        const k = sub.keys || {};
+        if (!endpoint || !k.p256dh || !k.auth) return J({ error: "bad subscription" }, 400);
+        const ex = await db(`aos_push_subs?endpoint=eq.${encodeURIComponent(endpoint)}&select=id`);
+        if (ex?.length) await db(`aos_push_subs?id=eq.${ex[0].id}`, { method: "PATCH", body: JSON.stringify({ athlete_id: p.id, p256dh: k.p256dh, auth: k.auth, ua: priv(b.ua, 200) || null }) });
+        else await db("aos_push_subs", { method: "POST", body: JSON.stringify({ athlete_id: p.id, endpoint, p256dh: k.p256dh, auth: k.auth, ua: priv(b.ua, 200) || null }) });
+        return J({ ok: true });
+      }
+      if (a === "push_unsubscribe") {
+        const endpoint = String((b.sub && b.sub.endpoint) || b.endpoint || "");
+        if (endpoint) await db(`aos_push_subs?endpoint=eq.${encodeURIComponent(endpoint)}`, { method: "DELETE" });
+        return J({ ok: true });
+      }
+
+      if (a === "msg") {
+        const text = priv(b.text, 600);
+        if (!text) return J({ error: "empty" }, 400);
+        await db("aos_messages", { method: "POST", body: JSON.stringify({ athlete_id: p.id, from_coach: false, text }) });
+        return J({ ok: true, messages: await msgsFor(p.id) });
+      }
+
+      if (a === "peer_rate") {
+        if (!p.team_id) return J({ error: "You're not in a team yet." }, 400);
+        const ratee = String(b.ratee || "");
+        if (ratee === p.id) return J({ error: "You can't rate yourself." }, 400);
+        const mate = await getAthlete(ratee);
+        if (!mate || mate.team_id !== p.team_id) return J({ error: "That athlete isn't on your team." }, 403);
+        const score = num(b.score, 1, 10, 0);
+        if (!score) return J({ error: "Pick a rating from 1 to 10." }, 400);
+        const ex = await db(`aos_peer_ratings?rater_id=eq.${p.id}&ratee_id=eq.${ratee}&select=id`);
+        if (ex?.length) await db(`aos_peer_ratings?id=eq.${ex[0].id}`, { method: "PATCH", body: JSON.stringify({ score, updated_at: new Date().toISOString() }) });
+        else await db("aos_peer_ratings", { method: "POST", body: JSON.stringify({ rater_id: p.id, ratee_id: ratee, score }) });
+        return J({ ok: true, state: await athleteState(await getAthlete(p.id)) });
+      }
 
       if (a === "checkin") {
         if (p.last_checkin === today) return J({ error: "Already checked in today." }, 409);
@@ -271,24 +396,101 @@ Deno.serve(async (req) => {
       }
     }
 
-    if (["roster", "cdetail", "note_add", "status_set"].includes(a)) {
+    if (["roster", "cdetail", "note_add", "status_set", "cmsg", "rate", "team_create", "team_assign", "sport_resolve", "event_create", "event_delete"].includes(a)) {
       if (String(b.code || "").toUpperCase() !== COACH_CODE) return J({ error: "bad coach code" }, 401);
 
       if (a === "roster") {
-        const athletes = await db("aos_athletes?select=id,name,sport,age,level,position,goals,injuries,train_freq,comp_schedule,equipment,location,contact,xp,streak,last_checkin,status,created_at&order=created_at.asc");
-        return J({ ok: true, today: sydToday(), athletes });
+        const [athletes, teams, peers, sportReqs, events, pushSubs] = await Promise.all([
+          db("aos_athletes?select=id,name,sport,sport_label,age,level,position,goals,injuries,train_freq,comp_schedule,equipment,location,contact,xp,streak,last_checkin,status,created_at,team_id,coach_rating,coach_rating_at&order=created_at.asc"),
+          teamsList(),
+          db("aos_peer_ratings?select=ratee_id,score"),
+          db("aos_sport_requests?status=eq.pending&select=id,athlete_name,sport,created_at&order=created_at.desc"),
+          db(`aos_events?starts_at=gte.${encodeURIComponent(new Date(Date.now() - 6 * 3600 * 1000).toISOString())}&select=id,title,type,starts_at,location,note,team_id&order=starts_at.asc&limit=100`),
+          db("aos_push_subs?select=athlete_id"),
+        ]);
+        const pmap: Record<string, number[]> = {};
+        (peers || []).forEach((r: any) => { (pmap[r.ratee_id] = pmap[r.ratee_id] || []).push(r.score); });
+        const pushMap: Record<string, number> = {};
+        (pushSubs || []).forEach((r: any) => { if (r.athlete_id) pushMap[r.athlete_id] = (pushMap[r.athlete_id] || 0) + 1; });
+        (athletes || []).forEach((x: any) => {
+          const arr = pmap[x.id];
+          x.peer_avg = arr && arr.length ? Math.round(arr.reduce((s: number, v: number) => s + v, 0) / arr.length * 10) / 10 : null;
+          x.peer_count = arr ? arr.length : 0;
+          x.push_on = !!pushMap[x.id];
+          x.push_count = pushMap[x.id] || 0;
+        });
+        return J({ ok: true, today: sydToday(), athletes, teams: teams || [], sport_requests: sportReqs || [], events: events || [] });
+      }
+      if (a === "event_create") {
+        const title = priv(b.title, 80);
+        if (title.length < 2) return J({ error: "Give the event a title." }, 400);
+        if (!b.starts_at) return J({ error: "Pick a date & time." }, 400);
+        const type = ["training", "game", "meeting", "other"].includes(String(b.type)) ? String(b.type) : "training";
+        const row = { title, type, starts_at: new Date(b.starts_at).toISOString(), location: priv(b.location, 80) || null, note: priv(b.note, 200) || null, team_id: b.team_id ? String(b.team_id) : null };
+        const rows = await db("aos_events", { method: "POST", headers: { Prefer: "return=representation" }, body: JSON.stringify(row) });
+        const ev = rows[0];
+        // Notify the roster (team-scoped or everyone) that a new event landed.
+        try {
+          const who = ev.team_id ? `aos_athletes?team_id=eq.${ev.team_id}&status=eq.active&select=id` : `aos_athletes?status=eq.active&select=id`;
+          const targets = await db(who);
+          const label = ev.type === "game" ? "New game scheduled" : ev.type === "meeting" ? "New meeting scheduled" : "New session scheduled";
+          for (const t of (targets || [])) await pushToAthlete(t.id, { title: label, body: ev.title, url: "./app.html?go=home", tag: "event" });
+        } catch (_) { /* swallow */ }
+        return J({ ok: true, event: ev });
+      }
+      if (a === "event_delete") {
+        await db(`aos_events?id=eq.${b.id}`, { method: "DELETE" });
+        return J({ ok: true });
+      }
+      if (a === "sport_resolve") {
+        const status = ["approved", "rejected"].includes(String(b.status)) ? String(b.status) : "approved";
+        await db(`aos_sport_requests?id=eq.${b.req_id}`, { method: "PATCH", body: JSON.stringify({ status, resolved_at: new Date().toISOString() }) });
+        return J({ ok: true });
       }
       if (a === "cdetail") {
         const p = await getAthlete(b.aid);
         if (!p) return J({ error: "no athlete" }, 404);
-        const [checkins, notes, journal] = await Promise.all([
+        const [checkins, notes, journal, messages, peer, teams, pushSubs] = await Promise.all([
           db(`aos_checkins?athlete_id=eq.${p.id}&select=d,energy,sleep_h,water,soreness,mins,focus,note&order=d.desc&limit=14`),
           db(`aos_notes?athlete_id=eq.${p.id}&select=id,text,created_at&order=created_at.asc`),
           db(`aos_journal?athlete_id=eq.${p.id}&share_coach=eq.true&select=kind,d,data,created_at&order=created_at.desc&limit=15`),
+          msgsFor(p.id),
+          peerAgg(p.id),
+          teamsList(),
+          db(`aos_push_subs?athlete_id=eq.${p.id}&select=id`),
         ]);
-        return J({ ok: true, profile: profile(p), contact: p.contact || null, status: p.status, checkins, notes,
+        return J({ ok: true, profile: profile(p), contact: p.contact || null, status: p.status, checkins, notes, messages, peer, teams: teams || [],
+          push_on: (pushSubs?.length || 0) > 0, push_count: pushSubs?.length || 0,
           shared_mind: journal.filter((j: any) => j.kind === "mind"),
           fuel: journal.filter((j: any) => j.kind === "fuel").slice(0, 7) });
+      }
+      if (a === "team_create") {
+        const name = priv(b.name, 60);
+        if (name.length < 2) return J({ error: "Name the team." }, 400);
+        const rows = await db("aos_teams", { method: "POST", headers: { Prefer: "return=representation" }, body: JSON.stringify({ name }) });
+        return J({ ok: true, team: rows[0], teams: await teamsList() });
+      }
+      if (a === "team_assign") {
+        if (!(await getAthlete(b.aid))) return J({ error: "no athlete" }, 404);
+        const team_id = b.team_id ? String(b.team_id) : null;
+        await db(`aos_athletes?id=eq.${b.aid}`, { method: "PATCH", body: JSON.stringify({ team_id }) });
+        return J({ ok: true });
+      }
+      if (a === "cmsg") {
+        const text = priv(b.text, 600);
+        if (!text) return J({ error: "empty" }, 400);
+        if (!(await getAthlete(b.aid))) return J({ error: "no athlete" }, 404);
+        await db("aos_messages", { method: "POST", body: JSON.stringify({ athlete_id: b.aid, from_coach: true, text }) });
+        await pushToAthlete(b.aid, { title: "New message from your coach", body: text.slice(0, 140), url: "./app.html?go=msgs", tag: "coach-msg" });
+        return J({ ok: true, messages: await msgsFor(b.aid) });
+      }
+      if (a === "rate") {
+        const score = num(b.score, 1, 10, 0);
+        if (!score) return J({ error: "Pick a rating from 1 to 10." }, 400);
+        if (!(await getAthlete(b.aid))) return J({ error: "no athlete" }, 404);
+        await db(`aos_athletes?id=eq.${b.aid}`, { method: "PATCH", body: JSON.stringify({ coach_rating: score, coach_rating_note: priv(b.note, 200) || null, coach_rating_at: new Date().toISOString() }) });
+        await pushToAthlete(b.aid, { title: "Your coach rated you " + score + "/10", body: priv(b.note, 140) || "Open Athlete OS to see the note.", url: "./app.html?go=msgs", tag: "coach-rate" });
+        return J({ ok: true });
       }
       if (a === "note_add") {
         const text = String(b.text || "").trim().slice(0, 300);
