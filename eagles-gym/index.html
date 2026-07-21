@@ -6,7 +6,8 @@
 <meta name="theme-color" content="#0a0a0a" />
 <title>Eagles Gym Staff Hub</title>
 <meta name="description" content="Eagles Gym Staff Hub — daily checklists, cleaning, equipment, SOPs and shift accountability for gym staff." />
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%A6%85%3C/text%3E%3C/svg%3E" />
+<link rel="icon" type="image/png" href="icon-192.png" />
+<link rel="apple-touch-icon" href="icon-192.png" />
 <link rel="manifest" href="manifest.json" />
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
@@ -80,9 +81,8 @@
 <div id="gate" class="fixed inset-0 z-50 bg-ink-900 flex items-center justify-center p-6">
   <div class="w-full max-w-sm bg-ink-850 rounded-3xl shadow-card border border-ink-700 p-7 animate-fadeUp">
     <div class="text-center mb-6">
-      <div class="text-5xl mb-3">🦅</div>
-      <h1 class="text-2xl font-bold tracking-tight">Eagles Gym</h1>
-      <p class="text-brand-500 font-semibold tracking-wide text-sm">STAFF HUB</p>
+      <img src="logo.png" alt="Eagles Gym" class="h-9 w-auto mx-auto mb-3" />
+      <p class="text-brand-500 font-semibold tracking-[0.25em] text-sm">STAFF HUB</p>
       <p class="text-neutral-400 text-sm mt-3">Clock in to start your shift. Every task you complete is stamped with your name — accountability, not paperwork.</p>
     </div>
     <label class="text-xs uppercase tracking-wider text-neutral-500 font-semibold">Who's on shift?</label>
@@ -96,16 +96,16 @@
 <!-- ===================== HEADER ===================== -->
 <header class="safe-t sticky top-0 z-30 bg-ink-900/85 backdrop-blur-xl border-b border-ink-700">
   <div class="max-w-5xl mx-auto px-4 py-3 flex items-center gap-3">
-    <div class="text-2xl">🦅</div>
-    <div class="leading-none">
-      <div class="font-bold text-[15px] tracking-tight">Eagles Gym</div>
-      <div class="text-[10px] text-brand-500 font-semibold tracking-widest">STAFF HUB</div>
+    <img src="logo.png" alt="Eagles Gym" class="h-6 w-auto" />
+    <div class="leading-none border-l border-ink-600 pl-3">
+      <div class="text-[10px] text-brand-500 font-semibold tracking-[0.2em]">STAFF HUB</div>
     </div>
-    <div class="ml-auto flex items-center gap-3">
+    <div class="ml-auto flex items-center gap-2 md:gap-3">
       <div class="text-right leading-tight">
         <div id="clock" class="font-bold text-brand-400 tabular-nums text-base">--:--</div>
         <div id="dateLabel" class="text-[10px] text-neutral-400">—</div>
       </div>
+      <button id="bossBtn" title="Boss mode" class="w-9 h-9 grid place-items-center bg-ink-800 border border-ink-600 rounded-full text-base active:scale-95 transition">🔒</button>
       <button id="whoBtn" class="flex items-center gap-2 bg-ink-800 border border-ink-600 rounded-full pl-1 pr-3 py-1 active:scale-95 transition">
         <span id="avatar" class="w-7 h-7 rounded-full bg-gradient-to-br from-brand-500 to-brand-600 grid place-items-center text-xs font-bold text-white">–</span>
         <span id="whoName" class="text-xs font-semibold max-w-[80px] truncate">—</span>
@@ -146,6 +146,7 @@ const nowTime  = ()=> new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minu
 const nowDate  = ()=> new Date().toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
 const uid      = ()=> Math.random().toString(36).slice(2,9);
 const initials = (n)=> (n||'?').trim().split(/\s+/).map(w=>w[0]).slice(0,2).join('').toUpperCase();
+const APP_ICON = 'icon-192.png'; // Eagles Gym logo (falls back gracefully if missing)
 
 let STAFF = store.get('staff',null); // {name}
 
@@ -163,9 +164,15 @@ const EMERGENCY = [
 ];
 
 /* ============================================================
-   CHECKLIST DATA
+   BOSS MODE  (only bosses with the code can edit lists)
    ============================================================ */
-const CHECKLISTS = {
+const BOSS_CODE = 'eagles2196';
+let bossMode = store.get('boss', false);
+
+/* ============================================================
+   CHECKLIST DATA  (boss-editable — stored, defaults below)
+   ============================================================ */
+const DEFAULT_CHECKLISTS = {
   morning: {label:'Morning', icon:'🌅', items:[
     'Unlock doors','Turn lights on','Check music','Turn TVs on','Check bathrooms',
     'Empty bins','Fill sanitiser stations','Check reception desk','Check towels',
@@ -179,15 +186,20 @@ const CHECKLISTS = {
     'Empty rubbish','Put equipment away','Final walk through','Alarm set'
   ]}
 };
-
-const CLEANING = {
+const DEFAULT_CLEANING = {
   hourly:{label:'Every Hour', icon:'🕐', items:['Walk gym floor','Put weights away','Wipe sweaty equipment']},
   twoHour:{label:'Every 2 Hours', icon:'🕑', items:['Check bathrooms','Restock paper towels','Empty bins if needed']},
   fourHour:{label:'Every 4 Hours', icon:'🕓', items:['Deep clean reception','Vacuum entrance','Mop toilets']}
 };
-
-const EQUIPMENT = ['Dumbbells organised','Plates organised','Barbells stored','Benches aligned',
+const DEFAULT_EQUIPMENT = ['Dumbbells organised','Plates organised','Barbells stored','Benches aligned',
   'Machines operational','Cardio equipment working','Cable attachments returned'];
+
+let CHECKLISTS = store.get('checklists', DEFAULT_CHECKLISTS);
+let CLEANING   = store.get('cleaning',   DEFAULT_CLEANING);
+let EQUIPMENT  = store.get('equipment_list', DEFAULT_EQUIPMENT);
+function saveChecklists(){ store.set('checklists', CHECKLISTS); }
+function saveCleaning(){ store.set('cleaning', CLEANING); }
+function saveEquipment(){ store.set('equipment_list', EQUIPMENT); }
 
 /* ============================================================
    GYMMASTER GUIDES
@@ -291,13 +303,65 @@ const KB = [
 ];
 
 /* ============================================================
-   REMINDERS ENGINE
+   REMINDERS  (boss-editable list — each = {id,text,interval})
+   interval ∈ 60 | 120 | 180 | 240 (minutes) | 'close'
    ============================================================ */
-const REMINDERS = [
-  {id:'r1h', every:60,  title:'Hourly floor sweep', body:'Walk gym floor · Put weights away · Wipe sweaty equipment', icon:'🕐'},
-  {id:'r2h', every:120, title:'2-hour check',        body:'Check bathrooms · Restock paper towels · Empty bins if needed', icon:'🕑'},
-  {id:'r4h', every:240, title:'4-hour deep clean',   body:'Deep clean reception · Vacuum entrance · Mop toilets', icon:'🕓'}
+const INTERVALS = [
+  {v:60,  l:'Every hour'},
+  {v:120, l:'Every 2 hours'},
+  {v:180, l:'Every 3 hours'},
+  {v:240, l:'Every 4 hours'},
+  {v:'close', l:'At close'}
 ];
+function intervalLabel(v){ const o=INTERVALS.find(x=>String(x.v)===String(v)); return o?o.l:'Every hour'; }
+const DEFAULT_REMINDERS = [
+  {id:uid(), text:'Walk the gym floor',                interval:60},
+  {id:uid(), text:'Put weights away',                  interval:60},
+  {id:uid(), text:'Wipe down sweaty equipment',        interval:60},
+  {id:uid(), text:'Check the bathrooms',               interval:120},
+  {id:uid(), text:'Restock paper towels',              interval:120},
+  {id:uid(), text:'Empty bins if needed',              interval:120},
+  {id:uid(), text:'Deep clean reception',              interval:240},
+  {id:uid(), text:'Vacuum the entrance',               interval:240},
+  {id:uid(), text:'Mop the toilets',                   interval:240},
+  {id:uid(), text:'Complete the closing checklist before locking up', interval:'close'}
+];
+let REMINDERS = store.get('reminders', DEFAULT_REMINDERS);
+function saveReminders(){ store.set('reminders', REMINDERS); }
+
+/* ============================================================
+   PRICE LIST  (boss-editable — groups of {name,price} + optional photo)
+   ============================================================ */
+const DEFAULT_PRICES = {
+  image:'',
+  groups:[
+    {id:uid(), name:'Memberships', items:[
+      {name:'Casual / day pass',            price:'$20'},
+      {name:'Weekly (direct debit)',        price:'$25/wk'},
+      {name:'Monthly (no lock-in)',         price:'$110/mo'},
+      {name:'3 months up front (cash)',     price:'$—'},
+      {name:'Annual up front',              price:'$—'},
+      {name:'Student / concession',         price:'15% off'},
+      {name:'Joining fee',                  price:'$49'}
+    ]},
+    {id:uid(), name:'Drinks', items:[
+      {name:'Water',        price:'$—'},
+      {name:'Sports drink', price:'$—'},
+      {name:'Protein shake',price:'$—'}
+    ]},
+    {id:uid(), name:'Supplements', items:[
+      {name:'Protein (single serve)', price:'$—'},
+      {name:'Pre-workout',            price:'$—'}
+    ]},
+    {id:uid(), name:'Retail', items:[
+      {name:'Towel',   price:'$—'},
+      {name:'Shaker',  price:'$—'},
+      {name:'Singlet', price:'$—'}
+    ]}
+  ]
+};
+let PRICES = store.get('prices', DEFAULT_PRICES);
+function savePrices(){ store.set('prices', PRICES); }
 
 /* ============================================================
    NAV
@@ -309,6 +373,7 @@ const NAV = [
   {id:'equipment',  label:'Equipment',      icon:'🏋️'},
   {id:'reception',  label:'Reception',      icon:'👥'},
   {id:'memberships',label:'Memberships',    icon:'💳'},
+  {id:'prices',     label:'Price List',     icon:'💲'},
   {id:'guide',      label:'GymMaster Guide',icon:'📖'},
   {id:'issues',     label:'Issues',         icon:'🚨'},
   {id:'handover',   label:'Handover',       icon:'📋'},
@@ -330,6 +395,14 @@ function setDone(scope,idx,on){
   saveDone(m);
 }
 function completionOf(scope,idx){ return doneMap()[taskId(scope,idx)]; }
+function setNote(scope,idx,note){
+  const m=doneMap(); const id=taskId(scope,idx);
+  if(m[id]){ m[id].note=note; saveDone(m); }
+}
+/* clear today's completions for one scope (used when a boss edits its list) */
+function clearScopeDone(scope){
+  const m=doneMap(); Object.keys(m).forEach(k=>{ if(k.startsWith(scope+':')) delete m[k]; }); saveDone(m);
+}
 
 /* progress across a set of scope+count pairs */
 function progress(pairs){
@@ -366,6 +439,116 @@ $('#modalHost').addEventListener('click',e=>{ if(e.target.id==='modalHost') clos
 
 function card(inner,cls=''){ return `<div class="bg-ink-850 border border-ink-700 rounded-3xl shadow-card ${cls}">${inner}</div>`; }
 
+/* ============================================================
+   BOSS MODE — unlock / lock / gate
+   ============================================================ */
+function setBoss(on){
+  bossMode = on; store.set('boss', on);
+  const b=$('#bossBtn');
+  if(b){
+    b.innerHTML = on ? '🔓' : '🔒';
+    b.classList.toggle('text-brand-400', on);
+    b.classList.toggle('bg-brand-500/10', on);
+  }
+}
+function openBossPrompt(){
+  openModal(`
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-2">
+        <h3 class="text-xl font-bold">🔒 Boss mode</h3>
+        <button onclick="closeModal()" class="text-neutral-500 hover:text-white text-2xl leading-none">×</button>
+      </div>
+      <p class="text-sm text-neutral-400 mb-4">Enter the boss code to edit checklists, reminders and prices. Staff can use the app but can't change the lists.</p>
+      <input id="bossCode" type="password" inputmode="text" autocomplete="off" placeholder="Boss code" class="w-full bg-ink-800 border border-ink-600 rounded-2xl px-4 py-3 text-base mb-3 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/40 outline-none" />
+      <button id="bossGo" class="w-full bg-gradient-to-br from-brand-500 to-brand-600 text-white font-bold py-3 rounded-2xl active:scale-95 transition">Unlock</button>
+    </div>`);
+  const go=()=>{
+    if($('#bossCode').value.trim().toLowerCase()===BOSS_CODE){
+      setBoss(true); closeModal(); render(currentView); toast('Boss mode unlocked — you can edit lists now','🔓'); haptic(25);
+    } else { $('#bossCode').classList.add('ring-2','ring-red-500'); toast('Wrong code','⚠️'); }
+  };
+  $('#bossGo').addEventListener('click',go);
+  $('#bossCode').addEventListener('keydown',e=>{ if(e.key==='Enter') go(); });
+  setTimeout(()=>$('#bossCode').focus(),50);
+}
+function toggleBoss(){
+  if(bossMode){ setBoss(false); render(currentView); toast('Boss mode locked','🔒'); }
+  else openBossPrompt();
+}
+/* little "edit / bosses only" tag for section headers */
+function editBtn(kind,key){
+  if(!bossMode) return '';
+  return `<button data-editlist="${kind}:${key}" class="text-xs font-semibold text-brand-400 active:scale-95">✏️ Edit list</button>`;
+}
+function bossBanner(){
+  if(!bossMode) return '';
+  return `<div class="mb-4 flex items-center gap-2 bg-brand-500/10 border border-brand-500/30 rounded-2xl px-4 py-2.5">
+    <span class="text-lg">🔓</span>
+    <span class="text-sm font-semibold text-brand-300 flex-1">Boss mode — you can edit lists</span>
+    <button onclick="toggleBoss()" class="text-xs font-semibold text-neutral-300 bg-ink-800 border border-ink-600 rounded-full px-3 py-1">Lock</button>
+  </div>`;
+}
+
+/* ============================================================
+   GENERIC LIST EDITOR  (boss-only) — edits an array of strings
+   ============================================================ */
+function listFor(kind,key){
+  if(kind==='checklist') return CHECKLISTS[key].items;
+  if(kind==='cleaning')  return CLEANING[key].items;
+  if(kind==='equipment') return EQUIPMENT;
+  return [];
+}
+function listTitle(kind,key){
+  if(kind==='checklist') return CHECKLISTS[key].label+' checklist';
+  if(kind==='cleaning')  return CLEANING[key].label+' cleaning';
+  if(kind==='equipment') return 'Equipment checklist';
+  return 'List';
+}
+function persistList(kind){
+  if(kind==='checklist') saveChecklists();
+  else if(kind==='cleaning') saveCleaning();
+  else if(kind==='equipment') saveEquipment();
+}
+function scopeFor(kind,key){
+  if(kind==='checklist') return key;
+  if(kind==='cleaning')  return 'clean_'+key;
+  if(kind==='equipment') return 'equipment';
+  return key;
+}
+function openListEditor(kind,key){
+  const items = listFor(kind,key);
+  const rows = ()=> items.map((t,i)=>`
+    <div class="editrow flex items-center gap-2 mb-2">
+      <input class="eitem flex-1 bg-ink-800 border border-ink-600 rounded-xl px-3 py-2 text-[15px] focus:border-brand-500 outline-none" data-i="${i}" value="${esc(t)}" />
+      <button data-del="${i}" class="w-9 h-9 shrink-0 rounded-xl bg-ink-800 border border-ink-700 text-neutral-500 hover:text-red-400">×</button>
+    </div>`).join('');
+  openModal(`
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-1">
+        <h3 class="text-xl font-bold">✏️ Edit — ${esc(listTitle(kind,key))}</h3>
+        <button onclick="closeModal()" class="text-neutral-500 hover:text-white text-2xl leading-none">×</button>
+      </div>
+      <p class="text-xs text-neutral-500 mb-4">Bosses only. Changes save for everyone on this device.</p>
+      <div id="editRows">${rows()}</div>
+      <button id="addItem" class="w-full border border-dashed border-ink-600 rounded-xl py-2.5 text-sm font-semibold text-brand-400 mt-1">＋ Add item</button>
+      <button id="saveList" class="w-full bg-gradient-to-br from-brand-500 to-brand-600 text-white font-bold py-3 rounded-2xl mt-4 active:scale-95 transition">Save list</button>
+    </div>`);
+  function rebind(){
+    $$('#editRows .eitem').forEach(inp=>inp.addEventListener('input',()=>{ items[+inp.dataset.i]=inp.value; }));
+    $$('#editRows [data-del]').forEach(b=>b.addEventListener('click',()=>{ items.splice(+b.dataset.del,1); $('#editRows').innerHTML=rows(); rebind(); }));
+  }
+  rebind();
+  $('#addItem').addEventListener('click',()=>{ items.push('New item'); $('#editRows').innerHTML=rows(); rebind();
+    const last=$$('#editRows .eitem').pop(); if(last){ last.focus(); last.select(); } });
+  $('#saveList').addEventListener('click',()=>{
+    // drop blank rows
+    for(let i=items.length-1;i>=0;i--){ if(!String(items[i]).trim()) items.splice(i,1); }
+    persistList(kind);
+    clearScopeDone(scopeFor(kind,key)); // indices changed — reset today's ticks for this list
+    closeModal(); render(currentView); toast('List updated','✅'); haptic(20);
+  });
+}
+
 function progressBar(pct,label=''){
   return `<div class="flex items-center gap-3">
     <div class="flex-1 h-2.5 rounded-full bg-ink-700 overflow-hidden">
@@ -376,46 +559,47 @@ function progressBar(pct,label=''){
   </div>`;
 }
 
-/* build a checkbox task row */
+/* build a checkbox task row (with per-task note field once ticked) */
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 function taskRow(scope,idx,text){
   const c = completionOf(scope,idx);
   const checked = c? 'checked':'';
-  const stamp = c? `<div class="text-[11px] text-neutral-500 mt-0.5 flex flex-wrap gap-x-2">
-      <span>✓ ${c.by}</span><span>· ${c.time}</span></div>`:'';
-  return `<div class="chk flex items-start gap-3 py-3 px-1 border-b border-ink-700/60 last:border-0">
+  return `<div class="chk py-3 px-1 border-b border-ink-700/60 last:border-0">
     <input type="checkbox" class="task hidden" id="${scope}_${idx}" data-scope="${scope}" data-idx="${idx}" ${checked} />
-    <label for="${scope}_${idx}" class="flex items-start gap-3 flex-1 cursor-pointer select-none">
+    <label for="${scope}_${idx}" class="flex items-start gap-3 cursor-pointer select-none">
       <span class="box mt-0.5 w-6 h-6 shrink-0 rounded-lg border-2 border-ink-500 grid place-items-center transition">
         <svg class="tick w-4 h-4 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
       </span>
-      <span class="flex-1">
-        <span class="ttl text-[15px] font-medium leading-snug">${text}</span>
-        ${stamp}
-      </span>
+      <span class="flex-1"><span class="ttl text-[15px] font-medium leading-snug">${esc(text)}</span></span>
     </label>
+    <div class="notewrap pl-9 mt-1 ${c?'':'hidden'}">
+      <div class="stamp text-[11px] text-neutral-500 flex flex-wrap gap-x-2">${c?`<span>✓ ${esc(c.by)}</span><span>· ${c.time}</span>`:''}</div>
+      <input type="text" class="note w-full mt-1 bg-ink-800 border border-ink-700 rounded-xl px-3 py-1.5 text-[13px] text-neutral-200 placeholder:text-neutral-600 focus:border-brand-500 outline-none"
+        data-nscope="${scope}" data-nidx="${idx}" value="${esc(c&&c.note)}" placeholder="📝 Add a note (e.g. found a problem)…" />
+    </div>
   </div>`;
 }
 
-/* wire checkbox behaviour after render */
+/* wire checkbox + note behaviour after render */
 function wireTasks(root=document){
   $$('input.task',root).forEach(cb=>{
     cb.addEventListener('change',()=>{
       setDone(cb.dataset.scope, +cb.dataset.idx, cb.checked);
       haptic();
+      const wrap = cb.parentElement.querySelector('.notewrap');
+      const stamp = wrap && wrap.querySelector('.stamp');
       if(cb.checked){
-        // add stamp live
-        const lbl = cb.nextElementSibling.querySelector('.flex-1');
-        if(lbl && !lbl.querySelector('.stamp')){
-          const s=document.createElement('div');
-          s.className='stamp text-[11px] text-neutral-500 mt-0.5 flex flex-wrap gap-x-2';
-          s.innerHTML=`<span>✓ ${STAFF.name}</span><span>· ${nowTime()}</span>`;
-          lbl.appendChild(s);
-        }
+        if(wrap) wrap.classList.remove('hidden');
+        if(stamp) stamp.innerHTML = `<span>✓ ${esc(STAFF.name)}</span><span>· ${nowTime()}</span>`;
       } else {
-        const s=cb.nextElementSibling.querySelector('.stamp'); if(s) s.remove();
+        if(wrap) wrap.classList.add('hidden');
+        const nf = wrap && wrap.querySelector('.note'); if(nf) nf.value='';
       }
       updateLiveProgress();
     });
+  });
+  $$('input.note',root).forEach(inp=>{
+    inp.addEventListener('input',()=>setNote(inp.dataset.nscope, +inp.dataset.nidx, inp.value));
   });
 }
 
@@ -560,7 +744,7 @@ function checklistBlock(key){
     <div class="p-5">
       <div class="flex items-center justify-between mb-3">
         <h3 class="font-bold text-lg flex items-center gap-2">${c.icon} ${c.label}</h3>
-        <span class="text-xs bg-ink-700 rounded-full px-3 py-1 text-neutral-300">${c.items.length} tasks</span>
+        ${bossMode?editBtn('checklist',key):`<span class="text-xs bg-ink-700 rounded-full px-3 py-1 text-neutral-300">${c.items.length} tasks</span>`}
       </div>
       <div data-prog='${JSON.stringify(pairs)}' class="mb-3">
         <div class="flex items-center gap-3">
@@ -573,7 +757,9 @@ function checklistBlock(key){
 }
 function viewChecklist(){
   return `
-  ${sectionHead('✅','Daily Checklist','Tap a task to mark it done — it stamps your name, time and date.')}
+  ${sectionHead('✅','Daily Checklist','Tap a task to mark it done — it stamps your name, time and date. Add a note if something needs flagging.')}
+  ${bossBanner()}
+  ${!bossMode?`<div class="mb-4 text-xs text-neutral-500 flex items-center gap-2 px-1"><span>🔒</span> Only bosses can change these lists. <button onclick="toggleBoss()" class="text-brand-400 font-semibold">Unlock</button></div>`:''}
   ${checklistBlock('morning')}
   ${checklistBlock('afternoon')}
   ${checklistBlock('closing')}
@@ -590,27 +776,60 @@ function cleaningBlock(key){
     <div class="p-5">
       <div class="flex items-center justify-between mb-3">
         <h3 class="font-bold text-lg flex items-center gap-2">${c.icon} ${c.label}</h3>
-        <span class="pt text-xs font-bold text-brand-400" >${p.pct}%</span>
+        ${bossMode?editBtn('cleaning',key):`<span class="pt text-xs font-bold text-brand-400">${p.pct}%</span>`}
       </div>
       <div data-prog='${JSON.stringify(pairs)}'>${c.items.map((t,i)=>taskRow('clean_'+key,i,t)).join('')}</div>
     </div>`,'mb-4');
 }
+function reminderRow(r){
+  if(bossMode){
+    return `<div class="remrow flex items-center gap-2 mb-2" data-id="${r.id}">
+      <input class="rtext flex-1 min-w-0 bg-ink-800 border border-ink-600 rounded-xl px-3 py-2 text-[15px] focus:border-brand-500 outline-none" value="${esc(r.text)}" />
+      <select class="rint shrink-0 bg-ink-800 border border-ink-600 rounded-xl px-2 py-2 text-[13px] focus:border-brand-500 outline-none">
+        ${INTERVALS.map(o=>`<option value="${o.v}" ${String(o.v)===String(r.interval)?'selected':''}>${o.l}</option>`).join('')}
+      </select>
+      <button data-rdel="${r.id}" class="w-9 h-9 shrink-0 rounded-xl bg-ink-800 border border-ink-700 text-neutral-500 hover:text-red-400">×</button>
+    </div>`;
+  }
+  return `<div class="flex items-center gap-3 bg-ink-800 border border-ink-700 rounded-2xl px-3 py-2.5 mb-2">
+    <span class="text-lg">${r.interval==='close'?'🌙':'🔔'}</span>
+    <span class="flex-1 text-[15px] font-medium">${esc(r.text)}</span>
+    <span class="text-[11px] font-semibold text-brand-400 bg-brand-500/10 rounded-full px-2.5 py-1 shrink-0">${intervalLabel(r.interval)}</span>
+  </div>`;
+}
 function viewCleaning(){
   const rem = store.get('reminders_on',false);
+  const closingTime = store.get('closingTime','21:00');
   return `
-  ${sectionHead('🧹','Cleaning','Rolling cleaning rounds. Turn on automatic reminders so nothing slips.')}
+  ${sectionHead('🧹','Cleaning','Rolling cleaning rounds and automatic reminders so nothing slips.')}
+  ${bossBanner()}
+
   ${card(`
-    <div class="p-5 flex items-center gap-4">
-      <div class="text-3xl">🔔</div>
-      <div class="flex-1">
-        <h3 class="font-bold">Automatic reminders</h3>
-        <p class="text-xs text-neutral-400 mt-0.5">Hourly floor sweep · 2-hr bathrooms · 4-hr deep clean · closing reminder.</p>
+    <div class="p-5">
+      <div class="flex items-center gap-4">
+        <div class="text-3xl ${rem?'':'opacity-60'}">🔔</div>
+        <div class="flex-1">
+          <h3 class="font-bold">Automatic reminders</h3>
+          <p class="text-xs text-neutral-400 mt-0.5">Get pinged on a timer through your shift. ${rem?'<span class="text-emerald-400 font-semibold">ON</span>':'Currently off.'}</p>
+        </div>
+        <button id="toggleRem" class="relative w-14 h-8 rounded-full transition ${rem?'bg-brand-500':'bg-ink-600'}">
+          <span class="absolute top-1 ${rem?'left-7':'left-1'} w-6 h-6 bg-white rounded-full transition-all shadow"></span>
+        </button>
       </div>
-      <button id="toggleRem" class="relative w-14 h-8 rounded-full transition ${rem?'bg-brand-500':'bg-ink-600'}">
-        <span class="absolute top-1 ${rem?'left-7':'left-1'} w-6 h-6 bg-white rounded-full transition-all shadow"></span>
-      </button>
+
+      <div class="mt-4" id="remList">${REMINDERS.map(reminderRow).join('') || '<p class="text-sm text-neutral-500">No reminders yet.</p>'}</div>
+
+      ${bossMode?`
+        <button id="addRem" class="w-full border border-dashed border-ink-600 rounded-xl py-2.5 text-sm font-semibold text-brand-400 mt-1">＋ Add reminder</button>
+        <div class="mt-4 flex items-center gap-3 bg-ink-800 border border-ink-700 rounded-2xl px-4 py-3">
+          <span class="text-xl">🌙</span>
+          <div class="flex-1"><div class="text-sm font-semibold">Closing time</div><div class="text-xs text-neutral-500">When "At close" reminders fire.</div></div>
+          <input id="closingTime" type="time" value="${closingTime}" class="bg-ink-900 border border-ink-600 rounded-xl px-3 py-2 text-sm focus:border-brand-500 outline-none" />
+        </div>
+        <button id="resetRem" class="text-xs font-semibold text-neutral-500 hover:text-neutral-300 mt-3">Reset reminders to default</button>
+      `:`<p class="text-[11px] text-neutral-600 mt-3 px-1">🔒 Only bosses can change reminders. <button onclick="toggleBoss()" class="text-brand-400 font-semibold">Unlock</button></p>`}
     </div>`,'mb-4')}
-  <div id="remStatus" class="text-xs text-neutral-500 mb-4 px-1">${rem?'Reminders are ON for this shift.':'Reminders are off.'}</div>
+
   ${cleaningBlock('hourly')}
   ${cleaningBlock('twoHour')}
   ${cleaningBlock('fourHour')}
@@ -626,11 +845,12 @@ function viewEquipment(){
   const reports = store.get('equipReports',[]);
   return `
   ${sectionHead('🏋️','Equipment Checks','Walk the floor and confirm everything is racked, stored and working.')}
+  ${bossBanner()}
   ${card(`
     <div class="p-5">
       <div class="flex items-center justify-between mb-3">
         <h3 class="font-bold text-lg">Equipment checklist</h3>
-        <span class="pt text-xs font-bold text-brand-400">${p.pct}%</span>
+        ${bossMode?editBtn('equipment','all'):`<span class="pt text-xs font-bold text-brand-400">${p.pct}%</span>`}
       </div>
       <div data-prog='${JSON.stringify(pairs)}'>${EQUIPMENT.map((t,i)=>taskRow('equipment',i,t)).join('')}</div>
     </div>`,'mb-4')}
@@ -724,8 +944,57 @@ function viewMemberships(){
   ${guideCatCard(dd)}
   ${card(`<div class="p-5">
     <h3 class="font-bold mb-2">💲 Current pricing</h3>
-    <p class="text-sm text-neutral-400">See <button data-go="sop" class="text-brand-400 font-semibold underline">SOP Library → Membership Pricing</button> for the live price list before quoting.</p>
+    <p class="text-sm text-neutral-400">See the full <button data-go="prices" class="text-brand-400 font-semibold underline">Price List</button> for memberships, drinks, supplements and retail.</p>
   </div>`)}`;
+}
+
+/* ---------- PRICE LIST (boss-editable) ---------- */
+function viewPrices(){
+  return `
+  ${sectionHead('💲','Price List','Memberships and everything we sell. Always the current price to quote.')}
+  ${bossBanner()}
+  ${!bossMode?`<div class="mb-4 text-xs text-neutral-500 flex items-center gap-2 px-1"><span>🔒</span> Only bosses can change prices. <button onclick="toggleBoss()" class="text-brand-400 font-semibold">Unlock</button></div>`:''}
+
+  ${card(`<div class="p-5">
+    <div class="flex items-center justify-between">
+      <h3 class="font-bold flex items-center gap-2">📷 Printed price list</h3>
+      ${bossMode?`<label class="text-xs font-semibold text-brand-400 cursor-pointer">${PRICES.image?'Replace':'Upload photo'}<input id="priceImg" type="file" accept="image/*" class="hidden" /></label>`:''}
+    </div>
+    ${PRICES.image
+      ? `<img src="${PRICES.image}" class="mt-3 rounded-2xl w-full object-contain max-h-[70vh] bg-ink-900" />${bossMode?`<button id="rmPriceImg" class="text-xs text-red-400/80 hover:text-red-400 mt-2">Remove photo</button>`:''}`
+      : `<p class="text-sm text-neutral-500 mt-2">${bossMode?'Snap a photo of the printed price list and it shows here.':'No photo uploaded yet.'}</p>`}
+  </div>`,'mb-4')}
+
+  <div id="priceGroups">${PRICES.groups.map(priceGroupCard).join('')}</div>
+
+  ${bossMode?`<button id="addGroup" class="w-full border border-dashed border-ink-600 rounded-2xl py-3 text-sm font-semibold text-brand-400 mb-4">＋ Add category</button>
+    <button id="resetPrices" class="text-xs font-semibold text-neutral-500 hover:text-neutral-300 px-1">Reset price list to default</button>`:''}
+  `;
+}
+function priceGroupCard(g){
+  const items = g.items.map((it,i)=>{
+    if(bossMode){
+      return `<div class="pitem flex items-center gap-2 mb-2" data-gid="${g.id}" data-i="${i}">
+        <input class="pname flex-1 min-w-0 bg-ink-800 border border-ink-600 rounded-xl px-3 py-2 text-[15px] focus:border-brand-500 outline-none" value="${esc(it.name)}" placeholder="Item" />
+        <input class="pprice w-24 shrink-0 bg-ink-800 border border-ink-600 rounded-xl px-3 py-2 text-[15px] text-right focus:border-brand-500 outline-none" value="${esc(it.price)}" placeholder="$" />
+        <button data-pidel="${g.id}:${i}" class="w-9 h-9 shrink-0 rounded-xl bg-ink-800 border border-ink-700 text-neutral-500 hover:text-red-400">×</button>
+      </div>`;
+    }
+    return `<div class="flex items-baseline gap-3 py-2 border-b border-ink-700/60 last:border-0">
+      <span class="flex-1 text-[15px]">${esc(it.name)}</span>
+      <span class="font-bold text-brand-400 tabular-nums">${esc(it.price)}</span>
+    </div>`;
+  }).join('');
+  return card(`<div class="p-5">
+    <div class="flex items-center justify-between mb-3">
+      ${bossMode
+        ? `<input class="pgname font-bold text-lg bg-transparent border-b border-ink-600 focus:border-brand-500 outline-none" data-gid="${g.id}" value="${esc(g.name)}" />
+           <button data-gdel="${g.id}" class="text-xs font-semibold text-red-400/80 hover:text-red-400">Delete</button>`
+        : `<h3 class="font-bold text-lg">${esc(g.name)}</h3>`}
+    </div>
+    <div>${items || '<p class="text-sm text-neutral-500">No items yet.</p>'}</div>
+    ${bossMode?`<button data-additem="${g.id}" class="w-full border border-dashed border-ink-600 rounded-xl py-2 text-sm font-semibold text-brand-400 mt-2">＋ Add item</button>`:''}
+  </div>`,'mb-4');
 }
 
 /* ---------- GYMMASTER GUIDE ---------- */
@@ -876,7 +1145,7 @@ function viewSop(){
 const VIEWS = {
   dashboard:viewDashboard, checklist:viewChecklist, cleaning:viewCleaning,
   equipment:viewEquipment, reception:viewReception, memberships:viewMemberships,
-  guide:viewGuide, issues:viewIssues, handover:viewHandover, sop:viewSop
+  prices:viewPrices, guide:viewGuide, issues:viewIssues, handover:viewHandover, sop:viewSop
 };
 
 function render(view){
@@ -915,6 +1184,11 @@ function navItem(n,view){
 function wireView(view){
   // global go buttons
   $$('[data-go]').forEach(b=>b.addEventListener('click',()=>{ render(b.dataset.go); }));
+  // boss "edit list" buttons (checklist / cleaning / equipment)
+  $$('[data-editlist]').forEach(b=>b.addEventListener('click',()=>{
+    const i=b.dataset.editlist.indexOf(':');
+    openListEditor(b.dataset.editlist.slice(0,i), b.dataset.editlist.slice(i+1));
+  }));
 
   if(view==='dashboard'){
     $('#addShift')?.addEventListener('click',()=>{
@@ -936,7 +1210,10 @@ function wireView(view){
 
   if(view==='cleaning'){
     $('#toggleRem')?.addEventListener('click',toggleReminders);
+    wireReminders();
   }
+
+  if(view==='prices'){ wirePrices(); }
 
   if(view==='equipment'){
     $('#reportBroken')?.addEventListener('click',openEquipModal);
@@ -972,6 +1249,76 @@ function wireShiftChips(){
     store.set('onshift',list); $('#shiftChips').innerHTML=renderShiftChips(list); wireShiftChips();
     $('#dashShift') && ($('#dashShift').textContent=list.length);
   }));
+}
+
+/* ---------- reminders manager (boss) ---------- */
+function wireReminders(){
+  // edit text / interval on blur-change (no re-render → keeps focus)
+  $$('#remList .remrow').forEach(row=>{
+    const id=row.dataset.id;
+    const r=REMINDERS.find(x=>x.id===id); if(!r) return;
+    const txt=row.querySelector('.rtext'); const sel=row.querySelector('.rint');
+    txt&&txt.addEventListener('change',()=>{ r.text=txt.value; saveReminders(); if(store.get('reminders_on',false)) startReminders(); });
+    sel&&sel.addEventListener('change',()=>{ r.interval = sel.value==='close'?'close':+sel.value; saveReminders(); if(store.get('reminders_on',false)) startReminders(); });
+  });
+  $$('#remList [data-rdel]').forEach(b=>b.addEventListener('click',()=>{
+    REMINDERS=REMINDERS.filter(x=>x.id!==b.dataset.rdel); saveReminders();
+    if(store.get('reminders_on',false)) startReminders();
+    render('cleaning');
+  }));
+  $('#addRem')?.addEventListener('click',()=>{
+    REMINDERS.push({id:uid(),text:'New reminder',interval:60}); saveReminders(); render('cleaning');
+  });
+  $('#closingTime')?.addEventListener('change',e=>{ store.set('closingTime', e.target.value||'21:00'); toast('Closing time saved','🌙'); });
+  $('#resetRem')?.addEventListener('click',()=>{
+    if(confirm('Reset the reminders list back to the default gym list?')){
+      REMINDERS = JSON.parse(JSON.stringify(DEFAULT_REMINDERS)); saveReminders();
+      if(store.get('reminders_on',false)) startReminders();
+      render('cleaning'); toast('Reminders reset','↩️');
+    }
+  });
+}
+
+/* ---------- price list manager (boss) ---------- */
+function wirePrices(){
+  // photo upload
+  $('#priceImg')?.addEventListener('change',e=>{
+    const f=e.target.files[0]; if(!f) return;
+    const rd=new FileReader(); rd.onload=()=>{ PRICES.image=rd.result; savePrices(); render('prices'); toast('Price list photo added','📷'); }; rd.readAsDataURL(f);
+  });
+  $('#rmPriceImg')?.addEventListener('click',()=>{ PRICES.image=''; savePrices(); render('prices'); });
+  // edit item name/price (save on change, no re-render)
+  $$('#priceGroups .pitem').forEach(row=>{
+    const g=PRICES.groups.find(x=>x.id===row.dataset.gid); if(!g) return;
+    const it=g.items[+row.dataset.i]; if(!it) return;
+    row.querySelector('.pname')?.addEventListener('change',e=>{ it.name=e.target.value; savePrices(); });
+    row.querySelector('.pprice')?.addEventListener('change',e=>{ it.price=e.target.value; savePrices(); });
+  });
+  // group name rename
+  $$('#priceGroups .pgname').forEach(inp=>inp.addEventListener('change',()=>{
+    const g=PRICES.groups.find(x=>x.id===inp.dataset.gid); if(g){ g.name=inp.value; savePrices(); }
+  }));
+  // delete item
+  $$('#priceGroups [data-pidel]').forEach(b=>b.addEventListener('click',()=>{
+    const [gid,i]=b.dataset.pidel.split(':'); const g=PRICES.groups.find(x=>x.id===gid);
+    if(g){ g.items.splice(+i,1); savePrices(); render('prices'); }
+  }));
+  // add item
+  $$('#priceGroups [data-additem]').forEach(b=>b.addEventListener('click',()=>{
+    const g=PRICES.groups.find(x=>x.id===b.dataset.additem);
+    if(g){ g.items.push({name:'New item',price:'$'}); savePrices(); render('prices'); }
+  }));
+  // delete group
+  $$('#priceGroups [data-gdel]').forEach(b=>b.addEventListener('click',()=>{
+    if(confirm('Delete this whole category?')){ PRICES.groups=PRICES.groups.filter(x=>x.id!==b.dataset.gdel); savePrices(); render('prices'); }
+  }));
+  // add group
+  $('#addGroup')?.addEventListener('click',()=>{
+    PRICES.groups.push({id:uid(),name:'New category',items:[{name:'New item',price:'$'}]}); savePrices(); render('prices');
+  });
+  $('#resetPrices')?.addEventListener('click',()=>{
+    if(confirm('Reset the whole price list back to default?')){ PRICES=JSON.parse(JSON.stringify(DEFAULT_PRICES)); savePrices(); render('prices'); toast('Prices reset','↩️'); }
+  });
 }
 
 /* ---------- equipment report ---------- */
@@ -1098,21 +1445,41 @@ function toggleReminders(){
   store.set('reminders_on',on);
   render('cleaning');
 }
-function fireReminder(r){
-  toast(`${r.icon} ${r.title}: ${r.body}`, '🔔');
-  haptic([200,80,200]);
+function fireReminder(title,body){
+  toast(`🔔 ${body}`, '🔔');
+  haptic([220,90,220]);
   if('Notification' in window && Notification.permission==='granted'){
-    try{ new Notification('Eagles Gym · '+r.title,{body:r.body,tag:r.id,icon:'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🦅%3C/text%3E%3C/svg%3E'}); }catch(e){}
+    try{ new Notification('Eagles Gym · '+title,{body,tag:'eg-'+title,icon:APP_ICON,vibrate:[220,90,220]}); }catch(e){}
   }
 }
 function startReminders(){
   stopReminders();
-  REMINDERS.forEach(r=>{
-    const t=setInterval(()=>fireReminder(r), r.every*60*1000);
+  if(!store.get('reminders_on',false)) return;
+  // group interval reminders so one interval fires a single combined ping
+  const groups={};
+  REMINDERS.filter(r=>r.interval!=='close').forEach(r=>{
+    const k=String(r.interval); (groups[k]=groups[k]||[]).push(r.text);
+  });
+  Object.entries(groups).forEach(([mins,texts])=>{
+    const t=setInterval(()=>fireReminder(intervalLabel(+mins), texts.join(' · ')), (+mins)*60*1000);
     remTimers.push(t);
   });
 }
 function stopReminders(){ remTimers.forEach(clearInterval); remTimers=[]; }
+/* fire "At close" reminders once, when closing time is reached */
+function checkClosing(){
+  if(!store.get('reminders_on',false)) return;
+  const ct=store.get('closingTime','21:00'); if(!ct) return;
+  const flag='closefired_'+todayKey();
+  if(store.get(flag,false)) return;
+  const now=new Date();
+  const cur=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  if(cur>=ct){
+    const closers=REMINDERS.filter(r=>r.interval==='close').map(r=>r.text);
+    if(closers.length){ fireReminder('At close', closers.join(' · ')); }
+    store.set(flag,true);
+  }
+}
 
 /* ============================================================
    CLOCK + BOOT
@@ -1121,12 +1488,16 @@ function tickClock(){
   const c=$('#clock'); if(c) c.textContent=nowTime();
   const d=$('#dateLabel'); if(d) d.textContent=new Date().toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});
   if(currentView==='dashboard') paintDashCounters();
+  checkClosing();
 }
 
 function bootApp(){
   // header identity
   $('#whoName').textContent = STAFF.name;
   $('#avatar').textContent = initials(STAFF.name);
+  // boss button
+  setBoss(bossMode);
+  $('#bossBtn').addEventListener('click',toggleBoss);
   // ensure on-shift includes current staff
   const os=store.get('onshift',[]); if(!os.includes(STAFF.name)){ os.push(STAFF.name); store.set('onshift',os); }
   // reminders resume
