@@ -104,6 +104,22 @@
 
   /* ---- section heads ---- */
   .sechead{display:flex;align-items:baseline;gap:10px;margin:30px 0 14px}
+  .sechead .spacer{flex:1}
+  /* schedule / agenda */
+  .agenda{display:grid;gap:10px}
+  .ev{display:flex;align-items:center;gap:14px;border:1px solid var(--line);border-radius:var(--r-lg);background:var(--surface);padding:13px 15px;box-shadow:var(--shadow-sm)}
+  .ev .evd{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:52px;padding:6px 8px;border-radius:12px;background:var(--surface-2,rgba(255,255,255,.04));border:1px solid var(--line)}
+  .ev .evd .mo{font-family:var(--fm);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--dim)}
+  .ev .evd .dy{font-family:var(--fd);font-size:22px;line-height:1;color:var(--text)}
+  .ev .evmain{flex:1;min-width:0}
+  .ev .evtit{font-weight:650;font-size:14.5px;display:flex;align-items:center;gap:8px}
+  .ev .evmeta{font-size:12px;color:var(--dim);margin-top:3px}
+  .ev .evtype{font-family:var(--fm);font-size:9.5px;letter-spacing:.8px;text-transform:uppercase;padding:3px 7px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+  .ev .evtype.game{color:var(--accent-text);border-color:var(--accent)}
+  .ev .evtype.meeting{color:var(--amber,#e0a92e)}
+  .ev .evdel{background:none;border:none;color:var(--dim);cursor:pointer;font-size:16px;padding:6px;border-radius:8px}
+  .ev .evdel:hover{color:var(--bad);background:rgba(255,80,80,.08)}
+  .ev.soon{border-color:var(--accent)}
   .sechead h2{font-family:var(--fd);text-transform:uppercase;letter-spacing:.6px;font-size:15px;color:var(--muted);font-weight:700}
   .sechead .hint{font-size:12px;color:var(--dim)}
 
@@ -258,6 +274,9 @@
   .sheet h3{font-family:var(--fd);text-transform:uppercase;letter-spacing:.5px;font-size:22px;margin-bottom:6px}
   .sheet p{color:var(--muted);font-size:13.5px;line-height:1.55;margin-bottom:14px}
   .sheet .row{display:flex;gap:8px;margin-top:14px}
+  .sheet .fld{display:block;margin-top:12px}
+  .sheet .fld>span{display:block;font-family:var(--fm);font-size:10.5px;letter-spacing:.8px;text-transform:uppercase;color:var(--dim);margin-bottom:6px}
+  .sheet .fld input,.sheet .fld select{margin:0}
 
   /* ---- skeleton ---- */
   .skel{position:relative;overflow:hidden;background:var(--fill);border-radius:var(--r-md)}
@@ -333,6 +352,9 @@
     <div class="sechead"><h2>Quick actions</h2></div>
     <div class="qas" id="qas"></div>
 
+    <div class="sechead" id="schedHead"><h2>Schedule</h2><span class="hint">Training, games &amp; meetings — athletes see these on their Home</span><div class="spacer"></div><button class="btn btn-primary btn-sm" id="newEventBtn">＋ New event</button></div>
+    <div id="scheduleWrap"></div>
+
     <div class="sechead"><h2>Athletes</h2><span class="hint" id="rosterHint"></span></div>
     <div class="toolbar">
       <label class="field"><span class="ic">⌕</span><input type="search" id="search" placeholder="Search name, goals, location…" aria-label="Search athletes" /></label>
@@ -383,7 +405,7 @@
 (function(){
   const FN = 'https://ymuwuhvqqftgpxwhzoub.supabase.co/functions/v1/aos-api';
   let CODE = sessionStorage.getItem('aos_coach_code') || '';
-  let ROWS = [], TEAMS = [], TODAY = '', SPORT_REQS = [], CUR = null, curId = null, lastFocus = null;
+  let ROWS = [], TEAMS = [], TODAY = '', SPORT_REQS = [], EVENTS = [], CUR = null, curId = null, lastFocus = null;
   const REDUCE = matchMedia('(prefers-reduced-motion:reduce)').matches;
 
   const $ = s => document.querySelector(s);
@@ -429,7 +451,7 @@
   /* ---- data ---- */
   async function load(){
     const r = await api({ action:'roster' });
-    ROWS = r.athletes || []; TEAMS = r.teams || []; TODAY = r.today || ''; SPORT_REQS = r.sport_requests || [];
+    ROWS = r.athletes || []; TEAMS = r.teams || []; TODAY = r.today || ''; SPORT_REQS = r.sport_requests || []; EVENTS = r.events || [];
     buildFilters(); render();
   }
   ['refreshBtn','refreshBtn2'].forEach(id=>{ const b=$('#'+id); if(b)b.addEventListener('click', ()=> load().then(()=>toast('Refreshed'))); });
@@ -461,7 +483,7 @@
     });
   }
 
-  function render(){ renderKPIs(); renderHealth(); renderSportReqs(); renderQuick(); renderGroups(); renderCards(); }
+  function render(){ renderKPIs(); renderHealth(); renderSportReqs(); renderQuick(); renderSchedule(); renderGroups(); renderCards(); }
 
   function renderSportReqs(){
     const w=$('#sportReqWrap');
@@ -489,18 +511,21 @@
     const avgRating=rated.length?(rated.reduce((s,r)=>s+r.coach_rating,0)/rated.length):0;
     const injured=A.filter(r=>r.injuries).length;
     const rate=A.length?Math.round(inToday/A.length*100):0;
+    const now=Date.now();
+    const upcomingGames=EVENTS.filter(e=>e.type==='game' && new Date(e.starts_at).getTime()>=now).length;
+    const nextGame=EVENTS.filter(e=>e.type==='game' && new Date(e.starts_at).getTime()>=now).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at))[0];
     const kpis=[
       {n:ROWS.length,l:'Athletes',cls:'accent'},
       {n:inToday,l:'Checked in today',s:A.length?rate+'% of active':''},
       {n:ROWS.filter(r=>r.streak>=3).length,l:'On a 3d+ streak'},
       {n:injured,l:'Managing injury',cls:injured>0?'bad':''},
       {n:avgRating,l:'Avg coach rating',dec:1,suffix:'/10',s:rated.length?rated.length+' rated':'none rated'},
+      {n:upcomingGames,l:'Upcoming games',cls:upcomingGames>0?'accent':'',s:nextGame?('next '+fmtDay(nextGame.starts_at)):'none scheduled'},
       {n:new Set(ROWS.map(r=>r.sport)).size,l:'Sports'},
     ];
     const setups=[
       {t:'Attendance %',need:'training sessions'},
       {t:'Avg wellness',need:'daily wellness rollup'},
-      {t:'Upcoming games',need:'a fixtures calendar'},
       {t:'Unread messages',need:'message read receipts'},
     ];
     $('#kpis').innerHTML =
@@ -548,7 +573,7 @@
   const QA=[
     {i:'📣',t:'Send Announcement',fn:announce,live:true},
     {i:'➕',t:'Add Athlete',fn:addAthlete},
-    {i:'📅',t:'Schedule Training',need:'a sessions calendar'},
+    {i:'📅',t:'Schedule Training',fn:()=>openEventSheet('training'),live:true},
     {i:'✅',t:'Record Attendance',need:'a sessions + attendance model'},
     {i:'🎯',t:'Create Drill',need:'a drill library'},
     {i:'📎',t:'Upload File',need:'a file storage bucket'},
@@ -559,6 +584,72 @@
     $('#qas').querySelectorAll('[data-qa]').forEach(b=>b.addEventListener('click',()=>{ const q=QA[+b.dataset.qa]; q.fn?q.fn():comingSoon(q.t,q.need); }));
   }
   const abtn=$('#announceBtn2'); if(abtn)abtn.addEventListener('click',announce);
+  $('#newEventBtn').addEventListener('click',()=>openEventSheet('training'));
+
+  /* ---- schedule / calendar ---- */
+  const EV_ICON={training:'🏀',game:'🏆',meeting:'👥',other:'📌'};
+  function renderSchedule(){
+    const w=$('#scheduleWrap'); const now=Date.now();
+    const up=EVENTS.filter(e=>new Date(e.starts_at).getTime()>=now-6*3600*1000).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at));
+    if(!up.length){ w.innerHTML=`<div class="empty" style="margin-top:0">Nothing scheduled yet — tap <b>＋ New event</b> to add a training, game or meeting. Your athletes will see it on their Home.</div>`; return; }
+    w.innerHTML=`<div class="agenda">${up.map(e=>{
+      const d=new Date(e.starts_at), soon=(d.getTime()-now)<36*3600*1000 && d.getTime()>=now-6*3600*1000;
+      const mo=d.toLocaleDateString(undefined,{month:'short'}), dy=d.getDate();
+      const time=d.toLocaleTimeString(undefined,{hour:'2-digit',minute:'2-digit'});
+      const tm=e.team_id?teamName(e.team_id):'All athletes';
+      return `<div class="ev ${soon?'soon':''}">
+        <div class="evd"><span class="mo">${esc(mo)}</span><span class="dy">${dy}</span></div>
+        <div class="evmain">
+          <div class="evtit"><span>${EV_ICON[e.type]||'📌'}</span><span>${esc(e.title)}</span><span class="evtype ${esc(e.type)}">${esc(e.type)}</span></div>
+          <div class="evmeta">${esc(fmtDay(e.starts_at))} · ${esc(time)}${e.location?' · '+esc(e.location):''} · ${esc(tm)}${e.note?' · '+esc(e.note):''}</div>
+        </div>
+        <button class="evdel" data-del="${esc(e.id)}" title="Delete event" aria-label="Delete event">✕</button>
+      </div>`;
+    }).join('')}</div>`;
+    w.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>deleteEvent(b.dataset.del)));
+  }
+  function pad(n){return String(n).padStart(2,'0');}
+  function defaultWhen(){ const d=new Date(Date.now()+24*3600*1000); d.setMinutes(0,0,0); d.setHours(18); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`; }
+  function openEventSheet(preType){
+    const types=[['training','🏀 Training'],['game','🏆 Game'],['meeting','👥 Meeting'],['other','📌 Other']];
+    openSheet(`<h3>New event</h3><p>Adds it to the team schedule. Athletes see upcoming events on their Home screen.</p>
+      <label class="fld"><span>Title</span><input id="evTitle" placeholder="e.g. Team Training · Defense focus" maxlength="80"></label>
+      <div class="row" style="gap:10px">
+        <label class="fld" style="flex:1"><span>Type</span><select id="evType">${types.map(t=>`<option value="${t[0]}" ${t[0]===preType?'selected':''}>${t[1]}</option>`).join('')}</select></label>
+        <label class="fld" style="flex:1"><span>When</span><input id="evWhen" type="datetime-local" value="${defaultWhen()}"></label>
+      </div>
+      <div class="row" style="gap:10px">
+        <label class="fld" style="flex:1"><span>Location</span><input id="evLoc" placeholder="e.g. Main Court" maxlength="80"></label>
+        <label class="fld" style="flex:1"><span>Team</span><select id="evTeam"><option value="">All athletes</option>${TEAMS.map(t=>`<option value="${esc(t.id)}">${esc(t.name)}</option>`).join('')}</select></label>
+      </div>
+      <label class="fld"><span>Note (optional)</span><input id="evNote" placeholder="e.g. Bring both jerseys" maxlength="200"></label>
+      <div class="row"><button class="btn btn-ghost" style="flex:1" id="shClose">Cancel</button><button class="btn btn-primary" style="flex:1" id="evSave">Add to schedule</button></div>
+      <div class="err" id="evErr" style="display:none"></div>`);
+    $('#shClose').addEventListener('click',closeSheet);
+    setTimeout(()=>{ const i=$('#evTitle'); if(i)i.focus(); },50);
+    $('#evSave').addEventListener('click',async()=>{
+      const title=$('#evTitle').value.trim(), when=$('#evWhen').value, type=$('#evType').value;
+      const err=$('#evErr'); err.style.display='none';
+      if(title.length<2){ err.textContent='Give the event a title.'; err.style.display='block'; return; }
+      if(!when){ err.textContent='Pick a date & time.'; err.style.display='block'; return; }
+      const btn=$('#evSave'); btn.disabled=true; btn.textContent='Adding…';
+      try{
+        await api({action:'event_create',title,type,starts_at:new Date(when).toISOString(),location:$('#evLoc').value.trim(),team_id:$('#evTeam').value||null,note:$('#evNote').value.trim()});
+        closeSheet(); await load(); toast('Event added');
+        const sh=$('#schedHead'); if(sh)sh.scrollIntoView({behavior:REDUCE?'auto':'smooth',block:'center'});
+      }catch(e){ btn.disabled=false; btn.textContent='Add to schedule'; err.textContent=e.message||'Could not add event'; err.style.display='block'; }
+    });
+  }
+  async function deleteEvent(id){
+    const ev=EVENTS.find(e=>e.id===id);
+    openSheet(`<h3>Delete event?</h3><p>${ev?`Remove <b>${esc(ev.title)}</b> from the schedule.`:'Remove this event.'} Athletes will no longer see it. This can't be undone.</p>
+      <div class="row"><button class="btn btn-ghost" style="flex:1" id="shClose">Keep it</button><button class="btn btn-primary" style="flex:1;background:var(--bad);border-color:var(--bad)" id="evDelYes">Delete</button></div>`);
+    $('#shClose').addEventListener('click',closeSheet);
+    $('#evDelYes').addEventListener('click',async()=>{
+      try{ await api({action:'event_delete',id}); closeSheet(); await load(); toast('Event deleted'); }
+      catch(e){ toast('Failed'); }
+    });
+  }
 
   /* ---- groups + cards ---- */
   function renderGroups(){

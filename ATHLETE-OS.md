@@ -94,8 +94,8 @@ audience. Lives in `athlete-os/` and deploys with the rest of the static site
    `awaiting_reply`) — promotes 4 placeholders (wellness, training completion,
    awaiting-reply, Team-Health Readiness) to real. No new tables.
 2. Server `broadcast` action (one call instead of the client `cmsg` loop).
-3. Calendar / fixtures (`aos_events`, `aos_sessions`, `aos_attendance`) → real
-   attendance %, upcoming games, Schedule Training / Record Attendance.
+3. ~~Calendar / fixtures~~ **✅ shipped (V2.2)** — see below. Still to add:
+   attendance (`aos_attendance`) + Record Attendance.
 4. Rich comms (message `read_at` → true unread, attachments, typing).
 5. File library (storage + `aos_documents`). 6. Training planner (`aos_drills`).
 7. Performance metrics (`aos_perf`: PBs, tests, wearables).
@@ -122,6 +122,23 @@ audience. Lives in `athlete-os/` and deploys with the rest of the static site
   athletes (PIN `1234`) — varied streaks, XP, ratings, an injury, check-in
   history, peer ratings and messages — plus **Aiman** (PIN `0088`,
   aimanmaged88@gmail.com) on the team. Coach code `OS-COACH`.
+
+## V2.2 — Calendar / Schedule (shipped)
+
+- **`aos_events` table** (live): `id, title, type, starts_at, location, note,
+  team_id, created_at`. `type` ∈ `training | game | meeting | other`. A null
+  `team_id` = an all-athletes event; a set `team_id` scopes it to that team.
+- **Coach dashboard**: a **Schedule** section shows the upcoming agenda (icon,
+  date chip, title, type badge, time · location · team · note) with per-event
+  delete. **＋ New event** and the **Schedule Training** quick action open a
+  create sheet (title, type, date-time, location, team, note). The **Upcoming
+  games** KPI is now real (counts future `game` events + shows the next date).
+  Coach actions: `event_create`, `event_delete`; `roster` now returns `events`.
+- **Athlete app**: a **📅 Next up** card on Home lists the next 4 events for the
+  athlete (their team's events + all-athletes events), with friendly relative
+  days (Today / Tomorrow / weekday). `state` now returns `events`.
+- Seeded: 4 events on **Lockdown Ballers** (team training, skills session, game
+  vs Northside Hawks, parent + coach meeting).
 
 ## Backend (Supabase project `lockdown-lab`, ref `ymuwuhvqqftgpxwhzoub`)
 

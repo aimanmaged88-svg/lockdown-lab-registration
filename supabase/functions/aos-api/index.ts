@@ -151,9 +151,11 @@ async function athleteState(p: any) {
     const myMap: Record<string, number> = Object.fromEntries((mine || []).map((r: any) => [r.ratee_id, r.score]));
     teammates = (mates || []).map((m: any) => ({ id: m.id, name: m.name, position: m.position, my_rating: myMap[m.id] || null }));
   }
+  const evFilter = p.team_id ? `or=(team_id.eq.${p.team_id},team_id.is.null)` : `team_id=is.null`;
+  const events = await db(`aos_events?starts_at=gte.${encodeURIComponent(new Date().toISOString())}&${evFilter}&select=id,title,type,starts_at,location,note&order=starts_at.asc&limit=6`);
   const today = sydToday();
   return {
-    profile: profile(p), checkins, messages, peer, team, teammates,
+    profile: profile(p), checkins, messages, peer, team, teammates, events,
     ai: buildAI(p, checkins, journal, peer),
     mind: journal.filter((j: any) => j.kind === "mind").slice(0, 10),
     diary: journal.filter((j: any) => j.kind === "diary").slice(0, 10),
@@ -319,15 +321,16 @@ Deno.serve(async (req) => {
       }
     }
 
-    if (["roster", "cdetail", "note_add", "status_set", "cmsg", "rate", "team_create", "team_assign", "sport_resolve"].includes(a)) {
+    if (["roster", "cdetail", "note_add", "status_set", "cmsg", "rate", "team_create", "team_assign", "sport_resolve", "event_create", "event_delete"].includes(a)) {
       if (String(b.code || "").toUpperCase() !== COACH_CODE) return J({ error: "bad coach code" }, 401);
 
       if (a === "roster") {
-        const [athletes, teams, peers, sportReqs] = await Promise.all([
+        const [athletes, teams, peers, sportReqs, events] = await Promise.all([
           db("aos_athletes?select=id,name,sport,sport_label,age,level,position,goals,injuries,train_freq,comp_schedule,equipment,location,contact,xp,streak,last_checkin,status,created_at,team_id,coach_rating,coach_rating_at&order=created_at.asc"),
           teamsList(),
           db("aos_peer_ratings?select=ratee_id,score"),
           db("aos_sport_requests?status=eq.pending&select=id,athlete_name,sport,created_at&order=created_at.desc"),
+          db(`aos_events?starts_at=gte.${encodeURIComponent(new Date(Date.now() - 6 * 3600 * 1000).toISOString())}&select=id,title,type,starts_at,location,note,team_id&order=starts_at.asc&limit=100`),
         ]);
         const pmap: Record<string, number[]> = {};
         (peers || []).forEach((r: any) => { (pmap[r.ratee_id] = pmap[r.ratee_id] || []).push(r.score); });
@@ -336,7 +339,20 @@ Deno.serve(async (req) => {
           x.peer_avg = arr && arr.length ? Math.round(arr.reduce((s: number, v: number) => s + v, 0) / arr.length * 10) / 10 : null;
           x.peer_count = arr ? arr.length : 0;
         });
-        return J({ ok: true, today: sydToday(), athletes, teams: teams || [], sport_requests: sportReqs || [] });
+        return J({ ok: true, today: sydToday(), athletes, teams: teams || [], sport_requests: sportReqs || [], events: events || [] });
+      }
+      if (a === "event_create") {
+        const title = priv(b.title, 80);
+        if (title.length < 2) return J({ error: "Give the event a title." }, 400);
+        if (!b.starts_at) return J({ error: "Pick a date & time." }, 400);
+        const type = ["training", "game", "meeting", "other"].includes(String(b.type)) ? String(b.type) : "training";
+        const row = { title, type, starts_at: new Date(b.starts_at).toISOString(), location: priv(b.location, 80) || null, note: priv(b.note, 200) || null, team_id: b.team_id ? String(b.team_id) : null };
+        const rows = await db("aos_events", { method: "POST", headers: { Prefer: "return=representation" }, body: JSON.stringify(row) });
+        return J({ ok: true, event: rows[0] });
+      }
+      if (a === "event_delete") {
+        await db(`aos_events?id=eq.${b.id}`, { method: "DELETE" });
+        return J({ ok: true });
       }
       if (a === "sport_resolve") {
         const status = ["approved", "rejected"].includes(String(b.status)) ? String(b.status) : "approved";
