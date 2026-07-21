@@ -81,7 +81,7 @@
 <div id="gate" class="fixed inset-0 z-50 bg-ink-900 flex items-center justify-center p-6">
   <div class="w-full max-w-sm bg-ink-850 rounded-3xl shadow-card border border-ink-700 p-7 animate-fadeUp">
     <div class="text-center mb-6">
-      <img src="logo.png" alt="Eagles Gym" class="h-9 w-auto mx-auto mb-3" />
+      <img src="logo.png" alt="Eagles Gym" class="h-9 w-auto mx-auto mb-3" style="height:36px;width:auto;max-width:80%" />
       <p class="text-brand-500 font-semibold tracking-[0.25em] text-sm">STAFF HUB</p>
       <p class="text-neutral-400 text-sm mt-3">Clock in to start your shift. Every task you complete is stamped with your name — accountability, not paperwork.</p>
     </div>
@@ -96,7 +96,7 @@
 <!-- ===================== HEADER ===================== -->
 <header class="safe-t sticky top-0 z-30 bg-ink-900/85 backdrop-blur-xl border-b border-ink-700">
   <div class="max-w-5xl mx-auto px-4 py-3 flex items-center gap-3">
-    <img src="logo.png" alt="Eagles Gym" class="h-6 w-auto" />
+    <img src="logo.png" alt="Eagles Gym" class="h-6 w-auto" style="height:24px;width:auto;max-width:60vw" />
     <div class="leading-none border-l border-ink-600 pl-3">
       <div class="text-[10px] text-brand-500 font-semibold tracking-[0.2em]">STAFF HUB</div>
     </div>
@@ -105,6 +105,7 @@
         <div id="clock" class="font-bold text-brand-400 tabular-nums text-base">--:--</div>
         <div id="dateLabel" class="text-[10px] text-neutral-400">—</div>
       </div>
+      <button id="followBell" title="Follow-ups due" class="relative hidden w-9 h-9 place-items-center bg-ink-800 border border-ink-600 rounded-full text-base active:scale-95 transition">📞<span id="followCount" class="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 bg-red-500 text-white text-[10px] font-bold rounded-full grid place-items-center">0</span></button>
       <button id="bossBtn" title="Boss mode" class="w-9 h-9 grid place-items-center bg-ink-800 border border-ink-600 rounded-full text-base active:scale-95 transition">🔒</button>
       <button id="whoBtn" class="flex items-center gap-2 bg-ink-800 border border-ink-600 rounded-full pl-1 pr-3 py-1 active:scale-95 transition">
         <span id="avatar" class="w-7 h-7 rounded-full bg-gradient-to-br from-brand-500 to-brand-600 grid place-items-center text-xs font-bold text-white">–</span>
@@ -416,6 +417,8 @@ const NAV = [
   {id:'cleaning',   label:'Cleaning',       icon:'🧹'},
   {id:'equipment',  label:'Equipment',      icon:'🏋️'},
   {id:'reception',  label:'Reception',      icon:'👥'},
+  {id:'calls',      label:'Phone Calls',    icon:'☎️'},
+  {id:'calendar',   label:'Calendar',       icon:'📅'},
   {id:'memberships',label:'Memberships',    icon:'💳'},
   {id:'prices',     label:'Price List',     icon:'💲'},
   {id:'guide',      label:'GymMaster Guide',icon:'📖'},
@@ -704,95 +707,164 @@ function sectionHead(icon,title,sub){
   </div>`;
 }
 
-/* ---------- DASHBOARD ---------- */
+/* ---------- DASHBOARD (command centre on desktop, stacked on mobile) ---------- */
+function dayPairsAll(){ return [
+  ['morning',CHECKLISTS.morning.items.length],
+  ['afternoon',CHECKLISTS.afternoon.items.length],
+  ['closing',CHECKLISTS.closing.items.length],
+  ['equipment',EQUIPMENT.length]
+];}
 function viewDashboard(){
-  const dayPairs = [
-    ['morning',CHECKLISTS.morning.items.length],
-    ['afternoon',CHECKLISTS.afternoon.items.length],
-    ['closing',CHECKLISTS.closing.items.length],
-    ['equipment',EQUIPMENT.length]
-  ];
+  const dayPairs = dayPairsAll();
   const p = progress(dayPairs);
   const openTasks = p.total - p.done;
   const issues = store.get('issues',[]).filter(i=>i.status!=='resolved');
   const onShift = store.get('onshift',[STAFF.name]);
-
+  const due = dueFollowups();
+  const teamlog = store.get('teamlog',[]).slice(-4).reverse();
   const quick = NAV.filter(n=>n.id!=='dashboard');
 
   return `
   ${sectionHead('🏠','Home Dashboard', nowDate())}
+  <div class="lg:grid lg:grid-cols-6 lg:gap-4 lg:items-start">
 
-  <!-- top stat row -->
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-    ${statTile('🕐','Time', `<span id="dashClock">${nowTime()}</span>`,'brand')}
-    ${statTile('👥','On shift', `<span id="dashShift">${onShift.length}</span>`,'sky')}
-    ${statTile('📋','Open tasks', `<span id="dashOpen">${openTasks}</span>`,'amber')}
-    ${statTile('✅','Completed', `<span id="dashDone">${p.done}</span>`,'green')}
-  </div>
+    <!-- KPI row -->
+    <div class="lg:col-span-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4 lg:mb-0">
+      ${statTile('🕐','Time',`<span id="dashClock">${nowTime()}</span>`,'brand')}
+      ${statTile('👥','On shift',`<span id="dashShift">${onShift.length}</span>`,'sky','shift')}
+      ${statTile('📋','Open tasks',`<span id="dashOpen">${openTasks}</span>`,'amber','tasks')}
+      ${statTile('✅','Completed',`<span id="dashDone">${p.done}</span>`,'green')}
+      ${statTile('🚨','Open issues',`${issues.length}`,'red','issues')}
+      ${statTile('📞','Follow-ups',`${due.length}`,'violet','calls')}
+    </div>
 
-  <!-- shift progress -->
-  ${card(`
-    <div class="p-5">
-      <div class="flex items-center justify-between mb-3">
-        <h3 class="font-bold text-lg">Today's shift progress</h3>
-        <span class="text-xs bg-ink-700 rounded-full px-3 py-1 text-neutral-300" id="dashPct">${p.pct}% complete</span>
-      </div>
-      <div data-prog='${JSON.stringify(dayPairs)}'>
-        <div class="flex items-center gap-3">
-          <div class="flex-1 h-3 rounded-full bg-ink-700 overflow-hidden">
-            <div class="pf h-full rounded-full bg-gradient-to-r from-brand-400 to-brand-600 transition-all duration-500" style="width:${p.pct}%"></div>
+    <!-- left / main column -->
+    <div class="lg:col-span-4 lg:space-y-4">
+      ${card(`
+        <div class="p-5">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold text-lg">Today's shift progress</h3>
+            <span class="text-xs bg-ink-700 rounded-full px-3 py-1 text-neutral-300" id="dashPct">${p.pct}% complete</span>
           </div>
-          <span class="pt text-sm font-bold text-brand-400 tabular-nums w-10 text-right">${p.pct}%</span>
-        </div>
-        <div class="pm text-xs text-neutral-500 mt-2">${p.done}/${p.total} done</div>
-      </div>
-    </div>`,'mb-4')}
+          <div data-prog='${JSON.stringify(dayPairs)}'>
+            <div class="flex items-center gap-3">
+              <div class="flex-1 h-3 rounded-full bg-ink-700 overflow-hidden">
+                <div class="pf h-full rounded-full bg-gradient-to-r from-brand-400 to-brand-600 transition-all duration-500" style="width:${p.pct}%"></div>
+              </div>
+              <span class="pt text-sm font-bold text-brand-400 tabular-nums w-10 text-right">${p.pct}%</span>
+            </div>
+            <div class="pm text-xs text-neutral-500 mt-2">${p.done}/${p.total} done</div>
+          </div>
+        </div>`,'mb-4 lg:mb-0')}
 
-  <!-- staff on shift -->
-  ${card(`
-    <div class="p-5">
-      <div class="flex items-center justify-between mb-3">
-        <h3 class="font-bold">👥 Staff on shift</h3>
-        <button id="addShift" class="text-xs font-semibold text-brand-400 active:scale-95">+ Add</button>
-      </div>
-      <div id="shiftChips" class="flex flex-wrap gap-2">${renderShiftChips(onShift)}</div>
-    </div>`,'mb-4')}
+      ${followupsCard(due)}
+      ${dashIssuesCard(issues)}
+      ${dashTeamLogCard(teamlog)}
+    </div>
 
-  <!-- quick buttons -->
-  ${card(`
-    <div class="p-5">
-      <h3 class="font-bold mb-3">⚡ Quick actions</h3>
-      <div class="grid grid-cols-3 sm:grid-cols-5 gap-3">
-        ${quick.map(n=>`
-          <button data-go="${n.id}" class="quickbtn flex flex-col items-center gap-1.5 bg-ink-800 hover:bg-ink-700 border border-ink-700 rounded-2xl py-3 active:scale-95 transition">
-            <span class="text-2xl">${n.icon}</span>
-            <span class="text-[10px] font-semibold text-neutral-300 text-center leading-tight">${n.label}</span>
-          </button>`).join('')}
-      </div>
-    </div>`,'mb-4')}
+    <!-- right column -->
+    <div class="lg:col-span-2 lg:space-y-4">
+      ${card(`
+        <div class="p-5">
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold">👥 Staff on shift</h3>
+            <button id="addShift" class="text-xs font-semibold text-brand-400 active:scale-95">+ Add</button>
+          </div>
+          <div id="shiftChips" class="flex flex-wrap gap-2">${renderShiftChips(onShift)}</div>
+        </div>`,'mb-4 lg:mb-0')}
 
-  <!-- emergency contacts -->
-  ${card(`
-    <div class="p-5">
-      <h3 class="font-bold mb-3">🚨 Emergency contacts</h3>
-      <div class="grid sm:grid-cols-2 gap-2">
-        ${EMERGENCY.map(e=>`
-          <a href="tel:${e.num.replace(/\s/g,'')}" class="flex items-center gap-3 bg-ink-800 border border-ink-700 rounded-2xl px-3 py-2.5 active:scale-95 transition">
-            <span class="text-xl">${e.icon}</span>
-            <span class="flex-1 min-w-0"><span class="block text-[13px] font-semibold truncate">${e.label}</span><span class="block text-xs text-brand-400 font-bold">${e.num}</span></span>
-            <span class="text-neutral-500 text-lg">›</span>
-          </a>`).join('')}
-      </div>
-    </div>`)}
-  `;
+      ${card(`
+        <div class="p-5">
+          <h3 class="font-bold mb-3">⚡ Quick actions</h3>
+          <div class="grid grid-cols-3 sm:grid-cols-5 lg:grid-cols-3 gap-3">
+            ${quick.map(n=>`
+              <button data-go="${n.id}" class="quickbtn flex flex-col items-center gap-1.5 bg-ink-800 hover:bg-ink-700 border border-ink-700 rounded-2xl py-3 active:scale-95 transition">
+                <span class="text-2xl">${n.icon}</span>
+                <span class="text-[10px] font-semibold text-neutral-300 text-center leading-tight">${n.label}</span>
+              </button>`).join('')}
+          </div>
+        </div>`,'mb-4 lg:mb-0')}
+
+      ${card(`
+        <div class="p-5">
+          <h3 class="font-bold mb-3">🚨 Emergency contacts</h3>
+          <div class="grid gap-2">
+            ${EMERGENCY.map(e=>`
+              <a href="tel:${e.num.replace(/\s/g,'')}" class="flex items-center gap-3 bg-ink-800 border border-ink-700 rounded-2xl px-3 py-2.5 active:scale-95 transition">
+                <span class="text-xl">${e.icon}</span>
+                <span class="flex-1 min-w-0"><span class="block text-[13px] font-semibold truncate">${e.label}</span><span class="block text-xs text-brand-400 font-bold">${e.num}</span></span>
+                <span class="text-neutral-500 text-lg">›</span>
+              </a>`).join('')}
+          </div>
+        </div>`,'mb-4 lg:mb-0')}
+    </div>
+  </div>`;
 }
-function statTile(icon,label,val,tone){
-  const toneMap={brand:'text-brand-400',sky:'text-sky-400',amber:'text-amber-400',green:'text-emerald-400'};
-  return card(`<div class="p-4 text-center">
+function statTile(icon,label,val,tone,openKey){
+  const toneMap={brand:'text-brand-400',sky:'text-sky-400',amber:'text-amber-400',green:'text-emerald-400',red:'text-red-400',violet:'text-violet-400'};
+  const clickable = openKey? `data-open="${openKey}" role="button" tabindex="0" class="dash-open p-4 text-center cursor-pointer hover:border-brand-500/50 transition"` : `class="p-4 text-center"`;
+  return card(`<div ${clickable}>
     <div class="text-2xl mb-1">${icon}</div>
     <div class="text-2xl font-bold ${toneMap[tone]} tabular-nums">${val}</div>
-    <div class="text-[11px] text-neutral-500 font-medium uppercase tracking-wide mt-0.5">${label}</div>
+    <div class="text-[11px] text-neutral-500 font-medium uppercase tracking-wide mt-0.5">${label}${openKey?' ›':''}</div>
   </div>`);
+}
+function followupsCard(due){
+  const body = due.length
+    ? due.slice(0,6).map(c=>{
+        const m=callTypeMeta(c.type);
+        const overdue = c.followDate < todayKey();
+        return `<div class="flex items-center gap-3 bg-ink-800 border ${overdue?'border-red-500/40':'border-ink-700'} rounded-2xl px-3 py-2.5">
+          <span class="text-lg">${m.ic}</span>
+          <div class="flex-1 min-w-0">
+            <div class="text-[14px] font-semibold truncate">${esc(c.name)} <span class="text-[11px] font-normal text-neutral-500">· ${overdue?'<span class="text-red-400 font-semibold">overdue</span>':'today'}</span></div>
+            <div class="text-[12px] text-neutral-400 truncate">${esc(callActionLine(c))}</div>
+          </div>
+          ${c.phone?`<a href="tel:${esc(c.phone)}" class="shrink-0 text-xs font-bold text-white bg-emerald-600 rounded-full px-3 py-1.5">Call</a>`:''}
+          <button data-calldone="${c.id}" class="shrink-0 text-xs font-semibold text-neutral-400 hover:text-emerald-400">Done</button>
+        </div>`;
+      }).join('')
+    : '<p class="text-sm text-neutral-500">Nothing due today. 🎉</p>';
+  return card(`<div class="p-5">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="font-bold text-lg">📞 Follow-ups due ${due.length?`<span class="text-brand-400">(${due.length})</span>`:''}</h3>
+      <button data-go="calendar" class="text-xs font-semibold text-brand-400">Calendar →</button>
+    </div>
+    <div class="space-y-2" id="dashFollowups">${body}</div>
+  </div>`,'mb-4 lg:mb-0');
+}
+function dashIssuesCard(issues){
+  const catIcon={Cleaning:'🧹',Equipment:'🏋️','Member complaint':'😠',Maintenance:'🔧',Safety:'⚠️',Stock:'📦'};
+  const body = issues.length
+    ? issues.slice(-5).reverse().map(i=>`<div class="flex items-center gap-2 bg-ink-800 border border-ink-700 rounded-2xl px-3 py-2">
+        <span>${catIcon[i.category]||'📌'}</span>
+        <span class="flex-1 min-w-0 text-[13px] truncate">${esc(i.desc)}</span>
+        <span class="text-[10px] text-neutral-500 shrink-0">${esc(i.by)}</span>
+      </div>`).join('')
+    : '<p class="text-sm text-neutral-500">No open issues. All clear.</p>';
+  return card(`<div class="p-5">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="font-bold text-lg">🚨 Open issues ${issues.length?`<span class="text-red-400">(${issues.length})</span>`:''}</h3>
+      <button data-go="issues" class="text-xs font-semibold text-brand-400">All →</button>
+    </div>
+    <div class="space-y-2">${body}</div>
+  </div>`,'mb-4 lg:mb-0');
+}
+function dashTeamLogCard(teamlog){
+  const body = teamlog.length
+    ? `<div class="grid grid-cols-2 gap-2">${teamlog.map(e=>`
+        <div class="bg-ink-800 border border-ink-700 rounded-2xl overflow-hidden">
+          ${e.photo?`<img src="${e.photo}" class="w-full h-24 object-cover" />`:'<div class="w-full h-24 grid place-items-center text-2xl bg-ink-900">📝</div>'}
+          <div class="p-2"><div class="text-[12px] font-semibold truncate">${esc(e.by)}</div><div class="text-[11px] text-neutral-500 truncate">${esc(e.text||e.flag||'')}</div></div>
+        </div>`).join('')}</div>`
+    : '<p class="text-sm text-neutral-500">Nothing logged yet.</p>';
+  return card(`<div class="p-5">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="font-bold text-lg">📸 Recent Team Log</h3>
+      <button data-go="log" class="text-xs font-semibold text-brand-400">Open →</button>
+    </div>
+    ${body}
+  </div>`,'mb-4 lg:mb-0');
 }
 function renderShiftChips(list){
   return list.map(n=>`<span class="flex items-center gap-2 bg-ink-800 border border-ink-600 rounded-full pl-1 pr-2 py-1">
@@ -1318,11 +1390,349 @@ function viewSop(){
 }
 
 /* ============================================================
+   PHONE CALLS  +  CALENDAR  +  FOLLOW-UP ALERTS
+   ============================================================ */
+const CALL_TYPES=[
+  {k:'Payment',  ic:'💵', cls:'text-emerald-400 bg-emerald-500/10'},
+  {k:'Call back',ic:'↩️', cls:'text-sky-400 bg-sky-500/10'},
+  {k:'Enquiry',  ic:'❓', cls:'text-brand-400 bg-brand-500/10'},
+  {k:'Booking',  ic:'📅', cls:'text-violet-400 bg-violet-500/10'},
+  {k:'Complaint',ic:'😠', cls:'text-red-400 bg-red-500/10'},
+  {k:'Other',    ic:'📌', cls:'text-neutral-300 bg-ink-700'}
+];
+function callTypeMeta(k){ return CALL_TYPES.find(t=>t.k===k)||CALL_TYPES[CALL_TYPES.length-1]; }
+function getCalls(){ return store.get('calls',[]); }
+function fmtDate(iso){ if(!iso) return ''; const d=new Date(iso+'T00:00:00'); return isNaN(d)?iso:d.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short',year:'numeric'}); }
+function fmtDateShort(iso){ if(!iso) return ''; const d=new Date(iso+'T00:00:00'); return isNaN(d)?iso:d.toLocaleDateString('en-AU',{day:'numeric',month:'short'}); }
+function addDaysKey(iso,n){ const d=iso?new Date(iso+'T00:00:00'):new Date(); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); }
+function dueFollowups(){ const t=todayKey(); return getCalls().filter(c=>c.status!=='done'&&c.followDate&&c.followDate<=t).sort((a,b)=>(a.followDate||'').localeCompare(b.followDate||'')); }
+function callActionLine(c){
+  if(c.type==='Payment') return 'Will pay'+(c.amount?(' '+c.amount):'')+(c.followDate?(' on '+fmtDateShort(c.followDate)):'');
+  if(c.action) return c.action;
+  if(c.said) return c.said;
+  return 'Follow up';
+}
+function callPlainLine(c){ return `${c.name} — ${callActionLine(c)}`; }
+
+/* ---------- Calls view ---------- */
+function viewCalls(){
+  const calls=getCalls();
+  const due=dueFollowups();
+  return `
+  ${sectionHead('☎️','Phone Calls','Log every call — who called, what was said, what they need, and when to follow up. Set a date and it lands on the Calendar and alerts you that day.')}
+  ${card(`<div class="p-5"><button id="newCall" class="w-full bg-gradient-to-br from-brand-500 to-brand-600 text-white font-bold py-3.5 rounded-2xl active:scale-95 transition flex items-center justify-center gap-2">➕ Log a call</button></div>`,'mb-4')}
+  ${due.length?card(`<div class="p-5">
+    <h3 class="font-bold mb-3">🔔 Due to follow up (${due.length})</h3>
+    <div class="space-y-2">${due.map(c=>`<div class="flex items-center gap-3 bg-ink-800 border ${c.followDate<todayKey()?'border-red-500/40':'border-ink-700'} rounded-2xl px-3 py-2.5">
+      <span class="text-lg">${callTypeMeta(c.type).ic}</span>
+      <div class="flex-1 min-w-0"><div class="text-[14px] font-semibold truncate">${esc(c.name)}</div><div class="text-[12px] text-neutral-400 truncate">${esc(callActionLine(c))}</div></div>
+      ${c.phone?`<a href="tel:${esc(c.phone)}" class="shrink-0 text-xs font-bold text-white bg-emerald-600 rounded-full px-3 py-1.5">Call</a>`:''}
+      <button data-calldone="${c.id}" class="shrink-0 text-xs font-semibold text-neutral-400 hover:text-emerald-400">Done</button>
+    </div>`).join('')}</div>
+  </div>`,'mb-4'):''}
+  ${card(`<div class="p-5">
+    <h3 class="font-bold mb-3">Call log (${calls.length})</h3>
+    <div id="callFeed">${renderCalls(calls)}</div>
+  </div>`)}`;
+}
+function renderCalls(calls){
+  if(!calls.length) return '<p class="text-sm text-neutral-500">No calls logged yet.</p>';
+  return calls.slice().reverse().map(c=>{
+    const m=callTypeMeta(c.type); const done=c.status==='done';
+    const overdue=c.followDate && c.followDate<todayKey() && !done;
+    return `<div class="border ${overdue?'border-red-500/40':'border-ink-700'} rounded-2xl p-3 mb-2 ${done?'opacity-60':''}">
+      <div class="flex items-center gap-2 flex-wrap">
+        <span>${m.ic}</span>
+        <span class="font-semibold text-[15px] flex-1 min-w-0">${esc(c.name)}</span>
+        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${m.cls}">${esc(c.type)}</span>
+        ${c.amount?`<span class="text-[11px] font-bold text-emerald-400">${esc(c.amount)}</span>`:''}
+        <button data-calldel="${c.id}" class="text-neutral-600 hover:text-red-400 text-sm">×</button>
+      </div>
+      ${c.said?`<div class="mt-1.5"><span class="text-[10px] font-bold uppercase text-neutral-500">Said</span><p class="text-sm text-neutral-200">${esc(c.said)}</p></div>`:''}
+      ${c.action?`<div class="mt-1"><span class="text-[10px] font-bold uppercase text-neutral-500">To do</span><p class="text-sm text-neutral-200">${esc(c.action)}</p></div>`:''}
+      ${c.followDate?`<div class="mt-2 inline-flex items-center gap-1 text-[12px] font-semibold ${overdue?'text-red-400':'text-brand-400'} bg-ink-800 rounded-full px-2.5 py-1">📅 ${fmtDate(c.followDate)}${overdue?' · overdue':''}</div>`:''}
+      <div class="flex items-center justify-between mt-2 gap-2">
+        <span class="text-[11px] text-neutral-500 min-w-0 truncate">${c.phone?`<a href="tel:${esc(c.phone)}" class="text-emerald-400 font-semibold">${esc(c.phone)}</a> · `:''}${esc(c.by)} · ${c.time} · ${c.date}</span>
+        <button data-calldone="${c.id}" class="shrink-0 text-[11px] font-semibold ${done?'text-neutral-500':'text-emerald-400'}">${done?'↩ Reopen':'✓ Done'}</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+function openCallModal(){
+  openModal(`
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-xl font-bold">☎️ Log a call</h3>
+        <button onclick="closeModal()" class="text-neutral-500 hover:text-white text-2xl leading-none">×</button>
+      </div>
+      <div class="space-y-3">
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="text-xs uppercase tracking-wider text-neutral-500 font-semibold">Customer name <span class="text-red-400">*</span></label>
+            <input id="callName" placeholder="Who called?" class="w-full mt-1.5 bg-ink-800 border border-ink-600 rounded-2xl px-4 py-3 focus:border-brand-500 outline-none" /></div>
+          <div><label class="text-xs uppercase tracking-wider text-neutral-500 font-semibold">Phone</label>
+            <input id="callPhone" type="tel" inputmode="tel" placeholder="04…" class="w-full mt-1.5 bg-ink-800 border border-ink-600 rounded-2xl px-4 py-3 focus:border-brand-500 outline-none" /></div>
+        </div>
+        <div><label class="text-xs uppercase tracking-wider text-neutral-500 font-semibold">Type of call</label>
+          <div class="flex flex-wrap gap-2 mt-1.5" id="callType">
+            ${CALL_TYPES.map((t,i)=>`<button data-ct="${t.k}" class="ct-opt border border-ink-600 rounded-full px-3 py-1.5 text-sm font-semibold ${i===0?'ring-2 ring-brand-500 bg-brand-500/10 text-brand-400':''}">${t.ic} ${t.k}</button>`).join('')}
+          </div></div>
+        <div><label class="text-xs uppercase tracking-wider text-neutral-500 font-semibold">What was said</label>
+          <textarea id="callSaid" rows="4" placeholder="Everything they told you — take your time, there's plenty of room…" class="w-full mt-1.5 bg-ink-800 border border-ink-600 rounded-2xl px-4 py-3 resize-none focus:border-brand-500 outline-none"></textarea></div>
+        <div><label class="text-xs uppercase tracking-wider text-neutral-500 font-semibold">What they need / next step</label>
+          <textarea id="callAction" rows="3" placeholder="e.g. Wants to pay next week · needs a call back · booking a casual visit…" class="w-full mt-1.5 bg-ink-800 border border-ink-600 rounded-2xl px-4 py-3 resize-none focus:border-brand-500 outline-none"></textarea></div>
+        <div class="grid grid-cols-2 gap-3">
+          <div><label class="text-xs uppercase tracking-wider text-neutral-500 font-semibold">Amount (if paying)</label>
+            <input id="callAmount" placeholder="$" class="w-full mt-1.5 bg-ink-800 border border-ink-600 rounded-2xl px-4 py-3 focus:border-brand-500 outline-none" /></div>
+          <div><label class="text-xs uppercase tracking-wider text-neutral-500 font-semibold">Follow-up date</label>
+            <input id="callFollow" type="date" class="w-full mt-1.5 bg-ink-800 border border-ink-600 rounded-2xl px-4 py-3 focus:border-brand-500 outline-none" /></div>
+        </div>
+        <p class="text-[11px] text-neutral-500">Set a follow-up date and it lands on the <b class="text-neutral-300">Calendar</b> — the app will alert you that day to call them.</p>
+        <p class="text-xs text-neutral-500">Logged by <b class="text-neutral-300">${esc(STAFF.name)}</b></p>
+        <button id="callSubmit" class="w-full bg-gradient-to-br from-brand-500 to-brand-600 text-white font-bold py-3 rounded-2xl active:scale-95 transition">Post call</button>
+      </div>
+    </div>`);
+  let type=CALL_TYPES[0].k;
+  $$('#callType .ct-opt').forEach(b=>b.addEventListener('click',()=>{ type=b.dataset.ct;
+    $$('#callType .ct-opt').forEach(x=>x.className='ct-opt border border-ink-600 rounded-full px-3 py-1.5 text-sm font-semibold');
+    b.className='ct-opt border border-ink-600 rounded-full px-3 py-1.5 text-sm font-semibold ring-2 ring-brand-500 bg-brand-500/10 text-brand-400';
+  }));
+  $('#callSubmit').addEventListener('click',()=>{
+    const name=$('#callName').value.trim();
+    if(!name){ toast('Enter the customer name','⚠️'); $('#callName').focus(); return; }
+    const c={ id:uid(), name, phone:$('#callPhone').value.trim(), type,
+      said:$('#callSaid').value.trim(), action:$('#callAction').value.trim(),
+      amount:$('#callAmount').value.trim(), followDate:$('#callFollow').value||'',
+      by:STAFF.name, time:nowTime(), date:nowDate(), status:'open', alerted:'' };
+    const calls=getCalls(); calls.push(c);
+    if(!trySet('calls',calls)){ toast('Storage full — delete old calls and try again','⚠️'); return; }
+    updateFollowBell(dueFollowups().length);
+    closeModal(); render('calls');
+    toast(c.followDate?`Logged — on the calendar for ${fmtDateShort(c.followDate)}`:'Call logged','☎️'); haptic(25);
+  });
+  setTimeout(()=>$('#callName').focus(),50);
+}
+function wireCalls(){
+  $('#newCall')?.addEventListener('click',openCallModal);
+  $$('[data-calldel]').forEach(b=>b.addEventListener('click',()=>{
+    if(!confirm('Delete this call?')) return;
+    const calls=getCalls().filter(c=>c.id!==b.dataset.calldel); trySet('calls',calls);
+    updateFollowBell(dueFollowups().length); render('calls');
+  }));
+}
+
+/* ---------- Calendar view ---------- */
+let calY=null, calM=null, calSel=null;
+function viewCalendar(){
+  const now=new Date();
+  if(calY==null){ calY=now.getFullYear(); calM=now.getMonth(); }
+  const first=new Date(calY,calM,1);
+  const monthName=first.toLocaleDateString('en-AU',{month:'long',year:'numeric'});
+  const startWeekday=(first.getDay()+6)%7; // Monday-first
+  const daysInMonth=new Date(calY,calM+1,0).getDate();
+  const t=todayKey();
+  const calls=getCalls().filter(c=>c.status!=='done'&&c.followDate);
+  const byDate={}; calls.forEach(c=>{ (byDate[c.followDate]=byDate[c.followDate]||[]).push(c); });
+  let cells='';
+  for(let i=0;i<startWeekday;i++) cells+='<div></div>';
+  for(let d=1; d<=daysInMonth; d++){
+    const key=`${calY}-${String(calM+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const list=byDate[key]||[]; const isToday=key===t; const sel=key===calSel; const overdue=list.length&&key<t;
+    cells+=`<button data-calday="${key}" class="aspect-square rounded-xl border ${sel?'border-brand-500 bg-brand-500/10':'border-ink-700'} ${isToday?'ring-1 ring-brand-500/60':''} flex flex-col items-center justify-center active:scale-95 transition">
+      <span class="text-[13px] ${isToday?'font-bold text-brand-400':'text-neutral-200'}">${d}</span>
+      ${list.length?`<span class="text-[9px] font-bold ${overdue?'text-red-400':'text-brand-400'} leading-none mt-0.5">●${list.length>1?' '+list.length:''}</span>`:''}
+    </button>`;
+  }
+  const agenda=(calSel?(byDate[calSel]||[]):calls.filter(c=>{const [yy,mm]=c.followDate.split('-');return +yy===calY&&+mm===calM+1;})).sort((a,b)=>a.followDate.localeCompare(b.followDate));
+  const WD=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  return `
+  ${sectionHead('📅','Calendar','Follow-ups from your phone calls — who is due to pay or be called, and when.')}
+  ${card(`<div class="p-5">
+    <div class="flex items-center justify-between mb-4">
+      <button id="calPrev" class="w-9 h-9 grid place-items-center bg-ink-800 border border-ink-700 rounded-xl active:scale-95">‹</button>
+      <div class="text-center"><div class="font-bold text-lg">${monthName}</div><button id="calToday" class="text-[11px] font-semibold text-brand-400">Today</button></div>
+      <button id="calNext" class="w-9 h-9 grid place-items-center bg-ink-800 border border-ink-700 rounded-xl active:scale-95">›</button>
+    </div>
+    <div class="grid grid-cols-7 gap-1.5 mb-1.5">${WD.map(w=>`<div class="text-center text-[10px] font-bold text-neutral-500">${w}</div>`).join('')}</div>
+    <div class="grid grid-cols-7 gap-1.5">${cells}</div>
+  </div>`,'mb-4')}
+  ${card(`<div class="p-5">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="font-bold">${calSel?fmtDate(calSel):'This month'} ${agenda.length?`<span class="text-brand-400">(${agenda.length})</span>`:''}</h3>
+      ${calSel?`<button id="calClear" class="text-xs font-semibold text-brand-400">Show month</button>`:''}
+    </div>
+    <div class="space-y-2">${agenda.length?agenda.map(c=>{
+      const overdue=c.followDate<t; const m=callTypeMeta(c.type);
+      return `<div class="flex items-center gap-3 bg-ink-800 border ${overdue?'border-red-500/40':'border-ink-700'} rounded-2xl px-3 py-2.5">
+        <div class="text-center shrink-0 w-10"><div class="text-[10px] text-neutral-500 uppercase">${fmtDateShort(c.followDate).split(' ')[1]||''}</div><div class="text-lg font-bold leading-none ${overdue?'text-red-400':'text-brand-400'}">${fmtDateShort(c.followDate).split(' ')[0]}</div></div>
+        <div class="flex-1 min-w-0"><div class="text-[14px] font-semibold truncate">${m.ic} ${esc(c.name)}</div><div class="text-[12px] text-neutral-400 truncate">${esc(callActionLine(c))}</div></div>
+        ${c.phone?`<a href="tel:${esc(c.phone)}" class="shrink-0 text-xs font-bold text-white bg-emerald-600 rounded-full px-3 py-1.5">Call</a>`:''}
+        <button data-calldone="${c.id}" class="shrink-0 text-xs font-semibold text-neutral-400 hover:text-emerald-400">Done</button>
+      </div>`;
+    }).join(''):'<p class="text-sm text-neutral-500">No follow-ups here. Log a call to add one.</p>'}</div>
+  </div>`)}`;
+}
+function wireCalendar(){
+  $('#calPrev')?.addEventListener('click',()=>{ calM--; if(calM<0){calM=11;calY--;} calSel=null; render('calendar'); });
+  $('#calNext')?.addEventListener('click',()=>{ calM++; if(calM>11){calM=0;calY++;} calSel=null; render('calendar'); });
+  $('#calToday')?.addEventListener('click',()=>{ const n=new Date(); calY=n.getFullYear(); calM=n.getMonth(); calSel=todayKey(); render('calendar'); });
+  $('#calClear')?.addEventListener('click',()=>{ calSel=null; render('calendar'); });
+  $$('[data-calday]').forEach(b=>b.addEventListener('click',()=>{ calSel=(calSel===b.dataset.calday?null:b.dataset.calday); render('calendar'); }));
+}
+
+/* ---------- follow-up alerts ---------- */
+function toggleCallDone(id){
+  const calls=getCalls(); const c=calls.find(x=>x.id===id);
+  if(!c) return;
+  c.status = c.status==='done'?'open':'done';
+  trySet('calls',calls); updateFollowBell(dueFollowups().length);
+  if(!$('#modalHost').classList.contains('hidden')){ const due=dueFollowups(); if(due.length) showAlerts(due); else closeModal(); }
+  if(['dashboard','calls','calendar'].includes(currentView)) render(currentView);
+}
+function updateFollowBell(n){
+  const bell=$('#followBell'); if(!bell) return;
+  if(n>0){ bell.classList.remove('hidden'); bell.classList.add('grid'); const c=$('#followCount'); if(c) c.textContent=n; }
+  else { bell.classList.add('hidden'); bell.classList.remove('grid'); }
+}
+function showAlerts(list){
+  if(!list||!list.length) return;
+  openModal(`
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-1">
+        <h3 class="text-xl font-bold">🔔 Time to follow up</h3>
+        <button onclick="closeModal()" class="text-neutral-500 hover:text-white text-2xl leading-none">×</button>
+      </div>
+      <p class="text-xs text-neutral-500 mb-4">These people are due today — give them a call.</p>
+      <div class="space-y-2">
+        ${list.map(c=>`<div class="bg-ink-800 border ${c.followDate<todayKey()?'border-red-500/40':'border-ink-700'} rounded-2xl p-3">
+          <div class="flex items-center gap-2">
+            <span class="text-lg">${callTypeMeta(c.type).ic}</span>
+            <span class="font-semibold flex-1 min-w-0 truncate">${esc(c.name)}</span>
+            <span class="text-[11px] text-neutral-500 shrink-0">${fmtDateShort(c.followDate)}${c.followDate<todayKey()?' · overdue':''}</span>
+          </div>
+          <p class="text-[13px] text-neutral-300 mt-1">${esc(callActionLine(c))}</p>
+          ${c.said?`<p class="text-[12px] text-neutral-500 mt-1 italic">"${esc(c.said)}"</p>`:''}
+          <div class="flex gap-2 mt-2">
+            ${c.phone?`<a href="tel:${esc(c.phone)}" class="flex-1 text-center text-xs font-bold text-white bg-emerald-600 rounded-xl py-2">📞 Call ${esc(c.phone)}</a>`:'<span class="flex-1 text-center text-xs text-neutral-500 py-2">No number</span>'}
+            <button data-alertdone="${c.id}" class="px-3 text-xs font-bold bg-ink-700 rounded-xl py-2">✓ Done</button>
+            <button data-alertsnooze="${c.id}" class="px-3 text-xs font-semibold bg-ink-700 rounded-xl py-2">Tomorrow</button>
+          </div>
+        </div>`).join('')}
+      </div>
+      <button onclick="closeModal()" class="w-full mt-4 bg-ink-700 text-neutral-200 font-semibold py-2.5 rounded-2xl">Close</button>
+    </div>`);
+  $$('[data-alertdone]').forEach(b=>b.addEventListener('click',()=>{
+    const calls=getCalls(); const c=calls.find(x=>x.id===b.dataset.alertdone); if(c) c.status='done';
+    trySet('calls',calls); afterAlertAction();
+  }));
+  $$('[data-alertsnooze]').forEach(b=>b.addEventListener('click',()=>{
+    const calls=getCalls(); const c=calls.find(x=>x.id===b.dataset.alertsnooze); if(c){ c.followDate=addDaysKey(todayKey(),1); c.alerted=''; }
+    trySet('calls',calls); afterAlertAction();
+  }));
+}
+function afterAlertAction(){
+  const due=dueFollowups(); updateFollowBell(due.length);
+  if(due.length) showAlerts(due); else closeModal();
+  if(['dashboard','calls','calendar'].includes(currentView)) render(currentView);
+}
+function checkFollowups(){
+  const due=dueFollowups(); updateFollowBell(due.length);
+  const t=todayKey();
+  const fresh=due.filter(c=>c.alerted!==t);
+  if(fresh.length){
+    const calls=getCalls();
+    fresh.forEach(f=>{ const c=calls.find(x=>x.id===f.id); if(c) c.alerted=t; });
+    trySet('calls',calls);
+    fresh.forEach(f=>fireReminder('Call '+f.name, callPlainLine(f)));
+    if($('#modalHost').classList.contains('hidden')) showAlerts(due);
+  }
+}
+
+/* ---------- dashboard tile modals ---------- */
+function handleDashOpen(key){
+  if(key==='shift') openShiftModal();
+  else if(key==='tasks') openTasksModal();
+  else if(key==='issues') render('issues');
+  else if(key==='calls') render('calls');
+}
+function openShiftModal(){
+  const draw=()=>{
+    const list=store.get('onshift',[STAFF.name]);
+    openModal(`
+      <div class="p-6">
+        <div class="flex items-center justify-between mb-1">
+          <h3 class="text-xl font-bold">👥 On shift now</h3>
+          <button onclick="closeModal()" class="text-neutral-500 hover:text-white text-2xl leading-none">×</button>
+        </div>
+        <p class="text-xs text-neutral-500 mb-4">Everyone currently clocked in. Add or remove people here.</p>
+        <div class="space-y-2 mb-4">${list.length?list.map(n=>`<div class="flex items-center gap-3 bg-ink-800 border border-ink-700 rounded-2xl px-3 py-2.5">
+          <span class="w-8 h-8 rounded-full bg-gradient-to-br from-brand-500 to-brand-600 grid place-items-center text-xs font-bold text-white">${initials(n)}</span>
+          <span class="flex-1 font-semibold">${esc(n)}</span>
+          <button data-rmshift2="${esc(n)}" class="text-xs font-semibold text-neutral-500 hover:text-red-400">Remove</button>
+        </div>`).join(''):'<p class="text-sm text-neutral-500">No one on shift yet.</p>'}</div>
+        <div class="flex gap-2">
+          <input id="shiftAddName" placeholder="Add someone…" class="flex-1 bg-ink-800 border border-ink-600 rounded-2xl px-4 py-3 focus:border-brand-500 outline-none" />
+          <button id="shiftAddBtn" class="px-5 bg-brand-500 text-white font-bold rounded-2xl active:scale-95 transition">Add</button>
+        </div>
+      </div>`);
+    $$('[data-rmshift2]').forEach(b=>b.addEventListener('click',()=>{
+      const l=store.get('onshift',[STAFF.name]).filter(x=>x!==b.dataset.rmshift2); store.set('onshift',l);
+      if(currentView==='dashboard') render('dashboard'); draw();
+    }));
+    const add=()=>{ const v=$('#shiftAddName').value.trim(); if(!v) return;
+      const l=store.get('onshift',[STAFF.name]); if(!l.includes(v)){ l.push(v); store.set('onshift',l); rememberName(v); }
+      if(currentView==='dashboard') render('dashboard'); draw();
+    };
+    $('#shiftAddBtn').addEventListener('click',add);
+    $('#shiftAddName').addEventListener('keydown',e=>{ if(e.key==='Enter') add(); });
+  };
+  draw();
+}
+function openTasksModal(){
+  const groups=[
+    ['Morning','morning',CHECKLISTS.morning.items],
+    ['Afternoon','afternoon',CHECKLISTS.afternoon.items],
+    ['Closing','closing',CHECKLISTS.closing.items],
+    ['Cleaning · hourly','clean_hourly',CLEANING.hourly.items],
+    ['Cleaning · 2-hourly','clean_twoHour',CLEANING.twoHour.items],
+    ['Cleaning · 4-hourly','clean_fourHour',CLEANING.fourHour.items],
+    ['Equipment','equipment',EQUIPMENT]
+  ];
+  const draw=()=>{
+    let html='', total=0;
+    groups.forEach(([label,scope,items])=>{
+      const open=items.map((t,i)=>({t,i})).filter(o=>!isDone(scope,o.i));
+      if(!open.length) return; total+=open.length;
+      html+=`<div class="mb-3"><div class="text-[11px] font-bold uppercase text-neutral-500 mb-1">${esc(label)} (${open.length})</div>
+        ${open.map(o=>`<label class="flex items-center gap-3 bg-ink-800 border border-ink-700 rounded-xl px-3 py-2 mb-1.5 cursor-pointer">
+          <input type="checkbox" class="opentask w-5 h-5 accent-brand-500" data-scope="${scope}" data-idx="${o.i}" />
+          <span class="flex-1 text-[14px]">${esc(o.t)}</span></label>`).join('')}</div>`;
+    });
+    if(!total) html='<p class="text-sm text-neutral-500">🎉 No open tasks — everything is ticked off.</p>';
+    openModal(`<div class="p-6">
+      <div class="flex items-center justify-between mb-1"><h3 class="text-xl font-bold">📋 Open tasks ${total?`(${total})`:''}</h3><button onclick="closeModal()" class="text-neutral-500 hover:text-white text-2xl leading-none">×</button></div>
+      <p class="text-xs text-neutral-500 mb-4">Tick to complete — stamped with your name.</p>
+      <div>${html}</div>
+      <div class="grid grid-cols-2 gap-2 mt-4">
+        <button data-gomodal="checklist" class="bg-ink-800 border border-ink-700 rounded-2xl py-2.5 font-semibold text-sm">Daily Checklist</button>
+        <button data-gomodal="cleaning" class="bg-ink-800 border border-ink-700 rounded-2xl py-2.5 font-semibold text-sm">Cleaning</button>
+      </div>
+    </div>`);
+    $$('.opentask').forEach(cb=>cb.addEventListener('change',()=>{
+      setDone(cb.dataset.scope, +cb.dataset.idx, true); haptic();
+      if(currentView==='dashboard') render('dashboard'); draw();
+    }));
+    $$('#modalCard [data-gomodal]').forEach(b=>b.addEventListener('click',()=>{ closeModal(); render(b.dataset.gomodal); }));
+  };
+  draw();
+}
+
+/* ============================================================
    ROUTER
    ============================================================ */
 const VIEWS = {
   dashboard:viewDashboard, checklist:viewChecklist, cleaning:viewCleaning,
   equipment:viewEquipment, reception:viewReception, memberships:viewMemberships,
+  calls:viewCalls, calendar:viewCalendar,
   prices:viewPrices, guide:viewGuide, issues:viewIssues, log:viewLog, handover:viewHandover, sop:viewSop
 };
 
@@ -1367,6 +1777,17 @@ function wireView(view){
     const i=b.dataset.editlist.indexOf(':');
     openListEditor(b.dataset.editlist.slice(0,i), b.dataset.editlist.slice(i+1));
   }));
+  // clickable dashboard tiles (on-shift / open tasks / issues / follow-ups)
+  $$('[data-open]').forEach(el=>{
+    const go=()=>handleDashOpen(el.dataset.open);
+    el.addEventListener('click',go);
+    el.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); go(); } });
+  });
+  // follow-up "Done" buttons (dashboard / calls / calendar)
+  $$('[data-calldone]').forEach(b=>b.addEventListener('click',()=>toggleCallDone(b.dataset.calldone)));
+
+  if(view==='calls'){ wireCalls(); }
+  if(view==='calendar'){ wireCalendar(); }
 
   if(view==='dashboard'){
     $('#addShift')?.addEventListener('click',()=>{
@@ -1894,6 +2315,7 @@ function tickClock(){
   const c=$('#clock'); if(c) c.textContent=nowTime();
   const d=$('#dateLabel'); if(d) d.textContent=new Date().toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});
   if(currentView==='dashboard') paintDashCounters();
+  updateFollowBell(dueFollowups().length);
   checkClosing();
 }
 
@@ -1904,6 +2326,8 @@ function bootApp(){
   // boss button
   setBoss(bossMode);
   $('#bossBtn').addEventListener('click',toggleBoss);
+  // follow-up bell -> open the due-list alert
+  $('#followBell').addEventListener('click',()=>{ const due=dueFollowups(); if(due.length) showAlerts(due); else render('calendar'); });
   // ensure on-shift includes current staff
   const os=store.get('onshift',[]); if(!os.includes(STAFF.name)){ os.push(STAFF.name); store.set('onshift',os); }
   // reminders resume
@@ -1911,6 +2335,7 @@ function bootApp(){
   // render last view
   render(store.get('lastView','dashboard'));
   tickClock(); setInterval(tickClock,1000*15);
+  checkFollowups(); setInterval(checkFollowups, 60*1000);
   $('#gate').style.display='none';
 }
 
