@@ -85,9 +85,9 @@
       <p class="text-brand-500 font-semibold tracking-[0.25em] text-sm">STAFF HUB</p>
       <p class="text-neutral-400 text-sm mt-3">Clock in to start your shift. Every task you complete is stamped with your name — accountability, not paperwork.</p>
     </div>
-    <label class="text-xs uppercase tracking-wider text-neutral-500 font-semibold">Who's on shift?</label>
-    <select id="staffSelect" class="w-full mt-2 mb-3 bg-ink-800 border border-ink-600 rounded-2xl px-4 py-3 text-base focus:border-brand-500 focus:ring-2 focus:ring-brand-500/40 outline-none"></select>
-    <input id="staffCustom" type="text" placeholder="…or type your name" class="w-full bg-ink-800 border border-ink-600 rounded-2xl px-4 py-3 text-base mb-4 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/40 outline-none" />
+    <label class="text-xs uppercase tracking-wider text-neutral-500 font-semibold">Enter your name to start your shift</label>
+    <input id="staffName" type="text" autocomplete="name" placeholder="Your name" class="w-full mt-2 mb-3 bg-ink-800 border border-ink-600 rounded-2xl px-4 py-3 text-base focus:border-brand-500 focus:ring-2 focus:ring-brand-500/40 outline-none" />
+    <div id="recentNames" class="flex flex-wrap gap-2 mb-4"></div>
     <button id="clockIn" class="w-full bg-gradient-to-br from-brand-500 to-brand-600 text-white font-bold py-3.5 rounded-2xl text-base active:scale-95 transition shadow-glow">Start Shift →</button>
     <p class="text-center text-[11px] text-neutral-600 mt-4">Runs offline · No login required · Data stays on this device</p>
   </div>
@@ -150,8 +150,9 @@ const APP_ICON = 'icon-192.png'; // Eagles Gym logo (falls back gracefully if mi
 
 let STAFF = store.get('staff',null); // {name}
 
-/* ---------- roster ---------- */
-const ROSTER = store.get('roster',['Aiman','Sarah','Jordan','Mia','Coach Dre','Front Desk']);
+/* ---------- roster (no presets — names accumulate as people clock in) ---------- */
+let ROSTER = store.get('roster',[]);
+function rememberName(n){ if(n && !ROSTER.includes(n)){ ROSTER.push(n); store.set('roster',ROSTER); } }
 
 /* ---------- emergency contacts ---------- */
 const EMERGENCY = [
@@ -303,6 +304,49 @@ const KB = [
 ];
 
 /* ============================================================
+   IDEA LAB — a bank of upgrade ideas inspired by top gyms worldwide.
+   "Press a button, get a fresh idea to spruce up the gym."
+   ============================================================ */
+const IDEAS = [
+  {c:'Recovery', t:'Add a recovery corner — foam rollers, massage guns and a stretching mat zone members can book.'},
+  {c:'Recovery', t:'Install an infrared sauna or ice bath — recovery is the #1 add-on driving memberships worldwide.'},
+  {c:'Recovery', t:'Compression-boot station (like NormaTec) members pay a small add-on to use.'},
+  {c:'Tech', t:'QR check-in at the door so members scan in with their phone — no queue at reception.'},
+  {c:'Tech', t:'Put a big screen showing today\'s class timetable and a live "how busy are we" gym-capacity meter.'},
+  {c:'Tech', t:'Offer a members app with workout tracking and streaks — gamified progress keeps people coming.'},
+  {c:'Tech', t:'Body-composition scanner (InBody style) with monthly re-scans as a paid or premium perk.'},
+  {c:'Classes', t:'Run a small-group strength program (3-6 people) — higher value than 1:1, more social than solo.'},
+  {c:'Classes', t:'Add a beginners-only "first 30 days" onboarding class so new members never feel lost.'},
+  {c:'Classes', t:'Sunrise 5:30am + late 8pm class slots to capture shift workers and early risers.'},
+  {c:'Classes', t:'Mobility / stretch class on the timetable — low-cost to run, huge for retention over 40s.'},
+  {c:'Community', t:'Monthly member challenge (most sessions, biggest lift PR) with a leaderboard on the wall.'},
+  {c:'Community', t:'"Bring a mate free" week — members are your best salespeople.'},
+  {c:'Community', t:'Post-workout coffee / shake bar so people hang around and the gym feels like a community.'},
+  {c:'Community', t:'Members-only social event or comp night once a quarter to build loyalty.'},
+  {c:'Community', t:'Wall of PRs / member-of-the-month photos near reception.'},
+  {c:'Retention', t:'Automated check-in text to members who haven\'t trained in 10 days — win-backs before they cancel.'},
+  {c:'Retention', t:'Free monthly "form check" with a coach so members feel looked after, not just billed.'},
+  {c:'Retention', t:'Birthday message + a free guest pass to give away — cheap, personal, memorable.'},
+  {c:'Retail', t:'Stock premium recovery gear (bands, sleeves, belts) at the desk for impulse buys.'},
+  {c:'Retail', t:'Branded Eagles Gym merch — shakers, singlets, hoodies. Members become walking billboards.'},
+  {c:'Retail', t:'Grab-and-go fridge with protein drinks and healthy snacks by the exit.'},
+  {c:'Space', t:'Dedicated turf / sled track for functional and athletic training — a big draw for younger members.'},
+  {c:'Space', t:'A quiet "focus zone" with no music for members who want to lock in with headphones.'},
+  {c:'Space', t:'Refresh the lighting — warm LED + a feature wall makes the gym instantly photograph better.'},
+  {c:'Space', t:'Chalk / lifting platform area with mirrors for the serious lifters.'},
+  {c:'Space', t:'Add a kids-minding corner or crèche hour to unlock the parents market.'},
+  {c:'Brand', t:'A signature Eagles Gym scent + clean playlist — the sensory details premium gyms obsess over.'},
+  {c:'Brand', t:'Instagram-worthy mural or neon sign so members post and tag the gym for free reach.'},
+  {c:'Brand', t:'Consistent branded signage on every machine zone — looks professional, guides new members.'},
+  {c:'Wellness', t:'Partner with a physio or massage therapist to run a chair on-site one day a week.'},
+  {c:'Wellness', t:'Free water-refill station with electrolytes — small touch members genuinely love.'},
+  {c:'Wellness', t:'Add a nutrition seminar or meal-prep workshop as a members perk.'},
+  {c:'Access', t:'Offer 24/7 fob access for trusted members — captures people who train at odd hours.'},
+  {c:'Access', t:'Corporate memberships — pitch nearby businesses a group rate for their staff.'},
+  {c:'Access', t:'Student & shift-worker off-peak tier to fill the quiet daytime hours.'}
+];
+
+/* ============================================================
    REMINDERS  (boss-editable list — each = {id,text,interval})
    interval ∈ 60 | 120 | 180 | 240 (minutes) | 'close'
    ============================================================ */
@@ -376,6 +420,7 @@ const NAV = [
   {id:'prices',     label:'Price List',     icon:'💲'},
   {id:'guide',      label:'GymMaster Guide',icon:'📖'},
   {id:'issues',     label:'Issues',         icon:'🚨'},
+  {id:'log',        label:'Team Log',       icon:'📸'},
   {id:'handover',   label:'Handover',       icon:'📋'},
   {id:'sop',        label:'SOP Library',    icon:'⚙️'}
 ];
@@ -1074,6 +1119,81 @@ function renderIssues(issues){
     </div>`).join('');
 }
 
+/* ---------- TEAM LOG (shared photo / incident board) ---------- */
+function viewLog(){
+  const log = store.get('teamlog',[]);
+  return `
+  ${sectionHead('📸','Team Log','Post a photo of any problem or incident so the whole team and the next shift can see it.')}
+  ${card(`<div class="p-5">
+    <button id="newLog" class="w-full bg-gradient-to-br from-brand-500 to-brand-600 text-white font-bold py-3.5 rounded-2xl active:scale-95 transition flex items-center justify-center gap-2">📷 Post to the log</button>
+  </div>`,'mb-4')}
+  <div class="mb-4 text-[11px] text-neutral-600 px-1">🔒 Posts are saved on this device. When we add staff accounts, the log syncs live across everyone's phones.</div>
+  ${card(`<div class="p-5">
+    <div class="flex items-center justify-between mb-3">
+      <h3 class="font-bold">Log (${log.length})</h3>
+    </div>
+    <div id="logFeed">${renderLog(log)}</div>
+  </div>`)}`;
+}
+function renderLog(log){
+  if(!log.length) return '<p class="text-sm text-neutral-500">Nothing logged yet. Post the first photo.</p>';
+  const flag={'Incident':'bg-red-500/20 text-red-400','Problem':'bg-amber-500/15 text-amber-400','Note':'bg-ink-700 text-neutral-300','Win':'bg-emerald-500/15 text-emerald-400'};
+  return log.slice().reverse().map(e=>`
+    <div class="border border-ink-700 rounded-2xl overflow-hidden mb-3">
+      ${e.photo?`<img src="${e.photo}" class="w-full max-h-72 object-cover bg-ink-900" />`:''}
+      <div class="p-3">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="w-6 h-6 rounded-full bg-gradient-to-br from-brand-500 to-brand-600 grid place-items-center text-[10px] font-bold text-white">${initials(e.by)}</span>
+          <span class="text-[13px] font-semibold flex-1">${esc(e.by)}</span>
+          ${e.flag?`<span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${flag[e.flag]||''}">${e.flag}</span>`:''}
+          <button data-logdel="${e.id}" class="text-neutral-600 hover:text-red-400 text-sm">×</button>
+        </div>
+        ${e.text?`<p class="text-sm text-neutral-200">${esc(e.text)}</p>`:''}
+        <div class="text-[11px] text-neutral-500 mt-1.5">${e.time} · ${e.date}</div>
+      </div>
+    </div>`).join('');
+}
+function openLogModal(){
+  const flags=['Problem','Incident','Note','Win'];
+  openModal(`
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-xl font-bold">📷 Post to the Team Log</h3>
+        <button onclick="closeModal()" class="text-neutral-500 hover:text-white text-2xl leading-none">×</button>
+      </div>
+      <div class="space-y-3">
+        <div><label class="text-xs uppercase tracking-wider text-neutral-500 font-semibold">Photo</label>
+          <input id="logPhoto" type="file" accept="image/*" capture="environment" class="w-full mt-1.5 text-sm text-neutral-400 file:mr-3 file:rounded-xl file:border-0 file:bg-ink-700 file:text-neutral-200 file:px-3 file:py-2" />
+          <div id="logPhotoPrev"></div></div>
+        <div><label class="text-xs uppercase tracking-wider text-neutral-500 font-semibold">What's going on?</label>
+          <textarea id="logText" rows="3" placeholder="Describe the problem / incident…" class="w-full mt-1.5 bg-ink-800 border border-ink-600 rounded-2xl px-4 py-3 resize-none focus:border-brand-500 outline-none"></textarea></div>
+        <div><label class="text-xs uppercase tracking-wider text-neutral-500 font-semibold">Tag</label>
+          <div class="grid grid-cols-4 gap-2 mt-1.5" id="logFlag">
+            ${flags.map((f,i)=>`<button data-flag="${f}" class="flag-opt border border-ink-600 rounded-xl py-2 text-sm font-semibold ${i===0?'ring-2 ring-brand-500 bg-brand-500/10 text-brand-400':''}">${f}</button>`).join('')}
+          </div></div>
+        <p class="text-xs text-neutral-500">Posted by <b class="text-neutral-300">${esc(STAFF.name)}</b></p>
+        <button id="logSubmit" class="w-full bg-gradient-to-br from-brand-500 to-brand-600 text-white font-bold py-3 rounded-2xl active:scale-95 transition">Post to log</button>
+      </div>
+    </div>`);
+  let flag=flags[0], photo='';
+  $$('#logFlag .flag-opt').forEach(b=>b.addEventListener('click',()=>{ flag=b.dataset.flag;
+    $$('#logFlag .flag-opt').forEach(x=>x.className='flag-opt border border-ink-600 rounded-xl py-2 text-sm font-semibold');
+    b.className='flag-opt border border-ink-600 rounded-xl py-2 text-sm font-semibold ring-2 ring-brand-500 bg-brand-500/10 text-brand-400';
+  }));
+  $('#logPhoto').addEventListener('change',e=>{
+    const f=e.target.files[0]; if(!f) return;
+    const r=new FileReader(); r.onload=()=>{ photo=r.result; $('#logPhotoPrev').innerHTML=`<img src="${photo}" class="mt-2 rounded-xl max-h-48 w-full object-cover" />`; }; r.readAsDataURL(f);
+  });
+  $('#logSubmit').addEventListener('click',()=>{
+    const text=$('#logText').value.trim();
+    if(!photo && !text){ toast('Add a photo or a note','⚠️'); return; }
+    const log=store.get('teamlog',[]);
+    log.push({id:uid(),text,photo,flag,by:STAFF.name,time:nowTime(),date:nowDate()});
+    store.set('teamlog',log);
+    closeModal(); render('log'); toast('Posted to the Team Log','📸'); haptic(25);
+  });
+}
+
 /* ---------- HANDOVER ---------- */
 function viewHandover(){
   const draft = store.get('handoverDraft',{});
@@ -1120,8 +1240,31 @@ function renderHandovers(log){
 
 /* ---------- SOP LIBRARY (knowledge base) ---------- */
 function viewSop(){
+  const saved = store.get('saved_ideas',[]);
   return `
   ${sectionHead('⚙️','SOP Library','The staff knowledge base — rules, procedures and standards.')}
+
+  ${card(`<div class="p-5">
+    <div class="flex items-center gap-2 mb-1">
+      <span class="text-2xl">💡</span>
+      <h3 class="font-bold text-lg flex-1">Idea Lab</h3>
+      <span class="text-[10px] font-semibold text-brand-400 bg-brand-500/10 rounded-full px-2 py-1">${IDEAS.length} ideas</span>
+    </div>
+    <p class="text-sm text-neutral-400 mb-3">Press the button for a fresh idea to spruce up the gym — inspired by what the best gyms around the world are doing.</p>
+    <div id="ideaOut" class="bg-ink-800 border border-ink-700 rounded-2xl p-4 mb-3 min-h-[76px] flex items-center">
+      <p class="text-sm text-neutral-500">Tap "Give me an idea" to start…</p>
+    </div>
+    <div class="flex gap-2">
+      <button id="ideaGo" class="flex-1 bg-gradient-to-br from-brand-500 to-brand-600 text-white font-bold py-3 rounded-2xl active:scale-95 transition">✨ Give me an idea</button>
+      <button id="ideaSave" class="px-4 bg-ink-800 border border-ink-600 rounded-2xl font-semibold text-sm text-neutral-300 active:scale-95 transition hidden">＋ Save</button>
+    </div>
+    <p class="text-[11px] text-neutral-600 mt-3">Ideas come from a built-in best-practices bank. Live AI that scans gyms worldwide can be wired in when we connect the backend.</p>
+    <div id="savedIdeas" class="${saved.length?'':'hidden'} mt-4">
+      <div class="flex items-center justify-between mb-2"><h4 class="font-bold text-sm">⭐ Saved ideas (${saved.length})</h4><button id="clearIdeas" class="text-[11px] text-neutral-500 hover:text-neutral-300">Clear</button></div>
+      <div class="space-y-2">${saved.map(s=>`<div class="flex gap-2 text-[14px] bg-ink-800 border border-ink-700 rounded-xl px-3 py-2"><span class="text-[10px] font-bold text-brand-400 bg-brand-500/10 rounded px-1.5 py-0.5 h-fit mt-0.5 shrink-0">${esc(s.c)}</span><span class="flex-1">${esc(s.t)}</span></div>`).join('')}</div>
+    </div>
+  </div>`,'mb-4')}
+
   <div class="space-y-2">
     ${KB.map((k,i)=>`
       <details class="acc bg-ink-850 border border-ink-700 rounded-3xl overflow-hidden shadow-card" ${i===0?'open':''}>
@@ -1145,7 +1288,7 @@ function viewSop(){
 const VIEWS = {
   dashboard:viewDashboard, checklist:viewChecklist, cleaning:viewCleaning,
   equipment:viewEquipment, reception:viewReception, memberships:viewMemberships,
-  prices:viewPrices, guide:viewGuide, issues:viewIssues, handover:viewHandover, sop:viewSop
+  prices:viewPrices, guide:viewGuide, issues:viewIssues, log:viewLog, handover:viewHandover, sop:viewSop
 };
 
 function render(view){
@@ -1215,6 +1358,15 @@ function wireView(view){
 
   if(view==='prices'){ wirePrices(); }
 
+  if(view==='log'){
+    $('#newLog')?.addEventListener('click',openLogModal);
+    $$('[data-logdel]').forEach(b=>b.addEventListener('click',()=>{
+      if(!bossMode && !confirm('Delete this post?')) return;
+      const list=store.get('teamlog',[]).filter(e=>e.id!==b.dataset.logdel);
+      store.set('teamlog',list); render('log');
+    }));
+  }
+
   if(view==='equipment'){
     $('#reportBroken')?.addEventListener('click',openEquipModal);
     wireEquipList();
@@ -1241,6 +1393,28 @@ function wireView(view){
     }));
     $('#submitHandover')?.addEventListener('click',submitHandover);
   }
+
+  if(view==='sop'){ wireIdeaLab(); }
+}
+
+/* ---------- Idea Lab ---------- */
+let currentIdea=null, lastIdeaIdx=-1;
+function wireIdeaLab(){
+  const out=$('#ideaOut'), saveBtn=$('#ideaSave');
+  $('#ideaGo')?.addEventListener('click',()=>{
+    let i; do { i=Math.floor(Math.random()*IDEAS.length); } while(i===lastIdeaIdx && IDEAS.length>1);
+    lastIdeaIdx=i; currentIdea=IDEAS[i];
+    out.innerHTML=`<div><span class="text-[10px] font-bold text-brand-400 bg-brand-500/10 rounded-full px-2 py-0.5">${esc(currentIdea.c)}</span><p class="text-[15px] font-medium mt-2 leading-snug">${esc(currentIdea.t)}</p></div>`;
+    out.classList.add('animate-pop'); setTimeout(()=>out.classList.remove('animate-pop'),300);
+    saveBtn.classList.remove('hidden'); $('#ideaGo').innerHTML='🔄 Another idea'; haptic();
+  });
+  saveBtn?.addEventListener('click',()=>{
+    if(!currentIdea) return;
+    const saved=store.get('saved_ideas',[]);
+    if(!saved.some(s=>s.t===currentIdea.t)){ saved.push(currentIdea); store.set('saved_ideas',saved); toast('Idea saved','⭐'); render('sop'); }
+    else toast('Already saved','⭐');
+  });
+  $('#clearIdeas')?.addEventListener('click',()=>{ if(confirm('Clear all saved ideas?')){ store.del('saved_ideas'); render('sop'); } });
 }
 
 function wireShiftChips(){
@@ -1516,34 +1690,45 @@ $('#whoBtn').addEventListener('click',()=>{
         <h3 class="text-xl font-bold">Switch staff</h3>
         <button onclick="closeModal()" class="text-neutral-500 hover:text-white text-2xl leading-none">×</button>
       </div>
-      <p class="text-sm text-neutral-400 mb-4">Currently on shift as <b class="text-brand-400">${STAFF.name}</b>.</p>
-      <div class="space-y-2">
-        ${ROSTER.map(n=>`<button data-switch="${n}" class="w-full text-left bg-ink-800 hover:bg-ink-700 border border-ink-700 rounded-2xl px-4 py-3 font-semibold flex items-center gap-3">
-          <span class="w-8 h-8 rounded-full bg-gradient-to-br from-brand-500 to-brand-600 grid place-items-center text-xs font-bold text-white">${initials(n)}</span>${n}</button>`).join('')}
-      </div>
+      <p class="text-sm text-neutral-400 mb-4">Currently on shift as <b class="text-brand-400">${esc(STAFF.name)}</b>.</p>
+      <input id="switchName" type="text" placeholder="Type a name to switch" class="w-full bg-ink-800 border border-ink-600 rounded-2xl px-4 py-3 text-base mb-2 focus:border-brand-500 outline-none" />
+      <button id="switchGo" class="w-full bg-gradient-to-br from-brand-500 to-brand-600 text-white font-bold py-3 rounded-2xl active:scale-95 transition mb-4">Switch</button>
+      ${ROSTER.length?`<p class="text-[11px] text-neutral-600 mb-2">Recent:</p><div class="space-y-2">
+        ${ROSTER.slice().reverse().slice(0,8).map(n=>`<button data-switch="${esc(n)}" class="w-full text-left bg-ink-800 hover:bg-ink-700 border border-ink-700 rounded-2xl px-4 py-3 font-semibold flex items-center gap-3">
+          <span class="w-8 h-8 rounded-full bg-gradient-to-br from-brand-500 to-brand-600 grid place-items-center text-xs font-bold text-white">${initials(n)}</span>${esc(n)}</button>`).join('')}
+      </div>`:''}
       <button onclick="closeModal()" class="mt-5 w-full bg-ink-700 text-neutral-200 font-semibold py-3 rounded-2xl">Cancel</button>
     </div>`);
-  $$('[data-switch]').forEach(b=>b.addEventListener('click',()=>{
-    STAFF={name:b.dataset.switch}; store.set('staff',STAFF);
+  const doSwitch=(name)=>{
+    name=(name||'').trim(); if(!name) return;
+    STAFF={name}; store.set('staff',STAFF); rememberName(name);
     $('#whoName').textContent=STAFF.name; $('#avatar').textContent=initials(STAFF.name);
     const os=store.get('onshift',[]); if(!os.includes(STAFF.name)){os.push(STAFF.name);store.set('onshift',os);}
     closeModal(); render(currentView); toast('Now on shift: '+STAFF.name,'🦅');
-  }));
+  };
+  $('#switchGo').addEventListener('click',()=>doSwitch($('#switchName').value));
+  $('#switchName').addEventListener('keydown',e=>{ if(e.key==='Enter') doSwitch($('#switchName').value); });
+  $$('[data-switch]').forEach(b=>b.addEventListener('click',()=>doSwitch(b.dataset.switch)));
 });
 
 /* ============================================================
    GATE
    ============================================================ */
 function initGate(){
-  const sel=$('#staffSelect');
-  sel.innerHTML = `<option value="">Select staff…</option>` + ROSTER.map(n=>`<option>${n}</option>`).join('');
-  $('#clockIn').addEventListener('click',()=>{
-    const name = ($('#staffCustom').value.trim() || sel.value).trim();
-    if(!name){ $('#staffCustom').classList.add('ring-2','ring-red-500'); toast('Pick or type your name','⚠️'); return; }
-    STAFF={name}; store.set('staff',STAFF);
-    if(!ROSTER.includes(name)){ ROSTER.push(name); store.set('roster',ROSTER); }
-    bootApp();
-  });
+  const rn=$('#recentNames');
+  if(ROSTER.length){
+    rn.innerHTML = `<span class="w-full text-[11px] text-neutral-600 mb-0.5">Been here before? Tap your name:</span>` +
+      ROSTER.slice().reverse().slice(0,8).map(n=>`<button class="recent bg-ink-800 border border-ink-600 rounded-full px-3 py-1.5 text-sm active:scale-95 transition" data-name="${esc(n)}">${esc(n)}</button>`).join('');
+    $$('#recentNames .recent').forEach(b=>b.addEventListener('click',()=>{ $('#staffName').value=b.dataset.name; go(); }));
+  }
+  function go(){
+    const name=$('#staffName').value.trim();
+    if(!name){ $('#staffName').classList.add('ring-2','ring-red-500'); toast('Type your name to start','⚠️'); return; }
+    STAFF={name}; store.set('staff',STAFF); rememberName(name); bootApp();
+  }
+  $('#clockIn').addEventListener('click',go);
+  $('#staffName').addEventListener('keydown',e=>{ if(e.key==='Enter') go(); });
+  setTimeout(()=>$('#staffName').focus(),60);
 }
 
 /* ============================================================
