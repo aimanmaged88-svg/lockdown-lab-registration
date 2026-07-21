@@ -10,6 +10,7 @@
 <link rel="apple-touch-icon" href="icon-192.png" />
 <link rel="manifest" href="manifest.json" />
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   tailwind.config = {
     darkMode: 'class',
@@ -98,7 +99,7 @@
   <div class="max-w-5xl mx-auto px-4 py-3 flex items-center gap-3">
     <img src="logo.png" alt="Eagles Gym" class="h-6 w-auto" style="height:24px;width:auto;max-width:60vw" />
     <div class="leading-none border-l border-ink-600 pl-3">
-      <div class="text-[10px] text-brand-500 font-semibold tracking-[0.2em]">STAFF HUB</div>
+      <div class="text-[10px] text-brand-500 font-semibold tracking-[0.2em] flex items-center gap-1.5">STAFF HUB <span id="syncDot" title="Offline — local only" class="w-1.5 h-1.5 rounded-full bg-neutral-600"></span></div>
     </div>
     <div class="ml-auto flex items-center gap-2 md:gap-3">
       <div class="text-right leading-tight">
@@ -139,8 +140,8 @@ const $  = (s,r=document)=>r.querySelector(s);
 const $$ = (s,r=document)=>[...r.querySelectorAll(s)];
 const store = {
   get:(k,d)=>{try{return JSON.parse(localStorage.getItem('eg_'+k))??d}catch(e){return d}},
-  set:(k,v)=>localStorage.setItem('eg_'+k,JSON.stringify(v)),
-  del:(k)=>localStorage.removeItem('eg_'+k)
+  set:(k,v)=>{ localStorage.setItem('eg_'+k,JSON.stringify(v)); syncPush(k); },
+  del:(k)=>{ localStorage.removeItem('eg_'+k); syncDel(k); }
 };
 const todayKey = ()=> new Date().toISOString().slice(0,10);
 const nowTime  = ()=> new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'});
@@ -2319,6 +2320,94 @@ function tickClock(){
   checkClosing();
 }
 
+/* ============================================================
+   LIVE SYNC (Supabase) — one shared gym dataset, realtime
+   Shared-access v1: staff share data via the public app key.
+   ============================================================ */
+const SB_URL='https://ymuwuhvqqftgpxwhzoub.supabase.co';
+const SB_KEY='sb_publishable_-j-P1TcLeGZ6lGspru2YwA_3RxAlucJ';
+var SB=null, applyingRemote=false;
+const SYNC_KEYS=new Set(['calls','teamlog','issues','equipReports','saved_ideas',
+  'onshift','roster','reminders','reminders_on','closingTime','prices',
+  'checklists','cleaning','equipment_list']);
+const ID_KEYS=new Set(['calls','teamlog','issues','equipReports','saved_ideas']); // array-of-{id}
+const STRSET_KEYS=new Set(['onshift','roster']);                                   // array-of-string (union)
+function isSyncKey(k){ return SYNC_KEYS.has(k) || (typeof k==='string' && k.startsWith('done_')); }
+function mergeById(local, remote){
+  const rids=new Set((remote||[]).map(x=>x&&x.id).filter(Boolean));
+  const extra=(local||[]).filter(x=>x&&x.id&&!rids.has(x.id));
+  return [...(remote||[]), ...extra];
+}
+function mergeVal(k, cur, remote){
+  if(remote==null) return null;
+  if(ID_KEYS.has(k)) return mergeById(cur||[], remote);
+  if(STRSET_KEYS.has(k)) return [...new Set([...(cur||[]),...(remote||[])])];
+  if(typeof k==='string' && k.startsWith('done_')) return Object.assign({}, cur||{}, remote);
+  return remote;
+}
+const _pushT={};
+function syncPush(k){
+  if(applyingRemote || !SB || !isSyncKey(k)) return;
+  clearTimeout(_pushT[k]);
+  _pushT[k]=setTimeout(()=>{ try{ SB.from('eg_kv').upsert({k, v:store.get(k,null), ts:Date.now()}).then(()=>{},()=>{}); }catch(e){} }, 350);
+}
+function syncDel(k){
+  if(applyingRemote || !SB || !isSyncKey(k)) return;
+  try{ SB.from('eg_kv').delete().eq('k',k).then(()=>{},()=>{}); }catch(e){}
+}
+function hydrateGlobals(){
+  CHECKLISTS=store.get('checklists',DEFAULT_CHECKLISTS);
+  CLEANING=store.get('cleaning',DEFAULT_CLEANING);
+  EQUIPMENT=store.get('equipment_list',DEFAULT_EQUIPMENT);
+  REMINDERS=store.get('reminders',DEFAULT_REMINDERS);
+  PRICES=store.get('prices',DEFAULT_PRICES);
+  ROSTER=store.get('roster',[]);
+}
+function writeLocalRaw(k,v){ if(v==null) localStorage.removeItem('eg_'+k); else localStorage.setItem('eg_'+k,JSON.stringify(v)); }
+function applyRemote(k, remoteVal){
+  const cur=store.get(k,null);
+  const next=mergeVal(k, cur, remoteVal);
+  if(JSON.stringify(cur)===JSON.stringify(next)) return;
+  applyingRemote=true; writeLocalRaw(k,next); applyingRemote=false;
+  hydrateGlobals();
+  if(typeof updateFollowBell==='function') updateFollowBell(dueFollowups().length);
+  const ae=document.activeElement;
+  const busy=ae && /^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName);
+  const modalOpen=$('#modalHost') && !$('#modalHost').classList.contains('hidden');
+  if(STAFF && !busy && !modalOpen && typeof render==='function') render(currentView);
+}
+function updateSyncDot(on){
+  const d=$('#syncDot'); if(!d) return;
+  d.title = on? 'Live sync on' : 'Offline — local only';
+  d.classList.toggle('bg-emerald-500', !!on);
+  d.classList.toggle('bg-neutral-600', !on);
+}
+async function syncBoot(){
+  if(!window.supabase || !window.supabase.createClient) return; // offline / CDN blocked
+  try{
+    SB=window.supabase.createClient(SB_URL, SB_KEY, {auth:{persistSession:false}});
+    const {data,error}=await SB.from('eg_kv').select('k,v');
+    if(!error && Array.isArray(data)){
+      const cloud=new Set();
+      applyingRemote=true;
+      data.forEach(row=>{ cloud.add(row.k); writeLocalRaw(row.k, mergeVal(row.k, store.get(row.k,null), row.v)); });
+      applyingRemote=false;
+      hydrateGlobals();
+      if(STAFF && typeof render==='function'){ if(typeof updateFollowBell==='function') updateFollowBell(dueFollowups().length); render(currentView); }
+      // seed cloud with local keys it doesn't have yet (first device online)
+      const seed=[...SYNC_KEYS].filter(k=>!cloud.has(k) && store.get(k,null)!=null);
+      const dk='done_'+todayKey(); if(!cloud.has(dk) && store.get(dk,null)!=null) seed.push(dk);
+      seed.forEach(k=>{ try{ SB.from('eg_kv').upsert({k, v:store.get(k,null), ts:Date.now()}).then(()=>{},()=>{}); }catch(e){} });
+    }
+    SB.channel('eg_kv_ch').on('postgres_changes',{event:'*',schema:'public',table:'eg_kv'},payload=>{
+      const row=(payload.new&&payload.new.k)?payload.new:payload.old;
+      if(!row||!row.k) return;
+      applyRemote(row.k, payload.eventType==='DELETE'?null:row.v);
+    }).subscribe();
+    updateSyncDot(true);
+  }catch(e){ console.warn('Eagles sync off:',e); updateSyncDot(false); }
+}
+
 function bootApp(){
   // header identity
   $('#whoName').textContent = STAFF.name;
@@ -2337,6 +2426,7 @@ function bootApp(){
   tickClock(); setInterval(tickClock,1000*15);
   checkFollowups(); setInterval(checkFollowups, 60*1000);
   $('#gate').style.display='none';
+  syncBoot(); // connect live sync (no-op if offline)
 }
 
 /* who button -> switch staff */

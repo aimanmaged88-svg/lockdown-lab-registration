@@ -30,10 +30,20 @@ Clean black / orange / white gym theme, dark mode, rounded cards, large touch
 targets, smooth animations. Installable to the home screen (PWA) and works
 offline via `sw.js`.
 
-## Data
-All state lives in `localStorage` on the device (`eg_*` keys). **Future-ready
-for Supabase** — swap the `store` helper for Supabase auth + tables to sync
-staff accounts across devices.
+## Data & live sync
+Local state lives in `localStorage` (`eg_*` keys) and is the offline cache.
+**Live sync is on** via Supabase: one shared `public.eg_kv(k, v jsonb, ts)`
+key/value table in the `lockdown-lab` project (`ymuwuhvqqftgpxwhzoub`), realtime
+enabled. Every device hydrates from the table on load, pushes writes (debounced),
+and subscribes to changes — so calls, the calendar, Team Log, issues, checklists
+and settings sync across all staff phones in real time. Id-bearing collections
+(calls/teamlog/issues/reports/ideas) merge by id and name lists (onshift/roster)
+union, to avoid clobbering concurrent adds.
+
+**v1 access model:** shared — anyone with the app (public anon key) reads/writes
+the one gym dataset (RLS policies are open). Next step: Supabase Auth so only
+logged-in staff can access (the call log holds customer PII). Closed-app push
+notifications for follow-ups are also a backend follow-up.
 
 ## Files
 - `index.html` — the entire app
