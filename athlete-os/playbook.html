@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Athlete OS — Pilot Playbook</title>
+<meta name="description" content="A coach's field guide to piloting Athlete OS — who to recruit, the 4-week plan, keeping athletes logging, what to measure, and how to grow it.">
+<meta name="robots" content="noindex">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0C0C0E">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#F6F3ED">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%A1%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --ground:#F6F3ED; --surface:#FFFFFF; --surface-2:#FBF8F2;
+    --ink:#1A1512; --muted:#6E645A; --faint:#948A7E;
+    --line:#E7DFD1; --line-strong:#D9CFBC;
+    --accent:#FF7A00; --accent-2:#FF9A2E; --accent-ink:#C25400;
+    --accent-soft:rgba(255,122,0,.10); --accent-glow:rgba(255,122,0,.28);
+    --good:#2E8B57; --good-soft:rgba(46,139,87,.10);
+    --warn:#B4690E;
+    --shadow:0 1px 2px rgba(26,21,18,.04),0 12px 30px -18px rgba(26,21,18,.22);
+    --sans:system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --mono:ui-monospace,"SF Mono","Roboto Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --ground:#0C0C0E; --surface:#161517; --surface-2:#1C1B1D;
+      --ink:#F2EEE7; --muted:#A79F95; --faint:#7C746A;
+      --line:#272528; --line-strong:#343135;
+      --accent:#FF7A00; --accent-2:#FFA23E; --accent-ink:#FF9A3D;
+      --accent-soft:rgba(255,122,0,.13); --accent-glow:rgba(255,122,0,.36);
+      --good:#54C08A; --good-soft:rgba(84,192,138,.12);
+      --warn:#E4A04B;
+      --shadow:0 1px 2px rgba(0,0,0,.4),0 18px 40px -22px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="light"]{
+    --ground:#F6F3ED; --surface:#FFFFFF; --surface-2:#FBF8F2;
+    --ink:#1A1512; --muted:#6E645A; --faint:#948A7E;
+    --line:#E7DFD1; --line-strong:#D9CFBC;
+    --accent:#FF7A00; --accent-2:#FF9A2E; --accent-ink:#C25400;
+    --accent-soft:rgba(255,122,0,.10); --accent-glow:rgba(255,122,0,.28);
+    --good:#2E8B57; --good-soft:rgba(46,139,87,.10); --warn:#B4690E;
+    --shadow:0 1px 2px rgba(26,21,18,.04),0 12px 30px -18px rgba(26,21,18,.22);
+  }
+  :root[data-theme="dark"]{
+    --ground:#0C0C0E; --surface:#161517; --surface-2:#1C1B1D;
+    --ink:#F2EEE7; --muted:#A79F95; --faint:#7C746A;
+    --line:#272528; --line-strong:#343135;
+    --accent:#FF7A00; --accent-2:#FFA23E; --accent-ink:#FF9A3D;
+    --accent-soft:rgba(255,122,0,.13); --accent-glow:rgba(255,122,0,.36);
+    --good:#54C08A; --good-soft:rgba(84,192,138,.12); --warn:#E4A04B;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 18px 40px -22px rgba(0,0,0,.7);
+  }
+
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--sans);
+    line-height:1.62;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+  .wrap{max-width:760px;margin:0 auto;padding:0 20px 96px}
+
+  /* ---------- eyebrow / labels ---------- */
+  .eyebrow{font-family:var(--mono);font-size:11px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--accent-ink);font-weight:600}
+  .kicker{font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--faint)}
+
+  /* ---------- hero ---------- */
+  .hero{position:relative;padding:64px 0 40px;overflow:hidden}
+  .hero::before{content:"";position:absolute;top:-140px;left:50%;transform:translateX(-50%);
+    width:620px;height:360px;background:radial-gradient(ellipse at center,var(--accent-glow),transparent 68%);
+    opacity:.9;pointer-events:none;filter:blur(6px)}
+  .hero-inner{position:relative}
+  .brandrow{display:flex;align-items:center;gap:10px;margin-bottom:26px}
+  .spark{width:26px;height:26px;border-radius:7px;background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    display:grid;place-items:center;color:#0c0c0e;font-weight:900;font-size:15px;box-shadow:0 6px 16px -6px var(--accent-glow)}
+  h1{font-size:clamp(34px,7vw,52px);line-height:1.02;letter-spacing:-.02em;font-weight:850;
+    margin:14px 0 0;text-wrap:balance}
+  .h1-accent{color:var(--accent-ink)}
+  .lede{font-size:clamp(16px,2.4vw,18px);color:var(--muted);margin:20px 0 0;max-width:56ch}
+  .goalcard{margin-top:30px;background:var(--surface);border:1px solid var(--line);
+    border-left:3px solid var(--accent);border-radius:14px;padding:22px 22px 20px;box-shadow:var(--shadow)}
+  .goalcard .kicker{display:block;margin-bottom:10px}
+  .goalcard p{margin:0;font-size:17px;line-height:1.55}
+  .goalcard b{color:var(--ink);font-weight:750}
+  .meta{margin-top:22px;font-family:var(--mono);font-size:12px;color:var(--faint);letter-spacing:.04em}
+
+  /* ---------- section ---------- */
+  section{padding:44px 0 4px;border-top:1px solid var(--line);margin-top:44px}
+  .sec-head{display:flex;gap:16px;align-items:baseline;margin-bottom:8px}
+  .sec-num{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--accent-ink);
+    letter-spacing:.1em;flex:0 0 auto;padding-top:4px}
+  h2{font-size:clamp(23px,4vw,30px);line-height:1.1;letter-spacing:-.015em;font-weight:800;margin:0;text-wrap:balance}
+  .sec-sub{color:var(--muted);margin:12px 0 24px;font-size:15.5px}
+  p{margin:0 0 16px}
+  .body-em{color:var(--ink);font-weight:650}
+  a{color:var(--accent-ink)}
+
+  /* ---------- generic card ---------- */
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px 22px;box-shadow:var(--shadow)}
+  .stack{display:flex;flex-direction:column;gap:14px}
+
+  /* ---------- roster (archetypes) ---------- */
+  .roster{display:flex;flex-direction:column;gap:12px;margin:6px 0 20px}
+  .role{display:flex;gap:14px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);
+    border-radius:13px;padding:15px 17px;box-shadow:var(--shadow)}
+  .role .tag{font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--accent-ink);background:var(--accent-soft);border:1px solid var(--line);border-radius:99px;
+    padding:5px 9px;white-space:nowrap;flex:0 0 auto;margin-top:2px}
+  .role .rx{font-size:15px}
+  .role .rx b{font-weight:750}
+  .role .rx span{color:var(--muted)}
+
+  /* ---------- callout / rules ---------- */
+  .rule{display:flex;gap:12px;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--line)}
+  .rule:last-child{border-bottom:0}
+  .rule .rn{font-family:var(--mono);font-size:12px;color:var(--accent-ink);font-weight:600;flex:0 0 auto;margin-top:3px;width:20px}
+  .rule .rt{font-size:15px}
+  .rule .rt b{font-weight:750}
+  .rule .rt span{color:var(--muted)}
+
+  /* ---------- timeline (4-week plan) ---------- */
+  .timeline{position:relative;margin:8px 0 8px;padding-left:26px}
+  .timeline::before{content:"";position:absolute;left:6px;top:6px;bottom:6px;width:2px;
+    background:linear-gradient(180deg,var(--accent),var(--line))}
+  .tl{position:relative;margin-bottom:24px}
+  .tl:last-child{margin-bottom:4px}
+  .tl::before{content:"";position:absolute;left:-26px;top:5px;width:14px;height:14px;border-radius:50%;
+    background:var(--surface);border:2.5px solid var(--accent);box-shadow:0 0 0 4px var(--ground)}
+  .tl .when{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent-ink);font-weight:600}
+  .tl .tt{font-size:17px;font-weight:750;margin:3px 0 6px}
+  .tl .td{color:var(--muted);font-size:15px;margin:0}
+
+  /* ---------- checklist ---------- */
+  .checklist{list-style:none;margin:14px 0 6px;padding:0;display:flex;flex-direction:column;gap:11px}
+  .checklist li{display:flex;gap:12px;align-items:flex-start;font-size:15px}
+  .checklist .box{flex:0 0 auto;width:20px;height:20px;border-radius:6px;border:2px solid var(--line-strong);
+    margin-top:2px;position:relative;background:var(--surface-2)}
+  .checklist .box::after{content:"";position:absolute;left:6px;top:2px;width:5px;height:10px;
+    border:solid var(--accent);border-width:0 2.5px 2.5px 0;transform:rotate(45deg);opacity:.32}
+  .checklist li b{font-weight:750}
+  .checklist li span{color:var(--muted)}
+
+  /* ---------- coach scripts ---------- */
+  .scripts{display:flex;flex-direction:column;gap:14px;margin:8px 0 4px}
+  .script{position:relative;background:var(--surface);border:1px solid var(--line);
+    border-left:3px solid var(--accent);border-radius:13px;padding:16px 18px 17px}
+  .script .lbl{display:flex;align-items:center;gap:8px;font-family:var(--mono);font-size:10.5px;
+    letter-spacing:.14em;text-transform:uppercase;color:var(--accent-ink);font-weight:600;margin-bottom:9px}
+  .script .lbl::before{content:"“";font-size:26px;line-height:0;position:relative;top:8px;color:var(--accent);opacity:.55}
+  .script p{margin:0;font-size:15.5px;line-height:1.55;color:var(--ink)}
+
+  /* ---------- scorecard ---------- */
+  .score{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:6px 0 18px}
+  .metric{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:16px 17px;box-shadow:var(--shadow)}
+  .metric .mlabel{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  .metric .mval{font-size:27px;font-weight:850;letter-spacing:-.01em;margin:5px 0 2px;color:var(--accent-ink);
+    font-variant-numeric:tabular-nums}
+  .metric .mnote{font-size:13px;color:var(--muted);line-height:1.4}
+  .metric.wide{grid-column:1/-1}
+
+  /* ---------- ladder ---------- */
+  .ladder{counter-reset:rung;list-style:none;margin:8px 0 4px;padding:0;display:flex;flex-direction:column;gap:12px}
+  .ladder li{position:relative;padding:15px 17px 15px 54px;background:var(--surface);border:1px solid var(--line);
+    border-radius:13px;box-shadow:var(--shadow);font-size:15px}
+  .ladder li::before{counter-increment:rung;content:counter(rung);position:absolute;left:15px;top:14px;
+    width:26px;height:26px;border-radius:8px;background:var(--accent-soft);border:1px solid var(--line);
+    color:var(--accent-ink);font-family:var(--mono);font-weight:700;font-size:13px;display:grid;place-items:center}
+  .ladder li b{font-weight:750}
+  .ladder li span{color:var(--muted)}
+
+  /* ---------- mistakes ---------- */
+  .dont{list-style:none;margin:6px 0 4px;padding:0;display:flex;flex-direction:column;gap:10px}
+  .dont li{display:flex;gap:12px;align-items:flex-start;font-size:15px;color:var(--ink)}
+  .dont li::before{content:"✕";flex:0 0 auto;color:var(--accent);font-weight:800;font-size:14px;margin-top:2px;
+    width:20px;height:20px;border-radius:6px;background:var(--accent-soft);display:grid;place-items:center}
+  .dont li b{font-weight:750}
+
+  /* ---------- tags ---------- */
+  .pin{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--accent-ink);background:var(--accent-soft);border:1px solid var(--line);
+    border-radius:6px;padding:3px 7px;vertical-align:middle;margin-left:6px}
+
+  /* ---------- do this first ---------- */
+  .finish{margin-top:52px;background:linear-gradient(160deg,var(--surface),var(--surface-2));
+    border:1px solid var(--line-strong);border-radius:18px;padding:30px 26px 28px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .finish::before{content:"";position:absolute;top:-80px;right:-60px;width:260px;height:220px;
+    background:radial-gradient(ellipse at center,var(--accent-glow),transparent 70%);opacity:.7}
+  .finish .eyebrow{position:relative}
+  .finish h2{margin:12px 0 20px;position:relative}
+  .steps{counter-reset:step;list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:16px;position:relative}
+  .steps li{position:relative;padding-left:44px;font-size:15.5px}
+  .steps li::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;
+    width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--accent),var(--accent-2));
+    color:#0c0c0e;font-weight:850;font-size:15px;display:grid;place-items:center;box-shadow:0 6px 14px -6px var(--accent-glow)}
+  .steps li b{font-weight:750}
+  .steps li span{color:var(--muted)}
+
+  .footer{margin-top:40px;text-align:center;color:var(--faint);font-family:var(--mono);font-size:11.5px;letter-spacing:.06em}
+  .footer .creed{color:var(--accent-ink);font-size:13px;letter-spacing:.02em;margin-bottom:6px;font-weight:600}
+
+  @media (max-width:520px){
+    .score{grid-template-columns:1fr}
+    .role{flex-direction:column;gap:8px}
+    .sec-head{gap:10px}
+  }
+  @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="brandrow">
+        <span class="spark">⚡</span>
+        <span class="eyebrow">Athlete OS · Pilot Playbook</span>
+      </div>
+      <h1>Run your first <span class="h1-accent">real cohort</span> — and know if it worked.</h1>
+      <p class="lede">Not a beta test. A hand-picked squad of athletes, logging honestly, with a coach who acts on what he sees. Here's exactly how to run it this week.</p>
+
+      <div class="goalcard">
+        <span class="kicker">The one-line goal</span>
+        <p>Get <b>5–6 hand-picked athletes checking in honestly 4+ days a week for four straight weeks</b> — and walk away with at least one athlete who can name a real thing he did differently because the app was watching. That's the whole win. Not signups. Not perfect streaks. <b>Honest logging that survives a bad week, and a coach who acts on it.</b></p>
+      </div>
+      <div class="meta">For Aiman · UNC — Sydney</div>
+    </div>
+  </header>
+
+  <!-- 01 WHO -->
+  <section>
+    <div class="sec-head"><span class="sec-num">01</span><h2>Who to get on board</h2></div>
+    <p class="sec-sub">You're not recruiting talent. You're recruiting <b class="body-em">phone-openers</b> — people who'll log honestly every day. A gifted athlete who won't check in gives you zero. A mid-tier grinder who logs daily gives you everything.</p>
+
+    <p>Your <b class="body-em">ideal first athlete is your MMA/BJJ mate.</b> Already lined up, emotionally invested, and doing the exact sport Athlete OS serves best — soreness, RPE, training load, the "you vs you" creed. His emotionality is a <em>feature</em>: he'll actually use the note field. He becomes your reference case — his streak, his load card, his AI-insight moment are the proof you show everyone else.</p>
+
+    <div class="roster">
+      <div class="role"><span class="tag">Anchor ×1</span><div class="rx"><b>Your emotional MMA/BJJ mate.</b> <span>Onboard first, in person. He's your runbook and your first story.</span></div></div>
+      <div class="role"><span class="tag">Core ×4</span><div class="rx"><b>Your own basketball players.</b> <span>The ones who do extra reps unprompted and ask "what should I work on?" You already see their on-court performance — that's what makes "the gap shows up on the court" real and enforceable. This group proves retention.</span></div></div>
+      <div class="role"><span class="tag">Wildcard ×1</span><div class="rx"><b>One boxing / BJJ gym contact.</b> <span>Stress-tests that the sport packs reshape drills and language per athlete — your white-label proof later. Max two off-sport athletes; every one you can't watch train weakens the loop.</span></div></div>
+    </div>
+
+    <div class="card">
+      <span class="kicker" style="display:block;margin-bottom:12px">Screen before you invite — say YES to 2 of 3</span>
+      <div class="rule"><span class="rn">1</span><div class="rt"><b>Trains on their own</b> <span>between your sessions.</span></div></div>
+      <div class="rule"><span class="rn">2</span><div class="rt"><b>Replies to your texts</b> <span>within a day.</span></div></div>
+      <div class="rule"><span class="rn">3</span><div class="rt"><b>Has asked you "what should I work on?"</b> <span>— already wants feedback.</span></div></div>
+    </div>
+
+    <p style="margin-top:22px"><b class="body-em">Cohort size: 6, hard ceiling of 8.</b> Fewer than 4 and you can't spot patterns or build squad energy. More than 8 and your "Needs attention today" list becomes a chore you stop checking — and the pilot dies. Source them face-to-face or by <b>personal voice note. Never a group blast.</b> The personal ask is what converts.</p>
+
+    <div class="script" style="margin-top:8px">
+      <div class="lbl">The exact ask — voice note or in person</div>
+      <p>"I'm building something called Athlete OS — accountability app, it's you against you, tracks how you're actually training. I'm only letting a handful of people in first, and I want you to be a <b>founding athlete</b>. You in?"</p>
+    </div>
+    <p style="margin-top:16px;font-size:14.5px;color:var(--muted)">Founding, chosen, hand-picked — never <em>"want to test my beta?"</em> That framing is the difference between daily effort and guinea-pig energy.</p>
+  </section>
+
+  <!-- 02 PLAN -->
+  <section>
+    <div class="sec-head"><span class="sec-num">02</span><h2>The 4-week plan</h2></div>
+    <p class="sec-sub"><b class="body-em">Onboard in a staggered wave, not all at once.</b> Anchor first → watch 3–4 days, fix the first friction → then the core four → then the wildcard. Each new athlete joins an app that already has a live streak and squad activity, not an empty room.</p>
+
+    <div class="card" style="margin-bottom:26px">
+      <span class="kicker" style="display:block;margin-bottom:4px">Week 0 · The day-0 handover ritual</span>
+      <p style="margin:8px 0 4px;font-size:15px"><b class="body-em">15 minutes, phone in HIS hand.</b> Don't text the link and hope — sit next to him. Installing <em>for</em> him is the single highest-leverage thing you do all week. iPhone Add-to-Home-Screen and the notification prompt are where solo installs die. <b>Not in the room = didn't happen.</b></p>
+      <ul class="checklist">
+        <li><span class="box"></span><div>Invite link open in <b>his</b> phone browser</div></li>
+        <li><span class="box"></span><div>Share → <b>Add to Home Screen</b> — icon visible on his home screen</div></li>
+        <li><span class="box"></span><div><b>Notifications Allowed</b> — tested, buzz confirmed</div></li>
+        <li><span class="box"></span><div><b>First check-in done together</b> — let the celebration fire (flash, XP fly-up, haptic). Say nothing. Let the dopamine land.</div></li>
+        <li><span class="box"></span><div><b>Coach message sent within 2 hrs</b> — so his next notification is YOU, not the system</div></li>
+        <li><span class="box"></span><div>Day-5 date written down — so you know exactly when to judge activation</div></li>
+      </ul>
+      <p style="margin:16px 0 0;font-size:14.5px;color:var(--muted)">Coach the first check-in to be <b class="body-em">honest and slightly ugly</b>. If he's wrecked — soreness high, energy low. It proves the celebration rewards showing up, not good numbers. Say it to his face: <em>"Inflate this and the gap shows up on the mat — and I see your performance too."</em></p>
+    </div>
+
+    <span class="kicker" style="display:block;margin-bottom:16px">Weeks 1–4 · The fixed rhythm — put both touchpoints in your own calendar</span>
+    <div class="timeline">
+      <div class="tl"><div class="when">Every Monday</div><div class="tt">The reset</div><p class="td">One message naming the week's focus, tied to his sport.</p></div>
+      <div class="tl"><div class="when">Every Friday</div><div class="tt">Load review</div><p class="td">Open his weekly Training Load card. Send ONE observation that proves you read it — a spike, a drop-off, a smart back-off he made.</p></div>
+      <div class="tl"><div class="when">Daily · 2 min</div><div class="tt">Triage scan</div><p class="td">Open the dashboard, scan "Needs attention today," hand-reply to any check-in with a note, send one human message per flag.</p></div>
+      <div class="tl"><div class="when">After 3rd check-in</div><div class="tt">Teach the loop</div><p class="td">Read his AI insight aloud and message him about it: honest log → AI spots something → coach acts → he feels seen.</p></div>
+      <div class="tl"><div class="when">Day 7</div><div class="tt">Sit-down debrief</div><p class="td">Show his streak, load card, level. Celebrate the streak explicitly. Set ONE week-2 target together.</p></div>
+      <div class="tl"><div class="when">Weeks 4–6</div><div class="tt">The boring middle</div><p class="td">Where retention dies. Hold the Monday/Friday rhythm no matter what, and attach a real coach moment to his next level-up so momentum has a horizon.</p></div>
+    </div>
+    <p style="margin-top:20px;font-size:14.5px;color:var(--muted)"><b class="body-em">The day-2/3 cliff:</b> novelty fades 48–72 hrs after signup. No check-in by midday day 2 → same-day nudge. A 3-day streak that breaks is worse than never starting. Write down every friction point from the anchor before you invite anyone else — one athlete onboarded perfectly teaches you the runbook you'll sell.</p>
+  </section>
+
+  <!-- 03 KEEP LOGGING -->
+  <section>
+    <div class="sec-head"><span class="sec-num">03</span><h2>How to keep them logging</h2></div>
+    <p class="sec-sub">Retention isn't the XP loop. <b class="body-em">It's the athlete feeling seen within hours of a check-in.</b> Everything here protects one thing: honesty. The moment a bad-day log feels like a failure, honest logging dies — and so does the pilot.</p>
+
+    <div class="card" style="margin-bottom:22px">
+      <div class="rule"><span class="rn">→</span><div class="rt"><b>Reply to the NOTE, never the numbers.</b> <span>The note is the emotional payload. Quote his words back so he knows a person read it. Two minutes a day — your single biggest lever.</span></div></div>
+      <div class="rule"><span class="rn">→</span><div class="rt"><b>Celebrate the ugly log LOUDER than the clean one.</b> <span>Energy 2, soreness 8, a rough note — that's the moment for a rating bump or a message. React only to good numbers and you train him to inflate.</span></div></div>
+      <div class="rule"><span class="rn">→</span><div class="rt"><b>Never weaponize the streak.</b> <span>"Don't break your streak" turns an identity tool into a guilt tool. A missed day is rest, not failure. The real churn signal is a streak that never restarts — if he's dark 48 hrs, reach out about the human.</span></div></div>
+      <div class="rule"><span class="rn">→</span><div class="rt"><b>One notification, not five.</b> <span>A single check-in reminder at a fixed time. Everything else that pings should be a real coach action. If it isn't you being human, question whether it should fire.</span></div></div>
+      <div class="rule"><span class="rn">→</span><div class="rt"><b>The creed is HIS line, not your slogan.</b> <span>"The app isn't me watching you — it's you watching you. I see your performance on the mat anyway. The honesty in there is for you."</span></div></div>
+    </div>
+
+    <span class="kicker" style="display:block;margin-bottom:14px">Steal these — exact coach scripts</span>
+    <div class="scripts">
+      <div class="script"><div class="lbl">Monday reset</div><p>"New week. It's you against you — nobody's scoring but you. This week I want one thing: honest RPE after every session, even the flat ones. I'm watching your load, not your ego."</p></div>
+      <div class="script"><div class="lbl">Bad-day reaction · fire on any low-energy / high-soreness log</div><p>"This is the log I respect most — you told the truth on a hard day. That's the whole game. Rest up, we go again."</p></div>
+      <div class="script"><div class="lbl">Streak-break reframe · same day he misses</div><p>"Streak's a tool, not a jail. A missed day is rest, not failure — I'd take one honest gap over ten fake logs. Check in today and we keep rolling."</p></div>
+      <div class="script"><div class="lbl">Load-spike · duty of care</div><p>"App showed me your load climbing and soreness up two days straight — that's how tweaks happen. Thursday's technical, not a war. You're protecting the work, not dodging it."</p></div>
+    </div>
+  </section>
+
+  <!-- 04 MEASURE -->
+  <section>
+    <div class="sec-head"><span class="sec-num">04</span><h2>What to measure</h2></div>
+    <p class="sec-sub">Tiny cohort — so treat every number as a <b class="body-em">per-athlete count, not a percentage</b>. Your entire analytics stack is the "Needs attention today" triage plus three scheduled conversations. No spreadsheets.</p>
+
+    <span class="kicker" style="display:block;margin-bottom:14px">The scorecard · cohort of ~6, 30-day pilot — hit 5 of 6 and it worked</span>
+    <div class="score">
+      <div class="metric"><div class="mlabel">Activation</div><div class="mval">6 / 6</div><div class="mnote">Installed + push ON + first honest check-in, done with you in the room. Never "I'll set it up later."</div></div>
+      <div class="metric"><div class="mlabel">Day-7 retention</div><div class="mval">6 / 6</div><div class="mnote">Still logging a week in.</div></div>
+      <div class="metric"><div class="mlabel">Day-30 retention</div><div class="mval">4–5 / 6</div><div class="mnote">Still logging 4+ days/week at day 30.</div></div>
+      <div class="metric"><div class="mlabel">Cadence</div><div class="mval">4+ / wk</div><div class="mnote">Honest check-ins per athlete. 5–7 locked in · 3–4 holding · 0–2 intervene. Don't chase a perfect 7 — it invites inflation.</div></div>
+      <div class="metric"><div class="mlabel">Streak recovery</div><div class="mval">48 hrs</div><div class="mnote">Every broken streak restarted within two days at least once.</div></div>
+      <div class="metric"><div class="mlabel">Lagging proof</div><div class="mval">≥ 1</div><div class="mnote">One athlete names a concrete behaviour that changed — and says he'd be annoyed if you switched it off.</div></div>
+      <div class="metric wide"><div class="mlabel">Weekly honesty spot-check</div><div class="mnote" style="font-size:14px;margin-top:6px">Pick one athlete. Compare logged RPE/soreness against what you saw in the gym. Match = trustworthy data. "Fresh, RPE 4" after a war of a round = the exact coaching conversation the whole product exists to create. Flat-lined inputs (10/0/10 every day) = someone's gaming it — re-sell the honesty tutorial.</div></div>
+    </div>
+
+    <div class="card">
+      <span class="kicker" style="display:block;margin-bottom:12px">The three conversations — book all three on day one or they won't happen</span>
+      <div class="rule"><span class="rn">W1</span><div class="rt"><b>Week 1 · 15 min, per athlete.</b> <span>"Did the check-in take under a minute? Did the celebration land or feel cringe? Straight up — honest numbers or shading them up? What made you skip a day?" Write answers verbatim.</span></div></div>
+      <div class="rule"><span class="rn">W4</span><div class="rt"><b>Week 4 · 10 min.</b> <span>"Still worth opening? What do you ignore? Has it changed anything you actually do in training?"</span></div></div>
+      <div class="rule"><span class="rn">END</span><div class="rt"><b>End-of-pilot debrief · 20 min.</b> <span>"Do you feel more accountable? Name one thing you did differently because it was watching. Would you be annoyed if I turned it off tomorrow? Would you tell a training partner?" The last two are your go/no-go for expanding.</span></div></div>
+    </div>
+    <p style="margin-top:18px;font-size:14.5px;color:var(--muted)">The dashboard tells you <em>if</em> they're using it. Only the conversations tell you <em>why</em> they'd quit and whether they feel more accountable. Retention without a debrief is a vanity number.</p>
+  </section>
+
+  <!-- 05 AFTER -->
+  <section>
+    <div class="sec-head"><span class="sec-num">05</span><h2>After it works</h2></div>
+    <p class="sec-sub"><b class="body-em">Capture wins in the moment, not as a favour you beg for later.</b> Ask at emotional peaks — right after a level-up, a 7-day streak, a coach message that landed. A 20-second voice note, not a survey. Save every reply into Drive <span style="font-family:var(--mono);font-size:13px">03 Docs &amp; Guides</span>. Target: 3 usable before/after stories.</p>
+
+    <div class="scripts" style="margin-bottom:24px">
+      <div class="script"><div class="lbl">Testimonial prompt · after a level-up or 7-day streak</div><p>"Bro real quick — what's different about how you're training since you started logging honest every day? Talk into your phone for 20 seconds, no script. Wanna use it if it's fire."</p></div>
+      <div class="script"><div class="lbl">Athlete → teammate referral · hand them a code</div><p>"Founding spots are limited and they don't come back. You're in — full badge vault. Send this to one training partner you actually rock with. They get founding too. After the seats fill, everyone else only gets the taster."</p></div>
+    </div>
+
+    <span class="kicker" style="display:block;margin-bottom:14px">The ladder — don't skip a rung</span>
+    <ul class="ladder">
+      <li><b>Now — your MMA anchor.</b> <span>Instrument + capture his story on day 1 / 7 / 14.</span></li>
+      <li><b>The cohort — your 6.</b> <span>Success = 4–5 still checking in weekly at week 4 + 3 before/after stories.</span></li>
+      <li><b>A second squad in a different sport</b> <span>(netball, soccer — even 5 athletes) through the same runbook. Two sports proving out = a credible white-label pitch. One sport = "nice app for your gym."</span></li>
+      <li><b>Coach #2 — the graduation test.</b> <span>Mint one COACH code, give it to a coach you trust, watch them run their own squad <em>without you touching their dashboard</em>. If they need you in the room, it's not ready to sell.</span></li>
+      <li><b>Only then — the white-label build.</b> <span>New Supabase project per client, coach personas per vertical, billing.</span></li>
+    </ul>
+
+    <div class="card" style="margin-top:22px;border-left:3px solid var(--accent)">
+      <span class="kicker" style="display:block;margin-bottom:10px">Hold the line</span>
+      <p style="margin:0 0 14px;font-size:15px">No white-label productisation until all three gates are green: <b>(1)</b> cohort hits its week-4 retention number, <b>(2)</b> 3 before/after stories saved, <b>(3)</b> one outside coach ran a squad solo. The "let's invest money into it" pressure is real — resist it until the loop is proven. Scale a leaky bucket and every new coach amplifies churn instead of the win.</p>
+      <div class="script" style="border-left-width:3px">
+        <div class="lbl">Recruit-a-coach pitch line</div>
+        <p>"Your athletes tell you they trained hard. This tells you the truth — sleep, soreness, effort, honesty — and it flags who's about to break down before they do. It's them against them. You just finally get to see who actually showed up. Want a code to run your own squad?"</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 06 MISTAKES -->
+  <section>
+    <div class="sec-head"><span class="sec-num">06</span><h2>Common mistakes to avoid</h2></div>
+    <ul class="dont">
+      <li><div><b>Recruiting for talent over daily-logging discipline.</b> A flaky superstar gives you no data and a dead-looking app.</div></li>
+      <li><div><b>Texting the link and letting them self-install.</b> iPhone Add-to-Home-Screen and the push prompt are where solo installs die.</div></li>
+      <li><div><b>Skipping notification permission "to not be pushy."</b> Without push the app is invisible after day 1. Turn it on together, day 0, non-negotiable.</div></li>
+      <li><div><b>Rewarding good numbers with your attention.</b> It silently trains inflation and destroys the one signal the product protects.</div></li>
+      <li><div><b>Weaponizing the streak.</b> An emotional athlete ghosts rather than logs a low day.</div></li>
+      <li><div><b>Over-notifying.</b> More than one automated daily nudge reads as spam and gets push killed.</div></li>
+      <li><div><b>Going quiet in the boring middle (weeks 4–6).</b> Retention dies here without the rhythm and a milestone to climb toward.</div></li>
+      <li><div><b>Reading a 1-athlete cohort as signal.</b> The MMA mate's bad week reads as "pilot failed" when it's just a mood. You need the squad for signal.</div></li>
+      <li><div><b>Skipping the debrief because the dashboard "looks fine."</b> No named behaviour change = no proof of value.</div></li>
+      <li><div><b>Scaling on excitement, not evidence.</b> "20 seats filled" is a success costume. Weekly-active-at-week-4 is the only number that means anything.</div></li>
+    </ul>
+  </section>
+
+  <!-- DO THIS FIRST -->
+  <div class="finish">
+    <span class="eyebrow">Do this first · this week</span>
+    <h2>Three moves, starting today.</h2>
+    <ol class="steps">
+      <li><b>Sit down with your MMA/BJJ mate today.</b> <span>Run the 15-min day-0 handover — install to home screen, push on, first honest check-in together, celebration fires, your first message sent within 2 hours. Write his day-5 date down.</span></li>
+      <li><b>Line up the other 5 from your own gym.</b> <span>Four basketball players who train on their own + one combat-sport wildcard. Screen each against the 2-of-3 rule. Invite by personal voice note — "I want you to be a founding athlete" — never a group blast.</span></li>
+      <li><b>Put five things in your calendar now.</b> <span>Recurring Monday reset, recurring Friday load review, the daily 2-min triage scan, the Week-1 calls, and the end-of-pilot debrief. If they're not scheduled, they won't happen — and those conversations are where the real proof lives.</span></li>
+    </ol>
+  </div>
+
+  <div class="footer">
+    <div class="creed">It's you against you. Nobody's keeping score but you.</div>
+    Athlete OS — Pilot Playbook
+  </div>
+
+</div>
+</body>
+</html>
