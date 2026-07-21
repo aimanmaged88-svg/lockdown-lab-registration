@@ -302,6 +302,10 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 .jstep.on{display:flex;animation:page-in .4s cubic-bezier(.2,.8,.2,1)}
 .jback{font-family:var(--fm);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim);text-align:center;padding:4px;transition:color .2s}
 .jback:hover{color:var(--muted)}
+.jdoor{text-align:center;border:1px solid rgba(255,107,0,.4);border-radius:18px;padding:20px 16px;background:radial-gradient(120% 80% at 50% -10%,rgba(255,107,0,.16),transparent 60%),var(--glass2)}
+.jdlock{font-size:34px;line-height:1;margin-bottom:8px}
+.jdh{font-family:var(--fd);font-size:22px;letter-spacing:1px;text-transform:uppercase;margin-bottom:15px}
+.jdsub{color:var(--muted);font-size:12px;line-height:1.5;margin-top:13px}
 .oss{display:flex;flex-direction:column;gap:8px}
 .ossrow{display:flex;gap:11px;align-items:center;border:1px solid var(--line2);border-radius:14px;padding:10px 12px;background:rgba(255,255,255,.03)}
 .ossrow span{font-size:20px}
@@ -705,14 +709,20 @@ body.rmode *{animation:none!important;transition:none!important}
       <div class="ob-err" id="jErr"></div>
 
       <div class="jstep on" data-js="0">
-        <div class="oss">
+        <div class="jdoor">
+          <div class="jdlock">🔒</div>
+          <div class="jdh">Two ways through the door</div>
+          <button class="btn btn-p btn-block" id="jHasCode">🔑 I’ve got a code</button>
+          <button class="btn btn-g btn-block" id="jKnock" style="margin-top:9px">🚪 No code? Knock to get in</button>
+          <div class="jdsub">A code puts you straight in. No code? <b style="color:var(--accent)">Knock</b> — UNC gets pinged and the app opens itself the second he clears you.</div>
+        </div>
+        <div class="oss" style="margin-top:18px">
           <div class="ossrow"><span>📊</span><div><b>Daily check-ins</b><small>The Lab reads your game, every day</small></div></div>
           <div class="ossrow"><span>🧠</span><div><b>Mind · the flush file</b><small>Train the head like the handles</small></div></div>
           <div class="ossrow"><span>🔋</span><div><b>Fuel + hydration</b><small>Eat and drink like an athlete</small></div></div>
           <div class="ossrow"><span>📍</span><div><b>Live runs board</b><small>See where the squad's playing, right now</small></div></div>
           <div class="ossrow"><span>💬</span><div><b>Direct line to UNC</b><small>Six specialist coaches on call</small></div></div>
         </div>
-        <button class="btn btn-p btn-block jnext">This is the one → build my profile</button>
         <div class="ob-note">One app · everything · free for the founding squad</div>
       </div>
 
@@ -1437,6 +1447,9 @@ body.rmode *{animation:none!important;transition:none!important}
   }
   document.querySelectorAll('.jnext').forEach(b=>b.addEventListener('click',()=>{ if(jValidate(jstep)) jGoTo(jstep+1); }));
   document.querySelectorAll('.jback').forEach(b=>b.addEventListener('click',()=>jGoTo(jstep-1)));
+  /* door fork: got a code -> code step (focused); knock -> straight to your case */
+  $('#jHasCode')&&$('#jHasCode').addEventListener('click',()=>{ jGoTo(1); setTimeout(()=>{ const i=$('#jInvite'); if(i){ i.focus(); } },90); });
+  $('#jKnock')&&$('#jKnock').addEventListener('click',()=>{ const i=$('#jInvite'); if(i) i.value=''; try{ $('#jGo').textContent='Knock On The Door 🚪'; }catch(e){} jGoTo(2); });
   const POSAI={PG:'PG — floor general. The Lab loves a brain.',SG:'SG — shooters eat first here.',SF:'SF — the do-everything wing. Perfect.',PF:'PF — motor, muscle, boards. Respect.',C:'C — own the paint. We see you.'};
   $('#jPos').addEventListener('click',e=>{ const p=e.target.closest('.pill'); if(p&&POSAI[p.textContent]) typeAI(POSAI[p.textContent]); });
   const JBMSGS=['Spinning up your AI profile…','Reserving your locker…','Wiring your line to UNC…','Mapping 971 courts around you…','Sealing the door behind you…'];
