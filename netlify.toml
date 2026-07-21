@@ -1,6 +1,19 @@
 [build]
   publish = "."
 
+# --- Athlete OS -----------------------------------------------------------
+# Clean short entry: /os → the Athlete OS app (served from /athlete-os/).
+# Path depth is preserved so the pages' relative assets keep resolving.
+[[redirects]]
+  from = "/os"
+  to = "/os/"
+  status = 301
+
+[[redirects]]
+  from = "/os/*"
+  to = "/athlete-os/:splat"
+  status = 200
+
 # --- NOVA Rewards (giveaway) ---------------------------------------------
 # publish stays "." so the existing site root and other products are
 # untouched; the config below is scoped to /giveaway/ only.
