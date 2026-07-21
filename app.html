@@ -1791,8 +1791,14 @@ body.rmode *{animation:none!important;transition:none!important}
     const key='ll_vault_'+sess.pid;
     const firstSync=!localStorage.getItem(key);
     const earned=vaultEarned(); const ctx=vaultCtx();
-    ctx.earnedCount=VFLAT.filter(b=>earned[b.id]).length;
     let changed=false;
+    /* coach-awarded badges arrive from the server — earn + celebrate */
+    ((PST&&PST.awards)||[]).forEach(id=>{
+      if(earned[id]||!VFLAT.some(b=>b.id===id)) return;
+      earned[id]=Date.now(); changed=true;
+      if(!firstSync){ const b=VFLAT.find(x=>x.id===id); badgeUpShow({ic:b.ico,name:b.name,meaning:'Coach awarded you this 🏆 · +'+VTIER[b.tier][1]+' Lab Bucks',tier:VTIER[b.tier][0]}); }
+    });
+    ctx.earnedCount=VFLAT.filter(b=>earned[b.id]).length;
     for(let pass=0;pass<2;pass++){ /* 2 passes so Hall of Fame settles */
       VFLAT.forEach(b=>{
         if(earned[b.id]||!b.earn||!canEarnV(b,ctx.founding)) return;

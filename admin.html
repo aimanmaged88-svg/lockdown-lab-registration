@@ -139,6 +139,10 @@ input::placeholder{color:#5d5851}
 .sbi.on{color:var(--accent);background:var(--accent-soft)}
 .bdg{font-style:normal;margin-left:auto;font-family:var(--fm);font-size:10px;background:var(--accent);color:#150a00;border-radius:99px;padding:1px 7px;display:none}
 .bdg.on{display:inline-block}
+.bchips{display:flex;flex-wrap:wrap;gap:7px}
+.bchip{font-family:var(--fm);font-size:11px;border:1px solid var(--line);background:var(--glass2);color:var(--muted);border-radius:999px;padding:7px 12px;cursor:pointer;transition:all .15s}
+.bchip:hover{border-color:var(--accent);color:var(--text)}
+.bchip.on{border-color:var(--accent);background:rgba(255,107,0,.14);color:var(--accent)}
 .sb-foot{margin-top:auto;display:flex;flex-direction:column;gap:8px}
 .osmain{flex:1;min-width:0;padding:26px 24px 60px;max-width:1150px}
 .oh{font-family:var(--fd);font-size:30px;letter-spacing:1px;text-transform:uppercase;font-weight:400;margin-bottom:4px}
@@ -589,6 +593,7 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
   });
 
   /* ---- the squad: full roster with reach / founding / edit / delete ---- */
+  const AWARDABLE=[['potw','🏆','Player of the Week'],['most-improved','📈','Most Improved'],['the-lockdown','🔒','The Lockdown'],['on-camera','🎥','On Camera'],['og','🏅','OG']];
   function renderSquad(players,force){
     const box=$('#squad'); if(!box) return;
     /* never re-render while UNC is typing in the search or an edit form */
@@ -601,6 +606,7 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
         +'<small>'+p.xp+' XP · 🔥 '+p.streak+'d · '+p.sessions+' sessions · '+(ok?'✓ checked in today':'⚠ not today')+(p.contact?' · reach: '+esc(p.contact):'')+'</small></div>'
         +'<div class="rowbtns"><button class="btn btn-p" data-dm="'+p.id+'" title="Message them in the app">💬</button>'+contactBtns(p.contact)
         +'<button class="btn btn-g" data-star="'+p.id+'" title="Founding">'+(p.founding?'⭐':'☆')+'</button>'
+        +'<button class="btn btn-g" data-badgeopen="'+p.id+'" title="Coach badges">🏅</button>'
         +'<button class="btn btn-g" data-ed="'+p.id+'" title="Edit">✎</button>'
         +'<button class="btn-x" data-del="'+p.id+'" data-nm="'+esc(p.name)+'" title="Remove">✕</button></div>'
         +'<div class="editbox" id="dm-'+p.id+'">'
@@ -612,10 +618,20 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
         +'<div class="er"><span><label>Position</label><input data-f="pos" value="'+esc(p.pos||'')+'" maxlength="8"></span><span><label>Age</label><input data-f="age" type="number" min="5" max="99" value="'+(p.age||'')+'"></span></div>'
         +'<div class="er"><span><label>Reach (IG @ / mobile)</label><input data-f="contact" value="'+esc(p.contact||'')+'" maxlength="80"></span><span><label>New PIN (only to reset)</label><input data-f="new_pin" inputmode="numeric" maxlength="4" placeholder="••••"></span></div>'
         +'<div style="display:flex;gap:8px"><button class="btn btn-p" data-save="'+p.id+'">Save ✓</button><button class="btn btn-g" data-cancel="'+p.id+'">Cancel</button></div>'
+        +'</div>'
+        +'<div class="editbox" id="bd-'+p.id+'">'
+        +'<div class="cl" style="margin-bottom:8px">🏅 <b>Coach badges</b> · tap to award — lands in '+esc(p.name.split(" ")[0])+'\'s vault + buzzes their phone</div>'
+        +'<div class="bchips">'+AWARDABLE.map(a=>{const on=(p.awards||[]).includes(a[0]);return '<button class="bchip'+(on?" on":"")+'" data-award="'+p.id+'" data-bid="'+a[0]+'">'+a[1]+' '+a[2]+(on?" ✓":"")+'</button>';}).join('')+'</div>'
         +'</div></div>';
     }).join(''):'<p class="empty">'+(q?'Nobody matches that.':'Fresh slate.')+'</p>';
     box.querySelectorAll('[data-star]').forEach(b=>b.onclick=async()=>{ const p=(R.players||[]).find(x=>x.id===b.dataset.star); try{ await api({action:'founding_set',code:CODE,pid:b.dataset.star,founding:!(p&&p.founding)}); toast(p&&p.founding?'Star removed':'⭐ Founding locked in'); document.activeElement&&document.activeElement.blur(); refresh(); }catch(e){toast(e.message)} });
     box.querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>{ const eb=document.getElementById('ed-'+b.dataset.ed); if(eb) eb.classList.toggle('open'); });
+    box.querySelectorAll('[data-badgeopen]').forEach(b=>b.onclick=()=>{ const eb=document.getElementById('bd-'+b.dataset.badgeopen); if(eb) eb.classList.toggle('open'); });
+    box.querySelectorAll('[data-award]').forEach(b=>b.onclick=async()=>{
+      const pid=b.dataset.award, bid=b.dataset.bid;
+      const p=(R.players||[]).find(x=>x.id===pid); const have=!!(p&&(p.awards||[]).includes(bid));
+      try{ await api({action:have?'badge_unaward':'badge_award',code:CODE,pid,badge:bid}); toast(have?'Badge pulled back':'🏅 Badge awarded — buzzed their phone'); refresh(); }catch(e){toast(e.message)}
+    });
     box.querySelectorAll('[data-dm]').forEach(b=>b.onclick=()=>{ const eb=document.getElementById('dm-'+b.dataset.dm); if(!eb) return; const opening=!eb.classList.contains('open'); eb.classList.toggle('open'); if(opening){ loadDm(b.dataset.dm); const inp=document.getElementById('dmi-'+b.dataset.dm); if(inp) setTimeout(()=>inp.focus(),60); } });
     box.querySelectorAll('[data-dmsend]').forEach(b=>b.onclick=()=>sendDm(b.dataset.dmsend));
     box.querySelectorAll('[id^="dmi-"]').forEach(inp=>inp.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); sendDm(inp.id.slice(4)); } }));

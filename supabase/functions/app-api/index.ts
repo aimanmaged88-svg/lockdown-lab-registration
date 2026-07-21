@@ -214,6 +214,7 @@ async function playerState(p: any) {
     diary: journal.filter((j: any) => j.kind === "diary").slice(0, 10),
     fuel_today: journal.find((j: any) => j.kind === "fuel" && j.d === today) || null,
     invites, coachq, runs, sessions,
+    awards: Array.isArray(p.awards) ? p.awards : [],
     today,
   };
 }
@@ -500,8 +501,21 @@ Deno.serve(async (req) => {
       }
     }
 
-    if (["roster", "cdetail", "intel_add", "hw_add", "attend", "cmsg", "cpost", "invite_approve", "invite_deny", "invite_mint", "answerq", "knock_approve", "knock_deny", "founding_set", "push_sub", "player_edit", "player_delete", "session_add", "session_del", "program_add", "deckreq_add", "deckreq_done", "deckreq_del", "coach_add", "coach_list", "coach_edit", "coach_set_status", "coach_set_perms", "coach_delete", "coach_assign_session", "coach_unassign_session", "coach_code_mint", "coach_code_del", "coach_req_approve", "coach_req_deny"].includes(a)) {
+    if (["roster", "cdetail", "intel_add", "hw_add", "attend", "cmsg", "cpost", "invite_approve", "invite_deny", "invite_mint", "answerq", "knock_approve", "knock_deny", "founding_set", "push_sub", "player_edit", "player_delete", "session_add", "session_del", "program_add", "deckreq_add", "deckreq_done", "deckreq_del", "coach_add", "coach_list", "coach_edit", "coach_set_status", "coach_set_perms", "coach_delete", "coach_assign_session", "coach_unassign_session", "coach_code_mint", "coach_code_del", "coach_req_approve", "coach_req_deny", "badge_award", "badge_unaward"].includes(a)) {
       if (String(b.code || "").toUpperCase() !== COACH_CODE) return J({ error: "bad coach code" }, 401);
+
+      if (a === "badge_award" || a === "badge_unaward") {
+        const p = await getPlayer(b.pid);
+        if (!p) return J({ error: "no player" }, 404);
+        const badge = String(b.badge || "").slice(0, 40);
+        if (!badge) return J({ error: "no badge" }, 400);
+        let aw = Array.isArray(p.awards) ? p.awards.slice() : [];
+        if (a === "badge_award") { if (!aw.includes(badge)) aw.push(badge); }
+        else { aw = aw.filter((x: string) => x !== badge); }
+        await db(`ll_players?id=eq.${p.id}`, { method: "PATCH", body: JSON.stringify({ awards: aw }) });
+        if (a === "badge_award") await pushPlayer(p.id);
+        return J({ ok: true, awards: aw });
+      }
 
       if (a === "push_sub") {
         const sub = b.sub;
@@ -681,7 +695,7 @@ Deno.serve(async (req) => {
       if (a === "roster") {
         const cutoff = new Date(Date.now() - BATCH_TTL_MS).toISOString();
         const [players, posts, invites, active, questions, knocks, runs, sessions, deckreqs, creqs] = await Promise.all([
-          db("ll_players?status=eq.active&select=id,name,pos,age,xp,streak,sessions,last_checkin,prefs,founding,contact,created_at&order=created_at.asc"),
+          db("ll_players?status=eq.active&select=id,name,pos,age,xp,streak,sessions,last_checkin,prefs,founding,contact,awards,created_at&order=created_at.asc"),
           db("ll_posts?select=id,author_name,is_coach,text,likes,created_at&order=created_at.desc&limit=30"),
           db("ll_invites?status=eq.pending&select=id,friend_name,created_at,player:ll_players!ll_invites_player_id_fkey(name)&order=created_at.asc"),
           db(`ll_invites?status=eq.approved&used_by=is.null&code_at=gt.${encodeURIComponent(cutoff)}&select=id,friend_name,code,code_at,created_at,max_uses,use_count,player:ll_players!ll_invites_player_id_fkey(name)&order=code_at.desc&limit=60`),
@@ -751,7 +765,7 @@ Deno.serve(async (req) => {
           db(`ll_homework?player_id=eq.${p.id}&select=id,text,done&order=created_at.desc&limit=10`),
           db(`ll_journal?player_id=eq.${p.id}&share_coach=eq.true&select=kind,d,data,created_at&order=created_at.desc&limit=15`),
         ]);
-        return J({ ok: true, profile: publicProfile(p), contact: p.contact || null, checkins, intel, messages: msgs, homework: hw,
+        return J({ ok: true, profile: publicProfile(p), contact: p.contact || null, checkins, intel, messages: msgs, homework: hw, awards: Array.isArray(p.awards) ? p.awards : [],
           shared_mind: journal.filter((j: any) => j.kind === "mind"),
           fuel: journal.filter((j: any) => j.kind === "fuel").slice(0, 7) });
       }

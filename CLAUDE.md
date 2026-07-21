@@ -41,6 +41,20 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   Bucks tally shown (earned/505); wallet+redeem still Phase 2. Verified E2E
   (founding→12 earned/65 LB; non-founding→4 earned/8 LB, 39 founding-locked).
   Design artifact: https://claude.ai/code/artifact/84185e58-5b8a-44b5-a493-c4f883b7dc70
+- **Coach-award badges — SHIPPED (edge v24, 2026-07-21).** ll_players gained
+  `awards jsonb`. Edge: admin `badge_award`/`badge_unaward` {pid,badge}
+  (coach code) append/remove + pushPlayer; playerState + cdetail + roster
+  return `awards`. app.html: evalVault earns+celebrates any id in PST.awards
+  (overlay "Coach awarded you this"), so the 5 manual badges (potw/
+  most-improved/the-lockdown/on-camera/og) light in the vault. admin.html:
+  the per-squad-row button opens a panel of AWARDABLE[5] chips toggling
+  award/unaward (buzzes their phone). VAPID re-verified byte-for-byte.
+  Verified E2E (award to Unlocked, unaward removes).
+- **Program 01 LOCKED (2026-07-21):** name **Winter Arc**, first session
+  **Mon 17 Aug 2026**, **20 founding seats** (25-use launch code). Filled into
+  every teaser caption (teasers-base.html) + the Week 3 reveal tile rebuilt
+  (assets/teaser-05-w3-mon-reveal.png, template removed, zip refreshed).
+  Trivial to change — swap the 3 values.
   Master: scratchpad/badges-base.html (fonts injected → badges.html).
   6 tiers (Bronze/Silver/Gold/Elite/Founding/Legend) across 12 categories,
   all client-computable from existing metrics EXCEPT 3 coach-picks
