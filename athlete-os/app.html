@@ -194,6 +194,16 @@ h1.page{font-size:34px;margin-bottom:4px}
 .nu-tag{font-family:var(--fm);font-size:8.5px;letter-spacing:1px;text-transform:uppercase;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:3px 8px;flex:0 0 auto}
 .nu-tag.game{border-color:var(--accent-text);color:var(--accent-text);background:var(--accent-soft)}
 .nu.soon .nu-main b{color:var(--accent-text)}
+/* training load card */
+.load-row{display:flex;align-items:center;gap:14px;margin-top:4px}
+.load-big{flex:1}
+.load-big b{font-family:var(--fd);font-size:34px;line-height:1;color:var(--accent-text)}
+.load-big span{display:block;font-size:11px;color:var(--dim);margin-top:3px}
+.load-trend{text-align:right;flex:0 0 auto}
+.load-trend .lt{font-weight:700;font-size:15px}
+.load-trend .lt.up{color:var(--good)} .load-trend .lt.down{color:var(--muted)}
+.load-trend .lt-sub{display:block;font-size:11px;color:var(--dim);margin-top:2px}
+.load-note{font-size:12.5px;color:var(--muted);margin-top:10px;line-height:1.45}
 .pills{display:flex;flex-wrap:wrap;gap:8px}
 .pill{font-family:var(--fd);font-size:14px;letter-spacing:1px;text-transform:uppercase;padding:9px 14px;border-radius:13px;border:1px solid var(--line);background:rgba(255,255,255,.05);cursor:pointer;transition:all .18s;user-select:none}
 .pill.sel{background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:var(--on-accent);border-color:transparent;box-shadow:0 6px 18px -8px var(--accent-glow)}
@@ -518,6 +528,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
         <div id="nextUpList"></div>
       </div>
 
+      <div class="card" id="loadCard" style="display:none">
+        <span class="cl">⚡ Training load · this week</span>
+        <div class="load-row">
+          <div class="load-big"><b id="loadWeek">0</b><span>load units (RPE × min)</span></div>
+          <div class="load-trend" id="loadTrend"></div>
+        </div>
+        <div class="load-note" id="loadNote"></div>
+      </div>
+
       <div class="card hot">
         <span class="cl">Daily Accountability · Sydney time</span>
         <h3 id="ciTitle">Today's Check-In</h3>
@@ -526,6 +545,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
           <div class="slider"><label>Sleep last night (hrs) <b id="vSleep">8</b></label><input type="range" id="rSleep" min="3" max="12" step="0.5" value="8"></div>
           <div class="slider"><label>Muscle soreness <b id="vSore">3</b></label><input type="range" id="rSore" min="1" max="10" value="3"></div>
           <div class="slider"><label>Minutes trained <b id="vMin">30</b></label><input type="range" id="rMin" min="0" max="240" step="15" value="30"></div>
+          <div class="slider"><label>How hard was it? · RPE <b id="vRpe">6</b></label><input type="range" id="rRpe" min="1" max="10" value="6"></div>
           <div style="margin:4px 0 12px">
             <div class="cl" style="margin-bottom:8px">What did you work on?</div>
             <div class="pills" id="focusPills"></div>
@@ -1143,6 +1163,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
     $('#tfChips').innerHTML='<span class="chip pro">'+esc(drill.c)+'</span><span class="chip">'+drill.m+' min</span>';
     /* next up (calendar) */
     renderNextUp();
+    /* training load */
+    (function(){ const L=AST.load||{week:0,prev:0,trend:0}; const c=$('#loadCard');
+      if(!L.week && !L.prev){ c.style.display='none'; return; }
+      c.style.display='block';
+      $('#loadWeek').textContent=L.week;
+      const t=L.trend, up=t>0, big=Math.abs(t)>=50;
+      $('#loadTrend').innerHTML = L.prev? `<span class="lt ${up?'up':'down'}">${up?'▲':'▼'} ${Math.abs(t)}%</span><span class="lt-sub">vs last week</span>` : `<span class="lt-sub">first week logged</span>`;
+      $('#loadNote').textContent = !L.prev? 'Log RPE each session and your load trend builds here.' :
+        (big&&up? 'Big jump in load — make sure recovery keeps up.' : up? 'Trending up — steady progression is how you build.' : t<-30? 'Load dropped off — a taper, or missed sessions?' : 'Holding steady. Consistency wins.');
+    })();
     /* check-in */
     const done=p.last_checkin===AST.today;
     $('#ciBody').style.display=done?'none':'block';
@@ -1370,7 +1400,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
   $('#catBar').addEventListener('click',e=>{ const p=e.target.closest('[data-cat]'); if(p)renderLib(p.dataset.cat); });
 
   /* check-in */
-  [['rEnergy','vEnergy'],['rSleep','vSleep'],['rSore','vSore'],['rMin','vMin']].forEach(([r,v])=>$('#'+r).addEventListener('input',e=>$('#'+v).textContent=e.target.value));
+  [['rEnergy','vEnergy'],['rSleep','vSleep'],['rSore','vSore'],['rMin','vMin'],['rRpe','vRpe']].forEach(([r,v])=>{const el=$('#'+r); if(el)el.addEventListener('input',e=>$('#'+v).textContent=e.target.value);});
   $('#focusPills').addEventListener('click',e=>{const p=e.target.closest('.pill');if(p)p.classList.toggle('sel')});
   $('#ciSubmit').addEventListener('click',async()=>{
     const focus=[...document.querySelectorAll('#focusPills .pill.sel')].map(x=>x.textContent);
@@ -1378,7 +1408,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
     try{
       const r=await api({action:'checkin',aid:sess.aid,pin:sess.pin,
         energy:+$('#rEnergy').value,sleep_h:+$('#rSleep').value,soreness:+$('#rSore').value,
-        mins:+$('#rMin').value,focus,note:$('#ciNote').value.trim()});
+        mins:+$('#rMin').value,rpe:+$('#rRpe').value,focus,note:$('#ciNote').value.trim()});
       AST=r.state; renderAll(); toast('+40 XP · your OS is reading 🧠');
     }catch(e){ toast(e.message,true); }
     busy($('#ciSubmit'),0,'Lock It In · +40 XP');
