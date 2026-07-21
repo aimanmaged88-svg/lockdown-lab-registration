@@ -2327,6 +2327,7 @@ function tickClock(){
 const SB_URL='https://ymuwuhvqqftgpxwhzoub.supabase.co';
 const SB_KEY='sb_publishable_-j-P1TcLeGZ6lGspru2YwA_3RxAlucJ';
 const GYM_JOIN_CODE='eaglesteam'; // needed to create a staff account (boss can change)
+const ADMIN_EMAIL='admin@eaglesgym.local'; // admin login: password IS the boss code (eagles2196)
 var SB=null, applyingRemote=false;
 function ensureSB(){
   if(SB) return SB;
@@ -2505,35 +2506,57 @@ async function logout(){
 }
 function showAuthGate(){
   const card=$('#gateCard'); if(!card) return;
-  let mode='login';
+  let mode='login'; // 'login' | 'signup' | 'admin'
+  const sub={login:'Log in to your staff account.',signup:'Create your staff account to join the team.',admin:'Admin access — just enter the admin code.'};
+  const goLabel={login:'Log in',signup:'Create account',admin:'Enter as admin'};
+  const inputCls='w-full mb-3 bg-ink-800 border border-ink-600 rounded-2xl px-4 py-3 text-base focus:border-brand-500 focus:ring-2 focus:ring-brand-500/40 outline-none';
   const draw=()=>{
     card.innerHTML=`
       <div class="text-center mb-6">
         <img src="logo.png" alt="Eagles Gym" class="h-9 w-auto mx-auto mb-3" style="height:36px;width:auto;max-width:80%" />
         <p class="text-brand-500 font-semibold tracking-[0.25em] text-sm">STAFF HUB</p>
-        <p class="text-neutral-400 text-sm mt-3">${mode==='login'?'Log in to your staff account.':'Create your staff account to join the team.'}</p>
+        <p class="text-neutral-400 text-sm mt-3">${sub[mode]}</p>
       </div>
-      ${mode==='signup'?`<input id="auName" type="text" placeholder="Your name" class="w-full mb-3 bg-ink-800 border border-ink-600 rounded-2xl px-4 py-3 text-base focus:border-brand-500 focus:ring-2 focus:ring-brand-500/40 outline-none" />`:''}
-      <input id="auEmail" type="email" inputmode="email" autocomplete="email" placeholder="Email" class="w-full mb-3 bg-ink-800 border border-ink-600 rounded-2xl px-4 py-3 text-base focus:border-brand-500 focus:ring-2 focus:ring-brand-500/40 outline-none" />
-      <input id="auPass" type="password" autocomplete="${mode==='login'?'current-password':'new-password'}" placeholder="Password" class="w-full mb-3 bg-ink-800 border border-ink-600 rounded-2xl px-4 py-3 text-base focus:border-brand-500 focus:ring-2 focus:ring-brand-500/40 outline-none" />
-      ${mode==='signup'?`<input id="auCode" type="text" placeholder="Gym join code" class="w-full mb-3 bg-ink-800 border border-ink-600 rounded-2xl px-4 py-3 text-base focus:border-brand-500 focus:ring-2 focus:ring-brand-500/40 outline-none" />`:''}
+      ${mode==='admin'?`
+        <input id="auAdminCode" type="password" inputmode="text" autocomplete="off" placeholder="Admin code" class="${inputCls}" />
+      `:`
+        ${mode==='signup'?`<input id="auName" type="text" placeholder="Your name" class="${inputCls}" />`:''}
+        <input id="auEmail" type="email" inputmode="email" autocomplete="email" placeholder="Email" class="${inputCls}" />
+        <input id="auPass" type="password" autocomplete="${mode==='login'?'current-password':'new-password'}" placeholder="Password" class="${inputCls}" />
+        ${mode==='signup'?`<input id="auCode" type="text" placeholder="Gym join code" class="${inputCls}" />`:''}
+      `}
       <p id="auErr" class="hidden text-red-400 text-xs text-center mb-3"></p>
-      <button id="auGo" class="w-full bg-gradient-to-br from-brand-500 to-brand-600 text-white font-bold py-3.5 rounded-2xl text-base active:scale-95 transition shadow-glow">${mode==='login'?'Log in':'Create account'} →</button>
-      <button id="auToggle" class="w-full text-center text-xs font-semibold text-brand-400 mt-4">${mode==='login'?"New here? Create a staff account":'Have an account? Log in'}</button>
+      <button id="auGo" class="w-full bg-gradient-to-br from-brand-500 to-brand-600 text-white font-bold py-3.5 rounded-2xl text-base active:scale-95 transition shadow-glow">${goLabel[mode]} →</button>
+      ${mode==='admin'
+        ? `<button id="auBack" class="w-full text-center text-xs font-semibold text-brand-400 mt-4">← Back to staff login</button>`
+        : `<button id="auToggle" class="w-full text-center text-xs font-semibold text-brand-400 mt-4">${mode==='login'?"New here? Create a staff account":'Have an account? Log in'}</button>
+           ${mode==='login'?`<button id="auAdmin" class="w-full text-center text-xs font-semibold text-neutral-400 mt-3 flex items-center justify-center gap-1">🛡️ Are you an admin?</button>`:''}`}
       <p class="text-center text-[11px] text-neutral-600 mt-3">🔒 Your team's data is private to logged-in staff.</p>`;
-    $('#auToggle').addEventListener('click',()=>{ mode=mode==='login'?'signup':'login'; draw(); });
     $('#auGo').addEventListener('click',submit);
+    $('#auToggle')?.addEventListener('click',()=>{ mode=mode==='login'?'signup':'login'; draw(); });
+    $('#auAdmin')?.addEventListener('click',()=>{ mode='admin'; draw(); });
+    $('#auBack')?.addEventListener('click',()=>{ mode='login'; draw(); });
     card.querySelectorAll('input').forEach(inp=>inp.addEventListener('keydown',e=>{ if(e.key==='Enter') submit(); }));
     setTimeout(()=>{ const f=card.querySelector('input'); if(f) f.focus(); },50);
   };
   const err=(m)=>{ const e=$('#auErr'); if(e){ e.textContent=m; e.classList.remove('hidden'); } };
-  const busy=(on)=>{ const g=$('#auGo'); if(g){ g.disabled=on; g.style.opacity=on?'0.6':'1'; g.textContent=on?'…':(mode==='login'?'Log in →':'Create account →'); } };
+  const busy=(on)=>{ const g=$('#auGo'); if(g){ g.disabled=on; g.style.opacity=on?'0.6':'1'; g.textContent=on?'…':(goLabel[mode]+' →'); } };
   async function submit(){
     if(!ensureSB()){ err('Can\'t reach the server. Check your connection.'); return; }
-    const email=$('#auEmail').value.trim(); const pass=$('#auPass').value;
-    if(!email || !pass){ err('Enter your email and password.'); return; }
-    busy(true);
     try{
+      if(mode==='admin'){
+        const code=$('#auAdminCode').value.trim();
+        if(!code){ err('Enter the admin code.'); return; }
+        busy(true);
+        const { data, error } = await SB.auth.signInWithPassword({ email:ADMIN_EMAIL, password:code });
+        if(error){ err('Wrong admin code.'); busy(false); return; }
+        setStaffFromUser(data.user); setBoss(true); // admins get edit access on
+        bootApp();
+        return;
+      }
+      const email=$('#auEmail').value.trim(); const pass=$('#auPass').value;
+      if(!email || !pass){ err('Enter your email and password.'); return; }
+      busy(true);
       if(mode==='signup'){
         const name=$('#auName').value.trim(); const code=$('#auCode').value.trim();
         if(!name){ err('Enter your name.'); busy(false); return; }
