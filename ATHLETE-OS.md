@@ -162,13 +162,37 @@ audience. Lives in `athlete-os/` and deploys with the rest of the static site
   `theme-color` meta updates per theme. Accent-driven UI (orbs, avatar, AI card,
   "hot" cards) now flows through tokens so every theme is cohesive.
 
-## Launchpad (`/hub`)
+## V2.4 — True background push (shipped)
 
-A private, phone-friendly one-pager at
-`lockdown-lab-registration.netlify.app/hub` for the owner: each product (Athlete
-OS, Lockdown Lab, 2026 one-pager) with big tap-to-open links, tap-to-copy codes,
-a "who needs what / who doesn't" split, and a "what to say" script — plus an
-owner-only section (Netlify, Supabase, full access hub) marked never-share.
+Real web push that fires even when the app is closed — VAPID + service worker.
+
+- **Tables**: `aos_push_subs` (browser subscriptions per athlete) and
+  `aos_config` (VAPID keypair, subject, cron secret — stored in-DB so no edge
+  secret-setting is needed; only the service-role edge fn can read them).
+- **Edge fn actions**: `push_key` (returns the public VAPID key), athlete-auth
+  `push_subscribe` / `push_unsubscribe`, and `push_cron` (secret-header
+  protected daily sweep). `web-push@3.6.7` signs/encrypts; dead subscriptions
+  (404/410) self-prune.
+- **Triggers**: an athlete gets a real push when the coach **messages** them,
+  **rates** them, or **schedules an event** for their team/all — plus a **daily
+  check-in reminder** for anyone who hasn't logged in yet that day.
+- **Scheduling**: `pg_cron` job `aos-daily-checkin-push` calls `push_cron` via
+  `pg_net` at 08:00 UTC (6pm Sydney).
+- **Client**: on notifications-enable (and on every load if already on) the app
+  subscribes via `PushManager` with the VAPID key and registers the endpoint.
+  The service worker's `push` + `notificationclick` handlers show the alert and
+  deep-link into the right tab.
+- Verified end-to-end from Postgres via `pg_net`: `push_key` and `push_cron`
+  both return 200; `web-push` imports cleanly in the edge runtime.
+
+## Projects dashboard (`/hub`) — *personal, not part of Athlete OS*
+
+`lockdown-lab-registration.netlify.app/hub` — **"Projects Aiman's Working On"**,
+a private control panel for the owner spanning all current projects (Athlete OS,
+Lockdown Lab, the 2026 one-pager). Each has big tap-to-open links, tap-to-copy
+codes, a "who needs what / who doesn't" split, and a "what to say" script — plus
+an owner-only section (Netlify, Supabase, full access hub) marked never-share.
+It is a separate dashboard, deliberately not branded as or bundled into Athlete OS.
 
 ## Backend (Supabase project `lockdown-lab`, ref `ymuwuhvqqftgpxwhzoub`)
 

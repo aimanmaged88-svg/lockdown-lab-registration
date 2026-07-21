@@ -1,4 +1,5 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
+import webpush from "npm:web-push@3.6.7";
 
 // Athlete OS — app API. Sister product of LockDownLab Live, same engine:
 // all DB access is server-side (service role), athletes authenticate with
@@ -12,7 +13,7 @@ const COACH_CODE = (Deno.env.get("AOS_COACH_CODE") || "OS-COACH").toUpperCase();
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, content-type, apikey",
+  "Access-Control-Allow-Headers": "authorization, content-type, apikey, x-cron-secret",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 const J = (o: unknown, s = 200) => new Response(JSON.stringify(o), { status: s, headers: { ...cors, "Content-Type": "application/json" } });
@@ -65,6 +66,39 @@ async function peerAgg(aid: string) {
   const rows = await db(`aos_peer_ratings?ratee_id=eq.${aid}&select=score`);
   const n = rows?.length || 0;
   return { avg: n ? Math.round(rows.reduce((a: number, r: any) => a + r.score, 0) / n * 10) / 10 : null, count: n };
+}
+
+// ---- Web push (VAPID keys live in aos_config so no secret-setting needed) ----
+let vapidReady = false;
+async function ensureVapid() {
+  if (vapidReady) return true;
+  try {
+    const rows = await db(`aos_config?key=in.(vapid_public,vapid_private,vapid_subject)&select=key,value`);
+    const m: Record<string, string> = {};
+    (rows || []).forEach((r: any) => { m[r.key] = r.value; });
+    if (!m.vapid_public || !m.vapid_private) return false;
+    webpush.setVapidDetails(m.vapid_subject || "mailto:admin@athleteos.app", m.vapid_public, m.vapid_private);
+    vapidReady = true;
+    return true;
+  } catch (_) { return false; }
+}
+// Fire-and-forget: never let a push failure break the main action.
+async function pushToAthlete(aid: string, payload: { title: string; body: string; url?: string; tag?: string }) {
+  try {
+    if (!aid || !(await ensureVapid())) return;
+    const subs = await db(`aos_push_subs?athlete_id=eq.${aid}&select=id,endpoint,p256dh,auth`);
+    if (!subs || !subs.length) return;
+    const data = JSON.stringify(payload);
+    await Promise.all(subs.map(async (s: any) => {
+      try {
+        await webpush.sendNotification({ endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, data);
+        await db(`aos_push_subs?id=eq.${s.id}`, { method: "PATCH", body: JSON.stringify({ last_notified: new Date().toISOString() }) });
+      } catch (e: any) {
+        const code = e?.statusCode || e?.status;
+        if (code === 404 || code === 410) await db(`aos_push_subs?id=eq.${s.id}`, { method: "DELETE" });
+      }
+    }));
+  } catch (_) { /* swallow */ }
 }
 
 function profile(p: any) {
@@ -170,6 +204,31 @@ Deno.serve(async (req) => {
     const b = await req.json().catch(() => ({} as any));
     const a = b.action;
 
+    // Public VAPID key so the client can subscribe (safe to expose).
+    if (a === "push_key") {
+      const rows = await db(`aos_config?key=eq.vapid_public&select=value`);
+      return J({ ok: true, key: rows?.[0]?.value || null });
+    }
+
+    // Daily reminder sweep — called by pg_cron with the shared secret header.
+    if (a === "push_cron") {
+      const secret = req.headers.get("x-cron-secret") || b.secret || "";
+      const cfg = await db(`aos_config?key=eq.push_cron_secret&select=value`);
+      if (!cfg?.length || secret !== cfg[0].value) return J({ error: "forbidden" }, 403);
+      if (!(await ensureVapid())) return J({ error: "vapid not configured" }, 500);
+      const today = sydToday();
+      const subs = await db(`aos_push_subs?select=athlete_id`);
+      const ids = [...new Set((subs || []).map((s: any) => s.athlete_id).filter(Boolean))];
+      let sent = 0;
+      for (const id of ids) {
+        const ath = await getAthlete(id);
+        if (!ath || ath.status !== "active" || ath.last_checkin === today) continue;
+        await pushToAthlete(id, { title: "Time to check in 🏀", body: "Log today’s check-in to keep your streak alive.", url: "./app.html?go=home", tag: "daily" });
+        sent++;
+      }
+      return J({ ok: true, sent, candidates: ids.length });
+    }
+
     if (a === "register") {
       const name = String(b.name || "").trim().slice(0, 40);
       const pin = String(b.pin || "").trim();
@@ -211,12 +270,28 @@ Deno.serve(async (req) => {
       return J({ ok: true, aid: p.id, state: await athleteState(p) });
     }
 
-    if (["state", "checkin", "mind", "diary", "fuel", "goals_set", "profile_set", "msg", "peer_rate"].includes(a)) {
+    if (["state", "checkin", "mind", "diary", "fuel", "goals_set", "profile_set", "msg", "peer_rate", "push_subscribe", "push_unsubscribe"].includes(a)) {
       const p = await auth(b.aid, b.pin);
       if (!p) return J({ error: "unauthorized" }, 401);
       const today = sydToday();
 
       if (a === "state") return J({ ok: true, state: await athleteState(p) });
+
+      if (a === "push_subscribe") {
+        const sub = b.sub || {};
+        const endpoint = String(sub.endpoint || "");
+        const k = sub.keys || {};
+        if (!endpoint || !k.p256dh || !k.auth) return J({ error: "bad subscription" }, 400);
+        const ex = await db(`aos_push_subs?endpoint=eq.${encodeURIComponent(endpoint)}&select=id`);
+        if (ex?.length) await db(`aos_push_subs?id=eq.${ex[0].id}`, { method: "PATCH", body: JSON.stringify({ athlete_id: p.id, p256dh: k.p256dh, auth: k.auth, ua: priv(b.ua, 200) || null }) });
+        else await db("aos_push_subs", { method: "POST", body: JSON.stringify({ athlete_id: p.id, endpoint, p256dh: k.p256dh, auth: k.auth, ua: priv(b.ua, 200) || null }) });
+        return J({ ok: true });
+      }
+      if (a === "push_unsubscribe") {
+        const endpoint = String((b.sub && b.sub.endpoint) || b.endpoint || "");
+        if (endpoint) await db(`aos_push_subs?endpoint=eq.${encodeURIComponent(endpoint)}`, { method: "DELETE" });
+        return J({ ok: true });
+      }
 
       if (a === "msg") {
         const text = priv(b.text, 600);
@@ -348,7 +423,15 @@ Deno.serve(async (req) => {
         const type = ["training", "game", "meeting", "other"].includes(String(b.type)) ? String(b.type) : "training";
         const row = { title, type, starts_at: new Date(b.starts_at).toISOString(), location: priv(b.location, 80) || null, note: priv(b.note, 200) || null, team_id: b.team_id ? String(b.team_id) : null };
         const rows = await db("aos_events", { method: "POST", headers: { Prefer: "return=representation" }, body: JSON.stringify(row) });
-        return J({ ok: true, event: rows[0] });
+        const ev = rows[0];
+        // Notify the roster (team-scoped or everyone) that a new event landed.
+        try {
+          const who = ev.team_id ? `aos_athletes?team_id=eq.${ev.team_id}&status=eq.active&select=id` : `aos_athletes?status=eq.active&select=id`;
+          const targets = await db(who);
+          const label = ev.type === "game" ? "New game scheduled" : ev.type === "meeting" ? "New meeting scheduled" : "New session scheduled";
+          for (const t of (targets || [])) await pushToAthlete(t.id, { title: label, body: ev.title, url: "./app.html?go=home", tag: "event" });
+        } catch (_) { /* swallow */ }
+        return J({ ok: true, event: ev });
       }
       if (a === "event_delete") {
         await db(`aos_events?id=eq.${b.id}`, { method: "DELETE" });
@@ -391,6 +474,7 @@ Deno.serve(async (req) => {
         if (!text) return J({ error: "empty" }, 400);
         if (!(await getAthlete(b.aid))) return J({ error: "no athlete" }, 404);
         await db("aos_messages", { method: "POST", body: JSON.stringify({ athlete_id: b.aid, from_coach: true, text }) });
+        await pushToAthlete(b.aid, { title: "New message from your coach", body: text.slice(0, 140), url: "./app.html?go=msgs", tag: "coach-msg" });
         return J({ ok: true, messages: await msgsFor(b.aid) });
       }
       if (a === "rate") {
@@ -398,6 +482,7 @@ Deno.serve(async (req) => {
         if (!score) return J({ error: "Pick a rating from 1 to 10." }, 400);
         if (!(await getAthlete(b.aid))) return J({ error: "no athlete" }, 404);
         await db(`aos_athletes?id=eq.${b.aid}`, { method: "PATCH", body: JSON.stringify({ coach_rating: score, coach_rating_note: priv(b.note, 200) || null, coach_rating_at: new Date().toISOString() }) });
+        await pushToAthlete(b.aid, { title: "Your coach rated you " + score + "/10", body: priv(b.note, 140) || "Open Athlete OS to see the note.", url: "./app.html?go=msgs", tag: "coach-rate" });
         return J({ ok: true });
       }
       if (a === "note_add") {
