@@ -2,17 +2,13 @@
   publish = "."
 
 # --- Athlete OS -----------------------------------------------------------
-# Clean short entry: /os → the Athlete OS app (served from /athlete-os/).
-# Path depth is preserved so the pages' relative assets keep resolving.
+# Clean short entry: /os → the Athlete OS landing (real folder, no loop).
+# One-hop 302 to the real /athlete-os/ directory (which serves index.html
+# and resolves relative assets correctly). No self-referential redirect.
 [[redirects]]
   from = "/os"
-  to = "/os/"
-  status = 301
-
-[[redirects]]
-  from = "/os/*"
-  to = "/athlete-os/:splat"
-  status = 200
+  to = "/athlete-os/"
+  status = 302
 
 # --- NOVA Rewards (giveaway) ---------------------------------------------
 # publish stays "." so the existing site root and other products are
