@@ -194,6 +194,11 @@ h1.page{font-size:34px;margin-bottom:4px}
 .nu-tag{font-family:var(--fm);font-size:8.5px;letter-spacing:1px;text-transform:uppercase;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:3px 8px;flex:0 0 auto}
 .nu-tag.game{border-color:var(--accent-text);color:var(--accent-text);background:var(--accent-soft)}
 .nu.soon .nu-main b{color:var(--accent-text)}
+/* daily creed — you vs you */
+.creed{margin:12px 0 2px;padding:11px 14px;border-left:3px solid var(--accent);border-radius:0 14px 14px 0;
+  background:linear-gradient(90deg,var(--accent-soft),transparent);font-size:14px;font-weight:600;color:var(--text);line-height:1.45;
+  position:relative;overflow:hidden}
+.creed::before{content:"“";position:absolute;left:6px;top:-6px;font-size:34px;color:var(--accent);opacity:.25;font-family:Georgia,serif}
 /* training load card */
 .load-row{display:flex;align-items:center;gap:14px;margin-top:4px}
 .load-big{flex:1}
@@ -408,7 +413,54 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 .tut-dots i{width:20px;height:3px;border-radius:99px;background:var(--track);transition:background .3s}
 .tut-dots i.on{background:var(--accent)}
 .tut-nav{display:flex;gap:8px}
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+/* ============ Premium motion + glass (athletic, not cringe) ============ */
+@keyframes riseIn{from{opacity:0;transform:translateY(16px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes glossSweep{0%{transform:translateX(-120%) skewX(-18deg)}60%,100%{transform:translateX(240%) skewX(-18deg)}}
+@keyframes ringPulse{0%{box-shadow:0 0 0 0 var(--accent-glow)}70%{box-shadow:0 0 0 16px rgba(255,122,0,0)}100%{box-shadow:0 0 0 0 rgba(255,122,0,0)}}
+@keyframes cardFlash{0%{transform:scale(1)}18%{transform:scale(1.025)}100%{transform:scale(1)}}
+@keyframes xpFly{0%{opacity:0;transform:translateY(6px) scale(.9)}20%{opacity:1;transform:translateY(-2px) scale(1.05)}100%{opacity:0;transform:translateY(-42px) scale(1)}}
+@keyframes shimmer{0%{background-position:-160% 0}100%{background-position:260% 0}}
+
+/* staggered entrance on Home — strong but quick */
+section[data-page="home"]>*{animation:riseIn .5s var(--ease-out) both}
+section[data-page="home"]>*:nth-child(1){animation-delay:.00s}
+section[data-page="home"]>*:nth-child(2){animation-delay:.04s}
+section[data-page="home"]>*:nth-child(3){animation-delay:.08s}
+section[data-page="home"]>*:nth-child(4){animation-delay:.12s}
+section[data-page="home"]>*:nth-child(5){animation-delay:.16s}
+section[data-page="home"]>*:nth-child(6){animation-delay:.20s}
+section[data-page="home"]>*:nth-child(7){animation-delay:.24s}
+section[data-page="home"]>*:nth-child(n+8){animation-delay:.28s}
+
+/* glass sheen on the feature cards */
+.card,.ai{position:relative}
+.card.hot::after,.ai::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.08),transparent 42%);mix-blend-mode:screen}
+.card.hot{overflow:hidden}
+.card.hot::before{content:"";position:absolute;top:0;bottom:0;width:38%;left:0;pointer-events:none;z-index:1;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent);animation:glossSweep 6.5s ease-in-out infinite;animation-delay:1.2s}
+
+/* tactile press feedback on interactive surfaces */
+.btn,.stat,.pill,nav button,.sess,.chip,.sbtn,.wbtn,.rbtn,.hbtn,.theme-toggle{transition:transform .16s var(--ease-press),border-color .2s,background .2s,color .2s}
+.btn:active,.stat:active,.pill:active,nav button:active,.sess:active,.sbtn:active,.wbtn:active,.rbtn:active,.theme-toggle:active{transform:scale(.955)}
+.btn-p:active{transform:scale(.97)}
+
+/* powerful XP bar: smooth fill + moving shimmer */
+#xpFill{transition:width 1s var(--ease-out);position:relative;overflow:hidden;background-image:linear-gradient(90deg,var(--accent),var(--accent-hi),var(--accent));background-size:200% 100%;animation:shimmer 3.2s linear infinite}
+/* avatar ring breathes with intent */
+.av .ring{box-shadow:0 0 0 0 var(--accent-glow)}
+.av.pump .ring,.av.pump{animation:ringPulse .9s var(--ease-out)}
+
+/* check-in success flash + XP flyup */
+.flash{animation:cardFlash .5s var(--ease-spring)}
+.xpfly{position:absolute;left:50%;top:14px;transform:translateX(-50%);font-family:var(--fd);font-size:26px;color:var(--accent-hi);
+  text-shadow:0 2px 14px var(--accent-glow);pointer-events:none;z-index:5;animation:xpFly 1.15s var(--ease-out) forwards}
+
+/* level-up chip + streak fire get a subtle live glow */
+.chip.live{box-shadow:0 0 0 1px var(--good-soft),0 0 14px -4px var(--good)}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  section[data-page="home"]>*{animation:none!important}}
 </style>
 </head>
 <body>
@@ -508,6 +560,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
         <span class="chip live" style="margin-left:auto"><span class="d"></span><span id="streakChip">0</span>d streak</span>
       </div>
       <div class="profstrip" id="profStrip"></div>
+      <div class="creed" id="creed"></div>
       <div class="statrow">
         <div class="stat hot"><b id="stXp">0</b><span>XP</span></div>
         <div class="stat"><b id="stLogs">0</b><span>Check-ins</span></div>
@@ -834,7 +887,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 
   /* ---- custom-sport recognition (adds felt "we found your sport" UX; unknowns queue for coach approval) ---- */
   let CUSTOM_SPORT=null;
-  const PACK_SYN={basketball:['basketball','bball','hoops'],soccer:['soccer','football','futbol'],mma:['mma','muay thai','kickboxing','ufc'],oztag:['oztag','oz tag','touch football','touch'],netball:['netball'],rugby:['rugby','rugby union','rugby league'],afl:['afl','aussie rules','australian football','footy'],tennis:['tennis'],swimming:['swimming','swim','swimmer'],running:['running','run','track','athletics','sprinting','cross country','distance running'],volleyball:['volleyball','volley','beach volleyball']};
+  const PACK_SYN={basketball:['basketball','bball','hoops'],soccer:['soccer','football','futbol'],mma:['mma','mixed martial arts','muay thai','kickboxing','ufc'],boxing:['boxing','box','pugilism'],bjj:['jiu jitsu','jiu-jitsu','brazilian jiu jitsu','bjj','gi','no gi','no-gi','grappling','submission grappling','gracie jiu jitsu','judo'],oztag:['oztag','oz tag','touch football','touch'],netball:['netball'],rugby:['rugby','rugby union','rugby league'],afl:['afl','aussie rules','australian football','footy'],tennis:['tennis'],swimming:['swimming','swim','swimmer'],running:['running','run','track','athletics','sprinting','cross country','distance running'],volleyball:['volleyball','volley','beach volleyball']};
   const KNOWN_SPORTS=('padel,pickleball,squash,badminton,cricket,hockey,field hockey,ice hockey,water polo,lacrosse,rowing,cycling,bmx,mountain biking,skateboarding,surfing,boxing,judo,karate,taekwondo,jiu jitsu,brazilian jiu jitsu,bjj,wrestling,gymnastics,triathlon,golf,baseball,softball,handball,table tennis,ping pong,futsal,gaelic football,hurling,rock climbing,climbing,bouldering,skiing,snowboarding,sailing,kayaking,canoeing,fencing,archery,weightlifting,powerlifting,olympic weightlifting,crossfit,dancing,dance,cheerleading,calisthenics,rugby sevens,touch rugby,dodgeball,ultimate frisbee,polo,horse riding,equestrian,motocross,karting,diving,water skiing,wakeboarding,kitesurfing,rollerblading,speed skating,figure skating,curling,darts,snooker,billiards,esports,rock climbing,orienteering,rounders,korfball,sepak takraw').split(',');
   const titlecase=s=>String(s).replace(/\w\S*/g,w=>w[0].toUpperCase()+w.slice(1));
   function recognizeSport(text){
@@ -876,6 +929,22 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
         {t:'Solo grappling flow',m:15,c:'Grappling',d:'Shrimp, bridge, technical stand-up, sprawl — 10 each, flow between them without stopping for 3 rounds.'},
         {t:'Sprawl & shot ladder',m:10,c:'Wrestling',d:'Level change + penetration step ×10, sprawls ×10, alternate for 4 rounds. Speed comes after clean form.'},
         {t:'Assault intervals',m:12,c:'Cardio',d:'30s all-out (bike, sprints or burpees) / 90s easy × 6. Fights are won in the last minute of the round.'},
+      ]},
+    boxing:{label:'Boxing',emoji:'🥊',arena:'the ring',positions:['Orthodox','Southpaw','Switch'],
+      focus:['Jab','Combinations','Head Movement','Footwork','Conditioning','Film'],
+      drills:[
+        {t:'Jab isolation',m:12,c:'Jab',d:'3×3min, jab only — double it, feint it, dig it to the body. The jab wins rounds. Snap it back to the chin every time.'},
+        {t:'Combos on the bag',m:15,c:'Combinations',d:'1-2, 1-2-3, 1-2-slip-3. 3 rounds. Breathe out on every shot, hands never drop.'},
+        {t:'Slip line / reflex',m:10,c:'Head Movement',d:'Slip a rope or line, 4×2min. Small, tight movements, eyes forward. Turn hittable into un-hittable.'},
+        {t:'Roadwork intervals',m:15,c:'Conditioning',d:'6× (1min hard / 90s easy), run or skip. The championship rounds are won on the road, alone.'},
+      ]},
+    bjj:{label:'Jiu-Jitsu',emoji:'🥋',arena:'the mats',positions:['Guard','Passer','All-Round'],
+      focus:['Guard','Passing','Submissions','Escapes','Scrambles','Film'],
+      drills:[
+        {t:'Solo movement flow',m:12,c:'Escapes',d:'Shrimp, bridge, technical stand-up, granby roll — 10 each, flowing for 3 rounds. Mat time is skill time.'},
+        {t:'Guard retention',m:12,c:'Guard',d:'Reset the guard vs an imaginary passer — frames, hip escape, re-guard. 4 rounds. Never flat, always framing.'},
+        {t:'One submission, deep',m:15,c:'Submissions',d:'Pick ONE submission this week. 30 slow reps of the entry each side. Depth beats collecting.'},
+        {t:'Film: one position',m:15,c:'Film',d:'Watch one match. Track a single position (say, half guard). Pause and call the next move out loud.'},
       ]},
     oztag:{label:'Oztag',emoji:'🏉',arena:'the field',positions:['Middle','Link','Wing'],
       focus:['Speed','Acceleration','Agility','Passing','Evasion','Fitness'],
@@ -972,6 +1041,38 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
   function busy(btn,on,label){ if(!btn)return; if(on){btn.dataset.l=btn.innerHTML;btn.innerHTML='<span class="spin"></span>';btn.disabled=true;} else {btn.innerHTML=label||btn.dataset.l;btn.disabled=false;} }
   const rel=iso=>{ const s=(Date.now()-new Date(iso).getTime())/1e3; if(s<60)return'now'; if(s<3600)return Math.floor(s/60)+'m'; if(s<86400)return Math.floor(s/3600)+'h'; return Math.floor(s/86400)+'d'; };
   const doy=()=>Math.floor((Date.now()-new Date(new Date().getFullYear(),0,0))/864e5);
+  /* You vs you — daily creed (effort over results, nobody's keeping score but you). */
+  const CREED=[
+    "It's you against you. Nobody else is keeping score.",
+    "Beat yesterday. That's the whole game.",
+    "The work is the reward — log it, own it.",
+    "No one's coming to do it for you. That's the good news.",
+    "Quiet reps now. The results speak later.",
+    "You don't rise to the occasion — you fall to your training.",
+    "Discipline is you keeping a promise to yourself.",
+    "Results are noise. The habit is the signal.",
+    "One honest rep beats ten for show.",
+    "Show up for the person you're becoming.",
+    "Comparison is a thief. Run your own race.",
+    "Hard days are deposits. Keep stacking them.",
+  ];
+  /* dopamine on a locked-in check-in */
+  const HYPE=[
+    "Locked in. That's a rep on YOU 🔥",
+    "That's the deposit. Keep stacking 💪",
+    "Showed up when it counted. Respect.",
+    "Nobody saw that but it still counts. That's the point.",
+    "One more brick in the wall. Build it.",
+  ];
+  function celebrate(gained){
+    try{
+      const card=document.querySelector('.tabpage[data-page="home"] .card.hot');
+      if(card){ card.classList.remove('flash'); void card.offsetWidth; card.classList.add('flash');
+        const fly=document.createElement('span'); fly.className='xpfly'; fly.textContent='+'+(gained||40); card.appendChild(fly); setTimeout(()=>fly.remove(),1250); }
+      const av=document.querySelector('.hero-row .av'); if(av){ av.classList.remove('pump'); void av.offsetWidth; av.classList.add('pump'); }
+      if(navigator.vibrate) navigator.vibrate([18,40,18]);
+    }catch(e){}
+  }
 
   /* ---------- onboarding ---------- */
   document.querySelectorAll('.ob-tabs button').forEach(b=>b.addEventListener('click',()=>{
@@ -1155,6 +1256,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
       +(p.level?'<span class="chip">'+esc(p.level)+'</span>':'')
       +(p.train_freq?'<span class="chip">'+p.train_freq+'d / week</span>':'')
       +(p.injuries?'<span class="chip warn">⚠ managing injury</span>':'');
+    { const cr=$('#creed'); if(cr) cr.textContent=CREED[doy()%CREED.length]; }
     /* today's focus — deterministic rotation through the sport's drill bank */
     const drill=sp.drills[doy()%sp.drills.length];
     $('#tfKicker').textContent="Today's Focus · "+sp.label;
@@ -1409,7 +1511,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
       const r=await api({action:'checkin',aid:sess.aid,pin:sess.pin,
         energy:+$('#rEnergy').value,sleep_h:+$('#rSleep').value,soreness:+$('#rSore').value,
         mins:+$('#rMin').value,rpe:+$('#rRpe').value,focus,note:$('#ciNote').value.trim()});
-      AST=r.state; renderAll(); toast('+40 XP · your OS is reading 🧠');
+      AST=r.state; renderAll(); celebrate(r.gained); toast(HYPE[Math.floor(Math.random()*HYPE.length)]);
     }catch(e){ toast(e.message,true); }
     busy($('#ciSubmit'),0,'Lock It In · +40 XP');
   });
