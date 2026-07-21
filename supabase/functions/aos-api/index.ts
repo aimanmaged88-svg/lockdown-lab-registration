@@ -400,19 +400,24 @@ Deno.serve(async (req) => {
       if (String(b.code || "").toUpperCase() !== COACH_CODE) return J({ error: "bad coach code" }, 401);
 
       if (a === "roster") {
-        const [athletes, teams, peers, sportReqs, events] = await Promise.all([
+        const [athletes, teams, peers, sportReqs, events, pushSubs] = await Promise.all([
           db("aos_athletes?select=id,name,sport,sport_label,age,level,position,goals,injuries,train_freq,comp_schedule,equipment,location,contact,xp,streak,last_checkin,status,created_at,team_id,coach_rating,coach_rating_at&order=created_at.asc"),
           teamsList(),
           db("aos_peer_ratings?select=ratee_id,score"),
           db("aos_sport_requests?status=eq.pending&select=id,athlete_name,sport,created_at&order=created_at.desc"),
           db(`aos_events?starts_at=gte.${encodeURIComponent(new Date(Date.now() - 6 * 3600 * 1000).toISOString())}&select=id,title,type,starts_at,location,note,team_id&order=starts_at.asc&limit=100`),
+          db("aos_push_subs?select=athlete_id"),
         ]);
         const pmap: Record<string, number[]> = {};
         (peers || []).forEach((r: any) => { (pmap[r.ratee_id] = pmap[r.ratee_id] || []).push(r.score); });
+        const pushMap: Record<string, number> = {};
+        (pushSubs || []).forEach((r: any) => { if (r.athlete_id) pushMap[r.athlete_id] = (pushMap[r.athlete_id] || 0) + 1; });
         (athletes || []).forEach((x: any) => {
           const arr = pmap[x.id];
           x.peer_avg = arr && arr.length ? Math.round(arr.reduce((s: number, v: number) => s + v, 0) / arr.length * 10) / 10 : null;
           x.peer_count = arr ? arr.length : 0;
+          x.push_on = !!pushMap[x.id];
+          x.push_count = pushMap[x.id] || 0;
         });
         return J({ ok: true, today: sydToday(), athletes, teams: teams || [], sport_requests: sportReqs || [], events: events || [] });
       }
@@ -445,15 +450,17 @@ Deno.serve(async (req) => {
       if (a === "cdetail") {
         const p = await getAthlete(b.aid);
         if (!p) return J({ error: "no athlete" }, 404);
-        const [checkins, notes, journal, messages, peer, teams] = await Promise.all([
+        const [checkins, notes, journal, messages, peer, teams, pushSubs] = await Promise.all([
           db(`aos_checkins?athlete_id=eq.${p.id}&select=d,energy,sleep_h,water,soreness,mins,focus,note&order=d.desc&limit=14`),
           db(`aos_notes?athlete_id=eq.${p.id}&select=id,text,created_at&order=created_at.asc`),
           db(`aos_journal?athlete_id=eq.${p.id}&share_coach=eq.true&select=kind,d,data,created_at&order=created_at.desc&limit=15`),
           msgsFor(p.id),
           peerAgg(p.id),
           teamsList(),
+          db(`aos_push_subs?athlete_id=eq.${p.id}&select=id`),
         ]);
         return J({ ok: true, profile: profile(p), contact: p.contact || null, status: p.status, checkins, notes, messages, peer, teams: teams || [],
+          push_on: (pushSubs?.length || 0) > 0, push_count: pushSubs?.length || 0,
           shared_mind: journal.filter((j: any) => j.kind === "mind"),
           fuel: journal.filter((j: any) => j.kind === "fuel").slice(0, 7) });
       }

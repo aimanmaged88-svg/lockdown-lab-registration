@@ -208,6 +208,7 @@
   .chip.warn{border-color:var(--amber);color:var(--amber);background:var(--amber-soft)}
   .chip.inj{border-color:var(--bad);color:var(--bad);background:var(--bad-soft)}
   .chip.acc{border-color:var(--accent);color:var(--accent-text);background:var(--accent-soft)}
+  .chip.off{border-color:var(--line);color:var(--dim);opacity:.75}
   .ac-foot{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:11px;color:var(--dim);font-family:var(--fm)}
   .ac-foot .dot{margin-left:auto;color:var(--accent-text);font-family:var(--fb);font-weight:650}
   .empty{padding:70px 20px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:var(--r-lg)}
@@ -511,6 +512,8 @@
     const avgRating=rated.length?(rated.reduce((s,r)=>s+r.coach_rating,0)/rated.length):0;
     const injured=A.filter(r=>r.injuries).length;
     const rate=A.length?Math.round(inToday/A.length*100):0;
+    const pushCount=ROWS.filter(r=>r.push_on).length;
+    const pushPct=ROWS.length?Math.round(pushCount/ROWS.length*100):0;
     const now=Date.now();
     const upcomingGames=EVENTS.filter(e=>e.type==='game' && new Date(e.starts_at).getTime()>=now).length;
     const nextGame=EVENTS.filter(e=>e.type==='game' && new Date(e.starts_at).getTime()>=now).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at))[0];
@@ -521,7 +524,7 @@
       {n:injured,l:'Managing injury',cls:injured>0?'bad':''},
       {n:avgRating,l:'Avg coach rating',dec:1,suffix:'/10',s:rated.length?rated.length+' rated':'none rated'},
       {n:upcomingGames,l:'Upcoming games',cls:upcomingGames>0?'accent':'',s:nextGame?('next '+fmtDay(nextGame.starts_at)):'none scheduled'},
-      {n:new Set(ROWS.map(r=>r.sport)).size,l:'Sports'},
+      {n:pushCount,l:'Push reach',cls:pushCount>0?'accent':'',s:ROWS.length?pushPct+'% get alerts':'none yet'},
     ];
     const setups=[
       {t:'Attendance %',need:'training sessions'},
@@ -676,6 +679,7 @@
         </div>
         <div class="ac-stats">
           <span class="chip ${ok?'ok':(w>0?'warn':'')}">${ok?'✓ Today':(r.last_checkin?fmtDay(r.last_checkin):'No check-in')}</span>
+          ${r.push_on?'<span class="chip ok" title="Push notifications on — this athlete gets your messages live">🔔 Push</span>':'<span class="chip off" title="No push yet — they haven\'t installed + enabled notifications">🔕 No push</span>'}
           ${r.injuries?'<span class="chip inj">⚠ Injury</span>':''}
           ${r.coach_rating!=null?`<span class="chip acc">★ ${r.coach_rating}/10</span>`:'<span class="chip">Rate →</span>'}
           ${r.peer_count?`<span class="chip">◈ ${r.peer_avg}/10 · ${r.peer_count}</span>`:''}
@@ -744,6 +748,7 @@
         <div class="kv"><span class="k">Training</span><span class="v">${p.train_freq?p.train_freq+' days/week':'—'} · ${esc(p.comp_schedule||'no comp set')}</span></div>
         <div class="kv"><span class="k">Team</span><span class="v">${tn?esc(tn):'—'}</span></div>
         <div class="kv"><span class="k">Contact</span><span class="v">${d.contact?esc(d.contact):'—'}</span></div>
+        <div class="kv"><span class="k">Push alerts</span><span class="v">${d.push_on?`<span style="color:var(--good)">🔔 On</span>${d.push_count>1?' · '+d.push_count+' devices':''}`:'<span style="color:var(--dim)">🔕 Off — not installed / not enabled</span>'}</span></div>
       </div>
       <h4>Goals</h4>
       <div class="box">${(g.tags||[]).length?(g.tags||[]).map(t=>`<span class="chip acc" style="margin:0 5px 5px 0">${esc(t)}</span>`).join(''):'<span style="color:var(--dim)">No goals set</span>'}${g.note?`<div style="margin-top:8px">“${esc(g.note)}”</div>`:''}</div>

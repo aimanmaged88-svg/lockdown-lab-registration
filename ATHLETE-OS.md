@@ -184,6 +184,10 @@ Real web push that fires even when the app is closed — VAPID + service worker.
   deep-link into the right tab.
 - Verified end-to-end from Postgres via `pg_net`: `push_key` and `push_cron`
   both return 200; `web-push` imports cleanly in the edge runtime.
+- **Coach visibility**: `roster` and `cdetail` return `push_on`/`push_count`, so
+  the coach dashboard shows a **🔔 Push / 🔕 No push** chip on every athlete card,
+  a **Push reach** KPI (count + % of squad reachable), and a push-status line in
+  the athlete drawer — the coach can see at a glance who will actually get alerts.
 
 ## Projects dashboard (`/hub`) — *personal, not part of Athlete OS*
 
