@@ -1292,10 +1292,11 @@ function viewSop(){
       <button id="ideaGo" class="flex-1 bg-gradient-to-br from-brand-500 to-brand-600 text-white font-bold py-3 rounded-2xl active:scale-95 transition">✨ Give me an idea</button>
       <button id="ideaSave" class="px-4 bg-ink-800 border border-ink-600 rounded-2xl font-semibold text-sm text-neutral-300 active:scale-95 transition hidden">＋ Save</button>
     </div>
-    <p class="text-[11px] text-neutral-600 mt-3">Ideas come from a built-in best-practices bank. Live AI that scans gyms worldwide can be wired in when we connect the backend.</p>
+    <button id="addIdea" class="w-full mt-2 border border-brand-500/40 text-brand-400 font-semibold py-2.5 rounded-2xl active:scale-95 transition">🧠 Add your own · brainstorm it out</button>
+    <p class="text-[11px] text-neutral-600 mt-3">The generator draws on a built-in best-practices bank, and the brainstorm helper formulates your own ideas into a plan. A live conversational AI can be wired in when we connect the backend.</p>
     <div id="savedIdeas" class="${saved.length?'':'hidden'} mt-4">
-      <div class="flex items-center justify-between mb-2"><h4 class="font-bold text-sm">⭐ Saved ideas (${saved.length})</h4><button id="clearIdeas" class="text-[11px] text-neutral-500 hover:text-neutral-300">Clear</button></div>
-      <div class="space-y-2">${saved.map(s=>`<div class="flex gap-2 text-[14px] bg-ink-800 border border-ink-700 rounded-xl px-3 py-2"><span class="text-[10px] font-bold text-brand-400 bg-brand-500/10 rounded px-1.5 py-0.5 h-fit mt-0.5 shrink-0">${esc(s.c)}</span><span class="flex-1">${esc(s.t)}</span></div>`).join('')}</div>
+      <div class="flex items-center justify-between mb-2"><h4 class="font-bold text-sm">⭐ Saved ideas (${saved.length})</h4><button id="clearIdeas" class="text-[11px] text-neutral-500 hover:text-neutral-300">Clear all</button></div>
+      <div class="space-y-2">${renderSavedIdeas(saved)}</div>
     </div>
   </div>`,'mb-4')}
 
@@ -1431,7 +1432,149 @@ function wireView(view){
   if(view==='sop'){ wireIdeaLab(); }
 }
 
-/* ---------- Idea Lab ---------- */
+/* ---------- Idea Lab + brainstorm helper ---------- */
+const IDEA_CATS = ['Recovery','Tech','Classes','Community','Retention','Retail','Space','Brand','Wellness','Access','Other'];
+const CAT_BENEFIT = {
+  Recovery:'help members recover better and come back more often',
+  Tech:'make the gym run smoother and feel modern',
+  Classes:'add value to the timetable and pull in new members',
+  Community:"build a community people don't want to leave",
+  Retention:'keep members longer and cut cancellations',
+  Retail:'add an easy extra revenue stream',
+  Space:'make the floor more useful and inviting',
+  Brand:'make Eagles Gym stand out and get talked about',
+  Wellness:'look after members beyond just the workout',
+  Access:'open the gym up to more people and hours',
+  Other:'improve the member experience'
+};
+function shortTitle(raw){
+  let t=(raw||'').split(/[.!?\n]/)[0].replace(/\s+/g,' ').trim();
+  const w=t.split(' '); if(w.length>7) t=w.slice(0,7).join(' ')+'…';
+  return (t||'New idea').replace(/^./,c=>c.toUpperCase());
+}
+/* offline brainstorm helper — expands a rough note into a structured plan */
+function formulateIdea(raw, cat){
+  raw=(raw||'').trim(); const c=cat||'Other';
+  const benefit=CAT_BENEFIT[c]||CAT_BENEFIT.Other;
+  const lower=raw? raw.charAt(0).toLowerCase()+raw.slice(1) : 'this';
+  const related=IDEAS.filter(i=>i.c===c);
+  return {
+    c, custom:true,
+    title: shortTitle(raw),
+    pitch: `Bring ${lower} to Eagles Gym to ${benefit}.`,
+    why: `It's a simple change members notice — it ${benefit}.`,
+    steps: [
+      'Pin down the details: what it looks like, what it costs, and who runs it.',
+      'Trial it small for 2–4 weeks and ask members what they think.',
+      'If it lands, make it permanent — add signage and post it on the socials.'
+    ],
+    first: 'This week: sketch the plan, price it up, and run it past the team.',
+    angles: ideaAngles(raw),
+    pair: related.length? related[Math.floor(Math.random()*related.length)].t : null
+  };
+}
+function ideaAngles(raw){
+  const r=(raw||'').toLowerCase(); const a=[];
+  if(/app|online|book|qr|screen|digital/.test(r)) a.push('Tie it into a booking screen or the members app so it’s effortless to use.');
+  if(/class|session|program|coach|train/.test(r)) a.push('Add a beginner-friendly version so nobody feels left out.');
+  if(/sauna|ice|recover|massage|stretch|mobility|cold/.test(r)) a.push('Sell it as a paid recovery add-on — members love recovery perks.');
+  if(/member|discount|price|deal|offer|refer|mate|friend/.test(r)) a.push('Wrap it in a "bring a mate" or referral hook — members are your best sales team.');
+  if(/event|comp|challenge|social|community|leaderboard/.test(r)) a.push('Put a leaderboard or photo wall up so it builds buzz.');
+  if(/coffee|shake|drink|snack|retail|merch|protein/.test(r)) a.push('Place it near the exit for easy impulse buys.');
+  if(/kid|child|creche|family|parent/.test(r)) a.push('Even one supervised hour unlocks the parents market.');
+  if(/24|hour|access|late|early|night|fob/.test(r)) a.push('Fob access for trusted members captures odd-hour trainers.');
+  return a;
+}
+function renderSavedIdeas(saved){
+  return saved.map((s,idx)=>{
+    const title=esc(s.title||s.t||'');
+    const tag=s.custom?'Your idea':esc(s.c||'Idea');
+    const detail = s.custom && (s.pitch||(s.steps&&s.steps.length));
+    if(!detail){
+      return `<div class="flex gap-2 items-start text-[14px] bg-ink-800 border border-ink-700 rounded-xl px-3 py-2">
+        <span class="text-[10px] font-bold text-brand-400 bg-brand-500/10 rounded px-1.5 py-0.5 h-fit mt-0.5 shrink-0">${tag}</span>
+        <span class="flex-1">${title}</span>
+        <button data-ideadel="${idx}" class="text-neutral-600 hover:text-red-400 text-sm shrink-0">×</button>
+      </div>`;
+    }
+    return `<details class="acc bg-ink-800 border border-ink-700 rounded-xl overflow-hidden">
+      <summary class="flex gap-2 items-center px-3 py-2 cursor-pointer list-none text-[14px]">
+        <span class="text-[10px] font-bold text-brand-400 bg-brand-500/10 rounded px-1.5 py-0.5 shrink-0">${tag}</span>
+        <span class="flex-1 font-semibold">${title}</span>
+        <button data-ideadel="${idx}" class="text-neutral-600 hover:text-red-400 text-sm shrink-0">×</button>
+        <span class="chev text-brand-400">›</span>
+      </summary>
+      <div class="px-3 pb-3 text-[13px] space-y-2 text-neutral-300">
+        ${s.pitch?`<p class="text-neutral-200">${esc(s.pitch)}</p>`:''}
+        ${s.why?`<div><span class="text-[10px] font-bold text-neutral-500 uppercase">Why it works</span><p>${esc(s.why)}</p></div>`:''}
+        ${s.steps&&s.steps.length?`<div><span class="text-[10px] font-bold text-neutral-500 uppercase">How to roll it out</span><ol class="list-decimal ml-4">${s.steps.map(x=>`<li>${esc(x)}</li>`).join('')}</ol></div>`:''}
+        ${s.first?`<div><span class="text-[10px] font-bold text-neutral-500 uppercase">First step</span><p>${esc(s.first)}</p></div>`:''}
+        ${s.angles&&s.angles.length?`<div><span class="text-[10px] font-bold text-neutral-500 uppercase">Extra angles</span><ul class="list-disc ml-4">${s.angles.map(x=>`<li>${esc(x)}</li>`).join('')}</ul></div>`:''}
+        ${s.pair?`<p class="text-[12px] text-neutral-500">Pair with: ${esc(s.pair)}</p>`:''}
+      </div>
+    </details>`;
+  }).join('');
+}
+function saveIdeaObject(obj){
+  const saved=store.get('saved_ideas',[]);
+  saved.push(obj);
+  if(!trySet('saved_ideas',saved)){ toast('Storage full — clear some saved ideas','⚠️'); return; }
+  closeModal(); render('sop'); toast('Idea saved','⭐'); haptic(20);
+}
+function ideaResultHTML(b){
+  return `<div class="bg-ink-800 border border-brand-500/30 rounded-2xl p-4">
+    <div class="flex items-center gap-2 mb-2"><span class="text-[10px] font-bold text-brand-400 bg-brand-500/10 rounded px-1.5 py-0.5">${esc(b.c)}</span><span class="font-bold flex-1">${esc(b.title)}</span></div>
+    <p class="text-[14px] text-neutral-200 mb-2">${esc(b.pitch)}</p>
+    <div class="mb-2"><span class="text-[10px] font-bold text-neutral-500 uppercase">Why it works</span><p class="text-[13px] text-neutral-300">${esc(b.why)}</p></div>
+    <div class="mb-2"><span class="text-[10px] font-bold text-neutral-500 uppercase">How to roll it out</span><ol class="list-decimal ml-4 text-[13px] text-neutral-300">${b.steps.map(s=>`<li>${esc(s)}</li>`).join('')}</ol></div>
+    <div class="mb-2"><span class="text-[10px] font-bold text-neutral-500 uppercase">First step</span><p class="text-[13px] text-neutral-300">${esc(b.first)}</p></div>
+    ${b.angles&&b.angles.length?`<div class="mb-1"><span class="text-[10px] font-bold text-neutral-500 uppercase">Extra angles</span><ul class="list-disc ml-4 text-[13px] text-neutral-300">${b.angles.map(a=>`<li>${esc(a)}</li>`).join('')}</ul></div>`:''}
+    ${b.pair?`<p class="text-[12px] text-neutral-500 mt-1">Pair with: ${esc(b.pair)}</p>`:''}
+  </div>
+  <button id="ideaSaveBuilt" class="w-full mt-3 bg-gradient-to-br from-brand-500 to-brand-600 text-white font-bold py-3 rounded-2xl active:scale-95 transition">⭐ Save this idea</button>
+  <button id="ideaRedo" class="w-full mt-2 text-xs font-semibold text-neutral-400">↻ Formulate again</button>`;
+}
+function openIdeaModal(){
+  openModal(`
+    <div class="p-6">
+      <div class="flex items-center justify-between mb-1">
+        <h3 class="text-xl font-bold">🧠 Brainstorm an idea</h3>
+        <button onclick="closeModal()" class="text-neutral-500 hover:text-white text-2xl leading-none">×</button>
+      </div>
+      <p class="text-xs text-neutral-500 mb-4">Jot a rough idea and pick a category — the helper turns it into a plan you can action. Or just save the note.</p>
+      <label class="text-xs uppercase tracking-wider text-neutral-500 font-semibold">Your idea</label>
+      <textarea id="ideaRaw" rows="3" placeholder="e.g. put in an ice bath for recovery" class="w-full mt-1.5 mb-3 bg-ink-800 border border-ink-600 rounded-2xl px-4 py-3 resize-none focus:border-brand-500 outline-none"></textarea>
+      <label class="text-xs uppercase tracking-wider text-neutral-500 font-semibold">Category</label>
+      <div id="ideaCatRow" class="flex flex-wrap gap-2 mt-1.5 mb-4">
+        ${IDEA_CATS.map((c,i)=>`<button data-cat="${c}" class="icat border border-ink-600 rounded-full px-3 py-1.5 text-sm font-semibold ${i===0?'ring-2 ring-brand-500 bg-brand-500/10 text-brand-400':''}">${c}</button>`).join('')}
+      </div>
+      <div class="flex gap-2">
+        <button id="ideaFormulate" class="flex-1 bg-gradient-to-br from-brand-500 to-brand-600 text-white font-bold py-3 rounded-2xl active:scale-95 transition">✨ Help me formulate</button>
+        <button id="ideaSaveRaw" class="px-4 bg-ink-800 border border-ink-600 rounded-2xl font-semibold text-sm text-neutral-300">Save note</button>
+      </div>
+      <div id="ideaResult" class="hidden mt-4"></div>
+    </div>`);
+  let cat=IDEA_CATS[0], built=null;
+  $$('#ideaCatRow .icat').forEach(b=>b.addEventListener('click',()=>{ cat=b.dataset.cat;
+    $$('#ideaCatRow .icat').forEach(x=>x.className='icat border border-ink-600 rounded-full px-3 py-1.5 text-sm font-semibold');
+    b.className='icat border border-ink-600 rounded-full px-3 py-1.5 text-sm font-semibold ring-2 ring-brand-500 bg-brand-500/10 text-brand-400';
+  }));
+  function runFormulate(){
+    const raw=$('#ideaRaw').value.trim();
+    if(!raw){ toast('Jot your idea first','⚠️'); $('#ideaRaw').focus(); return; }
+    built=formulateIdea(raw,cat);
+    const res=$('#ideaResult'); res.classList.remove('hidden'); res.innerHTML=ideaResultHTML(built);
+    $('#ideaSaveBuilt').addEventListener('click',()=>saveIdeaObject(built));
+    $('#ideaRedo').addEventListener('click',runFormulate);
+    res.scrollIntoView({behavior:'smooth',block:'nearest'}); haptic();
+  }
+  $('#ideaFormulate').addEventListener('click',runFormulate);
+  $('#ideaSaveRaw').addEventListener('click',()=>{
+    const raw=$('#ideaRaw').value.trim(); if(!raw){ toast('Jot your idea first','⚠️'); $('#ideaRaw').focus(); return; }
+    saveIdeaObject({c:cat, t:raw, custom:true});
+  });
+  setTimeout(()=>$('#ideaRaw').focus(),50);
+}
 let currentIdea=null, lastIdeaIdx=-1;
 function wireIdeaLab(){
   const out=$('#ideaOut'), saveBtn=$('#ideaSave');
@@ -1445,9 +1588,18 @@ function wireIdeaLab(){
   saveBtn?.addEventListener('click',()=>{
     if(!currentIdea) return;
     const saved=store.get('saved_ideas',[]);
-    if(!saved.some(s=>s.t===currentIdea.t)){ saved.push(currentIdea); store.set('saved_ideas',saved); toast('Idea saved','⭐'); render('sop'); }
-    else toast('Already saved','⭐');
+    if(!saved.some(s=>(s.t||s.title)===currentIdea.t)){
+      saved.push(currentIdea);
+      if(!trySet('saved_ideas',saved)){ toast('Storage full — clear some saved ideas','⚠️'); return; }
+      toast('Idea saved','⭐'); render('sop');
+    } else toast('Already saved','⭐');
   });
+  $('#addIdea')?.addEventListener('click',openIdeaModal);
+  $$('#savedIdeas [data-ideadel]').forEach(b=>b.addEventListener('click',e=>{
+    e.preventDefault(); e.stopPropagation();
+    const saved=store.get('saved_ideas',[]); saved.splice(+b.dataset.ideadel,1);
+    store.set('saved_ideas',saved); render('sop');
+  }));
   $('#clearIdeas')?.addEventListener('click',()=>{ if(confirm('Clear all saved ideas?')){ store.del('saved_ideas'); render('sop'); } });
 }
 
