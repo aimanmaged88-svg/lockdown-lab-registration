@@ -375,6 +375,18 @@
   }
   .side-scrim{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:25;display:none}
   .side-scrim.open{display:block}
+  /* Needs-attention triage */
+  .attn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+  .attn{display:flex;align-items:center;gap:11px;text-align:left;background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:14px;padding:12px 14px;cursor:pointer;box-shadow:var(--shadow-sm);transition:.14s}
+  .attn:hover{transform:translateY(-2px);box-shadow:var(--lift);border-color:var(--amber)}
+  .mono-av.sm{width:38px;height:38px}
+  .mono-av.sm b{font-size:14px}
+  .attn-b{flex:1;min-width:0}
+  .attn-nm{display:block;font-weight:650;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .attn-rs{display:block;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+  .attn-go{color:var(--dim);flex:0 0 auto}
+  .attn-clear{background:var(--good-soft);border:1px solid var(--good);color:var(--good);border-radius:14px;padding:13px 15px;font-size:13.5px;margin-top:4px}
+  .attn-clear b{color:var(--good)}
 </style>
 </head>
 <body>
@@ -434,6 +446,7 @@
       <h1 id="greetTitle">Welcome back, Coach</h1>
       <p class="greet-sub" id="greetSub"></p>
     </div>
+    <div id="attnWrap"></div>
     <div class="sechead"><h2>Team overview</h2><span class="hint" id="ovHint"></span></div>
     <div class="kpis aos-stagger" id="kpis"></div>
 
@@ -578,7 +591,24 @@
     });
   }
 
-  function render(){ renderGreeting(); renderKPIs(); renderHealth(); renderSportReqs(); renderQuick(); renderSchedule(); renderGroups(); renderCards(); }
+  function render(){ renderGreeting(); renderAttention(); renderKPIs(); renderHealth(); renderSportReqs(); renderQuick(); renderSchedule(); renderGroups(); renderCards(); }
+
+  const ATTN_IC={no_checkin:'📭',sore:'🩹',load:'📈',energy:'🔋',injury:'⚠️'};
+  function renderAttention(){
+    const w=$('#attnWrap'); if(!w) return;
+    const flagged=ROWS.filter(r=>r.status==='active' && (r.attention||[]).length)
+      .map(r=>({r, top:r.attention[0], n:r.attention.length}))
+      .sort((a,b)=>b.n-a.n);
+    if(!flagged.length){ w.innerHTML=`<div class="attn-clear">✅ <b>All clear</b> — nobody's flagged for attention right now.</div>`; return; }
+    w.innerHTML=`<div class="sechead"><h2>Needs attention today</h2><span class="hint">${flagged.length} athlete${flagged.length>1?'s':''} · tap to open their file</span></div>
+      <div class="attn-grid">${flagged.map(({r,top,n})=>`
+        <button class="attn" data-open="${r.id}">
+          <span class="mono-av sm" style="--rc:var(--amber);--rp:0"><b>${initials(r.name)}</b>${r.avatar_url?`<img src="${esc(r.avatar_url)}" alt="">`:''}</span>
+          <span class="attn-b"><span class="attn-nm">${esc(r.name)}</span><span class="attn-rs">${ATTN_IC[top.t]||'•'} ${esc(top.label)}${n>1?` · +${n-1} more`:''}</span></span>
+          <span class="attn-go">▸</span>
+        </button>`).join('')}</div>`;
+    w.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>openDrawer(b.dataset.open,b)));
+  }
 
   function renderGreeting(){
     const now=new Date();

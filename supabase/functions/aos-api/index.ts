@@ -180,9 +180,22 @@ function buildAI(p: any, checkins: any[], journal: any[], peer: any) {
   return out;
 }
 
+// Session-RPE load (Foster): rpe × minutes. Weekly rollups for trend + readiness.
+function loadSummary(checkins: any[]) {
+  const nowMs = Date.now();
+  const loadOf = (c: any) => (c.rpe ? c.rpe : 0) * (c.mins || 0);
+  const inWindow = (c: any, aDays: number, bDays: number) => {
+    const dt = nowMs - new Date(c.d).getTime();
+    return dt >= aDays * 864e5 && dt < bDays * 864e5;
+  };
+  const week = Math.round(checkins.filter((c) => inWindow(c, 0, 7)).reduce((s, c) => s + loadOf(c), 0));
+  const prev = Math.round(checkins.filter((c) => inWindow(c, 7, 14)).reduce((s, c) => s + loadOf(c), 0));
+  return { week, prev, trend: prev ? Math.round((week - prev) / prev * 100) : (week ? 100 : 0) };
+}
+
 async function athleteState(p: any) {
   const [checkins, journal, messages, peer] = await Promise.all([
-    db(`aos_checkins?athlete_id=eq.${p.id}&select=d,energy,sleep_h,water,soreness,mins,focus,note&order=d.desc&limit=14`),
+    db(`aos_checkins?athlete_id=eq.${p.id}&select=d,energy,sleep_h,water,soreness,mins,rpe,focus,note&order=d.desc&limit=14`),
     db(`aos_journal?athlete_id=eq.${p.id}&select=id,kind,d,data,share_coach,created_at&order=created_at.desc&limit=40`),
     msgsFor(p.id),
     peerAgg(p.id),
@@ -202,6 +215,7 @@ async function athleteState(p: any) {
   const today = sydToday();
   return {
     profile: profile(p), checkins, messages, peer, team, teammates, events,
+    load: loadSummary(checkins),
     ai: buildAI(p, checkins, journal, peer),
     mind: journal.filter((j: any) => j.kind === "mind").slice(0, 10),
     diary: journal.filter((j: any) => j.kind === "diary").slice(0, 10),
@@ -354,6 +368,7 @@ Deno.serve(async (req) => {
           water: num(b.water, 0, 12, 0),
           soreness: num(b.soreness, 1, 10, 3),
           mins: num(b.mins, 0, 600, 0),
+          rpe: (b.rpe != null && b.rpe !== "") ? num(b.rpe, 1, 10, 5) : null,
           focus: Array.isArray(b.focus) ? b.focus.slice(0, 6).map((f: unknown) => priv(f, 30)) : [],
           note: priv(b.note, 400),
         }) });
@@ -523,26 +538,50 @@ Deno.serve(async (req) => {
       }
 
       if (a === "roster") {
-        const [athletes, teams, peers, sportReqs, events, pushSubs] = await Promise.all([
+        const cutoff = new Date(Date.now() - 28 * 864e5).toLocaleDateString("en-CA", { timeZone: "Australia/Sydney" });
+        const [athletes, teams, peers, sportReqs, events, pushSubs, recentCk] = await Promise.all([
           db("aos_athletes?select=id,name,sport,sport_label,age,level,position,goals,injuries,train_freq,comp_schedule,equipment,location,contact,xp,streak,last_checkin,status,created_at,team_id,coach_rating,coach_rating_at,avatar_url&order=created_at.asc"),
           teamsList(),
           db("aos_peer_ratings?select=ratee_id,score"),
           db("aos_sport_requests?status=eq.pending&select=id,athlete_name,sport,created_at&order=created_at.desc"),
           db(`aos_events?starts_at=gte.${encodeURIComponent(new Date(Date.now() - 6 * 3600 * 1000).toISOString())}&select=id,title,type,starts_at,location,note,team_id&order=starts_at.asc&limit=100`),
           db("aos_push_subs?select=athlete_id"),
+          db(`aos_checkins?d=gte.${cutoff}&select=athlete_id,d,energy,soreness,mins,rpe&order=d.desc&limit=4000`),
         ]);
         const pmap: Record<string, number[]> = {};
         (peers || []).forEach((r: any) => { (pmap[r.ratee_id] = pmap[r.ratee_id] || []).push(r.score); });
         const pushMap: Record<string, number> = {};
         (pushSubs || []).forEach((r: any) => { if (r.athlete_id) pushMap[r.athlete_id] = (pushMap[r.athlete_id] || 0) + 1; });
+        const ckByA: Record<string, any[]> = {};
+        (recentCk || []).forEach((c: any) => { (ckByA[c.athlete_id] = ckByA[c.athlete_id] || []).push(c); });
+        const today = sydToday();
+        const nowMs = Date.now();
         (athletes || []).forEach((x: any) => {
           const arr = pmap[x.id];
           x.peer_avg = arr && arr.length ? Math.round(arr.reduce((s: number, v: number) => s + v, 0) / arr.length * 10) / 10 : null;
           x.peer_count = arr ? arr.length : 0;
           x.push_on = !!pushMap[x.id];
           x.push_count = pushMap[x.id] || 0;
+          // Attention triage — combine simple, individualised signals.
+          const cks = ckByA[x.id] || [];
+          const loadOf = (c: any) => (c.rpe ? c.rpe : 0) * (c.mins || 0);
+          const within = (c: any, d: number) => (nowMs - new Date(c.d).getTime()) < d * 864e5;
+          const load7 = cks.filter((c: any) => within(c, 7)).reduce((s: number, c: any) => s + loadOf(c), 0);
+          const load28 = cks.filter((c: any) => within(c, 28)).reduce((s: number, c: any) => s + loadOf(c), 0);
+          const chronicWk = load28 / 4;
+          const last = cks[0];
+          const e14 = cks.filter((c: any) => within(c, 14)).map((c: any) => +c.energy || 0).filter(Boolean);
+          const eAvg = e14.length ? e14.reduce((s: number, v: number) => s + v, 0) / e14.length : null;
+          const att: any[] = [];
+          if (x.status === "active" && x.last_checkin !== today) att.push({ t: "no_checkin", label: "No check-in today" });
+          if (last && last.soreness >= 7) att.push({ t: "sore", label: `Soreness ${last.soreness}/10` });
+          if (chronicWk > 0 && load7 >= 1.5 * chronicWk) att.push({ t: "load", label: "Training load spiking" });
+          if (last && eAvg && +last.energy <= eAvg - 2) att.push({ t: "energy", label: "Energy below their norm" });
+          if (x.injuries) att.push({ t: "injury", label: "Managing injury" });
+          x.attention = att;
+          x.load7 = Math.round(load7);
         });
-        return J({ ok: true, today: sydToday(), athletes, teams: teams || [], sport_requests: sportReqs || [], events: events || [] });
+        return J({ ok: true, today, athletes, teams: teams || [], sport_requests: sportReqs || [], events: events || [] });
       }
       if (a === "event_create") {
         const title = priv(b.title, 80);
@@ -574,7 +613,7 @@ Deno.serve(async (req) => {
         const p = await getAthlete(b.aid);
         if (!p) return J({ error: "no athlete" }, 404);
         const [checkins, notes, journal, messages, peer, teams, pushSubs] = await Promise.all([
-          db(`aos_checkins?athlete_id=eq.${p.id}&select=d,energy,sleep_h,water,soreness,mins,focus,note&order=d.desc&limit=14`),
+          db(`aos_checkins?athlete_id=eq.${p.id}&select=d,energy,sleep_h,water,soreness,mins,rpe,focus,note&order=d.desc&limit=14`),
           db(`aos_notes?athlete_id=eq.${p.id}&select=id,text,created_at&order=created_at.asc`),
           db(`aos_journal?athlete_id=eq.${p.id}&share_coach=eq.true&select=kind,d,data,created_at&order=created_at.desc&limit=15`),
           msgsFor(p.id),
@@ -583,7 +622,7 @@ Deno.serve(async (req) => {
           db(`aos_push_subs?athlete_id=eq.${p.id}&select=id`),
         ]);
         return J({ ok: true, profile: profile(p), contact: p.contact || null, status: p.status, checkins, notes, messages, peer, teams: teams || [],
-          push_on: (pushSubs?.length || 0) > 0, push_count: pushSubs?.length || 0,
+          push_on: (pushSubs?.length || 0) > 0, push_count: pushSubs?.length || 0, load: loadSummary(checkins),
           shared_mind: journal.filter((j: any) => j.kind === "mind"),
           fuel: journal.filter((j: any) => j.kind === "fuel").slice(0, 7) });
       }
