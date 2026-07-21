@@ -20,6 +20,14 @@
   to = "/giveaway/"
   status = 301
 
+# --- Eagles Gym Staff Hub ------------------------------------------------
+# Standalone staff-accountability PWA. publish stays "." — scoped to
+# /eagles-gym/ only, other products untouched.
+[[redirects]]
+  from = "/eagles-gym"
+  to = "/eagles-gym/"
+  status = 301
+
 # Security headers for the giveaway app.
 [[headers]]
   for = "/giveaway/*"
