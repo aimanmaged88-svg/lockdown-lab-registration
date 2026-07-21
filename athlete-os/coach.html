@@ -199,6 +199,7 @@
     background:conic-gradient(var(--rc) calc(var(--rp)*1%), var(--track) 0)}
   .mono-av::after{content:"";position:absolute;inset:2px;border-radius:50%;background:var(--surface)}
   .mono-av b{position:relative;z-index:1;font-family:var(--fd);font-size:17px;letter-spacing:.5px}
+  .mono-av img{position:absolute;inset:2px;z-index:2;width:calc(100% - 4px);height:calc(100% - 4px);border-radius:50%;object-fit:cover}
   .ac-id{min-width:0;flex:1}
   .ac-id .nm{display:block;font-family:var(--fd);text-transform:uppercase;letter-spacing:.4px;font-size:18px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .ac-id .meta{display:block;font-size:12px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -335,6 +336,7 @@
       <div class="brand"><svg class="lg" style="width:26px;height:26px;color:var(--accent)"><use href="#ll"/></svg><b>Athlete <i>OS</i></b></div>
       <span class="pill hide-sm">Coach · <b>All Athletes</b></span>
       <div class="spacer"></div>
+      <a class="btn btn-ghost" href="admin.html" title="Organisation structure">🏛 Org</a>
       <button class="theme-toggle" id="themeToggle" aria-label="Switch theme">☾</button>
       <button class="btn btn-ghost hide-sm" id="exportBtn">Export CSV</button>
       <button class="btn btn-ghost" id="logoutBtn">Log out</button>
@@ -674,7 +676,7 @@
       const tn=teamName(r.team_id);
       return `<button class="acard" data-open="${r.id}" aria-haspopup="dialog" aria-label="Open ${esc(r.name)}'s file">
         <div class="ac-top">
-          <span class="mono-av" style="--rc:${rc};--rp:${Math.round(Math.min(r.xp||0,1200)/1200*100)}"><b>${initials(r.name)}</b></span>
+          <span class="mono-av" style="--rc:${rc};--rp:${Math.round(Math.min(r.xp||0,1200)/1200*100)}"><b>${initials(r.name)}</b>${r.avatar_url?`<img src="${esc(r.avatar_url)}" alt="">`:''}</span>
           <span class="ac-id"><span class="nm">${esc(r.name)}</span><span class="meta">${esc(meta||'—')}${tn?' · '+esc(tn):''}</span></span>
         </div>
         <div class="ac-stats">

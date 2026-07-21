@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<script>(function(){var T=['dark','light','midnight','forest','grape'];try{var t=localStorage.getItem('aos_theme');document.documentElement.setAttribute('data-theme',T.indexOf(t)>=0?t:'dark');}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+<title>Athlete OS — Admin · Organisation</title>
+<meta name="theme-color" content="#090909">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<style>
+:root{
+  --bg:#090909; --surface:#121212; --surface-2:#181818;
+  --line:rgba(255,255,255,.09); --line2:rgba(255,255,255,.05);
+  --text:#F5F5F5; --muted:#9B9B9B; --dim:#7C7C7C;
+  --accent:#FF7A00; --accent-text:#FF7A00; --accent-soft:rgba(255,122,0,.13); --on-accent:#1A0E00;
+  --good:#30D158; --bad:#FF453A; --bad-soft:rgba(255,69,58,.12);
+  --r:16px; --r-sm:10px; --r-pill:999px;
+  --fd:'Bebas Neue',"Arial Narrow",Arial,sans-serif; --fb:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,system-ui,sans-serif;
+  --fm:ui-monospace,'SF Mono','Roboto Mono',Menlo,monospace;
+  color-scheme:dark;
+}
+:root[data-theme="light"]{ --bg:#F2F2F7; --surface:#fff; --surface-2:#fff; --line:rgba(0,0,0,.1); --line2:rgba(0,0,0,.06); --text:#1D1D1F; --muted:#6E6E73; --dim:#8E8E93; --accent-text:#C2410C; --accent-soft:rgba(255,122,0,.1); color-scheme:light; }
+:root[data-theme="midnight"]{ --bg:#0A0F1E; --surface:#111830; --surface-2:#16203C; --line:rgba(120,150,255,.14); --text:#EAF0FF; --muted:#96A2C4; --dim:#6E7A9C; --accent:#4C8DFF; --accent-text:#7CB0FF; --accent-soft:rgba(76,141,255,.16); --on-accent:#04122E; }
+:root[data-theme="forest"]{ --bg:#08120C; --surface:#0F1D14; --surface-2:#14261A; --line:rgba(120,255,170,.12); --text:#EAFBF0; --muted:#8FB6A0; --dim:#688A76; --accent:#22C55E; --accent-text:#4ADE80; --accent-soft:rgba(34,197,94,.16); --on-accent:#04150B; }
+:root[data-theme="grape"]{ --bg:#100A1A; --surface:#1A1030; --surface-2:#21163C; --line:rgba(190,150,255,.14); --text:#F3EDFF; --muted:#AC9DC8; --dim:#7F6E9C; --accent:#B57BFF; --accent-text:#CDA4FF; --accent-soft:rgba(181,123,255,.17); --on-accent:#1A0733; }
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{background:var(--bg);color:var(--text);font-family:var(--fb);line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100dvh}
+a{color:inherit}
+button{font-family:inherit;color:inherit;background:none;border:none;cursor:pointer}
+input,select,textarea{font-family:var(--fb);color:var(--text);background:var(--surface-2);border:1px solid var(--line);border-radius:var(--r-sm);padding:11px 13px;font-size:14px;outline:none;width:100%}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+.wrap{max-width:960px;margin:0 auto;padding:22px 20px 80px}
+.brand{display:flex;align-items:center;gap:11px}
+.brand svg{width:30px;height:30px;color:var(--accent)}
+.brand b{font-family:var(--fd);font-size:24px;letter-spacing:1.5px;text-transform:uppercase;font-weight:400}
+.brand b i{font-style:normal;color:var(--accent-text)}
+.btn{font-family:var(--fb);font-weight:650;font-size:14px;border-radius:var(--r-sm);padding:11px 16px;display:inline-flex;align-items:center;gap:8px;justify-content:center;transition:.15s;border:1px solid transparent}
+.btn:active{transform:scale(.97)}
+.btn-p{background:var(--accent);color:var(--on-accent)}
+.btn-g{background:var(--surface-2);border-color:var(--line);color:var(--text)}
+.btn-sm{padding:7px 12px;font-size:12.5px;font-weight:600}
+.btn-block{width:100%}
+
+/* login */
+#login{min-height:100dvh;display:grid;place-items:center;padding:24px}
+#login .card{width:100%;max-width:380px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:28px 24px;text-align:center}
+#login h1{font-family:var(--fd);font-size:26px;letter-spacing:.5px;margin:16px 0 6px;text-transform:uppercase;font-weight:400}
+#login p{color:var(--muted);font-size:13.5px;margin-bottom:16px}
+#login input{text-align:center;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px}
+.err{display:none;color:var(--bad);font-size:13px;margin-top:10px}
+
+/* header */
+.top{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:6px}
+.top .spacer{flex:1}
+.sub{color:var(--dim);font-size:13px;margin-bottom:18px}
+.tabs{display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.tabs a{font-family:var(--fm);font-size:11px;letter-spacing:.6px;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:var(--r-pill);padding:8px 14px}
+.tabs a.on{color:var(--on-accent);background:var(--accent);border-color:var(--accent)}
+
+.bar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:18px}
+
+/* tree */
+.tree{display:grid;gap:12px}
+.node{border:1px solid var(--line);border-radius:var(--r);background:var(--surface);overflow:hidden}
+.node > .row{display:flex;align-items:center;gap:10px;padding:13px 15px}
+.row .tag{font-family:var(--fm);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--dim);border:1px solid var(--line);border-radius:var(--r-pill);padding:3px 8px;flex:0 0 auto}
+.row .nm{font-weight:650;font-size:15px;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .act{display:flex;gap:5px;flex:0 0 auto}
+.iconbtn{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);color:var(--muted);display:grid;place-items:center;font-size:13px}
+.iconbtn:hover{border-color:var(--accent);color:var(--accent-text)}
+.iconbtn.del:hover{border-color:var(--bad);color:var(--bad)}
+.kids{padding:0 12px 12px 22px;display:grid;gap:9px}
+.club{border-left:2px solid var(--accent-soft);border-radius:0 12px 12px 0;background:var(--surface-2)}
+.season,.age{background:var(--surface-2);border-radius:10px;border:1px solid var(--line)}
+.teamrow{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px dashed var(--line);border-radius:9px;background:transparent}
+.teamrow .tn{flex:1;min-width:0;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.teamrow .cnt{font-family:var(--fm);font-size:11px;color:var(--dim);flex:0 0 auto}
+.teamrow select{width:auto;padding:6px 8px;font-size:12px}
+.addbtn{font-size:12px;color:var(--accent-text);border:1px dashed var(--line);border-radius:9px;padding:8px 12px;background:transparent;justify-self:start}
+.addbtn:hover{border-color:var(--accent)}
+.empty{border:1px dashed var(--line);border-radius:var(--r);padding:40px 20px;text-align:center;color:var(--muted)}
+.empty b{display:block;font-family:var(--fd);font-size:22px;text-transform:uppercase;color:var(--text);margin-bottom:6px}
+.sec-h{font-family:var(--fm);font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--dim);margin:22px 0 10px}
+
+/* sheet / modal */
+.scrim{position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);display:none;place-items:center;padding:20px;z-index:60}
+.scrim.open{display:grid}
+.sheet{width:100%;max-width:520px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:22px}
+.sheet h3{font-family:var(--fd);font-size:22px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;font-weight:400}
+.sheet p{color:var(--muted);font-size:13px;margin-bottom:14px;line-height:1.5}
+.sheet .row2{display:flex;gap:10px;margin-top:16px}
+.sheet textarea{min-height:150px;font-family:var(--fm);font-size:12.5px;line-height:1.5;resize:vertical}
+.codeblock{font-family:var(--fm);font-size:11.5px;color:var(--muted);background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:11px 12px;white-space:pre;overflow-x:auto;margin-bottom:12px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(14px);background:var(--text);color:#111;font-weight:700;font-size:13px;padding:11px 18px;border-radius:var(--r-pill);opacity:0;transition:.2s;pointer-events:none;z-index:70}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.theme-toggle{width:34px;height:34px;border-radius:var(--r-pill);border:1px solid var(--line);color:var(--muted);display:grid;place-items:center;font-size:15px}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="ll" viewBox="0 0 120 120" fill="none"><circle cx="60" cy="60" r="50" stroke="currentColor" stroke-width="7"/><path d="M34 92 L60 24 L86 92" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><path d="M45 70 H75" stroke="currentColor" stroke-width="7" stroke-linecap="round"/></symbol></svg>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="card">
+    <div class="brand" style="justify-content:center"><svg><use href="#ll"/></svg><b>Athlete <i>OS</i></b></div>
+    <h1>Admin Access</h1>
+    <p>Enter your coach code to manage your organisation structure.</p>
+    <input id="token" type="password" placeholder="Coach code" autocomplete="off">
+    <button class="btn btn-p btn-block" id="loginBtn">Open admin →</button>
+    <div class="err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div class="wrap" id="admin" style="display:none">
+  <div class="top">
+    <div class="brand"><svg><use href="#ll"/></svg><b>Athlete <i>OS</i></b></div>
+    <span class="spacer"></span>
+    <button class="theme-toggle" id="themeToggle" aria-label="Theme">☾</button>
+    <button class="btn btn-g btn-sm" id="logoutBtn">Log out</button>
+  </div>
+  <div class="tabs">
+    <a href="coach.html">Dashboard</a>
+    <a class="on">Organisation</a>
+  </div>
+  <div class="sub" id="orgSub">Build your structure: Organisation → Club → Season → Age Group → Team. Athletes attach to teams.</div>
+
+  <div class="bar">
+    <button class="btn btn-p btn-sm" id="newOrgBtn">＋ New organisation</button>
+    <button class="btn btn-g btn-sm" id="importBtn">⇪ Import (paste / CSV)</button>
+    <button class="btn btn-g btn-sm" id="refreshBtn">↻ Refresh</button>
+  </div>
+
+  <div id="tree" class="tree"></div>
+</div>
+
+<div class="scrim" id="scrim"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const FN='https://ymuwuhvqqftgpxwhzoub.supabase.co/functions/v1/aos-api';
+  let CODE=sessionStorage.getItem('aos_coach_code')||'';
+  let D={orgs:[],clubs:[],seasons:[],age_groups:[],teams:[]};
+  const $=s=>document.querySelector(s);
+  const esc=s=>(s==null?'':String(s)).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+  let tT; const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),1800);};
+
+  async function api(p){
+    const r=await fetch(FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(Object.assign({code:CODE},p))});
+    const j=await r.json().catch(()=>({}));
+    if(r.status===401) throw new Error('unauthorized');
+    if(!r.ok) throw new Error(j.error||('HTTP '+r.status));
+    return j;
+  }
+
+  /* ---- login ---- */
+  $('#loginBtn').addEventListener('click',doLogin);
+  $('#token').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+  async function doLogin(){
+    const t=$('#token').value.trim().toUpperCase(); if(!t)return;
+    CODE=t;
+    try{ await load(); sessionStorage.setItem('aos_coach_code',CODE); $('#login').style.display='none'; $('#admin').style.display='block'; }
+    catch(e){ const el=$('#loginErr'); el.style.display='block'; el.textContent=(e.message==='unauthorized'||/coach code/.test(e.message))?'That code was not accepted.':'Could not connect. Try again.'; }
+  }
+  $('#logoutBtn').addEventListener('click',()=>{ sessionStorage.removeItem('aos_coach_code'); CODE=''; $('#admin').style.display='none'; $('#login').style.display='grid'; $('#token').value=''; });
+
+  /* ---- data ---- */
+  async function load(){ const r=await api({action:'org_tree'}); D={orgs:r.orgs||[],clubs:r.clubs||[],seasons:r.seasons||[],age_groups:r.age_groups||[],teams:r.teams||[]}; render(); }
+  $('#refreshBtn').addEventListener('click',()=>load().then(()=>toast('Refreshed')));
+
+  /* ---- render tree ---- */
+  function render(){
+    const byOrg={}, bySeasonClub={}, byAgeSeason={}, byTeamAge={};
+    D.clubs.forEach(c=>(byOrg[c.org_id]=byOrg[c.org_id]||[]).push(c));
+    D.seasons.forEach(s=>(bySeasonClub[s.club_id]=bySeasonClub[s.club_id]||[]).push(s));
+    D.age_groups.forEach(a=>(byAgeSeason[a.season_id]=byAgeSeason[a.season_id]||[]).push(a));
+    D.teams.forEach(t=>{ if(t.age_group_id) (byTeamAge[t.age_group_id]=byTeamAge[t.age_group_id]||[]).push(t); });
+    const unassigned=D.teams.filter(t=>!t.age_group_id);
+
+    const wrap=$('#tree');
+    if(!D.orgs.length && !D.teams.length){
+      wrap.innerHTML=`<div class="empty"><b>No structure yet</b>Start with <b style="color:var(--accent-text);display:inline">＋ New organisation</b>, or paste a whole structure with <b style="display:inline">Import</b>. Your existing teams show under “Unassigned”.</div>`;
+    } else {
+      let html=D.orgs.map(org=>{
+        const clubs=byOrg[org.id]||[];
+        return `<div class="node"><div class="row">
+          <span class="tag">Org</span><span class="nm">${esc(org.name)}</span>
+          <span class="act">
+            <button class="iconbtn" data-add="club" data-parent="${org.id}" title="Add club">＋</button>
+            <button class="iconbtn" data-ren="org" data-id="${org.id}" data-name="${esc(org.name)}" title="Rename">✎</button>
+            <button class="iconbtn del" data-del="org" data-id="${org.id}" data-name="${esc(org.name)}" title="Delete">✕</button>
+          </span></div>
+          <div class="kids">
+            ${clubs.map(club=>renderClub(club,bySeasonClub,byAgeSeason,byTeamAge)).join('')}
+            <button class="addbtn" data-add="club" data-parent="${org.id}">＋ Add club</button>
+          </div></div>`;
+      }).join('');
+      // Unassigned teams
+      html+=`<div class="sec-h">Unassigned teams (${unassigned.length})</div>`;
+      if(unassigned.length){
+        html+=`<div class="node"><div class="kids" style="padding-top:12px">${unassigned.map(t=>teamRow(t,true)).join('')}</div></div>`;
+      } else {
+        html+=`<div class="empty" style="padding:22px">Every team is slotted into an age group. 🎯</div>`;
+      }
+      wrap.innerHTML=html;
+    }
+    wireTree();
+  }
+  function renderClub(club,bySeasonClub,byAgeSeason,byTeamAge){
+    const seasons=bySeasonClub[club.id]||[];
+    return `<div class="node club"><div class="row">
+      <span class="tag">Club</span><span class="nm">${esc(club.name)}</span>
+      <span class="act">
+        <button class="iconbtn" data-add="season" data-parent="${club.id}" title="Add season">＋</button>
+        <button class="iconbtn" data-ren="club" data-id="${club.id}" data-name="${esc(club.name)}" title="Rename">✎</button>
+        <button class="iconbtn del" data-del="club" data-id="${club.id}" data-name="${esc(club.name)}" title="Delete">✕</button>
+      </span></div>
+      <div class="kids">
+        ${seasons.map(s=>renderSeason(s,byAgeSeason,byTeamAge)).join('')}
+        <button class="addbtn" data-add="season" data-parent="${club.id}">＋ Add season</button>
+      </div></div>`;
+  }
+  function renderSeason(season,byAgeSeason,byTeamAge){
+    const ages=byAgeSeason[season.id]||[];
+    return `<div class="node season"><div class="row">
+      <span class="tag">Season</span><span class="nm">${esc(season.name)}</span>
+      <span class="act">
+        <button class="iconbtn" data-add="agegroup" data-parent="${season.id}" title="Add age group">＋</button>
+        <button class="iconbtn" data-ren="season" data-id="${season.id}" data-name="${esc(season.name)}" title="Rename">✎</button>
+        <button class="iconbtn del" data-del="season" data-id="${season.id}" data-name="${esc(season.name)}" title="Delete">✕</button>
+      </span></div>
+      <div class="kids">
+        ${ages.map(a=>renderAge(a,byTeamAge)).join('')}
+        <button class="addbtn" data-add="agegroup" data-parent="${season.id}">＋ Add age group</button>
+      </div></div>`;
+  }
+  function renderAge(age,byTeamAge){
+    const teams=byTeamAge[age.id]||[];
+    return `<div class="node age"><div class="row">
+      <span class="tag">Age</span><span class="nm">${esc(age.name)}</span>
+      <span class="act">
+        <button class="iconbtn" data-add="team" data-parent="${age.id}" title="Add team">＋</button>
+        <button class="iconbtn" data-ren="agegroup" data-id="${age.id}" data-name="${esc(age.name)}" title="Rename">✎</button>
+        <button class="iconbtn del" data-del="agegroup" data-id="${age.id}" data-name="${esc(age.name)}" title="Delete">✕</button>
+      </span></div>
+      <div class="kids">
+        ${teams.map(t=>teamRow(t,false)).join('')}
+        <button class="addbtn" data-add="team" data-parent="${age.id}">＋ Add team</button>
+      </div></div>`;
+  }
+  function ageOptions(sel){
+    // Flat list "Club · Season · Age" for assignment
+    const opts=D.age_groups.map(a=>{
+      const s=D.seasons.find(x=>x.id===a.season_id); const c=s&&D.clubs.find(x=>x.id===s.club_id);
+      const label=[c&&c.name,s&&s.name,a.name].filter(Boolean).join(' · ');
+      return `<option value="${a.id}" ${sel===a.id?'selected':''}>${esc(label)}</option>`;
+    }).join('');
+    return `<option value="">— unassigned —</option>${opts}`;
+  }
+  function teamRow(t,showAssign){
+    return `<div class="teamrow">
+      <span class="tag">Team</span>
+      <span class="tn">${esc(t.name)}</span>
+      <span class="cnt">${t.member_count||0} 👤</span>
+      ${showAssign?`<select data-assign="${t.id}" aria-label="Assign to age group">${ageOptions(t.age_group_id)}</select>`:`<button class="iconbtn" data-assign-open="${t.id}" title="Move">⇄</button>`}
+      <button class="iconbtn" data-ren="team" data-id="${t.id}" data-name="${esc(t.name)}" title="Rename">✎</button>
+      <button class="iconbtn del" data-del="team" data-id="${t.id}" data-name="${esc(t.name)}" title="Delete">✕</button>
+    </div>`;
+  }
+  function wireTree(){
+    document.querySelectorAll('[data-add]').forEach(b=>b.addEventListener('click',()=>askCreate(b.dataset.add,b.dataset.parent)));
+    document.querySelectorAll('[data-ren]').forEach(b=>b.addEventListener('click',()=>askRename(b.dataset.ren,b.dataset.id,b.dataset.name)));
+    document.querySelectorAll('[data-del]').forEach(b=>b.addEventListener('click',()=>askDelete(b.dataset.del,b.dataset.id,b.dataset.name)));
+    document.querySelectorAll('[data-assign]').forEach(s=>s.addEventListener('change',()=>assignTeam(s.dataset.assign,s.value||null)));
+    document.querySelectorAll('[data-assign-open]').forEach(b=>b.addEventListener('click',()=>askAssign(b.dataset.assignOpen)));
+  }
+
+  /* ---- ops ---- */
+  const KIND_LABEL={org:'organisation',club:'club',season:'season',agegroup:'age group',team:'team'};
+  const KIND_PH={org:'e.g. Metro Basketball',club:'e.g. Northside Hawks',season:'e.g. 2026 Summer',agegroup:'e.g. Under 16',team:'e.g. U16 Boys A'};
+  function askCreate(kind,parent){
+    openSheet(`<h3>New ${KIND_LABEL[kind]}</h3>
+      <input id="mName" placeholder="${KIND_PH[kind]}" autocomplete="off">
+      <div class="row2"><button class="btn btn-g" style="flex:1" id="mCancel">Cancel</button><button class="btn btn-p" style="flex:1" id="mOk">Create</button></div>
+      <div class="err" id="mErr"></div>`);
+    setTimeout(()=>$('#mName').focus(),40);
+    $('#mName').addEventListener('keydown',e=>{if(e.key==='Enter')$('#mOk').click();});
+    $('#mCancel').addEventListener('click',closeSheet);
+    $('#mOk').addEventListener('click',async()=>{
+      const name=$('#mName').value.trim(); if(!name){$('#mErr').style.display='block';$('#mErr').textContent='Give it a name.';return;}
+      try{ await api({action:'org_node',kind,op:'create',parent_id:parent||null,name}); closeSheet(); await load(); toast('Added'); }
+      catch(e){ $('#mErr').style.display='block'; $('#mErr').textContent=e.message; }
+    });
+  }
+  function askRename(kind,id,cur){
+    openSheet(`<h3>Rename ${KIND_LABEL[kind]}</h3>
+      <input id="mName" value="${esc(cur)}" autocomplete="off">
+      <div class="row2"><button class="btn btn-g" style="flex:1" id="mCancel">Cancel</button><button class="btn btn-p" style="flex:1" id="mOk">Save</button></div>
+      <div class="err" id="mErr"></div>`);
+    setTimeout(()=>{const i=$('#mName');i.focus();i.select();},40);
+    $('#mName').addEventListener('keydown',e=>{if(e.key==='Enter')$('#mOk').click();});
+    $('#mCancel').addEventListener('click',closeSheet);
+    $('#mOk').addEventListener('click',async()=>{
+      const name=$('#mName').value.trim(); if(!name)return;
+      try{ await api({action:'org_node',kind,op:'rename',id,name}); closeSheet(); await load(); toast('Renamed'); }
+      catch(e){ $('#mErr').style.display='block'; $('#mErr').textContent=e.message; }
+    });
+  }
+  function askDelete(kind,id,name){
+    const warn=kind==='team'?'Athletes on this team will become unassigned (not deleted).':'Everything inside it will be removed too. Teams inside become unassigned (athletes are kept).';
+    openSheet(`<h3>Delete ${KIND_LABEL[kind]}?</h3><p>Remove <b>${esc(name)}</b>. ${warn} This can't be undone.</p>
+      <div class="row2"><button class="btn btn-g" style="flex:1" id="mCancel">Keep it</button><button class="btn btn-p" style="flex:1;background:var(--bad)" id="mOk">Delete</button></div>`);
+    $('#mCancel').addEventListener('click',closeSheet);
+    $('#mOk').addEventListener('click',async()=>{ try{ await api({action:'org_node',kind,op:'delete',id}); closeSheet(); await load(); toast('Deleted'); }catch(e){ toast('Failed'); } });
+  }
+  async function assignTeam(id,ageId){ try{ await api({action:'org_node',kind:'team',op:'assign',id,parent_id:ageId}); await load(); toast(ageId?'Team assigned':'Team unassigned'); }catch(e){ toast('Failed'); } }
+  function askAssign(id){
+    const t=D.teams.find(x=>x.id===id)||{};
+    openSheet(`<h3>Move team</h3><p>Assign <b>${esc(t.name)}</b> to an age group.</p>
+      <select id="mAge">${ageOptions(t.age_group_id)}</select>
+      <div class="row2"><button class="btn btn-g" style="flex:1" id="mCancel">Cancel</button><button class="btn btn-p" style="flex:1" id="mOk">Save</button></div>`);
+    $('#mCancel').addEventListener('click',closeSheet);
+    $('#mOk').addEventListener('click',async()=>{ await assignTeam(id,$('#mAge').value||null); closeSheet(); });
+  }
+
+  /* ---- create org / import ---- */
+  $('#newOrgBtn').addEventListener('click',()=>askCreate('org',null));
+  $('#importBtn').addEventListener('click',()=>{
+    openSheet(`<h3>Import structure</h3>
+      <p>Paste one row per team, comma-separated, in this order (a header row is optional):</p>
+      <div class="codeblock">Org, Club, Season, Age Group, Team
+Metro Basketball, Northside Hawks, 2026 Summer, Under 16, U16 Boys A
+Metro Basketball, Northside Hawks, 2026 Summer, Under 16, U16 Boys B
+Metro Basketball, Northside Hawks, 2026 Summer, Under 14, U14 Girls</div>
+      <textarea id="mCsv" placeholder="Paste your CSV or tab-separated rows here…"></textarea>
+      <p style="margin-top:10px">Existing names are reused, not duplicated — safe to re-run. (Live import from another organisation's system isn't available; export to CSV from there and paste here.)</p>
+      <div class="row2"><button class="btn btn-g" style="flex:1" id="mCancel">Cancel</button><button class="btn btn-p" style="flex:1" id="mOk">Import</button></div>
+      <div class="err" id="mErr"></div>`);
+    $('#mCancel').addEventListener('click',closeSheet);
+    $('#mOk').addEventListener('click',async()=>{
+      const text=$('#mCsv').value.trim(); if(!text){$('#mErr').style.display='block';$('#mErr').textContent='Paste some rows first.';return;}
+      const btn=$('#mOk'); btn.disabled=true; btn.textContent='Importing…';
+      try{ const r=await api({action:'org_import',text}); closeSheet(); await load(); toast('Imported '+(r.teams_imported||0)+' team'+(r.teams_imported===1?'':'s')); }
+      catch(e){ btn.disabled=false; btn.textContent='Import'; $('#mErr').style.display='block'; $('#mErr').textContent=e.message; }
+    });
+  });
+
+  /* ---- sheet ---- */
+  const scrim=$('#scrim');
+  function openSheet(html){ $('#sheet').innerHTML=html; scrim.classList.add('open'); }
+  function closeSheet(){ scrim.classList.remove('open'); }
+  scrim.addEventListener('click',e=>{ if(e.target===scrim)closeSheet(); });
+  document.addEventListener('keydown',e=>{ if(e.key==='Escape'&&scrim.classList.contains('open'))closeSheet(); });
+
+  /* ---- theme ---- */
+  (function(){ const root=document.documentElement, tc=document.querySelector('meta[name="theme-color"]');
+    const TC={dark:'#090909',light:'#F2F2F7',midnight:'#0A0F1E',forest:'#08120C',grape:'#100A1A'};
+    const ORDER=['dark','light','midnight','forest','grape'];
+    function sync(){ const t=root.getAttribute('data-theme')||'dark'; const b=$('#themeToggle'); if(b)b.textContent=t==='light'?'☀':'☾'; if(tc)tc.setAttribute('content',TC[t]||'#090909'); }
+    sync();
+    $('#themeToggle').addEventListener('click',()=>{ const cur=root.getAttribute('data-theme')||'dark'; const next=ORDER[(ORDER.indexOf(cur)+1)%ORDER.length]; root.setAttribute('data-theme',next); try{localStorage.setItem('aos_theme',next);}catch(_){} sync(); });
+  })();
+
+  /* ---- boot ---- */
+  if(CODE){ load().then(()=>{ $('#login').style.display='none'; $('#admin').style.display='block'; }).catch(()=>{ sessionStorage.removeItem('aos_coach_code'); CODE=''; }); }
+})();
+</script>
+</body>
+</html>
