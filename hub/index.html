@@ -199,6 +199,9 @@ var PROJECTS = [
       {em:'📊', b:'Coach dashboard', u:BASE+'/athlete-os/coach.html'},
       {em:'🌐', b:'Landing page', u:BASE+'/athlete-os/'}
     ],
+    docs:[
+      {em:'📄', b:'Master project doc', u:'doc.html?t=Athlete%20OS%20master%20project&f=/ATHLETE-OS.md', sub:'ATHLETE-OS.md · what it is, features, roadmap'}
+    ],
     codes:[
       {k:'Your login', v:'Aiman · 0088', copy:'0088', btn:'Copy PIN'},
       {k:'Demo squad PIN', v:'1234', copy:'1234'},
@@ -225,6 +228,9 @@ var PROJECTS = [
       {em:'📱', b:'Player / Coach app', u:BASE+'/app.html'},
       {em:'🛠️', b:'Admin dashboard (you only)', u:BASE+'/admin.html'}
     ],
+    docs:[
+      {em:'📄', b:'Backend & engine spec', u:'doc.html?t=Lockdown%20Lab%20backend&f=/BACKEND.md', sub:'BACKEND.md · data model, API, auth'}
+    ],
     codes:[
       {k:'Coach code', v:'LAB-PYOD', copy:'LAB-PYOD'}
     ],
@@ -249,6 +255,9 @@ var PROJECTS = [
       {em:'👤', b:'Customer dashboard', u:BASE+'/giveaway/account.html'},
       {em:'🤝', b:'Affiliate portal', u:BASE+'/giveaway/affiliates.html'},
       {em:'🛠️', b:'Admin console (you only)', u:BASE+'/giveaway/admin.html'}
+    ],
+    docs:[
+      {em:'✅', b:'Requirements & coverage', u:'doc.html?t=Giveaway%20requirements&f=/giveaway/README.md', sub:'README.md · all 16 brief requirements + where each is built'}
     ],
     codes:[
       {k:'Admin token', v:'nova-admin', copy:'nova-admin'},
@@ -352,6 +361,17 @@ function renderDetail(p){
       h += '<a class="lk'+(l.primary?' primary':'')+'" href="'+l.u+'" target="_blank" rel="noopener">'+
         '<span class="em">'+l.em+'</span><span class="txt"><b>'+esc(l.b)+'</b>'+
         '<span>'+esc(l.sub || l.u.replace(BASE,'')) +'</span></span><span class="go">↗</span></a>';
+    });
+    h += '</div>';
+  }
+
+  // docs & requirements
+  if(p.docs && p.docs.length){
+    h += '<span class="lbl">Docs & requirements</span><div class="links">';
+    p.docs.forEach(function(l){
+      h += '<a class="lk" href="'+l.u+'">'+
+        '<span class="em">'+l.em+'</span><span class="txt"><b>'+esc(l.b)+'</b>'+
+        '<span>'+esc(l.sub||'')+'</span></span><span class="go">›</span></a>';
     });
     h += '</div>';
   }

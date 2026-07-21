@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#090909">
+<meta name="robots" content="noindex,nofollow">
+<title>Project doc — Launchpad</title>
+<style>
+  :root{
+    --bg:#090909; --card:#121212; --card2:#171717; --line:#262626; --line2:#333;
+    --text:#F5F5F5; --muted:#B4B4B4; --dim:#8A8A8A; --accent:#FF7A00; --accent-soft:rgba(255,122,0,.12);
+    --good:#30D158; --good-soft:rgba(48,209,88,.12);
+    --r:14px; --r-sm:10px; --r-pill:999px;
+    --fd:'Bebas Neue',-apple-system,system-ui,sans-serif;
+    --fb:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,system-ui,sans-serif;
+    --fm:ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{background:var(--bg);color:var(--text);font-family:var(--fb);line-height:1.6;
+    padding:max(16px,env(safe-area-inset-top)) 16px calc(48px + env(safe-area-inset-bottom));
+    max-width:720px;margin:0 auto;-webkit-font-smoothing:antialiased}
+  a{color:var(--accent)}
+  .top{display:flex;align-items:center;gap:10px;position:sticky;top:0;z-index:5;
+    background:linear-gradient(180deg,var(--bg) 70%,transparent);padding:8px 0 12px;margin-bottom:4px}
+  .back{display:inline-flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);
+    color:var(--muted);font-size:13px;font-weight:600;border-radius:var(--r-pill);padding:9px 15px 9px 12px;cursor:pointer;text-decoration:none}
+  .back:active{transform:scale(.96)}
+  .top .file{font-family:var(--fm);font-size:11px;color:var(--dim);margin-left:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:52vw}
+  #doc{animation:rise .2s ease both}
+  @keyframes rise{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  @media(prefers-reduced-motion:reduce){#doc{animation:none}}
+
+  /* markdown */
+  #doc h1{font-family:var(--fd);font-weight:400;letter-spacing:.6px;font-size:34px;line-height:1.05;margin:18px 0 6px}
+  #doc h2{font-family:var(--fd);font-weight:400;letter-spacing:.5px;font-size:26px;line-height:1.1;
+    margin:26px 0 8px;padding-top:16px;border-top:1px solid var(--line)}
+  #doc h3{font-size:16px;font-weight:700;margin:20px 0 6px;color:var(--text)}
+  #doc h4{font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin:16px 0 6px}
+  #doc p{margin:10px 0;color:var(--muted)}
+  #doc strong{color:var(--text);font-weight:700}
+  #doc em{color:var(--text)}
+  #doc a{text-decoration:none;border-bottom:1px solid rgba(255,122,0,.4)}
+  #doc code{font-family:var(--fm);font-size:.86em;background:var(--card2);border:1px solid var(--line);
+    border-radius:6px;padding:1px 6px;color:#ffd9b0}
+  #doc pre{background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);
+    padding:13px 14px;overflow-x:auto;margin:12px 0}
+  #doc pre code{background:none;border:0;padding:0;color:var(--text);font-size:12.5px;line-height:1.6}
+  #doc ul,#doc ol{margin:10px 0 10px 4px;padding-left:22px;color:var(--muted)}
+  #doc li{margin:5px 0}
+  #doc blockquote{border-left:3px solid var(--accent);background:var(--accent-soft);
+    border-radius:var(--r-sm);padding:10px 14px;margin:12px 0;color:var(--text)}
+  #doc blockquote p{color:var(--text);margin:4px 0}
+  #doc hr{border:0;border-top:1px solid var(--line);margin:22px 0}
+  .tablewrap{overflow-x:auto;margin:14px 0;border:1px solid var(--line);border-radius:var(--r-sm)}
+  #doc table{border-collapse:collapse;width:100%;font-size:13px;min-width:420px}
+  #doc th,#doc td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  #doc th{background:var(--card2);color:var(--text);font-weight:700;white-space:nowrap}
+  #doc td{color:var(--muted)}
+  #doc tr:last-child td{border-bottom:0}
+  #doc td code,#doc th code{white-space:nowrap}
+  .err{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;color:var(--muted);margin-top:20px}
+  .err b{color:var(--text)}
+  footer{text-align:center;color:var(--dim);font-size:11px;font-family:var(--fm);padding:34px 0 6px}
+</style>
+</head>
+<body>
+  <div class="top">
+    <a class="back" href="./">‹ &nbsp;Launchpad</a>
+    <span class="file" id="fileName"></span>
+  </div>
+  <div id="doc"></div>
+  <footer>Your Launchpad · project docs</footer>
+
+<script>
+/* ---- tiny, dependency-free Markdown renderer (headings, tables, lists,
+       code, blockquotes, hr, inline bold/italic/code/links) ---- */
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function inline(s){
+  s = esc(s);
+  s = s.replace(/`([^`]+)`/g, function(_,c){ return '<code>'+c+'</code>'; });
+  s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  s = s.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em>$2</em>');
+  s = s.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, function(_,t,u){
+    var safe = /^(https?:|\/|#|mailto:)/i.test(u) ? u : '#';
+    var ext = /^https?:/i.test(safe) ? ' target="_blank" rel="noopener"' : '';
+    return '<a href="'+safe+'"'+ext+'>'+t+'</a>';
+  });
+  return s;
+}
+function splitRow(line){
+  var cells = line.replace(/^\s*\|/,'').replace(/\|\s*$/,'').split('|');
+  return cells.map(function(c){ return c.trim(); });
+}
+function render(md){
+  md = md.replace(/\r\n?/g,'\n');
+  var lines = md.split('\n'), out = [], i = 0;
+  function flushListsGuard(){}
+  while(i < lines.length){
+    var line = lines[i];
+
+    // fenced code
+    var fence = line.match(/^```(.*)$/);
+    if(fence){
+      var buf = []; i++;
+      while(i < lines.length && !/^```/.test(lines[i])){ buf.push(lines[i]); i++; }
+      i++; // closing fence
+      out.push('<pre><code>'+esc(buf.join('\n'))+'</code></pre>');
+      continue;
+    }
+    // table: header row followed by |---| separator
+    if(/^\s*\|.*\|\s*$/.test(line) && i+1 < lines.length && /^\s*\|?[\s:|-]+\|?\s*$/.test(lines[i+1]) && /-/.test(lines[i+1])){
+      var head = splitRow(line); i += 2;
+      var rows = [];
+      while(i < lines.length && /^\s*\|.*\|\s*$/.test(lines[i])){ rows.push(splitRow(lines[i])); i++; }
+      var t = '<div class="tablewrap"><table><thead><tr>';
+      head.forEach(function(h){ t += '<th>'+inline(h)+'</th>'; });
+      t += '</tr></thead><tbody>';
+      rows.forEach(function(r){ t += '<tr>'; head.forEach(function(_,ci){ t += '<td>'+inline(r[ci]||'')+'</td>'; }); t += '</tr>'; });
+      t += '</tbody></table></div>';
+      out.push(t);
+      continue;
+    }
+    // heading
+    var hm = line.match(/^(#{1,6})\s+(.*)$/);
+    if(hm){ var lv = hm[1].length; out.push('<h'+lv+'>'+inline(hm[2])+'</h'+lv+'>'); i++; continue; }
+    // hr
+    if(/^\s*(-{3,}|\*{3,}|_{3,})\s*$/.test(line)){ out.push('<hr>'); i++; continue; }
+    // blockquote (consecutive)
+    if(/^\s*>/.test(line)){
+      var qb = [];
+      while(i < lines.length && /^\s*>/.test(lines[i])){ qb.push(lines[i].replace(/^\s*>\s?/,'')); i++; }
+      out.push('<blockquote>'+render(qb.join('\n'))+'</blockquote>');
+      continue;
+    }
+    // unordered list
+    if(/^\s*[-*+]\s+/.test(line)){
+      var ul = [];
+      while(i < lines.length && /^\s*[-*+]\s+/.test(lines[i])){ ul.push(lines[i].replace(/^\s*[-*+]\s+/,'')); i++; }
+      out.push('<ul>'+ul.map(function(x){ return '<li>'+inline(x)+'</li>'; }).join('')+'</ul>');
+      continue;
+    }
+    // ordered list
+    if(/^\s*\d+\.\s+/.test(line)){
+      var ol = [];
+      while(i < lines.length && /^\s*\d+\.\s+/.test(lines[i])){ ol.push(lines[i].replace(/^\s*\d+\.\s+/,'')); i++; }
+      out.push('<ol>'+ol.map(function(x){ return '<li>'+inline(x)+'</li>'; }).join('')+'</ol>');
+      continue;
+    }
+    // blank
+    if(/^\s*$/.test(line)){ i++; continue; }
+    // paragraph (gather until blank / block start)
+    var pb = [line]; i++;
+    while(i < lines.length && !/^\s*$/.test(lines[i]) && !/^(#{1,6}\s|```|\s*>|\s*[-*+]\s|\s*\d+\.\s)/.test(lines[i])
+          && !(/^\s*\|.*\|\s*$/.test(lines[i]))){ pb.push(lines[i]); i++; }
+    out.push('<p>'+inline(pb.join(' '))+'</p>');
+  }
+  return out.join('\n');
+}
+
+/* ---- load the requested doc ---- */
+var params = new URLSearchParams(location.search);
+var f = params.get('f') || '';
+var title = params.get('t') || '';
+if(title) document.title = title + ' — doc';
+// only allow same-site relative paths
+var safe = /^\/[A-Za-z0-9/_.-]+\.md$/.test(f) && f.indexOf('..') === -1;
+document.getElementById('fileName').textContent = safe ? f : '';
+if(!safe){
+  document.getElementById('doc').innerHTML = '<div class="err"><b>No document selected.</b><br>Open a project from the Launchpad and tap its docs link.</div>';
+} else {
+  fetch(f).then(function(r){ if(!r.ok) throw new Error(r.status); return r.text(); })
+    .then(function(txt){ document.getElementById('doc').innerHTML = render(txt); })
+    .catch(function(){ document.getElementById('doc').innerHTML = '<div class="err"><b>Couldn’t load '+esc(f)+'.</b><br>It may still be deploying — try again in a minute.</div>'; });
+}
+</script>
+</body>
+</html>
