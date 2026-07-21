@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#090909">
+<meta name="robots" content="noindex,nofollow">
+<title>Master Project Tracker — Launchpad</title>
+<style>
+  :root{
+    --bg:#090909; --card:#121212; --card2:#171717; --line:#262626; --line2:#333;
+    --text:#F5F5F5; --muted:#B4B4B4; --dim:#8A8A8A;
+    --accent:#FF7A00; --accent-soft:rgba(255,122,0,.12);
+    --good:#30D158; --good-soft:rgba(48,209,88,.12); --bad:#FF453A;
+    --warn:#FFC53D; --warn-soft:rgba(255,197,61,.13);
+    --pc:var(--accent); --pc-soft:var(--accent-soft);
+    --r:18px; --r-sm:12px; --r-pill:999px;
+    --fd:'Bebas Neue',-apple-system,system-ui,sans-serif;
+    --fb:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,system-ui,sans-serif;
+    --fm:ui-monospace,SFMono-Regular,Menlo,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  body{background:var(--bg);color:var(--text);font-family:var(--fb);line-height:1.5;
+    padding:max(16px,env(safe-area-inset-top)) 16px calc(40px + env(safe-area-inset-bottom));
+    max-width:640px;margin:0 auto;-webkit-font-smoothing:antialiased}
+  a{color:inherit;text-decoration:none}
+
+  .top{display:flex;align-items:center;gap:10px;margin:6px 0 2px}
+  .back{display:inline-flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);
+    color:var(--muted);font-size:13px;font-weight:600;border-radius:var(--r-pill);padding:9px 15px 9px 12px;cursor:pointer}
+  .back:active{transform:scale(.96)}
+
+  .hd{display:flex;align-items:center;gap:12px;margin:14px 0 4px}
+  .logo{width:44px;height:44px;flex:none;border-radius:13px;background:var(--accent-soft);
+    display:grid;place-items:center;border:1px solid var(--line);font-size:22px}
+  .hd h1{font-family:var(--fd);font-size:32px;letter-spacing:1px;line-height:.95;font-weight:400}
+  .hd h1 i{font-style:normal;color:var(--accent)}
+  .hd p{font-size:12.5px;color:var(--dim);margin-top:3px}
+
+  /* summary chips */
+  .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0 4px}
+  .sc{background:var(--card);border:1px solid var(--line);border-radius:var(--r-sm);padding:12px 8px;text-align:center}
+  .sc .n{font-family:var(--fd);font-size:30px;line-height:1;font-weight:400}
+  .sc .l{font-size:10px;letter-spacing:.4px;text-transform:uppercase;color:var(--dim);margin-top:5px}
+  .sc.live .n{color:var(--good)} .sc.proto .n{color:var(--warn)} .sc.act .n{color:var(--accent)}
+  @media(max-width:440px){.summary{grid-template-columns:repeat(2,1fr)}}
+
+  /* project card */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+    padding:18px 16px;margin-top:14px;position:relative;overflow:hidden}
+  .card::before{content:'';position:absolute;inset:0 auto 0 0;width:4px;background:var(--pc)}
+  .card .top2{display:flex;align-items:flex-start;gap:12px}
+  .ic{width:42px;height:42px;flex:none;border-radius:11px;display:grid;place-items:center;font-size:22px;
+    background:var(--pc-soft);border:1px solid var(--line)}
+  .card h2{font-family:var(--fd);font-size:24px;letter-spacing:.5px;font-weight:400;line-height:1}
+  .card .sub{font-size:12.5px;color:var(--dim);margin-top:4px}
+  .status{font-family:var(--fm);font-size:9.5px;letter-spacing:1px;text-transform:uppercase;
+    padding:5px 9px;border-radius:var(--r-pill);border:1px solid var(--line);margin-left:auto;flex:none;white-space:nowrap}
+  .status.live{color:var(--good);border-color:var(--good);background:var(--good-soft)}
+  .status.proto{color:var(--warn);border-color:var(--warn);background:var(--warn-soft)}
+  .status.act{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
+
+  /* meter */
+  .meter{margin:15px 0 4px}
+  .meter .barwrap{height:8px;background:var(--card2);border:1px solid var(--line);border-radius:var(--r-pill);overflow:hidden}
+  .meter .bar{height:100%;background:var(--pc);border-radius:var(--r-pill)}
+  .meter .cap{display:flex;justify-content:space-between;font-size:11px;color:var(--dim);margin-top:7px}
+  .meter .cap b{color:var(--text)}
+
+  .cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+  @media(max-width:480px){.cols{grid-template-columns:1fr}}
+  .col{background:var(--card2);border:1px solid var(--line);border-radius:var(--r-sm);padding:13px}
+  .col h4{font-size:11px;letter-spacing:.5px;text-transform:uppercase;margin-bottom:9px;display:flex;align-items:center;gap:6px}
+  .col.done h4{color:var(--good)} .col.next h4{color:var(--muted)}
+  .col ul{list-style:none;display:grid;gap:7px}
+  .col li{font-size:12.5px;color:var(--muted);padding-left:17px;position:relative;line-height:1.4}
+  .col.done li::before{content:'✓';position:absolute;left:0;color:var(--good);font-weight:700}
+  .col.next li::before{content:'';position:absolute;left:3px;top:7px;width:6px;height:6px;border-radius:50%;
+    border:1.5px solid var(--dim)}
+  .col li b{color:var(--text)}
+  .col.act-li li:first-child{color:var(--text)}
+  .col.act-li li:first-child::before{border-color:var(--accent);background:var(--accent)}
+
+  .flags{display:flex;flex-wrap:wrap;gap:7px;margin-top:13px}
+  .flag{font-size:11.5px;color:var(--muted);background:var(--card2);border:1px solid var(--line);
+    border-radius:var(--r-pill);padding:6px 11px}
+  .flag.hot{color:var(--accent);border-color:var(--accent);background:var(--accent-soft)}
+
+  .links{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+  .lk{flex:1;min-width:120px;display:flex;align-items:center;justify-content:center;gap:7px;
+    background:var(--card2);border:1px solid var(--line);border-radius:var(--r-sm);padding:11px 12px;
+    font-size:13px;font-weight:600;transition:border-color .15s}
+  .lk:active{transform:scale(.98)} .lk.primary{border-color:var(--pc);background:var(--pc-soft);color:var(--pc)}
+
+  .note{font-size:11.5px;color:var(--dim);text-align:center;line-height:1.6;margin-top:20px}
+  footer{text-align:center;color:var(--dim);font-size:11px;font-family:var(--fm);padding:26px 0 6px}
+</style>
+</head>
+<body>
+
+<div class="top"><a class="back" href="./">‹ &nbsp;Launchpad</a></div>
+
+<div class="hd">
+  <div class="logo">📊</div>
+  <div>
+    <h1>Master <i>Project Tracker</i></h1>
+    <p>Every project · status, what’s shipped & what’s next</p>
+  </div>
+</div>
+
+<div class="summary">
+  <div class="sc live"><div class="n">2</div><div class="l">Live</div></div>
+  <div class="sc proto"><div class="n">1</div><div class="l">Prototype</div></div>
+  <div class="sc act"><div class="n">1</div><div class="l">Needs you</div></div>
+  <div class="sc"><div class="n">4</div><div class="l">Projects</div></div>
+</div>
+
+<div id="board"></div>
+
+<div class="note">Status is generated from each project’s own doc — open any project’s<br><b>Docs & requirements</b> on the Launchpad for the full detail.</div>
+<footer>Your Launchpad · master project tracker</footer>
+
+<script>
+var BASE = 'https://lockdown-lab-registration.netlify.app';
+var PROJECTS = [
+  {
+    id:'athlete-os', name:'Athlete OS', icon:'🏆', color:'#FF7A00',
+    sub:'Private performance hub + coach dashboard · any sport',
+    status:{t:'Live · V2.3', c:'live'},
+    done:[
+      'Design system + 5 themes (dark/light/midnight/forest/grape)',
+      'Athlete app: onboarding, daily check-ins, XP / streaks / levels, journal, goals',
+      'Coach dashboard V2: roster, team health, athlete drawer',
+      'Messaging (1:1) + coach ratings + team peer ratings',
+      'Custom-sport flow + first-run tutorial',
+      'Calendar / schedule (V2.2)',
+      'Installable PWA + notifications (V2.3)',
+      'Live seed data (Lockdown Ballers + your login)'
+    ],
+    next:[
+      'Roster-lite edge patch → real wellness metrics',
+      'Server broadcast action',
+      'Attendance tracking',
+      'Rich comms (read receipts, attachments)',
+      'File library + training planner',
+      'Performance metrics (PBs, wearables)',
+      'Org hierarchy · global search'
+    ],
+    links:[{b:'Open app', u:BASE+'/athlete-os/app.html', primary:true},{b:'Docs', u:'doc.html?t=Athlete%20OS&f=/ATHLETE-OS.md'}]
+  },
+  {
+    id:'lockdown-lab', name:'Lockdown Lab', icon:'🔒', color:'#4F8CFF',
+    sub:'Registration + player / coach app · basketball',
+    status:{t:'Live', c:'live'},
+    done:[
+      'Registration wizard → Supabase (insert-only RLS, data stays private)',
+      'Live founding-seat counter',
+      'Admin dashboard: KPIs, search, status, CSV export (token-gated)',
+      'Confirmation email via Resend (trigger-fired, non-blocking)'
+    ],
+    next:[
+      'Turn on Resend email keys (config, no code)',
+      'Payments (Stripe)',
+      'Player / parent dashboards + auth',
+      'Gamification persistence'
+    ],
+    links:[{b:'Live site', u:BASE, primary:true},{b:'Docs', u:'doc.html?t=Lockdown%20Lab&f=/BACKEND.md'}]
+  },
+  {
+    id:'nova', name:'NOVA Rewards', icon:'🎁', color:'#F5C451',
+    sub:'Giveaway store + monthly draw · the giveaway website brief',
+    status:{t:'Prototype · 16/16 reqs', c:'proto'},
+    done:[
+      'Storefront + mobile giveaway landing (countdown, promo, Enter Now)',
+      'Packages + checkout + entry multipliers (2×–30×)',
+      'Membership / subscription + sign-up bonus',
+      'Entry database — 4 auditable buckets + full ledger',
+      'Manual entry management + audit trail',
+      'Coupons (10× / bonus / % / $ / free-ship / member-only)',
+      'Affiliate program (portal + admin, ?ref= attribution)',
+      'Customer dashboard + orders/refunds + CSV',
+      'Giveaway admin (create / end / duplicate, live multiplier)'
+    ],
+    next:[
+      'Real backend (WordPress+Woo, or Supabase edge fn)',
+      'Payments (Stripe / PayPal)',
+      'Transactional emails',
+      'Server-side auth & entry enforcement',
+      'Caching / CDN for promo-traffic scale'
+    ],
+    flags:[{t:'Prototype data is client-side (localStorage) — production needs a real backend', c:''}],
+    links:[{b:'Open store', u:BASE+'/giveaway/', primary:true},{b:'Requirements', u:'doc.html?t=Giveaway%20requirements&f=/giveaway/README.md'}]
+  },
+  {
+    id:'one-pager', name:'2026 One-Pager', icon:'✨', color:'#B084FF',
+    sub:'Upgraded 2026 demo one-pagers',
+    status:{t:'Needs you · pick one', c:'act'},
+    done:[
+      '6 live 2026 demos: apexmma, iblast, crownfencing, trainedbyzee, kahilmeats, eaglesgym'
+    ],
+    next:[
+      'Pick “the one” → I pin it with a big button + what-to-say'
+    ],
+    nextAct:true,
+    flags:[{t:'⭐ Tell me which demo is the one', c:'hot'}],
+    links:[{b:'See demos', u:'./#one-pager', primary:true}]
+  }
+];
+
+function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function softFromHex(hex){
+  var m=/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return m ? 'rgba('+parseInt(m[1],16)+','+parseInt(m[2],16)+','+parseInt(m[3],16)+',.14)' : 'rgba(255,122,0,.12)';
+}
+var board = document.getElementById('board'), html='';
+PROJECTS.forEach(function(p){
+  var total = p.done.length + p.next.length;
+  var pct = Math.round(p.done.length/total*100);
+  html += '<div class="card" style="--pc:'+p.color+';--pc-soft:'+softFromHex(p.color)+'">';
+  html += '<div class="top2"><div class="ic">'+p.icon+'</div><div style="flex:1">'+
+          '<h2>'+esc(p.name)+'</h2><div class="sub">'+esc(p.sub)+'</div></div>'+
+          '<span class="status '+p.status.c+'">'+esc(p.status.t)+'</span></div>';
+  html += '<div class="meter"><div class="barwrap"><div class="bar" style="width:'+pct+'%"></div></div>'+
+          '<div class="cap"><span><b>'+p.done.length+'</b> shipped</span><span>'+pct+'%</span>'+
+          '<span><b>'+p.next.length+'</b> on the list</span></div></div>';
+  html += '<div class="cols">';
+  html += '<div class="col done"><h4>Shipped</h4><ul>'+p.done.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul></div>';
+  html += '<div class="col next'+(p.nextAct?' act-li':'')+'"><h4>Next up</h4><ul>'+p.next.map(function(x){return '<li>'+esc(x)+'</li>';}).join('')+'</ul></div>';
+  html += '</div>';
+  if(p.flags){ html += '<div class="flags">'+p.flags.map(function(f){return '<span class="flag '+(f.c||'')+'">'+esc(f.t)+'</span>';}).join('')+'</div>'; }
+  html += '<div class="links">'+p.links.map(function(l){
+    var ext = /^https?:/i.test(l.u) ? ' target="_blank" rel="noopener"' : '';
+    return '<a class="lk'+(l.primary?' primary':'')+'" href="'+l.u+'"'+ext+'>'+esc(l.b)+' ›</a>';
+  }).join('')+'</div>';
+  html += '</div>';
+});
+board.innerHTML = html;
+</script>
+</body>
+</html>

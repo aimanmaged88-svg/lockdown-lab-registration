@@ -38,6 +38,18 @@
   .private b{color:var(--text)}
   .private .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex:none;box-shadow:0 0 0 4px var(--accent-soft)}
 
+  /* tracker button */
+  .tracker-btn{display:flex;align-items:center;gap:12px;margin-top:12px;
+    background:linear-gradient(135deg,var(--accent-soft),var(--card));border:1px solid var(--line);
+    border-radius:var(--r);padding:14px 15px;transition:border-color .15s,transform .06s}
+  .tracker-btn:active{transform:scale(.99)} .tracker-btn:hover{border-color:var(--accent)}
+  .tracker-btn .ic{width:42px;height:42px;flex:none;border-radius:12px;display:grid;place-items:center;font-size:21px;
+    background:var(--bg);border:1px solid var(--line)}
+  .tracker-btn .txt{flex:1;min-width:0}
+  .tracker-btn .txt b{font-family:var(--fd);font-size:20px;letter-spacing:.5px;font-weight:400;display:block;line-height:1}
+  .tracker-btn .txt span{font-size:11.5px;color:var(--dim);display:block;margin-top:4px}
+  .tracker-btn .go{color:var(--accent);font-size:20px;flex:none}
+
   /* ============ HOME: project grid ============ */
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
   @media(max-width:400px){.grid{grid-template-columns:1fr}}
@@ -173,6 +185,12 @@
   </div>
 
   <div class="private"><span class="dot"></span><span><b>Just for you.</b> Bookmark this page — it holds your codes. Share the individual app links inside, not this page.</span></div>
+
+  <a class="tracker-btn" href="tracker.html">
+    <span class="ic">📊</span>
+    <span class="txt"><b>Master Project Tracker</b><span>All 4 projects · status, what’s shipped & what’s next</span></span>
+    <span class="go">›</span>
+  </a>
 
   <div class="grid" id="grid"></div>
 </div>
