@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="hardwood">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Junior Basketball Development Blueprint — 2026 Digital Edition · Amanda Hodgson</title>
+<meta name="description" content="The mental toughness blueprint for junior basketballers — a tap-through digital book by Amanda Hodgson. Prepare young athletes for high-pressure games and long-term success." />
+<meta name="theme-color" content="#f4ece0" />
+<meta property="og:title" content="Junior Basketball Development Blueprint — 2026 Digital Edition" />
+<meta property="og:description" content="How to mentally prepare junior basketballers for high-pressure games & long-term success. By Amanda Hodgson." />
+<meta property="og:type" content="book" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Manrope:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600&display=swap" rel="stylesheet">
+<script>try{var _t=localStorage.getItem('jbb:theme');if(_t)document.documentElement.setAttribute('data-theme',_t);}catch(e){}</script>
+<style>
+/* ===== THEME SYSTEM — default = "Blueprint" (Amanda's original look) ===== */
+:root{
+  --bg:#f6f4ee; --bg2:#ffffff;
+  --text:#1a1c30; --muted:#54586e; --dim:#9195a8;
+  --accent:#3b30c9; --accent-hi:#5a4ef2; --accent-soft:rgba(59,48,201,.11); --accent-glow:rgba(59,48,201,.30);
+  --good:#0f9d58; --good-soft:rgba(15,157,88,.13);
+  --glass:rgba(59,48,201,.045); --line:rgba(26,28,48,.13);
+  --halo:rgba(59,48,201,.12);
+  --note-bg:linear-gradient(180deg,rgba(59,48,201,.08),rgba(59,48,201,.02));
+  --title-grad:linear-gradient(180deg,#1a1c30 26%,#3b30c9);
+  --on-accent:#ffffff;
+  --input-bg:rgba(26,28,48,.035);
+  --fd:'Playfair Display',Georgia,'Times New Roman',serif;
+  --fb:'Manrope',system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --disp-tt:none; --disp-weight:800;
+  --r:22px;
+}
+/* Royal Court — deep navy + electric blue, serif */
+:root[data-theme="royal"]{
+  --bg:#0a0a1f; --bg2:#12122e;
+  --text:#eef0ff; --muted:#a6a8c8; --dim:#6b6d8f;
+  --accent:#5a4ef2; --accent-hi:#8b82ff; --accent-soft:rgba(122,110,255,.18); --accent-glow:rgba(90,78,242,.45);
+  --good:#3ddc84; --good-soft:rgba(61,220,132,.15);
+  --glass:rgba(255,255,255,.05); --line:rgba(255,255,255,.12);
+  --halo:rgba(90,78,242,.22);
+  --note-bg:linear-gradient(180deg,rgba(122,110,255,.12),rgba(122,110,255,.03));
+  --title-grad:linear-gradient(180deg,#ffffff 22%,#8b82ff);
+  --on-accent:#0a0a1f; --input-bg:rgba(0,0,0,.3);
+  --fd:'Playfair Display',Georgia,serif; --disp-tt:none; --disp-weight:800;
+}
+/* Court Night — dark charcoal + orange, condensed sport type */
+:root[data-theme="court"]{
+  --bg:#050506; --bg2:#0b0b0d;
+  --text:#f6f4f1; --muted:#a09a92; --dim:#6d6861;
+  --accent:#ff6b00; --accent-hi:#ff8a2b; --accent-soft:rgba(255,107,0,.15); --accent-glow:rgba(255,107,0,.38);
+  --good:#30d158; --good-soft:rgba(48,209,88,.14);
+  --glass:rgba(255,255,255,.055); --line:rgba(255,255,255,.11);
+  --halo:rgba(255,107,0,.13);
+  --note-bg:linear-gradient(180deg,rgba(255,107,0,.09),rgba(255,107,0,.03));
+  --title-grad:linear-gradient(180deg,#fff 30%,#c9c4bd);
+  --on-accent:#100800; --input-bg:rgba(0,0,0,.35);
+  --fd:'Bebas Neue',"Arial Narrow",Arial,sans-serif; --disp-tt:uppercase; --disp-weight:400;
+}
+/* Hardwood — warm cream + amber, serif */
+:root[data-theme="hardwood"]{
+  --bg:#f4ece0; --bg2:#fffaf3;
+  --text:#2a2016; --muted:#6e604f; --dim:#a8977f;
+  --accent:#c85a12; --accent-hi:#e8862f; --accent-soft:rgba(200,90,18,.12); --accent-glow:rgba(200,90,18,.30);
+  --good:#2f8f4e; --good-soft:rgba(47,143,78,.14);
+  --glass:rgba(120,80,30,.05); --line:rgba(60,40,20,.15);
+  --halo:rgba(200,90,18,.14);
+  --note-bg:linear-gradient(180deg,rgba(200,90,18,.09),rgba(200,90,18,.02));
+  --title-grad:linear-gradient(180deg,#2a2016 26%,#c05a10);
+  --on-accent:#fffaf3; --input-bg:rgba(60,40,20,.04);
+  --fd:'Playfair Display',Georgia,serif; --disp-tt:none; --disp-weight:800;
+}
+/* Rose — soft blush + pink, serif (light) */
+:root[data-theme="rose"]{
+  --bg:#fbf1f2; --bg2:#ffffff;
+  --text:#2a1e22; --muted:#6d5a60; --dim:#b09aa0;
+  --accent:#d6336c; --accent-hi:#f0568b; --accent-soft:rgba(214,51,108,.12); --accent-glow:rgba(214,51,108,.28);
+  --good:#0f9d58; --good-soft:rgba(15,157,88,.13);
+  --glass:rgba(214,51,108,.05); --line:rgba(60,30,40,.13);
+  --halo:rgba(214,51,108,.13);
+  --note-bg:linear-gradient(180deg,rgba(214,51,108,.08),rgba(214,51,108,.02));
+  --title-grad:linear-gradient(180deg,#2a1e22 26%,#d6336c);
+  --on-accent:#ffffff; --input-bg:rgba(60,30,40,.035);
+  --fd:'Playfair Display',Georgia,serif; --disp-tt:none; --disp-weight:800;
+}
+/* Sage — calm mint-cream + green, serif (light) */
+:root[data-theme="sage"]{
+  --bg:#eef3ec; --bg2:#fbfdfa;
+  --text:#1e2a20; --muted:#54685a; --dim:#9aad9f;
+  --accent:#2f8f5b; --accent-hi:#3fb473; --accent-soft:rgba(47,143,91,.12); --accent-glow:rgba(47,143,91,.28);
+  --good:#188a52; --good-soft:rgba(24,138,82,.13);
+  --glass:rgba(47,143,91,.05); --line:rgba(30,42,32,.13);
+  --halo:rgba(47,143,91,.12);
+  --note-bg:linear-gradient(180deg,rgba(47,143,91,.08),rgba(47,143,91,.02));
+  --title-grad:linear-gradient(180deg,#1e2a20 26%,#2f8f5b);
+  --on-accent:#ffffff; --input-bg:rgba(30,42,32,.035);
+  --fd:'Playfair Display',Georgia,serif; --disp-tt:none; --disp-weight:800;
+}
+/* Ink — warm paper + charcoal, minimal serif (light) */
+:root[data-theme="ink"]{
+  --bg:#f3f1ec; --bg2:#ffffff;
+  --text:#1c1b19; --muted:#57544d; --dim:#9c988f;
+  --accent:#3a3733; --accent-hi:#615c53; --accent-soft:rgba(58,55,51,.1); --accent-glow:rgba(0,0,0,.16);
+  --good:#3a7d44; --good-soft:rgba(58,125,68,.13);
+  --glass:rgba(30,28,25,.04); --line:rgba(30,28,25,.13);
+  --halo:rgba(0,0,0,.06);
+  --note-bg:linear-gradient(180deg,rgba(30,28,25,.06),rgba(30,28,25,.02));
+  --title-grad:linear-gradient(180deg,#1c1b19 30%,#57544d);
+  --on-accent:#ffffff; --input-bg:rgba(30,28,25,.035);
+  --fd:'Playfair Display',Georgia,serif; --disp-tt:none; --disp-weight:800;
+}
+/* Sunset — dark plum + coral, serif (dark) */
+:root[data-theme="sunset"]{
+  --bg:#1a1220; --bg2:#251830;
+  --text:#f7ecf0; --muted:#c0a8b8; --dim:#7d6a78;
+  --accent:#ff6b6b; --accent-hi:#ff9a8b; --accent-soft:rgba(255,107,107,.16); --accent-glow:rgba(255,107,107,.4);
+  --good:#43d19e; --good-soft:rgba(67,209,158,.15);
+  --glass:rgba(255,255,255,.05); --line:rgba(255,255,255,.12);
+  --halo:rgba(255,107,107,.2);
+  --note-bg:linear-gradient(180deg,rgba(255,107,107,.12),rgba(255,107,107,.03));
+  --title-grad:linear-gradient(180deg,#ffffff 22%,#ff9a8b);
+  --on-accent:#2a1018; --input-bg:rgba(0,0,0,.3);
+  --fd:'Playfair Display',Georgia,serif; --disp-tt:none; --disp-weight:800;
+}
+/* Forest — deep green + lime, serif (dark) */
+:root[data-theme="forest"]{
+  --bg:#0e1a12; --bg2:#15271b;
+  --text:#e9f5ec; --muted:#a3c0aa; --dim:#66806d;
+  --accent:#3fce74; --accent-hi:#86efac; --accent-soft:rgba(63,206,116,.16); --accent-glow:rgba(63,206,116,.38);
+  --good:#3fce74; --good-soft:rgba(63,206,116,.15);
+  --glass:rgba(255,255,255,.05); --line:rgba(255,255,255,.12);
+  --halo:rgba(63,206,116,.18);
+  --note-bg:linear-gradient(180deg,rgba(63,206,116,.12),rgba(63,206,116,.03));
+  --title-grad:linear-gradient(180deg,#ffffff 22%,#86efac);
+  --on-accent:#08160d; --input-bg:rgba(0,0,0,.3);
+  --fd:'Playfair Display',Georgia,serif; --disp-tt:none; --disp-weight:800;
+}
+/* Berry — dark + magenta, serif (dark) */
+:root[data-theme="berry"]{
+  --bg:#160c1c; --bg2:#22132b;
+  --text:#f5ecfa; --muted:#bda8c8; --dim:#7a6685;
+  --accent:#d02fe0; --accent-hi:#e879f9; --accent-soft:rgba(208,47,224,.18); --accent-glow:rgba(208,47,224,.42);
+  --good:#3ddc84; --good-soft:rgba(61,220,132,.15);
+  --glass:rgba(255,255,255,.05); --line:rgba(255,255,255,.12);
+  --halo:rgba(208,47,224,.2);
+  --note-bg:linear-gradient(180deg,rgba(208,47,224,.13),rgba(208,47,224,.03));
+  --title-grad:linear-gradient(180deg,#ffffff 22%,#e879f9);
+  --on-accent:#1a0820; --input-bg:rgba(0,0,0,.3);
+  --fd:'Playfair Display',Georgia,serif; --disp-tt:none; --disp-weight:800;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  margin:0;font-family:var(--fb);background:var(--bg);color:var(--text);
+  line-height:1.6;overflow-x:hidden;
+  background-image:radial-gradient(120% 60% at 50% -10%,var(--halo),transparent 60%);
+  transition:background-color .3s ease,color .3s ease;
+  background-attachment:fixed;
+}
+img{max-width:100%}
+a{color:inherit}
+
+/* reading progress */
+#progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:60;
+  background:linear-gradient(90deg,var(--accent),var(--accent-hi));box-shadow:0 0 12px var(--accent-glow)}
+
+/* layout */
+.wrap{max-width:760px;margin:0 auto;padding:0 20px}
+section{padding:64px 0;position:relative}
+.reveal{opacity:0;transform:translateY(26px);transition:opacity .7s ease,transform .7s ease}
+.reveal.in{opacity:1;transform:none}
+
+/* type */
+h1,h2,h3{font-family:var(--fd);font-weight:var(--disp-weight);letter-spacing:.01em;line-height:1;margin:0}
+.eyebrow{font-family:var(--fd);color:var(--accent);letter-spacing:.22em;font-size:.82rem;text-transform:uppercase;margin:0 0 14px}
+p{margin:0 0 16px}
+.lead{font-size:1.13rem;color:var(--text)}
+.muted{color:var(--muted)}
+strong{color:var(--text);font-weight:700}
+
+/* HERO */
+.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;text-align:center;padding:80px 20px 48px;position:relative}
+.hero .badge{display:inline-flex;align-items:center;gap:8px;align-self:center;
+  font-family:var(--fd);letter-spacing:.18em;font-size:.72rem;text-transform:uppercase;color:var(--accent-hi);
+  border:1px solid var(--line);background:var(--glass);padding:7px 15px;border-radius:999px;margin-bottom:26px}
+.hero h1{font-size:clamp(2.7rem,13.5vw,5.6rem);text-transform:var(--disp-tt);line-height:.98;
+  background:var(--title-grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero .sub{max-width:30ch;margin:20px auto 0;font-size:1.12rem;color:var(--muted)}
+.hero .author{margin-top:30px;font-family:var(--fd);letter-spacing:.16em;font-size:1.15rem}
+.hero .author span{color:var(--accent)}
+.hero .tag{margin-top:6px;font-size:.82rem;color:var(--dim);letter-spacing:.04em}
+.scrollcue{margin-top:40px;color:var(--dim);font-size:.78rem;letter-spacing:.15em;text-transform:uppercase;animation:bob 2.2s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0);opacity:.5}50%{transform:translateY(7px);opacity:1}}
+
+/* IG chip */
+.ig-chip{display:inline-flex;align-items:center;gap:9px;text-decoration:none;
+  background:linear-gradient(135deg,#feda75 0%,#fa7e1e 25%,#d62976 50%,#962fbf 75%,#4f5bd5 100%);
+  color:#fff;font-weight:700;font-size:.92rem;padding:11px 18px;border-radius:999px;margin-top:26px;
+  box-shadow:0 8px 26px rgba(214,41,118,.34);transition:transform .18s ease}
+.ig-chip:active{transform:scale(.96)}
+.ig-chip svg{width:18px;height:18px;fill:#fff;flex:none}
+
+/* chapter number rail */
+.chnum{font-family:var(--fd);font-size:.9rem;letter-spacing:.2em;color:var(--accent);text-transform:uppercase;margin-bottom:10px}
+.chtitle{font-size:clamp(2.1rem,8vw,3.3rem);text-transform:var(--disp-tt);margin-bottom:22px}
+.divider{height:1px;background:linear-gradient(90deg,var(--accent),transparent);margin:0 0 26px;width:120px}
+
+/* cards / lists */
+.card{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);padding:22px 22px;margin:18px 0;backdrop-filter:blur(8px)}
+ul.clean{list-style:none;padding:0;margin:16px 0}
+ul.clean li{position:relative;padding:9px 0 9px 30px;border-bottom:1px solid var(--line)}
+ul.clean li:last-child{border-bottom:0}
+ul.clean li::before{content:"";position:absolute;left:4px;top:17px;width:8px;height:8px;border-radius:50%;
+  background:var(--accent);box-shadow:0 0 10px var(--accent-glow)}
+
+/* numbered steps */
+.step{display:flex;gap:16px;padding:18px 0;border-top:1px solid var(--line)}
+.step:first-of-type{border-top:0}
+.step .n{font-family:var(--fd);font-size:2rem;color:var(--accent);line-height:1;flex:none;width:44px}
+.step h4{margin:0 0 6px;font-size:1.08rem;font-weight:700}
+.step p{margin:0;color:var(--muted);font-size:.98rem}
+
+/* trigger grid */
+.trigger{border-left:3px solid var(--accent);padding:12px 0 12px 16px;margin:14px 0}
+.trigger b{display:block;color:var(--text);font-size:1rem;margin-bottom:3px}
+.trigger span{color:var(--muted);font-size:.96rem}
+
+/* interactive checklist */
+.check{display:flex;gap:13px;align-items:flex-start;padding:13px 0;border-bottom:1px solid var(--line);cursor:pointer;user-select:none}
+.check:last-child{border-bottom:0}
+.check .box{flex:none;width:24px;height:24px;border-radius:7px;border:2px solid var(--dim);margin-top:2px;
+  display:grid;place-items:center;transition:all .18s ease}
+.check .box svg{width:14px;height:14px;stroke:#fff;stroke-width:3.5;fill:none;opacity:0;transform:scale(.5);transition:all .18s ease}
+.check.done .box{background:var(--good);border-color:var(--good)}
+.check.done .box svg{opacity:1;transform:none}
+.check.done .lbl{color:var(--dim);text-decoration:line-through}
+.check .lbl{font-size:1rem;transition:color .18s}
+
+/* input fields for workshop */
+.field{margin:14px 0}
+.field label{display:block;font-size:.82rem;color:var(--muted);margin-bottom:6px;letter-spacing:.02em}
+.field textarea{width:100%;background:var(--input-bg);border:1px solid var(--line);border-radius:14px;
+  color:var(--text);font-family:var(--fb);font-size:.98rem;padding:12px 14px;resize:vertical;min-height:56px}
+.field textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+
+/* AI COACH NOTE */
+.ainote{border:1px solid var(--accent-soft);background:var(--note-bg);
+  border-radius:var(--r);margin:24px 0;overflow:hidden}
+.ainote summary{list-style:none;cursor:pointer;padding:16px 20px;display:flex;align-items:center;gap:12px;font-weight:700}
+.ainote summary::-webkit-details-marker{display:none}
+.ainote summary .bot{width:34px;height:34px;border-radius:10px;flex:none;display:grid;place-items:center;
+  background:var(--accent-soft);font-size:1.1rem}
+.ainote summary .cap{font-family:var(--fd);letter-spacing:.14em;font-size:.82rem;color:var(--accent-hi);text-transform:uppercase;flex:1}
+.ainote summary .chev{color:var(--accent);transition:transform .25s;font-size:1.2rem}
+.ainote[open] summary .chev{transform:rotate(180deg)}
+.ainote .body{padding:2px 20px 20px;color:var(--muted);font-size:.98rem}
+.ainote .body p:last-child{margin-bottom:0}
+.ainote .body b{color:var(--accent-hi)}
+
+/* quote */
+.pull{font-family:var(--fd);font-size:clamp(1.9rem,7vw,2.8rem);line-height:1.05;text-transform:var(--disp-tt);
+  color:var(--text);text-align:center;padding:20px 0;letter-spacing:.01em}
+.pull span{color:var(--accent)}
+
+/* AI intro section special bg */
+.ai-hero{background:radial-gradient(120% 80% at 50% 0%,var(--halo),transparent 60%)}
+.pillrow{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}
+.pill{border:1px solid var(--line);background:var(--glass);border-radius:999px;padding:9px 15px;font-size:.9rem;font-weight:600}
+.pill b{color:var(--accent-hi)}
+
+/* resources */
+.res-grid{display:grid;grid-template-columns:1fr;gap:14px;margin-top:18px}
+.res h4{font-family:var(--fd);letter-spacing:.1em;font-size:1rem;color:var(--accent);margin:0 0 10px;text-transform:uppercase}
+.res ul{margin:0;padding-left:18px;color:var(--muted)}
+.res ul li{margin:5px 0}
+
+/* CLOSING CTA */
+.close-cta{text-align:center;padding:88px 20px}
+.close-cta h2{font-size:clamp(2.4rem,10vw,4rem);text-transform:var(--disp-tt);margin-bottom:18px}
+.ig-big{display:inline-flex;align-items:center;gap:12px;text-decoration:none;
+  background:linear-gradient(135deg,#feda75 0%,#fa7e1e 25%,#d62976 50%,#962fbf 75%,#4f5bd5 100%);
+  color:#fff;font-weight:800;font-size:1.12rem;padding:17px 30px;border-radius:999px;margin-top:14px;
+  box-shadow:0 12px 40px rgba(214,41,118,.4);transition:transform .18s ease}
+.ig-big:active{transform:scale(.97)}
+.ig-big svg{width:26px;height:26px;fill:#fff}
+.handle{font-family:var(--fd);letter-spacing:.14em;font-size:1.3rem;margin-top:22px;color:var(--accent)}
+.footer{text-align:center;padding:34px 20px 60px;color:var(--dim);font-size:.82rem;border-top:1px solid var(--line)}
+
+/* floating chapters button + sheet */
+#chBtn{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:55;
+  display:flex;align-items:center;gap:8px;border:none;cursor:pointer;
+  background:var(--accent);color:var(--on-accent);font-family:var(--fd);letter-spacing:.12em;font-size:.9rem;text-transform:uppercase;
+  padding:13px 18px;border-radius:999px;box-shadow:0 10px 30px var(--accent-glow);transition:transform .18s}
+#chBtn:active{transform:scale(.95)}
+#chBtn svg{width:16px;height:16px;stroke:var(--on-accent);stroke-width:2.4;fill:none}
+#sheet{position:fixed;inset:0;z-index:70;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);
+  opacity:0;pointer-events:none;transition:opacity .25s}
+#sheet.open{opacity:1;pointer-events:auto}
+.sheet-inner{position:absolute;left:0;right:0;bottom:0;background:var(--bg2);border-top:1px solid var(--line);
+  border-radius:24px 24px 0 0;padding:14px 14px calc(20px + env(safe-area-inset-bottom));max-height:82vh;overflow:auto;
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.22,1,.36,1)}
+#sheet.open .sheet-inner{transform:none}
+.sheet-grab{width:44px;height:5px;border-radius:3px;background:var(--dim);margin:6px auto 14px}
+.sheet-inner h3{font-family:var(--fd);letter-spacing:.16em;color:var(--muted);font-size:.86rem;text-transform:uppercase;padding:0 10px 8px}
+.toc-item{display:flex;align-items:center;gap:14px;padding:14px 12px;border-radius:14px;text-decoration:none;color:var(--text);cursor:pointer}
+.toc-item:active{background:var(--glass)}
+.toc-item .tnum{font-family:var(--fd);font-size:1.1rem;color:var(--accent);width:30px;flex:none}
+.toc-item .ttl{font-weight:600;font-size:1rem}
+.toc-item.ig{color:var(--text);background:linear-gradient(135deg,rgba(214,41,118,.22),rgba(79,91,213,.16));margin-top:6px}
+.toc-item.ig .tnum{color:#e46}
+
+/* theme picker */
+#themeWrap{position:fixed;top:calc(12px + env(safe-area-inset-top));right:14px;z-index:58}
+#themeBtn{width:46px;height:46px;border-radius:50%;border:1px solid var(--line);cursor:pointer;
+  background:var(--bg2);color:var(--accent);display:grid;place-items:center;
+  box-shadow:0 6px 20px rgba(0,0,0,.18);transition:transform .18s}
+#themeBtn:active{transform:scale(.92)}
+#themeBtn svg{width:22px;height:22px;fill:currentColor}
+#themeMenu{position:absolute;top:56px;right:0;width:224px;max-height:min(72vh,560px);overflow:auto;
+  background:var(--bg2);border:1px solid var(--line);
+  border-radius:16px;padding:8px;box-shadow:0 18px 46px rgba(0,0,0,.3);
+  opacity:0;transform:translateY(-8px) scale(.97);pointer-events:none;transition:opacity .2s ease,transform .2s ease}
+#themeMenu.open{opacity:1;transform:none;pointer-events:auto}
+.tm-title{font-family:var(--fd);letter-spacing:.14em;text-transform:uppercase;font-size:.72rem;color:var(--muted);padding:6px 10px 8px}
+.tm-opt{display:flex;align-items:center;gap:11px;width:100%;border:none;background:none;cursor:pointer;
+  color:var(--text);font-family:var(--fb);font-weight:600;font-size:.95rem;text-align:left;padding:10px 10px;border-radius:11px}
+.tm-opt:hover{background:var(--glass)}
+.tm-opt.cur{background:var(--accent-soft)}
+.tm-opt em{color:var(--muted);font-style:normal;font-weight:500;font-size:.82rem}
+.tm-opt .sw{display:inline-flex;flex:none}
+.tm-opt .sw i{width:17px;height:17px;border-radius:50%;border:1.5px solid rgba(255,255,255,.6);box-shadow:0 0 0 1px var(--line)}
+.tm-opt .sw i+i{margin-left:-7px}
+.tm-opt .chk{margin-left:auto;color:var(--accent);opacity:0;font-weight:800}
+.tm-opt.cur .chk{opacity:1}
+
+/* ===== PAGED BOOK MODE ===== */
+body{padding-bottom:92px}
+.page{display:none}
+.page.active{display:block}
+.hero.active{display:flex}
+section.page{padding:52px 0 16px;min-height:auto}
+.startbtn{margin:40px auto 0;display:inline-flex;align-items:center;gap:8px;cursor:pointer;
+  border:1px solid var(--line);background:var(--glass);color:var(--text);font-family:var(--fb);font-weight:700;
+  font-size:1.02rem;padding:15px 30px;border-radius:999px;transition:transform .15s}
+.startbtn:active{transform:scale(.96)}
+
+/* bottom pager */
+#pager{position:fixed;left:0;right:0;bottom:0;z-index:56;display:flex;align-items:stretch;gap:9px;
+  padding:9px 11px calc(9px + env(safe-area-inset-bottom));background:var(--bg2);border-top:1px solid var(--line)}
+.pgbtn{min-width:92px;display:flex;align-items:center;justify-content:center;gap:7px;cursor:pointer;
+  border:1px solid var(--line);background:var(--glass);color:var(--text);font-family:var(--fb);font-weight:700;
+  font-size:.98rem;padding:12px 10px;border-radius:14px;transition:transform .14s,opacity .14s}
+.pgbtn:active{transform:scale(.95)}
+.pgbtn:disabled{opacity:.32}
+.pgbtn.next{background:var(--accent);color:var(--on-accent);border-color:transparent}
+.pgbtn svg{width:15px;height:15px;stroke:currentColor;stroke-width:2.6;fill:none;flex:none}
+.pg-center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;
+  border:1px solid var(--line);background:transparent;border-radius:14px;color:var(--text);font-family:var(--fb)}
+.pg-center .cl{font-family:var(--fd);letter-spacing:.13em;text-transform:uppercase;font-size:.64rem;color:var(--muted)}
+.pg-center .cc{font-weight:700;font-size:.9rem}
+
+/* QUIZ */
+.quiz-q{background:var(--glass);border:1px solid var(--line);border-radius:var(--r);padding:20px;margin:16px 0}
+.quiz-q .qi{font-size:.7rem;color:var(--accent);letter-spacing:.14em;text-transform:uppercase;font-family:var(--fd);margin-bottom:8px}
+.quiz-q .qh{font-weight:700;font-size:1.1rem;margin-bottom:12px;line-height:1.35}
+.opt{display:flex;gap:12px;align-items:center;width:100%;text-align:left;border:1px solid var(--line);
+  background:var(--bg2);color:var(--text);border-radius:14px;padding:13px 15px;margin:8px 0;cursor:pointer;
+  font-family:var(--fb);font-size:1rem;transition:transform .12s,border-color .15s,background .15s}
+.opt:active{transform:scale(.99)}
+.opt .mk{flex:none;width:26px;height:26px;border-radius:50%;border:2px solid var(--dim);display:grid;place-items:center;font-weight:800;font-size:.88rem;color:var(--muted)}
+.opt.correct{border-color:var(--good);background:var(--good-soft)}
+.opt.correct .mk{border-color:var(--good);background:var(--good);color:#fff}
+.opt.wrong{border-color:#d9534f;background:rgba(217,83,79,.13)}
+.opt.wrong .mk{border-color:#d9534f;background:#d9534f;color:#fff}
+.opt:disabled{cursor:default}
+.quiz-fb{margin:8px 2px 0;font-size:.94rem;color:var(--muted)}
+.quiz-result{text-align:center;border:1px solid var(--accent-soft);background:var(--note-bg);border-radius:var(--r);padding:28px 22px;margin-top:20px}
+.quiz-result .rbig{font-family:var(--fd);font-weight:var(--disp-weight);font-size:clamp(2.1rem,10vw,3.2rem);color:var(--accent);line-height:1.05;margin-bottom:6px}
+.quiz-result .rsc{font-weight:700;font-size:1.1rem;margin-bottom:10px}
+.btnline{display:inline-flex;align-items:center;gap:8px;cursor:pointer;border:1px solid var(--line);background:var(--bg2);
+  color:var(--text);font-family:var(--fb);font-weight:700;font-size:.95rem;padding:11px 22px;border-radius:999px;margin-top:6px}
+
+/* Q&A flashcards */
+.qa{border:1px solid var(--line);background:var(--glass);border-radius:16px;margin:12px 0;overflow:hidden}
+.qa summary{cursor:pointer;list-style:none;padding:16px 18px;font-weight:700;font-size:1.04rem;display:flex;gap:12px;align-items:center}
+.qa summary::-webkit-details-marker{display:none}
+.qa summary .q{flex:1}
+.qa summary .tap{font-family:var(--fd);font-size:.64rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);flex:none}
+.qa[open] summary .tap{opacity:0}
+.qa .a{padding:0 18px 18px;color:var(--muted);font-size:1rem}
+
+/* community */
+.join{display:flex;gap:14px;align-items:flex-start;background:var(--glass);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin:12px 0}
+.join .jem{font-size:1.5rem;flex:none;line-height:1.2}
+.join h4{margin:0 0 3px;font-size:1.06rem;font-weight:700}
+.join p{margin:0;color:var(--muted);font-size:.96rem}
+
+@media (min-width:720px){ .res-grid{grid-template-columns:1fr 1fr} }
+</style>
+</head>
+<body>
+<div id="progress"></div>
+
+<!-- ============ COVER ============ -->
+<header class="hero page active" id="top">
+  <span class="badge">● 2026 Digital Edition · Tap to read</span>
+  <h1>Junior<br>Basketball<br>Blueprint</h1>
+  <p class="sub">How to mentally prepare junior basketballers for high-pressure games &amp; long-term success.</p>
+  <div class="author">BY <span>AMANDA HODGSON</span></div>
+  <div class="tag">A GUIDE FOR PARENTS &amp; ATHLETES · AGES ~10–18</div>
+  <a class="ig-chip" href="https://www.instagram.com/amanda_hodgson_/" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16M12 0C8.74 0 8.33.01 7.05.07c-1.28.06-2.15.26-2.91.56-.79.31-1.46.72-2.13 1.38A5.9 5.9 0 0 0 .63 4.14c-.3.76-.5 1.63-.56 2.91C.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.28.26 2.15.56 2.91.31.79.72 1.46 1.38 2.13.67.66 1.34 1.07 2.13 1.38.76.3 1.63.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.28-.06 2.15-.26 2.91-.56a5.9 5.9 0 0 0 2.13-1.38 5.9 5.9 0 0 0 1.38-2.13c.3-.76.5-1.63.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.28-.26-2.15-.56-2.91a5.9 5.9 0 0 0-1.38-2.13A5.9 5.9 0 0 0 19.86.63c-.76-.3-1.63-.5-2.91-.56C15.67.01 15.26 0 12 0z"/><path d="M12 5.84A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84zM12 16a4 4 0 1 1 4-4 4 4 0 0 1-4 4z"/><circle cx="18.41" cy="5.59" r="1.44"/></svg>
+    Follow @amanda_hodgson_
+  </a>
+  <button class="startbtn" id="startBtn">Start reading →</button>
+</header>
+
+<!-- ============ CH 1 — INTRO ============ -->
+<section class="reveal page" id="ch1">
+  <div class="wrap">
+    <div class="chnum">Chapter 01</div>
+    <h2 class="chtitle">The Advantage of a Strong Mental Game</h2>
+    <div class="divider"></div>
+    <p class="lead">It's called a blueprint for a reason. These pages help you understand <strong>why the mind slips into a protective state of avoiding adversity</strong>, the signs your body is under pressure, and a step-by-step toolkit to stay focused, sharp and high-performing in any situation.</p>
+    <p class="muted">As an ex-basketballer, it's immediately evident to me how much more is demanded of our athletes just to stay in the mix for top teams. They're doing huge amounts of extra training — yet no one is guiding these young athletes through the mental hurdles they face, or helping them build the fortitude to keep going.</p>
+    <p class="muted">Early on, using the skills I developed as a player and a performance coach, I decided I'd arm my boys with the mindset tools they needed — not just to have an edge, but to <strong>thrive and be happy</strong> while working hard toward their goals. In three short years they've been selected for State-level high-performance squads and the top teams at their competitive club, won a State Championship, and taken home a Bronze medal at the U14 Club National Championships. A huge part of those milestones was the time we invested in their mental and emotional acuity.</p>
+    <p>This guide helps parents and junior athletes build <strong>resilience, focus and consistency under pressure</strong> — to perform at their best and enjoy the journey without burnout, plus specific communication tools that limit the feeling of pressure and expectation.</p>
+
+    <details class="ainote">
+      <summary><span class="bot">🤖</span><span class="cap">AI Coach's Note · how to get the most from this book</span><span class="chev">⌄</span></summary>
+      <div class="body">
+        <p>This edition is <b>interactive</b> — tap the <b>Chapters</b> button (bottom-right) to jump anywhere, tick off the checklists as you go, and type straight into the workshop pages. Your progress and answers save on <b>this device</b> automatically.</p>
+        <p>Prefer a different look? Tap the <b>🎨 palette</b> button (top-right) to recolour the whole book — warm <b>Hardwood</b> (the default), the <b>Blueprint</b> navy from Amanda's printed book, a deep <b>Royal Court</b>, or a dark <b>Court Night</b>. Your choice is remembered.</p>
+        <p>New to this 2026 version: a plain-English <b>intro to AI</b> for parents and coaches near the end, and short "AI Coach's Notes" like this one that add a practical tip to each chapter. They're optional extras — Amanda's words are the blueprint; these just help you action them.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ CH 2 — ABOUT ME ============ -->
+<section class="reveal page" id="ch2">
+  <div class="wrap">
+    <div class="chnum">Chapter 02</div>
+    <h2 class="chtitle">About Me &amp; My Sons</h2>
+    <div class="divider"></div>
+    <p class="lead">One of the skills I was most proud of as a player was the ability to never be swayed from my focus. The game on the line, seconds to go, the coach yelling — that was my favourite place on earth.</p>
+    <p class="muted">Full transparency: my boys had the "advantage" of a massive life trauma when they were young. Their dad went into heart failure, leading to many life-and-death situations they witnessed. He eventually had a heart transplant, and the boys were there through the whole recovery. The tools we used to navigate that — and the skills they built to prepare their minds for the worst case — are the same ones they use now to overcome high-pressure situations on the court.</p>
+    <p class="muted">Investing time in your athlete's mental wellbeing gives them an edge rarely seen nowadays. As physical demands increase, no one is paying attention to the mental load that comes with them. This is your opportunity to get a head start — not just to gain an advantage, but more importantly, <strong>to protect your child</strong>.</p>
+    <div class="pull">Sport is the only place where those <span>hard emotions</span> should be welcomed regularly.</div>
+    <p class="muted">As parents, we try to minimise our children being uncomfortable or in any situation where they must navigate adversity. So often I see parents helping kids <strong>avoid</strong> pressure instead of helping them <strong>walk through it</strong> — which is detrimental to their development as an athlete. Pre-emptively building strategies for them to overcome high-pressure scenarios is what serves them best.</p>
+  </div>
+</section>
+
+<!-- ============ CH 3 — UNDERSTANDING PRESSURE ============ -->
+<section class="reveal page" id="ch3">
+  <div class="wrap">
+    <div class="chnum">Chapter 03</div>
+    <h2 class="chtitle">Understanding the Pressure of a Game</h2>
+    <div class="divider"></div>
+    <p class="lead">Giving your kids the tools to independently manage high-pressure, in-game scenarios arms them for similar moments in life — and for any disappointments down the track in their sport.</p>
+    <div class="card">
+      <div class="chnum" style="color:var(--good)">Advantages of pressure in junior sport</div>
+      <ul class="clean">
+        <li>Learning to <strong>manage anxiety</strong></li>
+        <li>Developing the ability to <strong>self-assess</strong></li>
+        <li>Developing <strong>quick thinking</strong> in a high-pressure moment</li>
+        <li>The ability to <strong>overcome things quickly</strong> and move on</li>
+        <li>Improving <strong>self-talk</strong> as a tool to overcome intrusive thoughts</li>
+      </ul>
+    </div>
+    <details class="ainote">
+      <summary><span class="bot">🤖</span><span class="cap">AI Coach's Note · reframe it in one line</span><span class="chev">⌄</span></summary>
+      <div class="body">
+        <p>A phrase that lands well with juniors: <b>"Pressure is a privilege — it means the moment matters and you're the one they trust in it."</b> Say it in the car, put it on a locker sticker. Repeated calm framing teaches the brain that pressure = opportunity, not threat, long before game day.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ CH 4 — PHYSIO/PSYCH EFFECTS ============ -->
+<section class="reveal page" id="ch4">
+  <div class="wrap">
+    <div class="chnum">Chapter 04</div>
+    <h2 class="chtitle">Effects of High-Pressure Situations</h2>
+    <div class="divider"></div>
+    <p class="lead">When the pressure hits, the <strong>fight-or-flight</strong> mechanism is triggered — leading to symptoms that affect gameplay. How many of these can your athlete recognise?</p>
+    <p class="muted" style="font-size:.9rem">Tap each one you've felt — it saves as you go.</p>
+    <div class="card" data-check="symptoms">
+      <div class="check"><span class="box"><svg viewBox="0 0 24 24"><polyline points="4 12 9 18 20 5"/></svg></span><span class="lbl">Increased heart rate &amp; blood pressure — feeling nervous and overwhelmed</span></div>
+      <div class="check"><span class="box"><svg viewBox="0 0 24 24"><polyline points="4 12 9 18 20 5"/></svg></span><span class="lbl">Impaired motor function (that "uncoordinated" feeling)</span></div>
+      <div class="check"><span class="box"><svg viewBox="0 0 24 24"><polyline points="4 12 9 18 20 5"/></svg></span><span class="lbl">Increased muscle tension — reduced flexibility &amp; movement</span></div>
+      <div class="check"><span class="box"><svg viewBox="0 0 24 24"><polyline points="4 12 9 18 20 5"/></svg></span><span class="lbl">Impaired decision making</span></div>
+      <div class="check"><span class="box"><svg viewBox="0 0 24 24"><polyline points="4 12 9 18 20 5"/></svg></span><span class="lbl">Unable to understand simple instructions from coach or teammates</span></div>
+      <div class="check"><span class="box"><svg viewBox="0 0 24 24"><polyline points="4 12 9 18 20 5"/></svg></span><span class="lbl">Feeling like everyone is "against" you and you can't do anything right</span></div>
+    </div>
+    <details class="ainote">
+      <summary><span class="bot">🤖</span><span class="cap">AI Coach's Note · the fastest reset that exists</span><span class="chev">⌄</span></summary>
+      <div class="body">
+        <p>When the body flips into fight-or-flight, the quickest switch back is the breath. Teach <b>box breathing</b>: in for 4, hold 4, out for 4, hold 4 — three rounds. It's discreet enough to do at the free-throw line or on the bench, and it physically lowers heart rate so the "uncoordinated" feeling fades. Pair it with a long exhale (out longer than in) for an even faster calm.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ CH 5 — STRONG MINDSET ============ -->
+<section class="reveal page" id="ch5">
+  <div class="wrap">
+    <div class="chnum">Chapter 05</div>
+    <h2 class="chtitle">The Ultimate Feeling of a Strong Mindset</h2>
+    <div class="divider"></div>
+    <div class="pull">Calm under fire. <span>Focused</span> when it counts. Free to <span>play</span>.</div>
+    <p class="muted" style="text-align:center">A strong mindset feels like time slowing down — you see the play, you trust your training, and the noise (the crowd, the score, the last mistake) fades into the background. This is the state every tool in this blueprint is building toward.</p>
+    <div class="card" style="text-align:center">
+      <p style="margin:0"><strong>Make it real:</strong> screenshot this page and set it as your athlete's phone wallpaper for the season — a daily reminder of the feeling they're training for.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CH 6 — PRE-GAME ROUTINE ============ -->
+<section class="reveal page" id="ch6">
+  <div class="wrap">
+    <div class="chnum">Chapter 06</div>
+    <h2 class="chtitle">Building a Pre-Game Mindset Routine</h2>
+    <div class="divider"></div>
+    <p class="lead">Three easy pre-game tools before every game to elevate your mental strength. <strong>Don't skip these</strong> — they set you up for the next day.</p>
+    <div class="card">
+      <div class="step"><div class="n">1</div><div><h4>Visualise the night before</h4><p>Imagine the role you'll play, who your opposition will be, the moves you'll make (successfully) — and celebrating the win with your team afterwards.</p></div></div>
+      <div class="step"><div class="n">2</div><div><h4>Focus on two skills you'll do well</h4><p>Ease the pressure by leaning into what you know you do well and can contribute. Pick two (max) and commit to doing them all game — despite anything that goes "wrong".</p></div></div>
+      <div class="step"><div class="n">3</div><div><h4>Reverse your bad habits under pressure</h4><p>For every bad habit, choose a direct opposite action to trigger the moment you feel yourself slipping. E.g. replace eye-rolling with giving a teammate five, or speaking encouraging words.</p></div></div>
+    </div>
+    <p class="muted" style="font-size:.9rem">Tap to build tonight's routine:</p>
+    <div class="card" data-check="routine">
+      <div class="check"><span class="box"><svg viewBox="0 0 24 24"><polyline points="4 12 9 18 20 5"/></svg></span><span class="lbl">I visualised tomorrow's game last night</span></div>
+      <div class="check"><span class="box"><svg viewBox="0 0 24 24"><polyline points="4 12 9 18 20 5"/></svg></span><span class="lbl">I chose my two go-to skills for this game</span></div>
+      <div class="check"><span class="box"><svg viewBox="0 0 24 24"><polyline points="4 12 9 18 20 5"/></svg></span><span class="lbl">I have a reverse-action ready for my main bad habit</span></div>
+    </div>
+    <details class="ainote">
+      <summary><span class="bot">🤖</span><span class="cap">AI Coach's Note · make the routine stick</span><span class="chev">⌄</span></summary>
+      <div class="body">
+        <p>Habits form best when they're <b>anchored to something that already happens</b>. Tie visualisation to lights-out, and the "two skills" pick to putting shoes in the bag. Writing the two skills on a wristband or inside a shoe gives an in-game cue exactly when adrenaline makes them hard to recall.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ CH 7 — CONFIDENCE THROUGH CHALLENGE ============ -->
+<section class="reveal page" id="ch7">
+  <div class="wrap">
+    <div class="chnum">Chapter 07</div>
+    <h2 class="chtitle">Confidence Through Challenge</h2>
+    <div class="divider"></div>
+    <p class="lead">How you react to tough calls, coaches' decisions and in-game adversity dictates how you play and the kind of teammate you are. Use these <strong>behaviour triggers</strong> to take control of your emotions.</p>
+    <p class="muted" style="font-size:.95rem">The list below is just <strong>examples of the obvious ones</strong> — use them to get thinking. Every athlete is different, so the real work is spotting <em>your own</em> reactions and building a counter-trigger for each. You'll do exactly that in the <strong>Self-Assessment Workshop</strong>.</p>
+    <div class="trigger"><b>Disagree with a ref call</b><span>Immediately move on. Commit to creating positive impact within 30 seconds — be specific: get the next rebound, get a stop on defence.</span></div>
+    <div class="trigger"><b>Turnover (yours or a teammate's)</b><span>Speak encouragement — internally for you, or directly to your teammate.</span></div>
+    <div class="trigger"><b>Critical mistake at a crucial time</b><span>Have an affirmation ready: "On to the next", "Next stop is mine", "There's X minutes left to create impact." Ask your coach to hold you accountable to the positive action.</span></div>
+    <div class="trigger"><b>Momentum swings</b><span>Remind yourself it's part of the game — the next swing is yours. Increase your intensity to make it happen sooner.</span></div>
+    <div class="trigger"><b>Self-doubt</b><span>You were put on that team for a reason. Simplify: focus on one or two skills you know you can do well.</span></div>
+    <div class="trigger"><b>Missing shots</b><span>Create immediate impact elsewhere — defensive pressure, boxing out, assists. Ask your coach whether to keep shooting or look for the next pass.</span></div>
+    <div class="trigger"><b>Trash talk</b><span>Easy one — ignore it. Nothing annoys a trash-talker more than an opponent who stays locked into their own game.</span></div>
+    <div class="trigger"><b>Social media pressure</b><span>If it's affecting your game, remove it. Your number-one priority is your performance and contribution to the team.</span></div>
+    <div class="trigger"><b>Extended time on the bench</b><span>Stay mentally in the game: study your likely match-ups, read what's working in offence, support teammates with high energy. <strong>Never</strong> sit away from the team, go quiet or sulk.</span></div>
+    <details class="ainote">
+      <summary><span class="bot">🤖</span><span class="cap">AI Coach's Note · these are examples — find your own</span><span class="chev">⌄</span></summary>
+      <div class="body">
+        <p>These aren't a checklist to memorise — they're common examples to get you thinking about what actually sets <i>you</i> off. Head to the <b>Self-Assessment Workshop</b> to pin down your own main reactions and a counter-trigger for each, then pick your <b>top three</b> and pop them on a small card for the kit bag. A few rehearsed responses beat a long list you can't reach for under adrenaline.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ CH 8 — COMMUNICATION TOOLS ============ -->
+<section class="reveal page" id="ch8">
+  <div class="wrap">
+    <div class="chnum">Chapter 08</div>
+    <h2 class="chtitle">Communication Tools for Parents</h2>
+    <div class="divider"></div>
+    <p class="lead">A baseline of communication to support your junior athlete's mental fortitude — as a player and a teammate.</p>
+    <div class="card">
+      <div class="chnum">On the way to the game</div>
+      <div class="step"><div class="n">1</div><div><h4>"What do you do well?"</h4></div></div>
+      <div class="step"><div class="n">2</div><div><h4>"What do you need to pay attention to?"</h4></div></div>
+      <div class="step"><div class="n">3</div><div><h4>"What are two skills you can do well to create impact?"</h4></div></div>
+      <p class="muted" style="margin-top:14px">Be led by your athlete on timing — an opportunity will present itself. With consistency, these conversations become easier and "normal".</p>
+    </div>
+    <div class="card">
+      <div class="chnum">On the way home / during the week</div>
+      <ul class="clean">
+        <li>"What are you most proud of?" <span class="muted">(they must have at least one)</span></li>
+        <li>"What's something you need to work on?"</li>
+        <li>"How does that translate to training this week — how can I help?"</li>
+      </ul>
+      <p class="muted" style="margin-top:6px">Revisit these as checkpoints for whether actions match what was discussed. Teenage emotions are unpredictable, but keeping them connected to their commitment and goals makes it easier.</p>
+    </div>
+    <div class="card">
+      <div class="chnum">My point of difference · have it early</div>
+      <p style="margin:0 0 10px">I tackle these conversations <strong>in the moment — usually in the car</strong>, not days later. The longer you wait, the more a young athlete's memory of the game warps and dramatises. Having the chat early, and consistently (good games and bad), makes it just a normal part of game day — my boys expect it.</p>
+      <p class="muted" style="margin:0">It's a mix of <strong>letting them sit in the emotion</strong> AND working through the questions together, so they can revert to <strong>neutral, accurate thinking</strong> while it's still fresh. If they genuinely don't want to talk, I don't push — but they know it's coming.</p>
+    </div>
+    <details class="ainote">
+      <summary><span class="bot">🤖</span><span class="cap">AI Coach's Note · make the in-the-moment chat land</span><span class="chev">⌄</span></summary>
+      <div class="body">
+        <p>To keep an in-the-moment chat feeling like <b>support, not an interrogation</b>: open with genuine praise ("I loved watching you play"), then ask rather than tell — <b>"what did you feel out there?"</b> lands better than "why did you do that?". Let them lead the pace, and gently walk a dramatised replay back to the facts, together, while it's still fresh.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ CH 9 — PERMANENT CHANGE ============ -->
+<section class="reveal page" id="ch9">
+  <div class="wrap">
+    <div class="chnum">Chapter 09</div>
+    <h2 class="chtitle">How to Make Permanent Changes</h2>
+    <div class="divider"></div>
+    <p class="lead">The steps so far help you change your mindset in the moment. But how do you build that into a <strong>permanent mindset</strong> that happens automatically?</p>
+    <p class="muted">Some say 21 days, some say 60. My advice: keep doing it until you realise it's automatic — however long that takes, because it's different for everyone. It might take two games, or half a season of small improvements.</p>
+    <div class="card">
+      <div class="chnum" style="color:var(--good)">Signs you're building a stronger mindset</div>
+      <ul class="clean">
+        <li>Your <strong>reaction time reduces</strong> — to a play, a ref's call, a decision</li>
+        <li>You use the triggers <strong>more than you don't</strong> throughout the game</li>
+        <li>Your mind is <strong>focused on the team</strong>, not personal outcomes or mistakes</li>
+        <li>Coaches and teammates start to <strong>notice a positive change</strong></li>
+        <li>You can <strong>move quickly on</strong> to the next play</li>
+      </ul>
+    </div>
+    <p class="muted">At this point, actively practise positive self-talk based on the results you've noticed. A few key sentences before the game will help frame your mindset.</p>
+  </div>
+</section>
+
+<!-- ============ CH 10 — SELF-ASSESSMENT WORKSHOP ============ -->
+<section class="reveal page" id="ch10">
+  <div class="wrap">
+    <div class="chnum">Chapter 10 · Workshop</div>
+    <h2 class="chtitle">Self-Assessment Workshop</h2>
+    <div class="divider"></div>
+    <p class="lead">Time to get specific. Ask your coach, mentor or parents for help here. You might not have three — but don't list more than three. That's too many to change at once. <span class="muted">(Everything you type saves on this device.)</span></p>
+    <div class="card">
+      <p style="margin:0 0 8px"><strong>Three negative behaviour / thought patterns in your game</strong> — ranked most-impactful first.</p>
+      <div class="field"><label>1 · Pattern &amp; how it affects my game</label><textarea data-save="wk1"></textarea></div>
+      <div class="field"><label>2 · Pattern &amp; how it affects my game</label><textarea data-save="wk2"></textarea></div>
+      <div class="field"><label>3 · Pattern &amp; how it affects my game</label><textarea data-save="wk3"></textarea></div>
+    </div>
+    <div class="card">
+      <p style="margin:0 0 8px"><strong>Your triggers.</strong> Using Chapters 6 &amp; 7, write a trigger you'll use to overcome each behaviour. If nothing fits, create your own — an action or thought that moves you on to the next play quickly.</p>
+      <div class="field"><label>Trigger for behaviour 1</label><textarea data-save="tr1"></textarea></div>
+      <div class="field"><label>Trigger for behaviour 2</label><textarea data-save="tr2"></textarea></div>
+      <div class="field"><label>Trigger for behaviour 3</label><textarea data-save="tr3"></textarea></div>
+    </div>
+    <div class="card">
+      <p style="margin:0 0 8px"><strong>Post-game assessment.</strong> What situation arose, which trigger you used, and how it impacted your game. Be honest — was the outcome positive or negative, and what could be different next time? <strong>Don't skip this step.</strong></p>
+      <div class="field"><label>Post-game reflection</label><textarea data-save="post" style="min-height:110px"></textarea></div>
+    </div>
+    <details class="ainote">
+      <summary><span class="bot">🤖</span><span class="cap">AI Coach's Note · a rhythm for the reflection</span><span class="chev">⌄</span></summary>
+      <div class="body">
+        <p>Reflection sticks when it's short and regular. Try <b>three lines after every game</b>: one win, one lesson, one focus for next time. A rolling log like this turns a season into visible progress — and makes the parent conversations in Chapter 8 effortless, because the athlete already knows their own answers.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ============ CH 11 — RESOURCES ============ -->
+<section class="reveal page" id="ch11">
+  <div class="wrap">
+    <div class="chnum">Chapter 11</div>
+    <h2 class="chtitle">Resources</h2>
+    <div class="divider"></div>
+    <p class="lead">You now have a step-by-step process to strengthen your mind and impact on the court. Here's what supports the work.</p>
+    <div class="res-grid">
+      <div class="res card"><h4>📚 Books</h4><ul><li>The Mountain Is You — Brianna Wiest</li><li>Relentless — Tim Grover</li><li>Limitless — Jim Kwik</li><li>Atomic Habits — James Clear</li></ul></div>
+      <div class="res card"><h4>🎧 Podcasts</h4><ul><li>Mind the Game</li><li>The Mindset Mentor</li><li>The High Performance Podcast</li><li>Unlocking Us</li><li>The Rich Roll Podcast</li></ul></div>
+      <div class="res card"><h4>📓 Journal</h4><ul><li>I Choose Joy — Danelle Delgado <span class="muted">(on Amazon)</span></li></ul></div>
+      <div class="res card"><h4>🎵 Other</h4><ul><li>Binaural Beats on Spotify — search "Binaural Beats for Focus / Sleep / Relaxing" or whatever state you're after</li></ul></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CH 12 — AI INTRO (NEW) ============ -->
+<section class="reveal ai-hero page" id="ch12">
+  <div class="wrap">
+    <div class="chnum">Chapter 12 · New for 2026</div>
+    <h2 class="chtitle">Meet Your Assistant Coach: AI</h2>
+    <div class="divider"></div>
+    <p class="lead">You've just read a blueprint built on <strong>years</strong> of lived experience. Here's the exciting part: a tool now exists that can help you share it with more families, faster — without you learning to code a thing. Let's demystify it.</p>
+    <p class="muted"><strong>Quick note — who's this chapter for?</strong> The rest of the book is for parents and athletes. This bonus is a plain-English intro to AI for anyone curious — and it's especially handy for <strong>coaches and creators like Amanda</strong> who want to get this kind of work out to more people.</p>
+    <p class="muted"><strong>So what is AI, in plain English?</strong> Think of it as an incredibly well-read assistant who's available 24/7, never gets tired, and does exactly what you ask. You type what you want in normal words — like texting a really capable friend — and it helps you write, plan, brainstorm and organise. That's it. No tech background needed. If you can send a DM, you can use AI.</p>
+
+    <div class="card">
+      <div class="chnum" style="color:var(--good)">Four ways AI can help you create &amp; share <em>(for coaches like Amanda)</em></div>
+      <div class="pillrow">
+        <span class="pill">📱 <b>Content:</b> turn one tip into a week of Instagram posts &amp; captions</span>
+        <span class="pill">💬 <b>DMs:</b> draft warm, on-brand replies to parents' questions</span>
+        <span class="pill">🏀 <b>Drills:</b> brainstorm pre-game routines for different ages</span>
+        <span class="pill">📖 <b>Resources:</b> spin this blueprint into worksheets &amp; email series</span>
+      </div>
+    </div>
+
+    <p class="muted"><strong>Why this matters for you specifically:</strong> the hardest part of growing something meaningful is finding the hours. AI gives you those hours back. The wisdom, the voice, the standards — that's all you. AI is just the assistant who helps you get it out into the world so more kids benefit.</p>
+
+    <div class="pull">You bring the <span>expertise</span>.<br>AI handles the <span>busywork</span>.</div>
+
+    <details class="ainote" open>
+      <summary><span class="bot">✨</span><span class="cap">For coaches &amp; creators · your weekly content engine</span><span class="chev">⌄</span></summary>
+      <div class="body">
+        <p>Want regular mindset content for your page? Open a free AI chat tool and paste this: <b>"You're my content assistant. I'm a basketball mindset coach for junior athletes. Give me 7 short Instagram post ideas about handling pressure, nerves and confidence on the court — each with a one-line caption in a warm, motivating voice. Keep it simple and real."</b></p>
+        <p>Keep the ones that sound like <b>you</b>, tweak the wording, and you've got a week of posts in minutes. Do this once a week and you'll never stare at a blank screen again. You're the coach; AI is just the intern taking your direction. 🚀</p>
+      </div>
+    </details>
+    <p class="muted" style="font-size:.86rem">This chapter was added by AI for the 2026 edition, as a friendly on-ramp — written to sit alongside Amanda's blueprint, not replace a word of it.</p>
+  </div>
+</section>
+
+<!-- ============ QUIZ (NEW) ============ -->
+<section class="reveal page" id="quiz">
+  <div class="wrap">
+    <div class="chnum">Game Time · Quiz</div>
+    <h2 class="chtitle">Test Your Mindset</h2>
+    <div class="divider"></div>
+    <p class="lead">Five quick plays, straight from the blueprint. Tap your answer — there's no losing here, just reps for your brain. 🏀</p>
+    <div id="quizBox"></div>
+  </div>
+</section>
+
+<!-- ============ GET TO KNOW AMANDA (NEW) ============ -->
+<section class="reveal page" id="amanda">
+  <div class="wrap">
+    <div class="chnum">Behind the Blueprint</div>
+    <h2 class="chtitle">Get to Know Amanda</h2>
+    <div class="divider"></div>
+    <p class="lead">Tap a question to flip it over. 👇</p>
+    <details class="qa"><summary><span class="q">Favourite place on a basketball court?</span><span class="tap">Tap ↻</span></summary><div class="a">The game on the line, a few seconds to go, the coach yelling — that was my favourite place on earth.</div></details>
+    <details class="qa"><summary><span class="q">The real secret behind the boys' results?</span><span class="tap">Tap ↻</span></summary><div class="a">Not more drills. It was mental fortitude — resilience in games and through the hard physical work required to reach big goals.</div></details>
+    <details class="qa"><summary><span class="q">Where did these tools really come from?</span><span class="tap">Tap ↻</span></summary><div class="a">From navigating real life-and-death moments as a family, through their dad's heart failure and transplant. The skills that got us through became the same tools we use on the court.</div></details>
+    <details class="qa"><summary><span class="q">Best advice for a nervous parent on the sideline?</span><span class="tap">Tap ↻</span></summary><div class="a">Don't jump in to rescue them from pressure — help them walk through it. Sport is the one place those hard emotions should be welcomed.</div></details>
+    <details class="qa"><summary><span class="q">One line you live by?</span><span class="tap">Tap ↻</span></summary><div class="a">"The best kind of success is the one you share with others." It's exactly why this book exists.</div></details>
+    <div class="card" style="text-align:center">
+      <p style="margin:0 0 12px"><strong>Want to say hi?</strong> I read my DMs and love hearing how it's going.</p>
+      <a class="ig-chip" style="margin-top:0" href="https://www.instagram.com/amanda_hodgson_/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16M12 0C8.74 0 8.33.01 7.05.07c-1.28.06-2.15.26-2.91.56-.79.31-1.46.72-2.13 1.38A5.9 5.9 0 0 0 .63 4.14c-.3.76-.5 1.63-.56 2.91C.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.28.26 2.15.56 2.91.31.79.72 1.46 1.38 2.13.67.66 1.34 1.07 2.13 1.38.76.3 1.63.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.28-.06 2.15-.26 2.91-.56a5.9 5.9 0 0 0 2.13-1.38 5.9 5.9 0 0 0 1.38-2.13c.3-.76.5-1.63.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.28-.26-2.15-.56-2.91a5.9 5.9 0 0 0-1.38-2.13A5.9 5.9 0 0 0 19.86.63c-.76-.3-1.63-.5-2.91-.56C15.67.01 15.26 0 12 0z"/><path d="M12 5.84A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84zM12 16a4 4 0 1 1 4-4 4 4 0 0 1-4 4z"/><circle cx="18.41" cy="5.59" r="1.44"/></svg>Follow @amanda_hodgson_</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ COMMUNITY (NEW) ============ -->
+<section class="reveal page" id="community">
+  <div class="wrap">
+    <div class="chnum">Our Community</div>
+    <h2 class="chtitle">The Locker Room</h2>
+    <div class="divider"></div>
+    <p class="lead">No logins, no fancy forum — just parents and young athletes figuring it out together, over on Instagram where I actually hang out and reply.</p>
+    <div class="join"><span class="jem">👀</span><div><h4>Follow along</h4><p>Little tips and reminders through the week, so the mindset work stays front of mind between games.</p></div></div>
+    <div class="join"><span class="jem">💬</span><div><h4>Ask anything</h4><p>Stuck on something? Send me a DM. No question is too small — chances are another parent is wondering the same thing.</p></div></div>
+    <div class="join"><span class="jem">🏆</span><div><h4>Share your wins</h4><p>Tag <strong>@amanda_hodgson_</strong> in a game-day story — a calm comeback, a brave shot, a good attitude — and I'll cheer your athlete on.</p></div></div>
+    <div class="card" style="text-align:center">
+      <p style="margin:0 0 12px">The community grows as you do. Come and be part of it. 🧡</p>
+      <a class="ig-big" href="https://www.instagram.com/amanda_hodgson_/" target="_blank" rel="noopener" style="font-size:1rem;padding:14px 24px"><svg viewBox="0 0 24 24"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16M12 0C8.74 0 8.33.01 7.05.07c-1.28.06-2.15.26-2.91.56-.79.31-1.46.72-2.13 1.38A5.9 5.9 0 0 0 .63 4.14c-.3.76-.5 1.63-.56 2.91C.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.28.26 2.15.56 2.91.31.79.72 1.46 1.38 2.13.67.66 1.34 1.07 2.13 1.38.76.3 1.63.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.28-.06 2.15-.26 2.91-.56a5.9 5.9 0 0 0 2.13-1.38 5.9 5.9 0 0 0 1.38-2.13c.3-.76.5-1.63.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.28-.26-2.15-.56-2.91a5.9 5.9 0 0 0-1.38-2.13A5.9 5.9 0 0 0 19.86.63c-.76-.3-1.63-.5-2.91-.56C15.67.01 15.26 0 12 0z"/><path d="M12 5.84A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84zM12 16a4 4 0 1 1 4-4 4 4 0 0 1-4 4z"/><circle cx="18.41" cy="5.59" r="1.44"/></svg>Join us on Instagram</a>
+    </div>
+  </div>
+</section>
+
+<!-- ============ FINISH / CLOSING ============ -->
+<section class="reveal page" id="finish">
+  <div class="wrap" style="text-align:center">
+    <div class="chnum" style="text-align:center">A note to finish</div>
+    <p class="lead" style="max-width:34ch;margin:0 auto 18px">I can't wait to hear how these tools make a positive impact on your — or your child's — game.</p>
+    <p class="muted">Using these same tools, my boys achieved goals reserved for the top kids in the State. It seemed crazy to keep that to myself, so I created this book for you. <strong>The best kind of success is the one you share with others.</strong></p>
+    <h2 style="font-family:var(--fd);font-weight:var(--disp-weight);font-size:clamp(2.2rem,9vw,3.4rem);text-transform:var(--disp-tt);line-height:1;margin:30px 0 14px">Let's Stay Connected</h2>
+    <p class="muted" style="max-width:32ch;margin:0 auto 4px">Follow along for useful tips every week, and DM me any time.</p>
+    <a class="ig-big" href="https://www.instagram.com/amanda_hodgson_/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16M12 0C8.74 0 8.33.01 7.05.07c-1.28.06-2.15.26-2.91.56-.79.31-1.46.72-2.13 1.38A5.9 5.9 0 0 0 .63 4.14c-.3.76-.5 1.63-.56 2.91C.01 8.33 0 8.74 0 12s.01 3.67.07 4.95c.06 1.28.26 2.15.56 2.91.31.79.72 1.46 1.38 2.13.67.66 1.34 1.07 2.13 1.38.76.3 1.63.5 2.91.56C8.33 23.99 8.74 24 12 24s3.67-.01 4.95-.07c1.28-.06 2.15-.26 2.91-.56a5.9 5.9 0 0 0 2.13-1.38 5.9 5.9 0 0 0 1.38-2.13c.3-.76.5-1.63.56-2.91.06-1.28.07-1.69.07-4.95s-.01-3.67-.07-4.95c-.06-1.28-.26-2.15-.56-2.91a5.9 5.9 0 0 0-1.38-2.13A5.9 5.9 0 0 0 19.86.63c-.76-.3-1.63-.5-2.91-.56C15.67.01 15.26 0 12 0z"/><path d="M12 5.84A6.16 6.16 0 1 0 18.16 12 6.16 6.16 0 0 0 12 5.84zM12 16a4 4 0 1 1 4-4 4 4 0 0 1-4 4z"/><circle cx="18.41" cy="5.59" r="1.44"/></svg>Follow @amanda_hodgson_</a>
+    <div class="handle">Thank you &amp; good luck 🏀</div>
+    <div class="footer" style="border-top:1px solid var(--line);margin-top:40px">Junior Basketball Development Blueprint · 2026 Digital Edition<br>© Amanda Hodgson · A guide for parents &amp; athletes</div>
+  </div>
+</section>
+
+<!-- theme picker -->
+<div id="themeWrap">
+  <button id="themeBtn" aria-label="Change colour theme" title="Change colour theme">
+    <svg viewBox="0 0 24 24"><path d="M12 2C6.49 2 2 6.49 2 12s4.49 10 10 10c.93 0 1.68-.75 1.68-1.68 0-.44-.17-.83-.44-1.13-.26-.29-.43-.68-.43-1.11 0-.93.75-1.68 1.68-1.68H16c3.31 0 6-2.69 6-6 0-4.96-4.49-8.72-10-8.72zM6.5 13a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3-4a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm3 4a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/></svg>
+  </button>
+  <div id="themeMenu" role="menu">
+    <div class="tm-title">Colour theme</div>
+    <button class="tm-opt" data-theme="hardwood"><span class="sw"><i style="background:#c85a12"></i><i style="background:#f4ece0"></i></span>Hardwood <em>· default</em><span class="chk">✓</span></button>
+    <button class="tm-opt" data-theme="blueprint"><span class="sw"><i style="background:#3b30c9"></i><i style="background:#f6f4ee"></i></span>Blueprint <em>· from the book</em><span class="chk">✓</span></button>
+    <button class="tm-opt" data-theme="rose"><span class="sw"><i style="background:#d6336c"></i><i style="background:#fbf1f2"></i></span>Rose<span class="chk">✓</span></button>
+    <button class="tm-opt" data-theme="sage"><span class="sw"><i style="background:#2f8f5b"></i><i style="background:#eef3ec"></i></span>Sage<span class="chk">✓</span></button>
+    <button class="tm-opt" data-theme="ink"><span class="sw"><i style="background:#3a3733"></i><i style="background:#f3f1ec"></i></span>Ink<span class="chk">✓</span></button>
+    <button class="tm-opt" data-theme="royal"><span class="sw"><i style="background:#5a4ef2"></i><i style="background:#0a0a1f"></i></span>Royal Court<span class="chk">✓</span></button>
+    <button class="tm-opt" data-theme="court"><span class="sw"><i style="background:#ff6b00"></i><i style="background:#050506"></i></span>Court Night<span class="chk">✓</span></button>
+    <button class="tm-opt" data-theme="sunset"><span class="sw"><i style="background:#ff6b6b"></i><i style="background:#1a1220"></i></span>Sunset<span class="chk">✓</span></button>
+    <button class="tm-opt" data-theme="forest"><span class="sw"><i style="background:#3fce74"></i><i style="background:#0e1a12"></i></span>Forest<span class="chk">✓</span></button>
+    <button class="tm-opt" data-theme="berry"><span class="sw"><i style="background:#d02fe0"></i><i style="background:#160c1c"></i></span>Berry<span class="chk">✓</span></button>
+  </div>
+</div>
+
+<!-- bottom pager -->
+<nav id="pager">
+  <button class="pgbtn back" id="pgBack"><svg viewBox="0 0 24 24"><polyline points="15 5 8 12 15 19"/></svg>Back</button>
+  <button class="pg-center" id="pgMenu"><span class="cl">☰ Chapters</span><span class="cc" id="pgCount">1 / 17</span></button>
+  <button class="pgbtn next" id="pgNext">Next<svg viewBox="0 0 24 24"><polyline points="9 5 16 12 9 19"/></svg></button>
+</nav>
+
+<!-- bottom-sheet TOC -->
+<div id="sheet" role="dialog" aria-modal="true">
+  <div class="sheet-inner">
+    <div class="sheet-grab"></div>
+    <h3>Jump to a chapter</h3>
+    <a class="toc-item" data-go="top"><span class="tnum">—</span><span class="ttl">Cover</span></a>
+    <a class="toc-item" data-go="ch1"><span class="tnum">01</span><span class="ttl">The Advantage of a Strong Mental Game</span></a>
+    <a class="toc-item" data-go="ch2"><span class="tnum">02</span><span class="ttl">About Me &amp; My Sons</span></a>
+    <a class="toc-item" data-go="ch3"><span class="tnum">03</span><span class="ttl">Understanding the Pressure of a Game</span></a>
+    <a class="toc-item" data-go="ch4"><span class="tnum">04</span><span class="ttl">Effects of High-Pressure Situations</span></a>
+    <a class="toc-item" data-go="ch5"><span class="tnum">05</span><span class="ttl">The Ultimate Feeling of a Strong Mindset</span></a>
+    <a class="toc-item" data-go="ch6"><span class="tnum">06</span><span class="ttl">Building a Pre-Game Routine</span></a>
+    <a class="toc-item" data-go="ch7"><span class="tnum">07</span><span class="ttl">Confidence Through Challenge</span></a>
+    <a class="toc-item" data-go="ch8"><span class="tnum">08</span><span class="ttl">Communication Tools for Parents</span></a>
+    <a class="toc-item" data-go="ch9"><span class="tnum">09</span><span class="ttl">How to Make Permanent Changes</span></a>
+    <a class="toc-item" data-go="ch10"><span class="tnum">10</span><span class="ttl">Self-Assessment Workshop</span></a>
+    <a class="toc-item" data-go="ch11"><span class="tnum">11</span><span class="ttl">Resources</span></a>
+    <a class="toc-item" data-go="ch12"><span class="tnum">12</span><span class="ttl">Meet Your Assistant Coach: AI ✨</span></a>
+    <a class="toc-item" data-go="quiz"><span class="tnum">🎮</span><span class="ttl">Test Your Mindset · Quiz</span></a>
+    <a class="toc-item" data-go="amanda"><span class="tnum">⭐</span><span class="ttl">Get to Know Amanda</span></a>
+    <a class="toc-item" data-go="community"><span class="tnum">💬</span><span class="ttl">The Locker Room · Community</span></a>
+    <a class="toc-item" data-go="finish"><span class="tnum">🏀</span><span class="ttl">Let's Stay Connected</span></a>
+    <a class="toc-item ig" href="https://www.instagram.com/amanda_hodgson_/" target="_blank" rel="noopener"><span class="tnum">↗</span><span class="ttl">Follow @amanda_hodgson_ on Instagram</span></a>
+  </div>
+</div>
+
+<script>
+(function(){
+  var root=document.documentElement;
+
+  /* ---------- THEME PICKER ---------- */
+  var TKEY='jbb:theme';
+  function setTheme(t){
+    root.setAttribute('data-theme',t);
+    try{localStorage.setItem(TKEY,t);}catch(e){}
+    document.querySelectorAll('.tm-opt').forEach(function(o){o.classList.toggle('cur',o.getAttribute('data-theme')===t);});
+  }
+  var stored='hardwood';try{stored=localStorage.getItem(TKEY)||'hardwood';}catch(e){}
+  setTheme(stored);
+  var tBtn=document.getElementById('themeBtn'), tMenu=document.getElementById('themeMenu');
+  tBtn.addEventListener('click',function(e){e.stopPropagation();tMenu.classList.toggle('open');});
+  tMenu.addEventListener('click',function(e){e.stopPropagation();});
+  document.querySelectorAll('.tm-opt').forEach(function(o){
+    o.addEventListener('click',function(){setTheme(o.getAttribute('data-theme'));tMenu.classList.remove('open');});
+  });
+
+  /* ---------- PAGER (flip-through chapters) ---------- */
+  var pages=Array.prototype.slice.call(document.querySelectorAll('.page'));
+  var idxById={}; pages.forEach(function(p,i){if(p.id)idxById[p.id]=i;});
+  var idx=0;
+  var back=document.getElementById('pgBack'), next=document.getElementById('pgNext'),
+      cnt=document.getElementById('pgCount'), bar=document.getElementById('progress');
+  function show(i){
+    if(i<0)i=0; if(i>pages.length-1)i=pages.length-1;
+    pages.forEach(function(p,j){p.classList.toggle('active',j===i);});
+    var cur=pages[i];
+    var revs=cur.querySelectorAll('.reveal');
+    cur.classList.remove('in'); revs.forEach(function(r){r.classList.remove('in');});
+    void cur.offsetWidth;
+    if(cur.classList.contains('reveal'))cur.classList.add('in');
+    revs.forEach(function(r){r.classList.add('in');});
+    idx=i;
+    back.disabled=(i===0); next.disabled=(i===pages.length-1);
+    cnt.textContent=(i+1)+' / '+pages.length;
+    bar.style.width=(pages.length>1?(i/(pages.length-1)*100):0)+'%';
+    window.scrollTo(0,0);
+  }
+  back.addEventListener('click',function(){show(idx-1);});
+  next.addEventListener('click',function(){show(idx+1);});
+  var startBtn=document.getElementById('startBtn');
+  if(startBtn)startBtn.addEventListener('click',function(){show(idx+1);});
+
+  /* ---------- CHAPTERS SHEET ---------- */
+  var sheet=document.getElementById('sheet');
+  document.getElementById('pgMenu').addEventListener('click',function(e){e.stopPropagation();sheet.classList.add('open');});
+  sheet.addEventListener('click',function(e){if(e.target===sheet)sheet.classList.remove('open');});
+  document.querySelectorAll('[data-go]').forEach(function(a){
+    a.addEventListener('click',function(){
+      sheet.classList.remove('open');
+      var id=this.getAttribute('data-go');
+      if(id in idxById)show(idxById[id]);
+    });
+  });
+  document.addEventListener('click',function(){tMenu.classList.remove('open');});
+
+  /* ---------- SWIPE + ARROW KEYS ---------- */
+  var x0=null,y0=null;
+  document.addEventListener('touchstart',function(e){var t=e.touches[0];x0=t.clientX;y0=t.clientY;},{passive:true});
+  document.addEventListener('touchend',function(e){
+    if(x0===null)return;
+    var t=e.changedTouches[0], dx=t.clientX-x0, dy=t.clientY-y0;
+    if(Math.abs(dx)>60 && Math.abs(dx)>Math.abs(dy)*1.7){ show(dx<0?idx+1:idx-1); }
+    x0=y0=null;
+  },{passive:true});
+  document.addEventListener('keydown',function(e){
+    if(e.key==='ArrowRight')show(idx+1); else if(e.key==='ArrowLeft')show(idx-1);
+  });
+
+  /* ---------- CHECKLISTS (persisted) ---------- */
+  document.querySelectorAll('[data-check]').forEach(function(group){
+    var key='jbb:'+group.getAttribute('data-check');
+    var saved=[];try{saved=JSON.parse(localStorage.getItem(key)||'[]');}catch(e){}
+    var items=group.querySelectorAll('.check');
+    items.forEach(function(it,i){
+      if(saved.indexOf(i)>-1)it.classList.add('done');
+      it.addEventListener('click',function(){
+        it.classList.toggle('done');
+        var done=[];items.forEach(function(x,j){if(x.classList.contains('done'))done.push(j);});
+        try{localStorage.setItem(key,JSON.stringify(done));}catch(e){}
+      });
+    });
+  });
+
+  /* ---------- WORKSHOP TEXT (persisted) ---------- */
+  document.querySelectorAll('[data-save]').forEach(function(t){
+    var key='jbb:'+t.getAttribute('data-save');
+    try{t.value=localStorage.getItem(key)||'';}catch(e){}
+    t.addEventListener('input',function(){try{localStorage.setItem(key,t.value);}catch(e){}});
+  });
+
+  /* ---------- MINDSET QUIZ ---------- */
+  var QUIZ=[
+    {q:"It's the night before a big game. What's the first mindset tool?", i:"Chapter 6",
+     a:["Visualise the game — your role, the moves, celebrating the win","Watch three hours of NBA highlights","Nothing — just wing it tomorrow"], c:0,
+     fb:"Visualisation the night before sets your mind up before you even arrive."},
+    {q:"The ref makes a call you totally disagree with. Best response?", i:"Chapter 7",
+     a:["Argue your case with the ref","Move on and create positive impact within 30 seconds","Drop your head and sulk"], c:1,
+     fb:"Move on fast — commit to something specific like the next rebound or a stop on defence."},
+    {q:"You've missed a few shots in a row. Now what?", i:"Chapter 7",
+     a:["Keep forcing the same shot","Stop trying so you can't miss again","Create impact elsewhere — defence, rebounds, assists"], c:2,
+     fb:"Make your mark another way while your shot settles."},
+    {q:"An opponent keeps trash-talking you. You…", i:"Chapter 7",
+     a:["Ignore it and lock into your own game","Fire it right back at them","Let it get in your head"], c:0,
+     fb:"Nothing annoys a trash-talker more than being completely ignored."},
+    {q:"How many 'go-to' skills should you commit to each game?", i:"Chapter 6",
+     a:["As many as you can","Two","Zero — just react"], c:1,
+     fb:"Pick two skills you do well and commit to them all game — it eases the pressure."}
+  ];
+  var box=document.getElementById('quizBox');
+  if(box){
+    var answered, score;
+    function build(){
+      box.innerHTML=''; answered=0; score=0;
+      QUIZ.forEach(function(item,qi){
+        var q=document.createElement('div'); q.className='quiz-q';
+        q.innerHTML='<div class="qi">Question '+(qi+1)+' · '+item.i+'</div><div class="qh">'+item.q+'</div>';
+        item.a.forEach(function(txt,ai){
+          var b=document.createElement('button'); b.className='opt'; b.type='button';
+          b.innerHTML='<span class="mk">'+String.fromCharCode(65+ai)+'</span><span>'+txt+'</span>';
+          b.addEventListener('click',function(){
+            if(q.getAttribute('data-done'))return;
+            q.setAttribute('data-done','1');
+            var opts=q.querySelectorAll('.opt');
+            opts.forEach(function(o){o.disabled=true;});
+            opts[item.c].classList.add('correct');
+            if(ai!==item.c)b.classList.add('wrong'); else score++;
+            var fb=document.createElement('div'); fb.className='quiz-fb'; fb.innerHTML='💡 '+item.fb;
+            q.appendChild(fb);
+            answered++; if(answered===QUIZ.length)finish();
+          });
+          q.appendChild(b);
+        });
+        box.appendChild(q);
+      });
+    }
+    function finish(){
+      var emoji, msg;
+      if(score>=5){emoji='🧊';msg='Ice in the Veins — mindset master!';}
+      else if(score>=3){emoji='💪';msg="Strong Starter — you've got the tools.";}
+      else{emoji='🏃';msg='Rookie Runner — flip back and run it again!';}
+      var r=document.createElement('div'); r.className='quiz-result';
+      r.innerHTML='<div class="rbig">'+emoji+' '+score+'/'+QUIZ.length+'</div>'+
+        '<div class="rsc">'+msg+'</div>'+
+        '<p class="muted" style="margin:0 0 14px">Every question here is a real tool from the blueprint — the more it becomes second nature, the calmer the game feels.</p>'+
+        '<button class="btnline" type="button" id="quizAgain">↻ Play again</button>';
+      box.appendChild(r);
+      document.getElementById('quizAgain').addEventListener('click',function(){build();window.scrollTo(0,0);});
+      r.scrollIntoView({behavior:'smooth',block:'center'});
+    }
+    build();
+  }
+
+  /* ---------- START ---------- */
+  show(0);
+})();
+</script>
+</body>
+</html>
