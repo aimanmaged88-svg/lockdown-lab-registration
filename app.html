@@ -76,6 +76,40 @@
   --r:20px;
   color-scheme:dark;
 }
+/* ===== LIGHT MODE (Athlete-OS feel) — toggled via .lightmode on <html> ===== */
+:root.lightmode{
+  --bg:#EDEFF3;
+  --glass:#FFFFFF; --glass2:#F5F7FA;
+  --line:rgba(16,18,27,.10); --line2:rgba(16,18,27,.055);
+  --text:#0C0D12; --muted:#5C616B; --dim:#98A0AB;
+  --accent-soft:rgba(255,107,0,.12); --accent-glow:rgba(255,107,0,.26);
+  color-scheme:light;
+}
+.lightmode body{background:#c8ccd4}
+.lightmode input,.lightmode textarea{background:#fff}
+.lightmode input:focus,.lightmode textarea:focus{background:#fff}
+.lightmode input::placeholder,.lightmode textarea::placeholder{color:#9aa0ab}
+.lightmode header{background:rgba(255,255,255,.72);border-bottom-color:rgba(16,18,27,.07)}
+.lightmode .logo{color:#0c0d12}
+/* subtle white fills read as faint darks on light */
+.lightmode input[type=range]{background:rgba(16,18,27,.10)}
+.lightmode .pill,.lightmode .qbtn,.lightmode .sw,.lightmode .wcup,.lightmode .ossrow,.lightmode .snode .crest{background:rgba(16,18,27,.04)}
+.lightmode .ob-tabs{background:rgba(16,18,27,.05)}
+.lightmode .xpbar,.lightmode .jbar,.lightmode .swtch{background:rgba(16,18,27,.10)}
+.lightmode .jdots i,.lightmode #tipCard .tipdots i{background:rgba(16,18,27,.16)}
+.lightmode .av .ring{background:conic-gradient(var(--accent) var(--pct,0%), rgba(16,18,27,.10) 0)}
+.lightmode .card,.lightmode .stat,.lightmode .sess,.lightmode .pcard,.lightmode .post,.lightmode .ai,.lightmode .trailer{box-shadow:0 6px 20px -14px rgba(16,18,27,.35)}
+.lightmode .igcard img{border-color:rgba(16,18,27,.14)}
+.lightmode .skel{background:linear-gradient(100deg,var(--glass2) 30%,rgba(16,18,27,.06) 50%,var(--glass2) 70%);background-size:200% 100%}
+/* keep the immersive moments dark, but their inner text light (variable re-restore) */
+.lightmode #welcome,.lightmode #badgeUp,.lightmode #ntfLoud,.lightmode #levelup,.lightmode #vault{
+  --bg:#050506;
+  --text:#f6f4f1; --muted:#a09a92; --dim:#6d6861;
+  --glass:rgba(255,255,255,.055); --glass2:rgba(255,255,255,.03);
+  --line:rgba(255,255,255,.11); --line2:rgba(255,255,255,.06);
+  --accent-soft:rgba(255,107,0,.15); --accent-glow:rgba(255,107,0,.38);
+}
+.lightmode #vault .card,.lightmode #vault .stat,.lightmode #vault .badge{box-shadow:inset 0 1px 0 rgba(255,255,255,.06)}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%}
 body{background:#000;color:var(--text);font-family:var(--fb);-webkit-font-smoothing:antialiased;line-height:1.5;display:flex;justify-content:center}
@@ -816,6 +850,7 @@ body.rmode *{animation:none!important;transition:none!important}
     <span class="oa" aria-label="Live — on air"><i></i>LIVE</span>
     <div class="ttl"><b>Lockdown Lab <i>Live</i></b><small id="hSub">Founding Beta</small></div>
     <button class="sndbtn" id="ntfBell" aria-label="Notifications" style="display:none">🔔</button>
+    <button class="sndbtn" id="modeBtn" aria-label="Light or dark" data-modeico>☀️</button>
     <button class="sndbtn" id="setBtn" aria-label="Make it yours">⚙️</button>
     <button class="sndbtn" id="sndToggle" aria-label="Sound">🔊</button>
     <button class="hbtn" id="logout">Log out</button>
@@ -1115,6 +1150,8 @@ body.rmode *{animation:none!important;transition:none!important}
       <div class="card">
         <span class="cl">Feel</span>
         <h3>⚙️ Fine-Tune</h3>
+        <div class="flbl">Look</div>
+        <div class="pills" id="modePills"><span class="pill" data-md="dark">🌙 Dark</span><span class="pill" data-md="light">☀️ Light</span></div>
         <div class="flbl">Text size</div>
         <div class="pills" id="textPills"><span class="pill" data-tx="std">Standard</span><span class="pill" data-tx="big">Large</span></div>
         <div class="flbl">Motion &amp; effects</div>
@@ -1293,6 +1330,17 @@ body.rmode *{animation:none!important;transition:none!important}
   }
   let THEME=localStorage.getItem('ll_theme')||'#ff6b00';
   applyTheme(THEME);
+  /* ---- Light / Dark mode (dark = default) ---- */
+  function applyMode(m){
+    const light = m==='light';
+    document.documentElement.classList.toggle('lightmode', light);
+    document.querySelectorAll('[data-modeico]').forEach(el=>{ el.textContent = light?'🌙':'☀️'; });
+    document.querySelectorAll('[data-modelbl]').forEach(el=>{ el.textContent = light?'Light':'Dark'; });
+  }
+  let MODE=localStorage.getItem('ll_mode')||'dark';
+  applyMode(MODE);
+  function setMode(m){ MODE=m; localStorage.setItem('ll_mode',m); applyMode(m); }
+  function toggleMode(){ setMode(MODE==='light'?'dark':'light'); try{S.like();}catch(e){} try{haptic(12);}catch(e){} try{renderSettings();}catch(e){} }
   if(localStorage.getItem('ll_text')==='big') document.documentElement.classList.add('big');
   if(localStorage.getItem('ll_motion')==='calm'){ document.body.classList.add('rmode'); RM=true; }
 
@@ -2287,6 +2335,7 @@ body.rmode *{animation:none!important;transition:none!important}
 
   /* ---------- MAKE IT YOURS: settings ---------- */
   let lastPage='home';
+  $('#modeBtn').addEventListener('click',toggleMode);
   $('#setBtn').addEventListener('click',()=>{
     lastPage=(document.querySelector('.tabpage.on')||{}).dataset?.page||((sess&&sess.type==='coach')?'roster':'home');
     if(lastPage==='settings') return;
@@ -2300,6 +2349,7 @@ body.rmode *{animation:none!important;transition:none!important}
     $('#customColor').value=/^#[0-9a-fA-F]{6}$/.test(THEME)?THEME:'#ff6b00';
     const learn=(PST&&PST.profile&&PST.profile.prefs&&PST.profile.prefs.learn)||localStorage.getItem('ll_learn')||'';
     document.querySelectorAll('#learnPills .pill').forEach(x=>x.classList.toggle('sel',x.dataset.learn===learn));
+    document.querySelectorAll('#modePills .pill').forEach(x=>x.classList.toggle('sel',x.dataset.md===MODE));
     document.querySelectorAll('#textPills .pill').forEach(x=>x.classList.toggle('sel',(localStorage.getItem('ll_text')==='big')===(x.dataset.tx==='big')));
     document.querySelectorAll('#motionPills .pill').forEach(x=>x.classList.toggle('sel',(localStorage.getItem('ll_motion')==='calm')===(x.dataset.mo==='calm')));
     renderNP();
@@ -2313,6 +2363,10 @@ body.rmode *{animation:none!important;transition:none!important}
     document.querySelectorAll('#learnPills .pill').forEach(x=>x.classList.toggle('sel',x===p));
     localStorage.setItem('ll_learn',p.dataset.learn);
     try{ await api({action:'pref',pid:sess.pid,pin:sess.pin,learn:p.dataset.learn}); toast('Coach knows how you learn 🧬'); }catch(e){}
+  });
+  $('#modePills').addEventListener('click',e=>{
+    const p=e.target.closest('.pill'); if(!p)return;
+    setMode(p.dataset.md); renderSettings(); S.like(); haptic(12);
   });
   $('#textPills').addEventListener('click',e=>{
     const p=e.target.closest('.pill'); if(!p)return;
