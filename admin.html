@@ -66,6 +66,21 @@
   --fm:ui-monospace,"SF Mono",Menlo,monospace;
   color-scheme:dark;
 }
+/* ===== LIGHT MODE (Athlete-OS feel) — toggled via .lightmode on <html> ===== */
+:root.lightmode{
+  --bg:#EDEFF3; --text:#0C0D12; --muted:#5C616B; --dim:#98A0AB;
+  --accent-soft:rgba(255,107,0,.12); --accent-glow:rgba(255,107,0,.26);
+  --line:rgba(16,18,27,.10); --line2:rgba(16,18,27,.055);
+  --glass:#FFFFFF; --glass2:#F5F7FA;
+  color-scheme:light;
+}
+.lightmode body{background:radial-gradient(80% 40% at 50% -5%, rgba(255,107,0,.10), transparent 60%),#EDEFF3}
+.lightmode input,.lightmode textarea,.lightmode select{background:#fff}
+.lightmode input::placeholder,.lightmode textarea::placeholder{color:#9aa0ab}
+.lightmode .sb{background:rgba(16,18,27,.03)}
+.lightmode .row,.lightmode .editbox{background:rgba(16,18,27,.035)}
+.lightmode .card,.lightmode .kpi{box-shadow:0 6px 20px -14px rgba(16,18,27,.35)}
+.lightmode #athlete .adr{background:#fff}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{background:radial-gradient(80% 40% at 50% -5%, rgba(255,107,0,.14), transparent 60%),var(--bg);color:var(--text);font-family:var(--fb);-webkit-font-smoothing:antialiased;min-height:100dvh}
 #login{padding:20px 16px}
@@ -360,6 +375,7 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
       </nav>
       <div class="sb-foot">
         <span class="statchip"><span class="d"></span><span id="lastUpd">live</span></span>
+        <button class="btn btn-g" id="modeBtn" style="padding:8px 14px;font-size:12px"><span data-modeico>☀️</span> <span data-modelbl>Dark</span></button>
         <button class="btn btn-g" id="aOut" style="padding:8px 14px;font-size:12px">Lock up</button>
       </div>
     </aside>
@@ -593,6 +609,17 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
   const ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltdXd1aHZxcWZ0Z3B4d2h6b3ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NjUyMzgsImV4cCI6MjA5OTI0MTIzOH0.sOkWQpulWj_ZSqMNSV7YP55T70UFSm2mP5e5xapQyQo';
   const $=s=>document.querySelector(s);
   const esc=t=>String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  /* ---- Light / Dark mode (dark = default) ---- */
+  function applyMode(m){
+    const light=m==='light';
+    document.documentElement.classList.toggle('lightmode',light);
+    document.querySelectorAll('[data-modeico]').forEach(el=>el.textContent=light?'🌙':'☀️');
+    document.querySelectorAll('[data-modelbl]').forEach(el=>el.textContent=light?'Light':'Dark');
+  }
+  let MODE=localStorage.getItem('ll_mode')||'dark';
+  applyMode(MODE);
+  function setMode(m){ MODE=m; localStorage.setItem('ll_mode',m); applyMode(m); }
+  function toggleMode(){ setMode(MODE==='light'?'dark':'light'); }
   let CODE=localStorage.getItem('lll_admin')||'', R=null, pollT=null, toastT=null;
   async function api(body){
     const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+ANON,'apikey':ANON},body:JSON.stringify(body)});
@@ -937,6 +964,7 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
     catch(e){ $('#aErr').style.display='block'; }
   });
   $('#ac').addEventListener('keydown',e=>{ if(e.key==='Enter') $('#aGo').click(); });
+  $('#modeBtn')&&$('#modeBtn').addEventListener('click',toggleMode);
   $('#aOut').addEventListener('click',()=>{ localStorage.removeItem('lll_admin'); CODE=''; clearInterval(pollT); $('#desk').classList.remove('on'); $('#login').style.display='block'; });
   $('#mGo').addEventListener('click',async()=>{
     try{ const r=await api({action:'invite_mint',code:CODE,label:$('#mLabel').value.trim()}); $('#mLabel').value=''; toast('Minted '+r.code+' · burns in 6h'); refresh(); }catch(e){toast(e.message)}
@@ -1070,6 +1098,7 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
   /* Newest = highest id. Add a new entry (bump the id) and every coach's desk
      badges the Guide tab + pings them the next time it's open. */
   const NEWS=[
+    {id:22,d:'24 Jul',t:'Light mode — now on your desk too',body:'The Door Desk and the Coach Portal now have the same Light / Dark toggle as the player app. It’s the button next to Lock up / Log out in the sidebar. Dark stays the default; flip to light whenever the dark’s hard on your eyes. Your choice sticks across all three.'},
     {id:21,d:'24 Jul',t:'Light mode — toggle it',body:'The player app now has a Light / Dark toggle. Tap the ☀️/🌙 in the header, or Settings → Fine-Tune → Look. Dark stays the default; light is a clean Athlete-OS feel for daytime and easy-on-the-eyes reading. Badge unlocks and the Vault stay dark for the moment.'},
     {id:20,d:'21 Jul',t:'Injuries — athlete aware',body:'Open a player’s file → Injuries tab. Log body part, severity and status (active / managing / cleared), with a note. A 🩹 flag shows on the squad list and their file so you always train around it, not through it.'},
     {id:19,d:'21 Jul',t:'Tip of the Day (player side)',body:'Players get a Tip of the Day card on their home — up to 5 they can tap through, built from their own numbers and the homework you set them. Sharp, personal, straight to the point.'},
