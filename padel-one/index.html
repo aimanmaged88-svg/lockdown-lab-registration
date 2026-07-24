@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0B0E0C">
+<title>Padel One — The complete padel experience</title>
+<meta name="description" content="Book. Play. Compete. Belong. One app for courts, players, clubs, competitions and everything padel.">
+<link rel="stylesheet" href="styles.css">
+<link rel="preconnect" href="https://unpkg.com">
+</head>
+<body>
+<div class="stage">
+
+  <!-- desktop side panel -->
+  <aside class="desk-aside">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:26px">
+      <div style="width:44px;height:44px;border-radius:13px;background:var(--lime);display:grid;place-items:center">
+        <span style="font-weight:900;color:var(--lime-ink);font-size:22px">P</span>
+      </div>
+      <span style="font-weight:800;font-size:20px;letter-spacing:-0.02em">PADEL ONE</span>
+    </div>
+    <h1>Book. Play.<br><span class="lime">Compete.</span> Belong.</h1>
+    <p>One app for courts, players, clubs, competitions and everything padel. This is a clickable product prototype — explore every screen.</p>
+    <div class="desk-badges">
+      <span>Transparent pricing</span>
+      <span>Fair matchmaking</span>
+      <span>Real human support</span>
+      <span>Automatic match protection</span>
+    </div>
+    <p class="desk-hint">Tip: tap the ⚡ button inside the app to open the Demo Screens menu and jump to any flow.</p>
+  </aside>
+
+  <!-- phone -->
+  <div class="phone">
+    <div class="viewport" id="viewport">
+      <!-- screens injected by app.js -->
+    </div>
+
+    <!-- onboarding overlay -->
+    <div class="ob" id="onboarding"></div>
+
+    <!-- bottom nav -->
+    <nav class="bottomnav hidden" id="bottomnav">
+      <button class="navitem" data-tab="home"><i data-lucide="home"></i>Home</button>
+      <button class="navitem" data-tab="play"><i data-lucide="swords"></i>Play</button>
+      <button class="navitem" data-tab="clubs"><i data-lucide="map-pin"></i>Clubs</button>
+      <button class="navitem" data-tab="community"><i data-lucide="users"></i>Community</button>
+      <button class="navitem" data-tab="profile"><i data-lucide="circle-user"></i>Profile</button>
+    </nav>
+
+    <!-- demo fab -->
+    <button class="fab hidden" id="demoFab" title="Demo screens"><i data-lucide="zap"></i></button>
+
+    <!-- sheet -->
+    <div class="sheet-backdrop" id="sheetBackdrop"></div>
+    <div class="sheet" id="sheet">
+      <div class="grip"></div>
+      <div class="shead"><h3 id="sheetTitle"></h3><button class="iconbtn ghost" id="sheetClose"><i data-lucide="x"></i></button></div>
+      <div class="sbody" id="sheetBody"></div>
+      <div class="sfoot hidden" id="sheetFoot"></div>
+    </div>
+
+    <!-- toast -->
+    <div class="toast" id="toast"></div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="data.js"></script>
+<script src="screens.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
