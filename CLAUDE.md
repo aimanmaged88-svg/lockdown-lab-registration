@@ -297,3 +297,24 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   desk. NEWS is currently at id:18. Keep doing this every ship.
 - Aiman explicitly said to SKIP the "all passwords in one spot / same
   password" idea — do not build a password manager.
+- NEWS now at id:21 (light mode toggle). Keep incrementing every ship.
+
+## Light / Dark theme toggle (2026-07-24)
+
+- **SHIPPED in app.html** ("TOGGLE ME" — the dark theme was hurting his eyes;
+  wanted his KOS + Athlete-OS light feel as an OPTION, dark kept as default).
+  Master: scratchpad/app2-base.html.
+- `applyMode(m)` toggles `.lightmode` on `<html>`, persisted `ll_mode`
+  (default 'dark'). Two controls: header `#modeBtn` (☀️/🌙, `[data-modeico]`
+  auto-swaps) + Settings → Fine-Tune → **Look** pills (`#modePills`
+  dark/light). `setMode`/`toggleMode` near the THEME init (applied on load).
+- CSS: `:root.lightmode{}` flips surface vars (--bg #EDEFF3, --glass #fff,
+  --glass2 #F5F7FA, --line/--line2 dark-alpha, --text #0C0D12, --muted/--dim).
+  Light overrides for header (frosted white), inputs, and the ~10 faint-white
+  fills (.pill/.qbtn/.sw/.wcup/.ossrow/.ob-tabs, xpbar/jbar/swtch tracks,
+  jdots, av ring, skel, igcard border). Immersive overlays stay DARK by
+  re-restoring dark vars incl. --bg on #welcome,#badgeUp,#ntfLoud,#levelup,
+  #vault (Vault body was going light until --bg restored). Bottom nav stays a
+  dark floating pill (deliberate). Verified E2E in light across Home/Mind/
+  Fuel/Squad/Coach/Settings/Vault via scratchpad/light-shot.mjs.
+- NOT yet applied to admin.html / coach.html (offered; player app only for now).
