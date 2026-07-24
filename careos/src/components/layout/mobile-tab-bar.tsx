@@ -33,6 +33,7 @@ export function MobileTabBar() {
     family: "Family",
     timeline: "Timeline",
     roster: "Roster",
+    availability: "Avail",
     timepay: "Time",
     arrivals: "Arrivals",
     budgets: "Budget",
