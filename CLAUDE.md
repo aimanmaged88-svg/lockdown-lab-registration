@@ -284,3 +284,16 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
 - **NEXT (asked, not built):** structured **injuries** (area/severity/status/
   dates — needs edge + migration) + player **Tip of the Day** card (~5
   cyclable tips from their metrics + coach homework).
+
+## What's New pop-up + update log convention (2026-07-21)
+
+- **SHIPPED in admin.html.** `#whatsnew` overlay pops on desk open
+  (`showWhatsNew()` in openDesk) showing every `NEWS[]` item with id >
+  `lll_news_seen`; "Got it" → `markNewsSeen()` (seen=NEWS_LATEST) + clears the
+  🎓 Guide badge. Fresh browser (seen 0) shows the latest 6, not full history.
+- **CONVENTION (Aiman asked):** whenever ANY user-facing update ships, ADD a
+  new entry to `NEWS[]` in admin-base.html (increment the id, newest first,
+  short punchy title + body) so it pops up for him next time he opens the
+  desk. NEWS is currently at id:18. Keep doing this every ship.
+- Aiman explicitly said to SKIP the "all passwords in one spot / same
+  password" idea — do not build a password manager.

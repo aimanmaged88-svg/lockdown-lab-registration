@@ -181,6 +181,22 @@ input::placeholder{color:#5d5851}
 #athlete .lrow:first-child{border-top:none}
 #athlete .lrow small{display:block;color:var(--dim);font-family:var(--fm);font-size:9.5px;margin-top:2px}
 #athlete .empty{color:var(--dim);font-size:12px;padding:8px 0}
+/* ===== What's New pop-up ===== */
+#whatsnew{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;background:rgba(4,4,6,.72);backdrop-filter:blur(6px);padding:16px}
+#whatsnew.on{display:flex}
+#whatsnew .wn{width:100%;max-width:460px;max-height:86vh;display:flex;flex-direction:column;border:1px solid rgba(255,107,0,.45);border-radius:20px;overflow:hidden;
+  background:radial-gradient(120% 60% at 50% -10%,rgba(255,107,0,.16),transparent 55%),linear-gradient(180deg,#141416,#0c0c0d);box-shadow:0 30px 80px -20px #000}
+#whatsnew .wnh{padding:20px 20px 14px;text-align:center;border-bottom:1px solid var(--line)}
+#whatsnew .wnh .sp{font-size:30px;line-height:1}
+#whatsnew .wnh h2{font-family:var(--fd);font-size:28px;letter-spacing:1px;text-transform:uppercase;margin:6px 0 3px}
+#whatsnew .wnh h2 span{color:var(--accent)}
+#whatsnew .wnh p{color:var(--muted);font-size:12.5px}
+#whatsnew .wnb{overflow-y:auto;padding:14px 18px}
+#whatsnew .wni{border-left:2px solid var(--accent);padding:2px 0 12px 12px;margin-bottom:12px}
+#whatsnew .wni b{font-family:var(--fd);font-size:16px;letter-spacing:.5px;text-transform:uppercase;color:var(--text);display:block}
+#whatsnew .wni .dt{font-family:var(--fm);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--dim)}
+#whatsnew .wni p{color:var(--muted);font-size:12.5px;line-height:1.5;margin-top:4px}
+#whatsnew .wnf{padding:14px 18px 18px;border-top:1px solid var(--line)}
 .sb-foot{margin-top:auto;display:flex;flex-direction:column;gap:8px}
 .osmain{flex:1;min-width:0;padding:26px 24px 60px;max-width:1150px}
 .oh{font-family:var(--fd);font-size:30px;letter-spacing:1px;text-transform:uppercase;font-weight:400;margin-bottom:4px}
@@ -530,6 +546,14 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
 
     </main>
   </div>
+<div id="whatsnew">
+  <div class="wn">
+    <div class="wnh"><div class="sp">🆕</div><h2>What's <span>New</span></h2><p id="wnSub">Since you were last here</p></div>
+    <div class="wnb" id="wnBody"></div>
+    <div class="wnf"><button class="btn btn-p btn-block" id="wnGo">Got it — let's go 🔒</button></div>
+  </div>
+</div>
+
 <div id="athlete">
   <div class="adr">
     <div class="adh">
@@ -857,6 +881,7 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
     }catch(e){}
     await refresh();
     clearInterval(pollT); pollT=setInterval(refresh,12000);
+    setTimeout(showWhatsNew,600);
   }
   $('#aGo').addEventListener('click',async()=>{
     const c=$('#ac').value.trim().toUpperCase(); if(!c) return;
@@ -997,6 +1022,12 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
   /* Newest = highest id. Add a new entry (bump the id) and every coach's desk
      badges the Guide tab + pings them the next time it's open. */
   const NEWS=[
+    {id:18,d:'21 Jul',t:'Athlete Command Center',body:'Tap 📂 Open on any player in Squad and their whole file slides open, Athlete-OS style: snapshot (XP, streak, sessions), 7 tabs — Overview, Check-ins, Mind, Fuel, Homework, Scouting notes, Comms — plus log-a-session and founding right there. Everything you need to service an athlete, one screen.'},
+    {id:17,d:'21 Jul',t:'Program 01 locked — Winter Arc',body:'Your first program is set: Winter Arc, first session Mon 17 Aug, 20 founding seats. Every teaser caption is filled in and the Week 3 reveal tile is built. The whole 4-week campaign is ready to post at /teasers.html.'},
+    {id:16,d:'21 Jul',t:'New front door',body:'The signup now opens on a clear choice — 🔑 “I’ve got a code” or 🚪 “No code? Knock.” Point your Instagram link at /app to drop people straight on it.'},
+    {id:15,d:'20 Jul',t:'Loud notifications + coach push',body:'Players and coaches now get a loud primer to switch notifications on, delivered pings buzz hard and stay on screen, and coaches get buzzed even with the app fully closed the moment you assign them a session.'},
+    {id:14,d:'20 Jul',t:'Coach-award badges',body:'The 5 rare badges (Player of the Week, Most Improved, The Lockdown, On Camera, OG) are yours to hand out — award them from a player’s file and it lights up in their vault and buzzes their phone.'},
+    {id:13,d:'20 Jul',t:'The Badge Vault is live',body:'All 55 badges + Lab Bucks are in the app. Founding members earn the full vault; non-founding get the 10 bronze tasters and see the rest locked. Badges earn themselves as players train, with a celebration each time.'},
     {id:12,d:'20 Jul',t:'Coach platform is live',body:'Lockdown Lab is now a coaching platform. New 🧑‍🏫 Coaches tab: coaches sign up at /coach.html with a code you mint (or request one you approve), get their own dashboard, and you control exactly what each can see and do — earnings, sessions, everything — with live permission toggles.'},
     {id:11,d:'19 Jul',t:'The Target + Deck Bench',body:'Money tab levelled up: type "I need $500 by next week" and it tells you exactly how many seats and sessions get you there. Plus a topic generator and a Deck Bench — send a topic to Claude and a ready-made session deck comes back within the hour.'},
     {id:10,d:'19 Jul',t:'Street Vol. 2 energy',body:'Level-ups now hit like Gamebreakers, badges slap in like stickers with an impact ring, streaks catch fire at 3 days, check-ins throw up style points, and the Running Now board went full blacktop — chain-link and all.'},
@@ -1059,6 +1090,19 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
     if(NEWS_LATEST>+notifiedRaw){ notifyNews(NEWS.find(n=>n.id===NEWS_LATEST)); localStorage.setItem('lll_news_notified',String(NEWS_LATEST)); }
   }
   function markNewsSeen(){ localStorage.setItem('lll_news_seen',String(NEWS_LATEST)); const bg=$('#bGuide'); if(bg){ bg.textContent=''; bg.classList.remove('on'); } }
+  /* What's New pop-up — shows on desk open whenever something shipped since last time */
+  function showWhatsNew(){
+    const seen=newsSeen();
+    let items=NEWS.filter(n=>n.id>seen);
+    if(!items.length) return;              /* caught up */
+    if(seen===0) items=NEWS.slice(0,6);    /* fresh browser: latest 6, not the whole history */
+    $('#wnSub').textContent=items.length+' update'+(items.length>1?'s':'')+' since you were last here';
+    $('#wnBody').innerHTML=items.map(n=>'<div class="wni"><span class="dt">'+esc(n.d)+'</span><b>'+esc(n.t)+'</b><p>'+esc(n.body)+'</p></div>').join('');
+    $('#whatsnew').classList.add('on');
+  }
+  function closeWhatsNew(){ markNewsSeen(); $('#whatsnew').classList.remove('on'); }
+  $('#wnGo')&&($('#wnGo').onclick=closeWhatsNew);
+  $('#whatsnew')&&$('#whatsnew').addEventListener('click',e=>{ if(e.target.id==='whatsnew') closeWhatsNew(); });
   function paintPhone(){
     const el=$('#vscreen'); if(!el)return;
     if(vView==='detail'&&vSel){
