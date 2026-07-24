@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-<script>(function(){try{document.documentElement.setAttribute('data-theme',localStorage.getItem('aos_theme')||'dark');}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();</script>
+<script>(function(){try{document.documentElement.setAttribute('data-theme',localStorage.getItem('aos_theme_coach')||'light');}catch(e){document.documentElement.setAttribute('data-theme','light');}})();</script>
 <meta name="robots" content="noindex,nofollow" />
 <meta name="theme-color" content="#090909" />
 <title>Athlete OS · Coach</title>
@@ -199,6 +199,7 @@
     background:conic-gradient(var(--rc) calc(var(--rp)*1%), var(--track) 0)}
   .mono-av::after{content:"";position:absolute;inset:2px;border-radius:50%;background:var(--surface)}
   .mono-av b{position:relative;z-index:1;font-family:var(--fd);font-size:17px;letter-spacing:.5px}
+  .mono-av img{position:absolute;inset:2px;z-index:2;width:calc(100% - 4px);height:calc(100% - 4px);border-radius:50%;object-fit:cover}
   .ac-id{min-width:0;flex:1}
   .ac-id .nm{display:block;font-family:var(--fd);text-transform:uppercase;letter-spacing:.4px;font-size:18px;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .ac-id .meta{display:block;font-size:12px;color:var(--muted);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -310,6 +311,82 @@
   @media(min-width:641px){.drawer .grab{display:none}}
   @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
   @media (pointer:coarse){.rbtn{min-width:44px;min-height:44px}.gpill{min-height:40px}.qa{min-height:84px}}
+
+  /* ===================== CareOS-style shell ===================== */
+  :root{ --side-bg:#0F1520; --side-line:rgba(255,255,255,.09); --side-txt:#C3CAD9; --side-dim:#78839A; --side-active:rgba(255,255,255,.10); }
+  body{background-image:none}
+  .shell{display:flex;align-items:flex-start;min-height:100vh}
+  .side{width:244px;flex:0 0 244px;align-self:stretch;background:var(--side-bg);color:var(--side-txt);position:sticky;top:0;height:100vh;display:flex;flex-direction:column;padding:16px 12px;overflow-y:auto;z-index:30}
+  .side-brand{display:flex;align-items:center;gap:10px;padding:6px 8px 8px}
+  .side-brand svg{width:26px;height:26px;color:var(--accent)}
+  .side-brand b{font-size:18px;font-weight:800;color:#fff;letter-spacing:.3px}
+  .side-brand b i{font-style:normal;color:var(--accent)}
+  .nav{display:flex;flex-direction:column;gap:2px;flex:1;margin-top:4px}
+  .nav-lbl{font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--side-dim);margin:16px 10px 6px;font-weight:700}
+  .navitem{display:flex;align-items:center;gap:11px;padding:9px 11px;border-radius:10px;color:var(--side-txt);font-size:14px;font-weight:550;cursor:pointer;transition:.14s;text-align:left;width:100%;border:none;background:none;font-family:inherit}
+  .navitem:hover{background:rgba(255,255,255,.05);color:#fff}
+  .navitem.on{background:var(--side-active);color:#fff}
+  .navitem .nic{width:20px;text-align:center;font-size:15px;flex:0 0 auto}
+  .navitem .dotb{margin-left:auto;min-width:18px;height:18px;padding:0 5px;border-radius:9px;background:var(--accent);color:#1A0E00;font-size:10px;font-weight:800;display:none;align-items:center;justify-content:center}
+  .navitem .dotb.on{display:inline-flex}
+  .side-user{display:flex;align-items:center;gap:10px;padding:11px 8px 4px;border-top:1px solid var(--side-line);margin-top:12px}
+  .side-user .ua{width:38px;height:38px;border-radius:50%;background:linear-gradient(140deg,var(--accent-hi),var(--accent));display:grid;place-items:center;color:#1A0E00;font-weight:800;font-size:13px;flex:0 0 auto}
+  .side-user .un{min-width:0}
+  .side-user .un b{display:block;font-size:13px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .side-user .un span{font-size:11px;color:var(--side-dim)}
+  .main{flex:1;min-width:0}
+  .topbar{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;padding:13px 24px;background:var(--header-bg);backdrop-filter:blur(20px) saturate(150%);border-bottom:1px solid var(--line)}
+  .menu-btn{display:none;width:40px;height:40px;border-radius:10px;border:1px solid var(--line);background:var(--surface);place-items:center;font-size:17px;color:var(--text);flex:0 0 auto}
+  .tb-search{flex:1;max-width:520px;display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px;color:var(--muted)}
+  .tb-search input{border:none;background:none;outline:none;width:100%;color:var(--text);font-size:14px;font-family:inherit}
+  .tb-actions{display:flex;align-items:center;gap:8px;margin-left:auto}
+  .tb-ic{width:40px;height:40px;border-radius:11px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;font-size:15px;color:var(--muted);text-decoration:none}
+  .tb-ic:hover{color:var(--accent-text);border-color:var(--accent)}
+  .greet{padding:26px 0 4px}
+  .greet .eyebrow{font-size:11px;letter-spacing:1.4px;text-transform:uppercase;color:var(--accent-text);font-weight:700;margin-bottom:9px}
+  .greet h1{font-size:30px;font-weight:800;letter-spacing:-.6px;line-height:1.08}
+  .greet .greet-sub{color:var(--muted);font-size:15px;margin-top:9px;max-width:660px;line-height:1.5}
+  .main .wrap{max-width:1180px;padding:0 24px 64px}
+  /* friendlier section headings */
+  .sechead{margin:26px 0 14px}
+  .sechead h2{font-family:var(--fb);text-transform:none;letter-spacing:-.2px;font-size:17px;font-weight:750;color:var(--text)}
+  .sechead .hint{color:var(--dim)}
+  /* CareOS KPI cards */
+  .kpis{gap:14px;grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+  @media(max-width:1000px){.kpis{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}}
+  @media(max-width:560px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .kpi{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:17px 18px 15px;box-shadow:var(--shadow-sm);position:relative;overflow:hidden;min-height:118px;justify-content:flex-start}
+  .kpi .kico{position:absolute;top:15px;right:15px;width:34px;height:34px;border-radius:10px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent-text);font-size:15px}
+  .kpi .l{font-size:12.5px;color:var(--muted);font-weight:600;letter-spacing:0;text-transform:none;margin:0 0 auto;padding-right:42px;order:-1}
+  .kpi .n{font-size:32px;font-weight:800;letter-spacing:-1px;line-height:1;margin-top:12px}
+  .kpi .n .mono{font-family:var(--fb)}
+  .kpi .s{font-size:12px;color:var(--dim);margin-top:7px}
+  .kpi.accent .n{color:var(--accent-text)}
+  .kpi.bad .n{color:var(--bad)}
+  .kpi.setup{cursor:pointer}
+  .kpi.setup .kico{background:var(--fill);color:var(--dim)}
+  @media(max-width:1100px){.side{width:212px;flex-basis:212px}}
+  @media(max-width:820px){
+    .side{position:fixed;left:0;top:0;transform:translateX(-100%);transition:transform .25s var(--ease);box-shadow:0 20px 60px rgba(0,0,0,.5)}
+    .side.open{transform:none}
+    .main{width:100%}
+    .menu-btn{display:grid}
+    .greet h1{font-size:25px}
+  }
+  .side-scrim{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:25;display:none}
+  .side-scrim.open{display:block}
+  /* Needs-attention triage */
+  .attn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+  .attn{display:flex;align-items:center;gap:11px;text-align:left;background:var(--surface);border:1px solid var(--line);border-left:3px solid var(--amber);border-radius:14px;padding:12px 14px;cursor:pointer;box-shadow:var(--shadow-sm);transition:.14s}
+  .attn:hover{transform:translateY(-2px);box-shadow:var(--lift);border-color:var(--amber)}
+  .mono-av.sm{width:38px;height:38px}
+  .mono-av.sm b{font-size:14px}
+  .attn-b{flex:1;min-width:0}
+  .attn-nm{display:block;font-weight:650;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .attn-rs{display:block;font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px}
+  .attn-go{color:var(--dim);flex:0 0 auto}
+  .attn-clear{background:var(--good-soft);border:1px solid var(--good);color:var(--good);border-radius:14px;padding:13px 15px;font-size:13.5px;margin-top:4px}
+  .attn-clear b{color:var(--good)}
 </style>
 </head>
 <body>
@@ -330,22 +407,50 @@
 
 <!-- DASHBOARD -->
 <div id="dash">
-  <header class="top">
-    <div class="wrap row">
-      <div class="brand"><svg class="lg" style="width:26px;height:26px;color:var(--accent)"><use href="#ll"/></svg><b>Athlete <i>OS</i></b></div>
-      <span class="pill hide-sm">Coach · <b>All Athletes</b></span>
-      <div class="spacer"></div>
-      <button class="theme-toggle" id="themeToggle" aria-label="Switch theme">☾</button>
-      <button class="btn btn-ghost hide-sm" id="exportBtn">Export CSV</button>
-      <button class="btn btn-ghost" id="logoutBtn">Log out</button>
+ <div class="side-scrim" id="sideScrim"></div>
+ <div class="shell">
+  <aside class="side" id="side">
+    <div class="side-brand"><svg><use href="#ll"/></svg><b>Athlete <i>OS</i></b></div>
+    <nav class="nav" id="sideNav">
+      <div class="nav-lbl">Coach</div>
+      <button class="navitem on" data-scroll="top"><span class="nic">🏠</span>Dashboard</button>
+      <button class="navitem" data-scroll="athletesHead"><span class="nic">👥</span>Athletes<span class="dotb" id="navAthCount">0</span></button>
+      <button class="navitem" data-scroll="schedHead"><span class="nic">📅</span>Schedule</button>
+      <button class="navitem" data-scroll="healthHead"><span class="nic">💚</span>Team health</button>
+      <div class="nav-lbl">Manage</div>
+      <a class="navitem" href="admin.html"><span class="nic">🏛</span>Organisation</a>
+      <button class="navitem" id="navAnnounce"><span class="nic">📣</span>Announce</button>
+      <button class="navitem" id="navExport"><span class="nic">⬇️</span>Export CSV</button>
+    </nav>
+    <div class="side-user">
+      <span class="ua">UNC</span>
+      <span class="un"><b>Coach</b><span>All athletes</span></span>
     </div>
-  </header>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <button class="menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+      <label class="tb-search"><span>⌕</span><input type="search" id="topSearch" placeholder="Search athletes…" aria-label="Search athletes"></label>
+      <div class="tb-actions">
+        <a class="tb-ic" href="admin.html" title="Organisation">🏛</a>
+        <button class="tb-ic" id="themeToggle" aria-label="Switch theme">☾</button>
+        <button class="btn btn-ghost hide-sm" id="exportBtn">Export CSV</button>
+        <button class="btn btn-ghost" id="logoutBtn">Log out</button>
+      </div>
+    </div>
 
   <div class="wrap">
+    <div class="greet">
+      <div class="eyebrow" id="dateEyebrow"></div>
+      <h1 id="greetTitle">Welcome back, Coach</h1>
+      <p class="greet-sub" id="greetSub"></p>
+    </div>
+    <div id="attnWrap"></div>
     <div class="sechead"><h2>Team overview</h2><span class="hint" id="ovHint"></span></div>
     <div class="kpis aos-stagger" id="kpis"></div>
 
-    <div class="sechead"><h2>Team health</h2><span class="hint">Live — computed from athlete check-ins &amp; ratings</span></div>
+    <div class="sechead" id="healthHead"><h2>Team health</h2><span class="hint">Live — computed from athlete check-ins &amp; ratings</span></div>
     <div id="healthWrap"></div>
 
     <div id="sportReqWrap"></div>
@@ -356,7 +461,7 @@
     <div class="sechead" id="schedHead"><h2>Schedule</h2><span class="hint">Training, games &amp; meetings — athletes see these on their Home</span><div class="spacer"></div><button class="btn btn-primary btn-sm" id="newEventBtn">＋ New event</button></div>
     <div id="scheduleWrap"></div>
 
-    <div class="sechead"><h2>Athletes</h2><span class="hint" id="rosterHint"></span></div>
+    <div class="sechead" id="athletesHead"><h2>Athletes</h2><span class="hint" id="rosterHint"></span></div>
     <div class="toolbar">
       <label class="field"><span class="ic">⌕</span><input type="search" id="search" placeholder="Search name, goals, location…" aria-label="Search athletes" /></label>
       <select id="sportFilter" aria-label="Filter by sport"><option value="">All sports</option></select>
@@ -375,7 +480,9 @@
     <div class="empty" id="empty" style="display:none"><b>No athletes yet</b>Share the app link — they hit Join, pick their sport, done.</div>
 
     <div class="foot" id="foot"></div>
-  </div>
+  </div><!-- /.wrap -->
+  </div><!-- /.main -->
+ </div><!-- /.shell -->
 
   <div class="abar">
     <button class="btn btn-ghost" id="refreshBtn2">↻ Refresh</button>
@@ -484,7 +591,48 @@
     });
   }
 
-  function render(){ renderKPIs(); renderHealth(); renderSportReqs(); renderQuick(); renderSchedule(); renderGroups(); renderCards(); }
+  function render(){ renderGreeting(); renderAttention(); renderKPIs(); renderHealth(); renderSportReqs(); renderQuick(); renderSchedule(); renderGroups(); renderCards(); }
+
+  const ATTN_IC={no_checkin:'📭',sore:'🩹',load:'📈',energy:'🔋',injury:'⚠️'};
+  function renderAttention(){
+    const w=$('#attnWrap'); if(!w) return;
+    const flagged=ROWS.filter(r=>r.status==='active' && (r.attention||[]).length)
+      .map(r=>({r, top:r.attention[0], n:r.attention.length}))
+      .sort((a,b)=>b.n-a.n);
+    if(!flagged.length){ w.innerHTML=`<div class="attn-clear">✅ <b>All clear</b> — nobody's flagged for attention right now.</div>`; return; }
+    w.innerHTML=`<div class="sechead"><h2>Needs attention today</h2><span class="hint">${flagged.length} athlete${flagged.length>1?'s':''} · tap to open their file</span></div>
+      <div class="attn-grid">${flagged.map(({r,top,n})=>`
+        <button class="attn" data-open="${r.id}">
+          <span class="mono-av sm" style="--rc:var(--amber);--rp:0"><b>${initials(r.name)}</b>${r.avatar_url?`<img src="${esc(r.avatar_url)}" alt="">`:''}</span>
+          <span class="attn-b"><span class="attn-nm">${esc(r.name)}</span><span class="attn-rs">${ATTN_IC[top.t]||'•'} ${esc(top.label)}${n>1?` · +${n-1} more`:''}</span></span>
+          <span class="attn-go">▸</span>
+        </button>`).join('')}</div>`;
+    w.querySelectorAll('[data-open]').forEach(b=>b.addEventListener('click',()=>openDrawer(b.dataset.open,b)));
+  }
+
+  function renderGreeting(){
+    const now=new Date();
+    const h=now.getHours();
+    const hello=h<12?'Good morning':(h<18?'Good afternoon':'Good evening');
+    const gt=$('#greetTitle'); if(gt) gt.textContent=`${hello}, Coach`;
+    const de=$('#dateEyebrow'); if(de) de.textContent=now.toLocaleDateString(undefined,{weekday:'long',day:'numeric',month:'long'}).toUpperCase();
+    const A=ROWS.filter(r=>r.status==='active');
+    const inToday=ROWS.filter(r=>r.last_checkin===TODAY).length;
+    const injured=A.filter(r=>r.injuries).length;
+    const nowT=Date.now();
+    const nextGame=EVENTS.filter(e=>e.type==='game'&&new Date(e.starts_at).getTime()>=nowT).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at))[0];
+    let sub;
+    if(!ROWS.length){ sub='No athletes yet — share the app link and they’ll appear here the moment they join.'; }
+    else {
+      const bits=[`${inToday} of ${A.length} checked in today`];
+      if(injured) bits.push(`${injured} managing an injury`);
+      if(nextGame) bits.push(`next game ${fmtDay(nextGame.starts_at)}`);
+      sub=`${A.length} athlete${A.length===1?'':'s'} on your books — ${bits.join(' · ')}.`;
+    }
+    const gs=$('#greetSub'); if(gs) gs.textContent=sub;
+    // sidebar athletes count badge
+    const badge=$('#navAthCount'); if(badge){ badge.textContent=ROWS.length; badge.classList.toggle('on',ROWS.length>0); }
+  }
 
   function renderSportReqs(){
     const w=$('#sportReqWrap');
@@ -518,22 +666,22 @@
     const upcomingGames=EVENTS.filter(e=>e.type==='game' && new Date(e.starts_at).getTime()>=now).length;
     const nextGame=EVENTS.filter(e=>e.type==='game' && new Date(e.starts_at).getTime()>=now).sort((a,b)=>new Date(a.starts_at)-new Date(b.starts_at))[0];
     const kpis=[
-      {n:ROWS.length,l:'Athletes',cls:'accent'},
-      {n:inToday,l:'Checked in today',s:A.length?rate+'% of active':''},
-      {n:ROWS.filter(r=>r.streak>=3).length,l:'On a 3d+ streak'},
-      {n:injured,l:'Managing injury',cls:injured>0?'bad':''},
-      {n:avgRating,l:'Avg coach rating',dec:1,suffix:'/10',s:rated.length?rated.length+' rated':'none rated'},
-      {n:upcomingGames,l:'Upcoming games',cls:upcomingGames>0?'accent':'',s:nextGame?('next '+fmtDay(nextGame.starts_at)):'none scheduled'},
-      {n:pushCount,l:'Push reach',cls:pushCount>0?'accent':'',s:ROWS.length?pushPct+'% get alerts':'none yet'},
+      {n:ROWS.length,l:'Athletes',cls:'accent',ico:'👥'},
+      {n:inToday,l:'Checked in today',s:A.length?rate+'% of active':'',ico:'✅'},
+      {n:ROWS.filter(r=>r.streak>=3).length,l:'On a 3d+ streak',ico:'🔥'},
+      {n:injured,l:'Managing injury',cls:injured>0?'bad':'',ico:'🩹'},
+      {n:avgRating,l:'Avg coach rating',dec:1,suffix:'/10',s:rated.length?rated.length+' rated':'none rated',ico:'⭐'},
+      {n:upcomingGames,l:'Upcoming games',cls:upcomingGames>0?'accent':'',s:nextGame?('next '+fmtDay(nextGame.starts_at)):'none scheduled',ico:'🏆'},
+      {n:pushCount,l:'Push reach',cls:pushCount>0?'accent':'',s:ROWS.length?pushPct+'% get alerts':'none yet',ico:'🔔'},
     ];
     const setups=[
-      {t:'Attendance %',need:'training sessions'},
-      {t:'Avg wellness',need:'daily wellness rollup'},
-      {t:'Unread messages',need:'message read receipts'},
+      {t:'Attendance %',need:'training sessions',ico:'📋'},
+      {t:'Avg wellness',need:'daily wellness rollup',ico:'💗'},
+      {t:'Unread messages',need:'message read receipts',ico:'✉️'},
     ];
     $('#kpis').innerHTML =
-      kpis.map(k=>`<div class="kpi ${k.cls||''}"><div class="n"><span class="mono" data-to="${k.n}" ${k.dec?'data-dec="1"':''} ${k.suffix?`data-suffix="${k.suffix}"`:''}>0</span></div><div class="l">${k.l}</div>${k.s?`<div class="s">${esc(k.s)}</div>`:''}</div>`).join('') +
-      setups.map(s=>`<button class="kpi setup" data-soon="${esc(s.t)}" data-need="${esc(s.need)}"><div class="n">+</div><div class="l">${esc(s.t)}</div><div class="s">Set up</div></button>`).join('');
+      kpis.map(k=>`<div class="kpi ${k.cls||''}"><div class="kico">${k.ico||'•'}</div><div class="l">${k.l}</div><div class="n"><span class="mono" data-to="${k.n}" ${k.dec?'data-dec="1"':''} ${k.suffix?`data-suffix="${k.suffix}"`:''}>0</span></div>${k.s?`<div class="s">${esc(k.s)}</div>`:''}</div>`).join('') +
+      setups.map(s=>`<button class="kpi setup" data-soon="${esc(s.t)}" data-need="${esc(s.need)}"><div class="kico">${s.ico}</div><div class="l">${esc(s.t)}</div><div class="n" style="font-size:15px;color:var(--dim)">Set up</div><div class="s">tap to see plan</div></button>`).join('');
     $('#kpis').querySelectorAll('.mono[data-to]').forEach(countUp);
     $('#kpis').querySelectorAll('.setup').forEach(b=>b.addEventListener('click',()=>comingSoon(b.dataset.soon,b.dataset.need)));
     $('#ovHint').textContent = ROWS.length? `${ROWS.length} athlete${ROWS.length>1?'s':''} · ${new Set(ROWS.map(r=>r.sport)).size} sport${new Set(ROWS.map(r=>r.sport)).size>1?'s':''}` : '';
@@ -674,7 +822,7 @@
       const tn=teamName(r.team_id);
       return `<button class="acard" data-open="${r.id}" aria-haspopup="dialog" aria-label="Open ${esc(r.name)}'s file">
         <div class="ac-top">
-          <span class="mono-av" style="--rc:${rc};--rp:${Math.round(Math.min(r.xp||0,1200)/1200*100)}"><b>${initials(r.name)}</b></span>
+          <span class="mono-av" style="--rc:${rc};--rp:${Math.round(Math.min(r.xp||0,1200)/1200*100)}"><b>${initials(r.name)}</b>${r.avatar_url?`<img src="${esc(r.avatar_url)}" alt="">`:''}</span>
           <span class="ac-id"><span class="nm">${esc(r.name)}</span><span class="meta">${esc(meta||'—')}${tn?' · '+esc(tn):''}</span></span>
         </div>
         <div class="ac-stats">
@@ -887,8 +1035,23 @@
 
   /* ---- theme toggle ---- */
   (function(){ var root=document.documentElement, tc=document.querySelector('meta[name="theme-color"]');
-    function sync(){ var light=root.getAttribute('data-theme')==='light'; var b=$('#themeToggle'); if(b)b.textContent=light?'☀':'☾'; if(tc)tc.setAttribute('content',light?'#F2F2F7':'#090909'); }
-    sync(); document.addEventListener('click',function(e){ var t=e.target.closest&&e.target.closest('#themeToggle'); if(!t)return; var light=root.getAttribute('data-theme')==='light'; root.setAttribute('data-theme',light?'dark':'light'); try{localStorage.setItem('aos_theme',light?'dark':'light');}catch(_){} sync(); }); })();
+    function sync(){ var light=root.getAttribute('data-theme')==='light'; var b=$('#themeToggle'); if(b)b.textContent=light?'☀':'☾'; if(tc)tc.setAttribute('content',light?'#F4F5F7':'#0F1520'); }
+    sync(); document.addEventListener('click',function(e){ var t=e.target.closest&&e.target.closest('#themeToggle'); if(!t)return; var light=root.getAttribute('data-theme')==='light'; root.setAttribute('data-theme',light?'dark':'light'); try{localStorage.setItem('aos_theme_coach',light?'dark':'light');}catch(_){} sync(); }); })();
+
+  /* ---- sidebar nav + topbar (CareOS shell) ---- */
+  const side=$('#side'), sideScrim=$('#sideScrim');
+  function closeSide(){ if(side)side.classList.remove('open'); if(sideScrim)sideScrim.classList.remove('open'); }
+  const mb=$('#menuBtn'); if(mb) mb.addEventListener('click',()=>{ side.classList.toggle('open'); sideScrim.classList.toggle('open',side.classList.contains('open')); });
+  if(sideScrim) sideScrim.addEventListener('click',closeSide);
+  document.querySelectorAll('#sideNav .navitem[data-scroll]').forEach(b=>b.addEventListener('click',()=>{
+    document.querySelectorAll('#sideNav .navitem').forEach(x=>x.classList.remove('on')); b.classList.add('on');
+    const id=b.dataset.scroll; closeSide();
+    if(id==='top'){ window.scrollTo({top:0,behavior:REDUCE?'auto':'smooth'}); return; }
+    const el=$('#'+id); if(el) el.scrollIntoView({behavior:REDUCE?'auto':'smooth',block:'start'});
+  }));
+  const navAnn=$('#navAnnounce'); if(navAnn) navAnn.addEventListener('click',()=>{ closeSide(); announce(); });
+  const navExp=$('#navExport'); if(navExp) navExp.addEventListener('click',()=>{ closeSide(); exportCSV(); });
+  const topS=$('#topSearch'); if(topS) topS.addEventListener('input',()=>{ const s=$('#search'); if(s){ s.value=topS.value; renderCards(); } });
 
   /* ---- boot ---- */
   if(CODE){ load().then(showDash).catch(()=>{ sessionStorage.removeItem('aos_coach_code'); CODE=''; showLogin(); }); }

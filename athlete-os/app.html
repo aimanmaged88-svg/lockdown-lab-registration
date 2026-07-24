@@ -194,6 +194,21 @@ h1.page{font-size:34px;margin-bottom:4px}
 .nu-tag{font-family:var(--fm);font-size:8.5px;letter-spacing:1px;text-transform:uppercase;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:3px 8px;flex:0 0 auto}
 .nu-tag.game{border-color:var(--accent-text);color:var(--accent-text);background:var(--accent-soft)}
 .nu.soon .nu-main b{color:var(--accent-text)}
+/* daily creed — you vs you */
+.creed{margin:12px 0 2px;padding:11px 14px;border-left:3px solid var(--accent);border-radius:0 14px 14px 0;
+  background:linear-gradient(90deg,var(--accent-soft),transparent);font-size:14px;font-weight:600;color:var(--text);line-height:1.45;
+  position:relative;overflow:hidden}
+.creed::before{content:"“";position:absolute;left:6px;top:-6px;font-size:34px;color:var(--accent);opacity:.25;font-family:Georgia,serif}
+/* training load card */
+.load-row{display:flex;align-items:center;gap:14px;margin-top:4px}
+.load-big{flex:1}
+.load-big b{font-family:var(--fd);font-size:34px;line-height:1;color:var(--accent-text)}
+.load-big span{display:block;font-size:11px;color:var(--dim);margin-top:3px}
+.load-trend{text-align:right;flex:0 0 auto}
+.load-trend .lt{font-weight:700;font-size:15px}
+.load-trend .lt.up{color:var(--good)} .load-trend .lt.down{color:var(--muted)}
+.load-trend .lt-sub{display:block;font-size:11px;color:var(--dim);margin-top:2px}
+.load-note{font-size:12.5px;color:var(--muted);margin-top:10px;line-height:1.45}
 .pills{display:flex;flex-wrap:wrap;gap:8px}
 .pill{font-family:var(--fd);font-size:14px;letter-spacing:1px;text-transform:uppercase;padding:9px 14px;border-radius:13px;border:1px solid var(--line);background:rgba(255,255,255,.05);cursor:pointer;transition:all .18s;user-select:none}
 .pill.sel{background:linear-gradient(180deg,var(--accent-hi),var(--accent));color:var(--on-accent);border-color:transparent;box-shadow:0 6px 18px -8px var(--accent-glow)}
@@ -208,6 +223,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 .av{width:60px;height:60px;border-radius:50%;position:relative;flex:0 0 auto}
 .av .ring{position:absolute;inset:-3px;border-radius:50%;background:conic-gradient(var(--accent) var(--pct,0%), var(--track) 0)}
 .av .core{position:absolute;inset:1px;border-radius:50%;background:linear-gradient(140deg,var(--accent-hi),var(--accent));display:grid;place-items:center;font-family:var(--fd);font-size:22px;color:var(--on-accent);border:3px solid var(--bg)}
+.av .av-img{position:absolute;inset:1px;width:calc(100% - 2px);height:calc(100% - 2px);border-radius:50%;object-fit:cover;border:3px solid var(--bg)}
 .hero-row .hi small{font-family:var(--fm);font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:3px}
 .hero-row .hi b{font-family:var(--fd);font-size:26px;letter-spacing:.5px;text-transform:uppercase;font-weight:400;line-height:1}
 .profstrip{display:flex;flex-wrap:wrap;gap:6px;margin:-6px 0 14px}
@@ -362,6 +378,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 .gs-txt b{font-size:14.5px;font-weight:650;display:block}
 .gs-txt span{font-size:12px;color:var(--dim);display:block;margin-top:2px;line-height:1.4}
 .gs-row .btn{flex:0 0 auto;white-space:nowrap}
+.pf-prev{flex:0 0 auto;width:52px;height:52px;border-radius:50%;overflow:hidden;background:linear-gradient(140deg,var(--accent-hi),var(--accent));display:grid;place-items:center;font-family:var(--fd);font-size:19px;color:var(--on-accent);position:relative}
+.pf-prev img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
 .gs-pill{flex:0 0 auto;font-family:var(--fm);font-size:10px;letter-spacing:.6px;text-transform:uppercase;color:var(--good);border:1px solid var(--good);background:var(--good-soft);border-radius:99px;padding:7px 12px}
 .gs-guide{margin-top:10px;border:1px solid var(--line);border-radius:14px;background:var(--sunken);padding:0;overflow:hidden;display:none}
 .gs-guide.show{display:block}
@@ -395,7 +413,54 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 .tut-dots i{width:20px;height:3px;border-radius:99px;background:var(--track);transition:background .3s}
 .tut-dots i.on{background:var(--accent)}
 .tut-nav{display:flex;gap:8px}
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+/* ============ Premium motion + glass (athletic, not cringe) ============ */
+@keyframes riseIn{from{opacity:0;transform:translateY(16px) scale(.985)}to{opacity:1;transform:none}}
+@keyframes glossSweep{0%{transform:translateX(-120%) skewX(-18deg)}60%,100%{transform:translateX(240%) skewX(-18deg)}}
+@keyframes ringPulse{0%{box-shadow:0 0 0 0 var(--accent-glow)}70%{box-shadow:0 0 0 16px rgba(255,122,0,0)}100%{box-shadow:0 0 0 0 rgba(255,122,0,0)}}
+@keyframes cardFlash{0%{transform:scale(1)}18%{transform:scale(1.025)}100%{transform:scale(1)}}
+@keyframes xpFly{0%{opacity:0;transform:translateY(6px) scale(.9)}20%{opacity:1;transform:translateY(-2px) scale(1.05)}100%{opacity:0;transform:translateY(-42px) scale(1)}}
+@keyframes shimmer{0%{background-position:-160% 0}100%{background-position:260% 0}}
+
+/* staggered entrance on Home — strong but quick */
+section[data-page="home"]>*{animation:riseIn .5s var(--ease-out) both}
+section[data-page="home"]>*:nth-child(1){animation-delay:.00s}
+section[data-page="home"]>*:nth-child(2){animation-delay:.04s}
+section[data-page="home"]>*:nth-child(3){animation-delay:.08s}
+section[data-page="home"]>*:nth-child(4){animation-delay:.12s}
+section[data-page="home"]>*:nth-child(5){animation-delay:.16s}
+section[data-page="home"]>*:nth-child(6){animation-delay:.20s}
+section[data-page="home"]>*:nth-child(7){animation-delay:.24s}
+section[data-page="home"]>*:nth-child(n+8){animation-delay:.28s}
+
+/* glass sheen on the feature cards */
+.card,.ai{position:relative}
+.card.hot::after,.ai::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.08),transparent 42%);mix-blend-mode:screen}
+.card.hot{overflow:hidden}
+.card.hot::before{content:"";position:absolute;top:0;bottom:0;width:38%;left:0;pointer-events:none;z-index:1;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent);animation:glossSweep 6.5s ease-in-out infinite;animation-delay:1.2s}
+
+/* tactile press feedback on interactive surfaces */
+.btn,.stat,.pill,nav button,.sess,.chip,.sbtn,.wbtn,.rbtn,.hbtn,.theme-toggle{transition:transform .16s var(--ease-press),border-color .2s,background .2s,color .2s}
+.btn:active,.stat:active,.pill:active,nav button:active,.sess:active,.sbtn:active,.wbtn:active,.rbtn:active,.theme-toggle:active{transform:scale(.955)}
+.btn-p:active{transform:scale(.97)}
+
+/* powerful XP bar: smooth fill + moving shimmer */
+#xpFill{transition:width 1s var(--ease-out);position:relative;overflow:hidden;background-image:linear-gradient(90deg,var(--accent),var(--accent-hi),var(--accent));background-size:200% 100%;animation:shimmer 3.2s linear infinite}
+/* avatar ring breathes with intent */
+.av .ring{box-shadow:0 0 0 0 var(--accent-glow)}
+.av.pump .ring,.av.pump{animation:ringPulse .9s var(--ease-out)}
+
+/* check-in success flash + XP flyup */
+.flash{animation:cardFlash .5s var(--ease-spring)}
+.xpfly{position:absolute;left:50%;top:14px;transform:translateX(-50%);font-family:var(--fd);font-size:26px;color:var(--accent-hi);
+  text-shadow:0 2px 14px var(--accent-glow);pointer-events:none;z-index:5;animation:xpFly 1.15s var(--ease-out) forwards}
+
+/* level-up chip + streak fire get a subtle live glow */
+.chip.live{box-shadow:0 0 0 1px var(--good-soft),0 0 14px -4px var(--good)}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+  section[data-page="home"]>*{animation:none!important}}
 </style>
 </head>
 <body>
@@ -490,11 +555,12 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
     <!-- HOME -->
     <section class="tabpage" data-page="home">
       <div class="hero-row">
-        <div class="av"><span class="ring" id="xpRing"></span><span class="core" id="avInit">–</span></div>
+        <div class="av"><span class="ring" id="xpRing"></span><span class="core" id="avInit">–</span><img id="avImg" class="av-img" alt="" style="display:none"></div>
         <div class="hi"><small id="greet">Locked in?</small><b id="heroName">–</b></div>
         <span class="chip live" style="margin-left:auto"><span class="d"></span><span id="streakChip">0</span>d streak</span>
       </div>
       <div class="profstrip" id="profStrip"></div>
+      <div class="creed" id="creed"></div>
       <div class="statrow">
         <div class="stat hot"><b id="stXp">0</b><span>XP</span></div>
         <div class="stat"><b id="stLogs">0</b><span>Check-ins</span></div>
@@ -515,6 +581,15 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
         <div id="nextUpList"></div>
       </div>
 
+      <div class="card" id="loadCard" style="display:none">
+        <span class="cl">⚡ Training load · this week</span>
+        <div class="load-row">
+          <div class="load-big"><b id="loadWeek">0</b><span>load units (RPE × min)</span></div>
+          <div class="load-trend" id="loadTrend"></div>
+        </div>
+        <div class="load-note" id="loadNote"></div>
+      </div>
+
       <div class="card hot">
         <span class="cl">Daily Accountability · Sydney time</span>
         <h3 id="ciTitle">Today's Check-In</h3>
@@ -523,6 +598,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
           <div class="slider"><label>Sleep last night (hrs) <b id="vSleep">8</b></label><input type="range" id="rSleep" min="3" max="12" step="0.5" value="8"></div>
           <div class="slider"><label>Muscle soreness <b id="vSore">3</b></label><input type="range" id="rSore" min="1" max="10" value="3"></div>
           <div class="slider"><label>Minutes trained <b id="vMin">30</b></label><input type="range" id="rMin" min="0" max="240" step="15" value="30"></div>
+          <div class="slider"><label>How hard was it? · RPE <b id="vRpe">6</b></label><input type="range" id="rRpe" min="1" max="10" value="6"></div>
           <div style="margin:4px 0 12px">
             <div class="cl" style="margin-bottom:8px">What did you work on?</div>
             <div class="pills" id="focusPills"></div>
@@ -743,6 +819,17 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
     <h2 class="display">Settings</h2>
 
     <div class="gs-sec">
+      <div class="gs-lbl">Profile photo</div>
+      <div class="gs-row">
+        <span class="pf-prev" id="pfPrev"><span id="pfInit">–</span></span>
+        <div class="gs-txt"><b id="pfTit">Add a photo</b><span>Optional — put a face to your name. Your coach &amp; teammates will see it.</span></div>
+        <button class="btn btn-p btn-sm" id="pfPick">Add</button>
+        <button class="btn btn-g btn-sm" id="pfRemove" style="display:none">Remove</button>
+      </div>
+      <input type="file" id="pfFile" accept="image/*" style="display:none">
+    </div>
+
+    <div class="gs-sec">
       <div class="gs-lbl">Theme</div>
       <div class="themes" id="themeGrid"></div>
     </div>
@@ -800,7 +887,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 
   /* ---- custom-sport recognition (adds felt "we found your sport" UX; unknowns queue for coach approval) ---- */
   let CUSTOM_SPORT=null;
-  const PACK_SYN={basketball:['basketball','bball','hoops'],soccer:['soccer','football','futbol'],mma:['mma','muay thai','kickboxing','ufc'],oztag:['oztag','oz tag','touch football','touch'],netball:['netball'],rugby:['rugby','rugby union','rugby league'],afl:['afl','aussie rules','australian football','footy'],tennis:['tennis'],swimming:['swimming','swim','swimmer'],running:['running','run','track','athletics','sprinting','cross country','distance running'],volleyball:['volleyball','volley','beach volleyball']};
+  const PACK_SYN={basketball:['basketball','bball','hoops'],soccer:['soccer','football','futbol'],mma:['mma','mixed martial arts','muay thai','kickboxing','ufc'],boxing:['boxing','box','pugilism'],bjj:['jiu jitsu','jiu-jitsu','brazilian jiu jitsu','bjj','gi','no gi','no-gi','grappling','submission grappling','gracie jiu jitsu','judo'],oztag:['oztag','oz tag','touch football','touch'],netball:['netball'],rugby:['rugby','rugby union','rugby league'],afl:['afl','aussie rules','australian football','footy'],tennis:['tennis'],swimming:['swimming','swim','swimmer'],running:['running','run','track','athletics','sprinting','cross country','distance running'],volleyball:['volleyball','volley','beach volleyball']};
   const KNOWN_SPORTS=('padel,pickleball,squash,badminton,cricket,hockey,field hockey,ice hockey,water polo,lacrosse,rowing,cycling,bmx,mountain biking,skateboarding,surfing,boxing,judo,karate,taekwondo,jiu jitsu,brazilian jiu jitsu,bjj,wrestling,gymnastics,triathlon,golf,baseball,softball,handball,table tennis,ping pong,futsal,gaelic football,hurling,rock climbing,climbing,bouldering,skiing,snowboarding,sailing,kayaking,canoeing,fencing,archery,weightlifting,powerlifting,olympic weightlifting,crossfit,dancing,dance,cheerleading,calisthenics,rugby sevens,touch rugby,dodgeball,ultimate frisbee,polo,horse riding,equestrian,motocross,karting,diving,water skiing,wakeboarding,kitesurfing,rollerblading,speed skating,figure skating,curling,darts,snooker,billiards,esports,rock climbing,orienteering,rounders,korfball,sepak takraw').split(',');
   const titlecase=s=>String(s).replace(/\w\S*/g,w=>w[0].toUpperCase()+w.slice(1));
   function recognizeSport(text){
@@ -842,6 +929,22 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
         {t:'Solo grappling flow',m:15,c:'Grappling',d:'Shrimp, bridge, technical stand-up, sprawl — 10 each, flow between them without stopping for 3 rounds.'},
         {t:'Sprawl & shot ladder',m:10,c:'Wrestling',d:'Level change + penetration step ×10, sprawls ×10, alternate for 4 rounds. Speed comes after clean form.'},
         {t:'Assault intervals',m:12,c:'Cardio',d:'30s all-out (bike, sprints or burpees) / 90s easy × 6. Fights are won in the last minute of the round.'},
+      ]},
+    boxing:{label:'Boxing',emoji:'🥊',arena:'the ring',positions:['Orthodox','Southpaw','Switch'],
+      focus:['Jab','Combinations','Head Movement','Footwork','Conditioning','Film'],
+      drills:[
+        {t:'Jab isolation',m:12,c:'Jab',d:'3×3min, jab only — double it, feint it, dig it to the body. The jab wins rounds. Snap it back to the chin every time.'},
+        {t:'Combos on the bag',m:15,c:'Combinations',d:'1-2, 1-2-3, 1-2-slip-3. 3 rounds. Breathe out on every shot, hands never drop.'},
+        {t:'Slip line / reflex',m:10,c:'Head Movement',d:'Slip a rope or line, 4×2min. Small, tight movements, eyes forward. Turn hittable into un-hittable.'},
+        {t:'Roadwork intervals',m:15,c:'Conditioning',d:'6× (1min hard / 90s easy), run or skip. The championship rounds are won on the road, alone.'},
+      ]},
+    bjj:{label:'Jiu-Jitsu',emoji:'🥋',arena:'the mats',positions:['Guard','Passer','All-Round'],
+      focus:['Guard','Passing','Submissions','Escapes','Scrambles','Film'],
+      drills:[
+        {t:'Solo movement flow',m:12,c:'Escapes',d:'Shrimp, bridge, technical stand-up, granby roll — 10 each, flowing for 3 rounds. Mat time is skill time.'},
+        {t:'Guard retention',m:12,c:'Guard',d:'Reset the guard vs an imaginary passer — frames, hip escape, re-guard. 4 rounds. Never flat, always framing.'},
+        {t:'One submission, deep',m:15,c:'Submissions',d:'Pick ONE submission this week. 30 slow reps of the entry each side. Depth beats collecting.'},
+        {t:'Film: one position',m:15,c:'Film',d:'Watch one match. Track a single position (say, half guard). Pause and call the next move out loud.'},
       ]},
     oztag:{label:'Oztag',emoji:'🏉',arena:'the field',positions:['Middle','Link','Wing'],
       focus:['Speed','Acceleration','Agility','Passing','Evasion','Fitness'],
@@ -938,6 +1041,38 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
   function busy(btn,on,label){ if(!btn)return; if(on){btn.dataset.l=btn.innerHTML;btn.innerHTML='<span class="spin"></span>';btn.disabled=true;} else {btn.innerHTML=label||btn.dataset.l;btn.disabled=false;} }
   const rel=iso=>{ const s=(Date.now()-new Date(iso).getTime())/1e3; if(s<60)return'now'; if(s<3600)return Math.floor(s/60)+'m'; if(s<86400)return Math.floor(s/3600)+'h'; return Math.floor(s/86400)+'d'; };
   const doy=()=>Math.floor((Date.now()-new Date(new Date().getFullYear(),0,0))/864e5);
+  /* You vs you — daily creed (effort over results, nobody's keeping score but you). */
+  const CREED=[
+    "It's you against you. Nobody else is keeping score.",
+    "Beat yesterday. That's the whole game.",
+    "The work is the reward — log it, own it.",
+    "No one's coming to do it for you. That's the good news.",
+    "Quiet reps now. The results speak later.",
+    "You don't rise to the occasion — you fall to your training.",
+    "Discipline is you keeping a promise to yourself.",
+    "Results are noise. The habit is the signal.",
+    "One honest rep beats ten for show.",
+    "Show up for the person you're becoming.",
+    "Comparison is a thief. Run your own race.",
+    "Hard days are deposits. Keep stacking them.",
+  ];
+  /* dopamine on a locked-in check-in */
+  const HYPE=[
+    "Locked in. That's a rep on YOU 🔥",
+    "That's the deposit. Keep stacking 💪",
+    "Showed up when it counted. Respect.",
+    "Nobody saw that but it still counts. That's the point.",
+    "One more brick in the wall. Build it.",
+  ];
+  function celebrate(gained){
+    try{
+      const card=document.querySelector('.tabpage[data-page="home"] .card.hot');
+      if(card){ card.classList.remove('flash'); void card.offsetWidth; card.classList.add('flash');
+        const fly=document.createElement('span'); fly.className='xpfly'; fly.textContent='+'+(gained||40); card.appendChild(fly); setTimeout(()=>fly.remove(),1250); }
+      const av=document.querySelector('.hero-row .av'); if(av){ av.classList.remove('pump'); void av.offsetWidth; av.classList.add('pump'); }
+      if(navigator.vibrate) navigator.vibrate([18,40,18]);
+    }catch(e){}
+  }
 
   /* ---------- onboarding ---------- */
   document.querySelectorAll('.ob-tabs button').forEach(b=>b.addEventListener('click',()=>{
@@ -1073,7 +1208,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
     ['🧠','Your AI coach','It reads your check-ins and tells you what to work on next — in your sport’s language. It guides and motivates; it never diagnoses.'],
     ['🧬','Train · Body · Mind','A weekly plan, recovery + hydration + nutrition, and a mental file to flush the moments that rattle you. Tabs along the bottom.'],
     ['💬','Talk to your coach','The Coach tab is your direct line — message them, see your rating, and (if you’re on a team) rate your squad.'],
-    ['📲','Install it + turn on alerts','Tap the ⚙ in the header → Install to add Athlete OS to your home screen like a real app, and switch on reminders so you never miss a check-in or session.'],
+    ['🤝','Be honest — it’s the whole point','This only works if you log the truth. Real energy, real sleep, real effort. Inflate your numbers and the gap shows up where it counts — on the court, on the field, in the game. Your coach sees your performance too. Truth in here = growth out there.'],
+    ['📲','Install it + turn on alerts','Tap the ⚙ in the header → Install to add Athlete OS to your home screen like a real app, and switch on reminders so you never miss a check-in or session. Add a profile photo there too if you want.'],
     ['🚀','You’re set','Hit “Lock It In” on today’s check-in to start your streak. Tap ? in the header any time to see this again.'],
   ];
   let tutI=0;
@@ -1104,6 +1240,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
     /* home */
     $('#heroName').textContent=p.name;
     $('#avInit').textContent=p.name.split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    (function(){ const im=$('#avImg'); if(p.avatar_url){ im.src=p.avatar_url; im.style.display='block'; } else { im.removeAttribute('src'); im.style.display='none'; } })();
     $('#stXp').textContent=p.xp; $('#stLogs').textContent=AST.checkins.length;
     const week=AST.checkins.filter(c=>(Date.now()-new Date(c.d).getTime())<7*864e5).length;
     $('#stWeek').textContent=week+(p.train_freq?'/'+p.train_freq:'');
@@ -1119,6 +1256,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
       +(p.level?'<span class="chip">'+esc(p.level)+'</span>':'')
       +(p.train_freq?'<span class="chip">'+p.train_freq+'d / week</span>':'')
       +(p.injuries?'<span class="chip warn">⚠ managing injury</span>':'');
+    { const cr=$('#creed'); if(cr) cr.textContent=CREED[doy()%CREED.length]; }
     /* today's focus — deterministic rotation through the sport's drill bank */
     const drill=sp.drills[doy()%sp.drills.length];
     $('#tfKicker').textContent="Today's Focus · "+sp.label;
@@ -1127,6 +1265,16 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
     $('#tfChips').innerHTML='<span class="chip pro">'+esc(drill.c)+'</span><span class="chip">'+drill.m+' min</span>';
     /* next up (calendar) */
     renderNextUp();
+    /* training load */
+    (function(){ const L=AST.load||{week:0,prev:0,trend:0}; const c=$('#loadCard');
+      if(!L.week && !L.prev){ c.style.display='none'; return; }
+      c.style.display='block';
+      $('#loadWeek').textContent=L.week;
+      const t=L.trend, up=t>0, big=Math.abs(t)>=50;
+      $('#loadTrend').innerHTML = L.prev? `<span class="lt ${up?'up':'down'}">${up?'▲':'▼'} ${Math.abs(t)}%</span><span class="lt-sub">vs last week</span>` : `<span class="lt-sub">first week logged</span>`;
+      $('#loadNote').textContent = !L.prev? 'Log RPE each session and your load trend builds here.' :
+        (big&&up? 'Big jump in load — make sure recovery keeps up.' : up? 'Trending up — steady progression is how you build.' : t<-30? 'Load dropped off — a taper, or missed sessions?' : 'Holding steady. Consistency wins.');
+    })();
     /* check-in */
     const done=p.last_checkin===AST.today;
     $('#ciBody').style.display=done?'none':'block';
@@ -1354,7 +1502,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
   $('#catBar').addEventListener('click',e=>{ const p=e.target.closest('[data-cat]'); if(p)renderLib(p.dataset.cat); });
 
   /* check-in */
-  [['rEnergy','vEnergy'],['rSleep','vSleep'],['rSore','vSore'],['rMin','vMin']].forEach(([r,v])=>$('#'+r).addEventListener('input',e=>$('#'+v).textContent=e.target.value));
+  [['rEnergy','vEnergy'],['rSleep','vSleep'],['rSore','vSore'],['rMin','vMin'],['rRpe','vRpe']].forEach(([r,v])=>{const el=$('#'+r); if(el)el.addEventListener('input',e=>$('#'+v).textContent=e.target.value);});
   $('#focusPills').addEventListener('click',e=>{const p=e.target.closest('.pill');if(p)p.classList.toggle('sel')});
   $('#ciSubmit').addEventListener('click',async()=>{
     const focus=[...document.querySelectorAll('#focusPills .pill.sel')].map(x=>x.textContent);
@@ -1362,8 +1510,8 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
     try{
       const r=await api({action:'checkin',aid:sess.aid,pin:sess.pin,
         energy:+$('#rEnergy').value,sleep_h:+$('#rSleep').value,soreness:+$('#rSore').value,
-        mins:+$('#rMin').value,focus,note:$('#ciNote').value.trim()});
-      AST=r.state; renderAll(); toast('+40 XP · your OS is reading 🧠');
+        mins:+$('#rMin').value,rpe:+$('#rRpe').value,focus,note:$('#ciNote').value.trim()});
+      AST=r.state; renderAll(); celebrate(r.gained); toast(HYPE[Math.floor(Math.random()*HYPE.length)]);
     }catch(e){ toast(e.message,true); }
     busy($('#ciSubmit'),0,'Lock It In · +40 XP');
   });
@@ -1423,7 +1571,7 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 
   /* ---------- gear open / close ---------- */
   var sheet=$('#gearSheet');
-  function openGear(){ renderThemes(); refreshInstall(); refreshNotif(); sheet.classList.add('open'); }
+  function openGear(){ renderThemes(); refreshInstall(); refreshNotif(); refreshPhoto(); sheet.classList.add('open'); }
   function closeGear(){ sheet.classList.remove('open'); }
   document.addEventListener('click',function(e){
     if(e.target.closest&&e.target.closest('#gearBtn')) return openGear();
@@ -1484,6 +1632,49 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
       if(!sub) sub=await reg.pushManager.subscribe({ userVisibleOnly:true, applicationServerKey:urlB64ToU8(VAPID_PUB) });
       await fetch(FN,{ method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ action:'push_subscribe', aid:sess.aid, pin:sess.pin, sub:sub.toJSON(), ua:(navigator.userAgent||'').slice(0,180) }) });
     }catch(e){ /* subscription is best-effort */ }
+  }
+
+  /* ---------- Profile photo ---------- */
+  function toastMsg(m){ var t=document.getElementById('toast'); if(!t)return; t.textContent=m; t.className='show'; setTimeout(function(){t.classList.remove('show');},2000); }
+  function refreshPhoto(){
+    var im=document.getElementById('avImg'), prev=$('#pfPrev'), init=$('#pfInit'), tit=$('#pfTit'), pick=$('#pfPick'), rem=$('#pfRemove');
+    if(!prev)return;
+    var has=im && im.getAttribute('src') && im.style.display!=='none';
+    init.textContent=(document.getElementById('avInit')||{}).textContent||'–';
+    var old=prev.querySelector('img'); if(old)old.remove();
+    if(has){ var img=document.createElement('img'); img.src=im.src; img.alt=''; prev.appendChild(img); tit.textContent='Your photo'; pick.textContent='Change'; rem.style.display=''; }
+    else { tit.textContent='Add a photo'; pick.textContent='Add'; rem.style.display='none'; }
+  }
+  function applyPhoto(url){
+    var im=document.getElementById('avImg');
+    if(url){ im.src=url; im.style.display='block'; } else { im.removeAttribute('src'); im.style.display='none'; }
+    refreshPhoto();
+  }
+  function resizeImg(file, size, cb){
+    var url=URL.createObjectURL(file), img=new Image();
+    img.onload=function(){ var s=Math.min(img.width,img.height), sx=(img.width-s)/2, sy=(img.height-s)/2;
+      var cv=document.createElement('canvas'); cv.width=size; cv.height=size;
+      var ctx=cv.getContext('2d'); ctx.drawImage(img,sx,sy,s,s,0,0,size,size);
+      URL.revokeObjectURL(url); try{ cb(cv.toDataURL('image/jpeg',0.85)); }catch(e){ cb(null); } };
+    img.onerror=function(){ URL.revokeObjectURL(url); cb(null); };
+    img.src=url;
+  }
+  document.addEventListener('click',function(e){
+    if(e.target.closest&&e.target.closest('#pfPick')){ var f=$('#pfFile'); if(f)f.click(); }
+    if(e.target.closest&&e.target.closest('#pfRemove')){ removePhoto(); }
+  });
+  (function(){ var f=$('#pfFile'); if(f) f.addEventListener('change',function(){ var file=f.files&&f.files[0]; f.value=''; if(!file)return;
+    var sess=getSess(); if(!sess){ toastMsg('Log in first'); return; }
+    $('#pfPick').textContent='Uploading…';
+    resizeImg(file,256,function(dataUrl){ if(!dataUrl){ toastMsg('Could not read that image'); refreshPhoto(); return; }
+      fetch(FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'avatar_set',aid:sess.aid,pin:sess.pin,data:dataUrl})})
+        .then(function(r){return r.json();}).then(function(j){ if(j&&j.avatar_url){ applyPhoto(j.avatar_url); toastMsg('Photo updated 📸'); } else { toastMsg((j&&j.error)||'Upload failed'); refreshPhoto(); } })
+        .catch(function(){ toastMsg('Upload failed'); refreshPhoto(); });
+    });
+  }); })();
+  function removePhoto(){ var sess=getSess(); if(!sess)return;
+    fetch(FN,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'avatar_clear',aid:sess.aid,pin:sess.pin})})
+      .then(function(r){return r.json();}).then(function(){ applyPhoto(null); toastMsg('Photo removed'); }).catch(function(){ toastMsg('Failed'); });
   }
   function notifOn(){ return ('Notification' in window) && Notification.permission==='granted' && localStorage.getItem(NOTES_KEY)==='1'; }
   function refreshNotif(){

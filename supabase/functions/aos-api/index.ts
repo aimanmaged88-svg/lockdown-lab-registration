@@ -32,10 +32,10 @@ function sydYesterday() {
   return d.toLocaleDateString("en-CA", { timeZone: "Australia/Sydney" });
 }
 
-const SPORTS = ["basketball", "mma", "soccer", "oztag", "netball", "rugby", "afl", "tennis", "swimming", "running", "volleyball", "general"];
+const SPORTS = ["basketball", "mma", "boxing", "bjj", "soccer", "oztag", "netball", "rugby", "afl", "tennis", "swimming", "running", "volleyball", "general"];
 // Light terminology map so AI insights speak the athlete's language.
 const SPORT_WORD: Record<string, string> = {
-  basketball: "on the court", mma: "on the mats", soccer: "on the pitch", oztag: "on the field",
+  basketball: "on the court", mma: "on the mats", boxing: "in the ring", bjj: "on the mats", soccer: "on the pitch", oztag: "on the field",
   netball: "on the court", rugby: "on the field", afl: "on the field", tennis: "on the court",
   swimming: "in the pool", running: "on the track", volleyball: "on the court", general: "in training",
 };
@@ -106,9 +106,21 @@ function profile(p: any) {
     id: p.id, name: p.name, sport: p.sport, sport_label: p.sport_label || null, age: p.age, level: p.level, position: p.position,
     goals: p.goals || {}, injuries: p.injuries, train_freq: p.train_freq, comp_schedule: p.comp_schedule,
     equipment: p.equipment || [], xp: p.xp, streak: p.streak, last_checkin: p.last_checkin,
-    prefs: p.prefs || {}, created_at: p.created_at, team_id: p.team_id || null,
+    prefs: p.prefs || {}, created_at: p.created_at, team_id: p.team_id || null, avatar_url: p.avatar_url || null,
     coach_rating: p.coach_rating ?? null, coach_rating_note: p.coach_rating_note || null, coach_rating_at: p.coach_rating_at || null,
   };
+}
+
+// Upload an athlete avatar (JPEG bytes) to the public storage bucket via service role.
+async function uploadAvatar(aid: string, bytes: Uint8Array) {
+  const path = `${aid}.jpg`;
+  const r = await fetch(`${SUPABASE_URL}/storage/v1/object/aos-avatars/${path}`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${SERVICE_KEY}`, apikey: SERVICE_KEY, "Content-Type": "image/jpeg", "x-upsert": "true" },
+    body: bytes,
+  });
+  if (!r.ok) throw new Error(`storage ${r.status}: ${await r.text()}`);
+  return `${SUPABASE_URL}/storage/v1/object/public/aos-avatars/${path}`;
 }
 
 // Rule-driven AI Performance Coach — reads the athlete's own inputs and
@@ -168,9 +180,22 @@ function buildAI(p: any, checkins: any[], journal: any[], peer: any) {
   return out;
 }
 
+// Session-RPE load (Foster): rpe × minutes. Weekly rollups for trend + readiness.
+function loadSummary(checkins: any[]) {
+  const nowMs = Date.now();
+  const loadOf = (c: any) => (c.rpe ? c.rpe : 0) * (c.mins || 0);
+  const inWindow = (c: any, aDays: number, bDays: number) => {
+    const dt = nowMs - new Date(c.d).getTime();
+    return dt >= aDays * 864e5 && dt < bDays * 864e5;
+  };
+  const week = Math.round(checkins.filter((c) => inWindow(c, 0, 7)).reduce((s, c) => s + loadOf(c), 0));
+  const prev = Math.round(checkins.filter((c) => inWindow(c, 7, 14)).reduce((s, c) => s + loadOf(c), 0));
+  return { week, prev, trend: prev ? Math.round((week - prev) / prev * 100) : (week ? 100 : 0) };
+}
+
 async function athleteState(p: any) {
   const [checkins, journal, messages, peer] = await Promise.all([
-    db(`aos_checkins?athlete_id=eq.${p.id}&select=d,energy,sleep_h,water,soreness,mins,focus,note&order=d.desc&limit=14`),
+    db(`aos_checkins?athlete_id=eq.${p.id}&select=d,energy,sleep_h,water,soreness,mins,rpe,focus,note&order=d.desc&limit=14`),
     db(`aos_journal?athlete_id=eq.${p.id}&select=id,kind,d,data,share_coach,created_at&order=created_at.desc&limit=40`),
     msgsFor(p.id),
     peerAgg(p.id),
@@ -190,6 +215,7 @@ async function athleteState(p: any) {
   const today = sydToday();
   return {
     profile: profile(p), checkins, messages, peer, team, teammates, events,
+    load: loadSummary(checkins),
     ai: buildAI(p, checkins, journal, peer),
     mind: journal.filter((j: any) => j.kind === "mind").slice(0, 10),
     diary: journal.filter((j: any) => j.kind === "diary").slice(0, 10),
@@ -270,7 +296,7 @@ Deno.serve(async (req) => {
       return J({ ok: true, aid: p.id, state: await athleteState(p) });
     }
 
-    if (["state", "checkin", "mind", "diary", "fuel", "goals_set", "profile_set", "msg", "peer_rate", "push_subscribe", "push_unsubscribe"].includes(a)) {
+    if (["state", "checkin", "mind", "diary", "fuel", "goals_set", "profile_set", "msg", "peer_rate", "push_subscribe", "push_unsubscribe", "avatar_set", "avatar_clear"].includes(a)) {
       const p = await auth(b.aid, b.pin);
       if (!p) return J({ error: "unauthorized" }, 401);
       const today = sydToday();
@@ -291,6 +317,25 @@ Deno.serve(async (req) => {
         const endpoint = String((b.sub && b.sub.endpoint) || b.endpoint || "");
         if (endpoint) await db(`aos_push_subs?endpoint=eq.${encodeURIComponent(endpoint)}`, { method: "DELETE" });
         return J({ ok: true });
+      }
+
+      if (a === "avatar_set") {
+        let d = String(b.data || "");
+        const comma = d.indexOf(",");
+        if (d.startsWith("data:") && comma >= 0) d = d.slice(comma + 1);
+        if (!d) return J({ error: "No image." }, 400);
+        let bytes: Uint8Array;
+        try { bytes = Uint8Array.from(atob(d), c => c.charCodeAt(0)); } catch (_) { return J({ error: "Bad image." }, 400); }
+        if (bytes.length > 900 * 1024) return J({ error: "Image too large — pick a smaller one." }, 413);
+        const base = await uploadAvatar(p.id, bytes);
+        const url = base + "?v=" + Date.now();
+        await db(`aos_athletes?id=eq.${p.id}`, { method: "PATCH", body: JSON.stringify({ avatar_url: url }) });
+        return J({ ok: true, avatar_url: url, state: await athleteState(await getAthlete(p.id)) });
+      }
+      if (a === "avatar_clear") {
+        await fetch(`${SUPABASE_URL}/storage/v1/object/aos-avatars/${p.id}.jpg`, { method: "DELETE", headers: { Authorization: `Bearer ${SERVICE_KEY}`, apikey: SERVICE_KEY } }).catch(() => {});
+        await db(`aos_athletes?id=eq.${p.id}`, { method: "PATCH", body: JSON.stringify({ avatar_url: null }) });
+        return J({ ok: true, state: await athleteState(await getAthlete(p.id)) });
       }
 
       if (a === "msg") {
@@ -323,6 +368,7 @@ Deno.serve(async (req) => {
           water: num(b.water, 0, 12, 0),
           soreness: num(b.soreness, 1, 10, 3),
           mins: num(b.mins, 0, 600, 0),
+          rpe: (b.rpe != null && b.rpe !== "") ? num(b.rpe, 1, 10, 5) : null,
           focus: Array.isArray(b.focus) ? b.focus.slice(0, 6).map((f: unknown) => priv(f, 30)) : [],
           note: priv(b.note, 400),
         }) });
@@ -396,30 +442,146 @@ Deno.serve(async (req) => {
       }
     }
 
-    if (["roster", "cdetail", "note_add", "status_set", "cmsg", "rate", "team_create", "team_assign", "sport_resolve", "event_create", "event_delete"].includes(a)) {
+    if (["roster", "cdetail", "note_add", "status_set", "cmsg", "rate", "team_create", "team_assign", "sport_resolve", "event_create", "event_delete", "org_tree", "org_node", "org_import"].includes(a)) {
       if (String(b.code || "").toUpperCase() !== COACH_CODE) return J({ error: "bad coach code" }, 401);
 
+      if (a === "org_tree") {
+        const [orgs, clubs, seasons, ages, teams, ath] = await Promise.all([
+          db("aos_orgs?select=id,name&order=name.asc"),
+          db("aos_clubs?select=id,org_id,name&order=name.asc"),
+          db("aos_seasons?select=id,club_id,name&order=name.asc"),
+          db("aos_age_groups?select=id,season_id,name&order=name.asc"),
+          db("aos_teams?select=id,name,age_group_id&order=name.asc"),
+          db("aos_athletes?select=team_id"),
+        ]);
+        const counts: Record<string, number> = {};
+        (ath || []).forEach((r: any) => { if (r.team_id) counts[r.team_id] = (counts[r.team_id] || 0) + 1; });
+        (teams || []).forEach((t: any) => { t.member_count = counts[t.id] || 0; });
+        return J({ ok: true, orgs: orgs || [], clubs: clubs || [], seasons: seasons || [], age_groups: ages || [], teams: teams || [] });
+      }
+
+      if (a === "org_node") {
+        const kind = String(b.kind || "");
+        const op = String(b.op || "");
+        const name = priv(b.name, 80);
+        const tbl: Record<string, string> = { org: "aos_orgs", club: "aos_clubs", season: "aos_seasons", agegroup: "aos_age_groups", team: "aos_teams" };
+        const parentCol: Record<string, string> = { club: "org_id", season: "club_id", agegroup: "season_id", team: "age_group_id" };
+        const T = tbl[kind];
+        if (!T) return J({ error: "bad kind" }, 400);
+        if (op === "create") {
+          if (name.length < 1) return J({ error: "Give it a name." }, 400);
+          const row: any = { name };
+          if (parentCol[kind]) row[parentCol[kind]] = b.parent_id ? String(b.parent_id) : null;
+          const rows = await db(T, { method: "POST", headers: { Prefer: "return=representation" }, body: JSON.stringify(row) });
+          return J({ ok: true, node: rows[0] });
+        }
+        if (op === "rename") {
+          if (!b.id || name.length < 1) return J({ error: "bad rename" }, 400);
+          await db(`${T}?id=eq.${b.id}`, { method: "PATCH", body: JSON.stringify({ name }) });
+          return J({ ok: true });
+        }
+        if (op === "assign") {
+          if (kind !== "team" || !b.id) return J({ error: "bad assign" }, 400);
+          await db(`aos_teams?id=eq.${b.id}`, { method: "PATCH", body: JSON.stringify({ age_group_id: b.parent_id ? String(b.parent_id) : null }) });
+          return J({ ok: true });
+        }
+        if (op === "delete") {
+          if (!b.id) return J({ error: "bad delete" }, 400);
+          if (kind === "team") await db(`aos_athletes?team_id=eq.${b.id}`, { method: "PATCH", body: JSON.stringify({ team_id: null }) });
+          await db(`${T}?id=eq.${b.id}`, { method: "DELETE" });
+          return J({ ok: true });
+        }
+        return J({ error: "bad op" }, 400);
+      }
+
+      if (a === "org_import") {
+        const text = String(b.text || "");
+        if (!text.trim()) return J({ error: "Nothing to import." }, 400);
+        const cache: Record<string, string> = {};
+        async function foc(T: string, parentCol: string | null, parentId: string | null, name: string) {
+          const key = T + "|" + (parentId || "") + "|" + name.toLowerCase();
+          if (cache[key]) return cache[key];
+          let q = `${T}?name=eq.${encodeURIComponent(name)}&select=id`;
+          if (parentCol && parentId) q += `&${parentCol}=eq.${parentId}`;
+          const ex = await db(q);
+          let id: string;
+          if (ex && ex.length) id = ex[0].id;
+          else {
+            const row: any = { name };
+            if (parentCol) row[parentCol] = parentId;
+            const rows = await db(T, { method: "POST", headers: { Prefer: "return=representation" }, body: JSON.stringify(row) });
+            id = rows[0].id;
+          }
+          cache[key] = id;
+          return id;
+        }
+        const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+        let teams = 0, first = true;
+        for (const line of lines) {
+          const c = line.split(/[,\t]/).map(x => priv(x, 80));
+          if (first && /org/i.test(c[0] || "") && /team/i.test(c[c.length - 1] || "")) { first = false; continue; }
+          first = false;
+          const [org, club, season, age, team] = c;
+          if (!org) continue;
+          const orgId = await foc("aos_orgs", null, null, org);
+          if (!club) continue;
+          const clubId = await foc("aos_clubs", "org_id", orgId, club);
+          if (!season) continue;
+          const seasonId = await foc("aos_seasons", "club_id", clubId, season);
+          if (!age) continue;
+          const ageId = await foc("aos_age_groups", "season_id", seasonId, age);
+          if (!team) continue;
+          await foc("aos_teams", "age_group_id", ageId, team);
+          teams++;
+        }
+        return J({ ok: true, teams_imported: teams });
+      }
+
       if (a === "roster") {
-        const [athletes, teams, peers, sportReqs, events, pushSubs] = await Promise.all([
-          db("aos_athletes?select=id,name,sport,sport_label,age,level,position,goals,injuries,train_freq,comp_schedule,equipment,location,contact,xp,streak,last_checkin,status,created_at,team_id,coach_rating,coach_rating_at&order=created_at.asc"),
+        const cutoff = new Date(Date.now() - 28 * 864e5).toLocaleDateString("en-CA", { timeZone: "Australia/Sydney" });
+        const [athletes, teams, peers, sportReqs, events, pushSubs, recentCk] = await Promise.all([
+          db("aos_athletes?select=id,name,sport,sport_label,age,level,position,goals,injuries,train_freq,comp_schedule,equipment,location,contact,xp,streak,last_checkin,status,created_at,team_id,coach_rating,coach_rating_at,avatar_url&order=created_at.asc"),
           teamsList(),
           db("aos_peer_ratings?select=ratee_id,score"),
           db("aos_sport_requests?status=eq.pending&select=id,athlete_name,sport,created_at&order=created_at.desc"),
           db(`aos_events?starts_at=gte.${encodeURIComponent(new Date(Date.now() - 6 * 3600 * 1000).toISOString())}&select=id,title,type,starts_at,location,note,team_id&order=starts_at.asc&limit=100`),
           db("aos_push_subs?select=athlete_id"),
+          db(`aos_checkins?d=gte.${cutoff}&select=athlete_id,d,energy,soreness,mins,rpe&order=d.desc&limit=4000`),
         ]);
         const pmap: Record<string, number[]> = {};
         (peers || []).forEach((r: any) => { (pmap[r.ratee_id] = pmap[r.ratee_id] || []).push(r.score); });
         const pushMap: Record<string, number> = {};
         (pushSubs || []).forEach((r: any) => { if (r.athlete_id) pushMap[r.athlete_id] = (pushMap[r.athlete_id] || 0) + 1; });
+        const ckByA: Record<string, any[]> = {};
+        (recentCk || []).forEach((c: any) => { (ckByA[c.athlete_id] = ckByA[c.athlete_id] || []).push(c); });
+        const today = sydToday();
+        const nowMs = Date.now();
         (athletes || []).forEach((x: any) => {
           const arr = pmap[x.id];
           x.peer_avg = arr && arr.length ? Math.round(arr.reduce((s: number, v: number) => s + v, 0) / arr.length * 10) / 10 : null;
           x.peer_count = arr ? arr.length : 0;
           x.push_on = !!pushMap[x.id];
           x.push_count = pushMap[x.id] || 0;
+          // Attention triage — combine simple, individualised signals.
+          const cks = ckByA[x.id] || [];
+          const loadOf = (c: any) => (c.rpe ? c.rpe : 0) * (c.mins || 0);
+          const within = (c: any, d: number) => (nowMs - new Date(c.d).getTime()) < d * 864e5;
+          const load7 = cks.filter((c: any) => within(c, 7)).reduce((s: number, c: any) => s + loadOf(c), 0);
+          const load28 = cks.filter((c: any) => within(c, 28)).reduce((s: number, c: any) => s + loadOf(c), 0);
+          const chronicWk = load28 / 4;
+          const last = cks[0];
+          const e14 = cks.filter((c: any) => within(c, 14)).map((c: any) => +c.energy || 0).filter(Boolean);
+          const eAvg = e14.length ? e14.reduce((s: number, v: number) => s + v, 0) / e14.length : null;
+          const att: any[] = [];
+          if (x.status === "active" && x.last_checkin !== today) att.push({ t: "no_checkin", label: "No check-in today" });
+          if (last && last.soreness >= 7) att.push({ t: "sore", label: `Soreness ${last.soreness}/10` });
+          if (chronicWk > 0 && load7 >= 1.5 * chronicWk) att.push({ t: "load", label: "Training load spiking" });
+          if (last && eAvg && +last.energy <= eAvg - 2) att.push({ t: "energy", label: "Energy below their norm" });
+          if (x.injuries) att.push({ t: "injury", label: "Managing injury" });
+          x.attention = att;
+          x.load7 = Math.round(load7);
         });
-        return J({ ok: true, today: sydToday(), athletes, teams: teams || [], sport_requests: sportReqs || [], events: events || [] });
+        return J({ ok: true, today, athletes, teams: teams || [], sport_requests: sportReqs || [], events: events || [] });
       }
       if (a === "event_create") {
         const title = priv(b.title, 80);
@@ -451,7 +613,7 @@ Deno.serve(async (req) => {
         const p = await getAthlete(b.aid);
         if (!p) return J({ error: "no athlete" }, 404);
         const [checkins, notes, journal, messages, peer, teams, pushSubs] = await Promise.all([
-          db(`aos_checkins?athlete_id=eq.${p.id}&select=d,energy,sleep_h,water,soreness,mins,focus,note&order=d.desc&limit=14`),
+          db(`aos_checkins?athlete_id=eq.${p.id}&select=d,energy,sleep_h,water,soreness,mins,rpe,focus,note&order=d.desc&limit=14`),
           db(`aos_notes?athlete_id=eq.${p.id}&select=id,text,created_at&order=created_at.asc`),
           db(`aos_journal?athlete_id=eq.${p.id}&share_coach=eq.true&select=kind,d,data,created_at&order=created_at.desc&limit=15`),
           msgsFor(p.id),
@@ -460,14 +622,16 @@ Deno.serve(async (req) => {
           db(`aos_push_subs?athlete_id=eq.${p.id}&select=id`),
         ]);
         return J({ ok: true, profile: profile(p), contact: p.contact || null, status: p.status, checkins, notes, messages, peer, teams: teams || [],
-          push_on: (pushSubs?.length || 0) > 0, push_count: pushSubs?.length || 0,
+          push_on: (pushSubs?.length || 0) > 0, push_count: pushSubs?.length || 0, load: loadSummary(checkins),
           shared_mind: journal.filter((j: any) => j.kind === "mind"),
           fuel: journal.filter((j: any) => j.kind === "fuel").slice(0, 7) });
       }
       if (a === "team_create") {
         const name = priv(b.name, 60);
         if (name.length < 2) return J({ error: "Name the team." }, 400);
-        const rows = await db("aos_teams", { method: "POST", headers: { Prefer: "return=representation" }, body: JSON.stringify({ name }) });
+        const row: any = { name };
+        if (b.age_group_id) row.age_group_id = String(b.age_group_id);
+        const rows = await db("aos_teams", { method: "POST", headers: { Prefer: "return=representation" }, body: JSON.stringify(row) });
         return J({ ok: true, team: rows[0], teams: await teamsList() });
       }
       if (a === "team_assign") {
