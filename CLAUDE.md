@@ -317,4 +317,14 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   #vault (Vault body was going light until --bg restored). Bottom nav stays a
   dark floating pill (deliberate). Verified E2E in light across Home/Mind/
   Fuel/Squad/Coach/Settings/Vault via scratchpad/light-shot.mjs.
-- NOT yet applied to admin.html / coach.html (offered; player app only for now).
+- **Extended to admin.html + coach.html (2026-07-24).** Same `:root.lightmode`
+  variable flip + `applyMode`/`setMode`/`toggleMode` + `ll_mode` (SHARED key
+  across all three surfaces — same origin). Toggle button lives in each
+  sidebar `.sb-foot` (next to Lock up / Log out). Light overrides: `.sb`
+  sidebar, `.row` rows (were rgba(0,0,0,.25) → light), `.editbox`, and the
+  admin athlete drawer panel `#athlete .adr` (was #08080a → #fff; adcard/
+  adtabs/adbody already use --glass2 so they auto-adapt). Coach notif primer
+  #cNtf + welcome #cwelcome stay dark (own bg). NEWS id:22 announces it.
+  Verified E2E via scratchpad/deskcoach-light.mjs + coach-light2.mjs (temp
+  coach minted → dashboard shot → deleted). Masters: admin-base.html,
+  coach-base.html.
