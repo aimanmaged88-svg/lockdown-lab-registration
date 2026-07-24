@@ -2,23 +2,15 @@
    PADEL ONE — mock data (all local, no backend)
    ============================================================ */
 
-// Unsplash photo IDs (stable). Rendered via img() helper with gradient fallback.
+// Local photo assets (bundled — works offline / on Netlify with no CDN dependency).
 const IMG = {
-  court1: "photo-1554068865-24cecd4e34b8",   // padel/tennis court
-  court2: "photo-1626224583764-f87db24ac4ea", // indoor sport
-  court3: "photo-1622163642998-1ea32b0bbc67", // padel action
-  court4: "photo-1595435742656-5272d0b3fa82", // tennis court aerial
-  court5: "photo-1560012057-4372e14c5085",     // sport hall
-  hero:   "photo-1610768764270-790fbec18178",  // player
-  ob1:    "photo-1626224583764-f87db24ac4ea",
-  ob2:    "photo-1554068865-24cecd4e34b8",
-  ob3:    "photo-1595435742656-5272d0b3fa82",
-  club1:  "photo-1526676037777-05a232554f77",
-  club2:  "photo-1571902943202-507ec2618e8f",
-  community1: "photo-1517649763962-0c623066013b",
-  community2: "photo-1544551763-46a013bb70d5",
+  court1: "court1", court2: "court2", court3: "court3", court4: "court4", court5: "court5",
+  hero:   "court1",
+  ob1:    "ob1", ob2: "ob2", ob3: "ob3",
+  club1:  "court2", club2: "court4",
+  community1: "community1", community2: "community2",
 };
-function unsplash(id, w) { return `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w||800}&q=70`; }
+function unsplash(id, w) { return `assets/${id}.jpg`; }
 
 // Simple deterministic avatars (DiceBear-free — use ui-avatars-style svg data uri fallback in app.js)
 const ME = {
