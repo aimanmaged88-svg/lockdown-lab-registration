@@ -143,6 +143,44 @@ input::placeholder{color:#5d5851}
 .bchip{font-family:var(--fm);font-size:11px;border:1px solid var(--line);background:var(--glass2);color:var(--muted);border-radius:999px;padding:7px 12px;cursor:pointer;transition:all .15s}
 .bchip:hover{border-color:var(--accent);color:var(--text)}
 .bchip.on{border-color:var(--accent);background:rgba(255,107,0,.14);color:var(--accent)}
+/* ===== Athlete Command Center ===== */
+#athlete{position:fixed;inset:0;z-index:60;display:none;background:rgba(4,4,6,.62);backdrop-filter:blur(4px)}
+#athlete.on{display:block}
+#athlete .adr{position:absolute;top:0;right:0;bottom:0;width:min(580px,100%);background:#08080a;border-left:1px solid var(--line);display:flex;flex-direction:column;box-shadow:-24px 0 70px -24px #000;animation:adrIn .24s cubic-bezier(.2,.9,.3,1)}
+@keyframes adrIn{from{transform:translateX(34px);opacity:.5}to{transform:translateX(0);opacity:1}}
+#athlete .adh{padding:16px 16px 13px;border-bottom:1px solid var(--line);position:relative;background:radial-gradient(120% 90% at 100% -20%,rgba(255,107,0,.14),transparent 55%)}
+#athlete .adx{position:absolute;top:13px;right:13px;width:34px;height:34px;border-radius:50%;border:1px solid var(--line);background:var(--glass);color:var(--text);font-size:15px;cursor:pointer}
+#athlete .adname{font-family:var(--fd);font-size:27px;letter-spacing:.6px;text-transform:uppercase;line-height:1;padding-right:42px}
+#athlete .admeta{color:var(--muted);font-size:12px;margin-top:5px}
+#athlete .adsnap{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}
+#athlete .adchip{font-family:var(--fm);font-size:11px;border:1px solid var(--line);border-radius:99px;padding:6px 11px;color:var(--muted)}
+#athlete .adchip b{color:var(--text)}
+#athlete .adchip.hot{border-color:var(--accent);color:var(--accent)}
+#athlete .adact{display:flex;gap:7px;margin-top:12px;flex-wrap:wrap}
+#athlete .adtabs{display:flex;gap:2px;overflow-x:auto;padding:0 8px;border-bottom:1px solid var(--line);background:var(--glass2);flex:0 0 auto;-webkit-overflow-scrolling:touch}
+#athlete .adtab{font-family:var(--fm);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);padding:12px 11px;white-space:nowrap;border-bottom:2px solid transparent;cursor:pointer}
+#athlete .adtab.on{color:var(--accent);border-bottom-color:var(--accent)}
+#athlete .adbody{flex:1;overflow-y:auto;padding:14px 16px 34px;-webkit-overflow-scrolling:touch}
+#athlete .adcard{border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px;background:var(--glass2)}
+#athlete .adcl{font-family:var(--fm);font-size:9px;letter-spacing:1.6px;text-transform:uppercase;color:var(--dim);margin-bottom:8px;display:flex;align-items:center;gap:6px}
+#athlete .adcl .n{margin-left:auto;color:var(--muted)}
+#athlete .mrow{display:flex;align-items:center;gap:10px;margin:7px 0}
+#athlete .mrow .lb{font-family:var(--fm);font-size:10px;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);width:64px;flex:0 0 auto}
+#athlete .bar{flex:1;height:7px;border-radius:99px;background:rgba(255,255,255,.07);overflow:hidden}
+#athlete .bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent-hi))}
+#athlete .mrow .vv{font-family:var(--fm);font-size:11px;color:var(--text);width:44px;text-align:right;flex:0 0 auto}
+#athlete .ci{border-top:1px dashed var(--line2);padding:9px 0}
+#athlete .ci:first-child{border-top:none}
+#athlete .ci .cih{display:flex;justify-content:space-between;font-family:var(--fm);font-size:10px;color:var(--muted);margin-bottom:5px}
+#athlete .tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+#athlete .tag{font-family:var(--fm);font-size:9.5px;color:var(--muted);border:1px solid var(--line);border-radius:99px;padding:2px 8px}
+#athlete .note{color:var(--text);font-size:12.5px;line-height:1.45;margin-top:5px}
+#athlete .addbox{display:flex;gap:7px;margin-top:10px}
+#athlete .addbox input{flex:1}
+#athlete .lrow{font-size:12.5px;color:var(--text);line-height:1.4;padding:8px 0;border-top:1px dashed var(--line2)}
+#athlete .lrow:first-child{border-top:none}
+#athlete .lrow small{display:block;color:var(--dim);font-family:var(--fm);font-size:9.5px;margin-top:2px}
+#athlete .empty{color:var(--dim);font-size:12px;padding:8px 0}
 .sb-foot{margin-top:auto;display:flex;flex-direction:column;gap:8px}
 .osmain{flex:1;min-width:0;padding:26px 24px 60px;max-width:1150px}
 .oh{font-family:var(--fd);font-size:30px;letter-spacing:1px;text-transform:uppercase;font-weight:400;margin-bottom:4px}
@@ -492,6 +530,20 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
 
     </main>
   </div>
+<div id="athlete">
+  <div class="adr">
+    <div class="adh">
+      <button class="adx" id="adX">✕</button>
+      <div class="adname" id="adName">—</div>
+      <div class="admeta" id="adMeta"></div>
+      <div class="adsnap" id="adSnap"></div>
+      <div class="adact" id="adAct"></div>
+    </div>
+    <div class="adtabs" id="adTabs"></div>
+    <div class="adbody" id="adBody"></div>
+  </div>
+</div>
+
 <div id="toast"></div>
 
 <script>
@@ -604,7 +656,8 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
       const ok=p.last_checkin===((R&&R.today)||'');
       return '<div class="row" data-prow="'+p.id+'"><div class="info"><b>'+esc(p.name)+(p.founding?' ⭐':'')+'</b> '+(p.pos?'· '+esc(p.pos):'')+(p.age?' · '+p.age:'')
         +'<small>'+p.xp+' XP · 🔥 '+p.streak+'d · '+p.sessions+' sessions · '+(ok?'✓ checked in today':'⚠ not today')+(p.contact?' · reach: '+esc(p.contact):'')+'</small></div>'
-        +'<div class="rowbtns"><button class="btn btn-p" data-dm="'+p.id+'" title="Message them in the app">💬</button>'+contactBtns(p.contact)
+        +'<div class="rowbtns"><button class="btn btn-p" data-open="'+p.id+'" data-nm="'+esc(p.name)+'" title="Open athlete file">📂 Open</button>'
+        +'<button class="btn btn-g" data-dm="'+p.id+'" title="Message them in the app">💬</button>'+contactBtns(p.contact)
         +'<button class="btn btn-g" data-star="'+p.id+'" title="Founding">'+(p.founding?'⭐':'☆')+'</button>'
         +'<button class="btn btn-g" data-badgeopen="'+p.id+'" title="Coach badges">🏅</button>'
         +'<button class="btn btn-g" data-ed="'+p.id+'" title="Edit">✎</button>'
@@ -627,6 +680,7 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
     box.querySelectorAll('[data-star]').forEach(b=>b.onclick=async()=>{ const p=(R.players||[]).find(x=>x.id===b.dataset.star); try{ await api({action:'founding_set',code:CODE,pid:b.dataset.star,founding:!(p&&p.founding)}); toast(p&&p.founding?'Star removed':'⭐ Founding locked in'); document.activeElement&&document.activeElement.blur(); refresh(); }catch(e){toast(e.message)} });
     box.querySelectorAll('[data-ed]').forEach(b=>b.onclick=()=>{ const eb=document.getElementById('ed-'+b.dataset.ed); if(eb) eb.classList.toggle('open'); });
     box.querySelectorAll('[data-badgeopen]').forEach(b=>b.onclick=()=>{ const eb=document.getElementById('bd-'+b.dataset.badgeopen); if(eb) eb.classList.toggle('open'); });
+    box.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>openAthlete(b.dataset.open,b.dataset.nm));
     box.querySelectorAll('[data-award]').forEach(b=>b.onclick=async()=>{
       const pid=b.dataset.award, bid=b.dataset.bid;
       const p=(R.players||[]).find(x=>x.id===pid); const have=!!(p&&(p.awards||[]).includes(bid));
@@ -665,6 +719,103 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
     inp.value='';
     try{ const r=await api({action:'cmsg',code:CODE,pid,text}); paintDm(pid,r.messages); toast('Sent 💬 · their phone got buzzed'); }
     catch(e){ inp.value=text; toast(e.message); }
+  }
+  /* ===== Athlete Command Center — the full file, Athlete-OS style ===== */
+  let AD={pid:null,nm:'',cd:null,tab:'overview'};
+  const AD_TABS=[['overview','Overview'],['checkins','Check-ins'],['mind','Mind'],['fuel','Fuel'],['homework','Homework'],['scouting','Scouting'],['comms','Comms']];
+  async function openAthlete(pid,nm){
+    AD={pid,nm:nm||'Athlete',cd:null,tab:'overview'};
+    $('#athlete').classList.add('on');
+    $('#adName').textContent=AD.nm; $('#adMeta').textContent='Loading file…';
+    $('#adSnap').innerHTML=''; $('#adAct').innerHTML=''; $('#adTabs').innerHTML=''; $('#adBody').innerHTML='<p class="empty">Pulling the file…</p>';
+    try{ const r=await api({action:'cdetail',code:CODE,pid}); AD.cd=r; renderAthlete(); }
+    catch(e){ $('#adBody').innerHTML='<p class="empty">Couldn’t load — try again.</p>'; toast(e.message); }
+  }
+  function adClose(){ $('#athlete').classList.remove('on'); AD.pid=null; }
+  $('#adX')&&($('#adX').onclick=adClose);
+  $('#athlete')&&$('#athlete').addEventListener('click',e=>{ if(e.target.id==='athlete') adClose(); });
+  async function reloadAthlete(){ try{ const r=await api({action:'cdetail',code:CODE,pid:AD.pid}); AD.cd=r; renderAthlete(); }catch(e){} }
+  const adAvg=(arr,k)=> arr.length?Math.round(arr.reduce((a,c)=>a+(c[k]||0),0)/arr.length*10)/10:0;
+  const adBar=(v,max)=>'<div class="bar"><i style="width:'+Math.max(0,Math.min(100,Math.round((v/max)*100)))+'%"></i></div>';
+  function renderAthlete(){
+    const cd=AD.cd; if(!cd) return; const p=cd.profile||{}, today=(R&&R.today)||'', ci=cd.checkins||[];
+    $('#adName').textContent=p.name||AD.nm;
+    $('#adMeta').textContent=[p.pos,p.age?p.age+'y':'',p.founding?'⭐ Founding':''].filter(Boolean).join(' · ')||'—';
+    const inToday=p.last_checkin===today;
+    $('#adSnap').innerHTML='<span class="adchip"><b>'+(p.xp||0)+'</b> XP</span>'
+      +'<span class="adchip'+((p.streak||0)>=3?' hot':'')+'">🔥 <b>'+(p.streak||0)+'</b>d</span>'
+      +'<span class="adchip"><b>'+(p.sessions||0)+'</b> sessions</span>'
+      +'<span class="adchip">'+(inToday?'✓ in today':'⚠ not today')+'</span>';
+    $('#adAct').innerHTML='<button class="btn btn-p btn-sm" id="adSession">＋ Log a session</button>'
+      +'<button class="btn btn-g btn-sm" id="adFound">'+(p.founding?'⭐ Founding':'☆ Make founding')+'</button>';
+    $('#adSession').onclick=async()=>{ try{ await api({action:'attend',code:CODE,pid:AD.pid}); toast('Session logged · +25 XP'); await reloadAthlete(); refresh(); }catch(e){toast(e.message)} };
+    $('#adFound').onclick=async()=>{ try{ await api({action:'founding_set',code:CODE,pid:AD.pid,founding:!p.founding}); toast(p.founding?'Star removed':'⭐ Founding locked in'); await reloadAthlete(); refresh(); }catch(e){toast(e.message)} };
+    $('#adTabs').innerHTML=AD_TABS.map(t=>'<div class="adtab'+(t[0]===AD.tab?' on':'')+'" data-adtab="'+t[0]+'">'+t[1]+'</div>').join('');
+    $('#adTabs').querySelectorAll('[data-adtab]').forEach(b=>b.onclick=()=>{ AD.tab=b.dataset.adtab; renderAthlete(); });
+    $('#adBody').innerHTML=adTab(AD.tab,cd,p,ci); wireAdBody();
+  }
+  function adTab(tab,cd,p,ci){
+    if(tab==='overview'){
+      const l5=ci.slice(0,5), e=adAvg(l5,'energy'), c=adAvg(l5,'conf'), m=adAvg(l5,'mins');
+      let h='<div class="adcard"><div class="adcl">📊 Snapshot · last 5 check-ins</div>';
+      if(l5.length){ h+='<div class="mrow"><span class="lb">Energy</span>'+adBar(e,10)+'<span class="vv">'+e+'/10</span></div>'
+        +'<div class="mrow"><span class="lb">Confidence</span>'+adBar(c,10)+'<span class="vv">'+c+'/10</span></div>'
+        +'<div class="mrow"><span class="lb">Minutes</span>'+adBar(m,180)+'<span class="vv">'+m+'</span></div>'; }
+      else h+='<p class="empty">No check-ins yet.</p>';
+      h+='</div>';
+      if(p.prefs&&p.prefs.learn) h+='<div class="adcard"><div class="adcl">🎯 Wants to work on</div><div class="note">'+esc(p.prefs.learn)+'</div></div>';
+      h+='<div class="adcard"><div class="adcl">🏅 Coach badges</div><div class="bchips">'+AWARDABLE.map(a=>{const on=(cd.awards||[]).includes(a[0]);return '<button class="bchip'+(on?' on':'')+'" data-adaward="'+a[0]+'">'+a[1]+' '+a[2]+(on?' ✓':'')+'</button>';}).join('')+'</div></div>';
+      h+='<div class="adcard"><div class="adcl">📇 Reach</div><div class="note">'+(cd.contact?esc(cd.contact):'<span class="empty">No contact on file.</span>')+'</div></div>';
+      return h;
+    }
+    if(tab==='checkins'){
+      if(!ci.length) return '<div class="adcard"><p class="empty">No check-ins logged yet.</p></div>';
+      return '<div class="adcard"><div class="adcl">📊 Recent check-ins<span class="n">'+ci.length+'</span></div>'+ci.map(x=>
+        '<div class="ci"><div class="cih"><span>'+esc(x.d)+'</span><span>⚡'+(x.energy||0)+' · 💪'+(x.conf||0)+' · '+(x.mins||0)+'min</span></div>'
+        +(Array.isArray(x.focus)&&x.focus.length?'<div class="tags">'+x.focus.map(f=>'<span class="tag">'+esc(f)+'</span>').join('')+'</div>':'')
+        +(x.note?'<div class="note">“'+esc(x.note)+'”</div>':'')+'</div>').join('')+'</div>';
+    }
+    if(tab==='mind'){
+      const mm=cd.shared_mind||[];
+      if(!mm.length) return '<div class="adcard"><p class="empty">Nothing shared from their Mind file yet.</p></div>';
+      return mm.map(j=>{const d=j.data||{};return '<div class="adcard"><div class="adcl">🧠 '+esc(j.d||'')+(d.impact?'<span class="n">impact '+d.impact+'/10</span>':'')+'</div>'
+        +(d.trigger?'<div class="note"><b>Trigger:</b> '+esc(d.trigger)+'</div>':'')
+        +(d.said?'<div class="note">“'+esc(d.said)+'”</div>':'')
+        +(d.plan?'<div class="note"><b>Next time:</b> '+esc(d.plan)+'</div>':'')+'</div>';}).join('');
+    }
+    if(tab==='fuel'){
+      const ff=cd.fuel||[];
+      if(!ff.length) return '<div class="adcard"><p class="empty">No fuel logs yet.</p></div>';
+      return '<div class="adcard"><div class="adcl">🥗 Fuel &amp; hydration</div>'+ff.map(j=>{const d=j.data||{};return '<div class="ci"><div class="cih"><span>'+esc(j.d||'')+'</span><span>💧 '+(d.water||0)+'/8</span></div>'+(Array.isArray(d.pills)&&d.pills.length?'<div class="tags">'+d.pills.map(x=>'<span class="tag">'+esc(x)+'</span>').join('')+'</div>':'')+'</div>';}).join('')+'</div>';
+    }
+    if(tab==='homework'){
+      const hw=cd.homework||[]; let h='<div class="adcard"><div class="adcl">📌 Homework · lands in their app + buzzes phone</div>';
+      h+=hw.length?hw.map(x=>'<div class="lrow">'+(x.done?'✅ ':'▫️ ')+esc(x.text)+'</div>').join(''):'<p class="empty">Nothing set yet.</p>';
+      h+='<div class="addbox"><input id="adHw" placeholder="Set a task…" maxlength="300"><button class="btn btn-p btn-sm" id="adHwGo">Set</button></div></div>';
+      return h;
+    }
+    if(tab==='scouting'){
+      const it=cd.intel||[]; let h='<div class="adcard"><div class="adcl">🔒 Scouting notes · private — they never see these</div>';
+      h+=it.length?it.map(x=>'<div class="lrow">'+esc(x.text)+'<small>'+new Date(x.created_at).toLocaleDateString('en-AU')+'</small></div>').join(''):'<p class="empty">No notes yet.</p>';
+      h+='<div class="addbox"><input id="adIntel" placeholder="Add a read on this player…" maxlength="300"><button class="btn btn-p btn-sm" id="adIntelGo">Add</button></div></div>';
+      return h;
+    }
+    if(tab==='comms'){
+      const ms=cd.messages||[]; let h='<div class="adcard"><div class="adcl">💬 Direct line · lands in their app + buzzes phone</div>';
+      h+='<div class="dmthread">'+(ms.length?ms.slice(-14).map(m=>'<div class="dmb '+(m.from_coach?'me':'them')+'">'+esc(m.text)+'</div>').join(''):'<p class="empty">No messages yet — say the first word.</p>')+'</div>';
+      h+='<div class="addbox"><input id="adMsg" placeholder="Type it… (Enter to send)" maxlength="400"><button class="btn btn-p btn-sm" id="adMsgGo">Send</button></div></div>';
+      return h;
+    }
+    return '';
+  }
+  function wireAdBody(){
+    document.querySelectorAll('[data-adaward]').forEach(b=>b.onclick=async()=>{ const bid=b.dataset.adaward, have=(AD.cd.awards||[]).includes(bid); try{ await api({action:have?'badge_unaward':'badge_award',code:CODE,pid:AD.pid,badge:bid}); toast(have?'Badge pulled back':'🏅 Badge awarded · buzzed phone'); await reloadAthlete(); }catch(e){toast(e.message)} });
+    const hwGo=$('#adHwGo'); if(hwGo) hwGo.onclick=async()=>{ const i=$('#adHw'), t=(i.value||'').trim(); if(!t) return; try{ await api({action:'hw_add',code:CODE,pid:AD.pid,text:t}); toast('Homework set · buzzed their phone'); await reloadAthlete(); }catch(e){toast(e.message)} };
+    const inGo=$('#adIntelGo'); if(inGo) inGo.onclick=async()=>{ const i=$('#adIntel'), t=(i.value||'').trim(); if(!t) return; try{ await api({action:'intel_add',code:CODE,pid:AD.pid,text:t}); toast('Note saved'); await reloadAthlete(); }catch(e){toast(e.message)} };
+    const msGo=$('#adMsgGo'), msI=$('#adMsg');
+    const send=async()=>{ if(!msI) return; const t=(msI.value||'').trim(); if(!t) return; msI.value=''; try{ const r=await api({action:'cmsg',code:CODE,pid:AD.pid,text:t}); AD.cd.messages=r.messages; renderAthlete(); toast('Sent 💬 · buzzed their phone'); }catch(e){ msI.value=t; toast(e.message); } };
+    if(msGo) msGo.onclick=send;
+    if(msI) msI.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); send(); } });
   }
   $('#sqSearch')&&$('#sqSearch').addEventListener('input',()=>{ if(R&&!$('#squad').querySelector('.editbox.open')) renderSquad(R.players||[],true); });
   let prevK=-1,prevR=-1,prevDeck=-1,prevCReq=-1;

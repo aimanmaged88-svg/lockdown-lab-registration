@@ -268,3 +268,19 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   structure. To productise: swap logo + copy strings + coach personas per
   vertical, new Supabase project per client. Pitch angle: invite-only
   community app for any coach, not just hoops.
+
+## Athlete Command Center — coach squad drawer (2026-07-21)
+
+- **SHIPPED in admin.html.** Every Squad row got a **📂 Open** button →
+  `#athlete` right-side drawer (Athlete-OS style), loaded via existing
+  `cdetail` (no backend change). Header: name, pos/age/founding, snapshot
+  chips (XP / 🔥streak / sessions / in-today) + action rail (＋Log a session
+  =`attend`, ⭐founding toggle). 7 tabs: Overview (last-5 avg bars +
+  wants-to-work-on + badge chips + reach), Check-ins (energy/conf/mins/focus/
+  note), Mind (shared_mind), Fuel (pills+water), Homework (list + `hw_add`),
+  Scouting (private `intel_add` notes), Comms (DM thread + `cmsg`). Wires the
+  previously-unused intel_add/hw_add/attend actions. Master admin-base.html.
+  Verified E2E (open → 7 tabs render real data, actions fire). NBA-Street vibe.
+- **NEXT (asked, not built):** structured **injuries** (area/severity/status/
+  dates — needs edge + migration) + player **Tip of the Day** card (~5
+  cyclable tips from their metrics + coach homework).
