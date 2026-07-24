@@ -215,6 +215,7 @@ async function playerState(p: any) {
     fuel_today: journal.find((j: any) => j.kind === "fuel" && j.d === today) || null,
     invites, coachq, runs, sessions,
     awards: Array.isArray(p.awards) ? p.awards : [],
+    injuries: Array.isArray(p.injuries) ? p.injuries : [],
     today,
   };
 }
@@ -501,8 +502,31 @@ Deno.serve(async (req) => {
       }
     }
 
-    if (["roster", "cdetail", "intel_add", "hw_add", "attend", "cmsg", "cpost", "invite_approve", "invite_deny", "invite_mint", "answerq", "knock_approve", "knock_deny", "founding_set", "push_sub", "player_edit", "player_delete", "session_add", "session_del", "program_add", "deckreq_add", "deckreq_done", "deckreq_del", "coach_add", "coach_list", "coach_edit", "coach_set_status", "coach_set_perms", "coach_delete", "coach_assign_session", "coach_unassign_session", "coach_code_mint", "coach_code_del", "coach_req_approve", "coach_req_deny", "badge_award", "badge_unaward"].includes(a)) {
+    if (["roster", "cdetail", "intel_add", "hw_add", "attend", "cmsg", "cpost", "invite_approve", "invite_deny", "invite_mint", "answerq", "knock_approve", "knock_deny", "founding_set", "push_sub", "player_edit", "player_delete", "session_add", "session_del", "program_add", "deckreq_add", "deckreq_done", "deckreq_del", "coach_add", "coach_list", "coach_edit", "coach_set_status", "coach_set_perms", "coach_delete", "coach_assign_session", "coach_unassign_session", "coach_code_mint", "coach_code_del", "coach_req_approve", "coach_req_deny", "badge_award", "badge_unaward", "injury_add", "injury_status", "injury_del"].includes(a)) {
       if (String(b.code || "").toUpperCase() !== COACH_CODE) return J({ error: "bad coach code" }, 401);
+
+      if (a === "injury_add" || a === "injury_status" || a === "injury_del") {
+        const p = await getPlayer(b.pid);
+        if (!p) return J({ error: "no player" }, 404);
+        let list = Array.isArray(p.injuries) ? p.injuries.slice() : [];
+        if (a === "injury_add") {
+          const area = priv(b.area, 40);
+          if (area.length < 2) return J({ error: "Which body part?" }, 400);
+          const sev = ["niggle", "moderate", "serious"].includes(b.severity) ? b.severity : "moderate";
+          const st = ["active", "managing", "cleared"].includes(b.status) ? b.status : "managing";
+          const id = "inj_" + Array.from(crypto.getRandomValues(new Uint8Array(5))).map(x => x.toString(16).padStart(2, "0")).join("");
+          list.unshift({ id, area, severity: sev, status: st, note: priv(b.note, 200), date: sydToday() });
+          if (list.length > 30) list = list.slice(0, 30);
+        } else if (a === "injury_status") {
+          const st = ["active", "managing", "cleared"].includes(b.status) ? b.status : null;
+          if (!st) return J({ error: "bad status" }, 400);
+          list = list.map((x: any) => x.id === b.iid ? { ...x, status: st } : x);
+        } else {
+          list = list.filter((x: any) => x.id !== b.iid);
+        }
+        await db(`ll_players?id=eq.${p.id}`, { method: "PATCH", body: JSON.stringify({ injuries: list }) });
+        return J({ ok: true, injuries: list });
+      }
 
       if (a === "badge_award" || a === "badge_unaward") {
         const p = await getPlayer(b.pid);
@@ -695,7 +719,7 @@ Deno.serve(async (req) => {
       if (a === "roster") {
         const cutoff = new Date(Date.now() - BATCH_TTL_MS).toISOString();
         const [players, posts, invites, active, questions, knocks, runs, sessions, deckreqs, creqs] = await Promise.all([
-          db("ll_players?status=eq.active&select=id,name,pos,age,xp,streak,sessions,last_checkin,prefs,founding,contact,awards,created_at&order=created_at.asc"),
+          db("ll_players?status=eq.active&select=id,name,pos,age,xp,streak,sessions,last_checkin,prefs,founding,contact,awards,injuries,created_at&order=created_at.asc"),
           db("ll_posts?select=id,author_name,is_coach,text,likes,created_at&order=created_at.desc&limit=30"),
           db("ll_invites?status=eq.pending&select=id,friend_name,created_at,player:ll_players!ll_invites_player_id_fkey(name)&order=created_at.asc"),
           db(`ll_invites?status=eq.approved&used_by=is.null&code_at=gt.${encodeURIComponent(cutoff)}&select=id,friend_name,code,code_at,created_at,max_uses,use_count,player:ll_players!ll_invites_player_id_fkey(name)&order=code_at.desc&limit=60`),
@@ -765,7 +789,7 @@ Deno.serve(async (req) => {
           db(`ll_homework?player_id=eq.${p.id}&select=id,text,done&order=created_at.desc&limit=10`),
           db(`ll_journal?player_id=eq.${p.id}&share_coach=eq.true&select=kind,d,data,created_at&order=created_at.desc&limit=15`),
         ]);
-        return J({ ok: true, profile: publicProfile(p), contact: p.contact || null, checkins, intel, messages: msgs, homework: hw, awards: Array.isArray(p.awards) ? p.awards : [],
+        return J({ ok: true, profile: publicProfile(p), contact: p.contact || null, checkins, intel, messages: msgs, homework: hw, awards: Array.isArray(p.awards) ? p.awards : [], injuries: Array.isArray(p.injuries) ? p.injuries : [],
           shared_mind: journal.filter((j: any) => j.kind === "mind"),
           fuel: journal.filter((j: any) => j.kind === "fuel").slice(0, 7) });
       }

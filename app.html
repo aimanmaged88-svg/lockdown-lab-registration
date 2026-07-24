@@ -306,6 +306,14 @@ input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;heigh
 .jdlock{font-size:34px;line-height:1;margin-bottom:8px}
 .jdh{font-family:var(--fd);font-size:22px;letter-spacing:1px;text-transform:uppercase;margin-bottom:15px}
 .jdsub{color:var(--muted);font-size:12px;line-height:1.5;margin-top:13px}
+#tipCard{cursor:pointer}
+#tipCard .cl #tipCount{float:right;color:var(--dim);letter-spacing:1px}
+#tipCard .tipk{font-family:var(--fm);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--accent);margin:2px 0 7px}
+#tipCard #tipText{color:var(--text);font-size:14px;line-height:1.5;min-height:42px}
+#tipCard .tipdots{display:flex;gap:5px;justify-content:center;margin-top:13px}
+#tipCard .tipdots i{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.18);transition:all .2s}
+#tipCard .tipdots i.on{background:var(--accent);width:16px;border-radius:99px}
+#tipCard .tiphint{text-align:center;font-family:var(--fm);font-size:8.5px;letter-spacing:1px;text-transform:uppercase;color:var(--dim);margin-top:8px}
 .oss{display:flex;flex-direction:column;gap:8px}
 .ossrow{display:flex;gap:11px;align-items:center;border:1px solid var(--line2);border-radius:14px;padding:10px 12px;background:rgba(255,255,255,.03)}
 .ossrow span{font-size:20px}
@@ -828,6 +836,14 @@ body.rmode *{animation:none!important;transition:none!important}
       </div>
       <div class="xpbar"><i id="xpFill" style="width:0%"></i></div>
       <div class="xplab"><span id="lvlLab">Level 1 · Rookie</span><span id="xpLab">0 XP</span></div>
+
+      <div class="card" id="tipCard" style="margin-top:16px;display:none">
+        <span class="cl">🧠 Tip of the Day <span id="tipCount"></span></span>
+        <div class="tipk" id="tipKick"></div>
+        <p id="tipText"></p>
+        <div class="tipdots" id="tipDots"></div>
+        <div class="tiphint">tap for the next one</div>
+      </div>
 
       <div class="card" id="startCard" style="margin-top:16px;position:relative">
         <span class="tape"></span><span class="tape r"></span>
@@ -1859,6 +1875,32 @@ body.rmode *{animation:none!important;transition:none!important}
   $('#openVault')&&$('#openVault').addEventListener('click',openVault);
   $('#vaultX')&&$('#vaultX').addEventListener('click',()=>$('#vault').classList.remove('on'));
 
+  /* ===== Tip of the Day — up to 5, from what the Lab + coach know ===== */
+  let TIPS=[], TIP_I=0;
+  function buildTips(){
+    if(!PST) return []; const p=PST.profile||{}, out=[], seen=new Set();
+    const push=(k,t)=>{ if(!t) return; const key=String(t).slice(0,44); if(seen.has(key)) return; seen.add(key); out.push({k,t}); };
+    const hw=(PST.homework||[]).filter(h=>!h.done);
+    if(hw.length) push('Coach set you this','“'+hw[0].text+'” — knock it out today. A rep done while it’s fresh sticks.');
+    (PST.ai||[]).forEach(a=>{ if(a&&a[1]) push('The Lab is reading you', a[1]); });
+    if((p.streak||0)>=3) push('Protect the streak','You’re on a '+p.streak+'-day streak. Check in before you sleep — don’t hand it back.');
+    else if(!p.last_checkin||p.last_checkin!==PST.today) push('Start the day right','Log your check-in first. The Lab can’t read a game you don’t report.');
+    if((p.sessions||0)>0) push('Show up','You’ve run '+p.sessions+' session'+(p.sessions>1?'s':'')+'. Every live one is where the real jump happens.');
+    push('The chase','Every check-in, badge and rep banks Lab Bucks toward money off your sessions. Keep stacking.');
+    return out.slice(0,5);
+  }
+  function renderTip(){
+    const card=$('#tipCard'); if(!card) return;
+    TIPS=buildTips(); if(!TIPS.length){ card.style.display='none'; return; }
+    card.style.display='block'; if(TIP_I>=TIPS.length) TIP_I=0;
+    const t=TIPS[TIP_I];
+    $('#tipKick').textContent=t.k; $('#tipText').textContent=t.t;
+    $('#tipCount').textContent=(TIP_I+1)+' / '+TIPS.length;
+    $('#tipDots').innerHTML=TIPS.map((_,i)=>'<i class="'+(i===TIP_I?'on':'')+'"></i>').join('');
+    $('#tipCard .tiphint').style.display=TIPS.length>1?'block':'none';
+  }
+  $('#tipCard')&&$('#tipCard').addEventListener('click',()=>{ if(TIPS.length>1){ TIP_I=(TIP_I+1)%TIPS.length; renderTip(); try{haptic(8);S.tick&&S.tick();}catch(e){} } });
+
   /* first-entry welcome: the why, before the first badge drops */
   function maybeWelcome(){
     if(!sess||sess.type!=='player') return;
@@ -1876,7 +1918,7 @@ body.rmode *{animation:none!important;transition:none!important}
     const p=PST.profile;
     $('#heroName').textContent=p.name+(p.founding?' ⭐':'');
     if(p.founding) $('#hSub').textContent='Founding ⭐';
-    renderRuns(); renderSessList(); renderSessTrailer(); renderStarter(); try{ evalVault(); }catch(e){}
+    renderRuns(); renderSessList(); renderSessTrailer(); renderStarter(); try{ evalVault(); }catch(e){} try{ renderTip(); }catch(e){}
     $('#avInit').textContent=p.name.split(/\s+/).map(w=>w[0]).join('').slice(0,2).toUpperCase();
     countUp($('#stXp'),p.xp); countUp($('#stLogs'),PST.checkins.length); countUp($('#stSess'),p.sessions);
     $('#streakChip').textContent=p.streak;
