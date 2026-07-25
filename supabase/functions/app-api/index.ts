@@ -281,11 +281,20 @@ Deno.serve(async (req) => {
     if (a === "coach_login") {
       const key = String(b.username || "").trim().toLowerCase();
       const pin = String(b.pin || "").trim();
-      if (!key) return J({ error: "Enter your username." }, 400);
+      if (!key) return J({ error: "Enter your username or email." }, 400);
       const rows = await db(`ll_coaches?username=eq.${encodeURIComponent(key)}&select=*`);
       const c = rows?.[0];
-      if (!c || (await coachPinHash(key, pin)) !== c.pin_hash) return J({ error: "Wrong username or PIN." }, 401);
+      if (!c) return J({ error: "Wrong username or PIN." }, 401);
       if (c.status !== "active") return J({ error: "Your coach account is paused. Talk to the admin." }, 403);
+      // Claim-on-first-login: an account seeded without a PIN takes the first PIN entered as its master PIN.
+      if (!c.pin_hash) {
+        if (!/^\d{4}$/.test(pin)) return J({ error: "Set your 4-digit PIN — that becomes your login from now on." }, 400);
+        const newHash = await coachPinHash(c.username, pin);
+        await db(`ll_coaches?id=eq.${c.id}`, { method: "PATCH", body: JSON.stringify({ pin_hash: newHash }) });
+        c.pin_hash = newHash;
+        return J({ ok: true, cid: c.id, coach: publicCoach(c), sessions: await coachSessions(c.id), fresh: true });
+      }
+      if ((await coachPinHash(key, pin)) !== c.pin_hash) return J({ error: "Wrong username or PIN." }, 401);
       return J({ ok: true, cid: c.id, coach: publicCoach(c), sessions: await coachSessions(c.id) });
     }
 
