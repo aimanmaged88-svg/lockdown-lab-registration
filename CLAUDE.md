@@ -248,6 +248,30 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   at the Netlify-hosted /assets/ PNGs (binaries not uploaded — base64-inline
   only, so links instead). ⭐ START HERE doc at master root.
 
+## Aiman's own coach account + mobile coach menu (2026-07-25)
+
+- **Edge fn now v26.** `coach_login` gained a **claim-on-first-login** path: a
+  coach row seeded with an empty `pin_hash` ('') sets its master PIN from the
+  FIRST 4-digit PIN entered at login (returns fresh:true). Login prompt copy →
+  "username or email". Nothing else changed; deploy verified byte-for-byte,
+  VAPID keys re-checked identical.
+- **Aiman seeded as an owner coach** (SQL insert): username =
+  **aimanmaged88@gmail.com** (login uses username match, so his email IS the
+  login), display_name 'Aiman (UNC)', pin_hash '' (awaiting first PIN),
+  status active, ALL 14 permissions true. He logs into coach.html with his
+  email; first PIN he types becomes his. Separate from the admin coach CODE.
+  NOTE: until he claims it, anyone hitting coach_login with that exact email +
+  any 4-digit PIN could claim it — told him to log in soon to lock it.
+- **Coach portal mobile menu redesigned** (coach-base.html): the old fiddly
+  horizontal top strip is replaced by a fixed top bar with a ☰ hamburger →
+  **left slide-out vertical drawer** (`.sb` fixed, translateX(-100%)→0 on
+  `.open`, `#sbScrim` scrim, `drawer()` fn; closes on nav-item or scrim tap).
+  Opaque in BOTH themes (`.sb{background:#0a0a0c}` + `.lightmode .sb{#fff}`
+  inside the media query — the desktop translucent `.lightmode .sb` rule would
+  otherwise make the drawer see-through). Verified mobile E2E via
+  scratchpad/coach-mobile.mjs (temp coach, dark+light, closed/open/after-nav).
+  NEWS id:23. Admin desk mobile still uses its own top strip (not asked yet).
+
 ## Parked ideas (Aiman asked to save these)
 
 - **"A.I. MAN" Instagram post** — saved 2026-07-18, for a few weeks out.
