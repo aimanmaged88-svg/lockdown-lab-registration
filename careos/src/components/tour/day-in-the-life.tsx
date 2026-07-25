@@ -52,7 +52,7 @@ const journeys: Journey[] = [
         href: "/family",
         title: "How was his day — really?",
         pain: "You asked your child questions they couldn't answer, and heard nothing from the workers. Years of wondering.",
-        why: "Wins first, in plain language, updated through the day — photos and moments as they happen, not a report at pickup. Scroll down: it's all here.",
+        why: "Wins first, in plain language, updated through the day — photos and moments as they happen, not a report at pickup, and never silence.",
       },
       {
         href: "/family",
@@ -63,7 +63,7 @@ const journeys: Journey[] = [
       {
         href: "/timeline",
         title: "Nothing gets lost anymore",
-        pain: "His story used to live in strangers' heads — and left every time a worker resigned.",
+        pain: "His story used to live only in workers' heads — and walked out the door with every resignation.",
         why: "Every shift, every win, every setback becomes part of one continuous story that belongs to him.",
       },
       {
@@ -74,7 +74,7 @@ const journeys: Journey[] = [
       },
       {
         href: "/review-ready",
-        title: "Never walk in unarmed again",
+        title: "Never walk in empty-handed again",
         pain: "Funding got cut because you couldn't prove on paper what you live every single day.",
         why: "1,240 evidence items, auto-filed. A language guard stops one careless sentence costing him support.",
       },
@@ -94,7 +94,7 @@ const journeys: Journey[] = [
         href: "/timeline",
         title: "Three years from now",
         pain: "Most families end up with fragments — a few photos, half-remembered advice, restarted folders.",
-        why: "Three years in, this timeline holds thousands of moments: what worked, what changed, who helped. The longer it runs, the better everyone knows your child. That's the promise.",
+        why: "Every year this runs, it will hold thousands more moments — what worked, what changed, who helped. The longer it runs, the better everyone knows your child. That's the promise.",
       },
     ],
   },

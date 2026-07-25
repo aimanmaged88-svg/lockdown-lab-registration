@@ -121,7 +121,7 @@ export const complianceFrameworks: ComplianceFramework[] = [
 ];
 
 export const autoEvidence = [
-  { source: "Shift notes (same-day rate 93%)", becomes: "Service delivery evidence", count: "1,240 this quarter" },
+  { source: "Shift notes (same-day rate 93%)", becomes: "Service delivery evidence", count: "310 this quarter" },
   { source: "Medication sign-offs (double-signed)", becomes: "Safe medication management", count: "312 this quarter" },
   { source: "Incident reports + closures", becomes: "Incident management evidence", count: "14 closed, avg 6.2 days" },
   { source: "Goal progress records", becomes: "Outcomes evidence for plan reviews", count: "165 goals tracked" },

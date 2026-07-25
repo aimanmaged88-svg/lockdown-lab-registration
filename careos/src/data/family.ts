@@ -17,7 +17,7 @@ export const demoFamily = {
  * Access is consent-managed by the guardians and every view is audit-logged.
  */
 export const familyCircle = [
-  { name: "Faraz", relation: "Dad", initials: "FN", access: "Full access", note: "His own login — sees everything shared with family." },
-  { name: "Mum", relation: "Mum", initials: "M", access: "Full access", note: "Her own login — the same truth, independently. No middleman." },
+  { name: "Faraz", relation: "Dad", initials: "F", access: "Full access", note: "His own login — sees everything shared with family." },
+  { name: "Mum", relation: "Mum", initials: "M", access: "Full access", note: "Her own login — the same truth, at the same moment, in her own time." },
   { name: "Grandma", relation: "Grandmother", initials: "G", access: "View-only", note: "Wins and photos only — set by the parents." },
 ];
