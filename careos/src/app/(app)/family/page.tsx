@@ -26,7 +26,7 @@ import { MoodPill } from "@/components/shared/mood-pill";
 import { TrendAreaChart } from "@/components/charts/trend-area-chart";
 import { getParticipant } from "@/data/participants";
 import { getTimeline } from "@/data/timeline";
-import { demoFamily } from "@/data/family";
+import { demoFamily, familyCircle } from "@/data/family";
 import { FarazCorner } from "@/components/family/faraz-corner";
 import { staggerContainer, fadeUp } from "@/lib/motion";
 import { cn } from "@/lib/utils";
@@ -302,6 +302,35 @@ export default function FamilyPortalPage() {
             </Card>
           </div>
         </div>
+      </motion.section>
+
+      {/* Family access — one truth, a private door for every parent */}
+      <motion.section variants={fadeUp} aria-labelledby="family-access-heading">
+        <Card>
+          <CardHeader>
+            <CardTitle id="family-access-heading" className="flex items-center gap-2 text-base">
+              <ShieldCheck className="h-4 w-4 text-primary" aria-hidden="true" />
+              Family access — everyone has their own door
+            </CardTitle>
+            <CardDescription>
+              Together or living apart, each parent has their own private login to the same truth — nobody waits on anybody, and no child ever has to be the messenger. Access is set by the guardians and every view is audit-logged.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid grid-cols-1 gap-3 md:grid-cols-3">
+            {familyCircle.map((m) => (
+              <div key={m.relation} className="flex items-start gap-3 rounded-2xl border bg-background/60 p-3.5">
+                <PersonAvatar initials={m.initials} gradient="from-primary to-secondary" size="sm" />
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="text-sm font-semibold">{m.relation}</p>
+                    <Badge variant={m.access === "Full access" ? "success" : "muted"} className="font-normal">{m.access}</Badge>
+                  </div>
+                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{m.note}</p>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
       </motion.section>
 
       <FarazCorner />

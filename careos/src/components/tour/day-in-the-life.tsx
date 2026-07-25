@@ -20,6 +20,8 @@ import { cn } from "@/lib/utils";
 interface TourStop {
   href: string;
   title: string;
+  /** The pain this screen ends — the "before CareOS" life. Optional. */
+  pain?: string;
   why: string;
 }
 
@@ -35,15 +37,65 @@ interface Journey {
 const journeys: Journey[] = [
   {
     id: "parent",
-    label: "A parent's morning",
+    label: "A parent's story",
     person: "as Faraz — Zayd & Idris's dad",
     role: "parent",
     icon: HeartHandshake,
     stops: [
-      { href: "/family", title: "How was his day, really?", why: "Wins first, in plain language — and “Leila has arrived, 8:26am.” Reassurance without a phone call." },
-      { href: "/timeline", title: "The story, not snapshots", why: "Months of Zayd's progress in one stream. Nothing is lost when a worker changes." },
-      { href: "/budgets", title: "No surprises with the plan", why: "The same budget truth the provider sees — plain language, shortfalls flagged months early." },
-      { href: "/review-ready", title: "Armed for every review", why: "Every day of care is already evidence, and the language guard protects the boys' funding." },
+      {
+        href: "/family",
+        title: "7:52am — is anyone even there?",
+        pain: "You used to wait by the phone, wondering if support had actually shown up today.",
+        why: "“Leila has arrived — 8:26am.” The second support begins, you know. Every day, without asking.",
+      },
+      {
+        href: "/family",
+        title: "How was his day — really?",
+        pain: "You asked your child questions they couldn't answer, and heard nothing from the workers. Years of wondering.",
+        why: "Wins first, in plain language, updated through the day — photos and moments as they happen, not a report at pickup. Scroll down: it's all here.",
+      },
+      {
+        href: "/family",
+        title: "One truth, a door for every parent",
+        pain: "When parents live apart — or things aren't civil — one parent is always out of the loop, and the child becomes the messenger.",
+        why: "See “Family access”: every parent has their own private login to the same truth. Nobody waits on anybody. Nothing is filtered through anyone.",
+      },
+      {
+        href: "/timeline",
+        title: "Nothing gets lost anymore",
+        pain: "His story used to live in strangers' heads — and left every time a worker resigned.",
+        why: "Every shift, every win, every setback becomes part of one continuous story that belongs to him.",
+      },
+      {
+        href: "/budgets",
+        title: "Where did the plan money go?",
+        pain: "Funds ran out mid-plan with no warning, and nobody could tell you where they went.",
+        why: "The same budget truth the provider sees — plain language, live, shortfalls flagged months early with a fix.",
+      },
+      {
+        href: "/review-ready",
+        title: "Never walk in unarmed again",
+        pain: "Funding got cut because you couldn't prove on paper what you live every single day.",
+        why: "1,240 evidence items, auto-filed. A language guard stops one careless sentence costing him support.",
+      },
+      {
+        href: "/learning",
+        title: "Answers at midnight",
+        pain: "2am Googling, alone, hoping a stranger's forum post applied to your child.",
+        why: "Learning built around his diagnosis, his communication, his life — answers from people who actually know.",
+      },
+      {
+        href: "/support-circle",
+        title: "You're not doing this alone",
+        pain: "Every question felt like a battle you had to fight solo.",
+        why: "A circle of qualified people around your child, answering fast — with the office and 000 always one tap away.",
+      },
+      {
+        href: "/timeline",
+        title: "Three years from now",
+        pain: "Most families end up with fragments — a few photos, half-remembered advice, restarted folders.",
+        why: "Three years in, this timeline holds thousands of moments: what worked, what changed, who helped. The longer it runs, the better everyone knows your child. That's the promise.",
+      },
     ],
   },
   {
@@ -188,11 +240,14 @@ export function DayInTheLife() {
                 <X className="h-4 w-4" aria-hidden="true" />
               </button>
             </div>
-            <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground">{stop.why}</p>
+            {stop.pain && (
+              <p className="mt-1.5 text-xs italic leading-relaxed text-muted-foreground/80">{stop.pain}</p>
+            )}
+            <p className={cn("mt-1.5 text-xs leading-relaxed", stop.pain ? "font-medium text-foreground" : "text-muted-foreground")}>{stop.why}</p>
             <div className="mt-3 flex items-center justify-between gap-3">
               <div className="flex items-center gap-1.5" aria-hidden="true">
                 {journey.stops.map((_, i) => (
-                  <span key={i} className={cn("h-1.5 rounded-full transition-all", i === step ? "w-5 bg-primary" : "w-1.5 bg-muted-foreground/25")} />
+                  <span key={i} className={cn("h-1.5 rounded-full transition-all", i === step ? "w-4 bg-primary" : "w-1.5 bg-muted-foreground/25")} />
                 ))}
               </div>
               <button
