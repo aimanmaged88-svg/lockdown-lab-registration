@@ -1,6 +1,7 @@
 import { Sidebar } from "@/components/layout/sidebar";
 import { Topbar } from "@/components/layout/topbar";
 import { MobileTabBar } from "@/components/layout/mobile-tab-bar";
+import { DayInTheLife } from "@/components/tour/day-in-the-life";
 
 /** Authenticated application shell: sidebar, topbar and the content canvas. */
 export default function AppLayout({ children }: { children: React.ReactNode }) {
@@ -15,6 +16,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         </main>
       </div>
       <MobileTabBar />
+      <DayInTheLife />
     </div>
   );
 }

@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { PageHeader } from "@/components/shared/page-header";
 import { StatCard } from "@/components/shared/stat-card";
+import { useToday } from "@/lib/use-today";
 import { PersonAvatar } from "@/components/shared/person-avatar";
 import { MoodPill } from "@/components/shared/mood-pill";
 import { AiBadge } from "@/components/shared/ai-badge";
@@ -44,11 +45,12 @@ export default function DashboardPage() {
     p.riskAlerts.filter((r) => r.level === "important").map((r) => ({ ...r, participant: p }))
   );
   const firstName = definition.demoUser.name.split(" ")[0];
+  const today = useToday();
 
   return (
     <motion.div variants={staggerContainer} initial="initial" animate="animate" className="space-y-8">
       <PageHeader
-        eyebrow="Wednesday 15 July 2026"
+        eyebrow={today}
         title={`Good morning, ${firstName}`}
         description="Five people are counting on the team today. Here's everything you need to make their day a little better."
       >

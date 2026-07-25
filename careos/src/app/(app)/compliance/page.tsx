@@ -16,7 +16,7 @@ export default function CompliancePage() {
   return (
     <motion.div variants={staggerContainer} initial="initial" animate="animate" className="space-y-8">
       <PageHeader
-        eyebrow="Compliance · Sunrise Support Collective"
+        eyebrow="Compliance · Tender Loving Care"
         title="Always audit-ready — because the evidence writes itself"
         description="Worker records, participant files, sites and audit packs in one place. Every shift note, med sign-off and incident closure becomes practice-standard evidence the moment it's saved."
       >

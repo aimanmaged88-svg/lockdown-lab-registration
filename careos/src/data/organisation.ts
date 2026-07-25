@@ -1,10 +1,10 @@
 /**
- * Fictional organisation-level demo data for the Provider and CEO dashboards.
- * "Sunrise Support Collective" is an entirely fictional provider.
+ * Organisation-level demo data for the Provider and CEO dashboards.
+ * Branded for Tender Loving Care; all figures and people are fictional demo data.
  */
 
 export const organisation = {
-  name: "Sunrise Support Collective",
+  name: "Tender Loving Care",
   participants: 86,
   staff: 34,
   activeShiftsNow: 12,

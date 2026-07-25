@@ -21,6 +21,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress";
 import { PageHeader } from "@/components/shared/page-header";
 import { PersonAvatar } from "@/components/shared/person-avatar";
+import { useToday } from "@/lib/use-today";
 import { MoodPill } from "@/components/shared/mood-pill";
 import { TrendAreaChart } from "@/components/charts/trend-area-chart";
 import { getParticipant } from "@/data/participants";
@@ -61,13 +62,14 @@ export default function FamilyPortalPage() {
   const sharedAppointments = child.appointments.filter((a) => a.sharedWithFamily);
   const moodData = child.moodTrend.map((m) => ({ period: m.date.slice(8), value: m.score }));
   const photos = demoPhotos[child.id] ?? [];
+  const today = useToday();
 
   return (
     <motion.div variants={staggerContainer} initial="initial" animate="animate" className="space-y-6">
       <PageHeader
         eyebrow={`Family Portal · ${demoFamily.parentName}`}
         title={`Good evening, ${demoFamily.parentFirstName} — the boys had a good day 💙`}
-        description="Wednesday 15 July · updated 25 minutes ago by the support team"
+        description={`${today} · updated 25 minutes ago by the support team`}
       >
         <Badge variant="success" className="px-3 py-1.5 text-sm">
           <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />

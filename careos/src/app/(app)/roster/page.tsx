@@ -33,7 +33,7 @@ export default function RosterPage() {
   return (
     <motion.div variants={staggerContainer} initial="initial" animate="animate" className="space-y-8">
       <PageHeader
-        eyebrow="Rostering · Week of 13–19 July 2026"
+        eyebrow="Rostering · this week"
         title="Rostering that knows the participant, not just the hours"
         description="Every shift carries the person's goals, alerts and preferred workers. The AI fills gaps with the right match — and blocks award clashes before they reach the roster."
       >

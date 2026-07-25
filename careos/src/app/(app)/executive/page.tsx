@@ -11,6 +11,7 @@ import { OutcomeLinesChart } from "@/components/charts/outcome-lines-chart";
 import { organisation, outcomeSummary, ceoQuestions, familyEngagementSeries } from "@/data/organisation";
 import { participants } from "@/data/participants";
 import { useRole } from "@/providers/role-provider";
+import { useToday } from "@/lib/use-today";
 import { staggerContainer, fadeUp } from "@/lib/motion";
 import { cn } from "@/lib/utils";
 
@@ -26,13 +27,14 @@ const statusConfig = {
  */
 export default function ExecutivePage() {
   const { definition } = useRole();
+  const today = useToday();
   // Greet by given name, skipping honorifics ("Dr. Yasser Zaki" → "Yasser").
   const firstName = definition.demoUser.name.replace(/^(Dr|Prof|Mr|Mrs|Ms)\.?\s+/i, "").split(" ")[0];
 
   return (
     <motion.div variants={staggerContainer} initial="initial" animate="animate" className="space-y-8">
       <PageHeader
-        eyebrow={`Prepared for ${definition.demoUser.name} · ${organisation.name} · Wednesday 15 July 2026`}
+        eyebrow={`Prepared for ${definition.demoUser.name} · ${organisation.name} · ${today}`}
         title={`Good morning, ${firstName}. Are we genuinely improving people's lives?`}
         description="Yes — and here is the evidence, the honest caveats, and the one decision that needs you today."
       >
