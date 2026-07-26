@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CareOS — Study Guide · Learn it on the go</title>
+<style>
+  @page { size: A4; margin: 14mm 12mm; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif; color: #0f1a33; background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-size: 12pt; line-height: 1.55; }
+
+  .cover { padding: 30mm 0 20mm; page-break-after: always; text-align: left; }
+  .cover .brand { font-size: 10pt; letter-spacing: .16em; color: #6b7a99; text-transform: uppercase; margin-bottom: 12px; }
+  .cover h1 { font-size: 40pt; line-height: 1.05; margin: 0 0 14px; letter-spacing: -0.02em; color: #0a1229; }
+  .cover .lede { font-size: 14pt; color: #38466b; margin: 6px 0 24px; line-height: 1.55; max-width: 140mm; }
+  .cover .card { background: linear-gradient(135deg, #4f6bff 0%, #21c7a8 100%); color: #fff; border-radius: 14px; padding: 18px 22px; margin-top: 20px; max-width: 150mm; }
+  .cover .card .lbl { font-size: 9pt; letter-spacing: .12em; text-transform: uppercase; opacity: .9; margin-bottom: 6px; }
+  .cover .card p { margin: 4px 0; font-size: 13pt; line-height: 1.5; }
+  .cover .who { margin-top: 24px; font-size: 11pt; color: #6b7a99; }
+  .cover .who strong { color: #0a1229; }
+
+  h2.section { font-size: 11pt; letter-spacing: .18em; text-transform: uppercase; color: #4f6bff; margin: 40px 0 8px; padding-bottom: 4px; border-bottom: 2px solid #4f6bff; page-break-after: avoid; }
+  h2.section .sub { display: block; font-family: inherit; font-size: 22pt; font-weight: 700; margin-top: 10px; color: #0a1229; letter-spacing: -0.01em; text-transform: none; }
+  h2.section .sub em { font-style: normal; color: #21c7a8; }
+
+  .intro { font-size: 12.5pt; color: #38466b; margin: 8px 0 18px; line-height: 1.6; max-width: 155mm; }
+
+  .feature { break-inside: avoid; page-break-inside: avoid; border-left: 3px solid #4f6bff; padding: 10px 18px 12px; margin: 14px 0; background: #fbfcff; border-radius: 0 8px 8px 0; }
+  .feature .num { font-size: 9.5pt; color: #4f6bff; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; margin-bottom: 4px; }
+  .feature h3 { margin: 0 0 6px; font-size: 15pt; color: #0a1229; letter-spacing: -0.01em; line-height: 1.25; }
+  .feature .pain { font-style: italic; color: #6b7a99; margin: 6px 0 4px; font-size: 11pt; }
+  .feature .pain::before { content: "The pain: "; font-style: normal; color: #b0b8cc; font-weight: 600; font-size: 9.5pt; letter-spacing: .06em; text-transform: uppercase; }
+  .feature .way { color: #1a2a4d; margin: 8px 0 4px; font-size: 12pt; }
+  .feature .way::before { content: "The CareOS way: "; color: #21c7a8; font-weight: 700; font-size: 9.5pt; letter-spacing: .06em; text-transform: uppercase; display: block; margin-bottom: 3px; }
+  .feature .say { background: #fff; border: 1px solid #e2e8f4; border-radius: 6px; padding: 8px 12px; margin-top: 10px; color: #1a2a4d; font-size: 11pt; line-height: 1.5; }
+  .feature .say::before { content: "Say it like this: "; color: #4f6bff; font-weight: 700; font-size: 9.5pt; letter-spacing: .06em; text-transform: uppercase; display: block; margin-bottom: 3px; }
+  .feature.dark { background: linear-gradient(135deg, #0f1a33 0%, #1a2a4d 100%); border-left-color: #21c7a8; color: #e7edfb; }
+  .feature.dark h3 { color: #fff; }
+  .feature.dark .num { color: #8fd3c7; }
+  .feature.dark .pain { color: #a7b7dc; }
+  .feature.dark .pain::before { color: #6f83b3; }
+  .feature.dark .way { color: #d0dcf5; }
+  .feature.dark .way::before { color: #8fd3c7; }
+  .feature.dark .say { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.15); color: #fff; }
+  .feature.dark .say::before { color: #8fd3c7; }
+
+  .callout { background: #fff8ec; border: 1px solid #f5c257; border-radius: 8px; padding: 14px 18px; margin: 18px 0; break-inside: avoid; }
+  .callout .lbl { font-size: 9pt; text-transform: uppercase; letter-spacing: .1em; color: #6b4a00; font-weight: 700; margin-bottom: 6px; }
+  .callout p { margin: 4px 0; color: #4b3100; font-size: 11.5pt; line-height: 1.55; }
+
+  .quote-big { font-size: 16pt; line-height: 1.45; color: #0a1229; padding: 18px 22px; border-left: 4px solid #21c7a8; margin: 18px 0; background: #f0fbf8; border-radius: 0 8px 8px 0; }
+  .quote-big .attrib { display: block; margin-top: 10px; font-size: 10.5pt; color: #6b7a99; font-style: normal; }
+
+  .stats { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 12px 0 18px; break-inside: avoid; }
+  .stat { text-align: center; padding: 14px 8px; border: 1px solid #e2e8f4; border-radius: 10px; background: #fafbfe; }
+  .stat .n { font-size: 22pt; font-weight: 800; color: #4f6bff; letter-spacing: -0.02em; line-height: 1; }
+  .stat .l { font-size: 9pt; text-transform: uppercase; letter-spacing: .08em; color: #6b7a99; margin-top: 6px; font-weight: 600; }
+
+  .moat { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
+  .moat .m { background: #fbfcff; border: 1px solid #e2e8f4; border-radius: 10px; padding: 14px 16px; break-inside: avoid; }
+  .moat .m .t { font-weight: 700; color: #0a1229; font-size: 12pt; margin-bottom: 4px; }
+  .moat .m .d { font-size: 11pt; color: #38466b; line-height: 1.5; }
+
+  .close { page-break-before: always; padding-top: 30mm; text-align: left; }
+  .close .brand { font-size: 10pt; letter-spacing: .16em; color: #6b7a99; text-transform: uppercase; margin-bottom: 12px; }
+  .close h2 { font-size: 30pt; line-height: 1.1; margin: 0 0 14px; letter-spacing: -0.02em; color: #0a1229; border: none; padding: 0; text-transform: none; }
+  .close p { color: #38466b; font-size: 13pt; line-height: 1.6; max-width: 155mm; margin: 8px 0; }
+  .close .lines { margin-top: 20px; }
+  .close .line { font-size: 14pt; color: #0a1229; padding: 10px 16px; border-left: 3px solid #4f6bff; background: #f4f7ff; border-radius: 0 6px 6px 0; margin: 8px 0; line-height: 1.5; font-weight: 500; }
+  .close .footer { margin-top: 30px; padding-top: 12px; border-top: 1px solid #e2e8f4; font-size: 10pt; color: #6b7a99; }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<section class="cover">
+  <div class="brand">CareOS · Study guide · Read on your phone through the day</div>
+  <h1>Everything you built<br>— in the order it matters.</h1>
+  <p class="lede">One platform. 26 connected modules. Three lenses (parent, worker, CEO) onto the same source of truth. This guide is a slow read through the best of it, feature by feature, in the voice you'll use on Monday.</p>
+
+  <div class="card">
+    <div class="lbl">How to use this</div>
+    <p>Scroll top to bottom. Don't try to memorise. Just let each feature sink in. The three most important sections are highlighted in yellow — read those twice.</p>
+  </div>
+
+  <p class="who">Written for <strong>Faraz Normani</strong>, founder · For Monday's meeting with <strong>Dr Yasser Zaki</strong>, Tender Loving Care.</p>
+</section>
+
+
+<!-- THE STORY -->
+<h2 class="section">Chapter 1 · The story
+  <span class="sub">Everything starts with <em>one source of truth</em>.</span>
+</h2>
+
+<p class="intro">The disability sector runs on 5–8 different systems that don't talk. Rostering here. Compliance there. Family portal is an afterthought. Notes live in a folder nobody opens. When somebody leaves, their knowledge walks out the door with them.</p>
+
+<p class="intro">CareOS collapses all of that into <strong>one record</strong> per person, seen through <strong>role-shaped views</strong>. A parent sees wins. A worker sees today's plan. A CEO sees the whole organisation. Same data. Different lens. Every time.</p>
+
+<div class="stats">
+  <div class="stat"><div class="n">26</div><div class="l">Connected modules</div></div>
+  <div class="stat"><div class="n">8</div><div class="l">Role-shaped views</div></div>
+  <div class="stat"><div class="n">1</div><div class="l">Source of truth</div></div>
+</div>
+
+<div class="callout">
+  <div class="lbl">★ Read this twice</div>
+  <p><strong>The one-liner.</strong> CareOS isn't a compliance tool, a rostering tool, or a family portal. It's the platform where <em>a shift note becomes evidence, a photo becomes a family moment, a goal becomes an outcome</em> — automatically, without anyone re-typing anything.</p>
+</div>
+
+
+<!-- FOR PARENTS -->
+<h2 class="section">Chapter 2 · For parents
+  <span class="sub">The emotional core — <em>your</em> lived experience, in software.</span>
+</h2>
+
+<p class="intro">This is the section Yasser will feel the most. It's built from your own life. Nine features. Nine pains you've felt. Speak from that place.</p>
+
+<div class="feature">
+  <div class="num">Feature 01</div>
+  <h3>KnockIn™ Arrivals — the second support begins, you know</h3>
+  <div class="pain">You used to wait by the phone at 7:52am, wondering if support had shown up. Radio silence.</div>
+  <div class="way">Workers tap arrival on entry (geofenced). Parents get an instant confirmation: <em>“Leila arrived — 8:26am.”</em> Every day, without asking.</div>
+  <div class="say">“The moment support begins, the parent knows. Not a phone call. Not a follow-up. A notification, automatically, every day.”</div>
+</div>
+
+<div class="feature">
+  <div class="num">Feature 02</div>
+  <h3>Family Portal — wins, photos, moments as they happen</h3>
+  <div class="pain">You asked your child questions they couldn't answer, and heard nothing from workers. Years of wondering how their day actually went.</div>
+  <div class="way">Wins first, in plain language, updated through the day. Photos and moments as they happen — not a report at pickup, and never silence.</div>
+  <div class="say">“The old model is: your child gets home, you ask them how it went, they can't tell you. New model: you already know. You saw the photo at 11am.”</div>
+</div>
+
+<div class="feature">
+  <div class="num">Feature 03</div>
+  <h3>Family Access — every parent has their own door</h3>
+  <div class="pain">When parents live apart — or things aren't civil — one parent is always out of the loop. The child becomes the messenger.</div>
+  <div class="way">Every parent has their own private login to the same truth. Nobody waits on anybody. Nothing filtered through anyone. Grandparents get view-only windows. All audit-logged, all consent-managed.</div>
+  <div class="say">“Every family member has their own door to the same truth. No middleman. No child as messenger. That's a first in this sector.”</div>
+</div>
+
+<div class="feature">
+  <div class="num">Feature 04</div>
+  <h3>Timeline — nothing gets lost anymore</h3>
+  <div class="pain">Your child's story used to live only in workers' heads — and walked out the door with every resignation.</div>
+  <div class="way">Every shift, every win, every setback becomes part of one continuous story that belongs to the person. Years-long timeline that any authorised worker can pick up.</div>
+  <div class="say">“Turnover in this sector is 30%+. When a worker leaves, their knowledge shouldn't leave with them. It belongs to the person they cared for.”</div>
+</div>
+
+<div class="feature">
+  <div class="num">Feature 05</div>
+  <h3>Budget Guardian — where did the plan money go?</h3>
+  <div class="pain">Funds ran out mid-plan with no warning, and nobody could tell you where they went.</div>
+  <div class="way">Same budget truth the provider sees — plain language, live, shortfalls flagged months early with a fix.</div>
+  <div class="say">“Parents don't need dashboards. They need to know if the money's running out — and someone to tell them what to do about it.”</div>
+</div>
+
+<div class="feature">
+  <div class="num">Feature 06</div>
+  <h3>Review Ready — never walk in empty-handed</h3>
+  <div class="pain">Funding got cut because you couldn't prove on paper what you live every single day.</div>
+  <div class="way">1,240 evidence items auto-filed per plan. A language guard stops one careless sentence costing a family their support.</div>
+  <div class="say">“Every parent going to a plan review is terrified they'll lose funding. This platform walks in with them.”</div>
+</div>
+
+<div class="feature">
+  <div class="num">Feature 07</div>
+  <h3>Learning Hub — answers at midnight</h3>
+  <div class="pain">2am Googling, alone, hoping a stranger's forum post applied to your child.</div>
+  <div class="way">Learning built around the specific diagnosis, communication style, and life stage — vetted answers from people who actually know.</div>
+</div>
+
+<div class="feature">
+  <div class="num">Feature 08</div>
+  <h3>Support Circle — you're not doing this alone</h3>
+  <div class="pain">Every question felt like a battle you had to fight solo.</div>
+  <div class="way">A circle of qualified people around the person, answering fast. Office and 000 always one tap away.</div>
+</div>
+
+<div class="feature dark">
+  <div class="num">Feature 09 · The Promise</div>
+  <h3>Three years from now — the compounding value</h3>
+  <div class="pain">Most families end up with fragments — a few photos, half-remembered advice, restarted folders.</div>
+  <div class="way">Every year this runs, it holds thousands more moments — what worked, what changed, who helped. The longer it runs, the better everyone knows the person. That's the promise.</div>
+  <div class="say">“Software gets more valuable with time. Your child's care record should too. That's what compounding value looks like in disability support.”</div>
+</div>
+
+
+<!-- FOR WORKERS -->
+<h2 class="section">Chapter 3 · For workers
+  <span class="sub">Their day, made easier — <em>and</em> their voice, heard.</span>
+</h2>
+
+<p class="intro">The turnover crisis in this sector is real. CareOS gives workers a calmer day <em>and</em> a way for families' thank-yous to reach them. Both matter. Retention is the other half of quality care.</p>
+
+<div class="feature">
+  <div class="num">Feature 10</div>
+  <h3>Today's Shift — the two-minute briefing</h3>
+  <div class="pain">Workers walked in blind. First 15 minutes of every shift wasted catching up.</div>
+  <div class="way">Goals, recent notes, red flags — prepared, not blind. Notes are spoken (dictated), not typed.</div>
+  <div class="say">“A support worker's first two minutes shouldn't be reading a folder. It should be walking through the door already knowing.”</div>
+</div>
+
+<div class="feature">
+  <div class="num">Feature 11</div>
+  <h3>Smart Availability — say when you can work</h3>
+  <div class="pain">Rosters made without asking. Workers pushed shifts they couldn't do. Constant back-and-forth.</div>
+  <div class="way">Workers submit availability in the window; the AI fills open shifts while protecting permanent-to-participant pairings before flexing casuals.</div>
+  <div class="say">“The AI never breaks a permanent placement to fill a hole. It protects continuity first, always.”</div>
+</div>
+
+<div class="feature">
+  <div class="num">Feature 12</div>
+  <h3>Time & Pay — get paid right, every time</h3>
+  <div class="pain">Timesheet disputes. Missing hours. Awards misapplied.</div>
+  <div class="way">Shifts become timesheets become pay runs — with the SCHADS award baked in. Every kilometre, every allowance, on the record.</div>
+</div>
+
+<div class="feature">
+  <div class="num">Feature 13</div>
+  <h3>Care DNA Matching — the right person, not just an available one</h3>
+  <div class="pain">Rostering by who's free, not who's right. Bad matches burn workers and families out.</div>
+  <div class="way">Care DNA profiles for participants (interests, communication, sensory needs) matched to worker skills, background, style. The right pairing, first time.</div>
+</div>
+
+
+<!-- FOR THE ORG -->
+<h2 class="section">Chapter 4 · For the CEO
+  <span class="sub">Answer one honest question: <em>are we improving lives?</em></span>
+</h2>
+
+<p class="intro">This is Yasser's chapter. He runs 8 countries and 1,100+ staff. He needs to sleep at night knowing the compliance is real, the incidents are handled, and the people aren't burning out.</p>
+
+<div class="feature">
+  <div class="num">Feature 14</div>
+  <h3>Executive Dashboard — from live data, not anecdotes</h3>
+  <div class="pain">CEOs get filtered reports. Numbers massaged. Bad news arrives late.</div>
+  <div class="way">One honest question — are we improving people's lives — answered from live data, not slides prepared for the board.</div>
+  <div class="say">“The CEO sees the truth at the same moment the coordinator does. There's no reporting delay. There's no filter.”</div>
+</div>
+
+<div class="feature">
+  <div class="num">Feature 15</div>
+  <h3>Compliance — audit-ready today (96%)</h3>
+  <div class="pain">Audits are a fire-drill. Weeks of prep. Weekends lost. Staff pulled off frontline work.</div>
+  <div class="way">Audit readiness is <em>live</em> because evidence is a by-product of care. Shift notes, med sign-offs, incident closures — all auto-file against the Practice Standards.</div>
+  <div class="say">“Compliance is a by-product of care. Not a night-before scramble. Not a folder somebody rebuilds every year.”</div>
+</div>
+
+<div class="feature">
+  <div class="num">Feature 16</div>
+  <h3>Incidents — the 24-hour clock, visible and escalating</h3>
+  <div class="pain">Reportable incidents missed the 24-hour NDIS Commission window. Consequences.</div>
+  <div class="way">The Commission clock is visible from the moment an incident is logged. Notifications draft themselves. Escalation is automatic.</div>
+</div>
+
+<div class="feature">
+  <div class="num">Feature 17</div>
+  <h3>Wellbeing / Team Pulse — keep the people</h3>
+  <div class="pain">Burnout is invisible until someone quits. Sector turnover is over 30%.</div>
+  <div class="way">Burnout radar from roster data. Families' thank-yous reach workers directly. People and culture, protected.</div>
+  <div class="say">“Retention is care quality. The people who leave don't come back. Protecting them is protecting the participant.”</div>
+</div>
+
+<div class="feature">
+  <div class="num">Feature 18</div>
+  <h3>Homes & Sites — SIL/SDA that actually tracks</h3>
+  <div class="pain">Provider-managed properties (SIL houses) are usually spreadsheets and hope.</div>
+  <div class="way">Every home is a first-class record — residents, workers, incidents, per-home audit readiness. Auditor packs generated with one click.</div>
+</div>
+
+<div class="feature">
+  <div class="num">Feature 19</div>
+  <h3>Communications Hub — one inbox, AI receptionist 24/7</h3>
+  <div class="pain">SMS lives on somebody's phone. Voicemails miss for days. Emails buried.</div>
+  <div class="way">Unified SMS, call, email, chat — tied to the person's record. AI receptionist answers 24/7, transcribes, extracts action items, drafts replies for human approval.</div>
+  <div class="say">“The AI never sends a reply on its own. It drafts. Humans approve. That's the rule.”</div>
+</div>
+
+
+<!-- THE AI PRINCIPLE -->
+<h2 class="section">Chapter 5 · The AI principle
+  <span class="sub">Every AI feature serves <em>one rule</em>.</span>
+</h2>
+
+<div class="quote-big">
+  “Remove the thing the human shouldn't be doing. Not the human decision — the admin.”
+  <span class="attrib">— The rule every AI feature in CareOS follows.</span>
+</div>
+
+<p class="intro">The AI in CareOS never makes a care decision. It fills spreadsheets after humans set preferences. It drafts a compliance notification after a human logs the incident. It transcribes a call so the coordinator can approve the follow-up. Humans decide. AI removes the typing.</p>
+
+<div class="callout">
+  <div class="lbl">★ Read this twice</div>
+  <p><strong>Why this matters for enterprise NDIS.</strong> Every provider is nervous about AI in vulnerable-person contexts. CareOS's line is clear and defensible: AI drafts, humans approve. Every AI output is human-reviewed before it becomes part of a record. There is no autonomous AI in the care loop. That's a bright line — and it's the right one.</p>
+</div>
+
+
+<!-- THE MOAT -->
+<h2 class="section">Chapter 6 · The moat
+  <span class="sub">Why nobody else can copy this quickly.</span>
+</h2>
+
+<p class="intro">Yasser will ask: “what's stopping [any competitor] from building this?” Here's the honest answer.</p>
+
+<div class="moat">
+  <div class="m">
+    <div class="t">1. Lived experience</div>
+    <div class="d">The tour is built from real family pain. Nobody at Lumary, Brevity, or ShiftCare has felt the 2am Google spiral. That authenticity shows in every screen.</div>
+  </div>
+  <div class="m">
+    <div class="t">2. Architectural bet</div>
+    <div class="d">Every competitor is bolted-together modules. CareOS was built on <em>one source of truth</em> from day one. Rebuilding on that foundation costs years of engineering.</div>
+  </div>
+  <div class="m">
+    <div class="t">3. Family-first design</div>
+    <div class="d">Sector software treats families as an afterthought. CareOS treats them as first-class users with their own doors. Retrofitting that is culture, not code.</div>
+  </div>
+  <div class="m">
+    <div class="t">4. AI principle discipline</div>
+    <div class="d">“AI drafts, humans approve.” Every feature. Every time. Competitors will chase autonomous AI and get burned. CareOS won't.</div>
+  </div>
+  <div class="m">
+    <div class="t">5. Breadth × depth</div>
+    <div class="d">26 modules, all real, all integrated. Nobody adds 26 modules in 12 months. And nobody rebuilds them into one platform in less than three years.</div>
+  </div>
+  <div class="m">
+    <div class="t">6. The compounding record</div>
+    <div class="d">Every year of care makes the record more valuable. Providers who start now win in three years. Providers who switch later never catch up.</div>
+  </div>
+</div>
+
+
+<!-- CLOSING -->
+<section class="close">
+  <div class="brand">CareOS · Study guide · The close</div>
+  <h2>You built this. Own it.</h2>
+
+  <p>Every screen you'll show on Monday started with a pain you've lived, a question you've asked, a moment you wanted for your family. That's not marketing. That's the truth.</p>
+
+  <p>You don't need to remember every feature. You don't need to memorise every number. You need to remember <strong>why you built each one</strong> — because you were there.</p>
+
+  <p>When you get stuck tomorrow, come back to these four lines. They are the whole pitch.</p>
+
+  <div class="lines">
+    <div class="line">“I built this from lived experience. My son has autism. I've been the parent waiting by the phone. Every screen answers a pain I've felt.”</div>
+    <div class="line">“It's one platform where a shift note becomes evidence, a photo becomes a family moment, a goal becomes an outcome. Same entry, used everywhere.”</div>
+    <div class="line">“The AI drafts. Humans approve. That's the rule. No autonomous AI in the care loop, ever.”</div>
+    <div class="line">“I'm not asking you to buy a licence. I'm asking you to be a design partner. You have the scale. I have the lived experience. Together we build the reference case.”</div>
+  </div>
+
+  <div class="footer">
+    CareOS · For Faraz · Read this through the day · Go into Monday knowing exactly why every screen exists.
+  </div>
+</section>
+
+</body>
+</html>
