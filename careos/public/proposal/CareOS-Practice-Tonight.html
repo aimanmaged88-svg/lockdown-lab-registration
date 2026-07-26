@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>CareOS — Practice Tonight</title>
+<style>
+  @page { size: A4; margin: 18mm 16mm; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif; color: #0f1a33; background: #fff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { font-size: 10.5pt; line-height: 1.45; }
+  .brand { font-size: 9pt; color: #6b7a99; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 4px; }
+  h1 { font-size: 20pt; margin: 0 0 4px; letter-spacing: -0.01em; }
+  h1 .sub { display: block; font-size: 11pt; color: #6b7a99; font-weight: 500; margin-top: 4px; letter-spacing: 0; }
+  h2 { font-size: 12pt; margin: 16px 0 6px; color: #0f1a33; padding-bottom: 4px; border-bottom: 1px solid #e2e8f4; }
+  h3 { font-size: 10.5pt; margin: 10px 0 3px; color: #1a2a4d; }
+  p { margin: 4px 0; }
+  .lead { color: #38466b; font-size: 11pt; margin: 6px 0 14px; }
+  ol.steps { padding-left: 0; list-style: none; counter-reset: step; margin: 0; }
+  ol.steps li { counter-increment: step; position: relative; padding: 10px 0 10px 44px; border-top: 1px solid #eef1f8; }
+  ol.steps li:first-child { border-top: none; }
+  ol.steps li::before { content: counter(step); position: absolute; left: 0; top: 10px; width: 30px; height: 30px; border-radius: 50%; background: linear-gradient(135deg, #4f6bff 0%, #21c7a8 100%); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 12pt; }
+  ol.steps li .head { font-weight: 700; font-size: 11pt; color: #0f1a33; }
+  ol.steps li .meta { color: #6b7a99; font-size: 9.5pt; margin-left: 8px; font-weight: 500; }
+  ol.steps li .body { color: #38466b; margin-top: 4px; font-size: 10pt; line-height: 1.5; }
+  ol.steps li .body code { background: #f2f5fb; padding: 1px 6px; border-radius: 4px; font-size: 9.5pt; }
+  .callout { background: #f4f7ff; border-left: 3px solid #4f6bff; padding: 10px 14px; margin: 12px 0; border-radius: 4px; }
+  .callout .lbl { font-size: 8.5pt; text-transform: uppercase; letter-spacing: .08em; color: #4f6bff; font-weight: 700; margin-bottom: 3px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 10px 0; }
+  .card { border: 1px solid #e2e8f4; border-radius: 8px; padding: 10px 12px; background: #fafbfe; }
+  .card .lbl { font-size: 8.5pt; text-transform: uppercase; letter-spacing: .08em; color: #6b7a99; font-weight: 700; margin-bottom: 3px; }
+  .card .val { font-weight: 700; font-size: 11pt; color: #0f1a33; }
+  .card .sub { font-size: 9.5pt; color: #6b7a99; margin-top: 2px; }
+  .quote { border-left: 3px solid #21c7a8; padding: 6px 12px; margin: 8px 0; color: #1a2a4d; font-style: italic; background: #f0fbf8; border-radius: 4px; }
+  .kpi { display: flex; gap: 14px; margin: 10px 0 6px; }
+  .kpi .k { flex: 1; text-align: center; padding: 8px 6px; border-radius: 8px; background: #f4f7ff; border: 1px solid #e2e8f4; }
+  .kpi .k .n { font-size: 16pt; font-weight: 700; color: #4f6bff; }
+  .kpi .k .l { font-size: 8.5pt; color: #6b7a99; text-transform: uppercase; letter-spacing: .06em; margin-top: 2px; }
+  .footer { margin-top: 14px; padding-top: 8px; border-top: 1px solid #e2e8f4; font-size: 8.5pt; color: #6b7a99; display: flex; justify-content: space-between; }
+  .badge { display: inline-block; font-size: 8pt; padding: 2px 8px; background: #21c7a8; color: #fff; border-radius: 10px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; vertical-align: middle; margin-left: 6px; }
+  .warmline { color: #38466b; font-size: 10pt; margin: 6px 0 0; }
+  ul.check { list-style: none; padding: 0; margin: 4px 0; }
+  ul.check li { padding: 3px 0 3px 22px; position: relative; color: #1a2a4d; }
+  ul.check li::before { content: "✓"; position: absolute; left: 0; top: 3px; color: #21c7a8; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<div class="brand">CareOS · For Faraz · Practice tonight, present tomorrow</div>
+<h1>Practice Tonight
+  <span class="sub">A one-hour walk-through you can do at the kitchen table. Everything you need. Nothing you don't.</span>
+</h1>
+
+<div class="callout">
+  <div class="lbl">The whole point</div>
+  You built this from lived experience — autism in your family, NDIS as a parent, business and customer sense.
+  You are not selling security infrastructure. You are selling a way of working that would have changed your family's life.
+  <strong>Stay in your lane. That's where your power is.</strong>
+</div>
+
+<h2>Tonight's plan · 60 minutes</h2>
+
+<ol class="steps">
+
+<li>
+  <span class="head">Open the folder & the demo</span><span class="meta">5 min</span>
+  <div class="body">
+    Open the Drive folder in one tab. Open <code>careos-demo.netlify.app</code> in another.
+    Password: <code>TenderLovingCare2026!</code>.
+    Enter it once. Stays unlocked for the whole evening.
+  </div>
+</li>
+
+<li>
+  <span class="head">Watch the 100-second film</span><span class="meta">3 min</span>
+  <div class="body">
+    Open <strong>Backup Walkthrough Film</strong> from the folder (or go to <code>careos-demo.netlify.app/proposal/watch.html</code>).
+    This is exactly what Yasser will see. Watch it once. Notice the pacing. Notice how the coach cards read themselves.
+  </div>
+</li>
+
+<li>
+  <span class="head">Take the parent tour yourself</span><span class="meta">10 min</span>
+  <div class="body">
+    Back on the live demo. Bottom-right corner: click <strong>“A Day in the Life”</strong>.
+    Pick <strong>“A parent's story”</strong>. Click through all 9 stops. Read each card out loud.
+    <div class="quote">These are your pains. You've lived every one of them. Say them like you mean them — because you do.</div>
+  </div>
+</li>
+
+<li>
+  <span class="head">Take the worker & CEO tours</span><span class="meta">6 min</span>
+  <div class="body">
+    After parent journey completes, tap <strong>“Next: A worker's shift”</strong> (4 stops).
+    Then <strong>“Next: Your view”</strong> (4 stops — the CEO lens).
+    Same product. Three truths. That's the story.
+  </div>
+</li>
+
+<li>
+  <span class="head">Read the Session Plan v2</span><span class="meta">12 min</span>
+  <div class="body">
+    Open <strong>SESSION PLAN — FINAL v2</strong>. This is your script.
+    Follow the run-of-show: 0–15 teach · 15–24 hands-on · 24–35 capabilities · 35+ ask.
+    Skim the pre-flight checklist. Read the objection cards.
+  </div>
+</li>
+
+<li>
+  <span class="head">Read the FAQ + Security Card</span><span class="meta">8 min</span>
+  <div class="body">
+    Open <strong>FAQ + Security Card</strong> (also in the folder).
+    Focus on the <em>must-know 5</em> and the one security line.
+    Say the security line out loud three times. Own it.
+  </div>
+</li>
+
+<li>
+  <span class="head">Skim the deck</span><span class="meta">10 min</span>
+  <div class="body">
+    Open <strong>01 — Board Presentation</strong>. Click through the 25 slides in Presenter view.
+    Read the speaker notes on the bottom of each slide. Don't memorise — just get familiar.
+  </div>
+</li>
+
+<li>
+  <span class="head">One dry run — start to finish</span><span class="meta">6 min</span>
+  <div class="body">
+    Deck open. Demo open. Timer on your phone.
+    Do slide 1 to slide 12, hand off to the tour, one journey (parent), back to slide 13.
+    Don't do the whole thing. Just prove to yourself the transitions work.
+    <div class="quote">If you get to the end and it felt smooth — you're ready. Sleep on it.</div>
+  </div>
+</li>
+
+</ol>
+
+<h2>How to present tomorrow · the shape</h2>
+
+<div class="kpi">
+  <div class="k"><div class="n">15m</div><div class="l">Teach</div></div>
+  <div class="k"><div class="n">9m</div><div class="l">Hands-on</div></div>
+  <div class="k"><div class="n">11m</div><div class="l">Capabilities</div></div>
+  <div class="k"><div class="n">5m</div><div class="l">Ask</div></div>
+  <div class="k"><div class="n">Q&amp;A</div><div class="l">Open</div></div>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <div class="lbl">0:00 – 0:15 · Teach</div>
+    <div class="val">Slides 1–11</div>
+    <div class="sub">Reality of NDIS · the idea · why it matters. He listens.</div>
+  </div>
+  <div class="card">
+    <div class="lbl">0:15 – 0:24 · Hands-on</div>
+    <div class="val">Tour · 3 journeys</div>
+    <div class="sub">Slide 12: “Let's make it real.” Point to the button. Parent · Worker · CEO.</div>
+  </div>
+  <div class="card">
+    <div class="lbl">0:24 – 0:35 · Capabilities</div>
+    <div class="val">Slides 13–22</div>
+    <div class="sub">Pick 3–4 modules — family access, compliance, shift AI, homes. Show breadth.</div>
+  </div>
+  <div class="card">
+    <div class="lbl">0:35 – 0:40 · Ask</div>
+    <div class="val">Slides 23–25</div>
+    <div class="sub">Partnership, not a sale. Design partner. Next steps.</div>
+  </div>
+</div>
+
+<h2>Say these lines with your chest</h2>
+
+<div class="quote">“I built this from lived experience. My son has autism. I've been the parent waiting by the phone. Every screen you're about to see answers a pain I've felt.”</div>
+
+<div class="quote">“It's not a compliance tool. It's not a rostering tool. It's one platform where a shift note becomes evidence, a photo becomes a family moment, a goal becomes an outcome.”</div>
+
+<div class="quote">“I'm not a security expert, and I won't pretend to be. Security is the next hire. If we go forward, we co-design that with your IT team — that's what a design partner should shape.”</div>
+
+<div class="quote">“I'm not asking you to buy a licence. I'm asking you to be a design partner. You have the scale. I have the lived experience. Together we build the reference case.”</div>
+
+<h2>Before you leave the house</h2>
+
+<ul class="check">
+  <li>Laptop charged. Backup charger in the bag.</li>
+  <li>Demo open in one tab. Password entered. Deck open in another tab.</li>
+  <li>Hotspot on your phone in case of Wi-Fi issues.</li>
+  <li>Water. Breath mints. Something small to eat before you go in.</li>
+  <li>Executive Brief printed (1 page) — hand him a physical copy at the end.</li>
+</ul>
+
+<div class="footer">
+  <span>CareOS · For the meeting with Dr Yasser Zaki, Tender Loving Care</span>
+  <span>Monday · 1:00pm</span>
+</div>
+
+</body>
+</html>
