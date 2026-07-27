@@ -156,7 +156,7 @@ export default function ProposalKitPage() {
             </Link>
           </div>
           <p className="mt-3 text-xs text-white/85">
-            Password: <code className="rounded bg-white/20 px-2 py-0.5 font-mono">TenderLovingCare2026!</code>
+            Password: <code className="rounded bg-white/20 px-2 py-0.5 font-mono">TLC2026</code>
           </p>
         </section>
 
