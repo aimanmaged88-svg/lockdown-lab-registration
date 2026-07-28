@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0A0C0F">
-<title>OpenCourt — Sydney's open run</title>
+<title>Hoops Haven — Sydney's open run</title>
 <meta name="description" content="Find a run. Tap in. Pull up. Pickup basketball across 971 Sydney courts — open to everyone.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%23D8FF3E'/%3E%3Cpath d='M32 4v56M4 32h56M11 11c12 10 30 10 42 0M11 53c12-10 30-10 42 0' stroke='%230A0C0F' stroke-width='4' fill='none'/%3E%3C/svg%3E">
 <style>
@@ -219,7 +219,7 @@ header{
 <div class="wrap">
 
   <header>
-    <div class="logo" id="logoBtn"><b>OPEN</b><span>COURT</span><small>SYDNEY'S OPEN RUN</small></div>
+    <div class="logo" id="logoBtn"><b>HOOPS</b><span>HAVEN</span><small>SYDNEY'S OPEN RUN</small></div>
     <div class="me" id="meChip"><div class="av" id="meAv">?</div><b id="meName">Who are you?</b></div>
   </header>
 
@@ -238,7 +238,7 @@ header{
   </div>
 
   <div class="foot">
-    <b>OPENCOURT</b> · built in Sydney · court data © OpenStreetMap contributors<br>
+    <b>HOOPS HAVEN</b> · built in Sydney · court data © OpenStreetMap contributors<br>
     Runs are player-called. Pull up, play hard, look after each other.
   </div>
 </div>
@@ -321,7 +321,7 @@ header{
 
 <script>
 'use strict';
-/* ================= OPENCOURT v1 ================= */
+/* ================= HOOPS HAVEN v1 (codename OpenCourt) ================= */
 const API='https://ymuwuhvqqftgpxwhzoub.supabase.co/functions/v1/opencourt-api';
 // Public anon key — safe in the browser; tables are RLS-locked, all writes go through the edge fn.
 const ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltdXd1aHZxcWZ0Z3B4d2h6b3ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NjUyMzgsImV4cCI6MjA5OTI0MTIzOH0.sOkWQpulWj_ZSqMNSV7YP55T70UFSm2mP5e5xapQyQo';
@@ -360,7 +360,7 @@ $('#pfSave').onclick=()=>{
   if(!name){toast('Put a name on it',1);return}
   OCP={id:(OCP&&OCP.id)||crypto.randomUUID(),name,ig};
   localStorage.setItem('oc_profile',JSON.stringify(OCP));
-  paintMe(); closeSheet('shProfile'); toast('Locked in. Welcome to OpenCourt 🏀');
+  paintMe(); closeSheet('shProfile'); toast('Locked in. Welcome to Hoops Haven 🏀');
   if(afterProfile){const f=afterProfile;afterProfile=null;f();}
 };
 
@@ -464,7 +464,7 @@ function syncRun(){const i=RUNS.findIndex(x=>x.id===CUR.id);if(i>-1)RUNS[i]=CUR;
 $('#rShare').onclick=async()=>{
   const r=CUR,url=location.origin+location.pathname+'?run='+r.id;
   const text=`🏀 ${r.format} at ${r.court_name}${r.suburb?' ('+r.suburb+')':''} — ${dayLabel(runYmd(r))} ${runTime(r)}. Tap in:`;
-  if(navigator.share){try{await navigator.share({title:'OpenCourt run',text,url})}catch(e){}}
+  if(navigator.share){try{await navigator.share({title:'Hoops Haven run',text,url})}catch(e){}}
   else{await navigator.clipboard.writeText(text+' '+url);toast('Link copied — send it to the group chat');}
 };
 $('#rMaps').onclick=()=>{const r=CUR;window.open(`https://www.google.com/maps/dir/?api=1&destination=${r.lat},${r.lon}`,'_blank')};
