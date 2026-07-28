@@ -54,7 +54,9 @@ h2{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#5D666E;font
 </div>
 
 <div id="desk" style="display:none">
-  <h2>⏳ Waiting on verification</h2>
+  <h2>📨 Inbox — verification requests</h2>
+  <div id="inbox"></div>
+  <h2>⏳ Not verified yet</h2>
   <div id="pending"></div>
   <h2>Everyone</h2>
   <div id="all"></div>
@@ -111,8 +113,20 @@ async function load(){
   try{
     const d=await api({action:'admin_players'});
     const ps=d.players||[];
-    const pending=ps.filter(p=>!p.verified&&!p.banned);
-    $('#pending').innerHTML=pending.length?pending.map(p=>row(p,true)).join(''):'<div class="empty">Nobody waiting. All quiet.</div>';
+    const inbox=d.inbox||[];
+    $('#inbox').innerHTML=inbox.length?inbox.map(m=>`
+      <div class="row pending"><div class="who">
+        <b>${esc(m.name)} <span class="tag p">WANTS ✓</span></b>
+        ${m.ig?`<a href="https://instagram.com/${esc(m.ig)}" target="_blank" rel="noopener">@${esc(m.ig)} ↗ — check the profile is real</a>`:`<span>${esc(m.email)}</span>`}
+        ${m.text?`<span style="display:block;font-style:italic;margin-top:3px">“${esc(m.text)}”</span>`:''}
+      </div>
+      <button class="btn btn-v" data-verify="${esc(m.player_id)}">✓ Verify</button>
+      <button class="btn btn-g" data-dismiss="${esc(m.player_id)}">Dismiss</button>
+      <button class="btn btn-r" data-ban="${esc(m.player_id)}">Ban</button></div>`).join('')
+      :'<div class="empty">No requests waiting. All quiet.</div>';
+    const reqIds=new Set(inbox.map(m=>m.player_id));
+    const pending=ps.filter(p=>!p.verified&&!p.banned&&!reqIds.has(p.id));
+    $('#pending').innerHTML=pending.length?pending.map(p=>row(p,true)).join(''):'<div class="empty">Nobody else waiting.</div>';
     $('#all').innerHTML=ps.length?ps.map(p=>row(p,false)).join(''):'<div class="empty">No players yet.</div>';
     document.querySelectorAll('[data-verify]').forEach(b=>b.onclick=()=>act({action:'admin_verify',pid:b.dataset.verify},'Verified ✓ — they get full access'));
     document.querySelectorAll('[data-unverify]').forEach(b=>b.onclick=()=>act({action:'admin_verify',pid:b.dataset.unverify,on:false},'Verification removed'));
@@ -121,6 +135,7 @@ async function load(){
       act({action:'admin_ban',pid:b.dataset.ban,reason:'desk ban'},'Banned. Handle, email and device blocked.');
     });
     document.querySelectorAll('[data-unban]').forEach(b=>b.onclick=()=>act({action:'admin_ban',pid:b.dataset.unban,on:false},'Unbanned — they\'re back'));
+    document.querySelectorAll('[data-dismiss]').forEach(b=>b.onclick=()=>act({action:'admin_inbox_done',pid:b.dataset.dismiss},'Request dismissed'));
   }catch(e){toast(e.message,1)}
 }
 async function act(body,msg){

@@ -446,21 +446,33 @@ function paintVf(){
     el.innerHTML='<div style="font-weight:800;color:#4DE8A8">✓ Verified account</div><div style="font-size:12.5px;color:var(--muted);margin-top:4px">Your name carries the ✓ everywhere. Full access — call runs, post clips.</div>';
     return;
   }
-  const way=OCP.ig
-    ?`DM this code to <b style="color:var(--volt)">@${VERIFY_IG}</b> on Instagram — <b>from @${esc(OCP.ig)}</b> so we know it's really you`
-    :`email this code to <b style="color:var(--volt)">${VERIFY_EMAIL}</b> — <b>from ${esc(OCP.email||'your sign-up email')}</b>`;
+  if(OCP.req){
+    el.innerHTML=`<div style="font-weight:800;color:#FFD24D">📨 Verification request sent</div>
+      <div style="font-size:12.5px;color:var(--muted);margin:6px 0 10px">The desk has it — you'll get your ✓ once they check you out. Want it faster? DM your code <b style="color:var(--volt)">${esc(OCP.code||'')}</b> to <b style="color:var(--volt)">@${VERIFY_IG}</b> from @${esc(OCP.ig||'your handle')} as extra proof.</div>
+      <button class="btn btn-ghost btn-block" id="vfCheck">Check my status</button>`;
+    $('#vfCheck').onclick=async()=>{const b=$('#vfCheck');b.disabled=true;b.textContent='Checking…';await refreshMe(true);};
+    return;
+  }
   el.innerHTML=`<div style="font-weight:800">⏳ Verify your account</div>
-    <div style="font-size:12.5px;color:var(--muted);margin:6px 0 10px">You can join runs and check in now — verifying unlocks <b>calling runs</b> and <b>posting clips</b>, and puts the ✓ on your name. ${way}. We check daily.</div>
-    <div style="font-style:italic;font-weight:900;font-size:32px;letter-spacing:7px;color:var(--volt);text-align:center;margin-bottom:10px">${esc(OCP.code||'·····')}</div>
-    <button class="btn btn-ghost btn-block" id="vfCheck">I sent it — check my status</button>`;
-  $('#vfCheck').onclick=async()=>{const b=$('#vfCheck');b.disabled=true;b.textContent='Checking…';await refreshMe(true);};
+    <div style="font-size:12.5px;color:var(--muted);margin:6px 0 10px">You can join runs and check in now — verifying unlocks <b>calling runs</b> and <b>posting clips</b>, and puts the ✓ on your name. Send a request straight to the desk; they'll look at ${OCP.ig?`<b>@${esc(OCP.ig)}</b>`:'your account'} and wave you through.</div>
+    <input class="inp" id="vfMsg" maxlength="300" placeholder="Optional — who are you / where do you hoop?" style="margin-bottom:9px">
+    <button class="btn btn-v btn-block" id="vfSend">📨 Request verification</button>
+    <div style="font-size:11px;color:var(--dim);margin-top:8px;text-align:center">Extra proof (optional): DM code <b style="color:var(--volt)">${esc(OCP.code||'')}</b> to @${VERIFY_IG} from your @</div>`;
+  $('#vfSend').onclick=async()=>{
+    const b=$('#vfSend');b.disabled=true;b.textContent='Sending…';
+    try{
+      await api({action:'verify_request',player:OCP,text:$('#vfMsg').value.trim()});
+      OCP.req=true;localStorage.setItem('oc_profile',JSON.stringify(OCP));
+      toast('Sent to the desk 🏀 Your ✓ is coming.');paintVf();
+    }catch(e){toast(e.message,1);b.disabled=false;b.textContent='📨 Request verification';}
+  };
 }
 async function refreshMe(loud){
   if(!OCP)return;
   try{
     const d=await api({action:'me',player_id:OCP.id});
     const was=OCP.vf;
-    OCP.vf=d.verified;OCP.code=d.verify_code;
+    OCP.vf=d.verified;OCP.code=d.verify_code;OCP.req=!!d.requested;
     localStorage.setItem('oc_profile',JSON.stringify(OCP));
     paintMe();paintVf();
     if(d.verified&&!was)toast("You're verified ✓ Full access unlocked 🏀",0,3800);

@@ -319,14 +319,31 @@ Deno.serve(async (req: Request) => {
         if (!row) return J({ error: "no account", code: "terms" }, 404);
         let code = row.verify_code;
         if (!code) { code = mkCode(); await db(`oc_players?id=eq.${encodeURIComponent(id)}`, { method: "PATCH", body: JSON.stringify({ verify_code: code }) }); }
-        return J({ name: row.name, ig: row.ig, email: row.email, verified: !!row.verified, verify_code: code, banned: !!row.banned });
+        const req = await db(`oc_inbox?player_id=eq.${encodeURIComponent(id)}&select=player_id`);
+        return J({ name: row.name, ig: row.ig, email: row.email, verified: !!row.verified, verify_code: code, banned: !!row.banned, requested: !!req?.length });
+      }
+
+
+      // In-app verification request → lands in the Heaven desk inbox.
+      case "verify_request": {
+        const g = await guard(((b.player || {}) as Record<string, unknown>).id as string);
+        if (g.err) return g.err;
+        const player = g.p!;
+        if (player.verified) return J({ error: "you're already verified ✓" }, 400);
+        const rows = await db(`oc_players?id=eq.${encodeURIComponent(player.id)}&select=email`);
+        await db(`oc_inbox?on_conflict=player_id`, {
+          method: "POST", headers: { Prefer: "resolution=merge-duplicates" },
+          body: JSON.stringify({ player_id: player.id, name: player.name, ig: player.ig, email: rows?.[0]?.email || "", text: str(b.text, 300), created_at: new Date().toISOString() }),
+        });
+        return J({ ok: true });
       }
 
       // Heaven desk (Lab coach credentials): review + verify + ban.
       case "admin_players": {
         if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
         const rows = await db(`oc_players?select=id,name,ig,email,verified,verify_code,banned,created_at&order=created_at.desc&limit=200`);
-        return J({ players: rows || [] });
+        const inbox = await db(`oc_inbox?select=*&order=created_at.asc&limit=100`);
+        return J({ players: rows || [], inbox: inbox || [] });
       }
 
       case "admin_verify": {
@@ -334,6 +351,13 @@ Deno.serve(async (req: Request) => {
         const pid = str(b.pid, 64);
         if (!pid) return J({ error: "bad request" }, 400);
         await db(`oc_players?id=eq.${encodeURIComponent(pid)}`, { method: "PATCH", body: JSON.stringify({ verified: b.on !== false }) });
+        if (b.on !== false) await db(`oc_inbox?player_id=eq.${encodeURIComponent(pid)}`, { method: "DELETE" });
+        return J({ ok: true });
+      }
+
+      case "admin_inbox_done": {
+        if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
+        await db(`oc_inbox?player_id=eq.${encodeURIComponent(str(b.pid, 64))}`, { method: "DELETE" });
         return J({ ok: true });
       }
 

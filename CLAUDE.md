@@ -324,6 +324,16 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   join/checkin stay open to unverified. `me` action returns status; app
   refreshes on boot + "check my status" button; rosters/POTW rows carry
   `v` flag → volt ✓. Aiman's @lockdownlab3 verified via SQL.
+- **In-app verification requests (edge v7, 2026-07-29, Aiman: "DMs can go
+  to admin in my Heaven Desk").** Table `oc_inbox` (pk player_id — one live
+  request each, resubmit updates; row deleted on verify/dismiss). Actions:
+  `verify_request` (guarded, {player, text≤300}, rejects already-verified);
+  `me` returns `requested`; `admin_players` also returns `inbox`;
+  `admin_verify` clears the row; `admin_inbox_done` dismisses. App #vfCard:
+  unrequested → message box + "📨 Request verification"; requested → amber
+  waiting state; IG DM code demoted to optional extra proof. Desk gained a
+  top 📨 Inbox section (name, message, @ig tap-through, Verify/Dismiss/Ban
+  per row); pending list excludes players with a live request.
 - **Sign-up gate at the door (2026-07-29, Aiman asked).** First open now:
   house rules → full-screen non-dismissible sign-up page (#shProfile.gate —
   wordmark, "Create your account", scrim/✕ disabled via the gate class) →
