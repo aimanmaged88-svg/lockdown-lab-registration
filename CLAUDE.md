@@ -310,6 +310,14 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   unguarded (banned can only remove themselves). Emails never exposed in
   rosters. True Google/Apple OAuth parked — needs Aiman's GCP/Apple dev
   credentials (Supabase Auth ready when he wants it).
+- **Sign-up gate at the door (2026-07-29, Aiman asked).** First open now:
+  house rules → full-screen non-dismissible sign-up page (#shProfile.gate —
+  wordmark, "Create your account", scrim/✕ disabled via the gate class) →
+  app. Boot opens the gate when terms ok but no `oc_profile`; #tAgree chains
+  into it. openGate()/openEdit() swap the sheet's copy + dismissibility
+  (profile-chip edit stays closable). Gate-mode CSS note: `.panel>*` forced
+  `flex:0 0 auto` because .btn-v's row `flex:1.3` grows vertically in the
+  gate's column layout. Existing devices with a profile skip the gate.
 - **Colour schemes (2026-07-28, Aiman asked).** Header 🎨 → `#shTheme` sheet:
   THEMES[8] accent presets (Volt/Blaze/Ice/Grape/Cherry/Mint/Gold/Chalk) + a
   native Custom colour input. `applyAccent()` sets `--volt` + computed

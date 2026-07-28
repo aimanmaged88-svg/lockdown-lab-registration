@@ -102,6 +102,14 @@ header{
 .sheet{position:fixed;inset:0;z-index:60;display:none}
 #shProfile{z-index:70} /* identity ask always stacks above whatever asked for it */
 #shTerms{z-index:72}   /* house rules trump everything */
+/* sign-up gate: first open, account required before the app */
+#shProfile.gate .panel{max-height:100dvh;height:100dvh;border-radius:0;border:none;display:flex;flex-direction:column;justify-content:center}
+#shProfile.gate .panel>*{flex:0 0 auto} /* .btn-v's flex:1.3 is for rows — don't let it grow vertically here */
+#shProfile.gate .x,#shProfile.gate .grab{display:none}
+.gatewm{font-style:italic;font-weight:900;font-size:34px;letter-spacing:-1px;text-transform:uppercase;margin-bottom:18px;display:none}
+.gatewm b{color:transparent;-webkit-text-stroke:1.6px var(--volt)}
+.gatewm span{color:var(--volt)}
+#shProfile.gate .gatewm{display:block}
 .sheet.open{display:block}
 /* house rules */
 .rule{display:flex;gap:11px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px;color:var(--muted);line-height:1.5}
@@ -289,7 +297,8 @@ header{
 <!-- profile / sign-in sheet -->
 <div class="sheet" id="shProfile"><div class="scrim" data-close></div><div class="panel">
   <div class="grab"></div>
-  <div class="xrow"><div><h3>Who's pulling up?</h3><p class="sub">Your <b style="color:var(--volt)">@</b> is your jersey — it shows on every run so people can find you. Real accounts only (house rules).</p></div><button class="x" data-close>✕</button></div>
+  <div class="gatewm"><b>HOOPS</b><span>HEAVEN</span></div>
+  <div class="xrow"><div><h3 id="pfTitle">Who's pulling up?</h3><p class="sub" id="pfSub">Your <b style="color:var(--volt)">@</b> is your jersey — it shows on every run so people can find you. Real accounts only (house rules).</p></div><button class="x" data-close>✕</button></div>
   <div class="fld"><label>Your name</label><input class="inp" id="pfName" maxlength="40" placeholder="e.g. Jordan"></div>
   <div class="fld" id="igFld"><label>Instagram</label><div class="igwrap"><span class="at">@</span><input class="inp" id="pfIg" maxlength="30" autocapitalize="none" placeholder="yourhandle"></div></div>
   <div class="fld" id="emFld" style="display:none"><label>Email (Gmail / Apple ID / any real inbox)</label><input class="inp" id="pfEmail" type="email" autocapitalize="none" placeholder="you@gmail.com"></div>
@@ -413,6 +422,7 @@ $('#tAgree').onclick=()=>{
   closeSheet('shTerms');
   // Existing devices from before the gate: quietly register their profile.
   if(OCP)api({action:'register',accept:true,player:OCP}).catch(()=>{});
+  else openGate(); // no account yet → straight into sign-up
 };
 
 /* ---------- profile (registered device identity) ---------- */
@@ -423,10 +433,26 @@ function paintMe(){
   if(OCP){$('#meAv').textContent=(OCP.name[0]||'?').toUpperCase();$('#meName').textContent=OCP.ig?('@'+OCP.ig):OCP.name;}
   else{$('#meAv').textContent='?';$('#meName').textContent='Who are you?';}
 }
+// The sign-up gate: full-screen, non-dismissible account creation on first open.
+function openGate(){
+  $('#shProfile').classList.add('gate');
+  $('#pfTitle').textContent='Create your account';
+  $('#pfSub').innerHTML='Hoops Heaven runs on real people — you need an account before you play. Your <b style="color:var(--volt)">@</b> is your jersey; no Instagram, use a real email. One account, this stays your device\'s key to every court in Sydney.';
+  $('#pfSave').textContent='Create my account 🏀';
+  openSheet('shProfile');
+  setTimeout(()=>$('#pfName').focus(),300);
+}
+function openEdit(){
+  $('#shProfile').classList.remove('gate');
+  $('#pfTitle').textContent='Who\'s pulling up?';
+  $('#pfSub').innerHTML='Your <b style="color:var(--volt)">@</b> is your jersey — it shows on every run so people can find you. Real accounts only (house rules).';
+  $('#pfSave').textContent='Lock it in';
+  openSheet('shProfile');
+}
 function ensureProfile(cb){
   if(!termsOk()){openSheet('shTerms');return}
   if(OCP){cb();return}
-  afterProfile=cb; openSheet('shProfile'); setTimeout(()=>$('#pfName').focus(),250);
+  afterProfile=cb; openGate();
 }
 function setIdMode(m){
   idMode=m;
@@ -436,8 +462,12 @@ function setIdMode(m){
 }
 $('#idSwap').onclick=()=>setIdMode(idMode==='ig'?'email':'ig');
 $('#meChip').onclick=()=>{
-  if(OCP){$('#pfName').value=OCP.name;$('#pfIg').value=OCP.ig||'';$('#pfEmail').value=OCP.email||'';setIdMode(OCP.ig||!OCP.email?'ig':'email');}
-  openSheet('shProfile');
+  if(OCP){
+    $('#pfName').value=OCP.name;$('#pfIg').value=OCP.ig||'';$('#pfEmail').value=OCP.email||'';
+    setIdMode(OCP.ig||!OCP.email?'ig':'email');
+    openEdit();
+  }else if(termsOk())openGate();
+  else openSheet('shTerms');
 };
 $('#pfSave').onclick=async()=>{
   if(!termsOk()){openSheet('shTerms');return}
@@ -451,9 +481,13 @@ $('#pfSave').onclick=async()=>{
   const b=$('#pfSave'); b.disabled=true; b.textContent='Signing in…';
   try{
     await api({action:'register',accept:true,player:{id,name,ig,email}});
+    const fresh=!OCP;
     OCP={id,name,ig,email};
     localStorage.setItem('oc_profile',JSON.stringify(OCP));
-    paintMe(); closeSheet('shProfile'); toast('Locked in. Welcome to Hoops Heaven 🏀');
+    paintMe();
+    $('#shProfile').classList.remove('gate');
+    closeSheet('shProfile');
+    toast(fresh?'Account created. Welcome to Hoops Heaven 🏀':'Saved 🏀');
     if(afterProfile){const f=afterProfile;afterProfile=null;f();}
   }catch(e){toast(e.message,1)}
   b.disabled=false; b.textContent='Lock it in';
@@ -463,7 +497,10 @@ $('#pfSave').onclick=async()=>{
 function openSheet(id){$('#'+id).classList.add('open');document.body.style.overflow='hidden'}
 function closeSheet(id){$('#'+id).classList.remove('open');if(!document.querySelector('.sheet.open'))document.body.style.overflow=''}
 document.querySelectorAll('.sheet').forEach(sh=>{
-  sh.addEventListener('click',e=>{if(e.target.hasAttribute('data-close')||e.target.closest('[data-close]'))closeSheet(sh.id)});
+  sh.addEventListener('click',e=>{
+    if(sh.classList.contains('gate'))return; // sign-up gate can't be dismissed
+    if(e.target.hasAttribute('data-close')||e.target.closest('[data-close]'))closeSheet(sh.id);
+  });
 });
 
 /* ---------- time helpers (everything displayed in Sydney time) ---------- */
@@ -889,6 +926,7 @@ applyAccent(localStorage.getItem('oc_accent')||'#D8FF3E',false);
 /* ---------- boot ---------- */
 paintMe();
 if(!termsOk())openSheet('shTerms');
+else if(!OCP)openGate(); // rules done but no account yet → sign-up first
 $('#rulesLink').onclick=()=>openSheet('shTerms');
 loadBoard().then(()=>{
   const q=new URLSearchParams(location.search);
