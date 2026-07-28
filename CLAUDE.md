@@ -324,8 +324,24 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   NOTE: sandbox Chromium has no network — API calls bridged through Node
   undici proxy fetch; edge calls take 1-2s cold so pad test waits). All oc_
   test rows deleted after each run.
-- v2 ideas discussed: KOTC proper, court check-ins ("I'm here now"), run
-  chat, POTW weekly archive/all-time wall, PWA manifest + install.
+- **QR court check-ins — SHIPPED (edge v5, 2026-07-29, Aiman asked).** Table
+  `oc_checkins` (one active row per player, unique player_id, new court
+  replaces old; reads window to 2h; 48h purge on write). Actions: `checkin`
+  (guarded, {court, player, verified}) / `checkout` (unguarded, self-remove);
+  `court` returns `here[]` (id/name/ig/verified/at). App: court page "📍 Here
+  right now" section (#ctHere rows w/ ✓ when geo-verified, since-time,
+  #ciBtn check-in/tap-out). Geo policy: position at court (≤800m) → verified
+  ✓; clearly away → REFUSED; denied/unavailable → allowed unverified.
+  Deep link `?court=<key>&ci=1` = the QR payload → opens court page + auto
+  check-in. `oc_checkin` localStorage + `autoCheckout()` on boot/visibility:
+  if still marked here, geo permission already granted and >800m away →
+  server checkout + toast. TRUE background walk-away detection impossible in
+  a web app (native-only geofencing) — told Aiman, parked.
+  **hoopsheaven-qr.html** = printable per-court poster generator (search →
+  multi-select → print; QR = deep link; qrcode-generator 1.4.4 MIT inlined,
+  no CDN). E2E: scratchpad/hh-ci.mjs (Playwright mocked geolocation).
+- v2 ideas discussed: KOTC proper, run chat, POTW weekly archive/all-time
+  wall, PWA manifest + install, native app for background geofencing.
 
 ## Parked ideas (Aiman asked to save these)
 

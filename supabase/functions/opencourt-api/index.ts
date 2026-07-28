@@ -115,6 +115,14 @@ async function playsFor(courtKey: string, week: string, me: string) {
     .sort((a, b) => (b.fires as number) - (a.fires as number) || String(a.created_at).localeCompare(String(b.created_at)));
 }
 
+
+// Active check-ins at a court (2h window), oldest first.
+async function hereFor(courtKey: string) {
+  const since = new Date(Date.now() - 2 * 36e5).toISOString();
+  const rows: Record<string, unknown>[] = await db(`oc_checkins?court_key=eq.${encodeURIComponent(courtKey)}&checked_in_at=gte.${since}&select=player_id,name,ig,verified,checked_in_at&order=checked_in_at.asc`);
+  return rows.map(r => ({ id: r.player_id, name: r.name, ig: r.ig, verified: r.verified, at: r.checked_in_at }));
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return J({ error: "POST only" }, 405);
@@ -241,7 +249,35 @@ Deno.serve(async (req: Request) => {
           }
           kotc = Object.values(agg).sort((a, b) => b.runs - a.runs).slice(0, 5);
         }
-        return J({ runs: await withPlayers(runs), plays, week, kotc });
+        return J({ runs: await withPlayers(runs), plays, week, kotc, here: await hereFor(key) });
+      }
+
+
+      // QR / court check-in: one active check-in per player, new court replaces
+      // old, expires after 2h. verified = client geolocation put them at the court.
+      case "checkin": {
+        const g = await guard(((b.player || {}) as Record<string, unknown>).id as string);
+        if (g.err) return g.err;
+        const player = g.p!;
+        const court = courtOf(b);
+        if (!court) return J({ error: "bad court" }, 400);
+        // housekeeping: drop long-expired rows so the table stays tiny
+        await db(`oc_checkins?checked_in_at=lt.${new Date(Date.now() - 48 * 36e5).toISOString()}`, { method: "DELETE" }).catch(() => {});
+        await db(`oc_checkins?player_id=eq.${encodeURIComponent(player.id)}`, { method: "DELETE" });
+        await db(`oc_checkins`, {
+          method: "POST",
+          body: JSON.stringify({ court_key: court.key, court_name: court.name, suburb: court.suburb, lat: court.lat, lon: court.lon, player_id: player.id, name: player.name, ig: player.ig, verified: b.verified === true }),
+        });
+        return J({ here: await hereFor(court.key) });
+      }
+
+      case "checkout": {
+        // Leaving is always allowed, same as run_leave.
+        const pid = str(b.player_id, 64);
+        if (!pid) return J({ error: "bad request" }, 400);
+        const rows = await db(`oc_checkins?player_id=eq.${encodeURIComponent(pid)}&select=court_key`);
+        await db(`oc_checkins?player_id=eq.${encodeURIComponent(pid)}`, { method: "DELETE" });
+        return J({ ok: true, here: rows?.[0] ? await hereFor(rows[0].court_key as string) : [] });
       }
 
       // Play of the Week: one clip per player per court per week (resubmit replaces).

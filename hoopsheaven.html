@@ -347,6 +347,12 @@ header{
     <button class="btn btn-ghost" id="ctMaps">Directions</button>
   </div>
 
+  <div class="subsect"><h4>📍 Here right now</h4>
+    <div id="ctHere"></div>
+    <button class="btn btn-v btn-block" id="ciBtn" style="margin-top:2px">📍 I'm here — check in</button>
+    <p style="font-size:11.5px;color:var(--dim);margin-top:7px">Scan the court's QR when you pull up. Check-ins lapse after 2 hours.</p>
+  </div>
+
   <div class="subsect"><h4>Runs at this court</h4><div id="ctRuns"></div></div>
 
   <div class="subsect"><h4>🔥 Play of the Week <span class="chip f" id="ctWeek"></span></h4>
@@ -740,6 +746,7 @@ function openCourtPage(c){
   $('#ctPlays').innerHTML='<div class="skel" style="height:48px"></div>';
   $('#ctKotc').innerHTML='';
   $('#ctWx').innerHTML='';
+  $('#ctHere').innerHTML='<div class="skel" style="height:40px"></div>';
   (async()=>{try{
     const x=wxAt(await getWx(c.lat,c.lon),new Date());
     if(!x||CC!==c)return;
@@ -760,6 +767,7 @@ function openCourtPage(c){
       if(!RUNS.some(y=>y.id===r.id))RUNS.push(r);
       paintRun();openSheet('shRun');history.replaceState(null,'','?run='+r.id);
     });
+    paintHere(d.here||[]);
     paintPlays(d.plays);
     $('#ctKotc').innerHTML=(d.kotc||[]).filter(k=>k.runs>0).slice(0,3).map((k,i)=>`
       <div class="kr"><b>${['👑','🥈','🥉'][i]||''} ${esc(k.name)}${k.ig?` <a style="color:var(--muted);text-decoration:none" href="https://instagram.com/${esc(k.ig)}" target="_blank" rel="noopener">@${esc(k.ig)}</a>`:''}</b><span>${k.runs} run${k.runs===1?'':'s'}</span></div>`).join('');
@@ -789,6 +797,65 @@ $('#ctDrop').onclick=()=>ensureProfile(async()=>{
 });
 $('#ctCall').onclick=()=>{closeSheet('shCourt');startCall(CC);};
 $('#ctMaps').onclick=()=>window.open(`https://www.google.com/maps/dir/?api=1&destination=${CC.lat},${CC.lon}`,'_blank');
+
+/* ---------- court check-ins (QR → I'm here) ---------- */
+let HERE=[];
+const sinceHM=at=>new Date(at).toLocaleTimeString('en-AU',{timeZone:SYD,hour:'numeric',minute:'2-digit'}).replace(' ','').toLowerCase();
+function paintHere(list){
+  HERE=list;
+  $('#ctHere').innerHTML=list.length?list.map(h=>`
+    <div class="pl" style="margin-bottom:7px"><div class="av">${esc((h.name[0]||'?').toUpperCase())}</div>
+      <div class="nm"><b>${esc(h.name)}${h.verified?' <span title="location verified" style="color:#4DE8A8">✓</span>':''}</b>${h.ig?`<a href="https://instagram.com/${esc(h.ig)}" target="_blank" rel="noopener">@${esc(h.ig)}</a>`:''}</div>
+      <span style="font-size:11.5px;color:var(--dim)">since ${esc(sinceHM(h.at))}</span></div>`).join('')
+    :'<div class="empty" style="padding:14px">Nobody\'s checked in right now.</div>';
+  const b=$('#ciBtn'),mine=OCP&&list.some(h=>h.id===OCP.id);
+  b.disabled=false;
+  if(mine){b.textContent='👋 Tap out — I\'m leaving';b.className='btn btn-out btn-block';}
+  else{b.textContent='📍 I\'m here — check in';b.className='btn btn-v btn-block';}
+}
+const getPos=opts=>new Promise((res,rej)=>navigator.geolocation?navigator.geolocation.getCurrentPosition(res,rej,opts):rej(new Error('no geo')));
+$('#ciBtn').onclick=()=>ensureProfile(async()=>{
+  const c=CC,b=$('#ciBtn'),mine=HERE.some(h=>h.id===OCP.id);
+  b.disabled=true;
+  try{
+    if(mine){
+      const d=await api({action:'checkout',player_id:OCP.id});
+      localStorage.removeItem('oc_checkin');
+      paintHere(d.here||[]); toast('Checked out. Good run 🤝');
+    }else{
+      b.textContent='Checking you in…';
+      // Geo-verify when we can: at the court → ✓, clearly away → refused,
+      // location denied/unavailable → allowed but unverified.
+      let verified=false;
+      try{
+        const p=await getPos({timeout:7000,maximumAge:60000});
+        const km=dist(p.coords.latitude,p.coords.longitude,c.lat,c.lon);
+        if(km>0.8){toast("You don't look like you're at this court yet — check in when you pull up",1);paintHere(HERE);return}
+        verified=true;
+      }catch(e){}
+      const d=await api({action:'checkin',verified,court:{key:c.key,name:c.name,suburb:c.suburb||'',lat:c.lat,lon:c.lon},player:OCP});
+      localStorage.setItem('oc_checkin',JSON.stringify({key:c.key,name:c.name,lat:c.lat,lon:c.lon,t:Date.now()}));
+      paintHere(d.here||[]); toast("You're on the court 📍"+(verified?' Location verified ✓':''));
+    }
+  }catch(e){toast(e.message,1);paintHere(HERE);}
+});
+// Web apps can't watch location in the background — so on every app open,
+// if you're still marked "here" but your location says you left, check out.
+async function autoCheckout(){
+  let ci=null; try{ci=JSON.parse(localStorage.getItem('oc_checkin')||'null')}catch(e){}
+  if(!ci||!OCP)return;
+  if(Date.now()-ci.t>2*36e5){localStorage.removeItem('oc_checkin');return}
+  try{
+    if(navigator.permissions){const s=await navigator.permissions.query({name:'geolocation'});if(s.state!=='granted')return}
+    const p=await getPos({timeout:8000,maximumAge:120000});
+    if(dist(p.coords.latitude,p.coords.longitude,ci.lat,ci.lon)>0.8){
+      await api({action:'checkout',player_id:OCP.id});
+      localStorage.removeItem('oc_checkin');
+      toast('Left '+ci.name+' — checked you out automatically 👋');
+    }
+  }catch(e){}
+}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)autoCheckout()});
 $('#logoBtn').onclick=()=>{document.querySelectorAll('.sheet.open').forEach(s=>closeSheet(s.id));window.scrollTo({top:0,behavior:'smooth'});};
 
 /* ---------- colours (accent themes, per device) ---------- */
@@ -826,7 +893,14 @@ $('#rulesLink').onclick=()=>openSheet('shTerms');
 loadBoard().then(()=>{
   const q=new URLSearchParams(location.search);
   if(q.get('run'))openRun(q.get('run'),false);
+  else if(q.get('court'))loadCourts().then(cs=>{   // per-court QR: ?court=<key>&ci=1
+    const c=cs.find(x=>x.key===q.get('court'));
+    if(!c)return;
+    openCourtPage(c);
+    if(q.get('ci')==='1')setTimeout(()=>{if(!(OCP&&HERE.some(h=>h.id===OCP.id)))$('#ciBtn').click()},1200);
+  });
 });
+autoCheckout();
 setInterval(()=>{if(!document.hidden&&!document.querySelector('.sheet.open'))loadBoard()},30000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadBoard()});
 </script>
