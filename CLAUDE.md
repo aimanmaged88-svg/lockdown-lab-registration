@@ -324,6 +324,13 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   join/checkin stay open to unverified. `me` action returns status; app
   refreshes on boot + "check my status" button; rosters/POTW rows carry
   `v` flag → volt ✓. Aiman's @lockdownlab3 verified via SQL.
+- **Fresh slate + desk PIN claim (edge v8, 2026-07-29, Aiman asked).** ALL
+  oc_* data wiped (accounts/runs/checkins/inbox/bans — his own test rows
+  included, at his request). `coachAuth` now claims-on-first-PIN like
+  coach_login: pin_hash '' → first 4-8 digit PIN entered becomes the PIN
+  (PINs must be digits now). Aiman's ll_coaches pin_hash reset to '' —
+  UNCLAIMED until he logs into the desk (told him to do it soon). Note:
+  coachAuth accepts ANY active ll_coaches row (currently him + 'samk').
 - **In-app verification requests (edge v7, 2026-07-29, Aiman: "DMs can go
   to admin in my Heaven Desk").** Table `oc_inbox` (pk player_id — one live
   request each, resubmit updates; row deleted on verify/dismiss). Actions:

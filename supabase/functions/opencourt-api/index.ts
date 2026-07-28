@@ -73,10 +73,16 @@ async function sha256(s: string) {
 }
 async function coachAuth(user: unknown, pin: unknown) {
   const u = str(user, 120).toLowerCase(), p = str(pin, 8);
-  if (!u || !p) return false;
-  const rows = await db(`ll_coaches?username=eq.${encodeURIComponent(u)}&status=eq.active&select=pin_hash`);
-  if (!rows?.length || !rows[0].pin_hash) return false;
-  return rows[0].pin_hash === await sha256(`${u}:${p}:lockdownlabcoach`);
+  if (!u || !/^\d{4,8}$/.test(p)) return false;
+  const rows = await db(`ll_coaches?username=eq.${encodeURIComponent(u)}&status=eq.active&select=id,pin_hash`);
+  if (!rows?.length) return false;
+  const h = await sha256(`${u}:${p}:lockdownlabcoach`);
+  if (!rows[0].pin_hash) {
+    // First login claims the PIN (mirrors coach_login's claim-on-first-PIN).
+    await db(`ll_coaches?id=eq.${rows[0].id}`, { method: "PATCH", body: JSON.stringify({ pin_hash: h }) });
+    return true;
+  }
+  return rows[0].pin_hash === h;
 }
 const mkCode = () => String(Math.floor(10000 + Math.random() * 90000));
 
