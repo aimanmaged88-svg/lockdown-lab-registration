@@ -293,11 +293,29 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   past-time rejected), run_join (cap-checked), run_leave, court, play_submit
   (upsert per court+player+week), play_fire (toggle). Source committed at
   supabase/functions/opencourt-api/index.ts. app-api UNTOUCHED.
+- **House rules + enforced sign-in (edge v3, 2026-07-28, Aiman asked).**
+  Full-screen House Rules overlay `#shTerms` gates first open (`oc_terms`
+  localStorage, TERMS_V bump re-prompts): runs NOT confirmed/guaranteed
+  (community tool), play at own risk, community grows on the people, ZERO
+  tolerance → indefinite ban, real accounts only, bans stick. Footer "House
+  rules" link reopens it. Sign-in: IG handle REQUIRED, or a real email
+  (Gmail/Apple ID) via the `#idSwap` toggle for the IG-less. Server-side:
+  `register` action (name + ig|email + accept:true) writes **oc_players**
+  (device id pk, accepted_at, banned flag); ALL writes (run_create/join,
+  play_submit/fire) pass `guard()` — must be registered+clean — and use the
+  REGISTERED name/ig (client-sent identity ignored → no impersonation).
+  **oc_bans** blocklist matches handle/email/device, blocks writes AND
+  re-registration from new devices; banning = insert lowercased value into
+  oc_bans (no admin UI yet — Aiman asks, we SQL it). run_leave stays
+  unguarded (banned can only remove themselves). Emails never exposed in
+  rosters. True Google/Apple OAuth parked — needs Aiman's GCP/Apple dev
+  credentials (Supabase Auth ready when he wants it).
 - Brand: volt (#D8FF3E) on asphalt black, italic 900 display, court-line bg,
   bottom sheets. Dark only for now. No SW registration (root sw.js is the
-  Lab's). E2E-verified via scratchpad oc-e2e.mjs (Playwright; NOTE: sandbox
-  Chromium has no network — API calls bridged through Node undici proxy
-  fetch). All oc_ test rows deleted after the run.
+  Lab's). E2E-verified via scratchpad oc-e2e.mjs + oc-e2e2.mjs (Playwright;
+  NOTE: sandbox Chromium has no network — API calls bridged through Node
+  undici proxy fetch; edge calls take 1-2s cold so pad test waits). All oc_
+  test rows deleted after each run.
 - v2 ideas discussed: KOTC proper, court check-ins ("I'm here now"), run
   chat, POTW weekly archive/all-time wall, PWA manifest + install.
 

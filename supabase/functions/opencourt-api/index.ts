@@ -1,10 +1,14 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
-// OpenCourt — Sydney's open run. Sister product of Lockdown Lab Live, same
-// engine: all DB access is server-side (service role), the browser sends the
-// public anon key as Bearer + apikey. OpenCourt is OPEN by design — no
-// accounts, no PINs. A player is a device-generated id + a name + an
-// Instagram handle; the IG handle is how people connect. Objects:
+// Hoops Haven (codename OpenCourt) — Sydney's open run. Sister product of
+// Lockdown Lab Live, same engine: all DB access is server-side (service
+// role), the browser sends the public anon key as Bearer + apikey.
+// Identity: no passwords — a device registers once with a name + Instagram
+// handle (or an email for the IG-less), accepting the house rules. Every
+// write requires a registered, unbanned identity, and the server always uses
+// the REGISTERED name/handle (client-sent ones are ignored outside register)
+// so identities can't be faked per-request. Bans live in oc_bans and match
+// handle, email or device id — re-registering doesn't dodge one. Objects:
 //   runs  — pickup games called at a court; anyone taps in until it's full
 //   plays — Play of the Week: one clip link per player per court per week,
 //           ranked by 🔥 fires from other players
@@ -36,18 +40,12 @@ const num = (v: unknown, lo: number, hi: number, dflt: number) => {
 };
 // IG handles: letters/digits/dot/underscore, max 30, no @
 const igClean = (v: unknown) => String(v ?? "").replace(/^@+/, "").toLowerCase().replace(/[^a-z0-9._]/g, "").slice(0, 30);
+const emailClean = (v: unknown) => {
+  const e = String(v ?? "").trim().toLowerCase().slice(0, 120);
+  return /^[^\s@]+@[^\s@]+\.[a-z]{2,24}$/.test(e) ? e : "";
+};
 const FORMATS = ["5v5", "4v4", "3v3", "2v2", "1v1", "21", "shootaround"];
-
-// Player identity as sent by the client. id is a device uuid — no auth, but
-// every write is tied to it so a player can only remove/replace their own rows.
-function playerOf(b: Record<string, unknown>) {
-  const p = (b.player || {}) as Record<string, unknown>;
-  const id = str(p.id, 64);
-  const name = str(p.name, 40);
-  const ig = igClean(p.ig);
-  if (!id || id.length < 8 || !name) return null;
-  return { id, name, ig };
-}
+const BANNED_MSG = "this account is banned from Hoops Haven";
 
 function courtOf(b: Record<string, unknown>) {
   const c = (b.court || {}) as Record<string, unknown>;
@@ -57,6 +55,26 @@ function courtOf(b: Record<string, unknown>) {
   const lat = +(c.lat as number), lon = +(c.lon as number);
   if (!key || !Number.isFinite(lat) || !Number.isFinite(lon)) return null;
   return { key, name, suburb, lat, lon };
+}
+
+// Any of these identity values on the blocklist?
+async function bansHit(values: string[]) {
+  const vs = values.filter(Boolean).map(v => `"${v.toLowerCase().replace(/"/g, "")}"`);
+  if (!vs.length) return false;
+  const rows = await db(`oc_bans?value=in.(${encodeURIComponent(vs.join(","))})&select=value`);
+  return !!rows?.length;
+}
+
+// The write gate: device must be registered (terms accepted) and clean.
+// Returns {p} with the REGISTERED identity, or {err} as a ready Response.
+async function guard(pid: string): Promise<{ p?: { id: string; name: string; ig: string }; err?: Response }> {
+  const id = str(pid, 64);
+  if (!id || id.length < 8) return { err: J({ error: "sign in first", code: "terms" }, 401) };
+  const rows = await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=id,name,ig,email,accepted_at,banned`);
+  const row = rows?.[0];
+  if (!row || !row.accepted_at) return { err: J({ error: "sign in and accept the house rules first", code: "terms" }, 401) };
+  if (row.banned || await bansHit([row.id, row.ig, row.email])) return { err: J({ error: BANNED_MSG, code: "banned" }, 403) };
+  return { p: { id: row.id, name: row.name, ig: row.ig } };
 }
 
 // ISO week of the current Sydney date, e.g. "2026-W31" — the POTW window.
@@ -107,6 +125,26 @@ Deno.serve(async (req: Request) => {
   try {
     switch (action) {
 
+      // Sign-in: device id + name + (IG handle OR email) + terms acceptance.
+      // Re-registering refreshes name/handle; banned identities are refused.
+      case "register": {
+        const p = (b.player || {}) as Record<string, unknown>;
+        const id = str(p.id, 64), name = str(p.name, 40);
+        const ig = igClean(p.ig), email = emailClean(p.email);
+        if (!id || id.length < 8 || !name) return J({ error: "put a name on it" }, 400);
+        if (!ig && !email) return J({ error: "sign in with your Instagram — or an email if you don't have IG" }, 400);
+        if (b.accept !== true) return J({ error: "you have to accept the house rules to play" }, 400);
+        if (await bansHit([id, ig, email])) return J({ error: BANNED_MSG, code: "banned" }, 403);
+        // A banned device row stays banned even if they re-register.
+        const prev = await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=banned`);
+        if (prev?.[0]?.banned) return J({ error: BANNED_MSG, code: "banned" }, 403);
+        await db(`oc_players?on_conflict=id`, {
+          method: "POST", headers: { Prefer: "resolution=merge-duplicates" },
+          body: JSON.stringify({ id, name, ig, email, accepted_at: new Date().toISOString() }),
+        });
+        return J({ ok: true, player: { id, name, ig } });
+      }
+
       // The board: every open run from 3h ago (still live) to +14 days.
       case "board": {
         const from = new Date(Date.now() - 3 * 36e5).toISOString();
@@ -122,9 +160,10 @@ Deno.serve(async (req: Request) => {
       }
 
       case "run_create": {
-        const player = playerOf(b);
+        const g = await guard(((b.player || {}) as Record<string, unknown>).id as string);
+        if (g.err) return g.err;
+        const player = g.p!;
         const court = courtOf(b);
-        if (!player) return J({ error: "add your name first" }, 400);
         if (!court) return J({ error: "pick a court" }, 400);
         const at = new Date(str(b.run_at, 40));
         if (isNaN(at.getTime())) return J({ error: "bad time" }, 400);
@@ -150,8 +189,9 @@ Deno.serve(async (req: Request) => {
       }
 
       case "run_join": {
-        const player = playerOf(b);
-        if (!player) return J({ error: "add your name first" }, 400);
+        const g = await guard(((b.player || {}) as Record<string, unknown>).id as string);
+        if (g.err) return g.err;
+        const player = g.p!;
         const id = str(b.run_id, 64);
         const rows = await db(`oc_runs?id=eq.${encodeURIComponent(id)}&select=*`);
         const run = rows?.[0];
@@ -169,6 +209,7 @@ Deno.serve(async (req: Request) => {
       }
 
       case "run_leave": {
+        // Leaving is always allowed — even a banned account can only remove itself.
         const id = str(b.run_id, 64), pid = str(b.player_id, 64);
         if (!id || !pid) return J({ error: "bad request" }, 400);
         await db(`oc_run_players?run_id=eq.${encodeURIComponent(id)}&player_id=eq.${encodeURIComponent(pid)}`, { method: "DELETE" });
@@ -205,8 +246,9 @@ Deno.serve(async (req: Request) => {
 
       // Play of the Week: one clip per player per court per week (resubmit replaces).
       case "play_submit": {
-        const player = playerOf(b);
-        if (!player) return J({ error: "add your name first" }, 400);
+        const g = await guard(((b.player || {}) as Record<string, unknown>).id as string);
+        if (g.err) return g.err;
+        const player = g.p!;
         const key = str(b.court_key, 64);
         const name = str(b.court_name, 80), suburb = str(b.suburb, 60);
         const url = str(b.clip_url, 300);
@@ -221,8 +263,10 @@ Deno.serve(async (req: Request) => {
       }
 
       case "play_fire": {
-        const pid = str(b.player_id, 64), play = str(b.play_id, 64);
-        if (!pid || pid.length < 8 || !play) return J({ error: "bad request" }, 400);
+        const g = await guard(str(b.player_id, 64));
+        if (g.err) return g.err;
+        const pid = g.p!.id, play = str(b.play_id, 64);
+        if (!play) return J({ error: "bad request" }, 400);
         const rows = await db(`oc_plays?id=eq.${encodeURIComponent(play)}&select=id,court_key,week,player_id`);
         const p = rows?.[0];
         if (!p) return J({ error: "play not found" }, 404);

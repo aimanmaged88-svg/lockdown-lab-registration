@@ -101,7 +101,15 @@ header{
 /* ---------- sheets ---------- */
 .sheet{position:fixed;inset:0;z-index:60;display:none}
 #shProfile{z-index:70} /* identity ask always stacks above whatever asked for it */
+#shTerms{z-index:72}   /* house rules trump everything */
 .sheet.open{display:block}
+/* house rules */
+.rule{display:flex;gap:11px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px;color:var(--muted);line-height:1.5}
+.rule:last-child{border-bottom:none}
+.rule .ic{flex:none;font-size:17px;margin-top:1px}
+.rule b{color:var(--text)}
+.fineprint{font-size:11px;color:var(--dim);text-align:center;margin-top:9px}
+.linky{background:none;border:none;color:var(--volt);font-size:13px;font-weight:700;cursor:pointer;padding:0;font-family:inherit;text-decoration:underline;text-underline-offset:3px}
 .sheet .scrim{position:absolute;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);animation:fad .2s}
 @keyframes fad{from{opacity:0}}
 .panel{
@@ -239,16 +247,35 @@ header{
 
   <div class="foot">
     <b>HOOPS HAVEN</b> · built in Sydney · court data © OpenStreetMap contributors<br>
-    Runs are player-called. Pull up, play hard, look after each other.
+    Runs are player-called, never guaranteed. Pull up, play hard, look after each other.<br>
+    <button class="linky" id="rulesLink" style="margin-top:6px">House rules</button>
   </div>
 </div>
 
-<!-- profile sheet -->
+<!-- house rules (terms) -->
+<div class="sheet" id="shTerms"><div class="scrim"></div><div class="panel">
+  <div class="grab"></div>
+  <h3>House rules</h3>
+  <p class="sub">Read it once. It matters. This is what keeps the runs good.</p>
+  <div class="rule"><span class="ic">🏀</span><span><b>Runs aren't confirmed or guaranteed.</b> Hoops Haven doesn't run the runs — players call them, players show up (or don't). We're just here to help the community get together and get runs in.</span></div>
+  <div class="rule"><span class="ic">⚠️</span><span><b>Play at your own risk.</b> Public courts, real basketball. Look after your body, your stuff, your people and the court.</span></div>
+  <div class="rule"><span class="ic">🌱</span><span><b>The community IS the app.</b> It grows on the people in it. Bring good energy, welcome new hoopers, leave the court better than you found it.</span></div>
+  <div class="rule"><span class="ic">🧊</span><span><b>Zero tolerance on bad behaviour.</b> Disrespect, threats, abuse, discrimination — in the app or at a run — and you're gone. Banned indefinitely. One strike is enough.</span></div>
+  <div class="rule"><span class="ic">🪪</span><span><b>Real accounts only.</b> Sign in with your Instagram — or a real email (Gmail, Apple ID, whatever) if you don't have IG. Burner and fake accounts get removed on sight.</span></div>
+  <div class="rule"><span class="ic">🔨</span><span><b>Bans stick.</b> Break the rules and your handle, your email and your device are all blocked. A new account won't save you.</span></div>
+  <div class="rule"><span class="ic">🧹</span><span>We can remove any run, clip or account at any time to protect the community.</span></div>
+  <button class="btn btn-v btn-block" id="tAgree" style="margin-top:14px">I'm in — I agree ✊</button>
+  <p class="fineprint">Tapping "I'm in" means you accept the house rules.</p>
+</div></div>
+
+<!-- profile / sign-in sheet -->
 <div class="sheet" id="shProfile"><div class="scrim" data-close></div><div class="panel">
   <div class="grab"></div>
-  <div class="xrow"><div><h3>Who's pulling up?</h3><p class="sub">No accounts. Your <b style="color:var(--volt)">@</b> is your jersey — it shows on every run so people can find you.</p></div><button class="x" data-close>✕</button></div>
+  <div class="xrow"><div><h3>Who's pulling up?</h3><p class="sub">Your <b style="color:var(--volt)">@</b> is your jersey — it shows on every run so people can find you. Real accounts only (house rules).</p></div><button class="x" data-close>✕</button></div>
   <div class="fld"><label>Your name</label><input class="inp" id="pfName" maxlength="40" placeholder="e.g. Jordan"></div>
-  <div class="fld"><label>Instagram</label><div class="igwrap"><span class="at">@</span><input class="inp" id="pfIg" maxlength="30" autocapitalize="none" placeholder="yourhandle (optional)"></div></div>
+  <div class="fld" id="igFld"><label>Instagram</label><div class="igwrap"><span class="at">@</span><input class="inp" id="pfIg" maxlength="30" autocapitalize="none" placeholder="yourhandle"></div></div>
+  <div class="fld" id="emFld" style="display:none"><label>Email (Gmail / Apple ID / any real inbox)</label><input class="inp" id="pfEmail" type="email" autocapitalize="none" placeholder="you@gmail.com"></div>
+  <div class="fld"><button class="linky" id="idSwap">No Instagram? Sign in with an email instead</button></div>
   <button class="btn btn-v btn-block" id="pfSave">Lock it in</button>
 </div></div>
 
@@ -332,7 +359,10 @@ const SYD='Australia/Sydney';
 async function api(body){
   const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+ANON,'apikey':ANON},body:JSON.stringify(body)});
   const d=await r.json().catch(()=>({error:'network error'}));
-  if(!r.ok||d.error) throw new Error(d.error||'something broke');
+  if(!r.ok||d.error){
+    if(d.code==='terms'&&body.action!=='register'){localStorage.removeItem('oc_terms');openSheet('shTerms');}
+    const e=new Error(d.error||'something broke'); e.code=d.code; throw e;
+  }
   return d;
 }
 let toastT;
@@ -341,27 +371,58 @@ function toast(msg,err){
   clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2600);
 }
 
-/* ---------- profile (device identity) ---------- */
+/* ---------- house rules (terms) ---------- */
+const TERMS_V='1';
+const termsOk=()=>localStorage.getItem('oc_terms')===TERMS_V;
+$('#tAgree').onclick=()=>{
+  localStorage.setItem('oc_terms',TERMS_V);
+  closeSheet('shTerms');
+  // Existing devices from before the gate: quietly register their profile.
+  if(OCP)api({action:'register',accept:true,player:OCP}).catch(()=>{});
+};
+
+/* ---------- profile (registered device identity) ---------- */
 let OCP=null;
 try{OCP=JSON.parse(localStorage.getItem('oc_profile')||'null')}catch(e){}
-let afterProfile=null;
+let afterProfile=null,idMode='ig';
 function paintMe(){
   if(OCP){$('#meAv').textContent=(OCP.name[0]||'?').toUpperCase();$('#meName').textContent=OCP.ig?('@'+OCP.ig):OCP.name;}
   else{$('#meAv').textContent='?';$('#meName').textContent='Who are you?';}
 }
 function ensureProfile(cb){
+  if(!termsOk()){openSheet('shTerms');return}
   if(OCP){cb();return}
   afterProfile=cb; openSheet('shProfile'); setTimeout(()=>$('#pfName').focus(),250);
 }
-$('#meChip').onclick=()=>{ if(OCP){$('#pfName').value=OCP.name;$('#pfIg').value=OCP.ig||'';} openSheet('shProfile'); };
-$('#pfSave').onclick=()=>{
+function setIdMode(m){
+  idMode=m;
+  $('#igFld').style.display=m==='ig'?'':'none';
+  $('#emFld').style.display=m==='email'?'':'none';
+  $('#idSwap').textContent=m==='ig'?'No Instagram? Sign in with an email instead':'← Got Instagram? Use your handle instead';
+}
+$('#idSwap').onclick=()=>setIdMode(idMode==='ig'?'email':'ig');
+$('#meChip').onclick=()=>{
+  if(OCP){$('#pfName').value=OCP.name;$('#pfIg').value=OCP.ig||'';$('#pfEmail').value=OCP.email||'';setIdMode(OCP.ig||!OCP.email?'ig':'email');}
+  openSheet('shProfile');
+};
+$('#pfSave').onclick=async()=>{
+  if(!termsOk()){openSheet('shTerms');return}
   const name=$('#pfName').value.trim().slice(0,40);
-  const ig=$('#pfIg').value.trim().replace(/^@+/,'').toLowerCase().replace(/[^a-z0-9._]/g,'').slice(0,30);
+  const ig=idMode==='ig'?$('#pfIg').value.trim().replace(/^@+/,'').toLowerCase().replace(/[^a-z0-9._]/g,'').slice(0,30):'';
+  const email=idMode==='email'?$('#pfEmail').value.trim().toLowerCase().slice(0,120):'';
   if(!name){toast('Put a name on it',1);return}
-  OCP={id:(OCP&&OCP.id)||crypto.randomUUID(),name,ig};
-  localStorage.setItem('oc_profile',JSON.stringify(OCP));
-  paintMe(); closeSheet('shProfile'); toast('Locked in. Welcome to Hoops Haven 🏀');
-  if(afterProfile){const f=afterProfile;afterProfile=null;f();}
+  if(idMode==='ig'&&!ig){toast("Drop your @ — that's your jersey",1);return}
+  if(idMode==='email'&&!/^[^\s@]+@[^\s@]+\.[a-z]{2,24}$/i.test(email)){toast("That email doesn't look right",1);return}
+  const id=(OCP&&OCP.id)||crypto.randomUUID();
+  const b=$('#pfSave'); b.disabled=true; b.textContent='Signing in…';
+  try{
+    await api({action:'register',accept:true,player:{id,name,ig,email}});
+    OCP={id,name,ig,email};
+    localStorage.setItem('oc_profile',JSON.stringify(OCP));
+    paintMe(); closeSheet('shProfile'); toast('Locked in. Welcome to Hoops Haven 🏀');
+    if(afterProfile){const f=afterProfile;afterProfile=null;f();}
+  }catch(e){toast(e.message,1)}
+  b.disabled=false; b.textContent='Lock it in';
 };
 
 /* ---------- sheets ---------- */
@@ -628,6 +689,8 @@ $('#logoBtn').onclick=()=>{document.querySelectorAll('.sheet.open').forEach(s=>c
 
 /* ---------- boot ---------- */
 paintMe();
+if(!termsOk())openSheet('shTerms');
+$('#rulesLink').onclick=()=>openSheet('shTerms');
 loadBoard().then(()=>{
   const q=new URLSearchParams(location.search);
   if(q.get('run'))openRun(q.get('run'),false);
