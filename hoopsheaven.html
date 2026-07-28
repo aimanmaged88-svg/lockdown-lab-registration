@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0A0C0F">
-<title>Hoops Haven — Sydney's open run</title>
+<title>Hoops Heaven — Sydney's open run</title>
 <meta name="description" content="Find a run. Tap in. Pull up. Pickup basketball across 971 Sydney courts — open to everyone.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%23D8FF3E'/%3E%3Cpath d='M32 4v56M4 32h56M11 11c12 10 30 10 42 0M11 53c12-10 30-10 42 0' stroke='%230A0C0F' stroke-width='4' fill='none'/%3E%3C/svg%3E">
 <style>
@@ -236,7 +236,7 @@ header{
 <div class="wrap">
 
   <header>
-    <div class="logo" id="logoBtn"><b>HOOPS</b><span>HAVEN</span><small>SYDNEY'S OPEN RUN</small></div>
+    <div class="logo" id="logoBtn"><b>HOOPS</b><span>HEAVEN</span><small>SYDNEY'S OPEN RUN</small></div>
     <div class="hdr-r">
       <button class="iconbtn" id="themeBtn" title="Colours">🎨</button>
       <div class="me" id="meChip"><div class="av" id="meAv">?</div><b id="meName">Who are you?</b></div>
@@ -258,7 +258,7 @@ header{
   </div>
 
   <div class="foot">
-    <b>HOOPS HAVEN</b> · built in Sydney · court data © OpenStreetMap contributors<br>
+    <b>HOOPS HEAVEN</b> · built in Sydney · court data © OpenStreetMap contributors<br>
     Runs are player-called, never guaranteed. Pull up, play hard, look after each other.<br>
     <button class="linky" id="rulesLink" style="margin-top:6px">House rules</button>
   </div>
@@ -269,7 +269,7 @@ header{
   <div class="grab"></div>
   <h3>House rules</h3>
   <p class="sub">Read it once. It matters. This is what keeps the runs good.</p>
-  <div class="rule"><span class="ic">🏀</span><span><b>Runs aren't confirmed or guaranteed.</b> Hoops Haven doesn't run the runs — players call them, players show up (or don't). We're just here to help the community get together and get runs in.</span></div>
+  <div class="rule"><span class="ic">🏀</span><span><b>Runs aren't confirmed or guaranteed.</b> Hoops Heaven doesn't run the runs — players call them, players show up (or don't). We're just here to help the community get together and get runs in.</span></div>
   <div class="rule"><span class="ic">⚠️</span><span><b>Play at your own risk.</b> Public courts, real basketball. Look after your body, your stuff, your people and the court.</span></div>
   <div class="rule"><span class="ic">🌱</span><span><b>The community IS the app.</b> It grows on the people in it. Bring good energy, welcome new hoopers, leave the court better than you found it.</span></div>
   <div class="rule"><span class="ic">🧊</span><span><b>Zero tolerance on bad behaviour.</b> Disrespect, threats, abuse, discrimination — in the app or at a run — and you're gone. Banned indefinitely. One strike is enough.</span></div>
@@ -368,7 +368,7 @@ header{
 
 <script>
 'use strict';
-/* ================= HOOPS HAVEN v1 (codename OpenCourt) ================= */
+/* ================= HOOPS HEAVEN v1 (codename OpenCourt) ================= */
 const API='https://ymuwuhvqqftgpxwhzoub.supabase.co/functions/v1/opencourt-api';
 // Public anon key — safe in the browser; tables are RLS-locked, all writes go through the edge fn.
 const ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltdXd1aHZxcWZ0Z3B4d2h6b3ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NjUyMzgsImV4cCI6MjA5OTI0MTIzOH0.sOkWQpulWj_ZSqMNSV7YP55T70UFSm2mP5e5xapQyQo';
@@ -439,7 +439,7 @@ $('#pfSave').onclick=async()=>{
     await api({action:'register',accept:true,player:{id,name,ig,email}});
     OCP={id,name,ig,email};
     localStorage.setItem('oc_profile',JSON.stringify(OCP));
-    paintMe(); closeSheet('shProfile'); toast('Locked in. Welcome to Hoops Haven 🏀');
+    paintMe(); closeSheet('shProfile'); toast('Locked in. Welcome to Hoops Heaven 🏀');
     if(afterProfile){const f=afterProfile;afterProfile=null;f();}
   }catch(e){toast(e.message,1)}
   b.disabled=false; b.textContent='Lock it in';
@@ -545,7 +545,7 @@ function syncRun(){const i=RUNS.findIndex(x=>x.id===CUR.id);if(i>-1)RUNS[i]=CUR;
 $('#rShare').onclick=async()=>{
   const r=CUR,url=location.origin+location.pathname+'?run='+r.id;
   const text=`🏀 ${r.format} at ${r.court_name}${r.suburb?' ('+r.suburb+')':''} — ${dayLabel(runYmd(r))} ${runTime(r)}. Tap in:`;
-  if(navigator.share){try{await navigator.share({title:'Hoops Haven run',text,url})}catch(e){}}
+  if(navigator.share){try{await navigator.share({title:'Hoops Heaven run',text,url})}catch(e){}}
   else{await navigator.clipboard.writeText(text+' '+url);toast('Link copied — send it to the group chat');}
 };
 $('#rMaps').onclick=()=>{const r=CUR;window.open(`https://www.google.com/maps/dir/?api=1&destination=${r.lat},${r.lon}`,'_blank')};

@@ -272,12 +272,12 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   scratchpad/coach-mobile.mjs (temp coach, dark+light, closed/open/after-nav).
   NEWS id:23. Admin desk mobile still uses its own top strip (not asked yet).
 
-## Hoops Haven — pickup basketball network (2026-07-28, codename OpenCourt)
+## Hoops Heaven — pickup basketball network (2026-07-28, codename OpenCourt)
 
 - **NEW standalone product** (Aiman: own brand, "starting fresh", nothing to do
-  with the Lab). Named **Hoops Haven** (Aiman renamed it from OpenCourt same
-  day; internals — edge fn `opencourt-api`, `oc_` tables, branch — keep the
-  codename). **hoopshaven.html** — Sydney-wide pickup: public runs board,
+  with the Lab). Named **Hoops Heaven** (Aiman: OpenCourt → Hoops Haven → **Hoops Heaven**,
+  all same day; internals — edge fn `opencourt-api`, `oc_` tables, branch — keep the
+  codename). **hoopsheaven.html** (old /hoopshaven.html 301-redirects)  — Sydney-wide pickup: public runs board,
   call a run at any of the 971 courts (courts.json = the picker), tap in/out,
   shareable run links (?run=id). NO accounts: device uuid + name + **Instagram
   handle as the jersey** — rosters link to instagram.com/handle (that's how

@@ -1,6 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
-// Hoops Haven (codename OpenCourt) — Sydney's open run. Sister product of
+// Hoops Heaven (codename OpenCourt) — Sydney's open run. Sister product of
 // Lockdown Lab Live, same engine: all DB access is server-side (service
 // role), the browser sends the public anon key as Bearer + apikey.
 // Identity: no passwords — a device registers once with a name + Instagram
@@ -45,7 +45,7 @@ const emailClean = (v: unknown) => {
   return /^[^\s@]+@[^\s@]+\.[a-z]{2,24}$/.test(e) ? e : "";
 };
 const FORMATS = ["5v5", "4v4", "3v3", "2v2", "1v1", "21", "shootaround"];
-const BANNED_MSG = "this account is banned from Hoops Haven";
+const BANNED_MSG = "this account is banned from Hoops Heaven";
 
 function courtOf(b: Record<string, unknown>) {
   const c = (b.court || {}) as Record<string, unknown>;

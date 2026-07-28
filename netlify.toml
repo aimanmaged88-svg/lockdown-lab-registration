@@ -10,6 +10,13 @@
   to = "/athlete-os/"
   status = 302
 
+# --- Hoops Heaven ---------------------------------------------------------
+# The product was briefly live as hoopshaven.html — keep that link alive.
+[[redirects]]
+  from = "/hoopshaven.html"
+  to = "/hoopsheaven.html"
+  status = 301
+
 # --- NOVA Rewards (giveaway) ---------------------------------------------
 # publish stays "." so the existing site root and other products are
 # untouched; the config below is scoped to /giveaway/ only.
