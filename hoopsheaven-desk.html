@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Hoops Heaven — desk</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%23D8FF3E'/%3E%3Cpath d='M32 4v56M4 32h56M11 11c12 10 30 10 42 0M11 53c12-10 30-10 42 0' stroke='%230A0C0F' stroke-width='4' fill='none'/%3E%3C/svg%3E">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0A0C0F;color:#F4F6F0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;padding:20px;max-width:680px;margin:0 auto}
+h1{font-style:italic;font-weight:900;text-transform:uppercase;font-size:24px;margin-bottom:2px}
+h1 span{color:#D8FF3E}
+.sub{color:#96A0A8;font-size:13.5px;margin-bottom:18px}
+h2{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#5D666E;font-weight:800;margin:24px 0 10px}
+.card{background:#12151B;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:16px}
+.inp{width:100%;background:#0E1116;border:1px solid rgba(255,255,255,.12);border-radius:12px;color:#F4F6F0;font-size:16px;padding:12px 14px;outline:none;margin-bottom:10px}
+.inp:focus{border-color:rgba(216,255,62,.5)}
+.btn{border:none;border-radius:11px;font-weight:800;font-size:13.5px;padding:10px 16px;cursor:pointer;font-family:inherit}
+.btn-v{background:#D8FF3E;color:#0A0C0F}
+.btn-g{background:#0E1116;color:#F4F6F0;border:1px solid rgba(255,255,255,.15)}
+.btn-r{background:#0E1116;color:#FF5A5A;border:1px solid rgba(255,90,90,.35)}
+.btn-block{width:100%;padding:13px}
+.row{display:flex;align-items:center;gap:11px;background:#12151B;border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:12px 14px;margin-bottom:8px;flex-wrap:wrap}
+.row.pending{border-color:rgba(255,210,77,.4)}
+.row.banned{border-color:rgba(255,90,90,.4);opacity:.75}
+.row .who{flex:1;min-width:150px}
+.row .who b{display:block;font-size:14.5px;font-weight:800}
+.row .who b .vtick{color:#D8FF3E}
+.row .who a{color:#96A0A8;font-size:12.5px;text-decoration:none}
+.row .who a:hover{color:#D8FF3E}
+.row .who span{color:#96A0A8;font-size:12.5px}
+.code{font-style:italic;font-weight:900;font-size:19px;letter-spacing:3px;color:#D8FF3E}
+.tag{font-size:10px;letter-spacing:1.4px;font-weight:800;border-radius:99px;padding:3px 9px}
+.tag.p{color:#FFD24D;border:1px solid rgba(255,210,77,.4)}
+.tag.b{color:#FF5A5A;border:1px solid rgba(255,90,90,.4)}
+.empty{border:1.5px dashed rgba(255,255,255,.12);border-radius:14px;padding:20px;text-align:center;color:#96A0A8;font-size:13.5px}
+#toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(90px);background:#D8FF3E;color:#0A0C0F;font-weight:800;font-size:14px;border-radius:12px;padding:11px 18px;transition:transform .3s;z-index:9}
+#toast.show{transform:translateX(-50%) translateY(0)}
+#toast.err{background:#FF5A5A;color:#fff}
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+</style>
+</head>
+<body>
+<div class="top"><div>
+  <h1>Heaven <span>desk</span></h1>
+  <p class="sub">Verify accounts (check the DM came from their @, code matches → Verify) and handle bans.</p>
+</div><button class="btn btn-g" id="outBtn" style="display:none">Lock up</button></div>
+
+<div class="card" id="login">
+  <input class="inp" id="lu" placeholder="Coach email / username" autocapitalize="none">
+  <input class="inp" id="lp" placeholder="PIN" type="password" inputmode="numeric" maxlength="8">
+  <button class="btn btn-v btn-block" id="loginBtn">Open the desk</button>
+</div>
+
+<div id="desk" style="display:none">
+  <h2>⏳ Waiting on verification</h2>
+  <div id="pending"></div>
+  <h2>Everyone</h2>
+  <div id="all"></div>
+</div>
+
+<div id="toast"></div>
+<script>
+'use strict';
+const API='https://ymuwuhvqqftgpxwhzoub.supabase.co/functions/v1/opencourt-api';
+const ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltdXd1aHZxcWZ0Z3B4d2h6b3ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NjUyMzgsImV4cCI6MjA5OTI0MTIzOH0.sOkWQpulWj_ZSqMNSV7YP55T70UFSm2mP5e5xapQyQo';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let CREDS=null;try{CREDS=JSON.parse(sessionStorage.getItem('oc_desk')||'null')}catch(e){}
+let toastT;
+function toast(m,err){const t=$('#toast');t.textContent=m;t.classList.toggle('err',!!err);t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2400)}
+async function api(body){
+  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+ANON,'apikey':ANON},body:JSON.stringify({...body,user:CREDS.user,pin:CREDS.pin})});
+  const d=await r.json().catch(()=>({error:'network error'}));
+  if(!r.ok||d.error){
+    if(r.status===401){sessionStorage.removeItem('oc_desk');CREDS=null;show();}
+    throw new Error(d.error||'something broke');
+  }
+  return d;
+}
+function show(){
+  $('#login').style.display=CREDS?'none':'';
+  $('#desk').style.display=CREDS?'':'none';
+  $('#outBtn').style.display=CREDS?'':'none';
+  if(CREDS)load();
+}
+$('#loginBtn').onclick=async()=>{
+  CREDS={user:$('#lu').value.trim().toLowerCase(),pin:$('#lp').value.trim()};
+  try{await api({action:'admin_players'});sessionStorage.setItem('oc_desk',JSON.stringify(CREDS));toast('Desk open 🏀');show();}
+  catch(e){CREDS=null;toast(e.message,1)}
+};
+$('#outBtn').onclick=()=>{sessionStorage.removeItem('oc_desk');CREDS=null;show();};
+function row(p,pending){
+  const idShort=p.id.slice(0,8);
+  return `<div class="row ${pending?'pending':''} ${p.banned?'banned':''}">
+    <div class="who">
+      <b>${esc(p.name)} ${p.verified?'<span class="vtick">✓</span>':''} ${p.banned?'<span class="tag b">BANNED</span>':pending?'<span class="tag p">PENDING</span>':''}</b>
+      ${p.ig?`<a href="https://instagram.com/${esc(p.ig)}" target="_blank" rel="noopener">@${esc(p.ig)} ↗</a>`:`<span>${esc(p.email)}</span>`}
+    </div>
+    ${!p.verified&&!p.banned?`<span class="code">${esc(p.verify_code||'—')}</span>`:''}
+    ${p.banned
+      ?`<button class="btn btn-g" data-unban="${esc(p.id)}">Unban</button>`
+      :`${p.verified
+          ?`<button class="btn btn-g" data-unverify="${esc(p.id)}">Un-verify</button>`
+          :`<button class="btn btn-v" data-verify="${esc(p.id)}">✓ Verify</button>`}
+        <button class="btn btn-r" data-ban="${esc(p.id)}">Ban</button>`}
+  </div>`;
+}
+async function load(){
+  try{
+    const d=await api({action:'admin_players'});
+    const ps=d.players||[];
+    const pending=ps.filter(p=>!p.verified&&!p.banned);
+    $('#pending').innerHTML=pending.length?pending.map(p=>row(p,true)).join(''):'<div class="empty">Nobody waiting. All quiet.</div>';
+    $('#all').innerHTML=ps.length?ps.map(p=>row(p,false)).join(''):'<div class="empty">No players yet.</div>';
+    document.querySelectorAll('[data-verify]').forEach(b=>b.onclick=()=>act({action:'admin_verify',pid:b.dataset.verify},'Verified ✓ — they get full access'));
+    document.querySelectorAll('[data-unverify]').forEach(b=>b.onclick=()=>act({action:'admin_verify',pid:b.dataset.unverify,on:false},'Verification removed'));
+    document.querySelectorAll('[data-ban]').forEach(b=>b.onclick=()=>{
+      if(!confirm('Ban this account? Their handle, email and device all get blocked. Bans stick.'))return;
+      act({action:'admin_ban',pid:b.dataset.ban,reason:'desk ban'},'Banned. Handle, email and device blocked.');
+    });
+    document.querySelectorAll('[data-unban]').forEach(b=>b.onclick=()=>act({action:'admin_ban',pid:b.dataset.unban,on:false},'Unbanned — they\'re back'));
+  }catch(e){toast(e.message,1)}
+}
+async function act(body,msg){
+  try{await api(body);toast(msg);load();}catch(e){toast(e.message,1)}
+}
+show();
+</script>
+</body>
+</html>

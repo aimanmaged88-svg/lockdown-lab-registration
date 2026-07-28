@@ -303,6 +303,7 @@ header{
   <div class="fld" id="igFld"><label>Instagram</label><div class="igwrap"><span class="at">@</span><input class="inp" id="pfIg" maxlength="30" autocapitalize="none" placeholder="yourhandle"></div></div>
   <div class="fld" id="emFld" style="display:none"><label>Email (Gmail / Apple ID / any real inbox)</label><input class="inp" id="pfEmail" type="email" autocapitalize="none" placeholder="you@gmail.com"></div>
   <div class="fld"><button class="linky" id="idSwap">No Instagram? Sign in with an email instead</button></div>
+  <div id="vfCard" style="display:none;border:1px solid var(--line);border-radius:14px;padding:14px 15px;margin-bottom:14px;background:var(--card)"></div>
   <button class="btn btn-v btn-block" id="pfSave">Lock it in</button>
 </div></div>
 
@@ -404,6 +405,7 @@ async function api(body){
   const d=await r.json().catch(()=>({error:'network error'}));
   if(!r.ok||d.error){
     if(d.code==='terms'&&body.action!=='register'){localStorage.removeItem('oc_terms');openSheet('shTerms');}
+    if(d.code==='verify'){openEdit();paintVf();}
     const e=new Error(d.error||'something broke'); e.code=d.code; throw e;
   }
   return d;
@@ -430,8 +432,40 @@ let OCP=null;
 try{OCP=JSON.parse(localStorage.getItem('oc_profile')||'null')}catch(e){}
 let afterProfile=null,idMode='ig';
 function paintMe(){
-  if(OCP){$('#meAv').textContent=(OCP.name[0]||'?').toUpperCase();$('#meName').textContent=OCP.ig?('@'+OCP.ig):OCP.name;}
+  if(OCP){$('#meAv').textContent=(OCP.name[0]||'?').toUpperCase();$('#meName').textContent=(OCP.ig?('@'+OCP.ig):OCP.name)+(OCP.vf?' ✓':'');}
   else{$('#meAv').textContent='?';$('#meName').textContent='Who are you?';}
+}
+/* ---------- account verification (DM the code from your @) ---------- */
+const VERIFY_IG='lockdownlablive';            // swap when the Hoops Heaven IG page is live
+const VERIFY_EMAIL='aimanmaged88@gmail.com';  // for email sign-ups
+function paintVf(){
+  const el=$('#vfCard');
+  if(!OCP){el.style.display='none';return}
+  el.style.display='';
+  if(OCP.vf){
+    el.innerHTML='<div style="font-weight:800;color:#4DE8A8">✓ Verified account</div><div style="font-size:12.5px;color:var(--muted);margin-top:4px">Your name carries the ✓ everywhere. Full access — call runs, post clips.</div>';
+    return;
+  }
+  const way=OCP.ig
+    ?`DM this code to <b style="color:var(--volt)">@${VERIFY_IG}</b> on Instagram — <b>from @${esc(OCP.ig)}</b> so we know it's really you`
+    :`email this code to <b style="color:var(--volt)">${VERIFY_EMAIL}</b> — <b>from ${esc(OCP.email||'your sign-up email')}</b>`;
+  el.innerHTML=`<div style="font-weight:800">⏳ Verify your account</div>
+    <div style="font-size:12.5px;color:var(--muted);margin:6px 0 10px">You can join runs and check in now — verifying unlocks <b>calling runs</b> and <b>posting clips</b>, and puts the ✓ on your name. ${way}. We check daily.</div>
+    <div style="font-style:italic;font-weight:900;font-size:32px;letter-spacing:7px;color:var(--volt);text-align:center;margin-bottom:10px">${esc(OCP.code||'·····')}</div>
+    <button class="btn btn-ghost btn-block" id="vfCheck">I sent it — check my status</button>`;
+  $('#vfCheck').onclick=async()=>{const b=$('#vfCheck');b.disabled=true;b.textContent='Checking…';await refreshMe(true);};
+}
+async function refreshMe(loud){
+  if(!OCP)return;
+  try{
+    const d=await api({action:'me',player_id:OCP.id});
+    const was=OCP.vf;
+    OCP.vf=d.verified;OCP.code=d.verify_code;
+    localStorage.setItem('oc_profile',JSON.stringify(OCP));
+    paintMe();paintVf();
+    if(d.verified&&!was)toast("You're verified ✓ Full access unlocked 🏀",0,3800);
+    else if(loud&&!d.verified)toast('Not verified yet — we check DMs daily. Hang tight.',1);
+  }catch(e){if(loud)toast(e.message,1);paintVf();}
 }
 // The sign-up gate: full-screen, non-dismissible account creation on first open.
 function openGate(){
@@ -465,7 +499,7 @@ $('#meChip').onclick=()=>{
   if(OCP){
     $('#pfName').value=OCP.name;$('#pfIg').value=OCP.ig||'';$('#pfEmail').value=OCP.email||'';
     setIdMode(OCP.ig||!OCP.email?'ig':'email');
-    openEdit();
+    openEdit();paintVf();refreshMe(false);
   }else if(termsOk())openGate();
   else openSheet('shTerms');
 };
@@ -480,11 +514,11 @@ $('#pfSave').onclick=async()=>{
   const id=(OCP&&OCP.id)||crypto.randomUUID();
   const b=$('#pfSave'); b.disabled=true; b.textContent='Signing in…';
   try{
-    await api({action:'register',accept:true,player:{id,name,ig,email}});
+    const d=await api({action:'register',accept:true,player:{id,name,ig,email}});
     const fresh=!OCP;
-    OCP={id,name,ig,email};
+    OCP={id,name,ig,email,vf:!!d.verified,code:d.verify_code||''};
     localStorage.setItem('oc_profile',JSON.stringify(OCP));
-    paintMe();
+    paintMe();paintVf();
     $('#shProfile').classList.remove('gate');
     closeSheet('shProfile');
     toast(fresh?'Account created. Welcome to Hoops Heaven 🏀':'Saved 🏀');
@@ -619,7 +653,7 @@ function paintRun(){
   $('#rHost').textContent=`called by ${r.host_name}`;
   $('#rRoster').innerHTML=(r.players||[]).map(p=>`
     <div class="pl"><div class="av">${esc((p.name[0]||'?').toUpperCase())}</div>
-      <div class="nm"><b>${esc(p.name)}</b>${p.ig?`<a href="https://instagram.com/${esc(p.ig)}" target="_blank" rel="noopener">@${esc(p.ig)}</a>`:''}</div>
+      <div class="nm"><b>${esc(p.name)}${p.v?' <span style="color:var(--volt)" title="verified account">✓</span>':''}</b>${p.ig?`<a href="https://instagram.com/${esc(p.ig)}" target="_blank" rel="noopener">@${esc(p.ig)}</a>`:''}</div>
       ${p.id===r.host_id?'<span class="host">CALLED IT</span>':''}</div>`).join('');
   const j=$('#rJoin');
   if(im){j.textContent="I'm out";j.className='btn btn-out';j.style.flex='1.4';j.disabled=false;}
@@ -814,7 +848,7 @@ function paintPlays(plays){
   $('#ctPlays').innerHTML=(plays&&plays.length)?plays.map((p,i)=>`
     <div class="play ${i===0&&p.fires>0?'top':''}">
       <span class="rk">${i===0&&p.fires>0?'🏆':'#'+(i+1)}</span>
-      <div class="nm"><b>${esc(p.name)}</b>${p.ig?`<a href="https://instagram.com/${esc(p.ig)}" target="_blank" rel="noopener">@${esc(p.ig)}</a>`:''}</div>
+      <div class="nm"><b>${esc(p.name)}${p.v?' <span style="color:var(--volt)" title="verified account">✓</span>':''}</b>${p.ig?`<a href="https://instagram.com/${esc(p.ig)}" target="_blank" rel="noopener">@${esc(p.ig)}</a>`:''}</div>
       <a class="watch" href="${esc(p.clip_url)}" target="_blank" rel="noopener">▶ Watch</a>
       <button class="fire ${p.fired?'on':''}" data-fire="${esc(p.id)}">🔥 ${p.fires}</button>
     </div>`).join('')
@@ -927,6 +961,7 @@ applyAccent(localStorage.getItem('oc_accent')||'#D8FF3E',false);
 paintMe();
 if(!termsOk())openSheet('shTerms');
 else if(!OCP)openGate(); // rules done but no account yet → sign-up first
+refreshMe(false);        // pick up verification granted since last visit
 $('#rulesLink').onclick=()=>openSheet('shTerms');
 loadBoard().then(()=>{
   const q=new URLSearchParams(location.search);

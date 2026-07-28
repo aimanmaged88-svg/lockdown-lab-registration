@@ -310,6 +310,20 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   unguarded (banned can only remove themselves). Emails never exposed in
   rosters. True Google/Apple OAuth parked — needs Aiman's GCP/Apple dev
   credentials (Supabase Auth ready when he wants it).
+- **Account verification + Heaven desk (edge v6, 2026-07-29, Aiman asked).**
+  oc_players += `verified bool`, `verify_code text` (5-digit, issued at
+  register / backfilled by `me`). Verify = human loop, NO IG automation:
+  player DMs their code to VERIFY_IG ('lockdownlablive' const in
+  hoopsheaven.html — SWAP when the Heaven IG page exists) from their
+  signed-up handle (email users → VERIFY_EMAIL aimanmaged88@gmail.com);
+  Aiman confirms in **hoopsheaven-desk.html** (auth = ACTIVE ll_coaches
+  creds, same sha256 scheme as coach_login; actions admin_players /
+  admin_verify / admin_ban {pid,on,reason} — ban also writes oc_bans for
+  handle+email+device, unban clears). Gates: run_create + play_submit
+  require verified (error code 'verify' → app opens profile + #vfCard);
+  join/checkin stay open to unverified. `me` action returns status; app
+  refreshes on boot + "check my status" button; rosters/POTW rows carry
+  `v` flag → volt ✓. Aiman's @lockdownlab3 verified via SQL.
 - **Sign-up gate at the door (2026-07-29, Aiman asked).** First open now:
   house rules → full-screen non-dismissible sign-up page (#shProfile.gate —
   wordmark, "Create your account", scrim/✕ disabled via the gate class) →

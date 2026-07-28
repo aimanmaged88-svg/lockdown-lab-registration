@@ -65,16 +65,39 @@ async function bansHit(values: string[]) {
   return !!rows?.length;
 }
 
+
+// Heaven desk auth: any ACTIVE Lab coach account (same sha256 scheme as coach_login).
+async function sha256(s: string) {
+  const d = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(d)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+async function coachAuth(user: unknown, pin: unknown) {
+  const u = str(user, 120).toLowerCase(), p = str(pin, 8);
+  if (!u || !p) return false;
+  const rows = await db(`ll_coaches?username=eq.${encodeURIComponent(u)}&status=eq.active&select=pin_hash`);
+  if (!rows?.length || !rows[0].pin_hash) return false;
+  return rows[0].pin_hash === await sha256(`${u}:${p}:lockdownlabcoach`);
+}
+const mkCode = () => String(Math.floor(10000 + Math.random() * 90000));
+
+// Which of these player ids are account-verified?
+async function verifiedSet(ids: string[]) {
+  const uniq = [...new Set(ids.filter(Boolean))];
+  if (!uniq.length) return new Set<string>();
+  const rows = await db(`oc_players?id=in.(${uniq.map(i => `"${i.replace(/"/g, "")}"`).join(",")})&verified=is.true&select=id`);
+  return new Set<string>((rows || []).map((r: Record<string, unknown>) => r.id as string));
+}
+
 // The write gate: device must be registered (terms accepted) and clean.
 // Returns {p} with the REGISTERED identity, or {err} as a ready Response.
-async function guard(pid: string): Promise<{ p?: { id: string; name: string; ig: string }; err?: Response }> {
+async function guard(pid: string): Promise<{ p?: { id: string; name: string; ig: string; verified: boolean }; err?: Response }> {
   const id = str(pid, 64);
   if (!id || id.length < 8) return { err: J({ error: "sign in first", code: "terms" }, 401) };
-  const rows = await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=id,name,ig,email,accepted_at,banned`);
+  const rows = await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=id,name,ig,email,accepted_at,banned,verified`);
   const row = rows?.[0];
   if (!row || !row.accepted_at) return { err: J({ error: "sign in and accept the house rules first", code: "terms" }, 401) };
   if (row.banned || await bansHit([row.id, row.ig, row.email])) return { err: J({ error: BANNED_MSG, code: "banned" }, 403) };
-  return { p: { id: row.id, name: row.name, ig: row.ig } };
+  return { p: { id: row.id, name: row.name, ig: row.ig, verified: !!row.verified } };
 }
 
 // ISO week of the current Sydney date, e.g. "2026-W31" — the POTW window.
@@ -94,8 +117,9 @@ async function withPlayers(runs: Record<string, unknown>[]) {
   if (!runs.length) return runs;
   const ids = runs.map(r => r.id).join(",");
   const ps: Record<string, unknown>[] = await db(`oc_run_players?run_id=in.(${ids})&select=run_id,player_id,name,ig,joined_at&order=joined_at.asc`);
+  const vs = await verifiedSet(ps.map(p => p.player_id as string));
   const by: Record<string, unknown[]> = {};
-  for (const p of ps) (by[p.run_id as string] ||= []).push({ id: p.player_id, name: p.name, ig: p.ig });
+  for (const p of ps) (by[p.run_id as string] ||= []).push({ id: p.player_id, name: p.name, ig: p.ig, v: vs.has(p.player_id as string) });
   return runs.map(r => ({ ...r, players: by[r.id as string] || [] }));
 }
 
@@ -110,8 +134,9 @@ async function playsFor(courtKey: string, week: string, me: string) {
     n[f.play_id as string] = (n[f.play_id as string] || 0) + 1;
     if (f.player_id === me) mine[f.play_id as string] = true;
   }
+  const vs = await verifiedSet(plays.map(p => p.player_id as string));
   return plays
-    .map(p => ({ ...p, fires: n[p.id as string] || 0, fired: !!mine[p.id as string] }))
+    .map(p => ({ ...p, fires: n[p.id as string] || 0, fired: !!mine[p.id as string], v: vs.has(p.player_id as string) }))
     .sort((a, b) => (b.fires as number) - (a.fires as number) || String(a.created_at).localeCompare(String(b.created_at)));
 }
 
@@ -146,11 +171,14 @@ Deno.serve(async (req: Request) => {
         // A banned device row stays banned even if they re-register.
         const prev = await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=banned`);
         if (prev?.[0]?.banned) return J({ error: BANNED_MSG, code: "banned" }, 403);
+        const cur = await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=verified,verify_code`);
+        const verified = !!cur?.[0]?.verified;
+        const verify_code = cur?.[0]?.verify_code || mkCode();
         await db(`oc_players?on_conflict=id`, {
           method: "POST", headers: { Prefer: "resolution=merge-duplicates" },
-          body: JSON.stringify({ id, name, ig, email, accepted_at: new Date().toISOString() }),
+          body: JSON.stringify({ id, name, ig, email, accepted_at: new Date().toISOString(), verify_code }),
         });
-        return J({ ok: true, player: { id, name, ig } });
+        return J({ ok: true, player: { id, name, ig }, verified, verify_code });
       }
 
       // The board: every open run from 3h ago (still live) to +14 days.
@@ -171,6 +199,7 @@ Deno.serve(async (req: Request) => {
         const g = await guard(((b.player || {}) as Record<string, unknown>).id as string);
         if (g.err) return g.err;
         const player = g.p!;
+        if (!player.verified) return J({ error: "verify your account to call runs — takes one DM", code: "verify" }, 403);
         const court = courtOf(b);
         if (!court) return J({ error: "pick a court" }, 400);
         const at = new Date(str(b.run_at, 40));
@@ -280,11 +309,56 @@ Deno.serve(async (req: Request) => {
         return J({ ok: true, here: rows?.[0] ? await hereFor(rows[0].court_key as string) : [] });
       }
 
+
+      // My account status (verification state + code for the DM).
+      case "me": {
+        const id = str(b.player_id, 64);
+        if (!id) return J({ error: "bad request" }, 400);
+        const rows = await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=name,ig,email,verified,verify_code,banned`);
+        const row = rows?.[0];
+        if (!row) return J({ error: "no account", code: "terms" }, 404);
+        let code = row.verify_code;
+        if (!code) { code = mkCode(); await db(`oc_players?id=eq.${encodeURIComponent(id)}`, { method: "PATCH", body: JSON.stringify({ verify_code: code }) }); }
+        return J({ name: row.name, ig: row.ig, email: row.email, verified: !!row.verified, verify_code: code, banned: !!row.banned });
+      }
+
+      // Heaven desk (Lab coach credentials): review + verify + ban.
+      case "admin_players": {
+        if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
+        const rows = await db(`oc_players?select=id,name,ig,email,verified,verify_code,banned,created_at&order=created_at.desc&limit=200`);
+        return J({ players: rows || [] });
+      }
+
+      case "admin_verify": {
+        if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
+        const pid = str(b.pid, 64);
+        if (!pid) return J({ error: "bad request" }, 400);
+        await db(`oc_players?id=eq.${encodeURIComponent(pid)}`, { method: "PATCH", body: JSON.stringify({ verified: b.on !== false }) });
+        return J({ ok: true });
+      }
+
+      case "admin_ban": {
+        if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
+        const pid = str(b.pid, 64);
+        const rows = await db(`oc_players?id=eq.${encodeURIComponent(pid)}&select=id,ig,email`);
+        const row = rows?.[0];
+        if (!row) return J({ error: "player not found" }, 404);
+        if (b.on === false) {
+          await db(`oc_players?id=eq.${encodeURIComponent(pid)}`, { method: "PATCH", body: JSON.stringify({ banned: false, ban_reason: "" }) });
+          for (const v of [row.id, row.ig, row.email]) if (v) await db(`oc_bans?value=eq.${encodeURIComponent(String(v).toLowerCase())}`, { method: "DELETE" });
+        } else {
+          await db(`oc_players?id=eq.${encodeURIComponent(pid)}`, { method: "PATCH", body: JSON.stringify({ banned: true, ban_reason: str(b.reason, 200) }) });
+          for (const v of [row.id, row.ig, row.email]) if (v) await db(`oc_bans?on_conflict=value`, { method: "POST", headers: { Prefer: "resolution=merge-duplicates" }, body: JSON.stringify({ value: String(v).toLowerCase(), reason: str(b.reason, 200) }) });
+        }
+        return J({ ok: true });
+      }
+
       // Play of the Week: one clip per player per court per week (resubmit replaces).
       case "play_submit": {
         const g = await guard(((b.player || {}) as Record<string, unknown>).id as string);
         if (g.err) return g.err;
         const player = g.p!;
+        if (!player.verified) return J({ error: "verify your account to post clips — takes one DM", code: "verify" }, 403);
         const key = str(b.court_key, 64);
         const name = str(b.court_name, 80), suburb = str(b.suburb, 60);
         const url = str(b.clip_url, 300);
