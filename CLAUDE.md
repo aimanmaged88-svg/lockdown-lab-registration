@@ -310,9 +310,17 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   unguarded (banned can only remove themselves). Emails never exposed in
   rosters. True Google/Apple OAuth parked — needs Aiman's GCP/Apple dev
   credentials (Supabase Auth ready when he wants it).
-- Brand: volt (#D8FF3E) on asphalt black, italic 900 display, court-line bg,
-  bottom sheets. Dark only for now. No SW registration (root sw.js is the
-  Lab's). E2E-verified via scratchpad oc-e2e.mjs + oc-e2e2.mjs (Playwright;
+- **Colour schemes (2026-07-28, Aiman asked).** Header 🎨 → `#shTheme` sheet:
+  THEMES[8] accent presets (Volt/Blaze/Ice/Grape/Cherry/Mint/Gold/Chalk) + a
+  native Custom colour input. `applyAccent()` sets `--volt` + computed
+  `--onaccent` (luminance-picked black/white text on accent); ALL hardcoded
+  rgba(216,255,62,.x) were converted to `color-mix(in srgb, var(--volt) X%,
+  transparent)` so everything follows. Persisted `oc_accent` per device;
+  `brighten()` lifts too-dark custom picks (loop-capped) so they stay legible
+  on asphalt. Fire orange + danger red stay fixed (semantic).
+- Brand: volt (#D8FF3E) on asphalt black default, italic 900 display,
+  court-line bg, bottom sheets. Dark only for now. No SW registration (root
+  sw.js is the Lab's). E2E-verified via scratchpad oc-e2e.mjs + oc-e2e2.mjs (Playwright;
   NOTE: sandbox Chromium has no network — API calls bridged through Node
   undici proxy fetch; edge calls take 1-2s cold so pad test waits). All oc_
   test rows deleted after each run.

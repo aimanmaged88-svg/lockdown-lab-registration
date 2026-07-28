@@ -11,7 +11,7 @@
 :root{
   --bg:#0A0C0F; --card:#12151B; --card2:#171B22; --line:rgba(255,255,255,.09);
   --text:#F4F6F0; --muted:#96A0A8; --dim:#5D666E;
-  --volt:#D8FF3E; --volt2:#AEDC1E; --fire:#FF7A2F; --danger:#FF5A5A;
+  --volt:#D8FF3E; --volt2:#AEDC1E; --onaccent:#0A0C0F; --fire:#FF7A2F; --danger:#FF5A5A;
   --r:18px;
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -25,7 +25,7 @@ body{
 body::before{
   content:''; position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.55;
   background:
-    radial-gradient(circle 340px at 50% -180px, transparent 338px, rgba(216,255,62,.10) 339px, transparent 342px),
+    radial-gradient(circle 340px at 50% -180px, transparent 338px, color-mix(in srgb, var(--volt) 10%, transparent) 339px, transparent 342px),
     radial-gradient(circle 120px at 50% -20px, transparent 118px, rgba(255,255,255,.05) 119px, transparent 122px),
     linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px);
   background-size:auto,auto,100% 190px;
@@ -46,7 +46,7 @@ header{
   display:flex; align-items:center; gap:8px; background:var(--card); border:1px solid var(--line);
   border-radius:99px; padding:6px 12px 6px 7px; cursor:pointer; font-size:13px; color:var(--muted); max-width:46vw;
 }
-.me .av{width:26px;height:26px;border-radius:50%;background:var(--volt);color:#0A0C0F;font-weight:800;font-size:12px;display:grid;place-items:center;flex:none}
+.me .av{width:26px;height:26px;border-radius:50%;background:var(--volt);color:var(--onaccent);font-weight:800;font-size:12px;display:grid;place-items:center;flex:none}
 .me b{color:var(--text);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* ---------- hero ---------- */
@@ -61,7 +61,7 @@ header{
   font-family:inherit;
 }
 .btn:active{transform:scale(.97)}
-.btn-v{background:var(--volt);color:#0A0C0F;flex:1.3}
+.btn-v{background:var(--volt);color:var(--onaccent);flex:1.3}
 .btn-v:hover{filter:brightness(1.06)}
 .btn-o{background:var(--card);color:var(--text);border:1px solid var(--line);flex:1}
 .btn-block{width:100%}
@@ -76,7 +76,7 @@ header{
   background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 15px;margin-bottom:10px;
   cursor:pointer;display:flex;gap:14px;align-items:center;transition:border-color .15s;
 }
-.run:hover{border-color:rgba(216,255,62,.35)}
+.run:hover{border-color:color-mix(in srgb, var(--volt) 35%, transparent)}
 .run .tm{flex:none;text-align:center;min-width:56px}
 .run .tm b{display:block;font-size:19px;font-weight:900;font-style:italic;letter-spacing:-.5px}
 .run .tm span{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;font-weight:700}
@@ -84,7 +84,7 @@ header{
 .run .inf b{display:block;font-size:15.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .run .inf .sub{font-size:12.5px;color:var(--muted);margin-top:2px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .chip{display:inline-flex;align-items:center;gap:4px;background:var(--card2);border:1px solid var(--line);border-radius:99px;padding:2px 9px;font-size:11px;font-weight:700;color:var(--muted)}
-.chip.v{color:var(--volt);border-color:rgba(216,255,62,.3)}
+.chip.v{color:var(--volt);border-color:color-mix(in srgb, var(--volt) 30%, transparent)}
 .chip.f{color:var(--fire);border-color:rgba(255,122,47,.3)}
 .run .spots{flex:none;text-align:right}
 .run .spots b{font-size:14px;font-weight:900;color:var(--volt)}
@@ -110,6 +110,15 @@ header{
 .rule b{color:var(--text)}
 .fineprint{font-size:11px;color:var(--dim);text-align:center;margin-top:9px}
 .linky{background:none;border:none;color:var(--volt);font-size:13px;font-weight:700;cursor:pointer;padding:0;font-family:inherit;text-decoration:underline;text-underline-offset:3px}
+/* colour picker */
+.iconbtn{flex:none;background:var(--card);border:1px solid var(--line);border-radius:50%;width:36px;height:36px;font-size:16px;cursor:pointer;display:grid;place-items:center}
+.hdr-r{display:flex;gap:8px;align-items:center;min-width:0}
+.swgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-top:6px}
+.swb{border:1px solid var(--line);background:var(--card);border-radius:16px;padding:12px 6px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:7px;font-family:inherit}
+.swb .dot{width:34px;height:34px;border-radius:50%}
+.swb span:last-child{font-size:11px;font-weight:700;color:var(--muted)}
+.swb.on{border-color:var(--volt)}
+.swb.on .dot{box-shadow:0 0 0 3px #0E1116,0 0 0 5px var(--volt)}
 .sheet .scrim{position:absolute;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);animation:fad .2s}
 @keyframes fad{from{opacity:0}}
 .panel{
@@ -131,7 +140,7 @@ header{
   width:100%;background:var(--card);border:1px solid var(--line);border-radius:13px;color:var(--text);
   font-size:16px;padding:13px 14px;outline:none;font-family:inherit;
 }
-.inp:focus{border-color:rgba(216,255,62,.5)}
+.inp:focus{border-color:color-mix(in srgb, var(--volt) 50%, transparent)}
 .igwrap{position:relative}
 .igwrap .at{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--volt);font-weight:800}
 .igwrap .inp{padding-left:32px}
@@ -140,7 +149,7 @@ header{
   background:var(--card);border:1px solid var(--line);color:var(--muted);border-radius:99px;padding:9px 15px;
   font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;
 }
-.pill.on{background:rgba(216,255,62,.12);border-color:var(--volt);color:var(--volt)}
+.pill.on{background:color-mix(in srgb, var(--volt) 12%, transparent);border-color:var(--volt);color:var(--volt)}
 .step{display:flex;align-items:center;gap:14px}
 .step button{width:42px;height:42px;border-radius:12px;background:var(--card);border:1px solid var(--line);color:var(--text);font-size:20px;font-weight:800;cursor:pointer}
 .step b{font-size:20px;font-weight:900;min-width:34px;text-align:center}
@@ -151,7 +160,7 @@ header{
   display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:13px;
   padding:11px 13px;margin-bottom:7px;cursor:pointer;
 }
-.crow:hover{border-color:rgba(216,255,62,.35)}
+.crow:hover{border-color:color-mix(in srgb, var(--volt) 35%, transparent)}
 .crow .ic{flex:none;font-size:18px}
 .crow .nm{flex:1;min-width:0}
 .crow .nm b{display:block;font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -161,7 +170,7 @@ header{
 /* run sheet */
 .bigtime{font-style:italic;font-weight:900;font-size:26px;letter-spacing:-.5px;margin:2px 0 0}
 .courtlink{display:flex;align-items:center;gap:8px;margin:10px 0 4px;cursor:pointer;color:var(--text)}
-.courtlink b{font-size:16px;font-weight:800;text-decoration:underline;text-decoration-color:rgba(216,255,62,.5);text-underline-offset:3px}
+.courtlink b{font-size:16px;font-weight:800;text-decoration:underline;text-decoration-color:color-mix(in srgb, var(--volt) 50%, transparent);text-underline-offset:3px}
 .meta{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0 14px}
 .bar{height:7px;border-radius:99px;background:var(--card2);overflow:hidden;margin:6px 0 4px}
 .bar i{display:block;height:100%;background:var(--volt);border-radius:99px;transition:width .3s}
@@ -173,7 +182,7 @@ header{
 .pl .nm b{display:block;font-size:14px;font-weight:800}
 .pl .nm a{color:var(--muted);font-size:12.5px;text-decoration:none}
 .pl .nm a:hover{color:var(--volt)}
-.pl .host{flex:none;font-size:10px;letter-spacing:1.4px;font-weight:800;color:var(--volt);border:1px solid rgba(216,255,62,.35);border-radius:99px;padding:3px 8px}
+.pl .host{flex:none;font-size:10px;letter-spacing:1.4px;font-weight:800;color:var(--volt);border:1px solid color-mix(in srgb, var(--volt) 35%, transparent);border-radius:99px;padding:3px 8px}
 .btn-row{display:flex;gap:9px;margin-top:6px}
 .btn-ghost{background:var(--card);color:var(--text);border:1px solid var(--line)}
 .btn-out{background:var(--card);color:var(--danger);border:1px solid rgba(255,90,90,.3)}
@@ -197,7 +206,7 @@ header{
 .fire.on{color:var(--fire);border-color:rgba(255,122,47,.5);background:rgba(255,122,47,.1)}
 .kotc{
   border:1px solid var(--line);border-radius:var(--r);padding:18px;text-align:center;color:var(--muted);
-  background:radial-gradient(circle at 50% -40%,rgba(216,255,62,.08),var(--card));
+  background:radial-gradient(circle at 50% -40%,color-mix(in srgb, var(--volt) 8%, transparent),var(--card));
 }
 .kotc .crown{font-size:30px}
 .kotc b{display:block;color:var(--text);font-style:italic;font-weight:900;text-transform:uppercase;letter-spacing:.5px;margin:4px 0 3px}
@@ -212,7 +221,7 @@ header{
 /* toast */
 #toast{
   position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(90px);z-index:99;
-  background:var(--volt);color:#0A0C0F;font-weight:800;font-size:14px;border-radius:13px;padding:12px 20px;
+  background:var(--volt);color:var(--onaccent);font-weight:800;font-size:14px;border-radius:13px;padding:12px 20px;
   transition:transform .3s cubic-bezier(.32,.9,.35,1);max-width:88vw;text-align:center;
 }
 #toast.show{transform:translateX(-50%) translateY(0)}
@@ -228,7 +237,10 @@ header{
 
   <header>
     <div class="logo" id="logoBtn"><b>HOOPS</b><span>HAVEN</span><small>SYDNEY'S OPEN RUN</small></div>
-    <div class="me" id="meChip"><div class="av" id="meAv">?</div><b id="meName">Who are you?</b></div>
+    <div class="hdr-r">
+      <button class="iconbtn" id="themeBtn" title="Colours">🎨</button>
+      <div class="me" id="meChip"><div class="av" id="meAv">?</div><b id="meName">Who are you?</b></div>
+    </div>
   </header>
 
   <div class="hero">
@@ -342,6 +354,14 @@ header{
       <div class="klead" id="ctKotc"></div>
     </div>
   </div>
+</div></div>
+
+<!-- colour picker sheet -->
+<div class="sheet" id="shTheme"><div class="scrim" data-close></div><div class="panel">
+  <div class="grab"></div>
+  <div class="xrow"><div><h3>Colours</h3><p class="sub">Your court, your colours. Saved on this device.</p></div><button class="x" data-close>✕</button></div>
+  <div class="swgrid" id="swGrid"></div>
+  <input type="color" id="swCustom" value="#D8FF3E" style="position:absolute;width:0;height:0;opacity:0;border:0;padding:0">
 </div></div>
 
 <div id="toast"></div>
@@ -686,6 +706,34 @@ $('#ctDrop').onclick=()=>ensureProfile(async()=>{
 $('#ctCall').onclick=()=>{closeSheet('shCourt');startCall(CC);};
 $('#ctMaps').onclick=()=>window.open(`https://www.google.com/maps/dir/?api=1&destination=${CC.lat},${CC.lon}`,'_blank');
 $('#logoBtn').onclick=()=>{document.querySelectorAll('.sheet.open').forEach(s=>closeSheet(s.id));window.scrollTo({top:0,behavior:'smooth'});};
+
+/* ---------- colours (accent themes, per device) ---------- */
+const THEMES=[['Volt','#D8FF3E'],['Blaze','#FF7A2F'],['Ice','#5BC9FF'],['Grape','#B98CFF'],
+  ['Cherry','#FF5A7A'],['Mint','#4DE8A8'],['Gold','#FFD24D'],['Chalk','#F2F2F2']];
+const lum=hex=>{const n=parseInt(hex.slice(1),16);return(.299*(n>>16&255)+.587*(n>>8&255)+.114*(n&255))/255};
+function brighten(hex){ // dark custom picks get lifted so they read on asphalt
+  let n=parseInt(hex.slice(1),16),r=n>>16&255,g=n>>8&255,b=n&255,i=0;
+  while((.299*r+.587*g+.114*b)/255<.45&&i++<12){r=Math.min(255,Math.round(r*1.25+16));g=Math.min(255,Math.round(g*1.25+16));b=Math.min(255,Math.round(b*1.25+16));}
+  return '#'+[r,g,b].map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+function applyAccent(hex,save=true){
+  hex=brighten(hex);
+  document.documentElement.style.setProperty('--volt',hex);
+  document.documentElement.style.setProperty('--onaccent',lum(hex)>.55?'#0A0C0F':'#fff');
+  if(save)localStorage.setItem('oc_accent',hex);
+  paintSw(hex);
+}
+function paintSw(cur){
+  const g=$('#swGrid'),c0=cur.toLowerCase();
+  const preset=THEMES.some(t=>t[1].toLowerCase()===c0);
+  g.innerHTML=THEMES.map(([n,c])=>`<button class="swb ${c.toLowerCase()===c0?'on':''}" data-c="${c}"><span class="dot" style="background:${c}"></span><span>${n}</span></button>`).join('')
+    +`<button class="swb ${preset?'':'on'}" id="swCustomBtn"><span class="dot" style="background:conic-gradient(red,orange,yellow,lime,cyan,blue,magenta,red)"></span><span>Custom</span></button>`;
+  g.querySelectorAll('[data-c]').forEach(x=>x.onclick=()=>applyAccent(x.dataset.c));
+  $('#swCustomBtn').onclick=()=>$('#swCustom').click();
+}
+$('#swCustom').oninput=e=>applyAccent(e.target.value);
+$('#themeBtn').onclick=()=>{paintSw(localStorage.getItem('oc_accent')||'#D8FF3E');openSheet('shTheme')};
+applyAccent(localStorage.getItem('oc_accent')||'#D8FF3E',false);
 
 /* ---------- boot ---------- */
 paintMe();
