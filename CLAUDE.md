@@ -272,6 +272,33 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   scratchpad/coach-mobile.mjs (temp coach, dark+light, closed/open/after-nav).
   NEWS id:23. Admin desk mobile still uses its own top strip (not asked yet).
 
+## OpenCourt — pickup basketball network (2026-07-28)
+
+- **NEW standalone product** (Aiman: own brand, "starting fresh", nothing to do
+  with the Lab). **opencourt.html** — Sydney-wide pickup: public runs board,
+  call a run at any of the 971 courts (courts.json = the picker), tap in/out,
+  shareable run links (?run=id). NO accounts: device uuid + name + **Instagram
+  handle as the jersey** — rosters link to instagram.com/handle (that's how
+  people connect; never automate IG). Court pages: meta chips, runs here,
+  **🔥 Play of the Week** (one clip link per player per court per ISO week,
+  fires toggle, no self-fire, top clip crowned) and **👑 King of the Court**
+  = coming-soon teaser, but tap-ins per court already accrue (court action
+  returns 90-day leaders) so the throne has data when it ships.
+- **Backend: edge fn `opencourt-api` (v2, verify_jwt on — anon key as Bearer
+  + apikey, same as app-api).** Tables oc_runs / oc_run_players / oc_plays /
+  oc_play_fires (RLS on, no policies, service-role only). Actions: board,
+  run_get, run_create (host auto-joins, ≤6 runs/device/day, +14d window,
+  past-time rejected), run_join (cap-checked), run_leave, court, play_submit
+  (upsert per court+player+week), play_fire (toggle). Source committed at
+  supabase/functions/opencourt-api/index.ts. app-api UNTOUCHED.
+- Brand: volt (#D8FF3E) on asphalt black, italic 900 display, court-line bg,
+  bottom sheets. Dark only for now. No SW registration (root sw.js is the
+  Lab's). E2E-verified via scratchpad oc-e2e.mjs (Playwright; NOTE: sandbox
+  Chromium has no network — API calls bridged through Node undici proxy
+  fetch). All oc_ test rows deleted after the run.
+- v2 ideas discussed: KOTC proper, court check-ins ("I'm here now"), run
+  chat, POTW weekly archive/all-time wall, PWA manifest + install.
+
 ## Parked ideas (Aiman asked to save these)
 
 - **"A.I. MAN" Instagram post** — saved 2026-07-18, for a few weeks out.

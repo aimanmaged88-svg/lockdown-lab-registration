@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0A0C0F">
+<title>OpenCourt — Sydney's open run</title>
+<meta name="description" content="Find a run. Tap in. Pull up. Pickup basketball across 971 Sydney courts — open to everyone.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%23D8FF3E'/%3E%3Cpath d='M32 4v56M4 32h56M11 11c12 10 30 10 42 0M11 53c12-10 30-10 42 0' stroke='%230A0C0F' stroke-width='4' fill='none'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#0A0C0F; --card:#12151B; --card2:#171B22; --line:rgba(255,255,255,.09);
+  --text:#F4F6F0; --muted:#96A0A8; --dim:#5D666E;
+  --volt:#D8FF3E; --volt2:#AEDC1E; --fire:#FF7A2F; --danger:#FF5A5A;
+  --r:18px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg); color:var(--text); min-height:100dvh;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  font-size:16px; line-height:1.45; overflow-x:hidden;
+}
+/* faint court lines behind everything */
+body::before{
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.55;
+  background:
+    radial-gradient(circle 340px at 50% -180px, transparent 338px, rgba(216,255,62,.10) 339px, transparent 342px),
+    radial-gradient(circle 120px at 50% -20px, transparent 118px, rgba(255,255,255,.05) 119px, transparent 122px),
+    linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px);
+  background-size:auto,auto,100% 190px;
+}
+.wrap{position:relative; z-index:1; max-width:540px; margin:0 auto; padding:0 16px 90px}
+
+/* ---------- header ---------- */
+header{
+  position:sticky; top:0; z-index:30; display:flex; align-items:center; justify-content:space-between;
+  padding:14px 2px 10px; backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+  background:rgba(10,12,15,.82); border-bottom:1px solid var(--line); margin:0 -16px; padding-left:18px; padding-right:18px;
+}
+.logo{font-style:italic; font-weight:900; font-size:22px; letter-spacing:-.5px; text-transform:uppercase; user-select:none; cursor:pointer}
+.logo b{color:transparent; -webkit-text-stroke:1.4px var(--volt)}
+.logo span{color:var(--volt)}
+.logo small{display:block; font-style:normal; font-weight:600; font-size:9.5px; letter-spacing:2.6px; color:var(--dim); margin-top:-2px}
+.me{
+  display:flex; align-items:center; gap:8px; background:var(--card); border:1px solid var(--line);
+  border-radius:99px; padding:6px 12px 6px 7px; cursor:pointer; font-size:13px; color:var(--muted); max-width:46vw;
+}
+.me .av{width:26px;height:26px;border-radius:50%;background:var(--volt);color:#0A0C0F;font-weight:800;font-size:12px;display:grid;place-items:center;flex:none}
+.me b{color:var(--text);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* ---------- hero ---------- */
+.hero{padding:26px 2px 6px}
+.hero h1{font-style:italic;font-weight:900;font-size:clamp(30px,8.6vw,40px);line-height:1.02;text-transform:uppercase;letter-spacing:-1px}
+.hero h1 em{font-style:italic;color:var(--volt)}
+.hero p{color:var(--muted);margin-top:8px;font-size:15px}
+.cta{display:flex;gap:10px;margin-top:16px}
+.btn{
+  border:none;border-radius:14px;font-weight:800;font-size:15px;padding:14px 16px;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform .08s ease,filter .15s;
+  font-family:inherit;
+}
+.btn:active{transform:scale(.97)}
+.btn-v{background:var(--volt);color:#0A0C0F;flex:1.3}
+.btn-v:hover{filter:brightness(1.06)}
+.btn-o{background:var(--card);color:var(--text);border:1px solid var(--line);flex:1}
+.btn-block{width:100%}
+.btn[disabled]{opacity:.5;pointer-events:none}
+
+/* ---------- board ---------- */
+.sect{margin-top:26px}
+.sect h2{font-size:12px;letter-spacing:2.4px;text-transform:uppercase;color:var(--dim);font-weight:800;margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.sect h2 .liv{width:7px;height:7px;border-radius:50%;background:var(--volt);animation:pul 1.6s infinite}
+@keyframes pul{0%,100%{opacity:1}50%{opacity:.25}}
+.run{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 15px;margin-bottom:10px;
+  cursor:pointer;display:flex;gap:14px;align-items:center;transition:border-color .15s;
+}
+.run:hover{border-color:rgba(216,255,62,.35)}
+.run .tm{flex:none;text-align:center;min-width:56px}
+.run .tm b{display:block;font-size:19px;font-weight:900;font-style:italic;letter-spacing:-.5px}
+.run .tm span{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;font-weight:700}
+.run .inf{flex:1;min-width:0}
+.run .inf b{display:block;font-size:15.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.run .inf .sub{font-size:12.5px;color:var(--muted);margin-top:2px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:4px;background:var(--card2);border:1px solid var(--line);border-radius:99px;padding:2px 9px;font-size:11px;font-weight:700;color:var(--muted)}
+.chip.v{color:var(--volt);border-color:rgba(216,255,62,.3)}
+.chip.f{color:var(--fire);border-color:rgba(255,122,47,.3)}
+.run .spots{flex:none;text-align:right}
+.run .spots b{font-size:14px;font-weight:900;color:var(--volt)}
+.run .spots.full b{color:var(--fire)}
+.run .spots span{display:block;font-size:10.5px;color:var(--dim);letter-spacing:1px;text-transform:uppercase;font-weight:700}
+.run .spots .in{color:var(--volt);font-size:10.5px;font-weight:800;letter-spacing:1px}
+.empty{
+  border:1.5px dashed var(--line);border-radius:var(--r);padding:34px 20px;text-align:center;color:var(--muted);margin-top:8px;
+}
+.empty b{display:block;color:var(--text);font-style:italic;font-weight:900;text-transform:uppercase;font-size:18px;margin-bottom:6px}
+.skel{height:74px;border-radius:var(--r);background:linear-gradient(100deg,var(--card) 40%,var(--card2) 50%,var(--card) 60%);background-size:200% 100%;animation:sk 1.2s infinite;margin-bottom:10px}
+@keyframes sk{to{background-position:-200% 0}}
+
+/* ---------- sheets ---------- */
+.sheet{position:fixed;inset:0;z-index:60;display:none}
+#shProfile{z-index:70} /* identity ask always stacks above whatever asked for it */
+.sheet.open{display:block}
+.sheet .scrim{position:absolute;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);animation:fad .2s}
+@keyframes fad{from{opacity:0}}
+.panel{
+  position:absolute;left:0;right:0;bottom:0;max-width:540px;margin:0 auto;background:#0E1116;border:1px solid var(--line);border-bottom:none;
+  border-radius:22px 22px 0 0;padding:10px 18px calc(20px + env(safe-area-inset-bottom));max-height:88dvh;overflow-y:auto;
+  animation:up .26s cubic-bezier(.32,.9,.35,1);
+}
+@keyframes up{from{transform:translateY(60px);opacity:.4}}
+.grab{width:40px;height:4px;border-radius:99px;background:var(--line);margin:4px auto 14px}
+.panel h3{font-style:italic;font-weight:900;text-transform:uppercase;font-size:20px;letter-spacing:-.4px;margin-bottom:2px}
+.panel .sub{color:var(--muted);font-size:13.5px;margin-bottom:14px}
+.xrow{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.x{flex:none;background:var(--card);border:1px solid var(--line);color:var(--muted);width:32px;height:32px;border-radius:50%;font-size:15px;cursor:pointer}
+
+/* forms */
+.fld{margin-bottom:14px}
+.fld label{display:block;font-size:11px;letter-spacing:1.8px;text-transform:uppercase;color:var(--dim);font-weight:800;margin-bottom:7px}
+.inp{
+  width:100%;background:var(--card);border:1px solid var(--line);border-radius:13px;color:var(--text);
+  font-size:16px;padding:13px 14px;outline:none;font-family:inherit;
+}
+.inp:focus{border-color:rgba(216,255,62,.5)}
+.igwrap{position:relative}
+.igwrap .at{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--volt);font-weight:800}
+.igwrap .inp{padding-left:32px}
+.pills{display:flex;gap:8px;flex-wrap:wrap}
+.pill{
+  background:var(--card);border:1px solid var(--line);color:var(--muted);border-radius:99px;padding:9px 15px;
+  font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;
+}
+.pill.on{background:rgba(216,255,62,.12);border-color:var(--volt);color:var(--volt)}
+.step{display:flex;align-items:center;gap:14px}
+.step button{width:42px;height:42px;border-radius:12px;background:var(--card);border:1px solid var(--line);color:var(--text);font-size:20px;font-weight:800;cursor:pointer}
+.step b{font-size:20px;font-weight:900;min-width:34px;text-align:center}
+
+/* court search */
+.clist{margin-top:10px;max-height:44dvh;overflow-y:auto;border-radius:14px}
+.crow{
+  display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:13px;
+  padding:11px 13px;margin-bottom:7px;cursor:pointer;
+}
+.crow:hover{border-color:rgba(216,255,62,.35)}
+.crow .ic{flex:none;font-size:18px}
+.crow .nm{flex:1;min-width:0}
+.crow .nm b{display:block;font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crow .nm span{font-size:12px;color:var(--muted)}
+.crow .dist{flex:none;font-size:12px;color:var(--volt);font-weight:800}
+
+/* run sheet */
+.bigtime{font-style:italic;font-weight:900;font-size:26px;letter-spacing:-.5px;margin:2px 0 0}
+.courtlink{display:flex;align-items:center;gap:8px;margin:10px 0 4px;cursor:pointer;color:var(--text)}
+.courtlink b{font-size:16px;font-weight:800;text-decoration:underline;text-decoration-color:rgba(216,255,62,.5);text-underline-offset:3px}
+.meta{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0 14px}
+.bar{height:7px;border-radius:99px;background:var(--card2);overflow:hidden;margin:6px 0 4px}
+.bar i{display:block;height:100%;background:var(--volt);border-radius:99px;transition:width .3s}
+.bar.full i{background:var(--fire)}
+.roster{display:flex;flex-direction:column;gap:8px;margin:12px 0 16px}
+.pl{display:flex;align-items:center;gap:11px;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:9px 12px}
+.pl .av{width:34px;height:34px;border-radius:50%;background:var(--card2);border:1.5px solid var(--volt);color:var(--volt);display:grid;place-items:center;font-weight:900;font-size:13px;flex:none}
+.pl .nm{flex:1;min-width:0}
+.pl .nm b{display:block;font-size:14px;font-weight:800}
+.pl .nm a{color:var(--muted);font-size:12.5px;text-decoration:none}
+.pl .nm a:hover{color:var(--volt)}
+.pl .host{flex:none;font-size:10px;letter-spacing:1.4px;font-weight:800;color:var(--volt);border:1px solid rgba(216,255,62,.35);border-radius:99px;padding:3px 8px}
+.btn-row{display:flex;gap:9px;margin-top:6px}
+.btn-ghost{background:var(--card);color:var(--text);border:1px solid var(--line)}
+.btn-out{background:var(--card);color:var(--danger);border:1px solid rgba(255,90,90,.3)}
+
+/* court page */
+.cmeta{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0 14px}
+.subsect{margin-top:20px}
+.subsect h4{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);font-weight:800;margin-bottom:9px;display:flex;gap:7px;align-items:center}
+.play{display:flex;align-items:center;gap:11px;background:var(--card);border:1px solid var(--line);border-radius:13px;padding:10px 12px;margin-bottom:8px}
+.play.top{border-color:rgba(255,122,47,.45);background:linear-gradient(180deg,rgba(255,122,47,.07),var(--card))}
+.play .rk{flex:none;font-style:italic;font-weight:900;font-size:16px;color:var(--dim);min-width:20px;text-align:center}
+.play.top .rk{color:var(--fire)}
+.play .nm{flex:1;min-width:0}
+.play .nm b{display:block;font-size:13.5px;font-weight:800}
+.play .nm a{color:var(--muted);font-size:12px;text-decoration:none}
+.play .watch{flex:none;font-size:12px;font-weight:800;color:var(--text);background:var(--card2);border:1px solid var(--line);border-radius:99px;padding:6px 11px;text-decoration:none}
+.fire{
+  flex:none;background:var(--card2);border:1px solid var(--line);border-radius:99px;padding:6px 11px;cursor:pointer;
+  font-size:12.5px;font-weight:800;color:var(--muted);font-family:inherit;
+}
+.fire.on{color:var(--fire);border-color:rgba(255,122,47,.5);background:rgba(255,122,47,.1)}
+.kotc{
+  border:1px solid var(--line);border-radius:var(--r);padding:18px;text-align:center;color:var(--muted);
+  background:radial-gradient(circle at 50% -40%,rgba(216,255,62,.08),var(--card));
+}
+.kotc .crown{font-size:30px}
+.kotc b{display:block;color:var(--text);font-style:italic;font-weight:900;text-transform:uppercase;letter-spacing:.5px;margin:4px 0 3px}
+.kotc p{font-size:12.5px}
+.klead{display:flex;flex-direction:column;gap:6px;margin-top:12px;text-align:left}
+.klead .kr{display:flex;justify-content:space-between;font-size:13px;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:7px 11px}
+.klead .kr b{font-weight:800}
+.klead .kr span{color:var(--volt);font-weight:800}
+.droprow{display:flex;gap:8px;margin-top:9px}
+.droprow .inp{flex:1}
+
+/* toast */
+#toast{
+  position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(90px);z-index:99;
+  background:var(--volt);color:#0A0C0F;font-weight:800;font-size:14px;border-radius:13px;padding:12px 20px;
+  transition:transform .3s cubic-bezier(.32,.9,.35,1);max-width:88vw;text-align:center;
+}
+#toast.show{transform:translateX(-50%) translateY(0)}
+#toast.err{background:var(--danger);color:#fff}
+
+.foot{margin-top:44px;text-align:center;color:var(--dim);font-size:11.5px;line-height:1.7;padding-bottom:10px}
+.foot b{color:var(--muted)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="logo" id="logoBtn"><b>OPEN</b><span>COURT</span><small>SYDNEY'S OPEN RUN</small></div>
+    <div class="me" id="meChip"><div class="av" id="meAv">?</div><b id="meName">Who are you?</b></div>
+  </header>
+
+  <div class="hero">
+    <h1>Find a run.<br><em>Tap in.</em> Pull up.</h1>
+    <p>Pickup basketball across <b style="color:var(--text)">971 Sydney courts</b> — open to everyone. Your Instagram is your jersey.</p>
+    <div class="cta">
+      <button class="btn btn-v" id="callBtn">⚡ Call a run</button>
+      <button class="btn btn-o" id="courtsBtn">🏀 Courts</button>
+    </div>
+  </div>
+
+  <div class="sect">
+    <h2><span class="liv"></span> The board</h2>
+    <div id="board"><div class="skel"></div><div class="skel"></div></div>
+  </div>
+
+  <div class="foot">
+    <b>OPENCOURT</b> · built in Sydney · court data © OpenStreetMap contributors<br>
+    Runs are player-called. Pull up, play hard, look after each other.
+  </div>
+</div>
+
+<!-- profile sheet -->
+<div class="sheet" id="shProfile"><div class="scrim" data-close></div><div class="panel">
+  <div class="grab"></div>
+  <div class="xrow"><div><h3>Who's pulling up?</h3><p class="sub">No accounts. Your <b style="color:var(--volt)">@</b> is your jersey — it shows on every run so people can find you.</p></div><button class="x" data-close>✕</button></div>
+  <div class="fld"><label>Your name</label><input class="inp" id="pfName" maxlength="40" placeholder="e.g. Jordan"></div>
+  <div class="fld"><label>Instagram</label><div class="igwrap"><span class="at">@</span><input class="inp" id="pfIg" maxlength="30" autocapitalize="none" placeholder="yourhandle (optional)"></div></div>
+  <button class="btn btn-v btn-block" id="pfSave">Lock it in</button>
+</div></div>
+
+<!-- call-a-run sheet -->
+<div class="sheet" id="shCall"><div class="scrim" data-close></div><div class="panel">
+  <div class="grab"></div>
+  <div class="xrow"><div><h3 id="callTitle">Call a run</h3><p class="sub" id="callSub">Pick the court. The city sees it.</p></div><button class="x" data-close>✕</button></div>
+
+  <div id="stepCourt">
+    <div class="fld"><label>Court</label><input class="inp" id="cSearch" placeholder="Search court or suburb…"></div>
+    <button class="btn btn-ghost btn-block" id="nearBtn">📍 Courts near me</button>
+    <div class="clist" id="cList"></div>
+  </div>
+
+  <div id="stepWhen" style="display:none">
+    <div class="fld"><label>Day</label><div class="pills" id="dayPills"></div></div>
+    <div class="fld"><label>Tip-off</label><div class="pills" id="timePills"></div></div>
+    <div class="fld"><label>Format</label><div class="pills" id="fmtPills"></div></div>
+    <div class="fld"><label>Spots</label><div class="step"><button id="capMinus">−</button><b id="capN">10</b><button id="capPlus">＋</button></div></div>
+    <button class="btn btn-v btn-block" id="callGo">⚡ Put it on the board</button>
+  </div>
+</div></div>
+
+<!-- run sheet -->
+<div class="sheet" id="shRun"><div class="scrim" data-close></div><div class="panel">
+  <div class="grab"></div>
+  <div class="xrow"><div>
+    <div class="bigtime" id="rTime"></div>
+    <div class="courtlink" id="rCourtLink">🏀 <b id="rCourt"></b></div>
+  </div><button class="x" data-close>✕</button></div>
+  <div class="meta" id="rMeta"></div>
+  <div class="bar" id="rBar"><i></i></div>
+  <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted)"><span id="rSpots"></span><span id="rHost"></span></div>
+  <div class="roster" id="rRoster"></div>
+  <div class="btn-row">
+    <button class="btn btn-v" style="flex:1.4" id="rJoin">Tap in</button>
+    <button class="btn btn-ghost" id="rShare">Share</button>
+    <button class="btn btn-ghost" id="rMaps">Directions</button>
+  </div>
+</div></div>
+
+<!-- court page sheet -->
+<div class="sheet" id="shCourt"><div class="scrim" data-close></div><div class="panel">
+  <div class="grab"></div>
+  <div class="xrow"><div><h3 id="ctName"></h3><p class="sub" id="ctSub"></p></div><button class="x" data-close>✕</button></div>
+  <div class="cmeta" id="ctMeta"></div>
+  <div class="btn-row" style="margin-bottom:4px">
+    <button class="btn btn-v" style="flex:1.4" id="ctCall">⚡ Call a run here</button>
+    <button class="btn btn-ghost" id="ctMaps">Directions</button>
+  </div>
+
+  <div class="subsect"><h4>Runs at this court</h4><div id="ctRuns"></div></div>
+
+  <div class="subsect"><h4>🔥 Play of the Week <span class="chip f" id="ctWeek"></span></h4>
+    <div id="ctPlays"></div>
+    <div class="droprow"><input class="inp" id="ctClip" placeholder="Paste your clip link (IG reel, YouTube…)"><button class="btn btn-v" id="ctDrop">Drop it</button></div>
+    <p style="font-size:11.5px;color:var(--dim);margin-top:7px">One clip per player per week at each court. Most 🔥 by Sunday night takes it.</p>
+  </div>
+
+  <div class="subsect"><h4>👑 King of the Court</h4>
+    <div class="kotc">
+      <div class="crown">👑</div><b>The throne unlocks soon</b>
+      <p>Every run you tap into at this court counts. Show up, get crowned.</p>
+      <div class="klead" id="ctKotc"></div>
+    </div>
+  </div>
+</div></div>
+
+<div id="toast"></div>
+
+<script>
+'use strict';
+/* ================= OPENCOURT v1 ================= */
+const API='https://ymuwuhvqqftgpxwhzoub.supabase.co/functions/v1/opencourt-api';
+// Public anon key — safe in the browser; tables are RLS-locked, all writes go through the edge fn.
+const ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltdXd1aHZxcWZ0Z3B4d2h6b3ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NjUyMzgsImV4cCI6MjA5OTI0MTIzOH0.sOkWQpulWj_ZSqMNSV7YP55T70UFSm2mP5e5xapQyQo';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const SYD='Australia/Sydney';
+
+async function api(body){
+  const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+ANON,'apikey':ANON},body:JSON.stringify(body)});
+  const d=await r.json().catch(()=>({error:'network error'}));
+  if(!r.ok||d.error) throw new Error(d.error||'something broke');
+  return d;
+}
+let toastT;
+function toast(msg,err){
+  const t=$('#toast'); t.textContent=msg; t.classList.toggle('err',!!err); t.classList.add('show');
+  clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),2600);
+}
+
+/* ---------- profile (device identity) ---------- */
+let OCP=null;
+try{OCP=JSON.parse(localStorage.getItem('oc_profile')||'null')}catch(e){}
+let afterProfile=null;
+function paintMe(){
+  if(OCP){$('#meAv').textContent=(OCP.name[0]||'?').toUpperCase();$('#meName').textContent=OCP.ig?('@'+OCP.ig):OCP.name;}
+  else{$('#meAv').textContent='?';$('#meName').textContent='Who are you?';}
+}
+function ensureProfile(cb){
+  if(OCP){cb();return}
+  afterProfile=cb; openSheet('shProfile'); setTimeout(()=>$('#pfName').focus(),250);
+}
+$('#meChip').onclick=()=>{ if(OCP){$('#pfName').value=OCP.name;$('#pfIg').value=OCP.ig||'';} openSheet('shProfile'); };
+$('#pfSave').onclick=()=>{
+  const name=$('#pfName').value.trim().slice(0,40);
+  const ig=$('#pfIg').value.trim().replace(/^@+/,'').toLowerCase().replace(/[^a-z0-9._]/g,'').slice(0,30);
+  if(!name){toast('Put a name on it',1);return}
+  OCP={id:(OCP&&OCP.id)||crypto.randomUUID(),name,ig};
+  localStorage.setItem('oc_profile',JSON.stringify(OCP));
+  paintMe(); closeSheet('shProfile'); toast('Locked in. Welcome to OpenCourt 🏀');
+  if(afterProfile){const f=afterProfile;afterProfile=null;f();}
+};
+
+/* ---------- sheets ---------- */
+function openSheet(id){$('#'+id).classList.add('open');document.body.style.overflow='hidden'}
+function closeSheet(id){$('#'+id).classList.remove('open');if(!document.querySelector('.sheet.open'))document.body.style.overflow=''}
+document.querySelectorAll('.sheet').forEach(sh=>{
+  sh.addEventListener('click',e=>{if(e.target.hasAttribute('data-close')||e.target.closest('[data-close]'))closeSheet(sh.id)});
+});
+
+/* ---------- time helpers (everything displayed in Sydney time) ---------- */
+const ymdSyd=(off=0)=>new Date(Date.now()+off*864e5).toLocaleDateString('en-CA',{timeZone:SYD});
+function sydOffsetMin(ymd){
+  const probe=new Date(ymd+'T12:00:00Z');
+  const syd=new Date(probe.toLocaleString('en-US',{timeZone:SYD}));
+  const utc=new Date(probe.toLocaleString('en-US',{timeZone:'UTC'}));
+  return Math.round((syd-utc)/6e4);
+}
+function sydISO(ymd,hm){
+  const off=sydOffsetMin(ymd),sign=off<0?'-':'+',a=Math.abs(off),p=n=>String(n).padStart(2,'0');
+  return `${ymd}T${hm}:00${sign}${p(Math.floor(a/60))}:${p(a%60)}`;
+}
+const runYmd=r=>new Date(r.run_at).toLocaleDateString('en-CA',{timeZone:SYD});
+const runTime=r=>new Date(r.run_at).toLocaleTimeString('en-AU',{timeZone:SYD,hour:'numeric',minute:'2-digit'}).replace(' ','').toLowerCase();
+function dayLabel(ymd){
+  if(ymd===ymdSyd(0))return'Today';
+  if(ymd===ymdSyd(1))return'Tomorrow';
+  return new Date(ymd+'T12:00:00').toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});
+}
+
+/* ---------- board ---------- */
+let RUNS=[];
+async function loadBoard(){
+  try{
+    const d=await api({action:'board'});
+    RUNS=d.runs||[]; renderBoard();
+  }catch(e){ $('#board').innerHTML=`<div class="empty"><b>Can't reach the court</b>${esc(e.message)} — pull to retry.</div>`; }
+}
+function renderBoard(){
+  const el=$('#board');
+  if(!RUNS.length){
+    el.innerHTML=`<div class="empty"><b>Nothing on the board</b>Sydney's quiet. Be the one who calls it.<br><br><button class="btn btn-v" onclick="startCall()">⚡ Call the first run</button></div>`;
+    return;
+  }
+  let html='',lastDay='';
+  for(const r of RUNS){
+    const day=runYmd(r);
+    if(day!==lastDay){html+=`<div style="font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);font-weight:800;margin:14px 2px 8px">${esc(dayLabel(day))}</div>`;lastDay=day;}
+    const n=(r.players||[]).length,full=n>=r.cap;
+    const im=OCP&&(r.players||[]).some(p=>p.id===OCP.id);
+    html+=`<div class="run" data-run="${esc(r.id)}">
+      <div class="tm"><b>${esc(runTime(r))}</b><span>${esc(r.format)}</span></div>
+      <div class="inf"><b>${esc(r.court_name)}</b>
+        <div class="sub">${r.suburb?`<span class="chip">${esc(r.suburb)}</span>`:''}<span>by ${esc(r.host_name)}</span></div></div>
+      <div class="spots ${full?'full':''}"><b>${n}/${r.cap}</b><span>${im?'<span class="in">YOU\'RE IN</span>':full?'full':'in'}</span></div>
+    </div>`;
+  }
+  el.innerHTML=html;
+  el.querySelectorAll('[data-run]').forEach(x=>x.onclick=()=>openRun(x.dataset.run));
+}
+
+/* ---------- run sheet ---------- */
+let CUR=null;
+function openRun(id,push=true){
+  const r=RUNS.find(x=>x.id===id)||CUR&&CUR.id===id&&CUR;
+  if(r){CUR=r;paintRun();openSheet('shRun');}
+  else api({action:'run_get',run_id:id}).then(d=>{CUR=d.run;paintRun();openSheet('shRun');}).catch(e=>toast(e.message,1));
+  if(push)history.replaceState(null,'','?run='+id);
+}
+$('#shRun').addEventListener('click',e=>{if(e.target.hasAttribute('data-close')||e.target.closest('[data-close]'))history.replaceState(null,'',location.pathname)});
+function paintRun(){
+  const r=CUR,n=(r.players||[]).length,full=n>=r.cap,im=OCP&&(r.players||[]).some(p=>p.id===OCP.id);
+  $('#rTime').textContent=`${dayLabel(runYmd(r))} · ${runTime(r)}`;
+  $('#rCourt').textContent=r.court_name;
+  $('#rMeta').innerHTML=`<span class="chip v">${esc(r.format)}</span>${r.suburb?`<span class="chip">${esc(r.suburb)}</span>`:''}<span class="chip">${n}/${r.cap} in</span>`;
+  const bar=$('#rBar');bar.classList.toggle('full',full);bar.firstElementChild.style.width=Math.min(100,n/r.cap*100)+'%';
+  $('#rSpots').textContent=full?'Run is FULL':`${r.cap-n} spot${r.cap-n===1?'':'s'} left`;
+  $('#rHost').textContent=`called by ${r.host_name}`;
+  $('#rRoster').innerHTML=(r.players||[]).map(p=>`
+    <div class="pl"><div class="av">${esc((p.name[0]||'?').toUpperCase())}</div>
+      <div class="nm"><b>${esc(p.name)}</b>${p.ig?`<a href="https://instagram.com/${esc(p.ig)}" target="_blank" rel="noopener">@${esc(p.ig)}</a>`:''}</div>
+      ${p.id===r.host_id?'<span class="host">CALLED IT</span>':''}</div>`).join('');
+  const j=$('#rJoin');
+  if(im){j.textContent="I'm out";j.className='btn btn-out';j.style.flex='1.4';j.disabled=false;}
+  else if(full){j.textContent='Run is full';j.className='btn btn-ghost';j.disabled=true;}
+  else{j.textContent='Tap in';j.className='btn btn-v';j.style.flex='1.4';j.disabled=false;}
+}
+$('#rJoin').onclick=()=>{
+  const r=CUR,b=$('#rJoin'); if(!r)return;
+  const im=OCP&&(r.players||[]).some(p=>p.id===OCP.id);
+  const busy=t=>{b.disabled=true;b.textContent=t};
+  if(im){
+    busy('Tapping out…');
+    api({action:'run_leave',run_id:r.id,player_id:OCP.id}).then(d=>{CUR=d.run;syncRun();paintRun();toast('You tapped out');}).catch(e=>{toast(e.message,1);paintRun();});
+  }else ensureProfile(()=>{
+    busy('Tapping in…');
+    api({action:'run_join',run_id:r.id,player:OCP}).then(d=>{CUR=d.run;syncRun();paintRun();toast("You're in. Pull up 🏀");}).catch(e=>{toast(e.message,1);paintRun();});
+  });
+};
+function syncRun(){const i=RUNS.findIndex(x=>x.id===CUR.id);if(i>-1)RUNS[i]=CUR;renderBoard();}
+$('#rShare').onclick=async()=>{
+  const r=CUR,url=location.origin+location.pathname+'?run='+r.id;
+  const text=`🏀 ${r.format} at ${r.court_name}${r.suburb?' ('+r.suburb+')':''} — ${dayLabel(runYmd(r))} ${runTime(r)}. Tap in:`;
+  if(navigator.share){try{await navigator.share({title:'OpenCourt run',text,url})}catch(e){}}
+  else{await navigator.clipboard.writeText(text+' '+url);toast('Link copied — send it to the group chat');}
+};
+$('#rMaps').onclick=()=>{const r=CUR;window.open(`https://www.google.com/maps/dir/?api=1&destination=${r.lat},${r.lon}`,'_blank')};
+$('#rCourtLink').onclick=()=>{closeSheet('shRun');openCourtPage({key:CUR.court_key,name:CUR.court_name,suburb:CUR.suburb,lat:CUR.lat,lon:CUR.lon});};
+
+/* ---------- courts dataset ---------- */
+let COURTS=null,GEO=null;
+async function loadCourts(){
+  if(COURTS)return COURTS;
+  const d=await(await fetch('courts.json')).json();
+  COURTS=d.courts.map(c=>({...c,key:'oc_'+c.lat.toFixed(5)+'_'+c.lon.toFixed(5)}));
+  return COURTS;
+}
+const dist=(a,b,c,d)=>{const R=6371,x=(c-a)*Math.PI/180,y=(d-b)*Math.PI/180,h=Math.sin(x/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(y/2)**2;return 2*R*Math.asin(Math.sqrt(h))};
+function courtRows(list){
+  $('#cList').innerHTML=list.slice(0,40).map((c,i)=>`
+    <div class="crow" data-i="${i}"><span class="ic">${c.indoor?'🏟️':'🏀'}</span>
+      <div class="nm"><b>${esc(c.name)}</b><span>${esc(c.suburb||'')}${c.lit?' · 💡 lit':''}${c.hoops?' · '+esc(c.hoops)+' hoops':''}</span></div>
+      ${c.km!=null?`<span class="dist">${c.km<1?Math.round(c.km*1000)+'m':c.km.toFixed(1)+'km'}</span>`:''}</div>`).join('')
+    ||'<div class="empty" style="padding:18px">No courts match — try the suburb name.</div>';
+  $('#cList').querySelectorAll('.crow').forEach(x=>x.onclick=()=>pickCourt(list[+x.dataset.i]));
+}
+async function searchCourts(q){
+  const cs=await loadCourts();
+  q=q.trim().toLowerCase();
+  let list=cs;
+  if(q)list=cs.filter(c=>(c.name+' '+(c.suburb||'')).toLowerCase().includes(q));
+  if(GEO)list=[...list].map(c=>({...c,km:dist(GEO.lat,GEO.lon,c.lat,c.lon)})).sort((a,b)=>a.km-b.km);
+  else if(!q)list=[...list].sort((a,b)=>(b.name!=='Basketball Court')-(a.name!=='Basketball Court'));
+  courtRows(list);
+}
+$('#cSearch').oninput=e=>searchCourts(e.target.value);
+$('#nearBtn').onclick=()=>{
+  if(!navigator.geolocation){toast('No location on this device',1);return}
+  $('#nearBtn').textContent='📍 Finding you…';
+  navigator.geolocation.getCurrentPosition(p=>{
+    GEO={lat:p.coords.latitude,lon:p.coords.longitude};
+    $('#nearBtn').textContent='📍 Courts near me';
+    searchCourts($('#cSearch').value);
+  },()=>{$('#nearBtn').textContent='📍 Courts near me';toast('Location blocked — search by suburb instead',1)});
+};
+
+/* ---------- call-a-run flow ---------- */
+let MODE='call',SEL={court:null,day:ymdSyd(0),time:'17:30',format:'5v5',cap:10};
+function startCall(preCourt){
+  MODE='call';
+  $('#callTitle').textContent='Call a run';$('#callSub').textContent='Pick the court. The city sees it.';
+  if(preCourt){SEL.court=preCourt;showWhen();}
+  else{$('#stepCourt').style.display='';$('#stepWhen').style.display='none';searchCourts($('#cSearch').value);}
+  openSheet('shCall');
+}
+window.startCall=startCall;
+function startBrowse(){
+  MODE='browse';
+  $('#callTitle').textContent='Courts';$('#callSub').textContent='971 Sydney courts. Tap one to see its page.';
+  $('#stepCourt').style.display='';$('#stepWhen').style.display='none';
+  searchCourts($('#cSearch').value); openSheet('shCall');
+}
+$('#callBtn').onclick=()=>startCall();
+$('#courtsBtn').onclick=()=>startBrowse();
+function pickCourt(c){
+  if(MODE==='browse'){closeSheet('shCall');openCourtPage(c);return}
+  SEL.court=c; showWhen();
+}
+const ALL_TIMES=['06:00','07:00','08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','17:30','18:00','18:30','19:00','19:30','20:00','21:00'];
+function showWhen(){
+  $('#callTitle').textContent=SEL.court.name;
+  $('#callSub').textContent=(SEL.court.suburb?SEL.court.suburb+' · ':'')+'when do we run?';
+  $('#stepCourt').style.display='none';$('#stepWhen').style.display='';
+  // no calling runs in the past: today only offers tip-offs still ahead of Sydney now
+  const nowHM=new Date().toLocaleTimeString('en-GB',{timeZone:SYD,hour12:false,hour:'2-digit',minute:'2-digit'});
+  const avail=ymd=>ymd===ymdSyd(0)?ALL_TIMES.filter(t=>t>nowHM):ALL_TIMES;
+  const days=[...Array(8)].map((_,i)=>({ymd:ymdSyd(i),label:i===0?'Today':i===1?'Tmrw':dayLabel(ymdSyd(i)).split(' ').slice(0,2).join(' ')}))
+    .filter(d=>avail(d.ymd).length);
+  if(!days.some(d=>d.ymd===SEL.day))SEL.day=days[0].ymd;
+  $('#dayPills').innerHTML=days.map(d=>`<button class="pill ${d.ymd===SEL.day?'on':''}" data-d="${d.ymd}">${esc(d.label)}</button>`).join('');
+  $('#dayPills').querySelectorAll('.pill').forEach(p=>p.onclick=()=>{SEL.day=p.dataset.d;showWhen();});
+  const times=avail(SEL.day);
+  if(!times.includes(SEL.time))SEL.time=times.includes('17:30')?'17:30':times[0];
+  $('#timePills').innerHTML=times.map(t=>`<button class="pill ${t===SEL.time?'on':''}" data-t="${t}">${+t.slice(0,2)%12||12}${t.slice(3)==='30'?':30':''}${+t.slice(0,2)<12?'am':'pm'}</button>`).join('');
+  $('#timePills').querySelectorAll('.pill').forEach(p=>p.onclick=()=>{SEL.time=p.dataset.t;showWhen();});
+  const fmts=['5v5','4v4','3v3','2v2','1v1','21','shootaround'];
+  $('#fmtPills').innerHTML=fmts.map(f=>`<button class="pill ${f===SEL.format?'on':''}" data-f="${f}">${f==='shootaround'?'Shootaround':f}</button>`).join('');
+  $('#fmtPills').querySelectorAll('.pill').forEach(p=>p.onclick=()=>{SEL.format=p.dataset.f;showWhen();});
+  $('#capN').textContent=SEL.cap;
+}
+$('#capMinus').onclick=()=>{SEL.cap=Math.max(2,SEL.cap-1);$('#capN').textContent=SEL.cap};
+$('#capPlus').onclick=()=>{SEL.cap=Math.min(30,SEL.cap+1);$('#capN').textContent=SEL.cap};
+$('#callGo').onclick=()=>ensureProfile(async()=>{
+  const c=SEL.court,b=$('#callGo');b.disabled=true;
+  try{
+    const d=await api({action:'run_create',court:{key:c.key,name:c.name,suburb:c.suburb||'',lat:c.lat,lon:c.lon},
+      run_at:sydISO(SEL.day,SEL.time),format:SEL.format,cap:SEL.cap,player:OCP});
+    closeSheet('shCall');
+    RUNS.push(d.run);RUNS.sort((a,b2)=>new Date(a.run_at)-new Date(b2.run_at));renderBoard();
+    CUR=d.run;paintRun();openSheet('shRun');history.replaceState(null,'','?run='+d.run.id);
+    toast('It\'s on the board. Share it 📣');
+  }catch(e){toast(e.message,1)}
+  b.disabled=false;
+});
+
+/* ---------- court page ---------- */
+let CC=null;
+function openCourtPage(c){
+  CC=c;
+  $('#ctName').textContent=c.name;
+  $('#ctSub').textContent=c.suburb||'Sydney';
+  $('#ctMeta').innerHTML=[
+    c.indoor?'<span class="chip">🏟️ indoor</span>':'<span class="chip">🌤️ outdoor</span>',
+    c.lit?'<span class="chip v">💡 lit at night</span>':'',
+    c.hoops?`<span class="chip">${esc(c.hoops)} hoops</span>`:'',
+    c.surface?`<span class="chip">${esc(c.surface)}</span>`:'',
+  ].join('');
+  $('#ctRuns').innerHTML='<div class="skel" style="height:56px"></div>';
+  $('#ctPlays').innerHTML='<div class="skel" style="height:48px"></div>';
+  $('#ctKotc').innerHTML='';
+  openSheet('shCourt');
+  api({action:'court',court_key:c.key,player_id:OCP?OCP.id:''}).then(d=>{
+    $('#ctWeek').textContent=d.week;
+    $('#ctRuns').innerHTML=d.runs.length?d.runs.map(r=>`
+      <div class="run" data-crun="${esc(r.id)}" style="margin-bottom:8px">
+        <div class="tm"><b>${esc(runTime(r))}</b><span>${esc(dayLabel(runYmd(r)))}</span></div>
+        <div class="inf"><b>${esc(r.format)} · by ${esc(r.host_name)}</b><div class="sub">${(r.players||[]).length}/${r.cap} in</div></div>
+      </div>`).join('')
+      :'<div class="empty" style="padding:16px">No runs called here yet. Be first.</div>';
+    $('#ctRuns').querySelectorAll('[data-crun]').forEach(x=>x.onclick=()=>{
+      const r=d.runs.find(y=>y.id===x.dataset.crun);closeSheet('shCourt');CUR=r;
+      if(!RUNS.some(y=>y.id===r.id))RUNS.push(r);
+      paintRun();openSheet('shRun');history.replaceState(null,'','?run='+r.id);
+    });
+    paintPlays(d.plays);
+    $('#ctKotc').innerHTML=(d.kotc||[]).filter(k=>k.runs>0).slice(0,3).map((k,i)=>`
+      <div class="kr"><b>${['👑','🥈','🥉'][i]||''} ${esc(k.name)}${k.ig?` <a style="color:var(--muted);text-decoration:none" href="https://instagram.com/${esc(k.ig)}" target="_blank" rel="noopener">@${esc(k.ig)}</a>`:''}</b><span>${k.runs} run${k.runs===1?'':'s'}</span></div>`).join('');
+  }).catch(e=>toast(e.message,1));
+}
+function paintPlays(plays){
+  $('#ctPlays').innerHTML=(plays&&plays.length)?plays.map((p,i)=>`
+    <div class="play ${i===0&&p.fires>0?'top':''}">
+      <span class="rk">${i===0&&p.fires>0?'🏆':'#'+(i+1)}</span>
+      <div class="nm"><b>${esc(p.name)}</b>${p.ig?`<a href="https://instagram.com/${esc(p.ig)}" target="_blank" rel="noopener">@${esc(p.ig)}</a>`:''}</div>
+      <a class="watch" href="${esc(p.clip_url)}" target="_blank" rel="noopener">▶ Watch</a>
+      <button class="fire ${p.fired?'on':''}" data-fire="${esc(p.id)}">🔥 ${p.fires}</button>
+    </div>`).join('')
+    :'<div class="empty" style="padding:16px">No clips this week. Cook something and drop it. 🎬</div>';
+  $('#ctPlays').querySelectorAll('[data-fire]').forEach(b=>b.onclick=()=>ensureProfile(async()=>{
+    try{const d=await api({action:'play_fire',play_id:b.dataset.fire,player_id:OCP.id});paintPlays(d.plays);}
+    catch(e){toast(e.message,1)}
+  }));
+}
+$('#ctDrop').onclick=()=>ensureProfile(async()=>{
+  const url=$('#ctClip').value.trim();
+  if(!/^https?:\/\//i.test(url)){toast('Paste a link to your clip first',1);return}
+  try{
+    const d=await api({action:'play_submit',court_key:CC.key,court_name:CC.name,suburb:CC.suburb||'',clip_url:url,player:OCP});
+    $('#ctClip').value='';paintPlays(d.plays);toast('Clip is up. Let the 🔥 decide.');
+  }catch(e){toast(e.message,1)}
+});
+$('#ctCall').onclick=()=>{closeSheet('shCourt');startCall(CC);};
+$('#ctMaps').onclick=()=>window.open(`https://www.google.com/maps/dir/?api=1&destination=${CC.lat},${CC.lon}`,'_blank');
+$('#logoBtn').onclick=()=>{document.querySelectorAll('.sheet.open').forEach(s=>closeSheet(s.id));window.scrollTo({top:0,behavior:'smooth'});};
+
+/* ---------- boot ---------- */
+paintMe();
+loadBoard().then(()=>{
+  const q=new URLSearchParams(location.search);
+  if(q.get('run'))openRun(q.get('run'),false);
+});
+setInterval(()=>{if(!document.hidden&&!document.querySelector('.sheet.open'))loadBoard()},30000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadBoard()});
+</script>
+</body>
+</html>
