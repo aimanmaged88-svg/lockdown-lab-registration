@@ -119,6 +119,12 @@ header{
 .swb span:last-child{font-size:11px;font-weight:700;color:var(--muted)}
 .swb.on{border-color:var(--volt)}
 .swb.on .dot{box-shadow:0 0 0 3px #0E1116,0 0 0 5px var(--volt)}
+/* weather (semantic colours, not accent-driven) */
+.wx{margin:2px 0 10px;min-height:0}
+.wxchip{display:inline-flex;gap:6px;align-items:center;border-radius:99px;padding:6px 13px;font-size:12.5px;font-weight:700;border:1px solid}
+.wxchip.good{color:#4DE8A8;border-color:rgba(77,232,168,.35);background:rgba(77,232,168,.08)}
+.wxchip.iffy{color:#FFD24D;border-color:rgba(255,210,77,.35);background:rgba(255,210,77,.08)}
+.wxchip.wet{color:#FF5A5A;border-color:rgba(255,90,90,.35);background:rgba(255,90,90,.08)}
 .sheet .scrim{position:absolute;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);animation:fad .2s}
 @keyframes fad{from{opacity:0}}
 .panel{
@@ -304,7 +310,7 @@ header{
 
   <div id="stepWhen" style="display:none">
     <div class="fld"><label>Day</label><div class="pills" id="dayPills"></div></div>
-    <div class="fld"><label>Tip-off</label><div class="pills" id="timePills"></div></div>
+    <div class="fld"><label>Tip-off</label><div class="pills" id="timePills"></div><div class="wx" id="wxLine" style="margin-top:10px"></div></div>
     <div class="fld"><label>Format</label><div class="pills" id="fmtPills"></div></div>
     <div class="fld"><label>Spots</label><div class="step"><button id="capMinus">−</button><b id="capN">10</b><button id="capPlus">＋</button></div></div>
     <button class="btn btn-v btn-block" id="callGo">⚡ Put it on the board</button>
@@ -319,6 +325,7 @@ header{
     <div class="courtlink" id="rCourtLink">🏀 <b id="rCourt"></b></div>
   </div><button class="x" data-close>✕</button></div>
   <div class="meta" id="rMeta"></div>
+  <div class="wx" id="rWx"></div>
   <div class="bar" id="rBar"><i></i></div>
   <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--muted)"><span id="rSpots"></span><span id="rHost"></span></div>
   <div class="roster" id="rRoster"></div>
@@ -334,6 +341,7 @@ header{
   <div class="grab"></div>
   <div class="xrow"><div><h3 id="ctName"></h3><p class="sub" id="ctSub"></p></div><button class="x" data-close>✕</button></div>
   <div class="cmeta" id="ctMeta"></div>
+  <div class="wx" id="ctWx"></div>
   <div class="btn-row" style="margin-bottom:4px">
     <button class="btn btn-v" style="flex:1.4" id="ctCall">⚡ Call a run here</button>
     <button class="btn btn-ghost" id="ctMaps">Directions</button>
@@ -472,6 +480,39 @@ function dayLabel(ymd){
   return new Date(ymd+'T12:00:00').toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'});
 }
 
+/* ---------- weather (Open-Meteo — hourly, per-court coords, no key) ---------- */
+const WX_CACHE={};
+const wxKey=(lat,lon)=>(+lat).toFixed(2)+','+(+lon).toFixed(2);
+async function getWx(lat,lon){
+  const k=wxKey(lat,lon);
+  if(WX_CACHE[k])return WX_CACHE[k];
+  try{const c=JSON.parse(localStorage.getItem('oc_wx_'+k)||'null');
+    if(c&&Date.now()-c.t<18e5){WX_CACHE[k]=c.d;return c.d}}catch(e){}
+  const u=`https://api.open-meteo.com/v1/forecast?latitude=${(+lat).toFixed(3)}&longitude=${(+lon).toFixed(3)}&hourly=temperature_2m,precipitation_probability,weather_code,wind_speed_10m&timezone=Australia%2FSydney&forecast_days=16`;
+  const d=await(await fetch(u)).json();
+  if(!d||!d.hourly)throw new Error('no forecast');
+  WX_CACHE[k]=d;
+  try{localStorage.setItem('oc_wx_'+k,JSON.stringify({t:Date.now(),d}))}catch(e){}
+  return d;
+}
+// forecast for the Sydney hour a run tips off
+function wxAt(d,when){
+  const hh=new Date(when).toLocaleString('sv-SE',{timeZone:SYD}).slice(0,13).replace(' ','T');
+  const i=d.hourly.time.findIndex(t=>t.startsWith(hh));
+  if(i<0)return null;
+  const p=d.hourly.precipitation_probability[i];
+  return {t:Math.round(d.hourly.temperature_2m[i]),p:p==null?null:Math.round(p),
+    c:d.hourly.weather_code[i],w:Math.round(d.hourly.wind_speed_10m[i]||0)};
+}
+const wxIco=c=>c===0?'☀️':c<=2?'🌤️':c===3?'☁️':c<=48?'🌫️':c<=57?'🌦️':c<=67?'🌧️':c<=77?'🌨️':c<=82?'🌧️':'⛈️';
+const wxVerdict=x=>x.p>=60?['wet','likely wet']:x.p>=30?['iffy','rain risk']:['good','looks good'];
+const courtIndoor=key=>!!(COURTS&&COURTS.find(c=>c.key===key&&c.indoor));
+function wxChip(x,indoor){
+  if(indoor)return '<span class="wxchip good">🏟️ Indoor — rain can\'t touch this run</span>';
+  const [cls,label]=wxVerdict(x);
+  return `<span class="wxchip ${cls}">${wxIco(x.c)} ${x.t}°${x.p!=null?' · '+x.p+'% rain':''}${x.w>=30?' · 💨 '+x.w+'km/h':''} — ${label}</span>`;
+}
+
 /* ---------- board ---------- */
 let RUNS=[];
 async function loadBoard(){
@@ -495,12 +536,25 @@ function renderBoard(){
     html+=`<div class="run" data-run="${esc(r.id)}">
       <div class="tm"><b>${esc(runTime(r))}</b><span>${esc(r.format)}</span></div>
       <div class="inf"><b>${esc(r.court_name)}</b>
-        <div class="sub">${r.suburb?`<span class="chip">${esc(r.suburb)}</span>`:''}<span>by ${esc(r.host_name)}</span></div></div>
+        <div class="sub">${r.suburb?`<span class="chip">${esc(r.suburb)}</span>`:''}<span>by ${esc(r.host_name)}</span><span class="chip" data-wx="${esc(r.id)}" style="display:none"></span></div></div>
       <div class="spots ${full?'full':''}"><b>${n}/${r.cap}</b><span>${im?'<span class="in">YOU\'RE IN</span>':full?'full':'in'}</span></div>
     </div>`;
   }
   el.innerHTML=html;
   el.querySelectorAll('[data-run]').forEach(x=>x.onclick=()=>openRun(x.dataset.run));
+  fillBoardWx();
+}
+async function fillBoardWx(){
+  for(const r of RUNS){
+    const el=document.querySelector(`[data-wx="${r.id}"]`);
+    if(!el||el.textContent)continue;
+    try{
+      const x=wxAt(await getWx(r.lat,r.lon),r.run_at);
+      if(!x)continue;
+      el.textContent=`${wxIco(x.c)} ${x.t}°${x.p>=30?' · '+x.p+'%💧':''}`;
+      el.style.display='';
+    }catch(e){}
+  }
 }
 
 /* ---------- run sheet ---------- */
@@ -528,6 +582,16 @@ function paintRun(){
   if(im){j.textContent="I'm out";j.className='btn btn-out';j.style.flex='1.4';j.disabled=false;}
   else if(full){j.textContent='Run is full';j.className='btn btn-ghost';j.disabled=true;}
   else{j.textContent='Tap in';j.className='btn btn-v';j.style.flex='1.4';j.disabled=false;}
+  paintRunWx();
+}
+async function paintRunWx(){
+  const r=CUR,el=$('#rWx');
+  el.innerHTML='';
+  try{
+    const x=wxAt(await getWx(r.lat,r.lon),r.run_at);
+    if(!x||CUR!==r)return;
+    el.innerHTML=wxChip(x,courtIndoor(r.court_key));
+  }catch(e){}
 }
 $('#rJoin').onclick=()=>{
   const r=CUR,b=$('#rJoin'); if(!r)return;
@@ -631,6 +695,19 @@ function showWhen(){
   $('#fmtPills').innerHTML=fmts.map(f=>`<button class="pill ${f===SEL.format?'on':''}" data-f="${f}">${f==='shootaround'?'Shootaround':f}</button>`).join('');
   $('#fmtPills').querySelectorAll('.pill').forEach(p=>p.onclick=()=>{SEL.format=p.dataset.f;showWhen();});
   $('#capN').textContent=SEL.cap;
+  paintCallWx();
+}
+// forecast for the day+time being picked, so hosts schedule around rain
+async function paintCallWx(){
+  const c=SEL.court,el=$('#wxLine');
+  if(!c)return;
+  el.innerHTML='';
+  const snap=SEL.day+SEL.time;
+  try{
+    const x=wxAt(await getWx(c.lat,c.lon),sydISO(SEL.day,SEL.time));
+    if(!x||snap!==SEL.day+SEL.time)return;
+    el.innerHTML=wxChip(x,c.indoor);
+  }catch(e){}
 }
 $('#capMinus').onclick=()=>{SEL.cap=Math.max(2,SEL.cap-1);$('#capN').textContent=SEL.cap};
 $('#capPlus').onclick=()=>{SEL.cap=Math.min(30,SEL.cap+1);$('#capN').textContent=SEL.cap};
@@ -662,6 +739,13 @@ function openCourtPage(c){
   $('#ctRuns').innerHTML='<div class="skel" style="height:56px"></div>';
   $('#ctPlays').innerHTML='<div class="skel" style="height:48px"></div>';
   $('#ctKotc').innerHTML='';
+  $('#ctWx').innerHTML='';
+  (async()=>{try{
+    const x=wxAt(await getWx(c.lat,c.lon),new Date());
+    if(!x||CC!==c)return;
+    $('#ctWx').innerHTML=c.indoor?'<span class="wxchip good">🏟️ Indoor — always game time</span>'
+      :wxChip(x,false).replace('—','right now —');
+  }catch(e){}})();
   openSheet('shCourt');
   api({action:'court',court_key:c.key,player_id:OCP?OCP.id:''}).then(d=>{
     $('#ctWeek').textContent=d.week;
