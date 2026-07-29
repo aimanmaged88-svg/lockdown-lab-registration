@@ -79,8 +79,9 @@
 /* ================= CONFIG ================= */
 const SB_URL = "https://ymuwuhvqqftgpxwhzoub.supabase.co";
 const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltdXd1aHZxcWZ0Z3B4d2h6b3ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NjUyMzgsImV4cCI6MjA5OTI0MTIzOH0.sOkWQpulWj_ZSqMNSV7YP55T70UFSm2mP5e5xapQyQo";
-const TIMES = ["7:10 PM","7:23 PM","7:36 PM","7:49 PM","8:02 PM","8:15 PM"];
 const RR4 = [[0,1],[2,3],[0,2],[1,3],[0,3],[1,2]]; // 4-team round robin, one game per slot
+const GAME_MIN = 13;              // 10-min game + 3-min break
+const DEFAULT_START = "7:45 PM";
 
 /* ================= STATE ================= */
 let teams = [], games = [], admin = sessionStorage.getItem("lotg_admin") || null;
@@ -148,12 +149,16 @@ function standings(){
 function render(){
   const el = $("#app");
   if(loading){ el.innerHTML = `<div class="text-center pt-32 text-gray-500 font-bold">Loading…</div>`; return; }
+  // keep any open modal alive (as a live node, so ticks + typed values survive)
+  // across the re-renders fired by polling / visibilitychange refetches
+  const keepModal = $("#modal")?.firstElementChild || null;
   el.innerHTML = `
     ${headerHtml()}
     ${errMsg?`<div class="card p-4 mb-4 text-red-300 text-sm font-semibold">${esc(errMsg)}</div>`:""}
     ${admin? adminBar() : ""}
     ${tab==="board" ? boardHtml() : teamsAdminHtml()}
     <div id="modal"></div>`;
+  if(keepModal) $("#modal").appendChild(keepModal);
 }
 function headerHtml(){
   return `
@@ -176,7 +181,7 @@ function adminBar(){
     <span class="chip chip-live" style="animation:none;background:#4a2506;color:#fdba74">ADMIN MODE</span>
     <button class="btn ${tab==='board'?'btn-orange':'btn-ghost'}" onclick="tab='board';render()">Scoreboard</button>
     <button class="btn ${tab==='teams'?'btn-orange':'btn-ghost'}" onclick="tab='teams';render()">Teams</button>
-    <button class="btn btn-ghost" onclick="genFixtures()">⚡ Generate Fixtures</button>
+    <button class="btn btn-ghost" onclick="openGen()">⚡ Generate Fixtures</button>
     <button class="btn btn-ghost" onclick="clearScores()">Clear Scores</button>
     <button class="btn btn-ghost" onclick="changePw()">Password</button>
   </div>`;
@@ -197,8 +202,7 @@ function standingsHtml(){
       <tbody>${rows.map((r,i)=>`
         <tr class="border-t border-[#23232f]">
           <td class="py-2 pr-2 font-black text-gray-500">${i+1}</td>
-          <td class="py-2"><div class="flex items-center gap-2">${logoHtml(r.t,26)}<span class="font-bold">${esc(r.t.name)}</span>
-            <span class="text-[10px] text-gray-600 font-bold">C${r.t.court_group}</span></div></td>
+          <td class="py-2"><div class="flex items-center gap-2">${logoHtml(r.t,26)}<span class="font-bold">${esc(r.t.name)}</span></div></td>
           <td class="text-center px-2 text-gray-400">${r.p}</td>
           <td class="text-center px-2 font-black text-green-400">${r.w}</td>
           <td class="text-center px-2 font-black text-red-400">${r.l}</td>
@@ -211,6 +215,10 @@ function standingsHtml(){
 }
 function courtHtml(court){
   const list = games.filter(g=>g.court===court);
+  // show in clock order when every time parses (manually added games would
+  // otherwise always sit last on the court, whatever their printed time)
+  if(list.length && list.every(g=>parseStart(g.game_time)!=null))
+    list.sort((a,b)=>parseStart(a.game_time)-parseStart(b.game_time)||a.slot_index-b.slot_index);
   return `
   <section class="card p-4 sm:p-5 mb-5">
     <h2 class="font-black text-base mb-3 tracking-wide">🏀 COURT ${court}</h2>
@@ -286,7 +294,7 @@ function teamsAdminHtml(){
       <h2 class="font-black text-base tracking-wide">TEAMS</h2>
       <button class="btn btn-orange" onclick="addTeam()">+ Add Team</button>
     </div>
-    <p class="text-xs text-gray-500 mb-4">Rename teams, upload a logo (optional), and pick which court group they play in. Then hit <b>⚡ Generate Fixtures</b> to rebuild the round-robin (4 teams per court, 6 games each court).</p>
+    <p class="text-xs text-gray-500 mb-4">Rename teams, upload a logo (optional), and pick their usual court group. Then hit <b>⚡ Generate Fixtures</b> and tick who's in tonight — any 6 teams get a full everyone-plays-everyone night across both courts; 8 teams in 4/4 groups get the classic one-court round robin each.</p>
     ${teams.map(t=>`
       <div class="border-t border-[#23232f] py-3 flex items-center gap-3 flex-wrap">
         <label class="cursor-pointer" title="Upload logo">
@@ -389,17 +397,238 @@ function uploadLogo(id,input){
   };
   img.src = URL.createObjectURL(f);
 }
-async function genFixtures(){
-  const g1 = teams.filter(t=>t.court_group===1), g2 = teams.filter(t=>t.court_group===2);
-  if(g1.length!==4||g2.length!==4){ alert(`Fixtures need exactly 4 teams per court.\nCourt 1 has ${g1.length}, Court 2 has ${g2.length}. Fix the groups in the Teams tab first.`); return; }
-  if(!confirm("Generate a fresh round-robin for both courts? This deletes ALL current games and scores.")) return;
-  const rows = [];
-  for(const [court,grp] of [[1,g1],[2,g2]])
-    RR4.forEach((p,slot)=>rows.push({court,slot_index:slot,game_time:TIMES[slot],team1_id:grp[p[0]].id,team2_id:grp[p[1]].id}));
-  await write(async()=>{
+/* ==FIXSCHED== pure fixture-scheduling functions (no DOM) — exercised by tests */
+function parseStart(str){
+  const m = /^\s*(\d{1,2})[:.](\d{2})\s*([APap])?\.?\s*[Mm]?\.?\s*$/.exec(String(str||""));
+  if(!m) return null;
+  let h = +m[1]; const mn = +m[2];
+  if(h>23||mn>59) return null;
+  const ap = (m[3]||"").toUpperCase();
+  if(ap==="P"&&h<12) h+=12;
+  if(ap==="A"&&h===12) h=0;
+  if(!ap&&h>=1&&h<=11) h+=12; // bare "7:45" on a game night means PM
+  return h*60+mn;
+}
+function fmtTime(t){
+  t=((t%1440)+1440)%1440;
+  let h=Math.floor(t/60); const m=t%60, ap=h>=12?"PM":"AM";
+  h=h%12||12;
+  return h+":"+String(m).padStart(2,"0")+" "+ap;
+}
+function shuffleArr(a){
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+// Per-team court spread: heavy penalty for a team never crossing courts,
+// light penalty beyond a 1-game lopsidedness.
+function courtImbalance(games,n){
+  const c1=Array(n).fill(0), tot=Array(n).fill(0);
+  for(const g of games){ tot[g.a]++; tot[g.b]++; if(g.court===1){ c1[g.a]++; c1[g.b]++; } }
+  let bad=0;
+  for(let t=0;t<n;t++){
+    const a=c1[t], b=tot[t]-a;
+    if(tot[t]>=2&&(a===0||b===0)) bad+=50;
+    bad+=Math.max(0,Math.abs(a-b)-1)*4;
+  }
+  return bad;
+}
+// Flip a whole slot's court labels when it helps the per-team court spread.
+function balanceCourts(games,n){
+  const slots={};
+  games.forEach(g=>{ (slots[g.slot]=slots[g.slot]||[]).push(g); });
+  for(let pass=0;pass<6;pass++){
+    let improved=false;
+    for(const s in slots){
+      const before=courtImbalance(games,n);
+      slots[s].forEach(g=>g.court=g.court===1?2:1);
+      if(courtImbalance(games,n)<before) improved=true;
+      else slots[s].forEach(g=>g.court=g.court===1?2:1);
+    }
+    if(!improved) break;
+  }
+}
+function scoreSched(games,n){
+  const plays=Array.from({length:n},()=>[]);
+  games.forEach(g=>{ plays[g.a].push(g.slot); plays[g.b].push(g.slot); });
+  let sc=courtImbalance(games,n);
+  for(const ps of plays){
+    ps.sort((a,b)=>a-b);
+    for(let i=1;i<ps.length;i++){
+      if(ps[i]===ps[i-1]) sc+=1000;          // double-booked (should never happen)
+      if(ps[i]-ps[i-1]===1) sc+=5;           // back-to-back
+    }
+    for(let i=2;i<ps.length;i++) if(ps[i]-ps[i-2]===2) sc+=40; // three in a row
+  }
+  return sc;
+}
+function tripleCount(games,n){
+  const plays=Array.from({length:n},()=>[]);
+  games.forEach(g=>{ plays[g.a].push(g.slot); plays[g.b].push(g.slot); });
+  let tr=0;
+  for(const ps of plays){
+    ps.sort((a,b)=>a-b);
+    for(let i=2;i<ps.length;i++) if(ps[i]-ps[i-2]===2) tr++;
+  }
+  return tr;
+}
+function slotCap(nPairs,nSlots,s){ return (nPairs%2===1&&s===nSlots-1)?1:2; }
+function slotOk(games,g,slot,nPairs,nSlots){
+  const inSlot=games.filter(x=>x!==g&&x.slot===slot);
+  if(inSlot.length>=slotCap(nPairs,nSlots,slot)) return false;
+  return !inSlot.some(x=>[x.a,x.b].some(t=>t===g.a||t===g.b));
+}
+// After slot moves, re-split any slot whose two games landed on the same court.
+function fixCourts(games){
+  const slots={};
+  games.forEach(g=>{ (slots[g.slot]=slots[g.slot]||[]).push(g); });
+  for(const s in slots){
+    const gs=slots[s];
+    if(gs.length===2&&gs[0].court===gs[1].court) gs[1].court=gs[0].court===1?2:1;
+  }
+}
+// Full round robin for n teams over 2 courts: every pair once, one game per
+// team per time slot, odd game count puts the lone last game in the final slot.
+// Random-restart greedy seeds + hill-climbing (slot swaps/moves + court flips),
+// batched until a no-three-in-a-row schedule is found (or budget runs out).
+// For 6 teams this lands on the fair optimum: everyone gets exactly 2
+// back-to-backs and plays on both courts. (5 teams can't avoid a 4-game run —
+// only one team rests per slot; that's maths, not the scheduler.)
+function crossSchedule(n){
+  const pairs=[];
+  for(let i=0;i<n;i++) for(let j=i+1;j<n;j++) pairs.push([i,j]);
+  const nPairs=pairs.length, nSlots=Math.ceil(nPairs/2);
+  let best=null, bestScore=Infinity;
+  for(let batch=0;batch<6;batch++){
+    for(let r=0;r<40;r++){
+      const bag=shuffleArr(pairs.slice());
+      const slots=Array.from({length:nSlots},()=>[]);
+      let ok=true;
+      for(const p of bag){
+        let t=-1;
+        for(let s=0;s<nSlots;s++){
+          if(slots[s].length>=slotCap(nPairs,nSlots,s)) continue;
+          if(slots[s].some(q=>q.includes(p[0])||q.includes(p[1]))) continue;
+          if(t===-1||slots[s].length<slots[t].length) t=s;
+        }
+        if(t===-1){ ok=false; break; }
+        slots[t].push(p);
+      }
+      if(!ok) continue;
+      const games=[];
+      slots.forEach((gs,s)=>shuffleArr(gs).forEach((p,c)=>games.push({slot:s,court:c+1,a:p[0],b:p[1]})));
+      balanceCourts(games,n);
+      let cur=scoreSched(games,n);
+      for(let it=0;it<700;it++){
+        const g=games[Math.floor(Math.random()*games.length)];
+        if(Math.random()<0.5){
+          const h=games[Math.floor(Math.random()*games.length)];
+          if(g===h||g.slot===h.slot) continue;
+          const gs=g.slot, hs=h.slot;
+          g.slot=hs; h.slot=gs;
+          if(!slotOk(games,g,hs,nPairs,nSlots)||!slotOk(games,h,gs,nPairs,nSlots)){ g.slot=gs; h.slot=hs; continue; }
+          fixCourts(games); balanceCourts(games,n);
+          const sc=scoreSched(games,n);
+          if(sc<=cur) cur=sc;
+          else { g.slot=gs; h.slot=hs; fixCourts(games); balanceCourts(games,n); }
+        }else{
+          const s2=Math.floor(Math.random()*nSlots);
+          if(s2===g.slot||!slotOk(games,g,s2,nPairs,nSlots)) continue;
+          const gs=g.slot;
+          g.slot=s2;
+          fixCourts(games); balanceCourts(games,n);
+          const sc=scoreSched(games,n);
+          if(sc<=cur) cur=sc;
+          else { g.slot=gs; fixCourts(games); balanceCourts(games,n); }
+        }
+      }
+      if(cur<bestScore){ bestScore=cur; best=games.map(g=>({...g})); }
+    }
+    if(best&&tripleCount(best,n)===0) break;
+  }
+  return best;
+}
+/* ==/FIXSCHED== */
+
+function genSelected(){
+  return [...document.querySelectorAll("[data-genteam]")]
+    .filter(c=>c.checked).map(c=>teams.find(t=>t.id===c.dataset.genteam)).filter(Boolean);
+}
+function genPlan(){
+  const sel=genSelected(), start=parseStart($("#genStart")?.value);
+  if(sel.length<4) return {err:"Tick at least 4 teams."};
+  if(start==null) return {err:"Start time looks off — try 7:45 PM."};
+  const g1=sel.filter(t=>t.court_group===1).length;
+  if(sel.length===8&&g1===4) return {mode:"classic",sel,start,games:12,slots:6};
+  const games=sel.length*(sel.length-1)/2;
+  return {mode:"cross",sel,start,games,slots:Math.ceil(games/2)};
+}
+function updateGenSum(){
+  const el=$("#genSum"); if(!el) return;
+  const p=genPlan();
+  if(p.err){ el.textContent=p.err; return; }
+  const last=fmtTime(p.start+(p.slots-1)*GAME_MIN);
+  el.textContent = p.mode==="classic"
+    ? `Classic 4+4 pools: 12 games · 6 rounds per court · last tip-off ${last}`
+    : `${p.sel.length} teams, everyone plays everyone once: ${p.games} games (${p.sel.length-1} each) · spread over both courts · last tip-off ${last}`;
+}
+let genBusy=false;
+function openGen(){
+  if(genBusy) return;
+  if(teams.length<4){ alert("Need at least 4 teams — add them in the Teams tab first."); return; }
+  // teams sat out last generate start unticked; new teams default to in
+  let out=[]; try{ out=JSON.parse(localStorage.getItem("lotg_genout")||"[]"); }catch(e){}
+  $("#modal").innerHTML = `
+  <div class="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50" onclick="if(event.target===this)this.remove()">
+    <div class="card p-6 w-full max-w-sm" style="max-height:86vh;overflow-y:auto">
+      <h3 class="font-black mb-1">⚡ Generate Fixtures</h3>
+      <p class="text-xs text-gray-500 mb-3">Tick who's in tonight. Any 6 teams → everyone plays everyone once, crossing both courts. 8 teams in 4/4 groups → classic round robin per court.</p>
+      <div class="mb-3">${teams.map(t=>`
+        <label class="flex items-center gap-2 py-1 cursor-pointer">
+          <input type="checkbox" data-genteam="${t.id}" ${out.includes(t.id)?"":"checked"} onchange="updateGenSum()">
+          ${logoHtml(t,22)}<span class="font-bold text-sm">${esc(t.name)}</span>
+        </label>`).join("")}
+      </div>
+      <label class="text-[11px] text-gray-500 font-bold uppercase tracking-wider">First tip-off</label>
+      <input id="genStart" class="inp mb-2" value="${DEFAULT_START}" oninput="updateGenSum()">
+      <p id="genSum" class="text-xs text-orange-400 font-semibold mb-3"></p>
+      <button class="btn btn-orange w-full" onclick="doGen()">Generate — wipes current games</button>
+    </div>
+  </div>`;
+  updateGenSum();
+}
+async function doGen(){
+  if(genBusy) return;
+  const p=genPlan();
+  if(p.err){ alert(p.err); return; }
+  const finals=games.filter(g=>g.status==="final").length;
+  const modeTxt=p.mode==="classic"?"classic 4+4 pools":`${p.sel.length}-team cross-court`;
+  if(!confirm(`Generate ${p.games} games (${modeTxt}) starting ${fmtTime(p.start)}?\nThis deletes ALL current games and scores.${finals?`\n${finals} finished game${finals>1?"s":""} will be lost!`:""}`)) return;
+  let rows=[];
+  if(p.mode==="classic"){
+    const g1=p.sel.filter(t=>t.court_group===1), g2=p.sel.filter(t=>t.court_group===2);
+    for(const [court,grp] of [[1,g1],[2,g2]])
+      RR4.forEach((pair,slot)=>rows.push({court,slot_index:slot,game_time:fmtTime(p.start+slot*GAME_MIN),team1_id:grp[pair[0]].id,team2_id:grp[pair[1]].id}));
+  }else{
+    const order=shuffleArr(p.sel.slice());
+    const sched=crossSchedule(order.length);
+    if(!sched){ alert("Couldn't build a schedule — try again."); return; }
+    rows=sched.map(g=>({court:g.court,slot_index:g.slot,game_time:fmtTime(p.start+g.slot*GAME_MIN),team1_id:order[g.a].id,team2_id:order[g.b].id}));
+  }
+  genBusy=true;
+  // full-screen busy overlay: shows progress AND blocks every tap until done
+  $("#modal").innerHTML = `<div class="fixed inset-0 bg-black/70 flex items-center justify-center p-4 z-50"><div class="card p-6 font-black">Building tonight's schedule…</div></div>`;
+  try{
     await api("lotg_games?id=not.is.null",{method:"DELETE"});
     await api("lotg_games",{method:"POST",body:JSON.stringify(rows)});
-  });
+    localStorage.setItem("lotg_genout",JSON.stringify(teams.filter(t=>!p.sel.some(s=>s.id===t.id)).map(t=>t.id)));
+  }catch(e){
+    console.error(e);
+    if((e.message||"").includes("row-level security")){ alert("Not authorised — your admin session may have expired. Log in again."); doLogout(); }
+    else alert("Network hiccup — the board may be missing games. Open ⚡ Generate Fixtures and run it again to rebuild.");
+  }
+  await fetchAll();
+  $("#modal").innerHTML="";
+  genBusy=false;
 }
 function clearScores(){
   if(!confirm("Clear all scores and set every game back to upcoming?")) return;

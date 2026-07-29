@@ -408,7 +408,25 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   site. Merging to main also serves it at the Lab domain /lotg/ (harmless
   duplicate, same backend).
 - Real usage: 8 teams (LOTG/Syl/Kopiko/JC Cleaning · Primal/CBF/Herbalife/
-  Emad), full 12-game night already scored (all finals).
+  Emad); the 15 Jul night's 12 finals are snapshotted in
+  lotg/results-2026-07-15.md (generating fixtures wipes lotg_games).
+- **Cross-court fixture generator — SHIPPED 2026-07-29 (Aiman asked, for that
+  night: "6 teams, everyone plays everyone once, random/both courts, 7:45").**
+  ⚡ Generate Fixtures now opens a picker modal: tick who's in tonight + first
+  tip-off time (default 7:45 PM, GAME_MIN=13 cadence). Exactly 8 ticked in 4/4
+  court groups → classic per-court RR4; ANY other count ≥4 → cross-court full
+  round robin via `crossSchedule(n)` (==FIXSCHED== block): greedy seeds +
+  hill-climb (slot swaps/moves, court flips), scoring b2b ×5 / triple ×40 /
+  court-crossing, batched restarts until a no-triple schedule lands. 6 teams
+  = 15 games in 8 slots (7×2 + lone closer), fair optimum: exactly 2
+  back-to-backs each, everyone plays both courts, 7:45→9:16 tip-offs. Maths
+  notes: n=5 can't avoid a 4-game run (1 rester/slot); n=4 can't court-cross
+  (parity). Ladder's C1/C2 chip removed (courts cross now). Tested:
+  scratchpad lotg-sched-test.mjs (120-run stress) + lotg-e2e.mjs (Playwright
+  full admin flow, stubbed PostgREST). Deploy = manual: stage lotg/index.html
+  alone in a folder, `npx -y @netlify/mcp@latest --site-id 71a72434-... --proxy-path <from
+  Netlify MCP deploy-site>` from that folder (repo netlify.toml must NOT be
+  in the upload).
 
 ## Parked ideas (Aiman asked to save these)
 
