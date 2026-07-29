@@ -382,6 +382,34 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
 - v2 ideas discussed: KOTC proper, run chat, POTW weekly archive/all-time
   wall, PWA manifest + install, native app for background geofencing.
 
+## LOTG — Wednesday Night Basketball scoreboard (repo'd 2026-07-29)
+
+- **LOTG = "Love of the Game"**, a separate Sydney brand Aiman is involved
+  with (its own landing PWA lives at love-of-the-game-lotg.netlify.app —
+  merch/UBL/NBL1/community; NOT in this repo). The **Wednesday Night
+  Basketball scoreboard** at lotg-wednesday-night-basketball.netlify.app
+  (Netlify site 71a72434-5369-4d03-843e-2a7f405bfb84, MANUAL deploys — not
+  git-driven) is a single-file live-score app: 🏆 ladder (W/L, PF/PA, +/-,
+  draws possible) + 2 court sections, 6-slot round-robin each (4 teams per
+  court, TIMES 7:10→8:15 PM, 10-min games / 3-min break). Admin mode
+  ("For Aiman & SJ", shared password): start/final/forfeit/reopen games,
+  inline scores, add/del games, team CRUD + logo upload (96px data-URI),
+  ⚡ Generate Fixtures, Clear Scores, in-app password change. Public view
+  auto-polls every 30s.
+- **Backend: SAME Supabase project as the Lab, but raw PostgREST — no edge
+  fn.** Tables lotg_teams / lotg_games / lotg_admin (single row id=1 holds
+  the shared password). RLS: public SELECT; writes need header
+  `x-lotg-admin: <password>` checked by lotg_is_admin(); RPCs
+  lotg_verify_admin + lotg_change_password. Full reference:
+  supabase/lotg-schema.sql.
+- **Source mirrored to lotg/index.html** (byte-for-byte from the live
+  deploy — it was previously ONLY on Netlify, no version control). Editing
+  it here does NOT redeploy the LOTG site; deploy manually to its Netlify
+  site. Merging to main also serves it at the Lab domain /lotg/ (harmless
+  duplicate, same backend).
+- Real usage: 8 teams (LOTG/Syl/Kopiko/JC Cleaning · Primal/CBF/Herbalife/
+  Emad), full 12-game night already scored (all finals).
+
 ## Parked ideas (Aiman asked to save these)
 
 - **"A.I. MAN" Instagram post** — saved 2026-07-18, for a few weeks out.
