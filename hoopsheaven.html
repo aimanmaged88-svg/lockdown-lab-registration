@@ -370,7 +370,9 @@ header{
 <div class="sheet" id="shCourt"><div class="scrim" data-close></div><div class="panel">
   <div class="grab"></div>
   <div class="xrow"><div><h3 id="ctName"></h3><p class="sub" id="ctSub"></p></div><button class="x" data-close>✕</button></div>
+  <div id="ctPhoto" style="display:none;width:100%;height:172px;border-radius:14px;background:var(--card) center/cover no-repeat;border:1px solid var(--line);margin:2px 0 10px"></div>
   <div class="cmeta" id="ctMeta"></div>
+  <div id="ctNotes" style="display:none;font-size:13px;color:var(--muted);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 13px;margin-bottom:12px"></div>
   <div class="wx" id="ctWx"></div>
   <div class="btn-row" style="margin-bottom:4px">
     <button class="btn btn-v" style="flex:1.4" id="ctCall">⚡ Call a run here</button>
@@ -728,8 +730,17 @@ $('#rCourtLink').onclick=()=>{closeSheet('shRun');openCourtPage({key:CUR.court_k
 let COURTS=null,GEO=null;
 async function loadCourts(){
   if(COURTS)return COURTS;
-  const d=await(await fetch('courts.json')).json();
-  COURTS=d.courts.map(c=>({...c,key:'oc_'+c.lat.toFixed(5)+'_'+c.lon.toFixed(5)}));
+  // base data + desk overrides (renames, hidden courts)
+  const [d,meta]=await Promise.all([
+    fetch('courts.json').then(r=>r.json()),
+    api({action:'courts_meta'}).catch(()=>({courts:[]}))
+  ]);
+  const M={};(meta.courts||[]).forEach(m=>M[m.key]=m);
+  COURTS=d.courts.map(c=>{
+    const key='oc_'+c.lat.toFixed(5)+'_'+c.lon.toFixed(5);
+    const m=M[key];
+    return {...c,key,name:m&&m.name?m.name:c.name,hidden:!!(m&&m.hidden)};
+  }).filter(c=>!c.hidden);
   return COURTS;
 }
 const dist=(a,b,c,d)=>{const R=6371,x=(c-a)*Math.PI/180,y=(d-b)*Math.PI/180,h=Math.sin(x/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(y/2)**2;return 2*R*Math.asin(Math.sqrt(h))};
@@ -856,8 +867,15 @@ function openCourtPage(c){
     $('#ctWx').innerHTML=c.indoor?'<span class="wxchip good">🏟️ Indoor — always game time</span>'
       :wxChip(x,false).replace('—','right now —');
   }catch(e){}})();
+  $('#ctPhoto').style.display='none';
+  $('#ctNotes').style.display='none';
   openSheet('shCourt');
   api({action:'court',court_key:c.key,player_id:OCP?OCP.id:''}).then(d=>{
+    if(CC===c&&d.info){
+      if(d.info.name)$('#ctName').textContent=d.info.name;
+      if(d.info.photo_url){$('#ctPhoto').style.display='';$('#ctPhoto').style.backgroundImage=`url("${d.info.photo_url.replace(/"/g,'')}")`}
+      if(d.info.notes){$('#ctNotes').style.display='';$('#ctNotes').textContent='📌 '+d.info.notes}
+    }
     $('#ctWeek').textContent=d.week;
     $('#ctRuns').innerHTML=d.runs.length?d.runs.map(r=>`
       <div class="run" data-crun="${esc(r.id)}" style="margin-bottom:8px">

@@ -260,6 +260,13 @@ Deno.serve(async (req: Request) => {
         return J({ run: rows?.length ? (await withPlayers(rows))[0] : null });
       }
 
+
+      // All court overrides (small table) — the app applies name/hidden/photo.
+      case "courts_meta": {
+        const rows = await db(`oc_courts?select=key,name,notes,photo_url,hidden`);
+        return J({ courts: rows || [] });
+      }
+
       // Court page: upcoming runs here, this week's plays, early KOTC leaders.
       case "court": {
         const key = str(b.court_key, 64);
@@ -284,7 +291,8 @@ Deno.serve(async (req: Request) => {
           }
           kotc = Object.values(agg).sort((a, b) => b.runs - a.runs).slice(0, 5);
         }
-        return J({ runs: await withPlayers(runs), plays, week, kotc, here: await hereFor(key) });
+        const info = (await db(`oc_courts?key=eq.${encodeURIComponent(key)}&select=name,notes,photo_url,hidden`))?.[0] || null;
+        return J({ runs: await withPlayers(runs), plays, week, kotc, here: await hereFor(key), info });
       }
 
 
@@ -342,6 +350,42 @@ Deno.serve(async (req: Request) => {
           body: JSON.stringify({ player_id: player.id, name: player.name, ig: player.ig, email: rows?.[0]?.email || "", text: str(b.text, 300), created_at: new Date().toISOString() }),
         });
         return J({ ok: true });
+      }
+
+
+      // Heaven desk: court overrides (display name, notes, hide) + photo upload.
+      case "admin_court_set": {
+        if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
+        const key = str(b.key, 64);
+        if (!key) return J({ error: "bad court" }, 400);
+        await db(`oc_courts?on_conflict=key`, {
+          method: "POST", headers: { Prefer: "resolution=merge-duplicates" },
+          body: JSON.stringify({ key, name: str(b.name, 80), notes: str(b.notes, 400), photo_url: str(b.photo_url, 300), hidden: b.hidden === true, updated_at: new Date().toISOString() }),
+        });
+        return J({ ok: true });
+      }
+
+      case "admin_court_photo": {
+        if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
+        const key = str(b.key, 64);
+        const data = String(b.data ?? "");
+        const m = data.match(/^data:image\/(jpeg|png|webp);base64,(.+)$/);
+        if (!key || !m) return J({ error: "bad image" }, 400);
+        const bytes = Uint8Array.from(atob(m[2]), c => c.charCodeAt(0));
+        if (bytes.length > 3_500_000) return J({ error: "image too big" }, 400);
+        const path = `courts/${key}-${Date.now()}.${m[1] === "jpeg" ? "jpg" : m[1]}`;
+        const up = await fetch(`${SUPABASE_URL}/storage/v1/object/heaven/${path}`, {
+          method: "POST",
+          headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, "Content-Type": `image/${m[1]}`, "x-upsert": "true" },
+          body: bytes,
+        });
+        if (!up.ok) { console.error("upload", await up.text()); return J({ error: "upload failed" }, 500); }
+        const url = `${SUPABASE_URL}/storage/v1/object/public/heaven/${path}`;
+        await db(`oc_courts?on_conflict=key`, {
+          method: "POST", headers: { Prefer: "resolution=merge-duplicates" },
+          body: JSON.stringify({ key, photo_url: url, updated_at: new Date().toISOString() }),
+        });
+        return J({ ok: true, url });
       }
 
       // Heaven desk (Lab coach credentials): review + verify + ban.

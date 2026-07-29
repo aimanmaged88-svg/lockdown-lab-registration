@@ -324,6 +324,19 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   join/checkin stay open to unverified. `me` action returns status; app
   refreshes on boot + "check my status" button; rosters/POTW rows carry
   `v` flag → volt ✓. Aiman's @lockdownlab3 verified via SQL.
+- **Heaven desk 2.0 + court manager (edge v9, 2026-07-30, Aiman: "more like
+  KOS… manage all the courts, uploading photos").** Desk rebuilt OS-style:
+  left sidebar (Overview / Players / Courts), request-count badge, Light/Dark
+  toggle (CSS vars, shared `ll_mode` key). NEW table `oc_courts` (key pk,
+  name/notes/photo_url/hidden overrides on courts.json) + storage bucket
+  `heaven` (public read; writes via edge only). Edge: public `courts_meta`
+  (all overrides) + `court` returns `info`; admin `admin_court_set` (full
+  form upsert) + `admin_court_photo` (base64 jpeg/png/webp ≤3.5MB → storage
+  `courts/<key>-<ts>` → photo_url; desk canvas-downscales to 1280px jpeg
+  first). App: loadCourts merges meta (rename + hidden filter); court page
+  shows #ctPhoto hero + #ctNotes "📌". NOTE: storage.objects can't be
+  deleted via SQL (Supabase guard) — old photos accumulate, fine at this
+  scale. E2E: scratchpad/hh-courts.mjs.
 - **Desktop mode (2026-07-29, Aiman asked — "I'm doing a lot of admin").**
   hoopsheaven.html: `@media(min-width:1000px)` — wide wrap, hero side-by-side,
   board = auto-fill grid (`.daylbl` spans all columns), sheets become centred
