@@ -9,6 +9,24 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0A0C0F;color:#F4F6F0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;padding:20px;max-width:680px;margin:0 auto}
+@media(min-width:1000px){
+  body{max-width:1240px;padding:28px 40px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;align-items:start}
+}
+.stats{display:flex;gap:10px;flex-wrap:wrap;margin:4px 0 18px}
+.stat{background:#12151B;border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:10px 18px;text-align:center}
+.stat b{display:block;font-style:italic;font-weight:900;font-size:22px;color:#D8FF3E}
+.stat.warn b{color:#FFD24D}
+.stat.bad b{color:#FF5A5A}
+.stat span{font-size:10.5px;letter-spacing:1.4px;text-transform:uppercase;color:#96A0A8;font-weight:800}
+.runrow{display:flex;gap:12px;align-items:center;background:#12151B;border:1px solid rgba(255,255,255,.1);border-radius:14px;padding:11px 14px;margin-bottom:8px}
+.runrow .tm{flex:none;text-align:center;min-width:62px}
+.runrow .tm b{display:block;font-style:italic;font-weight:900;font-size:16px}
+.runrow .tm span{font-size:10px;color:#5D666E;text-transform:uppercase;letter-spacing:1px;font-weight:800}
+.runrow .inf{flex:1;min-width:0}
+.runrow .inf b{display:block;font-size:13.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.runrow .inf span{font-size:12px;color:#96A0A8}
+.runrow .n{flex:none;font-style:italic;font-weight:900;color:#D8FF3E}
 h1{font-style:italic;font-weight:900;text-transform:uppercase;font-size:24px;margin-bottom:2px}
 h1 span{color:#D8FF3E}
 .sub{color:#96A0A8;font-size:13.5px;margin-bottom:18px}
@@ -55,12 +73,21 @@ h2{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:#5D666E;font
 </div>
 
 <div id="desk" style="display:none">
-  <h2>📨 Inbox — verification requests</h2>
-  <div id="inbox"></div>
-  <h2>⏳ Not verified yet</h2>
-  <div id="pending"></div>
-  <h2>Everyone</h2>
-  <div id="all"></div>
+  <div class="stats" id="stats"></div>
+  <div class="grid">
+    <div>
+      <h2>📨 Inbox — verification requests</h2>
+      <div id="inbox"></div>
+      <h2>📋 Live board — every run called</h2>
+      <div id="boardList"></div>
+    </div>
+    <div>
+      <h2>⏳ Not verified yet</h2>
+      <div id="pending"></div>
+      <h2>Everyone</h2>
+      <div id="all"></div>
+    </div>
+  </div>
 </div>
 
 <div id="toast"></div>
@@ -110,11 +137,34 @@ function row(p,pending){
         <button class="btn btn-r" data-ban="${esc(p.id)}">Ban</button>`}
   </div>`;
 }
+const SYD='Australia/Sydney';
+const runTime=r=>new Date(r.run_at).toLocaleTimeString('en-AU',{timeZone:SYD,hour:'numeric',minute:'2-digit'}).replace(' ','').toLowerCase();
+const runDay=r=>{
+  const ymd=new Date(r.run_at).toLocaleDateString('en-CA',{timeZone:SYD});
+  const today=new Date().toLocaleDateString('en-CA',{timeZone:SYD});
+  const tmrw=new Date(Date.now()+864e5).toLocaleDateString('en-CA',{timeZone:SYD});
+  return ymd===today?'Today':ymd===tmrw?'Tmrw':new Date(ymd+'T12:00:00').toLocaleDateString('en-AU',{weekday:'short',day:'numeric'});
+};
 async function load(){
   try{
-    const d=await api({action:'admin_players'});
+    const [d,bd]=await Promise.all([api({action:'admin_players'}),api({action:'board'})]);
     const ps=d.players||[];
     const inbox=d.inbox||[];
+    const runs=bd.runs||[];
+    $('#stats').innerHTML=`
+      <div class="stat"><b>${ps.filter(p=>!p.banned).length}</b><span>players</span></div>
+      <div class="stat"><b>${ps.filter(p=>p.verified).length}</b><span>verified</span></div>
+      <div class="stat warn"><b>${inbox.length}</b><span>requests</span></div>
+      <div class="stat bad"><b>${ps.filter(p=>p.banned).length}</b><span>banned</span></div>
+      <div class="stat"><b>${runs.length}</b><span>runs live</span></div>
+      <div class="stat"><b>${runs.reduce((a,r)=>a+(r.players||[]).length,0)}</b><span>tapped in</span></div>`;
+    $('#boardList').innerHTML=runs.length?runs.map(r=>`
+      <div class="runrow">
+        <div class="tm"><b>${esc(runTime(r))}</b><span>${esc(runDay(r))}</span></div>
+        <div class="inf"><b>${esc(r.court_name)}${r.suburb?' · '+esc(r.suburb):''}</b>
+          <span>${esc(r.format)} · by ${esc(r.host_name)}${(r.players||[]).length?' — '+(r.players||[]).map(p=>esc(p.name)).join(', '):''}</span></div>
+        <div class="n">${(r.players||[]).length}/${r.cap}</div>
+      </div>`).join(''):'<div class="empty">No runs on the board right now.</div>';
     $('#inbox').innerHTML=inbox.length?inbox.map(m=>`
       <div class="row pending"><div class="who">
         <b>${esc(m.name)} <span class="tag p">WANTS ✓</span></b>
@@ -143,6 +193,8 @@ async function act(body,msg){
   try{await api(body);toast(msg);load();}catch(e){toast(e.message,1)}
 }
 show();
+setInterval(()=>{if(CREDS&&!document.hidden)load()},30000); // live desk
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&CREDS)load()});
 </script>
 </body>
 </html>

@@ -324,6 +324,13 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   join/checkin stay open to unverified. `me` action returns status; app
   refreshes on boot + "check my status" button; rosters/POTW rows carry
   `v` flag → volt ✓. Aiman's @lockdownlab3 verified via SQL.
+- **Desktop mode (2026-07-29, Aiman asked — "I'm doing a lot of admin").**
+  hoopsheaven.html: `@media(min-width:1000px)` — wide wrap, hero side-by-side,
+  board = auto-fill grid (`.daylbl` spans all columns), sheets become centred
+  dialogs (panel relative, pop animation, gate override included). Desk:
+  stats strip (players/verified/requests/banned/runs live/tapped in),
+  2-col grid ≥1000px (inbox + LIVE BOARD | pending + everyone), board via
+  public `board` action, 30s auto-refresh + visibilitychange reload.
 - **Fresh slate + desk PIN claim (edge v8, 2026-07-29, Aiman asked).** ALL
   oc_* data wiped (accounts/runs/checkins/inbox/bans — his own test rows
   included, at his request). `coachAuth` now claims-on-first-PIN like
