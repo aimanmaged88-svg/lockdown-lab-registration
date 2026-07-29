@@ -7,10 +7,13 @@
 <title>Hoops Heaven — court QR posters</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%23D8FF3E'/%3E%3Cpath d='M32 4v56M4 32h56M11 11c12 10 30 10 42 0M11 53c12-10 30-10 42 0' stroke='%230A0C0F' stroke-width='4' fill='none'/%3E%3C/svg%3E">
 <style>
+
+@font-face{font-family:'HHDisplay';src:url('assets/fonts/anton-400.woff2') format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:'HHCond';src:url('assets/fonts/barlowcondensed-600.woff2') format('woff2');font-weight:600;font-display:swap}
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0A0C0F;color:#F4F6F0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;padding:20px}
 .top{max-width:720px;margin:0 auto 20px}
-h1{font-style:italic;font-weight:900;text-transform:uppercase;font-size:26px}
+h1{font-family:'HHDisplay',sans-serif;font-weight:400;text-transform:uppercase;font-size:28px;letter-spacing:1px}
 h1 span{color:#D8FF3E}
 p.sub{color:#96A0A8;font-size:14px;margin:6px 0 16px}
 .inp{width:100%;background:#12151B;border:1px solid rgba(255,255,255,.12);border-radius:12px;color:#F4F6F0;font-size:16px;padding:12px 14px;outline:none}
@@ -29,14 +32,14 @@ p.sub{color:#96A0A8;font-size:14px;margin:6px 0 16px}
 .poster::before{content:'';position:absolute;inset:0;pointer-events:none;opacity:.5;
   background:radial-gradient(circle 560px at 50% -300px,transparent 557px,rgba(216,255,62,.14) 560px,transparent 565px),linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px);
   background-size:auto,100% 300px}
-.wm{font-style:italic;font-weight:900;text-transform:uppercase;font-size:52px;letter-spacing:-1px;line-height:.95;position:relative}
+.wm{font-family:'HHDisplay',sans-serif;font-weight:400;text-transform:uppercase;font-size:54px;letter-spacing:2px;line-height:.98;position:relative}
 .wm .o{color:transparent;-webkit-text-stroke:2.5px #D8FF3E}
 .wm .f{color:#D8FF3E}
-.poster .court{font-style:italic;font-weight:900;font-size:34px;text-transform:uppercase;margin:26px 0 4px;position:relative}
+.poster .court{font-family:'HHDisplay',sans-serif;font-weight:400;font-size:36px;text-transform:uppercase;letter-spacing:1px;margin:26px 0 4px;position:relative}
 .poster .sub2{color:#96A0A8;font-size:18px;font-weight:700;margin-bottom:28px;position:relative}
 .qrcard{background:#fff;border-radius:24px;display:inline-block;padding:26px;position:relative}
 .qrcard svg{display:block;width:340px;height:340px}
-.poster .cta{font-style:italic;font-weight:900;text-transform:uppercase;font-size:30px;margin-top:28px;position:relative}
+.poster .cta{font-family:'HHDisplay',sans-serif;font-weight:400;text-transform:uppercase;font-size:31px;letter-spacing:1.5px;margin-top:28px;position:relative}
 .poster .cta span{color:#D8FF3E}
 .poster .steps{color:#96A0A8;font-size:16px;font-weight:700;margin-top:12px;position:relative}
 .poster .rules{color:#5D666E;font-size:12.5px;margin-top:22px;position:relative}
@@ -69,8 +72,13 @@ const APP='https://lockdown-lab-registration.netlify.app/hoopsheaven.html';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let COURTS=[],SEL=[];
-fetch('courts.json').then(r=>r.json()).then(d=>{
+const ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltdXd1aHZxcWZ0Z3B4d2h6b3ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NjUyMzgsImV4cCI6MjA5OTI0MTIzOH0.sOkWQpulWj_ZSqMNSV7YP55T70UFSm2mP5e5xapQyQo';
+Promise.all([
+  fetch('courts.json').then(r=>r.json()),
+  fetch('https://ymuwuhvqqftgpxwhzoub.supabase.co/functions/v1/opencourt-api',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+ANON,'apikey':ANON},body:JSON.stringify({action:'courts_meta'})}).then(r=>r.json()).catch(()=>({courts:[]}))
+]).then(([d,meta])=>{
   COURTS=d.courts.map(c=>({...c,key:'oc_'+c.lat.toFixed(5)+'_'+c.lon.toFixed(5)}));
+  for(const m of (meta.courts||[]))if(m.custom&&!m.hidden&&m.lat!=null)COURTS.push({key:m.key,name:m.name||'Basketball Court',suburb:m.suburb||'',lat:m.lat,lon:m.lon});
   paint();
 });
 function paint(){

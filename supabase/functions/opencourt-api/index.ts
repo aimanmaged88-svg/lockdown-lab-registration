@@ -154,6 +154,22 @@ async function hereFor(courtKey: string) {
   return rows.map(r => ({ id: r.player_id, name: r.name, ig: r.ig, verified: r.verified, at: r.checked_in_at }));
 }
 
+
+// Rating summary {avg,n} per court for a set of keys (or all when keys null).
+async function ratingsFor(keys: string[] | null) {
+  const q = keys ? `oc_ratings?court_key=in.(${keys.map(k => `"${k.replace(/"/g, "")}"`).join(",")})&select=court_key,stars` : `oc_ratings?select=court_key,stars`;
+  const rows: Record<string, unknown>[] = await db(q);
+  const agg: Record<string, { s: number; n: number }> = {};
+  for (const r of rows || []) {
+    const k = r.court_key as string;
+    (agg[k] ||= { s: 0, n: 0 });
+    agg[k].s += r.stars as number; agg[k].n++;
+  }
+  const out: Record<string, { avg: number; n: number }> = {};
+  for (const k in agg) out[k] = { avg: Math.round(agg[k].s / agg[k].n * 10) / 10, n: agg[k].n };
+  return out;
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return J({ error: "POST only" }, 405);
@@ -263,7 +279,7 @@ Deno.serve(async (req: Request) => {
 
       // All court overrides (small table) — the app applies name/hidden/photo.
       case "courts_meta": {
-        const rows = await db(`oc_courts?select=key,name,notes,photo_url,hidden`);
+        const rows = await db(`oc_courts?select=key,name,notes,photo_url,hidden,lat,lon,suburb,indoor,lit,custom`);
         // live activity per court: active check-ins (2h) + upcoming runs
         const since = new Date(Date.now() - 2 * 36e5).toISOString();
         const cis = await db(`oc_checkins?checked_in_at=gte.${since}&select=court_key`);
@@ -272,7 +288,7 @@ Deno.serve(async (req: Request) => {
         const here: Record<string, number> = {}, runs: Record<string, number> = {};
         for (const c of cis || []) here[c.court_key as string] = (here[c.court_key as string] || 0) + 1;
         for (const r of rns || []) runs[r.court_key as string] = (runs[r.court_key as string] || 0) + 1;
-        return J({ courts: rows || [], here, runs });
+        return J({ courts: rows || [], here, runs, ratings: await ratingsFor(null) });
       }
 
       // Court page: upcoming runs here, this week's plays, early KOTC leaders.
@@ -300,7 +316,14 @@ Deno.serve(async (req: Request) => {
           kotc = Object.values(agg).sort((a, b) => b.runs - a.runs).slice(0, 5);
         }
         const info = (await db(`oc_courts?key=eq.${encodeURIComponent(key)}&select=name,notes,photo_url,hidden`))?.[0] || null;
-        return J({ runs: await withPlayers(runs), plays, week, kotc, here: await hereFor(key), info });
+        const rrows: Record<string, unknown>[] = await db(`oc_ratings?court_key=eq.${encodeURIComponent(key)}&select=player_id,stars,text,created_at&order=created_at.desc&limit=40`);
+        const rvs = await verifiedSet((rrows || []).map(r => r.player_id as string));
+        const rids = [...new Set((rrows || []).map(r => r.player_id as string))];
+        const rnames: Record<string, { name: string; ig: string }> = {};
+        if (rids.length) for (const p of await db(`oc_players?id=in.(${rids.map(i => `"${i}"`).join(",")})&select=id,name,ig`) || []) rnames[p.id] = { name: p.name, ig: p.ig };
+        const reviews = (rrows || []).map(r => ({ pid: r.player_id, stars: r.stars, text: r.text, at: r.created_at, name: rnames[r.player_id as string]?.name || "Hooper", ig: rnames[r.player_id as string]?.ig || "", v: rvs.has(r.player_id as string), mine: r.player_id === me }));
+        const rsum = reviews.length ? { avg: Math.round(reviews.reduce((a, r) => a + (r.stars as number), 0) / reviews.length * 10) / 10, n: reviews.length } : null;
+        return J({ runs: await withPlayers(runs), plays, week, kotc, here: await hereFor(key), info, reviews, rsum });
       }
 
 
@@ -360,6 +383,48 @@ Deno.serve(async (req: Request) => {
         return J({ ok: true });
       }
 
+
+
+      // Rate a court: 1-5 stars + optional words. One per player per court.
+      case "rate_court": {
+        const g = await guard(((b.player || {}) as Record<string, unknown>).id as string);
+        if (g.err) return g.err;
+        const player = g.p!;
+        const key = str(b.court_key, 64);
+        const stars = num(b.stars, 1, 5, 0);
+        if (!key || !stars) return J({ error: "pick your stars first" }, 400);
+        await db(`oc_ratings?on_conflict=court_key,player_id`, {
+          method: "POST", headers: { Prefer: "resolution=merge-duplicates" },
+          body: JSON.stringify({ court_key: key, player_id: player.id, stars, text: str(b.text, 300), created_at: new Date().toISOString() }),
+        });
+        return J({ ok: true });
+      }
+
+      // Heaven desk: add a custom court / delete one / remove a review.
+      case "admin_court_add": {
+        if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
+        const name = str(b.name, 80), suburb = str(b.suburb, 60);
+        const lat = +(b.lat as number), lon = +(b.lon as number);
+        if (!name) return J({ error: "name the court" }, 400);
+        if (!Number.isFinite(lat) || !Number.isFinite(lon) || lat < -35.5 || lat > -32.5 || lon < 149.5 || lon > 152.5) return J({ error: "that pin isn't in Sydney — paste \"lat, lon\" from Google Maps" }, 400);
+        const key = `oc_c_${crypto.randomUUID().slice(0, 8)}`;
+        await db(`oc_courts`, { method: "POST", body: JSON.stringify({ key, name, suburb, lat, lon, indoor: b.indoor === true, lit: b.lit === true, custom: true, updated_at: new Date().toISOString() }) });
+        return J({ ok: true, key });
+      }
+
+      case "admin_court_del": {
+        if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
+        await db(`oc_courts?key=eq.${encodeURIComponent(str(b.key, 64))}&custom=is.true`, { method: "DELETE" });
+        return J({ ok: true });
+      }
+
+      case "admin_review_del": {
+        if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
+        const key = str(b.key, 64), pid = str(b.pid, 64);
+        if (!key || !pid) return J({ error: "bad request" }, 400);
+        await db(`oc_ratings?court_key=eq.${encodeURIComponent(key)}&player_id=eq.${encodeURIComponent(pid)}`, { method: "DELETE" });
+        return J({ ok: true });
+      }
 
       // Heaven desk: court overrides (display name, notes, hide) + photo upload.
       case "admin_court_set": {

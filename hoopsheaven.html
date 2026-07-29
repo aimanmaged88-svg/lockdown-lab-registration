@@ -671,7 +671,13 @@ svg.leaflet-image-layer.leaflet-interactive path {
 	}
 </style>
 <style>
+
+@font-face{font-family:'HHDisplay';src:url('assets/fonts/anton-400.woff2') format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:'HHCond';src:url('assets/fonts/barlowcondensed-600.woff2') format('woff2');font-weight:600;font-display:swap}
+@font-face{font-family:'HHCond';src:url('assets/fonts/barlowcondensed-800.woff2') format('woff2');font-weight:800;font-display:swap}
+@font-face{font-family:'HHMarker';src:url('assets/fonts/permanentmarker-400.woff2') format('woff2');font-weight:400;font-display:swap}
 :root{
+  --disp:'HHDisplay','Arial Narrow',sans-serif; --cond:'HHCond','Arial Narrow',sans-serif;
   --bg:#0A0C0F; --card:#12151B; --card2:#171B22; --line:rgba(255,255,255,.09);
   --text:#F4F6F0; --muted:#96A0A8; --dim:#5D666E;
   --volt:#FF6A2B; --onaccent:#fff; --ok:#2ECC71; --fire:#FF7A2F; --danger:#FF5A5A;
@@ -694,7 +700,7 @@ header{
 }
 .logo{display:flex;align-items:center;gap:9px;cursor:pointer;user-select:none}
 .logo svg{width:34px;height:34px;flex:none}
-.logo .lw{font-weight:900;font-size:17px;line-height:.95;text-transform:uppercase;letter-spacing:.5px}
+.logo .lw{font-family:var(--disp);font-weight:400;font-size:17px;line-height:.98;text-transform:uppercase;letter-spacing:1px}
 .hdr-r{display:flex;gap:8px;align-items:center;min-width:0}
 .iconbtn{flex:none;background:var(--card);border:1px solid var(--line);border-radius:50%;width:36px;height:36px;font-size:16px;cursor:pointer;display:grid;place-items:center}
 .me{
@@ -706,8 +712,8 @@ header{
 
 /* ---------- hero ---------- */
 .hero{padding:24px 2px 4px}
-.hero h1{font-weight:900;font-size:clamp(34px,9.4vw,44px);line-height:1.0;text-transform:uppercase;letter-spacing:-1px}
-.hero .scripty{display:block;color:var(--volt);font-family:'Segoe Script','Brush Script MT',cursive;font-style:italic;text-transform:none;letter-spacing:0;font-size:.94em;transform:rotate(-2deg);transform-origin:left}
+.hero h1{font-family:var(--disp);font-weight:400;font-size:clamp(36px,10vw,48px);line-height:1.04;text-transform:uppercase;letter-spacing:.5px}
+.hero .scripty{display:block;color:var(--volt);font-family:'HHMarker',cursive;font-style:normal;text-transform:none;letter-spacing:0;font-size:.86em;transform:rotate(-2deg);transform-origin:left;padding:6px 0 4px}
 .hero p{color:var(--muted);margin-top:10px;font-size:15px}
 
 /* ---------- search + pills ---------- */
@@ -716,7 +722,7 @@ header{
 .search .ic{color:var(--dim)}
 .pills-h{display:flex;gap:8px;margin-top:12px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none}
 .pills-h::-webkit-scrollbar{display:none}
-.fpill{flex:none;display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);color:var(--muted);border-radius:99px;padding:8px 15px;font-size:12.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;cursor:pointer;font-family:inherit}
+.fpill{flex:none;display:inline-flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);color:var(--muted);border-radius:99px;padding:8px 16px;font-family:var(--cond);font-size:14.5px;font-weight:600;letter-spacing:1.6px;text-transform:uppercase;cursor:pointer}
 .fpill.on{background:color-mix(in srgb, var(--volt) 16%, transparent);border-color:var(--volt);color:var(--text)}
 .fpill.ok{color:var(--ok)}
 .fpill.ok.on{background:color-mix(in srgb, var(--ok) 14%, transparent);border-color:var(--ok)}
@@ -724,7 +730,7 @@ header{
 /* ---------- section labels ---------- */
 .sect{margin-top:24px}
 .seclbl{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
-.seclbl h2{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--text);font-weight:900}
+.seclbl h2{font-family:var(--cond);font-size:16px;letter-spacing:2.4px;text-transform:uppercase;color:var(--text);font-weight:800}
 .seclbl button{background:none;border:none;color:var(--volt);font-weight:800;font-size:12.5px;cursor:pointer;font-family:inherit;letter-spacing:.5px}
 
 /* ---------- nearby court cards ---------- */
@@ -760,21 +766,21 @@ header{
 .runstrip .avs .a{width:30px;height:30px;border-radius:50%;background:var(--card2);border:2px solid var(--bg);color:var(--volt);display:grid;place-items:center;font-weight:900;font-size:12px;margin-left:-8px}
 .runstrip .avs .a:first-child{margin-left:0}
 .runstrip .in{flex:1;min-width:0}
-.runstrip .in b{display:block;font-size:13px;letter-spacing:1.4px;text-transform:uppercase;font-weight:900}
+.runstrip .in b{display:block;font-family:var(--cond);font-size:15px;letter-spacing:2px;text-transform:uppercase;font-weight:800}
 .runstrip .in b em{color:var(--volt);font-style:normal}
 .runstrip .in span{font-size:12.5px;color:var(--muted)}
 .runstrip .ct{flex:none;text-align:right;font-size:12.5px;color:var(--muted);font-weight:700}
 .runstrip .ct b{display:block;color:var(--text);font-weight:900}
 
 /* ---------- board (runs tab) ---------- */
-.daylbl{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);font-weight:800;margin:14px 2px 8px}
+.daylbl{font-family:var(--cond);font-size:14px;letter-spacing:2.6px;text-transform:uppercase;color:var(--dim);font-weight:600;margin:14px 2px 8px}
 .run{
   background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px 15px;margin-bottom:10px;
   cursor:pointer;display:flex;gap:14px;align-items:center;transition:border-color .15s;
 }
 .run:hover{border-color:color-mix(in srgb, var(--volt) 35%, transparent)}
 .run .tm{flex:none;text-align:center;min-width:56px}
-.run .tm b{display:block;font-size:19px;font-weight:900;letter-spacing:-.5px}
+.run .tm b{display:block;font-family:var(--disp);font-weight:400;font-size:19px;letter-spacing:.5px}
 .run .tm span{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:1px;font-weight:700}
 .run .inf{flex:1;min-width:0}
 .run .inf b{display:block;font-size:15.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -790,7 +796,7 @@ header{
 .empty{
   border:1.5px dashed var(--line);border-radius:var(--r);padding:34px 20px;text-align:center;color:var(--muted);margin-top:8px;
 }
-.empty b{display:block;color:var(--text);font-weight:900;text-transform:uppercase;font-size:18px;margin-bottom:6px}
+.empty b{display:block;color:var(--text);font-family:var(--disp);font-weight:400;text-transform:uppercase;font-size:18px;letter-spacing:.8px;margin-bottom:6px}
 .skel{height:74px;border-radius:var(--r);background:linear-gradient(100deg,var(--card) 40%,var(--card2) 50%,var(--card) 60%);background-size:200% 100%;animation:sk 1.2s infinite;margin-bottom:10px}
 @keyframes sk{to{background-position:-200% 0}}
 
@@ -829,7 +835,7 @@ header{
   display:flex;gap:2px;background:rgba(14,17,22,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
   border:1px solid var(--line);border-radius:20px;padding:7px;width:min(94vw,420px);
 }
-.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;color:var(--dim);font-family:inherit;font-size:10px;font-weight:800;letter-spacing:.4px;padding:6px 2px;border-radius:14px;cursor:pointer}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;color:var(--dim);font-family:var(--cond);font-size:12px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;padding:6px 2px;border-radius:14px;cursor:pointer}
 .tab .i{font-size:18px;line-height:1}
 .tab.on{color:var(--volt);background:color-mix(in srgb, var(--volt) 12%, transparent)}
 
@@ -847,14 +853,14 @@ header{
 }
 @keyframes up{from{transform:translateY(60px);opacity:.4}}
 .grab{width:40px;height:4px;border-radius:99px;background:var(--line);margin:4px auto 14px}
-.panel h3{font-weight:900;text-transform:uppercase;font-size:20px;letter-spacing:-.4px;margin-bottom:2px}
+.panel h3{font-family:var(--disp);font-weight:400;text-transform:uppercase;font-size:21px;letter-spacing:.8px;margin-bottom:2px}
 .panel .sub{color:var(--muted);font-size:13.5px;margin-bottom:14px}
 .xrow{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 .x{flex:none;background:var(--card);border:1px solid var(--line);color:var(--muted);width:32px;height:32px;border-radius:50%;font-size:15px;cursor:pointer}
 #shProfile.gate .panel{max-height:100dvh;height:100dvh;border-radius:0;border:none;display:flex;flex-direction:column;justify-content:center}
 #shProfile.gate .panel>*{flex:0 0 auto}
 #shProfile.gate .x,#shProfile.gate .grab{display:none}
-.gatewm{font-weight:900;font-size:32px;letter-spacing:-1px;text-transform:uppercase;margin-bottom:18px;display:none;line-height:1}
+.gatewm{font-family:var(--disp);font-weight:400;font-size:34px;letter-spacing:1px;text-transform:uppercase;margin-bottom:18px;display:none;line-height:1}
 .gatewm span{color:var(--volt)}
 #shProfile.gate .gatewm{display:block}
 .rule{display:flex;gap:11px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line);font-size:13.5px;color:var(--muted);line-height:1.5}
@@ -866,7 +872,7 @@ header{
 
 /* forms */
 .fld{margin-bottom:14px}
-.fld label{display:block;font-size:11px;letter-spacing:1.8px;text-transform:uppercase;color:var(--dim);font-weight:800;margin-bottom:7px}
+.fld label{display:block;font-family:var(--cond);font-size:13.5px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);font-weight:600;margin-bottom:7px}
 .inp{
   width:100%;background:var(--card);border:1px solid var(--line);border-radius:13px;color:var(--text);
   font-size:16px;padding:13px 14px;outline:none;font-family:inherit;
@@ -887,7 +893,7 @@ header{
 .clist{margin-top:10px;max-height:44dvh;overflow-y:auto;border-radius:14px}
 
 /* run sheet */
-.bigtime{font-weight:900;font-size:26px;letter-spacing:-.5px;margin:2px 0 0}
+.bigtime{font-family:var(--disp);font-weight:400;font-size:27px;letter-spacing:.8px;margin:2px 0 0}
 .courtlink{display:flex;align-items:center;gap:8px;margin:10px 0 4px;cursor:pointer;color:var(--text)}
 .courtlink b{font-size:16px;font-weight:800;text-decoration:underline;text-decoration-color:color-mix(in srgb, var(--volt) 50%, transparent);text-underline-offset:3px}
 .meta{display:flex;gap:7px;flex-wrap:wrap;margin:10px 0 14px}
@@ -924,7 +930,7 @@ header{
 .amen .a span{display:block;font-size:10.5px;color:var(--muted);font-weight:700;margin-top:3px}
 .cmeta{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0 6px}
 .subsect{margin-top:20px}
-.subsect h4{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);font-weight:800;margin-bottom:9px;display:flex;gap:7px;align-items:center}
+.subsect h4{font-family:var(--cond);font-size:14px;letter-spacing:2.4px;text-transform:uppercase;color:var(--dim);font-weight:600;margin-bottom:9px;display:flex;gap:7px;align-items:center}
 .live{display:flex;align-items:center;gap:10px;margin-bottom:8px}
 .live .avs{display:flex}
 .live .avs .a{width:34px;height:34px;border-radius:50%;background:var(--card2);border:2px solid var(--bg);color:var(--text);display:grid;place-items:center;font-weight:900;font-size:13px;margin-left:-9px}
@@ -948,7 +954,7 @@ header{
   background:radial-gradient(circle at 50% -40%,color-mix(in srgb, var(--volt) 8%, transparent),var(--card));
 }
 .kotc .crown{font-size:30px}
-.kotc b{display:block;color:var(--text);font-weight:900;text-transform:uppercase;letter-spacing:.5px;margin:4px 0 3px}
+.kotc b{display:block;color:var(--text);font-family:var(--disp);font-weight:400;text-transform:uppercase;letter-spacing:1px;margin:4px 0 3px}
 .kotc p{font-size:12.5px}
 .klead{display:flex;flex-direction:column;gap:6px;margin-top:12px;text-align:left}
 .klead .kr{display:flex;justify-content:space-between;font-size:13px;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:7px 11px}
@@ -975,6 +981,20 @@ header{
 .swb.on{border-color:var(--volt)}
 .swb.on .dot{box-shadow:0 0 0 3px #0E1116,0 0 0 5px var(--volt)}
 
+/* ratings */
+.starline{display:flex;align-items:center;gap:7px;font-size:14px;font-weight:800;margin:2px 0 2px}
+.starline .st{color:#FFC24D}
+.starline .rn{color:var(--muted);font-weight:600;font-size:13px}
+.rate{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px 14px;margin-top:8px}
+.rate .stars{display:flex;gap:6px;margin-bottom:9px}
+.rate .stars button{background:none;border:none;font-size:26px;cursor:pointer;filter:grayscale(1);opacity:.45;transition:.12s;padding:0}
+.rate .stars button.on{filter:none;opacity:1;transform:scale(1.06)}
+.rev{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:10px 13px;margin-bottom:8px}
+.rev .top{display:flex;align-items:center;gap:8px;font-size:13.5px}
+.rev .top b{font-weight:800}
+.rev .top .st{color:#FFC24D;font-size:12.5px;letter-spacing:1px}
+.rev .top a{color:var(--muted);font-size:12px;text-decoration:none}
+.rev p{font-size:13px;color:var(--muted);margin-top:4px}
 /* toast */
 #toast{
   position:fixed;left:50%;bottom:88px;transform:translateX(-50%) translateY(140px);z-index:99;
@@ -1179,7 +1199,8 @@ header{
   <div class="cthero" id="ctPhoto"></div>
   <div class="xrow"><div style="flex:1;min-width:0">
     <div class="ctrow"><h3 id="ctName"></h3><span class="freetag">FREE</span><button class="bkm" id="ctBkm">🔖</button></div>
-    <p class="sub" id="ctSub" style="margin-bottom:4px"></p>
+    <p class="sub" id="ctSub" style="margin-bottom:2px"></p>
+    <div class="starline" id="ctStars" style="display:none"></div>
   </div><button class="x" data-close>✕</button></div>
   <div class="amen" id="ctAmen"></div>
   <div id="ctNotes" style="display:none;font-size:13px;color:var(--muted);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 13px;margin:8px 0 4px"></div>
@@ -1199,6 +1220,14 @@ header{
     <div id="ctPlays"></div>
     <div class="droprow"><input class="inp" id="ctClip" placeholder="Paste your clip link (IG reel, YouTube…)"><button class="btn btn-v" id="ctDrop">Drop it</button></div>
     <p style="font-size:11.5px;color:var(--dim);margin-top:7px">One clip per player per week at each court. Most 🔥 by Sunday night takes it.</p>
+  </div>
+  <div class="subsect"><h4>⭐ Reviews</h4>
+    <div id="ctRevs"></div>
+    <div class="rate">
+      <div class="stars" id="rateStars"></div>
+      <input class="inp" id="rateTxt" maxlength="300" placeholder="Say something about this court (optional)">
+      <button class="btn btn-v btn-block" id="rateGo" style="margin-top:9px">Post my rating</button>
+    </div>
   </div>
   <div class="subsect"><h4>👑 King of the Court</h4>
     <div class="kotc">
@@ -1579,28 +1608,34 @@ $('#rMaps').onclick=()=>{const r=CUR;window.open(`https://www.google.com/maps/di
 $('#rCourtLink').onclick=()=>{closeSheet('shRun');openCourtPage({key:CUR.court_key,name:CUR.court_name,suburb:CUR.suburb,lat:CUR.lat,lon:CUR.lon});};
 
 /* ---------- courts dataset + overrides + activity ---------- */
-let COURTS=null,GEO=null,ACT={here:{},runs:{}};
+let COURTS=null,GEO=null,ACT={here:{},runs:{},ratings:{}};
 async function loadCourts(){
   if(COURTS)return COURTS;
   const [d,meta]=await Promise.all([
     fetch('courts.json').then(r=>r.json()),
     api({action:'courts_meta'}).catch(()=>({courts:[],here:{},runs:{}}))
   ]);
-  ACT={here:meta.here||{},runs:meta.runs||{}};
-  const M={};(meta.courts||[]).forEach(m=>M[m.key]=m);
+  ACT={here:meta.here||{},runs:meta.runs||{},ratings:meta.ratings||{}};
+  const M={};(meta.courts||[]).forEach(m=>{if(!m.custom)M[m.key]=m});
   COURTS=d.courts.map(c=>{
     const key='oc_'+c.lat.toFixed(5)+'_'+c.lon.toFixed(5);
     const m=M[key];
     return {...c,key,name:m&&m.name?m.name:c.name,photo:m&&m.photo_url||'',hidden:!!(m&&m.hidden)};
   }).filter(c=>!c.hidden);
+  // coach-added courts layer straight into the dataset
+  for(const m of (meta.courts||[])){
+    if(m.custom&&!m.hidden&&m.lat!=null)COURTS.push({key:m.key,name:m.name||'Basketball Court',suburb:m.suburb||'',lat:m.lat,lon:m.lon,indoor:!!m.indoor,lit:!!m.lit,photo:m.photo_url||'',hidden:false,custom:true});
+  }
   return COURTS;
 }
 const dist=(a,b,c,d)=>{const R=6371,x=(c-a)*Math.PI/180,y=(d-b)*Math.PI/180,h=Math.sin(x/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(y/2)**2;return 2*R*Math.asin(Math.sqrt(h))};
 const hereN=c=>ACT.here[c.key]||0;
+const rateOf=c=>ACT.ratings[c.key]||null;
+const starBit=c=>{const r=rateOf(c);return r?`<span style="color:#FFC24D;font-weight:800">★ ${r.avg}</span> <span style="color:var(--dim)">(${r.n})</span> · `:''};
 
 /* home: nearby cards + search */
 let HOMEF={outdoor:false,now:false};
-function courtScore(c){return (hereN(c)*100)+((ACT.runs[c.key]||0)*40)+(c.photo?20:0)+(c.name!=='Basketball Court'?5:0)}
+function courtScore(c){const r=rateOf(c);return (hereN(c)*100)+((ACT.runs[c.key]||0)*40)+(r?r.n*10:0)+(c.photo?20:0)+(c.name!=='Basketball Court'?5:0)}
 function paintNearby(){
   if(!COURTS)return;
   let list=COURTS.filter(c=>(!HOMEF.outdoor||!c.indoor)&&(!HOMEF.now||hereN(c)>0||(ACT.runs[c.key]||0)>0));
@@ -1609,7 +1644,7 @@ function paintNearby(){
   $('#nearby').innerHTML=list.slice(0,12).map(c=>`
     <div class="ccard" data-k="${esc(c.key)}">
       <div class="ph ${c.photo?'has':''}" style="${c.photo?`background-image:url('${esc(c.photo)}')`:''}">${hereN(c)?`<span class="hb">${hereN(c)} here</span>`:''}</div>
-      <div class="bd"><b>${esc(c.name)}</b><span>${c.km!=null?(c.km<1?Math.round(c.km*1000)+'m':c.km.toFixed(1)+'km')+' · ':''}<span class="fr">Free</span>${c.suburb?' · '+esc(c.suburb):''}</span></div>
+      <div class="bd"><b>${esc(c.name)}</b><span>${starBit(c)}${c.km!=null?(c.km<1?Math.round(c.km*1000)+'m':c.km.toFixed(1)+'km')+' · ':''}<span class="fr">Free</span>${c.suburb?' · '+esc(c.suburb):''}</span></div>
     </div>`).join('')||'<div class="empty" style="flex:1">Nothing matches those filters right now.</div>';
   $('#nearby').querySelectorAll('.ccard').forEach(x=>x.onclick=()=>{
     const c=COURTS.find(y=>y.key===x.dataset.k); if(c)openCourtPage(c);
@@ -1623,7 +1658,7 @@ function paintHomeSearch(){
     .sort((a,b)=>courtScore(b)-courtScore(a)).slice(0,14);
   el.innerHTML=list.map(c=>`
     <div class="crow" data-k="${esc(c.key)}"><span class="ic">${c.indoor?'🏟️':'🏀'}</span>
-      <div class="nm"><b>${esc(c.name)}</b><span>${esc(c.suburb||'')}${c.lit?' · 💡 lit':''}</span></div>
+      <div class="nm"><b>${esc(c.name)}</b><span>${starBit(c)}${esc(c.suburb||'')}${c.lit?' · 💡 lit':''}</span></div>
       ${hereN(c)?`<span class="hb2">${hereN(c)} here</span>`:''}
       ${GEO?`<span class="dist">${(d=>d<1?Math.round(d*1000)+'m':d.toFixed(1)+'km')(dist(GEO.lat,GEO.lon,c.lat,c.lon))}</span>`:''}</div>`).join('')
     ||'<div class="empty" style="padding:16px">No courts match — try the suburb name.</div>';
@@ -1676,7 +1711,7 @@ function mapPick(c){
   $('#mapCard').style.display='';
   $('#mcName').textContent=c.name;
   const n=hereN(c);
-  $('#mcSub').innerHTML=`${c.suburb?esc(c.suburb)+' · ':''}<span style="color:var(--ok);font-weight:800">Free</span>${n?` · <span class="hn">${n} here now</span>`:''}`;
+  $('#mcSub').innerHTML=`${starBit(c)}${c.suburb?esc(c.suburb)+' · ':''}<span style="color:var(--ok);font-weight:800">Free</span>${n?` · <span class="hn">${n} here now</span>`:''}`;
   const th=$('#mcTh');
   if(c.photo){th.style.backgroundImage=`url('${c.photo}')`;th.textContent='';}
   else{th.style.backgroundImage='';th.textContent='🏀';}
@@ -1815,6 +1850,8 @@ function openCourtPage(c){
   $('#ctWx').innerHTML='';
   $('#ctHere').innerHTML='<div class="skel" style="height:40px"></div>';
   $('#ctLive').style.display='none';
+  $('#ctRevs').innerHTML='<div class="skel" style="height:40px"></div>';
+  paintCtStars(null);MYSTARS=0;paintRateStars();
   $('#ctNotes').style.display='none';
   const ph=$('#ctPhoto');
   if(c.photo){ph.classList.add('show');ph.style.backgroundImage=`url('${c.photo}')`}
@@ -1846,6 +1883,7 @@ function openCourtPage(c){
     });
     paintHere(d.here||[]);
     paintPlays(d.plays);
+    paintReviews(d);
     $('#ctKotc').innerHTML=(d.kotc||[]).filter(k=>k.runs>0).slice(0,3).map((k,i)=>`
       <div class="kr"><b>${['👑','🥈','🥉'][i]||''} ${esc(k.name)}${k.ig?` <a style="color:var(--muted);text-decoration:none" href="https://instagram.com/${esc(k.ig)}" target="_blank" rel="noopener">@${esc(k.ig)}</a>`:''}</b><span>${k.runs} run${k.runs===1?'':'s'}</span></div>`).join('');
   }).catch(e=>toast(e.message,1));
@@ -1874,6 +1912,43 @@ $('#ctDrop').onclick=()=>ensureProfile(async()=>{
 });
 $('#ctCall').onclick=()=>{closeSheet('shCourt');startCall(CC);};
 $('#ctMaps').onclick=()=>window.open(`https://www.google.com/maps/dir/?api=1&destination=${CC.lat},${CC.lon}`,'_blank');
+
+
+/* ---------- ratings ---------- */
+let MYSTARS=0;
+function starStr(n){return '★'.repeat(Math.round(n))}
+function paintCtStars(rsum){
+  const el=$('#ctStars');
+  if(rsum&&rsum.n){el.style.display='';el.innerHTML=`<span class="st">${starStr(rsum.avg)}</span> ${rsum.avg} <span class="rn">(${rsum.n} review${rsum.n===1?'':'s'})</span>`;}
+  else{el.style.display='none'}
+}
+function paintReviews(d){
+  paintCtStars(d.rsum);
+  const mine=(d.reviews||[]).find(r=>r.mine);
+  MYSTARS=mine?mine.stars:0;
+  if(mine)$('#rateTxt').value=mine.text||'';else $('#rateTxt').value='';
+  $('#rateGo').textContent=mine?'Update my rating':'Post my rating';
+  paintRateStars();
+  $('#ctRevs').innerHTML=(d.reviews&&d.reviews.length)?d.reviews.slice(0,12).map(r=>`
+    <div class="rev"><div class="top"><span class="st">${starStr(r.stars)}</span><b>${esc(r.name)}${r.v?' <span style="color:var(--volt)">✓</span>':''}</b>${r.ig?`<a href="https://instagram.com/${esc(r.ig)}" target="_blank" rel="noopener">@${esc(r.ig)}</a>`:''}${r.mine?'<span class="chip" style="margin-left:auto">you</span>':''}</div>
+    ${r.text?`<p>${esc(r.text)}</p>`:''}</div>`).join('')
+    :'<div class="empty" style="padding:14px">No reviews yet — you take the first word.</div>';
+}
+function paintRateStars(){
+  $('#rateStars').innerHTML=[1,2,3,4,5].map(s=>`<button class="${s<=MYSTARS?'on':''}" data-s="${s}">⭐</button>`).join('');
+  $('#rateStars').querySelectorAll('button').forEach(b=>b.onclick=()=>{MYSTARS=+b.dataset.s;paintRateStars();});
+}
+$('#rateGo').onclick=()=>ensureProfile(async()=>{
+  if(!MYSTARS){toast('Pick your stars first',1);return}
+  const b=$('#rateGo');b.disabled=true;b.textContent='Posting…';
+  try{
+    await api({action:'rate_court',court_key:CC.key,stars:MYSTARS,text:$('#rateTxt').value.trim(),player:OCP});
+    const d=await api({action:'court',court_key:CC.key,player_id:OCP.id});
+    paintReviews(d);
+    toast('Rating posted ⭐ Thanks for the scout report');
+  }catch(e){toast(e.message,1)}
+  b.disabled=false;
+});
 
 /* ---------- court check-ins ---------- */
 let HERE=[];

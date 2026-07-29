@@ -324,6 +324,24 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   join/checkin stay open to unverified. `me` action returns status; app
   refreshes on boot + "check my status" button; rosters/POTW rows carry
   `v` flag → volt ✓. Aiman's @lockdownlab3 verified via SQL.
+- **Ratings + fonts + custom courts (edge v12, 2026-07-30, Aiman asked).**
+  RATINGS: table `oc_ratings` (pk court_key+player_id, stars 1-5 + text≤300,
+  resubmit updates). Actions: `rate_court` (guarded, registered only —
+  verification NOT required); `court` returns `reviews[]` (incl pid for desk
+  moderation — pids already public via rosters) + `rsum {avg,n}`;
+  `courts_meta` returns `ratings` map for all courts → ★ badges on home
+  cards/search/map preview; desk court editor lists reviews w/
+  `admin_review_del`. NO fake ratings ever — all real player submissions.
+  FONTS: assets/fonts/*.woff2 (Anton 400 = display 'HHDisplay', Barlow
+  Condensed 600/800 = 'HHCond' labels, Permanent Marker = 'HHMarker'
+  script accents; OFL/Apache licensed, self-hosted, latin subsets, 93KB).
+  Applied across app + desk + QR posters — de-AI-ified the look per Aiman.
+  CUSTOM COURTS: oc_courts += lat/lon/suburb/indoor/lit/custom. Desk ➕ Add
+  a court (paste "lat, lon" from Google Maps, Sydney bounds enforced
+  server-side); `admin_court_add` (key oc_c_<uuid8>) / `admin_court_del`
+  (custom only). courts_meta customs merge into app dataset (picker, map,
+  search) + QR poster page. Verified via ultracode workflow (4 E2E lenses +
+  2 adversarial reviewers).
 - **HH 2.0 redesign (edge v10, 2026-07-30, Aiman sent a mock: "make it look
   like this").** hoopsheaven.html rebuilt to the mock: orange default accent
   (#FF6A2B 'Blaze', onaccent threshold .62 → white-on-orange), stacked
