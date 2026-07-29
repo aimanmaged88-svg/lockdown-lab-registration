@@ -324,6 +324,21 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   join/checkin stay open to unverified. `me` action returns status; app
   refreshes on boot + "check my status" button; rosters/POTW rows carry
   `v` flag → volt ✓. Aiman's @lockdownlab3 verified via SQL.
+- **HH 2.0 redesign (edge v10, 2026-07-30, Aiman sent a mock: "make it look
+  like this").** hoopsheaven.html rebuilt to the mock: orange default accent
+  (#FF6A2B 'Blaze', onaccent threshold .62 → white-on-orange), stacked
+  wordmark + hoop SVG, "Good courts. Real hoopers. Your game." (script via
+  'Segoe Script'/cursive), bottom tab bar (Home/Map/Runs/Saved/Profile,
+  view() router). Home: search-first (#hq), filter pills, NEARBY COURTS
+  h-scroll photo cards w/ "N here" badges, Runs-tonight strip. MAP tab:
+  Leaflet 1.9.4 INLINED (BSD-2) + CARTO dark_all tiles (external, attributed),
+  971 canvas dots, activity courts get divIcon count pins, tap → preview
+  card → court page. Court sheet: photo hero, FREE tag, 🔖 bookmark
+  (localStorage oc_saved → Saved tab), amenity tiles, live-activity
+  avatars, Directions + green I'm-Here. edge v10: courts_meta also returns
+  {here,runs} per-court activity counts. Ratings/reviews + court condition
+  from the mock SKIPPED deliberately (no review backend — no fake numbers).
+  E2E: scratchpad/hh-v2.mjs. File ~240KB (leaflet inlined).
 - **Heaven desk 2.0 + court manager (edge v9, 2026-07-30, Aiman: "more like
   KOS… manage all the courts, uploading photos").** Desk rebuilt OS-style:
   left sidebar (Overview / Players / Courts), request-count badge, Light/Dark

@@ -264,7 +264,15 @@ Deno.serve(async (req: Request) => {
       // All court overrides (small table) — the app applies name/hidden/photo.
       case "courts_meta": {
         const rows = await db(`oc_courts?select=key,name,notes,photo_url,hidden`);
-        return J({ courts: rows || [] });
+        // live activity per court: active check-ins (2h) + upcoming runs
+        const since = new Date(Date.now() - 2 * 36e5).toISOString();
+        const cis = await db(`oc_checkins?checked_in_at=gte.${since}&select=court_key`);
+        const from = new Date(Date.now() - 3 * 36e5).toISOString();
+        const rns = await db(`oc_runs?status=eq.open&run_at=gte.${from}&select=court_key`);
+        const here: Record<string, number> = {}, runs: Record<string, number> = {};
+        for (const c of cis || []) here[c.court_key as string] = (here[c.court_key as string] || 0) + 1;
+        for (const r of rns || []) runs[r.court_key as string] = (runs[r.court_key as string] || 0) + 1;
+        return J({ courts: rows || [], here, runs });
       }
 
       // Court page: upcoming runs here, this week's plays, early KOTC leaders.
