@@ -157,7 +157,7 @@ textarea.inp{resize:vertical;min-height:70px}
 
       <section id="sec-courts" style="display:none">
         <h1>Courts</h1>
-        <p class="sub">All 971 Sydney courts. Rename them, drop notes players see, upload photos, hide dead courts.</p>
+        <p class="sub"><span id="cCount">971</span> Sydney courts. Rename them, drop notes players see, upload photos, hide dead courts.</p>
         <div class="grid2">
           <div>
             <button class="btn btn-v btn-block" id="addCourtBtn" style="margin-bottom:10px">➕ Add a court</button>
@@ -328,6 +328,7 @@ async function initCourts(){
       META[m.key]=m;
       if(m.custom)COURTS.push({key:m.key,name:m.name||'Basketball Court',suburb:m.suburb||'',lat:m.lat,lon:m.lon,indoor:!!m.indoor,lit:!!m.lit,custom:true});
     });
+    const cc=document.getElementById('cCount');if(cc)cc.textContent=COURTS.length;
     paintCourts();
   }catch(e){toast(e.message,1);courtsInit=false}
 }
@@ -372,10 +373,10 @@ async function loadCourtReviews(c){
         ${r.text?`<span style="display:block;font-style:italic">“${esc(r.text)}”</span>`:''}</div>
       <button class="btn btn-r" data-rdel="${esc(r.pid||'')}" data-rkey="${esc(c.key)}">✕ Remove</button></div>`).join('')
       :'<div class="empty">No reviews here yet.</div>';
-    document.querySelectorAll('[data-rdel]').forEach(b=>b.onclick=()=>{
+    document.querySelectorAll('[data-rdel]').forEach(b=>b.onclick=async()=>{
       if(!confirm('Remove this review?'))return;
-      act({action:'admin_review_del',key:b.dataset.rkey,pid:b.dataset.rdel},'Review removed');
-      setTimeout(()=>loadCourtReviews(c),800);
+      try{await api({action:'admin_review_del',key:b.dataset.rkey,pid:b.dataset.rdel});toast('Review removed');await loadCourtReviews(c);}
+      catch(e){toast(e.message,1)}
     });
   }catch(e){$('#cedRevs').innerHTML='<div class="empty">Could not load reviews.</div>'}
 }

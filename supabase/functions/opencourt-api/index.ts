@@ -39,6 +39,9 @@ const num = (v: unknown, lo: number, hi: number, dflt: number) => {
   return Number.isFinite(n) ? Math.max(lo, Math.min(hi, Math.round(n))) : dflt;
 };
 // IG handles: letters/digits/dot/underscore, max 30, no @
+// Sanitize an id/key for safe interpolation into a PostgREST in.("...",...) list:
+// strip everything except the charset our ids/keys use, so no ", &, ) can inject.
+const sid = (v: unknown) => String(v ?? "").replace(/[^a-zA-Z0-9._-]/g, "");
 const igClean = (v: unknown) => String(v ?? "").replace(/^@+/, "").toLowerCase().replace(/[^a-z0-9._]/g, "").slice(0, 30);
 const emailClean = (v: unknown) => {
   const e = String(v ?? "").trim().toLowerCase().slice(0, 120);
@@ -90,7 +93,7 @@ const mkCode = () => String(Math.floor(10000 + Math.random() * 90000));
 async function verifiedSet(ids: string[]) {
   const uniq = [...new Set(ids.filter(Boolean))];
   if (!uniq.length) return new Set<string>();
-  const rows = await db(`oc_players?id=in.(${uniq.map(i => `"${i.replace(/"/g, "")}"`).join(",")})&verified=is.true&select=id`);
+  const rows = await db(`oc_players?id=in.(${uniq.map(i => `"${sid(i)}"`).join(",")})&verified=is.true&select=id`);
   return new Set<string>((rows || []).map((r: Record<string, unknown>) => r.id as string));
 }
 
@@ -157,7 +160,7 @@ async function hereFor(courtKey: string) {
 
 // Rating summary {avg,n} per court for a set of keys (or all when keys null).
 async function ratingsFor(keys: string[] | null) {
-  const q = keys ? `oc_ratings?court_key=in.(${keys.map(k => `"${k.replace(/"/g, "")}"`).join(",")})&select=court_key,stars` : `oc_ratings?select=court_key,stars`;
+  const q = keys ? `oc_ratings?court_key=in.(${keys.map(k => `"${sid(k)}"`).join(",")})&select=court_key,stars` : `oc_ratings?select=court_key,stars`;
   const rows: Record<string, unknown>[] = await db(q);
   const agg: Record<string, { s: number; n: number }> = {};
   for (const r of rows || []) {
@@ -186,7 +189,7 @@ Deno.serve(async (req: Request) => {
         const p = (b.player || {}) as Record<string, unknown>;
         const id = str(p.id, 64), name = str(p.name, 40);
         const ig = igClean(p.ig), email = emailClean(p.email);
-        if (!id || id.length < 8 || !name) return J({ error: "put a name on it" }, 400);
+        if (!id || !/^[a-zA-Z0-9._-]{8,64}$/.test(id) || !name) return J({ error: "put a name on it" }, 400);
         if (!ig && !email) return J({ error: "sign in with your Instagram — or an email if you don't have IG" }, 400);
         if (b.accept !== true) return J({ error: "you have to accept the house rules to play" }, 400);
         if (await bansHit([id, ig, email])) return J({ error: BANNED_MSG, code: "banned" }, 403);
@@ -320,8 +323,9 @@ Deno.serve(async (req: Request) => {
         const rvs = await verifiedSet((rrows || []).map(r => r.player_id as string));
         const rids = [...new Set((rrows || []).map(r => r.player_id as string))];
         const rnames: Record<string, { name: string; ig: string }> = {};
-        if (rids.length) for (const p of await db(`oc_players?id=in.(${rids.map(i => `"${i}"`).join(",")})&select=id,name,ig`) || []) rnames[p.id] = { name: p.name, ig: p.ig };
-        const reviews = (rrows || []).map(r => ({ pid: r.player_id, stars: r.stars, text: r.text, at: r.created_at, name: rnames[r.player_id as string]?.name || "Hooper", ig: rnames[r.player_id as string]?.ig || "", v: rvs.has(r.player_id as string), mine: r.player_id === me }));
+        if (rids.length) for (const p of await db(`oc_players?id=in.(${rids.map(i => `"${sid(i)}"`).join(",")})&select=id,name,ig`) || []) rnames[p.id] = { name: p.name, ig: p.ig };
+        const asAdmin = await coachAuth(b.user, b.pin);
+        const reviews = (rrows || []).map(r => ({ ...(asAdmin ? { pid: r.player_id } : {}), stars: r.stars, text: r.text, at: r.created_at, name: rnames[r.player_id as string]?.name || "Hooper", ig: rnames[r.player_id as string]?.ig || "", v: rvs.has(r.player_id as string), mine: r.player_id === me }));
         const rsum = reviews.length ? { avg: Math.round(reviews.reduce((a, r) => a + (r.stars as number), 0) / reviews.length * 10) / 10, n: reviews.length } : null;
         return J({ runs: await withPlayers(runs), plays, week, kotc, here: await hereFor(key), info, reviews, rsum });
       }
@@ -365,7 +369,7 @@ Deno.serve(async (req: Request) => {
         let code = row.verify_code;
         if (!code) { code = mkCode(); await db(`oc_players?id=eq.${encodeURIComponent(id)}`, { method: "PATCH", body: JSON.stringify({ verify_code: code }) }); }
         const req = await db(`oc_inbox?player_id=eq.${encodeURIComponent(id)}&select=player_id`);
-        return J({ name: row.name, ig: row.ig, email: row.email, verified: !!row.verified, verify_code: code, banned: !!row.banned, requested: !!req?.length });
+        return J({ name: row.name, ig: row.ig, verified: !!row.verified, verify_code: code, banned: !!row.banned, requested: !!req?.length });
       }
 
 
@@ -392,7 +396,12 @@ Deno.serve(async (req: Request) => {
         const player = g.p!;
         const key = str(b.court_key, 64);
         const stars = num(b.stars, 1, 5, 0);
-        if (!key || !stars) return J({ error: "pick your stars first" }, 400);
+        if (!key || !/^oc_[a-zA-Z0-9._-]+$/.test(key) || !stars) return J({ error: "pick your stars first" }, 400);
+        // Anti-flood: at most 30 distinct courts rated per device per day.
+        const dayAgo = new Date(Date.now() - 864e5).toISOString();
+        const mineToday = await db(`oc_ratings?player_id=eq.${encodeURIComponent(player.id)}&created_at=gte.${dayAgo}&select=court_key`);
+        const already = (mineToday || []).some((r: Record<string, unknown>) => r.court_key === key);
+        if (!already && (mineToday?.length || 0) >= 30) return J({ error: "easy — that's a lot of reviews for one day" }, 429);
         await db(`oc_ratings?on_conflict=court_key,player_id`, {
           method: "POST", headers: { Prefer: "resolution=merge-duplicates" },
           body: JSON.stringify({ court_key: key, player_id: player.id, stars, text: str(b.text, 300), created_at: new Date().toISOString() }),

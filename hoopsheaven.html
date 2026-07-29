@@ -1270,7 +1270,7 @@ async function api(body){
   const d=await r.json().catch(()=>({error:'network error'}));
   if(!r.ok||d.error){
     if(d.code==='terms'&&body.action!=='register'){localStorage.removeItem('oc_terms');openSheet('shTerms');}
-    if(d.code==='verify'){openEdit();paintVf();}
+    if(d.code==='verify'){view('Profile');paintVf();toast('Verify your account to unlock that — tap Request verification',1);}
     const e=new Error(d.error||'something broke'); e.code=d.code; throw e;
   }
   return d;
@@ -1940,13 +1940,14 @@ function paintRateStars(){
 }
 $('#rateGo').onclick=()=>ensureProfile(async()=>{
   if(!MYSTARS){toast('Pick your stars first',1);return}
-  const b=$('#rateGo');b.disabled=true;b.textContent='Posting…';
+  const b=$('#rateGo'),wasUpdate=b.textContent.indexOf('Update')>-1,label=b.textContent;
+  b.disabled=true;b.textContent='Posting…';
   try{
     await api({action:'rate_court',court_key:CC.key,stars:MYSTARS,text:$('#rateTxt').value.trim(),player:OCP});
     const d=await api({action:'court',court_key:CC.key,player_id:OCP.id});
     paintReviews(d);
-    toast('Rating posted ⭐ Thanks for the scout report');
-  }catch(e){toast(e.message,1)}
+    toast(wasUpdate?'Rating updated ⭐':'Rating posted ⭐ Thanks for the scout report');
+  }catch(e){toast(e.message,1);b.textContent=label;}
   b.disabled=false;
 });
 

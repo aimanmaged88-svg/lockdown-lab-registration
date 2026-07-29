@@ -342,6 +342,18 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   (custom only). courts_meta customs merge into app dataset (picker, map,
   search) + QR poster page. Verified via ultracode workflow (4 E2E lenses +
   2 adversarial reviewers).
+- **Security hardening (edge v13, 2026-07-30).** Review workflow caught a
+  real PostgREST injection: client-chosen device ids interpolated into
+  `in.(...)` filters unsanitized (rnames/verifiedSet/ratingsFor) → a `"`/`&`
+  in an id 500s a court page + the board for everyone. Fixed: `sid()` helper
+  strips ids/keys to `[a-zA-Z0-9._-]` everywhere they hit an in.() list;
+  register rejects ids failing `^[a-zA-Z0-9._-]{8,64}$`. Also: `pid` in the
+  court `reviews` payload is gated behind coachAuth (desk moderation only —
+  public never sees device ids); `me` no longer returns email; rate_court
+  validates court_key (`^oc_[...]+$`) + caps 30 distinct courts/device/day.
+  Frontend: rate button restores label on error, desk review-delete awaits
+  then reloads (no timer race), verify-gate routes to Profile tab, court
+  counts dynamic. Re-verified by curl against live v13.
 - **HH 2.0 redesign (edge v10, 2026-07-30, Aiman sent a mock: "make it look
   like this").** hoopsheaven.html rebuilt to the mock: orange default accent
   (#FF6A2B 'Blaze', onaccent threshold .62 → white-on-orange), stacked
