@@ -4,7 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0A0C0F">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="Hoops Heaven">
+<link rel="manifest" href="hoopsheaven.webmanifest">
+<link rel="apple-touch-icon" href="assets/hh-icon-180.png">
 <title>Hoops Heaven — Sydney's open run</title>
+<meta property="og:title" content="Hoops Heaven — Sydney's open run">
+<meta property="og:description" content="Good courts. Real hoopers. Your game. Find a free court near you, see who's playing right now, join the run.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://lockdown-lab-registration.netlify.app/hoopsheaven.html">
 <meta name="description" content="Good courts. Real hoopers. Your game. Find free courts near you, check live activity, join the run — 971 Sydney courts.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%23FF6A2B'/%3E%3Cpath d='M32 4v56M4 32h56M11 11c12 10 30 10 42 0M11 53c12-10 30-10 42 0' stroke='%230A0C0F' stroke-width='4' fill='none'/%3E%3C/svg%3E">
 <style>/* leaflet 1.9.4 (BSD-2) inlined */
@@ -689,14 +699,30 @@ body{
   background:var(--bg); color:var(--text); min-height:100dvh;
   font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
   font-size:16px; line-height:1.45; overflow-x:hidden;
+  -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; text-rendering:optimizeLegibility;
+}
+/* faint court-line texture behind everything — gives it character, not a flat AI page */
+body::before{
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:0; opacity:.9;
+  background:
+    radial-gradient(circle 360px at 50% -190px, transparent 357px, color-mix(in srgb, var(--volt) 13%, transparent) 360px, transparent 366px),
+    radial-gradient(circle 120px at 50% -22px, transparent 118px, rgba(255,255,255,.045) 120px, transparent 124px),
+    linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px);
+  background-size:auto,auto,100% 200px; background-repeat:no-repeat,no-repeat,repeat;
 }
 .wrap{position:relative; z-index:1; max-width:540px; margin:0 auto; padding:0 16px 96px}
+.wrap>section{animation:vin .34s cubic-bezier(.22,.7,.3,1)}
+@keyframes vin{from{opacity:0;transform:translateY(8px)}}
+/* premium press feedback across tappable cards */
+.ccard,.crow,.run,.runstrip,.prow,.play,.fpill,.tab,.amen .a{transition:transform .09s ease,border-color .15s ease,background .15s ease}
+.ccard:active,.crow:active,.run:active,.runstrip:active,.prow:active{transform:scale(.985)}
 
 /* ---------- header ---------- */
 header{
   position:sticky; top:0; z-index:30; display:flex; align-items:center; justify-content:space-between;
   padding:12px 2px 10px; backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
   background:rgba(10,12,15,.85); border-bottom:1px solid var(--line); margin:0 -16px; padding-left:18px; padding-right:18px;
+  padding-top:max(12px,env(safe-area-inset-top));
 }
 .logo{display:flex;align-items:center;gap:9px;cursor:pointer;user-select:none}
 .logo svg{width:34px;height:34px;flex:none}
@@ -715,6 +741,12 @@ header{
 .hero h1{font-family:var(--disp);font-weight:400;font-size:clamp(36px,10vw,48px);line-height:1.04;text-transform:uppercase;letter-spacing:.5px}
 .hero .scripty{display:block;color:var(--volt);font-family:'HHMarker',cursive;font-style:normal;text-transform:none;letter-spacing:0;font-size:.86em;transform:rotate(-2deg);transform-origin:left;padding:6px 0 4px}
 .hero p{color:var(--muted);margin-top:10px;font-size:15px}
+.herostat{display:none;margin-top:14px;gap:8px;flex-wrap:wrap}
+.herostat.on{display:flex}
+.herostat .hs{display:inline-flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);border-radius:99px;padding:7px 13px;font-size:12.5px;font-weight:700;color:var(--muted)}
+.herostat .hs b{color:var(--volt);font-family:var(--cond);font-size:15px;letter-spacing:.5px}
+.herostat .hs .live{width:7px;height:7px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 0 color-mix(in srgb,var(--ok) 70%,transparent);animation:pulse 1.8s infinite}
+@keyframes pulse{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--ok) 55%,transparent)}70%{box-shadow:0 0 0 7px transparent}100%{box-shadow:0 0 0 0 transparent}}
 
 /* ---------- search + pills ---------- */
 .search{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-top:16px}
@@ -1049,6 +1081,7 @@ header{
     <div class="hero">
       <h1>Good courts.<br>Real hoopers.<br><span class="scripty">Your game.</span></h1>
       <p>Find free courts near you. Check live activity. Join the run.</p>
+      <div class="herostat" id="heroStat"></div>
     </div>
     <div class="search"><span class="ic">🔍</span><input id="hq" placeholder="Search courts or suburbs" autocomplete="off"></div>
     <div class="pills-h">
@@ -1538,7 +1571,15 @@ function paintPopRuns(){
   const el=$('#popruns');
   const today=RUNS.filter(r=>runYmd(r)===ymdSyd(0));
   const list=today.length?today:RUNS;
-  if(!list.length){el.innerHTML='<div class="empty" style="padding:18px;margin-top:0">No runs called yet — be the one who starts it. Hit ⚡ Runs below.</div>';return}
+  if(!list.length){
+    el.innerHTML=`<div class="runstrip" id="popstrip" style="cursor:pointer">
+      <div class="avs"><span class="a" style="background:var(--volt);color:var(--onaccent)">⚡</span></div>
+      <div class="in"><b>Be the <em>first</em> to call a run</b><span>Pick a court, set a time — the city sees it</span></div>
+      <div class="ct"><b style="color:var(--volt)">Start it</b>›</div>
+    </div>`;
+    $('#popstrip').onclick=()=>{view('Runs');setTimeout(()=>ensureProfile(()=>$('#callBtn').click()),120)};
+    return;
+  }
   const names=[...new Set(list.flatMap(r=>(r.players||[]).map(p=>p.name)))];
   const first=list[0];
   el.innerHTML=`<div class="runstrip" id="popstrip">
@@ -1636,8 +1677,19 @@ const starBit=c=>{const r=rateOf(c);return r?`<span style="color:#FFC24D;font-we
 /* home: nearby cards + search */
 let HOMEF={outdoor:false,now:false};
 function courtScore(c){const r=rateOf(c);return (hereN(c)*100)+((ACT.runs[c.key]||0)*40)+(r?r.n*10:0)+(c.photo?20:0)+(c.name!=='Basketball Court'?5:0)}
+function paintHeroStat(){
+  const el=$('#heroStat'); if(!el||!COURTS)return;
+  const here=Object.values(ACT.here||{}).reduce((a,n)=>a+n,0);
+  const runs=(RUNS||[]).length;
+  let html=`<span class="hs"><b>${COURTS.length}</b> free courts</span>`;
+  if(here>0)html+=`<span class="hs"><span class="live"></span><b>${here}</b> playing now</span>`;
+  else if(runs>0)html+=`<span class="hs"><span class="live"></span><b>${runs}</b> run${runs===1?'':'s'} on</span>`;
+  else html+=`<span class="hs">📍 Sydney-wide</span>`;
+  el.innerHTML=html; el.classList.add('on');
+}
 function paintNearby(){
   if(!COURTS)return;
+  paintHeroStat();
   let list=COURTS.filter(c=>(!HOMEF.outdoor||!c.indoor)&&(!HOMEF.now||hereN(c)>0||(ACT.runs[c.key]||0)>0));
   list=GEO?[...list].map(c=>({...c,km:dist(GEO.lat,GEO.lon,c.lat,c.lon)})).sort((a,b)=>a.km-b.km)
           :[...list].sort((a,b)=>courtScore(b)-courtScore(a));
