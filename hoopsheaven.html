@@ -682,12 +682,15 @@ svg.leaflet-image-layer.leaflet-interactive path {
 </style>
 <style>
 
-@font-face{font-family:'HHDisplay';src:url('assets/fonts/anton-400.woff2') format('woff2');font-weight:400;font-display:swap}
-@font-face{font-family:'HHCond';src:url('assets/fonts/barlowcondensed-600.woff2') format('woff2');font-weight:600;font-display:swap}
-@font-face{font-family:'HHCond';src:url('assets/fonts/barlowcondensed-800.woff2') format('woff2');font-weight:800;font-display:swap}
+@font-face{font-family:'HHDisplay';src:url('assets/fonts/bebasneue-400.woff2') format('woff2');font-weight:400;font-display:swap}
+@font-face{font-family:'HHCond';src:url('assets/fonts/inter-600.woff2') format('woff2');font-weight:600;font-display:swap}
+@font-face{font-family:'HHCond';src:url('assets/fonts/inter-800.woff2') format('woff2');font-weight:700 900;font-display:swap}
+@font-face{font-family:'HHBody';src:url('assets/fonts/inter-400.woff2') format('woff2');font-weight:400 500;font-display:swap}
+@font-face{font-family:'HHBody';src:url('assets/fonts/inter-600.woff2') format('woff2');font-weight:600 700;font-display:swap}
+@font-face{font-family:'HHBody';src:url('assets/fonts/inter-800.woff2') format('woff2');font-weight:800 900;font-display:swap}
 @font-face{font-family:'HHMarker';src:url('assets/fonts/permanentmarker-400.woff2') format('woff2');font-weight:400;font-display:swap}
 :root{
-  --disp:'HHDisplay','Arial Narrow',sans-serif; --cond:'HHCond','Arial Narrow',sans-serif;
+  --disp:'HHDisplay','Arial Narrow',sans-serif; --cond:'HHCond',-apple-system,'Segoe UI',sans-serif;
   --bg:#0A0C0F; --card:#12151B; --card2:#171B22; --line:rgba(255,255,255,.09);
   --text:#F4F6F0; --muted:#96A0A8; --dim:#5D666E;
   --volt:#FF6A2B; --onaccent:#fff; --ok:#2ECC71; --fire:#FF7A2F; --danger:#FF5A5A;
@@ -699,7 +702,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 html{scroll-behavior:smooth}
 body{
   background:var(--bg); color:var(--text); min-height:100dvh;
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  font-family:'HHBody',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
   font-size:16px; line-height:1.45; overflow-x:hidden;
   -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; text-rendering:optimizeLegibility;
 }
