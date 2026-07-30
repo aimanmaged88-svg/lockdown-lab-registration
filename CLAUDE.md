@@ -444,8 +444,39 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   **hoopsheaven-qr.html** = printable per-court poster generator (search →
   multi-select → print; QR = deep link; qrcode-generator 1.4.4 MIT inlined,
   no CDN). E2E: scratchpad/hh-ci.mjs (Playwright mocked geolocation).
+- **Server-side geofenced check-in + off-app headcount — SHIPPED (edge v15,
+  2026-07-30, Aiman asked "geolocation-tagged, can't check in from Bankstown
+  claiming Sydenham").** The client no longer self-declares `verified`; the
+  SERVER is ground truth. `checkin` now takes `via` (`manual`|`qr`|`auto`) +
+  device `lat`/`lon`, looks up the court's REAL coords via `courtCoords()`
+  (`loadGeo()` fetches courts.json once, caches 6h; custom courts from
+  oc_courts) and haversine-compares to a per-court fence `courtRadius()`
+  (oc_courts.radius_m, default 300m, clamp 80–2000). Enforcement:
+  **manual + auto REQUIRE being inside the fence** (else `needloc` 400 /
+  `toofar` 403); **qr** (physical poster) is allowed with flaky GPS but only
+  gets ✓ when GPS also confirms. Stores the court's authoritative coords, not
+  the client's. New migration `opencourt_geofence`: oc_checkins += `via`,
+  `extra`; oc_courts += `radius_m` (oc_court_geo table created but unused —
+  coords come from courts.json at runtime instead).
+  **Off-app headcount** (`set_headcount`, guarded, must be checked in there):
+  a number 0–40 stored on the reporter's checkin row — NO free text, per
+  Aiman "don't give too much freedom". `hereFor()` now returns
+  `{list,total,extra}` (per-row extra included so the stepper inits to the
+  player's own count); `court`/`checkin`/`checkout` return `hereTotal`/
+  `hereExtra`; courts_meta home-card counts include extras.
+  Frontend hoopsheaven.html: `sendCheckin(c,via)` grabs GPS then lets the
+  server decide; `#ciBtn`=manual, QR deep link `?court=&ci=1`=qr,
+  `autoCheckin()` = if you're in a run at a court and you've arrived (GPS in
+  fence, location already granted → never prompts) you're checked in silently
+  on app open/visibility (web can't background-geofence). `#ctExtra` number
+  stepper (−/+ only, shown when I'm checked in there) → `set_headcount`.
+  "Not a booking system — times aren't guaranteed" disclaimer under the
+  live-activity list. Verified E2E against live v15 (scratchpad/geo-e2e.mjs,
+  10/10: needloc / toofar / at-court-verified / QR-unverified / QR-verified /
+  headcount total / per-row extra / needci); all test rows deleted.
 - v2 ideas discussed: KOTC proper, run chat, POTW weekly archive/all-time
-  wall, PWA manifest + install, native app for background geofencing.
+  wall, PWA manifest + install, native app for background geofencing. Heaven
+  desk radius control (`admin_court_radius` exists in edge v15, no UI yet).
 
 ## Parked ideas (Aiman asked to save these)
 
