@@ -510,16 +510,18 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   `prefers-reduced-motion`. Verified E2E (13-check backend + app/desk
   Playwright, all test rows deleted; live-verified official-only empty state +
   desk known-court https prefill).
-- **FONT CHANGED → Bebas Neue + Inter (2026-07-30, Aiman picked Option 1).**
+- **FONT → Chakra Petch (2026-07-30, Aiman's final pick = Option 8).**
   Showed an 8-option showcase (scratchpad/fontcompare2.html → fontcompare2.png:
   1 Bebas Neue, 2 Archivo Black, 3 Anton [old], 4 Saira Condensed, 5 Oswald,
-  6 Teko, 7 Antonio, 8 Chakra Petch). He chose **1**. Self-hosted
-  bebasneue-400 (display) + inter-400/600/800 (labels+body) now in
-  assets/fonts/; the `@font-face` family names **HHDisplay/HHCond kept** so no
-  other CSS changed, plus new **HHBody** (Inter) on `body`. Applied across
-  hoopsheaven.html + hoopsheaven-desk.html + hoopsheaven-qr.html. Permanent
-  Marker (HHMarker) script accent unchanged. Old anton/barlowcondensed woff2
-  deleted. Verified live (fonts 200, anton ref gone).
+  6 Teko, 7 Antonio, 8 Chakra Petch). Briefly shipped Option 1 (Bebas+Inter),
+  then he switched to **8 Chakra Petch** — techy/street display + body.
+  Self-hosted chakrapetch-400/600/700 in assets/fonts/; `@font-face` family
+  names **HHDisplay(700)/HHCond(600·700)/HHBody(400·600·700) kept** so no other
+  CSS changed (`--disp` fallback no longer 'Arial Narrow' — Chakra isn't
+  condensed). Applied across hoopsheaven.html + -desk.html + -qr.html. Permanent
+  Marker (HHMarker) accent unchanged. Old anton/barlow + bebas/inter woff2
+  deleted. Verified live (chakrapetch 200, old refs gone). To change again:
+  swap the 3 @font-face src blocks (same names) + drop new woff2 in assets/fonts.
 - v2 ideas discussed: KOTC proper, run chat, POTW weekly archive/all-time
   wall, PWA manifest + install, native app for background geofencing.
 
