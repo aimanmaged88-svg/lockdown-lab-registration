@@ -474,9 +474,50 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   live-activity list. Verified E2E against live v15 (scratchpad/geo-e2e.mjs,
   10/10: needloc / toofar / at-court-verified / QR-unverified / QR-verified /
   headcount total / per-row extra / needci); all test rows deleted.
+- **Official-only courts + rich details + suggestions + motion pass (edge v16,
+  2026-07-30, Aiman asked).** BIG SHIFT: the app no longer shows the 971
+  courts.json courts. The picker is now EXACTLY the courts the coach vets +
+  adds at the desk. oc_courts gained `official bool` (true on add) + `info
+  jsonb` (surface, hoops, rim, cost, best-times, water[bubbler|tap|none],
+  toilets, parking, shade, seating, shop/drinks, `bring[]` what-to-carry,
+  `tips`). New table `oc_court_reqs` — players SUGGEST courts (`court_suggest`,
+  guarded, ≤5/day), coach reviews in the desk inbox. Nobody drops random pins.
+  Migration `opencourt_court_details`.
+  Edge: `admin_court_add` now stores official+info+radius; new
+  `admin_court_edit` (all fields incl lat/lon+radius); `court_suggest` +
+  `admin_court_req_done`; `admin_players` also returns `court_reqs`;
+  `courts_meta` returns official/info/radius_m. courts.json still fetched by
+  the EDGE (geofence coords) + the DESK (971-court quick-add prefill), just
+  not by the app picker.
+  App (hoopsheaven.html): loadCourts = official-only. Court page gained the
+  full amenity grid, a **🎒 Before-you-leave checklist** (universal kit +
+  amenity-derived items like "no water here → water bottle" + coach's bring[],
+  ticks persist localStorage `oc_gear_<key>`), a **📋 Court tips** card, and
+  dynamic cost. **Suggest-a-court** sheet `#shSuggest` (name/where/note →
+  court_suggest) + empty-state CTAs (`data-suggest`) when no courts. Hero +
+  map counts now dynamic ("Courts dropping soon" at 0).
+  Desk (hoopsheaven-desk.html): court manager rebuilt — official-courts list,
+  full editor (name/suburb/latlon, amenity toggles, water select, parking,
+  surface/hoops/rim, best-times, what-to-bring chips, tips, quick note, **radius
+  slider 80–800m**, hide), photo upload, quick-add prefilled from the 971 known
+  courts, and a **📨 Court suggestions inbox** (Add it → prefills / Dismiss)
+  with a Courts nav badge. NOTE: desk still uses the volt-green brand (not the
+  app's orange) — pre-existing, not asked to change.
+  Motion pass (de-AI-ify, Aiman: "make it Apple-fluid, not an AI app"): shared
+  easing tokens (`--ease`/`--spring`/`--ease-out`), springier sheet enter +
+  real slide-down/fade **exit** animations (closeSheet adds `.closing`),
+  sharper card/button press + tab-icon pop, stronger scrim blur — all under
+  `prefers-reduced-motion`. Verified E2E (13-check backend + app/desk
+  Playwright, all test rows deleted; live-verified official-only empty state +
+  desk known-court https prefill).
+- **FONT DECISION PENDING (2026-07-30):** Aiman asked to change the app font
+  ("don't make it look AI") and wanted to pick first. Sent a 5-option
+  comparison image (scratchpad/fontcompare.html → fontcompare.png):
+  1 Bebas Neue, 2 Archivo Black, 3 Anton (current), 4 Saira Condensed,
+  5 Oswald. Once he picks, swap the self-hosted `--disp`/`--cond` fonts in
+  hoopsheaven.html (assets/fonts/*.woff2) + regen the QR poster + desk to match.
 - v2 ideas discussed: KOTC proper, run chat, POTW weekly archive/all-time
-  wall, PWA manifest + install, native app for background geofencing. Heaven
-  desk radius control (`admin_court_radius` exists in edge v15, no UI yet).
+  wall, PWA manifest + install, native app for background geofencing.
 
 ## Parked ideas (Aiman asked to save these)
 
