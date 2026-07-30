@@ -92,6 +92,20 @@ textarea.inp{resize:vertical;min-height:70px}
 .photo{width:100%;height:190px;border-radius:14px;background:var(--card2) center/cover no-repeat;border:1px solid var(--line);display:grid;place-items:center;color:var(--dim);font-size:13px;margin-bottom:12px}
 .swtchrow{display:flex;align-items:center;justify-content:space-between;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-bottom:10px;font-size:13.5px;font-weight:700}
 .swtchrow small{display:block;color:var(--muted);font-weight:600;font-size:11.5px;margin-top:2px}
+/* full court editor helpers */
+.lb{display:block;font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:var(--dim);font-weight:800;margin:2px 0 6px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.g3{display:grid;grid-template-columns:1.3fr .7fr 1fr;gap:10px}
+.chkrow{display:grid;grid-template-columns:1fr 1fr;gap:6px 14px;margin-bottom:12px}
+.chkrow label{display:flex;gap:8px;align-items:center;font-size:13.5px;font-weight:700;color:var(--text);cursor:pointer}
+.chkrow input{width:18px;height:18px;accent-color:var(--volt);flex:none}
+.bringrow{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.bringrow .inp{flex:1}
+.chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
+.chip{display:inline-flex;align-items:center;gap:7px;background:var(--card2);border:1px solid var(--line);border-radius:99px;padding:5px 6px 5px 12px;font-size:13px;font-weight:700}
+.chip button{background:var(--line);border:none;color:var(--text);width:19px;height:19px;border-radius:50%;font-size:12px;cursor:pointer;line-height:1}
+.hint{font-size:11.5px;color:var(--muted);margin:-4px 0 12px}
+.b2{background:var(--warn);color:#0A0C0F;font-size:11px;font-weight:900;border-radius:99px;padding:1px 8px;margin-left:4px}
 /* mobile */
 @media(max-width:999px){
   .shell{flex-direction:column}
@@ -111,7 +125,7 @@ textarea.inp{resize:vertical;min-height:70px}
     <nav class="nav">
       <button class="nv on" data-sec="overview">🏠 Overview <span class="b" id="bReq"></span></button>
       <button class="nv" data-sec="players">👥 Players</button>
-      <button class="nv" data-sec="courts">🏀 Courts</button>
+      <button class="nv" data-sec="courts">🏀 Courts <span class="b" id="bCourts"></span></button>
     </nav>
     <div class="sb-foot">
       <button class="btn btn-g" id="modeBtn">☀️ Light</button>
@@ -157,40 +171,94 @@ textarea.inp{resize:vertical;min-height:70px}
 
       <section id="sec-courts" style="display:none">
         <h1>Courts</h1>
-        <p class="sub"><span id="cCount">971</span> Sydney courts. Rename them, drop notes players see, upload photos, hide dead courts.</p>
+        <p class="sub"><span id="cCount">0</span> official courts on the map. Players only see what you add — nobody drops random pins.</p>
+
+        <div class="card" id="suggBox" style="margin-bottom:14px;display:none">
+          <h2 style="margin-top:0">📨 Court suggestions <span class="b2" id="suggN"></span></h2>
+          <div id="suggList"><div class="empty">No suggestions right now.</div></div>
+        </div>
+
         <div class="grid2">
           <div>
             <button class="btn btn-v btn-block" id="addCourtBtn" style="margin-bottom:10px">➕ Add a court</button>
-            <div class="card" id="addCourt" style="display:none;margin-bottom:12px">
-              <input class="inp" id="acName" maxlength="80" placeholder="Court name (e.g. Wentworth Park Courts)">
-              <input class="inp" id="acSuburb" maxlength="60" placeholder="Suburb">
-              <input class="inp" id="acLatLon" placeholder="Paste &quot;lat, lon&quot; from Google Maps (right-click the court → copy)">
-              <div style="display:flex;gap:14px;margin-bottom:10px;font-size:13.5px;font-weight:700">
-                <label style="display:flex;gap:7px;align-items:center"><input type="checkbox" id="acIndoor" style="width:18px;height:18px;accent-color:var(--volt)"> Indoor</label>
-                <label style="display:flex;gap:7px;align-items:center"><input type="checkbox" id="acLit" style="width:18px;height:18px;accent-color:var(--volt)"> Lights</label>
-              </div>
-              <button class="btn btn-v btn-block" id="acGo">Add it to the map</button>
-            </div>
-            <input class="inp" id="cq" placeholder="Search court or suburb…">
+            <input class="inp" id="cq" placeholder="Search your courts…">
             <div class="clist" id="clist"></div>
           </div>
+
           <div class="card" id="ced" style="display:none">
-            <h2 style="margin-top:0" id="cedTitle"></h2>
+            <h2 style="margin-top:0" id="cedTitle">New court</h2>
+
+            <!-- prefill from the 971 known Sydney courts (add mode only) -->
+            <div id="cKnownWrap" style="display:none;margin-bottom:12px">
+              <label class="lb">Start from a known court (optional)</label>
+              <input class="inp" id="cKnown" placeholder="Search Sydney's 971 courts to prefill name + pin…" style="margin-bottom:6px">
+              <div class="clist" id="cKnownList" style="max-height:180px"></div>
+            </div>
+
             <div class="photo" id="cedPhoto">No photo yet</div>
             <input type="file" id="cedFile" accept="image/*" style="display:none">
-            <div style="display:flex;gap:8px;margin-bottom:12px">
+            <div style="display:flex;gap:8px;margin-bottom:14px">
               <button class="btn btn-g" id="cedUpload" style="flex:1">📷 Upload photo</button>
               <button class="btn btn-g" id="cedQr">🖨️ QR poster</button>
             </div>
-            <label style="font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:var(--dim);font-weight:800">Display name (blank = keep original)</label>
-            <input class="inp" id="cedName" maxlength="80" style="margin-top:6px">
-            <label style="font-size:11px;letter-spacing:1.6px;text-transform:uppercase;color:var(--dim);font-weight:800">Notes — players see these on the court page</label>
-            <textarea class="inp" id="cedNotes" maxlength="400" style="margin-top:6px" placeholder="e.g. Double rims, lights until 10pm, enter from the carpark side"></textarea>
-            <div class="swtchrow"><span>🙈 Hide this court<small>Gone from the picker — for dead or closed courts</small></span><input type="checkbox" id="cedHide" style="width:20px;height:20px;accent-color:var(--volt)"></div>
-            <button class="btn btn-v btn-block" id="cedSave">Save court</button>
-            <button class="btn btn-r btn-block" id="cedDel" style="display:none;margin-top:8px">🗑 Delete this court (yours only)</button>
+
+            <label class="lb">Court name</label>
+            <input class="inp" id="cName" maxlength="80" placeholder="e.g. Alexandria Park Courts">
+            <div class="g2">
+              <div><label class="lb">Suburb</label><input class="inp" id="cSuburb" maxlength="60" placeholder="Alexandria"></div>
+              <div><label class="lb">Cost</label><input class="inp" id="cCost" maxlength="40" placeholder="Free"></div>
+            </div>
+            <label class="lb">Location — paste "lat, lon" from Google Maps</label>
+            <input class="inp" id="cLatLon" placeholder="-33.90807, 151.19539">
+
+            <label class="lb" style="margin-top:4px">Amenities</label>
+            <div class="chkrow">
+              <label><input type="checkbox" id="cIndoor"> 🏟️ Indoor</label>
+              <label><input type="checkbox" id="cLit"> 💡 Lights</label>
+              <label><input type="checkbox" id="cToilets"> 🚻 Toilets</label>
+              <label><input type="checkbox" id="cShade"> ⛱️ Shade</label>
+              <label><input type="checkbox" id="cSeating"> 🪑 Seating</label>
+              <label><input type="checkbox" id="cShop"> 🥤 Drinks nearby</label>
+            </div>
+
+            <div class="g2">
+              <div><label class="lb">Water on site</label>
+                <select class="inp" id="cWater">
+                  <option value="">Unknown</option>
+                  <option value="bubbler">Bubbler / fountain</option>
+                  <option value="tap">Tap</option>
+                  <option value="none">None — bring your own</option>
+                </select></div>
+              <div><label class="lb">Parking</label><input class="inp" id="cParking" maxlength="60" placeholder="Street / car park / none"></div>
+            </div>
+            <div class="g3">
+              <div><label class="lb">Surface</label><input class="inp" id="cSurface" maxlength="40" placeholder="Asphalt"></div>
+              <div><label class="lb">Hoops</label><input class="inp" id="cHoops" type="number" min="0" max="40" placeholder="4"></div>
+              <div><label class="lb">Rim</label><input class="inp" id="cRim" maxlength="40" placeholder="10ft"></div>
+            </div>
+            <label class="lb">Best times to play</label>
+            <input class="inp" id="cBest" maxlength="80" placeholder="Evenings & weekends">
+
+            <label class="lb">🎒 What to bring (players see these on their checklist)</label>
+            <div class="bringrow"><input class="inp" id="cBringIn" maxlength="60" placeholder="e.g. Your own ball" style="margin-bottom:0"><button class="btn btn-g" id="cBringAdd" type="button">Add</button></div>
+            <div id="cBringList" class="chips"></div>
+
+            <label class="lb">📋 Court tips (players see this)</label>
+            <textarea class="inp" id="cTips" maxlength="400" placeholder="e.g. Left hoop has the truest net. Packed after 6pm — get there early."></textarea>
+
+            <label class="lb">📌 Quick note (short, shows at the top of the court page)</label>
+            <textarea class="inp" id="cedNotes" maxlength="400" placeholder="e.g. Enter from the carpark side"></textarea>
+
+            <label class="lb">Check-in radius — <b id="cRadVal" style="color:var(--volt)">300</b> m</label>
+            <input type="range" id="cRadius" min="80" max="800" step="10" value="300" style="width:100%;accent-color:var(--volt);margin-bottom:12px">
+            <p class="hint">How close players must be to check in here. Tight for a single court, wider for a big park.</p>
+
+            <div class="swtchrow"><span>🙈 Hide this court<small>Off the map — for closed or dead courts</small></span><input type="checkbox" id="cedHide" style="width:20px;height:20px;accent-color:var(--volt)"></div>
+            <button class="btn btn-v btn-block" id="cedSave">Add it to the map</button>
+            <button class="btn btn-r btn-block" id="cedDel" style="display:none;margin-top:8px">🗑 Delete this court</button>
+
             <h2>⭐ Reviews on this court</h2>
-            <div id="cedRevs"><div class="empty">Pick a court to see its reviews.</div></div>
+            <div id="cedRevs"><div class="empty">Reviews show once the court is live.</div></div>
           </div>
         </div>
       </section>
@@ -275,6 +343,7 @@ async function load(){
     const [d,bd]=await Promise.all([api({action:'admin_players'}),api({action:'board'})]);
     const ps=d.players||[],inbox=d.inbox||[],runs=bd.runs||[];
     const bb=$('#bReq');bb.textContent=inbox.length;bb.style.display=inbox.length?'':'none';
+    renderSuggestions(d.court_reqs||[]);
     $('#stats').innerHTML=`
       <div class="stat"><b>${ps.filter(p=>!p.banned).length}</b><span>players</span></div>
       <div class="stat"><b>${ps.filter(p=>p.verified).length}</b><span>verified</span></div>
@@ -317,55 +386,173 @@ async function act(body,msg){
   try{await api(body);toast(msg);load();}catch(e){toast(e.message,1)}
 }
 
-/* ---------- courts manager ---------- */
-let COURTS=null,META={},CC=null,courtsInit=false;
+/* ---------- courts manager (official-only) ---------- */
+let KNOWN=[];              // the 971 courts.json entries — only used to prefill
+let OFFICIAL=[];           // the courts the coach has added (what players see)
+let CC=null;               // the meta row being edited, or null = adding new
+let CBRING=[];             // "what to bring" items being edited
+let SUGG=[];               // player court suggestions
+let courtsInit=false;
 async function initCourts(){
   if(courtsInit)return;courtsInit=true;
-  try{
-    const [cj,meta]=await Promise.all([fetch('courts.json').then(r=>r.json()),api({action:'courts_meta'})]);
-    COURTS=cj.courts.map(c=>({...c,key:'oc_'+c.lat.toFixed(5)+'_'+c.lon.toFixed(5)}));
-    (meta.courts||[]).forEach(m=>{
-      META[m.key]=m;
-      if(m.custom)COURTS.push({key:m.key,name:m.name||'Basketball Court',suburb:m.suburb||'',lat:m.lat,lon:m.lon,indoor:!!m.indoor,lit:!!m.lit,custom:true});
-    });
-    const cc=document.getElementById('cCount');if(cc)cc.textContent=COURTS.length;
-    paintCourts();
-  }catch(e){toast(e.message,1);courtsInit=false}
+  try{await refreshCourts(true);}catch(e){toast(e.message,1);courtsInit=false}
+}
+async function refreshCourts(loadKnown){
+  const jobs=[api({action:'courts_meta'})];
+  if(loadKnown)jobs.push(fetch('courts.json').then(r=>r.json()).catch(()=>({courts:[]})));
+  const [meta,cj]=await Promise.all(jobs);
+  if(cj)KNOWN=(cj.courts||[]).map(c=>({name:c.name,suburb:c.suburb||'',lat:+c.lat,lon:+c.lon,indoor:!!c.indoor,lit:!!c.lit}));
+  OFFICIAL=(meta.courts||[]).filter(m=>m.custom).sort((a,b)=>String(a.name||'').localeCompare(String(b.name||'')));
+  const cc=$('#cCount');if(cc)cc.textContent=OFFICIAL.filter(m=>!m.hidden).length;
+  paintCourts();
 }
 function paintCourts(){
   const q=$('#cq').value.trim().toLowerCase();
-  let list=COURTS.filter(c=>!q||(c.name+' '+(c.suburb||'')).toLowerCase().includes(q));
-  list=[...list].sort((a,b)=>(!!META[b.key]-!!META[a.key])||((b.name!=='Basketball Court')-(a.name!=='Basketball Court'))).slice(0,50);
-  $('#clist').innerHTML=list.map(c=>{
-    const m=META[c.key];
-    return `<div class="crow ${CC&&CC.key===c.key?'on':''}" data-k="${c.key}">
-      <b>${esc(m&&m.name?m.name:c.name)}</b>
-      ${c.custom?'<span class="tag g">YOURS</span>':''}${m&&m.photo_url?'<span>📷</span>':''}${m&&m.notes?'<span>📝</span>':''}${m&&m.hidden?'<span class="tag b">HIDDEN</span>':''}
-      <span>${esc(c.suburb||'')}</span></div>`;
-  }).join('')||'<div class="empty">No courts match.</div>';
-  $('#clist').querySelectorAll('.crow').forEach(x=>x.onclick=()=>editCourt(COURTS.find(c=>c.key===x.dataset.k)));
+  const list=OFFICIAL.filter(c=>!q||((c.name||'')+' '+(c.suburb||'')).toLowerCase().includes(q));
+  $('#clist').innerHTML=list.length?list.map(c=>`
+    <div class="crow ${CC&&CC.key===c.key?'on':''}" data-k="${esc(c.key)}">
+      <b>${esc(c.name||'Basketball Court')}</b>
+      ${c.photo_url?'<span>📷</span>':''}${c.info&&c.info.tips?'<span>📋</span>':''}${c.hidden?'<span class="tag b">HIDDEN</span>':''}
+      <span>${esc(c.suburb||'')}</span></div>`).join('')
+    :'<div class="empty">No courts yet. Hit ➕ Add a court to put Sydney\'s best on the map.</div>';
+  $('#clist').querySelectorAll('.crow').forEach(x=>x.onclick=()=>editCourt(OFFICIAL.find(c=>c.key===x.dataset.k)));
 }
 $('#cq').oninput=()=>paintCourts();
-function editCourt(c){
-  CC=c;
-  const m=META[c.key]||{};
+
+/* bring-list chips */
+function renderBring(){
+  $('#cBringList').innerHTML=CBRING.map((t,i)=>`<span class="chip">${esc(t)}<button type="button" data-bx="${i}">✕</button></span>`).join('');
+  $('#cBringList').querySelectorAll('[data-bx]').forEach(b=>b.onclick=()=>{CBRING.splice(+b.dataset.bx,1);renderBring();});
+}
+function addBring(){const v=$('#cBringIn').value.trim();if(!v)return;if(CBRING.length>=10){toast('That\'s plenty to carry 😅',1);return}CBRING.push(v.slice(0,60));$('#cBringIn').value='';renderBring();}
+$('#cBringAdd').onclick=addBring;
+$('#cBringIn').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();addBring();}};
+$('#cRadius').oninput=()=>{$('#cRadVal').textContent=$('#cRadius').value;};
+
+function blankForm(){
+  ['cName','cSuburb','cCost','cLatLon','cParking','cSurface','cHoops','cRim','cBest','cTips','cedNotes','cKnown'].forEach(id=>$('#'+id).value='');
+  ['cIndoor','cLit','cToilets','cShade','cSeating','cShop','cedHide'].forEach(id=>$('#'+id).checked=false);
+  $('#cWater').value='';$('#cRadius').value=300;$('#cRadVal').textContent='300';
+  CBRING=[];renderBring();
+  const ph=$('#cedPhoto');ph.style.backgroundImage='';ph.textContent='No photo yet';
+  $('#cKnownList').innerHTML='';
+}
+function newCourt(){
+  CC=null;blankForm();
   $('#ced').style.display='';
-  $('#cedTitle').textContent=c.name+(c.suburb?' · '+c.suburb:'');
-  $('#cedName').value=m.name||'';
+  $('#cKnownWrap').style.display='';
+  $('#cedTitle').textContent='New court';
+  $('#cedSave').textContent='Add it to the map';
+  $('#cedDel').style.display='none';
+  $('#cedRevs').innerHTML='<div class="empty">Reviews show once the court is live.</div>';
+  paintCourts();
+}
+$('#addCourtBtn').onclick=()=>{newCourt();$('#ced').scrollIntoView({behavior:'smooth',block:'start'});};
+function editCourt(m){
+  if(!m)return;
+  CC=m;const i=m.info||{};
+  $('#ced').style.display='';
+  $('#cKnownWrap').style.display='none';
+  $('#cedTitle').textContent=m.name||'Court';
+  $('#cName').value=m.name||'';$('#cSuburb').value=m.suburb||'';
+  $('#cLatLon').value=(m.lat!=null&&m.lon!=null)?`${m.lat}, ${m.lon}`:'';
+  $('#cIndoor').checked=!!m.indoor;$('#cLit').checked=!!m.lit;
+  $('#cToilets').checked=!!i.toilets;$('#cShade').checked=!!i.shade;$('#cSeating').checked=!!i.seating;$('#cShop').checked=!!i.shop;
+  $('#cWater').value=i.water||'';$('#cParking').value=i.parking||'';
+  $('#cSurface').value=i.surface||'';$('#cHoops').value=i.hoops||'';$('#cRim').value=i.rim||'';
+  $('#cCost').value=i.cost||'';$('#cBest').value=i.best||'';$('#cTips').value=i.tips||'';
   $('#cedNotes').value=m.notes||'';
   $('#cedHide').checked=!!m.hidden;
+  const rad=m.radius_m||300;$('#cRadius').value=rad;$('#cRadVal').textContent=rad;
+  CBRING=Array.isArray(i.bring)?i.bring.slice(0,10):[];renderBring();
   const ph=$('#cedPhoto');
   if(m.photo_url){ph.style.backgroundImage=`url("${m.photo_url}")`;ph.textContent='';}
   else{ph.style.backgroundImage='';ph.textContent='No photo yet';}
-  $('#cedDel').style.display=c.custom?'':'none';
-  loadCourtReviews(c);
-  paintCourts();
+  $('#cedSave').textContent='Save court';
+  $('#cedDel').style.display='';
+  loadCourtReviews(m);paintCourts();
 }
+function readForm(){
+  const ll=$('#cLatLon').value.trim().match(/(-?\d+\.\d+)[,\s]+(-?\d+\.\d+)/);
+  return {
+    name:$('#cName').value.trim(), suburb:$('#cSuburb').value.trim(),
+    ll, indoor:$('#cIndoor').checked, lit:$('#cLit').checked, hidden:$('#cedHide').checked,
+    notes:$('#cedNotes').value.trim(), radius_m:+$('#cRadius').value,
+    info:{
+      surface:$('#cSurface').value.trim(), hoops:+$('#cHoops').value||0, rim:$('#cRim').value.trim(),
+      cost:$('#cCost').value.trim()||'Free', best:$('#cBest').value.trim(), water:$('#cWater').value,
+      toilets:$('#cToilets').checked, parking:$('#cParking').value.trim(), shade:$('#cShade').checked,
+      seating:$('#cSeating').checked, shop:$('#cShop').checked, bring:CBRING.slice(), tips:$('#cTips').value.trim()
+    }
+  };
+}
+$('#cedSave').onclick=async()=>{
+  const f=readForm();
+  if(!f.name){toast('Name the court',1);return}
+  if(!f.ll){toast('Paste "lat, lon" from Google Maps — right-click the court → copy the numbers',1);return}
+  const b=$('#cedSave');b.disabled=true;const label=b.textContent;b.textContent='Saving…';
+  const payload={name:f.name,suburb:f.suburb,lat:+f.ll[1],lon:+f.ll[2],indoor:f.indoor,lit:f.lit,hidden:f.hidden,notes:f.notes,radius_m:f.radius_m,info:f.info};
+  try{
+    if(CC){await api({action:'admin_court_edit',key:CC.key,...payload});}
+    else{const d=await api({action:'admin_court_add',...payload});CC={key:d.key};}
+    await refreshCourts(false);
+    const fresh=OFFICIAL.find(c=>c.key===(CC&&CC.key));
+    toast(label.indexOf('Add')>-1?'Court live 🏀 Players see it now':'Court saved 🏀');
+    if(fresh)editCourt(fresh);
+  }catch(e){toast(e.message,1)}
+  b.disabled=false;b.textContent=CC?'Save court':'Add it to the map';
+};
+$('#cedDel').onclick=async()=>{
+  if(!CC)return;
+  if(!confirm('Delete this court? It vanishes from the app. Runs/reviews stay in the data.'))return;
+  try{await api({action:'admin_court_del',key:CC.key});CC=null;$('#ced').style.display='none';await refreshCourts(false);toast('Court deleted');}
+  catch(e){toast(e.message,1)}
+};
+$('#cedUpload').onclick=()=>{if(!CC){toast('Add the court first, then upload a photo',1);return}$('#cedFile').click();};
+$('#cedFile').onchange=e=>{
+  const f=e.target.files[0]; if(!f||!CC)return;
+  const img=new Image();
+  img.onload=async()=>{
+    const scale=Math.min(1,1280/Math.max(img.width,img.height));
+    const cv=document.createElement('canvas');
+    cv.width=Math.round(img.width*scale);cv.height=Math.round(img.height*scale);
+    cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+    const data=cv.toDataURL('image/jpeg',.82);
+    const b=$('#cedUpload');b.disabled=true;b.textContent='Uploading…';
+    try{
+      const d=await api({action:'admin_court_photo',key:CC.key,data});
+      $('#cedPhoto').style.backgroundImage=`url("${d.url}")`;$('#cedPhoto').textContent='';
+      await refreshCourts(false);toast('Photo up 📷 Players see it on the court page');
+    }catch(err){toast(err.message,1)}
+    b.disabled=false;b.textContent='📷 Upload photo';
+    e.target.value='';
+  };
+  img.src=URL.createObjectURL(f);
+};
+$('#cedQr').onclick=()=>window.open('hoopsheaven-qr.html','_blank');
+
+/* prefill a new court from one of the 971 known Sydney courts */
+$('#cKnown').oninput=()=>{
+  const q=$('#cKnown').value.trim().toLowerCase();
+  if(!q){$('#cKnownList').innerHTML='';return}
+  const list=KNOWN.filter(c=>((c.name||'')+' '+(c.suburb||'')).toLowerCase().includes(q)).slice(0,20);
+  $('#cKnownList').innerHTML=list.map((c,i)=>`<div class="crow" data-ki="${KNOWN.indexOf(c)}"><b>${esc(c.name||'Court')}</b><span>${esc(c.suburb||'')}</span></div>`).join('')
+    ||'<div class="empty">No match in the known list — just paste the pin below.</div>';
+  $('#cKnownList').querySelectorAll('[data-ki]').forEach(x=>x.onclick=()=>{
+    const c=KNOWN[+x.dataset.ki];if(!c)return;
+    $('#cName').value=c.name||'';$('#cSuburb').value=c.suburb||'';
+    $('#cLatLon').value=`${c.lat}, ${c.lon}`;
+    $('#cIndoor').checked=!!c.indoor;$('#cLit').checked=!!c.lit;
+    $('#cKnownList').innerHTML='';$('#cKnown').value='';
+    toast('Prefilled — fill in the details + add');
+  });
+};
+
 async function loadCourtReviews(c){
   $('#cedRevs').innerHTML='<div class="empty">Loading…</div>';
   try{
     const d=await api({action:'court',court_key:c.key});
-    if(CC!==c)return;
+    if(!CC||CC.key!==c.key)return;
     const revs=d.reviews||[];
     $('#cedRevs').innerHTML=revs.length?revs.map(r=>`
       <div class="row"><div class="who"><b><span style="color:#FFC24D">${'★'.repeat(r.stars)}</span> ${esc(r.name)}</b>
@@ -380,64 +567,38 @@ async function loadCourtReviews(c){
     });
   }catch(e){$('#cedRevs').innerHTML='<div class="empty">Could not load reviews.</div>'}
 }
-$('#addCourtBtn').onclick=()=>{const f=$('#addCourt');f.style.display=f.style.display==='none'?'':'none'};
-$('#acGo').onclick=async()=>{
-  const ll=$('#acLatLon').value.trim().match(/(-?\d+\.\d+)[,\s]+(-?\d+\.\d+)/);
-  if(!$('#acName').value.trim()){toast('Name the court',1);return}
-  if(!ll){toast('Paste "lat, lon" from Google Maps — right-click the court on the map → copy the numbers',1);return}
-  const b=$('#acGo');b.disabled=true;b.textContent='Adding…';
-  try{
-    const d=await api({action:'admin_court_add',name:$('#acName').value.trim(),suburb:$('#acSuburb').value.trim(),lat:+ll[1],lon:+ll[2],indoor:$('#acIndoor').checked,lit:$('#acLit').checked});
-    const c={key:d.key,name:$('#acName').value.trim(),suburb:$('#acSuburb').value.trim(),lat:+ll[1],lon:+ll[2],indoor:$('#acIndoor').checked,lit:$('#acLit').checked,custom:true};
-    COURTS.push(c);META[d.key]={key:d.key,custom:true,name:c.name,suburb:c.suburb};
-    $('#acName').value='';$('#acSuburb').value='';$('#acLatLon').value='';$('#addCourt').style.display='none';
-    toast('Court added 🏀 It\'s live in the app + on the map');
-    $('#cq').value=c.name;paintCourts();editCourt(c);
-  }catch(e){toast(e.message,1)}
-  b.disabled=false;b.textContent='Add it to the map';
-};
-$('#cedDel').onclick=()=>{
-  if(!CC||!CC.custom)return;
-  if(!confirm('Delete this court? Players lose its page, runs and reviews stay in the data but the court vanishes.'))return;
-  act({action:'admin_court_del',key:CC.key},'Court deleted');
-  COURTS=COURTS.filter(x=>x.key!==CC.key);delete META[CC.key];CC=null;
-  $('#ced').style.display='none';paintCourts();
-};
-$('#cedUpload').onclick=()=>$('#cedFile').click();
-$('#cedFile').onchange=e=>{
-  const f=e.target.files[0]; if(!f||!CC)return;
-  const img=new Image();
-  img.onload=async()=>{
-    // downscale to ~1280px jpeg so uploads stay light
-    const scale=Math.min(1,1280/Math.max(img.width,img.height));
-    const cv=document.createElement('canvas');
-    cv.width=Math.round(img.width*scale);cv.height=Math.round(img.height*scale);
-    cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
-    const data=cv.toDataURL('image/jpeg',.82);
-    const b=$('#cedUpload');b.disabled=true;b.textContent='Uploading…';
-    try{
-      const d=await api({action:'admin_court_photo',key:CC.key,data});
-      META[CC.key]={...(META[CC.key]||{}),key:CC.key,photo_url:d.url};
-      $('#cedPhoto').style.backgroundImage=`url("${d.url}")`;$('#cedPhoto').textContent='';
-      toast('Photo up 📷 Players see it on the court page');paintCourts();
-    }catch(err){toast(err.message,1)}
-    b.disabled=false;b.textContent='📷 Upload photo';
-    e.target.value='';
-  };
-  img.src=URL.createObjectURL(f);
-};
-$('#cedSave').onclick=async()=>{
-  if(!CC)return;
-  const b=$('#cedSave');b.disabled=true;b.textContent='Saving…';
-  try{
-    const m=META[CC.key]||{};
-    await api({action:'admin_court_set',key:CC.key,name:$('#cedName').value.trim(),notes:$('#cedNotes').value.trim(),photo_url:m.photo_url||'',hidden:$('#cedHide').checked});
-    META[CC.key]={key:CC.key,name:$('#cedName').value.trim(),notes:$('#cedNotes').value.trim(),photo_url:m.photo_url||'',hidden:$('#cedHide').checked};
-    toast('Court saved 🏀');paintCourts();
-  }catch(e){toast(e.message,1)}
-  b.disabled=false;b.textContent='Save court';
-};
-$('#cedQr').onclick=()=>{if(CC)window.open('hoopsheaven-qr.html','_blank')};
+
+/* player court suggestions → coach reviews + adds the good ones */
+function renderSuggestions(reqs){
+  if(reqs)SUGG=reqs;
+  const box=$('#suggBox'),list=$('#suggList'),n=$('#suggN'),bc=$('#bCourts');
+  if(bc){bc.textContent=SUGG.length;bc.style.display=SUGG.length?'':'none';}
+  if(!box)return;
+  box.style.display=SUGG.length?'':'none';
+  if(n){n.textContent=SUGG.length;n.style.display=SUGG.length?'':'none';}
+  list.innerHTML=SUGG.length?SUGG.map(s=>`
+    <div class="row"><div class="who">
+      <b>${esc(s.court_name||'Court')}</b>
+      <span>${esc(s.where_txt||'')}${s.note?' — “'+esc(s.note)+'”':''}</span>
+      <span style="opacity:.65">by ${esc(s.name||'someone')}${s.ig?' · @'+esc(s.ig):''}</span>
+    </div>
+    <button class="btn btn-v" data-sadd="${esc(s.id)}">➕ Add it</button>
+    <button class="btn btn-g" data-sdone="${esc(s.id)}">Dismiss</button></div>`).join('')
+    :'<div class="empty">No suggestions right now.</div>';
+  list.querySelectorAll('[data-sadd]').forEach(b=>b.onclick=()=>{
+    const s=SUGG.find(x=>x.id===b.dataset.sadd);if(!s)return;
+    newCourt();
+    $('#cName').value=s.court_name||'';
+    if(s.where_txt)$('#cKnown').value=s.where_txt;
+    if(s.note)$('#cTips').value=s.note;
+    $('#ced').scrollIntoView({behavior:'smooth',block:'start'});
+    toast('Prefilled from the suggestion — add the pin + details');
+  });
+  list.querySelectorAll('[data-sdone]').forEach(b=>b.onclick=async()=>{
+    try{await api({action:'admin_court_req_done',id:b.dataset.sdone});SUGG=SUGG.filter(x=>x.id!==b.dataset.sdone);renderSuggestions();toast('Dismissed');}
+    catch(e){toast(e.message,1)}
+  });
+}
 
 show();
 setInterval(()=>{if(CREDS&&!document.hidden)load()},30000);

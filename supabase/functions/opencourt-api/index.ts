@@ -60,6 +60,30 @@ function courtOf(b: Record<string, unknown>) {
   return { key, name, suburb, lat, lon };
 }
 
+// Normalise the rich "get ready" court details a coach fills in at the desk.
+// Everything is optional and bounded; water is a small enum so the app can
+// render the right icon and derive the leaving-the-house checklist.
+function infoOf(b: Record<string, unknown>) {
+  const i = (b.info || {}) as Record<string, unknown>;
+  const water = ["bubbler", "tap", "none"].includes(String(i.water)) ? String(i.water) : "";
+  const bring = Array.isArray(i.bring) ? (i.bring as unknown[]).slice(0, 10).map(x => str(x, 60)).filter(Boolean) : [];
+  return {
+    surface: str(i.surface, 40),
+    hoops: num(i.hoops, 0, 40, 0),
+    rim: str(i.rim, 40),
+    cost: str(i.cost, 40) || "Free",
+    best: str(i.best, 80),
+    water,
+    toilets: i.toilets === true,
+    parking: str(i.parking, 60),
+    shade: i.shade === true,
+    seating: i.seating === true,
+    shop: i.shop === true,
+    bring,
+    tips: str(i.tips, 400),
+  };
+}
+
 // Any of these identity values on the blocklist?
 async function bansHit(values: string[]) {
   const vs = values.filter(Boolean).map(v => `"${v.toLowerCase().replace(/"/g, "")}"`);
@@ -319,9 +343,10 @@ Deno.serve(async (req: Request) => {
       }
 
 
-      // All court overrides (small table) — the app applies name/hidden/photo.
+      // All court rows — the app builds its picker from the OFFICIAL ones and
+      // applies name/hidden/photo/details. Rich `info` + radius come along too.
       case "courts_meta": {
-        const rows = await db(`oc_courts?select=key,name,notes,photo_url,hidden,lat,lon,suburb,indoor,lit,custom`);
+        const rows = await db(`oc_courts?select=key,name,notes,photo_url,hidden,lat,lon,suburb,indoor,lit,custom,official,info,radius_m`);
         // live activity per court: active check-ins (2h) + upcoming runs
         const since = new Date(Date.now() - 2 * 36e5).toISOString();
         const cis = await db(`oc_checkins?checked_in_at=gte.${since}&select=court_key,extra`);
@@ -464,6 +489,30 @@ Deno.serve(async (req: Request) => {
         return J({ ok: true });
       }
 
+      // Suggest a court → Heaven desk. Players never add courts themselves; the
+      // coach reviews suggestions and adds the official ones. Rate-limited.
+      case "court_suggest": {
+        const g = await guard(((b.player || {}) as Record<string, unknown>).id as string);
+        if (g.err) return g.err;
+        const player = g.p!;
+        const court_name = str(b.court_name, 80);
+        if (!court_name) return J({ error: "what's the court called?" }, 400);
+        const dayAgo = new Date(Date.now() - 864e5).toISOString();
+        const mine = await db(`oc_court_reqs?player_id=eq.${encodeURIComponent(player.id)}&created_at=gte.${dayAgo}&select=id`);
+        if ((mine?.length || 0) >= 5) return J({ error: "easy — you've suggested a few today already, we'll get to them" }, 429);
+        await db(`oc_court_reqs`, {
+          method: "POST",
+          body: JSON.stringify({ player_id: player.id, name: player.name, ig: player.ig, court_name, where_txt: str(b.where, 200), note: str(b.note, 300), created_at: new Date().toISOString() }),
+        });
+        return J({ ok: true });
+      }
+
+      case "admin_court_req_done": {
+        if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
+        await db(`oc_court_reqs?id=eq.${encodeURIComponent(str(b.id, 64))}`, { method: "DELETE" });
+        return J({ ok: true });
+      }
+
 
 
       // Rate a court: 1-5 stars + optional words. One per player per court.
@@ -486,7 +535,8 @@ Deno.serve(async (req: Request) => {
         return J({ ok: true });
       }
 
-      // Heaven desk: add a custom court / delete one / remove a review.
+      // Heaven desk: add an OFFICIAL court (only the coach can add courts) with
+      // full details, or edit / delete one. Players suggest via court_suggest.
       case "admin_court_add": {
         if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
         const name = str(b.name, 80), suburb = str(b.suburb, 60);
@@ -494,8 +544,22 @@ Deno.serve(async (req: Request) => {
         if (!name) return J({ error: "name the court" }, 400);
         if (!Number.isFinite(lat) || !Number.isFinite(lon) || lat < -35.5 || lat > -32.5 || lon < 149.5 || lon > 152.5) return J({ error: "that pin isn't in Sydney — paste \"lat, lon\" from Google Maps" }, 400);
         const key = `oc_c_${crypto.randomUUID().slice(0, 8)}`;
-        await db(`oc_courts`, { method: "POST", body: JSON.stringify({ key, name, suburb, lat, lon, indoor: b.indoor === true, lit: b.lit === true, custom: true, updated_at: new Date().toISOString() }) });
+        await db(`oc_courts`, { method: "POST", body: JSON.stringify({ key, name, suburb, lat, lon, indoor: b.indoor === true, lit: b.lit === true, custom: true, official: true, info: infoOf(b), radius_m: num(b.radius_m, 80, 2000, 300), hidden: b.hidden === true, updated_at: new Date().toISOString() }) });
         return J({ ok: true, key });
+      }
+
+      case "admin_court_edit": {
+        if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
+        const key = str(b.key, 64);
+        if (!key) return J({ error: "bad court" }, 400);
+        const patch: Record<string, unknown> = { name: str(b.name, 80), suburb: str(b.suburb, 60), indoor: b.indoor === true, lit: b.lit === true, hidden: b.hidden === true, official: b.official !== false, info: infoOf(b), radius_m: num(b.radius_m, 80, 2000, 300), updated_at: new Date().toISOString() };
+        const lat = +(b.lat as number), lon = +(b.lon as number);
+        if (Number.isFinite(lat) && Number.isFinite(lon)) {
+          if (lat < -35.5 || lat > -32.5 || lon < 149.5 || lon > 152.5) return J({ error: "that pin isn't in Sydney" }, 400);
+          patch.lat = lat; patch.lon = lon;
+        }
+        await db(`oc_courts?key=eq.${encodeURIComponent(key)}`, { method: "PATCH", body: JSON.stringify(patch) });
+        return J({ ok: true });
       }
 
       case "admin_court_del": {
@@ -547,12 +611,13 @@ Deno.serve(async (req: Request) => {
         return J({ ok: true, url });
       }
 
-      // Heaven desk (Lab coach credentials): review + verify + ban.
+      // Heaven desk (Lab coach credentials): review + verify + ban + suggestions.
       case "admin_players": {
         if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
         const rows = await db(`oc_players?select=id,name,ig,email,verified,verify_code,banned,created_at&order=created_at.desc&limit=200`);
         const inbox = await db(`oc_inbox?select=*&order=created_at.asc&limit=100`);
-        return J({ players: rows || [], inbox: inbox || [] });
+        const court_reqs = await db(`oc_court_reqs?select=*&order=created_at.desc&limit=100`);
+        return J({ players: rows || [], inbox: inbox || [], court_reqs: court_reqs || [] });
       }
 
       case "admin_verify": {
