@@ -944,6 +944,14 @@ header{
 .pl .nm b{display:block;font-size:14px;font-weight:800}
 .pl .nm a{color:var(--muted);font-size:12.5px;text-decoration:none}
 .pl .nm a:hover{color:var(--volt)}
+.hcount{display:flex;align-items:center;gap:11px;background:var(--card);border:1px dashed var(--line);border-radius:13px;padding:9px 12px;margin-top:8px}
+.hcount .hcl{flex:1;min-width:0}
+.hcount .hcl b{display:block;font-size:13.5px;font-weight:800}
+.hcount .hcl span{font-size:11.5px;color:var(--dim)}
+.hcount .step{display:flex;align-items:center;gap:2px;flex:none}
+.hcount .step button{width:32px;height:32px;border-radius:9px;border:1px solid var(--line);background:var(--card2);color:var(--text);font-size:19px;font-weight:800;line-height:1;display:grid;place-items:center;cursor:pointer}
+.hcount .step button:active{transform:scale(.92)}
+.hcount .step b{min-width:26px;text-align:center;font-size:16px;font-weight:900;color:var(--volt)}
 .pl .host{flex:none;font-size:10px;letter-spacing:1.4px;font-weight:800;color:var(--volt);border:1px solid color-mix(in srgb, var(--volt) 35%, transparent);border-radius:99px;padding:3px 8px}
 .btn-row{display:flex;gap:9px;margin-top:6px}
 
@@ -1245,7 +1253,11 @@ header{
   <div class="subsect"><h4>📍 Live activity</h4>
     <div class="live" id="ctLive" style="display:none"><div class="avs" id="ctAvs"></div><span class="n" id="ctHereN"></span></div>
     <div id="ctHere"></div>
-    <p style="font-size:11.5px;color:var(--dim);margin-top:7px">Scan the court's QR when you pull up. Everyone auto-checks out after 2 hours — so this list is live, never crowded with ghosts.</p>
+    <div class="hcount" id="ctExtra" style="display:none">
+      <div class="hcl"><b>Others playing here</b><span>not on the app — old heads, casuals</span></div>
+      <div class="step"><button type="button" id="exMinus" aria-label="one fewer">−</button><b id="ctExtraN">0</b><button type="button" id="exPlus" aria-label="one more">+</button></div>
+    </div>
+    <p style="font-size:11.5px;color:var(--dim);margin-top:7px">Not a booking system — just who's here right now. Times aren't guaranteed. Check in when you're at the court, or scan its QR. Everyone auto-checks out after 2 hours, so this stays live.</p>
   </div>
   <div class="subsect"><h4>Runs at this court</h4><div id="ctRuns"></div>
     <button class="btn btn-v btn-block" id="ctCall" style="margin-top:8px">⚡ Call a run here</button></div>
@@ -1933,7 +1945,7 @@ function openCourtPage(c){
       if(!RUNS.some(y=>y.id===r.id))RUNS.push(r);
       paintRun();openSheet('shRun');history.replaceState(null,'','?run='+r.id);
     });
-    paintHere(d.here||[]);
+    paintHere(d.here||[],d.hereExtra||0);
     paintPlays(d.plays);
     paintReviews(d);
     $('#ctKotc').innerHTML=(d.kotc||[]).filter(k=>k.runs>0).slice(0,3).map((k,i)=>`
@@ -2003,28 +2015,54 @@ $('#rateGo').onclick=()=>ensureProfile(async()=>{
   b.disabled=false;
 });
 
-/* ---------- court check-ins ---------- */
-let HERE=[];
+/* ---------- court check-ins ----------
+   Two ways in, both anti-spoof:
+   • MANUAL  — the green button. Grabs device GPS; the SERVER checks that
+     position against the court's real coordinates. You can't check into
+     Sydenham while you're in Bankstown.
+   • QR      — scanning the court's printed poster (?court=&ci=1). Allowed
+     even if GPS is flaky, but only gets the ✓ when GPS also confirms.
+   • AUTO    — if you're in a run at a court and you arrive, you're checked
+     in silently (see autoCheckin). Web apps can't geofence in the
+     background, so this fires when the app is opened at the court.
+   The client no longer decides "verified" — the server is the ground truth. */
+let HERE=[], HEXTRA=0;
 const sinceHM=at=>new Date(at).toLocaleTimeString('en-AU',{timeZone:SYD,hour:'numeric',minute:'2-digit'}).replace(' ','').toLowerCase();
-function paintHere(list){
-  HERE=list;
+function paintHere(list,extra){
+  HERE=list; HEXTRA=extra||0;
+  const total=list.length+HEXTRA;
   const live=$('#ctLive');
-  if(list.length){
+  if(total){
     live.style.display='';
     $('#ctAvs').innerHTML=list.slice(0,7).map(h=>`<span class="a">${esc((h.name[0]||'?').toUpperCase())}</span>`).join('')+(list.length>7?`<span class="a">+${list.length-7}</span>`:'');
-    $('#ctHereN').textContent=`${list.length} here now`;
+    $('#ctHereN').textContent=`${total} here now`+(HEXTRA?` · ${HEXTRA} off-app`:'');
   }else live.style.display='none';
   $('#ctHere').innerHTML=list.length?list.map(h=>`
     <div class="pl" style="margin-bottom:7px"><div class="av">${esc((h.name[0]||'?').toUpperCase())}</div>
       <div class="nm"><b>${esc(h.name)}${h.verified?' <span title="location verified" style="color:#4DE8A8">✓</span>':''}</b>${h.ig?`<a href="https://instagram.com/${esc(h.ig)}" target="_blank" rel="noopener">@${esc(h.ig)}</a>`:''}</div>
       <span style="font-size:11.5px;color:var(--dim)">${OCP&&h.id===OCP.id?'auto-out '+esc(sinceHM(new Date(h.at).getTime()+72e5)):'since '+esc(sinceHM(h.at))}</span></div>`).join('')
-    :'<div class="empty" style="padding:14px">Nobody\'s checked in right now.</div>';
-  const b=$('#ciBtn'),mine=OCP&&list.some(h=>h.id===OCP.id);
+    :(HEXTRA?'<div class="empty" style="padding:14px">Only off-app players right now — check in when you pull up.</div>':'<div class="empty" style="padding:14px">Nobody\'s checked in right now.</div>');
+  const b=$('#ciBtn'),mine=OCP&&list.find(h=>h.id===OCP.id);
+  const ex=$('#ctExtra');
+  if(mine){ex.style.display='';$('#ctExtraN').textContent=(mine.extra||0);}
+  else ex.style.display='none';
   b.disabled=false;
   if(mine){b.textContent='👋 Tap out';b.className='btn btn-out';b.style.flex='1.3';}
   else{b.textContent='✓ I\'m here';b.className='btn btn-ok';b.style.flex='1.3';}
 }
 const getPos=opts=>new Promise((res,rej)=>navigator.geolocation?navigator.geolocation.getCurrentPosition(res,rej,opts):rej(new Error('no geo')));
+// Low-level: send one check-in for a court by a chosen method. Attaches GPS
+// when we can get it; the server decides whether it counts. Only stashes the
+// local marker AFTER the server accepts.
+async function sendCheckin(c,via){
+  let lat,lon;
+  try{const p=await getPos({timeout:8000,maximumAge:60000});lat=p.coords.latitude;lon=p.coords.longitude;}catch(e){}
+  const body={action:'checkin',via,court:{key:c.key,name:c.name,suburb:c.suburb||'',lat:c.lat,lon:c.lon},player:OCP};
+  if(lat!=null){body.lat=lat;body.lon=lon;}
+  const d=await api(body);
+  localStorage.setItem('oc_checkin',JSON.stringify({key:c.key,name:c.name,lat:c.lat,lon:c.lon,t:Date.now()}));
+  return d;
+}
 $('#ciBtn').onclick=()=>ensureProfile(async()=>{
   const c=CC,b=$('#ciBtn'),mine=HERE.some(h=>h.id===OCP.id);
   b.disabled=true;
@@ -2032,22 +2070,44 @@ $('#ciBtn').onclick=()=>ensureProfile(async()=>{
     if(mine){
       const d=await api({action:'checkout',player_id:OCP.id});
       localStorage.removeItem('oc_checkin');
-      paintHere(d.here||[]); toast('Checked out. Good run 🤝');
+      paintHere(d.here||[],d.hereExtra||0); toast('Checked out. Good run 🤝');
     }else{
-      b.textContent='Checking you in…';
-      let verified=false;
-      try{
-        const p=await getPos({timeout:7000,maximumAge:60000});
-        const km=dist(p.coords.latitude,p.coords.longitude,c.lat,c.lon);
-        if(km>0.8){toast("You don't look like you're at this court yet — check in when you pull up",1);paintHere(HERE);return}
-        verified=true;
-      }catch(e){}
-      const d=await api({action:'checkin',verified,court:{key:c.key,name:c.name,suburb:c.suburb||'',lat:c.lat,lon:c.lon},player:OCP});
-      localStorage.setItem('oc_checkin',JSON.stringify({key:c.key,name:c.name,lat:c.lat,lon:c.lon,t:Date.now()}));
-      paintHere(d.here||[]); toast("You're on the court 📍"+(verified?' ✓':'')+" You'll be auto-checked out in 2 hours — keeps this list live.",0,4600);
+      b.textContent='Finding you…';
+      const d=await sendCheckin(c,'manual');
+      paintHere(d.here||[],d.hereExtra||0);
+      toast("You're on the court 📍"+(d.verified?' ✓ location confirmed':'')+" — auto-checkout in 2 hours keeps this list live.",0,4600);
     }
-  }catch(e){toast(e.message,1);paintHere(HERE);}
+  }catch(e){toast(e.message,1,4200);paintHere(HERE,HEXTRA);}
 });
+// Off-app headcount: only shown when I'm checked in here. Number only — no
+// free text — so it stays a clean signal, not a comment box.
+async function setExtra(delta){
+  const cur=+($('#ctExtraN').textContent)||0, next=Math.max(0,Math.min(40,cur+delta));
+  if(next===cur)return;
+  $('#ctExtraN').textContent=next;
+  try{const d=await api({action:'set_headcount',extra:next,player:OCP});paintHere(d.here||[],d.hereExtra||0);}
+  catch(e){toast(e.message,1);}
+}
+$('#exMinus').onclick=()=>setExtra(-1);
+$('#exPlus').onclick=()=>setExtra(1);
+// Auto check-in: I'm in a run at a court and I've arrived (GPS inside the
+// fence). Silent — never prompts; only runs when location is already granted.
+async function autoCheckin(){
+  if(!OCP||localStorage.getItem('oc_checkin'))return;
+  const mine=RUNS.filter(r=>r.lat!=null&&(r.players||[]).some(p=>p.id===OCP.id));
+  if(!mine.length)return;
+  try{if(navigator.permissions){const s=await navigator.permissions.query({name:'geolocation'});if(s.state!=='granted')return}}catch(e){}
+  let p;try{p=await getPos({timeout:8000,maximumAge:120000});}catch(e){return}
+  let best=null,bestKm=1e9;
+  for(const r of mine){const km=dist(p.coords.latitude,p.coords.longitude,r.lat,r.lon);if(km<bestKm){bestKm=km;best=r;}}
+  if(!best||bestKm>0.5)return; // server enforces the exact fence; this is a coarse pre-check
+  try{
+    const d=await api({action:'checkin',via:'auto',lat:p.coords.latitude,lon:p.coords.longitude,court:{key:best.court_key,name:best.court_name,suburb:best.suburb||'',lat:best.lat,lon:best.lon},player:OCP});
+    localStorage.setItem('oc_checkin',JSON.stringify({key:best.court_key,name:best.court_name,lat:best.lat,lon:best.lon,t:Date.now()}));
+    toast("You're at "+best.court_name+" — checked you in 📍 Auto-out in 2 hours.",0,4200);
+    if(CC&&CC.key===best.court_key)paintHere(d.here||[],d.hereExtra||0);
+  }catch(e){/* not close enough yet, or already in — stay silent */}
+}
 async function autoCheckout(){
   let ci=null; try{ci=JSON.parse(localStorage.getItem('oc_checkin')||'null')}catch(e){}
   if(!ci||!OCP)return;
@@ -2062,7 +2122,7 @@ async function autoCheckout(){
     }
   }catch(e){}
 }
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)autoCheckout()});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){autoCheckout();autoCheckin();}});
 
 /* ---------- colours ---------- */
 const THEMES=[['Blaze','#FF6A2B'],['Volt','#D8FF3E'],['Ice','#5BC9FF'],['Grape','#B98CFF'],
@@ -2105,8 +2165,17 @@ loadBoard().then(()=>{
     const c=cs.find(x=>x.key===q.get('court'));
     if(!c)return;
     openCourtPage(c);
-    if(q.get('ci')==='1')setTimeout(()=>{if(!(OCP&&HERE.some(h=>h.id===OCP.id)))$('#ciBtn').click()},1200);
+    // ?ci=1 = scanned the court's QR poster → check in via the QR path
+    if(q.get('ci')==='1')setTimeout(()=>{
+      if(OCP&&HERE.some(h=>h.id===OCP.id))return;
+      ensureProfile(async()=>{
+        const b=$('#ciBtn');b.disabled=true;b.textContent='Scanning you in…';
+        try{const d=await sendCheckin(c,'qr');paintHere(d.here||[],d.hereExtra||0);toast("Scanned in at "+c.name+" 📍"+(d.verified?' ✓':'')+" — auto-out in 2 hours.",0,4200);}
+        catch(e){toast(e.message,1,4200);paintHere(HERE,HEXTRA);}
+      });
+    },1200);
   });
+  autoCheckin();
 });
 loadCourts().then(()=>{paintNearby();paintHomeSearch();});
 autoCheckout();
