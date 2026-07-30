@@ -150,11 +150,50 @@ async function playsFor(courtKey: string, week: string, me: string) {
 }
 
 
-// Active check-ins at a court (2h window), oldest first.
+// Metres between two lat/lon points (haversine).
+function metres(aLat: number, aLon: number, bLat: number, bLon: number) {
+  const R = 6371000, x = (bLat - aLat) * Math.PI / 180, y = (bLon - aLon) * Math.PI / 180;
+  const h = Math.sin(x / 2) ** 2 + Math.cos(aLat * Math.PI / 180) * Math.cos(bLat * Math.PI / 180) * Math.sin(y / 2) ** 2;
+  return 2 * R * Math.asin(Math.sqrt(h));
+}
+// Authoritative court coordinates — the 971 base courts come from the public
+// courts.json (fetched once, cached in memory across warm invocations); custom
+// courts come from oc_courts. This is the ground truth the client can't fake.
+let GEO_CACHE: Record<string, [number, number]> | null = null;
+let GEO_AT = 0;
+async function loadGeo(): Promise<Record<string, [number, number]>> {
+  if (GEO_CACHE && Date.now() - GEO_AT < 6 * 36e5) return GEO_CACHE;
+  try {
+    const d = await (await fetch("https://lockdown-lab-registration.netlify.app/courts.json")).json();
+    const m: Record<string, [number, number]> = {};
+    for (const c of d.courts || []) {
+      const k = "oc_" + (+c.lat).toFixed(5) + "_" + (+c.lon).toFixed(5);
+      m[k] = [+c.lat, +c.lon];
+    }
+    GEO_CACHE = m; GEO_AT = Date.now();
+  } catch (_e) { if (!GEO_CACHE) GEO_CACHE = {}; }
+  return GEO_CACHE;
+}
+async function courtCoords(key: string): Promise<[number, number] | null> {
+  const geo = await loadGeo();
+  if (geo[key]) return geo[key];
+  const rows = await db(`oc_courts?key=eq.${encodeURIComponent(key)}&select=lat,lon`);
+  const r = rows?.[0];
+  return (r && r.lat != null && r.lon != null) ? [r.lat as number, r.lon as number] : null;
+}
+async function courtRadius(key: string) {
+  const rows = await db(`oc_courts?key=eq.${encodeURIComponent(key)}&select=radius_m`);
+  const r = rows?.[0]?.radius_m;
+  return (typeof r === "number" && r >= 80 && r <= 2000) ? r : 300; // default 300m geofence
+}
+
+// Active check-ins at a court (2h window), oldest first, + off-app headcount.
 async function hereFor(courtKey: string) {
   const since = new Date(Date.now() - 2 * 36e5).toISOString();
-  const rows: Record<string, unknown>[] = await db(`oc_checkins?court_key=eq.${encodeURIComponent(courtKey)}&checked_in_at=gte.${since}&select=player_id,name,ig,verified,checked_in_at&order=checked_in_at.asc`);
-  return rows.map(r => ({ id: r.player_id, name: r.name, ig: r.ig, verified: r.verified, at: r.checked_in_at }));
+  const rows: Record<string, unknown>[] = await db(`oc_checkins?court_key=eq.${encodeURIComponent(courtKey)}&checked_in_at=gte.${since}&select=player_id,name,ig,verified,via,extra,checked_in_at&order=checked_in_at.asc`);
+  const list = rows.map(r => ({ id: r.player_id, name: r.name, ig: r.ig, verified: r.verified, via: r.via, extra: Number(r.extra) || 0, at: r.checked_in_at }));
+  const extra = rows.reduce((a, r) => a + (Number(r.extra) || 0), 0);
+  return { list, total: list.length + extra, extra };
 }
 
 
@@ -285,11 +324,11 @@ Deno.serve(async (req: Request) => {
         const rows = await db(`oc_courts?select=key,name,notes,photo_url,hidden,lat,lon,suburb,indoor,lit,custom`);
         // live activity per court: active check-ins (2h) + upcoming runs
         const since = new Date(Date.now() - 2 * 36e5).toISOString();
-        const cis = await db(`oc_checkins?checked_in_at=gte.${since}&select=court_key`);
+        const cis = await db(`oc_checkins?checked_in_at=gte.${since}&select=court_key,extra`);
         const from = new Date(Date.now() - 3 * 36e5).toISOString();
         const rns = await db(`oc_runs?status=eq.open&run_at=gte.${from}&select=court_key`);
         const here: Record<string, number> = {}, runs: Record<string, number> = {};
-        for (const c of cis || []) here[c.court_key as string] = (here[c.court_key as string] || 0) + 1;
+        for (const c of cis || []) here[c.court_key as string] = (here[c.court_key as string] || 0) + 1 + (Number(c.extra) || 0);
         for (const r of rns || []) runs[r.court_key as string] = (runs[r.court_key as string] || 0) + 1;
         return J({ courts: rows || [], here, runs, ratings: await ratingsFor(null) });
       }
@@ -327,26 +366,48 @@ Deno.serve(async (req: Request) => {
         const asAdmin = await coachAuth(b.user, b.pin);
         const reviews = (rrows || []).map(r => ({ ...(asAdmin ? { pid: r.player_id } : {}), stars: r.stars, text: r.text, at: r.created_at, name: rnames[r.player_id as string]?.name || "Hooper", ig: rnames[r.player_id as string]?.ig || "", v: rvs.has(r.player_id as string), mine: r.player_id === me }));
         const rsum = reviews.length ? { avg: Math.round(reviews.reduce((a, r) => a + (r.stars as number), 0) / reviews.length * 10) / 10, n: reviews.length } : null;
-        return J({ runs: await withPlayers(runs), plays, week, kotc, here: await hereFor(key), info, reviews, rsum });
+        const h = await hereFor(key);
+        return J({ runs: await withPlayers(runs), plays, week, kotc, here: h.list, hereTotal: h.total, hereExtra: h.extra, info, reviews, rsum });
       }
 
 
-      // QR / court check-in: one active check-in per player, new court replaces
-      // old, expires after 2h. verified = client geolocation put them at the court.
+      // Court check-in with SERVER-SIDE geofencing — the whole point is that
+      // nobody can claim they're at a court they're not at. The server looks up
+      // the court's REAL coordinates (embedded map / custom court) and compares
+      // them to the device GPS the client sends. It never trusts a client-sent
+      // "verified" flag or client-sent court coords.
+      //   via=manual → MUST be inside the geofence, or refused ('toofar'/'needloc')
+      //   via=auto   → same (fired automatically when a run player arrives)
+      //   via=qr     → scanned the physical court poster; allowed even if GPS is
+      //                flaky, but only marked verified ✓ when GPS also confirms
       case "checkin": {
         const g = await guard(((b.player || {}) as Record<string, unknown>).id as string);
         if (g.err) return g.err;
         const player = g.p!;
         const court = courtOf(b);
         if (!court) return J({ error: "bad court" }, 400);
+        const via = ["qr", "auto", "manual"].includes(str(b.via, 10)) ? str(b.via, 10) : "manual";
+        const coords = await courtCoords(court.key);
+        const dLat = +(b.lat as number), dLon = +(b.lon as number);
+        const haveGeo = Number.isFinite(dLat) && Number.isFinite(dLon);
+        let within = false, dist = -1;
+        if (coords && haveGeo) { dist = metres(coords[0], coords[1], dLat, dLon); within = dist <= await courtRadius(court.key); }
+        // Enforcement: manual/auto REQUIRE being inside the fence.
+        if (via !== "qr") {
+          if (!haveGeo) return J({ error: "turn on location to check in — or scan the court's QR when you get there", code: "needloc" }, 400);
+          if (!coords) return J({ error: "can't place that court — scan its QR instead", code: "needloc" }, 400);
+          if (!within) return J({ error: "you're not at this court yet — check in once you're there (or scan the QR)", code: "toofar" }, 403);
+        }
+        const verified = within; // ✓ only when GPS actually confirms the court
         // housekeeping: drop long-expired rows so the table stays tiny
         await db(`oc_checkins?checked_in_at=lt.${new Date(Date.now() - 48 * 36e5).toISOString()}`, { method: "DELETE" }).catch(() => {});
         await db(`oc_checkins?player_id=eq.${encodeURIComponent(player.id)}`, { method: "DELETE" });
         await db(`oc_checkins`, {
           method: "POST",
-          body: JSON.stringify({ court_key: court.key, court_name: court.name, suburb: court.suburb, lat: court.lat, lon: court.lon, player_id: player.id, name: player.name, ig: player.ig, verified: b.verified === true }),
+          body: JSON.stringify({ court_key: court.key, court_name: court.name, suburb: court.suburb, lat: coords ? coords[0] : court.lat, lon: coords ? coords[1] : court.lon, player_id: player.id, name: player.name, ig: player.ig, verified, via }),
         });
-        return J({ here: await hereFor(court.key) });
+        const h = await hereFor(court.key);
+        return J({ here: h.list, hereTotal: h.total, hereExtra: h.extra, verified });
       }
 
       case "checkout": {
@@ -355,7 +416,23 @@ Deno.serve(async (req: Request) => {
         if (!pid) return J({ error: "bad request" }, 400);
         const rows = await db(`oc_checkins?player_id=eq.${encodeURIComponent(pid)}&select=court_key`);
         await db(`oc_checkins?player_id=eq.${encodeURIComponent(pid)}`, { method: "DELETE" });
-        return J({ ok: true, here: rows?.[0] ? await hereFor(rows[0].court_key as string) : [] });
+        const h = rows?.[0] ? await hereFor(rows[0].court_key as string) : { list: [], total: 0, extra: 0 };
+        return J({ ok: true, here: h.list, hereTotal: h.total, hereExtra: h.extra });
+      }
+
+      // Off-app headcount: someone already checked in reports how many EXTRA
+      // people are physically playing but not on the app (old heads, casuals).
+      // Number only — no free text. Must be checked in at that court already.
+      case "set_headcount": {
+        const g = await guard(((b.player || {}) as Record<string, unknown>).id as string);
+        if (g.err) return g.err;
+        const player = g.p!;
+        const extra = num(b.extra, 0, 40, 0);
+        const rows = await db(`oc_checkins?player_id=eq.${encodeURIComponent(player.id)}&select=court_key`);
+        if (!rows?.[0]) return J({ error: "check in first, then you can update the headcount", code: "needci" }, 400);
+        await db(`oc_checkins?player_id=eq.${encodeURIComponent(player.id)}`, { method: "PATCH", body: JSON.stringify({ extra }) });
+        const h = await hereFor(rows[0].court_key as string);
+        return J({ ok: true, here: h.list, hereTotal: h.total, hereExtra: h.extra });
       }
 
 
