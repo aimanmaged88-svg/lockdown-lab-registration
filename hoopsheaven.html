@@ -692,6 +692,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
   --text:#F4F6F0; --muted:#96A0A8; --dim:#5D666E;
   --volt:#FF6A2B; --onaccent:#fff; --ok:#2ECC71; --fire:#FF7A2F; --danger:#FF5A5A;
   --r:18px;
+  /* motion — Apple-ish: fast, decisive, slight overshoot */
+  --ease:cubic-bezier(.22,.61,.24,1); --spring:cubic-bezier(.34,1.4,.5,1); --ease-out:cubic-bezier(.16,1,.3,1);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{scroll-behavior:smooth}
@@ -711,11 +713,11 @@ body::before{
   background-size:auto,auto,100% 200px; background-repeat:no-repeat,no-repeat,repeat;
 }
 .wrap{position:relative; z-index:1; max-width:540px; margin:0 auto; padding:0 16px 96px}
-.wrap>section{animation:vin .34s cubic-bezier(.22,.7,.3,1)}
-@keyframes vin{from{opacity:0;transform:translateY(8px)}}
-/* premium press feedback across tappable cards */
-.ccard,.crow,.run,.runstrip,.prow,.play,.fpill,.tab,.amen .a{transition:transform .09s ease,border-color .15s ease,background .15s ease}
-.ccard:active,.crow:active,.run:active,.runstrip:active,.prow:active{transform:scale(.985)}
+.wrap>section{animation:vin .5s var(--ease-out)}
+@keyframes vin{from{opacity:0;transform:translateY(12px)}}
+/* premium press feedback across tappable cards — quick down, springy back */
+.ccard,.crow,.run,.runstrip,.prow,.play,.fpill,.tab,.amen .a{transition:transform .28s var(--spring),border-color .18s var(--ease),background .18s var(--ease),box-shadow .18s var(--ease)}
+.ccard:active,.crow:active,.run:active,.runstrip:active,.prow:active,.play:active{transform:scale(.965);transition-duration:.06s}
 
 /* ---------- header ---------- */
 header{
@@ -849,10 +851,10 @@ header{
 /* ---------- buttons ---------- */
 .btn{
   border:none;border-radius:14px;font-weight:800;font-size:15px;padding:14px 16px;cursor:pointer;
-  display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform .08s ease,filter .15s;
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:transform .3s var(--spring),filter .15s var(--ease),box-shadow .18s var(--ease);
   font-family:inherit;
 }
-.btn:active{transform:scale(.97)}
+.btn:active{transform:scale(.94);transition-duration:.05s}
 .btn-v{background:var(--volt);color:var(--onaccent)}
 .btn-v:hover{filter:brightness(1.06)}
 .btn-ok{background:var(--ok);color:#0A0C0F}
@@ -868,22 +870,28 @@ header{
   border:1px solid var(--line);border-radius:20px;padding:7px;width:min(94vw,420px);
 }
 .tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;color:var(--dim);font-family:var(--cond);font-size:12px;font-weight:600;letter-spacing:1.2px;text-transform:uppercase;padding:6px 2px;border-radius:14px;cursor:pointer}
-.tab .i{font-size:18px;line-height:1}
+.tab .i{font-size:18px;line-height:1;transition:transform .34s var(--spring)}
 .tab.on{color:var(--volt);background:color-mix(in srgb, var(--volt) 12%, transparent)}
+.tab.on .i{transform:scale(1.16) translateY(-1px)}
 
 /* ---------- sheets ---------- */
 .sheet{position:fixed;inset:0;z-index:60;display:none}
 #shProfile{z-index:70}
 #shTerms{z-index:72}
 .sheet.open{display:block}
-.sheet .scrim{position:absolute;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);animation:fad .2s}
-@keyframes fad{from{opacity:0}}
+.sheet .scrim{position:absolute;inset:0;background:rgba(0,0,0,.62);backdrop-filter:blur(8px) saturate(1.05);-webkit-backdrop-filter:blur(8px) saturate(1.05);animation:fad .32s var(--ease)}
+@keyframes fad{from{opacity:0;backdrop-filter:blur(0)}}
 .panel{
   position:absolute;left:0;right:0;bottom:0;max-width:540px;margin:0 auto;background:#0E1116;border:1px solid var(--line);border-bottom:none;
   border-radius:22px 22px 0 0;padding:10px 18px calc(20px + env(safe-area-inset-bottom));max-height:90dvh;overflow-y:auto;
-  animation:up .26s cubic-bezier(.32,.9,.35,1);
+  animation:up .42s var(--ease-out);will-change:transform;
 }
-@keyframes up{from{transform:translateY(60px);opacity:.4}}
+@keyframes up{from{transform:translateY(100%)}to{transform:translateY(0)}}
+/* exit: slide the sheet back down + fade the scrim, then it hides */
+.sheet.closing .panel{animation:down .28s var(--ease) forwards}
+.sheet.closing .scrim{animation:fadout .28s var(--ease) forwards}
+@keyframes down{to{transform:translateY(100%)}}
+@keyframes fadout{to{opacity:0}}
 .grab{width:40px;height:4px;border-radius:99px;background:var(--line);margin:4px auto 14px}
 .panel h3{font-family:var(--disp);font-weight:400;text-transform:uppercase;font-size:21px;letter-spacing:.8px;margin-bottom:2px}
 .panel .sub{color:var(--muted);font-size:13.5px;margin-bottom:14px}
@@ -966,8 +974,22 @@ header{
 .bkm.on{color:var(--volt);border-color:var(--volt)}
 .amen{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0 4px}
 .amen .a{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:10px 4px;text-align:center}
+.amen .a.no{opacity:.5}
 .amen .a .i{font-size:18px}
 .amen .a span{display:block;font-size:10.5px;color:var(--muted);font-weight:700;margin-top:3px}
+/* before-you-leave checklist */
+.gearsect h4{color:var(--volt)}
+.gear{display:flex;flex-direction:column;gap:7px}
+.gitem{display:flex;align-items:center;gap:11px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 13px;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:border-color .18s var(--ease),background .18s var(--ease),transform .12s var(--spring)}
+.gitem:active{transform:scale(.985)}
+.gitem .bx{width:23px;height:23px;border-radius:7px;border:2px solid var(--line2);flex:none;display:grid;place-items:center;color:transparent;font-size:14px;font-weight:900;transition:background .18s var(--ease),border-color .18s var(--ease),color .12s var(--ease),transform .2s var(--spring)}
+.gitem .gt{font-size:14px;font-weight:600;color:var(--text)}
+.gitem .why{margin-left:auto;font-size:11px;color:var(--dim);font-weight:600;text-align:right}
+.gitem.on{border-color:color-mix(in srgb,var(--volt) 45%,transparent);background:color-mix(in srgb,var(--volt) 9%,transparent)}
+.gitem.on .bx{background:var(--volt);border-color:var(--volt);color:var(--onaccent);transform:scale(1.06)}
+.gitem.on .gt{color:var(--muted);text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--volt) 60%,transparent)}
+.tipcard{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--volt);border-radius:12px;padding:11px 14px;font-size:13.5px;line-height:1.5;color:var(--text)}
+.fine{font-size:11.5px;color:var(--dim);margin-top:7px}
 .cmeta{display:flex;gap:7px;flex-wrap:wrap;margin:8px 0 6px}
 .subsect{margin-top:20px}
 .subsect h4{font-family:var(--cond);font-size:14px;letter-spacing:2.4px;text-transform:uppercase;color:var(--dim);font-weight:600;margin-bottom:9px;display:flex;gap:7px;align-items:center}
@@ -1061,8 +1083,10 @@ header{
   .ccard .ph{height:112px}
   #map{height:calc(100dvh - 260px)}
   .sheet.open{display:grid;place-items:center}
-  .panel{position:relative;left:auto;right:auto;bottom:auto;width:620px;max-width:92vw;border-radius:22px;border:1px solid var(--line);max-height:88dvh;animation:pop .2s ease}
-  @keyframes pop{from{transform:scale(.965);opacity:0}}
+  .panel{position:relative;left:auto;right:auto;bottom:auto;width:620px;max-width:92vw;border-radius:22px;border:1px solid var(--line);max-height:88dvh;animation:pop .34s var(--spring)}
+  @keyframes pop{from{transform:scale(.94) translateY(10px);opacity:0}}
+  .sheet.closing .panel{animation:popout .2s var(--ease) forwards}
+  @keyframes popout{to{transform:scale(.96);opacity:0}}
   .grab{display:none}
   #shProfile.gate .panel{height:auto;max-height:88dvh;border-radius:22px;border:1px solid var(--line)}
   .clist{max-height:52dvh}
@@ -1117,7 +1141,7 @@ header{
   <!-- ============ MAP ============ -->
   <section id="vMap" style="display:none">
     <div class="sect" style="margin-top:16px">
-      <div class="seclbl"><h2>The map</h2><span style="font-size:12px;color:var(--dim)">971 courts</span></div>
+      <div class="seclbl"><h2>The map</h2><span style="font-size:12px;color:var(--dim)" id="mapCount"></span></div>
       <div id="map"></div>
       <div id="mapCard">
         <div class="row1">
@@ -1126,6 +1150,7 @@ header{
         </div>
         <button class="btn btn-v btn-block" id="mcView">VIEW COURT</button>
       </div>
+      <button class="btn btn-ghost btn-block" id="suggestBtn2" style="margin-top:12px">➕ Know a court that should be here? Suggest it</button>
     </div>
   </section>
 
@@ -1239,12 +1264,19 @@ header{
   <div class="grab"></div>
   <div class="cthero" id="ctPhoto"></div>
   <div class="xrow"><div style="flex:1;min-width:0">
-    <div class="ctrow"><h3 id="ctName"></h3><span class="freetag">FREE</span><button class="bkm" id="ctBkm">🔖</button></div>
+    <div class="ctrow"><h3 id="ctName"></h3><span class="freetag" id="ctCost">FREE</span><button class="bkm" id="ctBkm">🔖</button></div>
     <p class="sub" id="ctSub" style="margin-bottom:2px"></p>
     <div class="starline" id="ctStars" style="display:none"></div>
   </div><button class="x" data-close>✕</button></div>
   <div class="amen" id="ctAmen"></div>
   <div id="ctNotes" style="display:none;font-size:13px;color:var(--muted);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 13px;margin:8px 0 4px"></div>
+  <div class="subsect gearsect" id="ctGearWrap" style="display:none"><h4>🎒 Before you leave</h4>
+    <div id="ctGear" class="gear"></div>
+    <p class="fine">Tick these off as you pack — saved on your phone.</p>
+  </div>
+  <div class="subsect" id="ctTipsWrap" style="display:none"><h4>📋 Court tips</h4>
+    <div id="ctTips" class="tipcard"></div>
+  </div>
   <div class="wx" id="ctWx" style="margin-top:8px"></div>
   <div class="btn-row" style="margin:6px 0 4px">
     <button class="btn btn-ghost" id="ctMaps" style="flex:1">🧭 Directions</button>
@@ -1289,6 +1321,17 @@ header{
   <div class="xrow"><div><h3>Colours</h3><p class="sub">Your court, your colours. Saved on this device.</p></div><button class="x" data-close>✕</button></div>
   <div class="swgrid" id="swGrid"></div>
   <input type="color" id="swCustom" value="#FF6A2B" style="position:absolute;width:0;height:0;opacity:0;border:0;padding:0">
+</div></div>
+
+<!-- suggest a court sheet -->
+<div class="sheet" id="shSuggest"><div class="scrim" data-close></div><div class="panel">
+  <div class="grab"></div>
+  <div class="xrow"><div><h3>Suggest a court</h3><p class="sub">Only vetted courts go on the map. Send yours — we'll check it and add it.</p></div><button class="x" data-close>✕</button></div>
+  <div class="fld"><label>Court name</label><input class="inp" id="sgName" maxlength="80" placeholder="e.g. Tempe Reserve courts"></div>
+  <div class="fld"><label>Where is it?</label><input class="inp" id="sgWhere" maxlength="200" placeholder="Suburb, cross-street or a Google Maps link"></div>
+  <div class="fld"><label>Anything we should know? <span style="color:var(--dim)">(optional)</span></label><input class="inp" id="sgNote" maxlength="300" placeholder="2 full courts, lit at night, gets busy after 5…"></div>
+  <button class="btn btn-v btn-block" id="sgGo">Send it to the desk</button>
+  <p class="fine">The coach reviews every suggestion. Real courts only — no random pins.</p>
 </div></div>
 
 <div id="toast"></div>
@@ -1475,8 +1518,16 @@ $('#pfSave').onclick=async()=>{
 };
 
 /* ---------- sheets ---------- */
-function openSheet(id){$('#'+id).classList.add('open');document.body.style.overflow='hidden'}
-function closeSheet(id){$('#'+id).classList.remove('open');if(!document.querySelector('.sheet.open'))document.body.style.overflow=''}
+function openSheet(id){const s=$('#'+id);s.classList.remove('closing');s.classList.add('open');document.body.style.overflow='hidden'}
+function closeSheet(id){
+  const s=$('#'+id); if(!s||!s.classList.contains('open'))return;
+  s.classList.add('closing');           // plays the slide-down / fade-out
+  setTimeout(()=>{
+    if(!s.classList.contains('closing'))return; // reopened mid-close
+    s.classList.remove('open','closing');
+    if(!document.querySelector('.sheet.open'))document.body.style.overflow='';
+  },290);
+}
 document.querySelectorAll('.sheet').forEach(sh=>{
   sh.addEventListener('click',e=>{
     if(sh.classList.contains('gate'))return;
@@ -1664,21 +1715,20 @@ $('#rCourtLink').onclick=()=>{closeSheet('shRun');openCourtPage({key:CUR.court_k
 let COURTS=null,GEO=null,ACT={here:{},runs:{},ratings:{}};
 async function loadCourts(){
   if(COURTS)return COURTS;
-  const [d,meta]=await Promise.all([
-    fetch('courts.json').then(r=>r.json()),
-    api({action:'courts_meta'}).catch(()=>({courts:[],here:{},runs:{}}))
-  ]);
+  // OFFICIAL-ONLY: the picker is exactly the courts the coach has vetted +
+  // added at the Heaven desk. Nobody drops random pins — players suggest, the
+  // coach adds. Rich details (surface, amenities, what-to-bring) ride along.
+  const meta=await api({action:'courts_meta'}).catch(()=>({courts:[],here:{},runs:{},ratings:{}}));
   ACT={here:meta.here||{},runs:meta.runs||{},ratings:meta.ratings||{}};
-  const M={};(meta.courts||[]).forEach(m=>{if(!m.custom)M[m.key]=m});
-  COURTS=d.courts.map(c=>{
-    const key='oc_'+c.lat.toFixed(5)+'_'+c.lon.toFixed(5);
-    const m=M[key];
-    return {...c,key,name:m&&m.name?m.name:c.name,photo:m&&m.photo_url||'',hidden:!!(m&&m.hidden)};
-  }).filter(c=>!c.hidden);
-  // coach-added courts layer straight into the dataset
-  for(const m of (meta.courts||[])){
-    if(m.custom&&!m.hidden&&m.lat!=null)COURTS.push({key:m.key,name:m.name||'Basketball Court',suburb:m.suburb||'',lat:m.lat,lon:m.lon,indoor:!!m.indoor,lit:!!m.lit,photo:m.photo_url||'',hidden:false,custom:true});
-  }
+  COURTS=(meta.courts||[])
+    .filter(m=>m.official&&!m.hidden&&m.lat!=null&&m.lon!=null)
+    .map(m=>{
+      const info=m.info||{};
+      return {key:m.key,name:m.name||'Basketball Court',suburb:m.suburb||'',lat:m.lat,lon:m.lon,
+        indoor:!!m.indoor,lit:!!m.lit,photo:m.photo_url||'',notes:m.notes||'',hidden:false,custom:true,
+        info,radius:m.radius_m||300,
+        surface:info.surface||'',hoops:info.hoops||0,cost:info.cost||'Free'};
+    });
   return COURTS;
 }
 const dist=(a,b,c,d)=>{const R=6371,x=(c-a)*Math.PI/180,y=(d-b)*Math.PI/180,h=Math.sin(x/2)**2+Math.cos(a*Math.PI/180)*Math.cos(c*Math.PI/180)*Math.sin(y/2)**2;return 2*R*Math.asin(Math.sqrt(h))};
@@ -1693,10 +1743,11 @@ function paintHeroStat(){
   const el=$('#heroStat'); if(!el||!COURTS)return;
   const here=Object.values(ACT.here||{}).reduce((a,n)=>a+n,0);
   const runs=(RUNS||[]).length;
-  let html=`<span class="hs"><b>${COURTS.length}</b> free courts</span>`;
+  let html=COURTS.length?`<span class="hs"><b>${COURTS.length}</b> vetted court${COURTS.length===1?'':'s'}</span>`
+                        :`<span class="hs">🏗️ Courts dropping soon</span>`;
   if(here>0)html+=`<span class="hs"><span class="live"></span><b>${here}</b> playing now</span>`;
   else if(runs>0)html+=`<span class="hs"><span class="live"></span><b>${runs}</b> run${runs===1?'':'s'} on</span>`;
-  else html+=`<span class="hs">📍 Sydney-wide</span>`;
+  else if(COURTS.length)html+=`<span class="hs">📍 Sydney</span>`;
   el.innerHTML=html; el.classList.add('on');
 }
 function paintNearby(){
@@ -1709,7 +1760,9 @@ function paintNearby(){
     <div class="ccard" data-k="${esc(c.key)}">
       <div class="ph ${c.photo?'has':''}" style="${c.photo?`background-image:url('${esc(c.photo)}')`:''}">${hereN(c)?`<span class="hb">${hereN(c)} here</span>`:''}</div>
       <div class="bd"><b>${esc(c.name)}</b><span>${starBit(c)}${c.km!=null?(c.km<1?Math.round(c.km*1000)+'m':c.km.toFixed(1)+'km')+' · ':''}<span class="fr">Free</span>${c.suburb?' · '+esc(c.suburb):''}</span></div>
-    </div>`).join('')||'<div class="empty" style="flex:1">Nothing matches those filters right now.</div>';
+    </div>`).join('')||(COURTS.length===0
+      ? '<div class="empty" style="flex:1"><b>Courts dropping soon</b>We\'re hand-picking Sydney\'s best — real courts only. Know one?<br><br><button class="btn btn-v" data-suggest>➕ Suggest a court</button></div>'
+      : '<div class="empty" style="flex:1">Nothing matches those filters right now.</div>');
   $('#nearby').querySelectorAll('.ccard').forEach(x=>x.onclick=()=>{
     const c=COURTS.find(y=>y.key===x.dataset.k); if(c)openCourtPage(c);
   });
@@ -1725,7 +1778,7 @@ function paintHomeSearch(){
       <div class="nm"><b>${esc(c.name)}</b><span>${starBit(c)}${esc(c.suburb||'')}${c.lit?' · 💡 lit':''}</span></div>
       ${hereN(c)?`<span class="hb2">${hereN(c)} here</span>`:''}
       ${GEO?`<span class="dist">${(d=>d<1?Math.round(d*1000)+'m':d.toFixed(1)+'km')(dist(GEO.lat,GEO.lon,c.lat,c.lon))}</span>`:''}</div>`).join('')
-    ||'<div class="empty" style="padding:16px">No courts match — try the suburb name.</div>';
+    ||'<div class="empty" style="padding:16px">No court by that name yet. <button class="linky" data-suggest>Suggest it →</button></div>';
   el.querySelectorAll('.crow').forEach(x=>x.onclick=()=>{
     const c=COURTS.find(y=>y.key===x.dataset.k); if(c)openCourtPage(c);
   });
@@ -1748,6 +1801,7 @@ function initMap(){
   if(MAP){setTimeout(()=>MAP.invalidateSize(),60);return}
   if(typeof L==='undefined'){toast('Map failed to load',1);return}
   loadCourts().then(cs=>{
+    const mc=$('#mapCount');if(mc)mc.textContent=cs.length?cs.length+' court'+(cs.length===1?'':'s'):'coming soon';
     MAP=L.map('map',{renderer:L.canvas(),zoomControl:true,attributionControl:true}).setView([-33.87,151.06],11);
     L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
       attribution:'© <a href="https://www.openstreetmap.org/copyright">OSM</a> © <a href="https://carto.com/attributions">CARTO</a>',
@@ -1893,19 +1947,60 @@ $('#callGo').onclick=()=>ensureProfile(async()=>{
 /* ---------- court page ---------- */
 let CC=null;
 function amenTiles(c){
+  const i=c.info||{};
+  const water=i.water==='bubbler'?['🚰','Bubbler']:i.water==='tap'?['🚰','Tap water']:i.water==='none'?['🚱','No water',1]:null;
   const t=[];
   t.push(c.indoor?['🏟️','Indoor']:['☀️','Outdoor']);
-  if(c.surface)t.push(['🧱',c.surface]);
-  if(c.hoops)t.push(['🏀',c.hoops+' hoops']);
-  if(c.lit)t.push(['💡','Lights']);
-  if(t.length<4)t.push(['🆓','Free']);
-  return t.slice(0,4).map(([i,l])=>`<div class="a"><span class="i">${i}</span><span>${esc(l)}</span></div>`).join('');
+  if(i.surface)t.push(['🧱',i.surface]);
+  if(i.hoops)t.push(['🏀',i.hoops+(i.hoops===1?' hoop':' hoops')]);
+  t.push(c.lit?['💡','Lights']:['🌙','No lights',1]);
+  if(water)t.push(water);
+  t.push(i.toilets?['🚻','Toilets']:['🚻','No toilets',1]);
+  if(i.parking)t.push(['🅿️',i.parking]);
+  if(i.shade)t.push(['⛱️','Shade']);
+  if(i.seating)t.push(['🪑','Seating']);
+  if(i.shop)t.push(['🥤','Drinks nearby']);
+  t.push(['🏷️',i.cost||'Free']);
+  return t.slice(0,8).map(([ic,l,no])=>`<div class="a${no?' no':''}"><span class="i">${ic}</span><span>${esc(l)}</span></div>`).join('');
+}
+// The "before you leave" checklist: universal kit + a couple derived from the
+// court's amenities + whatever the coach flagged. Ticks persist per court.
+function gearList(c){
+  const i=c.info||{};
+  const g=[
+    {t:'Basketball',why:''},
+    {t:'Water bottle',why:i.water==='none'?'no water here':(i.water?'refill on site':'')},
+    {t:'Court shoes',why:i.surface||''},
+    {t:'Phone — to check in',why:''}
+  ];
+  if(!c.indoor)g.push({t:'Cap / sunscreen',why:'outdoor court'});
+  if(!c.lit&&!c.indoor)g.push({t:'Get there before dark',why:'no lights'});
+  (i.bring||[]).forEach(b=>g.push({t:b,why:'coach says'}));
+  return g;
+}
+function paintGear(c){
+  const wrap=$('#ctGearWrap'),el=$('#ctGear'),list=gearList(c);
+  if(!list.length){wrap.style.display='none';return}
+  wrap.style.display='';
+  let checked=[];try{checked=JSON.parse(localStorage.getItem('oc_gear_'+c.key)||'[]')}catch(e){}
+  el.innerHTML=list.map(g=>`<div class="gitem${checked.includes(g.t)?' on':''}" data-g="${esc(g.t)}">
+      <span class="bx">✓</span><span class="gt">${esc(g.t)}</span>${g.why?`<span class="why">${esc(g.why)}</span>`:''}</div>`).join('');
+  el.querySelectorAll('.gitem').forEach(it=>it.onclick=()=>{
+    it.classList.toggle('on');
+    const on=[...el.querySelectorAll('.gitem.on')].map(x=>x.dataset.g);
+    localStorage.setItem('oc_gear_'+c.key,JSON.stringify(on));
+  });
 }
 function openCourtPage(c){
   CC=c;
   $('#ctName').textContent=c.name;
   $('#ctSub').textContent=c.suburb||'Sydney';
   $('#ctAmen').innerHTML=amenTiles(c);
+  $('#ctCost').textContent=((c.info&&c.info.cost)||'Free').toUpperCase();
+  paintGear(c);
+  const tips=(c.info&&c.info.tips)||'';
+  $('#ctTipsWrap').style.display=tips?'':'none';
+  if(tips)$('#ctTips').textContent=tips;
   const bk=$('#ctBkm');bk.classList.toggle('on',isSaved(c.key));
   bk.onclick=()=>{toggleSaved(c.key);bk.classList.toggle('on',isSaved(c.key));};
   $('#ctRuns').innerHTML='<div class="skel" style="height:56px"></div>';
@@ -2123,6 +2218,23 @@ async function autoCheckout(){
   }catch(e){}
 }
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){autoCheckout();autoCheckin();}});
+
+/* ---------- suggest a court ---------- */
+function openSuggest(){ensureProfile(()=>openSheet('shSuggest'));}
+$('#suggestBtn2').onclick=openSuggest;
+document.addEventListener('click',e=>{const s=e.target.closest('[data-suggest]');if(s){e.preventDefault();openSuggest();}});
+$('#sgGo').onclick=()=>ensureProfile(async()=>{
+  const court_name=$('#sgName').value.trim();
+  if(!court_name){toast('What\'s the court called?',1);return}
+  const b=$('#sgGo');b.disabled=true;b.textContent='Sending…';
+  try{
+    await api({action:'court_suggest',player:OCP,court_name,where:$('#sgWhere').value.trim(),note:$('#sgNote').value.trim()});
+    $('#sgName').value='';$('#sgWhere').value='';$('#sgNote').value='';
+    closeSheet('shSuggest');
+    toast('Sent to the desk 🙏 We\'ll check it out',0,3600);
+  }catch(e){toast(e.message,1);}
+  b.disabled=false;b.textContent='Send it to the desk';
+});
 
 /* ---------- colours ---------- */
 const THEMES=[['Blaze','#FF6A2B'],['Volt','#D8FF3E'],['Ice','#5BC9FF'],['Grape','#B98CFF'],
