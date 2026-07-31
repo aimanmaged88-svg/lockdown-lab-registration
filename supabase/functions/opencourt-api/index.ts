@@ -50,6 +50,59 @@ const emailClean = (v: unknown) => {
 const FORMATS = ["5v5", "4v4", "3v3", "2v2", "1v1", "21", "shootaround"];
 const BANNED_MSG = "this account is banned from Hoops Heaven";
 
+// Pull [lat, lon] out of a Google Maps URL or a plain "lat, lon" string.
+// Handles @lat,lon / !3d..!4d.. / ?q=lat,lon / ?ll= / plain paste. Requires
+// 3+ decimals so it doesn't grab random numbers.
+function parseCoords(s: string): [number, number] | null {
+  if (!s) return null;
+  const pats = [
+    /@(-?\d{1,3}\.\d{3,}),(-?\d{1,3}\.\d{3,})/,
+    /!3d(-?\d{1,3}\.\d{3,})!4d(-?\d{1,3}\.\d{3,})/,
+    /[?&](?:q|query|ll|center|destination|sll)=(-?\d{1,3}\.\d{3,}),\s*(-?\d{1,3}\.\d{3,})/,
+    /(-?\d{1,3}\.\d{3,}),\s*(-?\d{1,3}\.\d{3,})/,
+  ];
+  for (const p of pats) { const m = s.match(p); if (m) return [+m[1], +m[2]]; }
+  return null;
+}
+// Resolve a Google Maps link (incl. short goo.gl / maps.app.goo.gl) to coords.
+// SSRF-safe: only follows google/goo.gl hosts, and only ever returns coordinates.
+async function resolveMapsUrl(url: string): Promise<[number, number] | null> {
+  const direct = parseCoords(url);
+  if (direct) return direct;
+  let u: URL; try { u = new URL(url); } catch { return null; }
+  const host = u.hostname.toLowerCase();
+  const okHost = /(^|\.)google\.[a-z.]+$/.test(host) || host === "goo.gl" || host === "maps.app.goo.gl" || host === "g.co" || host === "maps.google.com";
+  if (!okHost) return null;
+  try {
+    const r = await fetch(url, { redirect: "follow", headers: { "User-Agent": "Mozilla/5.0 (compatible; HoopsHeaven/1.0)" } });
+    let c = parseCoords(r.url);
+    if (!c) c = parseCoords((await r.text()).slice(0, 200000));
+    return c;
+  } catch (_e) { return null; }
+}
+// Upload a base64 data-url image to the public `heaven` bucket, return its URL.
+async function uploadImg(dataUrl: string, path: string): Promise<string> {
+  const m = dataUrl.match(/^data:image\/(jpeg|png|webp);base64,(.+)$/);
+  if (!m) throw new Error("bad image");
+  const bytes = Uint8Array.from(atob(m[2]), c => c.charCodeAt(0));
+  if (bytes.length > 3_500_000) throw new Error("image too big");
+  const full = `${path}.${m[1] === "jpeg" ? "jpg" : m[1]}`;
+  const up = await fetch(`${SUPABASE_URL}/storage/v1/object/heaven/${full}`, {
+    method: "POST",
+    headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, "Content-Type": `image/${m[1]}`, "x-upsert": "true" },
+    body: bytes,
+  });
+  if (!up.ok) { console.error("upload", await up.text()); throw new Error("upload failed"); }
+  return `${SUPABASE_URL}/storage/v1/object/public/heaven/${full}`;
+}
+// Only accept a photo URL that WE minted (our own public `heaven` bucket) — so a
+// coach can carry a player-suggested court's already-uploaded photo onto the new
+// court without us ever storing an arbitrary attacker-controlled URL.
+function ownPhoto(u: unknown): string {
+  const s = str(u, 300);
+  return s.startsWith(`${SUPABASE_URL}/storage/v1/object/public/heaven/`) ? s : "";
+}
+
 function courtOf(b: Record<string, unknown>) {
   const c = (b.court || {}) as Record<string, unknown>;
   const key = str(c.key, 64);
@@ -126,10 +179,10 @@ async function verifiedSet(ids: string[]) {
 async function guard(pid: string): Promise<{ p?: { id: string; name: string; ig: string; verified: boolean; checkins: number }; err?: Response }> {
   const id = str(pid, 64);
   if (!id || id.length < 8) return { err: J({ error: "sign in first", code: "terms" }, 401) };
-  const rows = await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=id,name,ig,email,accepted_at,banned,verified,checkins_total`);
+  const rows = await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=id,name,ig,tiktok,email,accepted_at,banned,verified,checkins_total`);
   const row = rows?.[0];
   if (!row || !row.accepted_at) return { err: J({ error: "sign in and accept the house rules first", code: "terms" }, 401) };
-  if (row.banned || await bansHit([row.id, row.ig, row.email])) return { err: J({ error: BANNED_MSG, code: "banned" }, 403) };
+  if (row.banned || await bansHit([row.id, row.ig, row.tiktok, row.email])) return { err: J({ error: BANNED_MSG, code: "banned" }, 403) };
   return { p: { id: row.id, name: row.name, ig: row.ig, verified: !!row.verified, checkins: Number(row.checkins_total) || 0 } };
 }
 
@@ -263,16 +316,17 @@ Deno.serve(async (req: Request) => {
   try {
     switch (action) {
 
-      // Sign-in: device id + name + (IG handle OR email) + terms acceptance.
-      // Re-registering refreshes name/handle; banned identities are refused.
+      // Sign-in: device id + name + a real social (Instagram OR TikTok) or an
+      // email + terms acceptance. The social handle is how the coach verifies
+      // you're a real person. Re-registering refreshes handles; bans are refused.
       case "register": {
         const p = (b.player || {}) as Record<string, unknown>;
         const id = str(p.id, 64), name = str(p.name, 40);
-        const ig = igClean(p.ig), email = emailClean(p.email);
+        const ig = igClean(p.ig), tiktok = igClean(p.tiktok), email = emailClean(p.email);
         if (!id || !/^[a-zA-Z0-9._-]{8,64}$/.test(id) || !name) return J({ error: "put a name on it" }, 400);
-        if (!ig && !email) return J({ error: "sign in with your Instagram — or an email if you don't have IG" }, 400);
+        if (!ig && !tiktok && !email) return J({ error: "sign in with your Instagram or TikTok — or a real email" }, 400);
         if (b.accept !== true) return J({ error: "you have to accept the house rules to play" }, 400);
-        if (await bansHit([id, ig, email])) return J({ error: BANNED_MSG, code: "banned" }, 403);
+        if (await bansHit([id, ig, tiktok, email])) return J({ error: BANNED_MSG, code: "banned" }, 403);
         // A banned device row stays banned even if they re-register.
         const prev = await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=banned`);
         if (prev?.[0]?.banned) return J({ error: BANNED_MSG, code: "banned" }, 403);
@@ -281,9 +335,18 @@ Deno.serve(async (req: Request) => {
         const verify_code = cur?.[0]?.verify_code || mkCode();
         await db(`oc_players?on_conflict=id`, {
           method: "POST", headers: { Prefer: "resolution=merge-duplicates" },
-          body: JSON.stringify({ id, name, ig, email, accepted_at: new Date().toISOString(), verify_code }),
+          body: JSON.stringify({ id, name, ig, tiktok, email, accepted_at: new Date().toISOString(), verify_code }),
         });
-        return J({ ok: true, player: { id, name, ig }, verified, verify_code });
+        return J({ ok: true, player: { id, name, ig, tiktok }, verified, verify_code });
+      }
+
+      // Resolve a Google Maps link (or plain "lat, lon") to coordinates so the
+      // coach doesn't have to dig lat/lon out by hand. Sydney-bounded.
+      case "resolve_maps": {
+        const c = await resolveMapsUrl(str(b.url, 400));
+        if (!c) return J({ error: "couldn't read that link — paste the Google Maps share link, or \"lat, lon\"" }, 400);
+        if (c[0] < -35.5 || c[0] > -32.5 || c[1] < 149.5 || c[1] > 152.5) return J({ error: "that pin isn't in Sydney" }, 400);
+        return J({ lat: c[0], lon: c[1] });
       }
 
       // The board: every open run from 3h ago (still live) to +14 days.
@@ -304,7 +367,7 @@ Deno.serve(async (req: Request) => {
         const g = await guard(((b.player || {}) as Record<string, unknown>).id as string);
         if (g.err) return g.err;
         const player = g.p!;
-        if (!player.verified) return J({ error: "verify your account to call runs — takes one DM", code: "verify" }, 403);
+        if (!player.verified) return J({ error: "get verified to call runs — tap “Request the ✓” in your profile", code: "verify" }, 403);
         const court = courtOf(b);
         if (!court) return J({ error: "pick a court" }, 400);
         const at = new Date(str(b.run_at, 40));
@@ -487,13 +550,13 @@ Deno.serve(async (req: Request) => {
       case "me": {
         const id = str(b.player_id, 64);
         if (!id) return J({ error: "bad request" }, 400);
-        const rows = await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=name,ig,email,verified,verify_code,banned`);
+        const rows = await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=name,ig,tiktok,email,verified,verify_code,banned`);
         const row = rows?.[0];
         if (!row) return J({ error: "no account", code: "terms" }, 404);
         let code = row.verify_code;
         if (!code) { code = mkCode(); await db(`oc_players?id=eq.${encodeURIComponent(id)}`, { method: "PATCH", body: JSON.stringify({ verify_code: code }) }); }
         const req = await db(`oc_inbox?player_id=eq.${encodeURIComponent(id)}&select=player_id`);
-        return J({ name: row.name, ig: row.ig, verified: !!row.verified, verify_code: code, banned: !!row.banned, requested: !!req?.length });
+        return J({ name: row.name, ig: row.ig, tiktok: row.tiktok || "", verified: !!row.verified, verify_code: code, banned: !!row.banned, requested: !!req?.length });
       }
 
 
@@ -518,7 +581,7 @@ Deno.serve(async (req: Request) => {
         const id = str(b.player_id, 64);
         if (!id) return J({ error: "bad request" }, 400);
         const viewer = str(b.viewer_id, 64);
-        const prow = (await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=id,name,ig,verified,checkins_total,created_at`))?.[0];
+        const prow = (await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=id,name,ig,tiktok,verified,checkins_total,created_at`))?.[0];
         if (!prow) return J({ error: "hooper not found" }, 404);
         const runs = (await db(`oc_run_players?player_id=eq.${encodeURIComponent(id)}&select=run_id`)) || [];
         const clips = (await db(`oc_plays?player_id=eq.${encodeURIComponent(id)}&select=id`)) || [];
@@ -551,7 +614,7 @@ Deno.serve(async (req: Request) => {
         if (!rcount) rating = { show: false, label: "Unrated", value: null, count: 0 };
         else if (avg < 7) rating = { show: true, label: "6−", value: null, count: rcount, soft: true };
         else rating = { show: true, label: (Math.round(avg * 10) / 10).toFixed(1), value: Math.round(avg * 10) / 10, count: rcount, soft: false };
-        return J({ id: prow.id, name: prow.name, ig: prow.ig, verified: !!prow.verified, checkins: Number(prow.checkins_total) || 0, runs: runs.length, clips: clips.length, fires, tier: tierOf(Number(prow.checkins_total) || 0), rating, comments: comments.slice(0, 30), mine, joined: prow.created_at });
+        return J({ id: prow.id, name: prow.name, ig: prow.ig, tiktok: prow.tiktok || "", verified: !!prow.verified, checkins: Number(prow.checkins_total) || 0, runs: runs.length, clips: clips.length, fires, tier: tierOf(Number(prow.checkins_total) || 0), rating, comments: comments.slice(0, 30), mine, joined: prow.created_at });
       }
 
       // Rate another hooper 1-10 (+ optional scouting note). Coach-moderated:
@@ -593,9 +656,19 @@ Deno.serve(async (req: Request) => {
         const dayAgo = new Date(Date.now() - 864e5).toISOString();
         const mine = await db(`oc_court_reqs?player_id=eq.${encodeURIComponent(player.id)}&created_at=gte.${dayAgo}&select=id`);
         if ((mine?.length || 0) >= 5) return J({ error: "easy — you've suggested a few today already, we'll get to them" }, 429);
+        const where = str(b.where, 300);
+        // If they pasted a Maps link (or lat,lon) in the location, resolve it now
+        // so the coach gets a court that's already pinned when they approve it.
+        const c = where ? await resolveMapsUrl(where) : null;
+        const inSyd = c && c[0] >= -35.5 && c[0] <= -32.5 && c[1] >= 149.5 && c[1] <= 152.5;
+        // Optional court photo → storage (moderated: only shows in the desk).
+        let photo_url = "";
+        if (typeof b.photo === "string" && b.photo.startsWith("data:image")) {
+          photo_url = await uploadImg(b.photo, `suggest/${sid(player.id)}-${Date.now()}`).catch(() => "");
+        }
         await db(`oc_court_reqs`, {
           method: "POST",
-          body: JSON.stringify({ player_id: player.id, name: player.name, ig: player.ig, court_name, where_txt: str(b.where, 200), note: str(b.note, 300), created_at: new Date().toISOString() }),
+          body: JSON.stringify({ player_id: player.id, name: player.name, ig: player.ig, court_name, where_txt: where, note: str(b.note, 300), photo_url, lat: inSyd ? c![0] : null, lon: inSyd ? c![1] : null, created_at: new Date().toISOString() }),
         });
         return J({ ok: true });
       }
@@ -637,7 +710,8 @@ Deno.serve(async (req: Request) => {
         if (!name) return J({ error: "name the court" }, 400);
         if (!Number.isFinite(lat) || !Number.isFinite(lon) || lat < -35.5 || lat > -32.5 || lon < 149.5 || lon > 152.5) return J({ error: "that pin isn't in Sydney — paste \"lat, lon\" from Google Maps" }, 400);
         const key = `oc_c_${crypto.randomUUID().slice(0, 8)}`;
-        await db(`oc_courts`, { method: "POST", body: JSON.stringify({ key, name, suburb, lat, lon, indoor: b.indoor === true, lit: b.lit === true, custom: true, official: true, info: infoOf(b), radius_m: num(b.radius_m, 80, 2000, 300), hidden: b.hidden === true, updated_at: new Date().toISOString() }) });
+        const photo = ownPhoto(b.photo_url);
+        await db(`oc_courts`, { method: "POST", body: JSON.stringify({ key, name, suburb, lat, lon, indoor: b.indoor === true, lit: b.lit === true, custom: true, official: true, info: infoOf(b), radius_m: num(b.radius_m, 80, 2000, 300), hidden: b.hidden === true, ...(photo ? { photo_url: photo } : {}), updated_at: new Date().toISOString() }) });
         return J({ ok: true, key });
       }
 
@@ -651,6 +725,7 @@ Deno.serve(async (req: Request) => {
           if (lat < -35.5 || lat > -32.5 || lon < 149.5 || lon > 152.5) return J({ error: "that pin isn't in Sydney" }, 400);
           patch.lat = lat; patch.lon = lon;
         }
+        const ep = ownPhoto(b.photo_url); if (ep) patch.photo_url = ep;
         await db(`oc_courts?key=eq.${encodeURIComponent(key)}`, { method: "PATCH", body: JSON.stringify(patch) });
         return J({ ok: true });
       }
@@ -707,11 +782,12 @@ Deno.serve(async (req: Request) => {
       // Heaven desk (Lab coach credentials): review + verify + ban + suggestions.
       case "admin_players": {
         if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
-        const rows = await db(`oc_players?select=id,name,ig,email,verified,verify_code,banned,created_at&order=created_at.desc&limit=200`);
+        const rows = await db(`oc_players?select=id,name,ig,tiktok,email,verified,verify_code,banned,checkins_total,created_at&order=created_at.desc&limit=300`);
         const inbox = await db(`oc_inbox?select=*&order=created_at.asc&limit=100`);
         const court_reqs = await db(`oc_court_reqs?select=*&order=created_at.desc&limit=100`);
         const fb_pending = await db(`oc_pfeedback?approved=is.false&select=id`);
-        return J({ players: rows || [], inbox: inbox || [], court_reqs: court_reqs || [], feedback_pending: (fb_pending || []).length });
+        const courts = await db(`oc_courts?select=key&official=is.true`);
+        return J({ players: rows || [], inbox: inbox || [], court_reqs: court_reqs || [], feedback_pending: (fb_pending || []).length, courts_total: (courts || []).length });
       }
 
       // Feedback moderation queue: player→player ratings + comments. Pending
@@ -757,15 +833,15 @@ Deno.serve(async (req: Request) => {
       case "admin_ban": {
         if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
         const pid = str(b.pid, 64);
-        const rows = await db(`oc_players?id=eq.${encodeURIComponent(pid)}&select=id,ig,email`);
+        const rows = await db(`oc_players?id=eq.${encodeURIComponent(pid)}&select=id,ig,tiktok,email`);
         const row = rows?.[0];
         if (!row) return J({ error: "player not found" }, 404);
         if (b.on === false) {
           await db(`oc_players?id=eq.${encodeURIComponent(pid)}`, { method: "PATCH", body: JSON.stringify({ banned: false, ban_reason: "" }) });
-          for (const v of [row.id, row.ig, row.email]) if (v) await db(`oc_bans?value=eq.${encodeURIComponent(String(v).toLowerCase())}`, { method: "DELETE" });
+          for (const v of [row.id, row.ig, row.tiktok, row.email]) if (v) await db(`oc_bans?value=eq.${encodeURIComponent(String(v).toLowerCase())}`, { method: "DELETE" });
         } else {
           await db(`oc_players?id=eq.${encodeURIComponent(pid)}`, { method: "PATCH", body: JSON.stringify({ banned: true, ban_reason: str(b.reason, 200) }) });
-          for (const v of [row.id, row.ig, row.email]) if (v) await db(`oc_bans?on_conflict=value`, { method: "POST", headers: { Prefer: "resolution=merge-duplicates" }, body: JSON.stringify({ value: String(v).toLowerCase(), reason: str(b.reason, 200) }) });
+          for (const v of [row.id, row.ig, row.tiktok, row.email]) if (v) await db(`oc_bans?on_conflict=value`, { method: "POST", headers: { Prefer: "resolution=merge-duplicates" }, body: JSON.stringify({ value: String(v).toLowerCase(), reason: str(b.reason, 200) }) });
         }
         return J({ ok: true });
       }
@@ -775,7 +851,7 @@ Deno.serve(async (req: Request) => {
         const g = await guard(((b.player || {}) as Record<string, unknown>).id as string);
         if (g.err) return g.err;
         const player = g.p!;
-        if (!player.verified) return J({ error: "verify your account to post clips — takes one DM", code: "verify" }, 403);
+        if (!player.verified) return J({ error: "get verified to post clips — tap “Request the ✓” in your profile", code: "verify" }, 403);
         const key = str(b.court_key, 64);
         const name = str(b.court_name, 80), suburb = str(b.suburb, 60);
         const url = str(b.clip_url, 300);

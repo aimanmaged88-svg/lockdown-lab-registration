@@ -1104,6 +1104,15 @@ header{
 #confetti i{position:absolute;top:-12px;width:9px;height:14px;border-radius:2px;animation:conf 2.4s var(--ease) forwards}
 @keyframes conf{0%{transform:translateY(-10px) rotate(0);opacity:1}100%{transform:translateY(102vh) rotate(720deg);opacity:.9}}
 #vfCard{border:1px solid var(--line);border-radius:14px;padding:14px 15px;margin-bottom:14px;background:var(--card)}
+.vfsteps{margin:10px 0;display:flex;flex-direction:column;gap:9px}
+.vfstep{display:flex;gap:10px;align-items:flex-start;font-size:12.5px;color:var(--muted);line-height:1.36}
+.vfstep .n{flex:0 0 20px;width:20px;height:20px;border-radius:50%;background:var(--volt);color:var(--onaccent,#0A0C0F);font-weight:800;font-size:11px;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.idpick{display:flex;gap:6px}
+.idpick button{flex:1;padding:9px 4px;border-radius:11px;border:1px solid var(--line);background:var(--card);color:var(--muted);font:inherit;font-weight:700;font-size:12px;cursor:pointer;transition:transform .15s var(--spring,cubic-bezier(.34,1.4,.5,1)),background .15s,color .15s,border-color .15s}
+.idpick button.on{background:var(--volt);color:var(--onaccent,#0A0C0F);border-color:transparent;transform:translateY(-1px)}
+.idpick button:active{transform:scale(.95)}
+.sgphoto{border:1px dashed var(--line);border-radius:12px;padding:18px;text-align:center;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer;background-size:cover;background-position:center;min-height:52px;display:flex;align-items:center;justify-content:center;transition:border-color .15s}
+.sgphoto.has{color:transparent;min-height:130px;border-style:solid;border-color:var(--line)}
 .swgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-top:6px}
 .swb{border:1px solid var(--line);background:var(--card);border-radius:16px;padding:12px 6px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:7px;font-family:inherit}
 .swb .dot{width:34px;height:34px;border-radius:50%}
@@ -1246,7 +1255,7 @@ header{
     <div class="sect" style="margin-top:16px">
       <div id="myCard"></div>
       <div id="vfCard" style="display:none;margin-top:12px"></div>
-      <div class="prow" id="pEdit" style="margin-top:12px"><span class="ic">✏️</span><span>Edit name / Instagram</span><span class="ar">›</span></div>
+      <div class="prow" id="pEdit" style="margin-top:12px"><span class="ic">✏️</span><span>Edit name / socials</span><span class="ar">›</span></div>
       <div class="prow" id="pTheme"><span class="ic">🎨</span><span>Colours</span><span class="ar">›</span></div>
       <div class="prow" id="pRules"><span class="ic">📜</span><span>House rules &amp; good vibes</span><span class="ar">›</span></div>
     </div>
@@ -1286,9 +1295,16 @@ header{
   <div class="gatewm">HOOPS <span>HEAVEN</span></div>
   <div class="xrow"><div><h3 id="pfTitle">Who's pulling up?</h3><p class="sub" id="pfSub">Your <b style="color:var(--volt)">@</b> is your jersey — it shows on every run so people can find you. Real accounts only (house rules).</p></div><button class="x" data-close>✕</button></div>
   <div class="fld"><label>Your name</label><input class="inp" id="pfName" maxlength="40" placeholder="e.g. Jordan"></div>
-  <div class="fld" id="igFld"><label>Instagram</label><div class="igwrap"><span class="at">@</span><input class="inp" id="pfIg" maxlength="30" autocapitalize="none" placeholder="yourhandle"></div></div>
+  <div class="fld"><label>How people find you — &amp; how we check you're real</label>
+    <div class="idpick" id="idPick">
+      <button type="button" data-id="ig" class="on">📸 Instagram</button>
+      <button type="button" data-id="tiktok">🎵 TikTok</button>
+      <button type="button" data-id="email">✉️ Email</button>
+    </div>
+  </div>
+  <div class="fld" id="igFld"><label>Instagram handle</label><div class="igwrap"><span class="at">@</span><input class="inp" id="pfIg" maxlength="30" autocapitalize="none" placeholder="yourhandle"></div></div>
+  <div class="fld" id="ttFld" style="display:none"><label>TikTok handle</label><div class="igwrap"><span class="at">@</span><input class="inp" id="pfTiktok" maxlength="30" autocapitalize="none" placeholder="yourhandle"></div></div>
   <div class="fld" id="emFld" style="display:none"><label>Email (Gmail / Apple ID / any real inbox)</label><input class="inp" id="pfEmail" type="email" autocapitalize="none" placeholder="you@gmail.com"></div>
-  <div class="fld"><button class="linky" id="idSwap">No Instagram? Sign in with an email instead</button></div>
   <button class="btn btn-v btn-block" id="pfSave">Lock it in</button>
 </div></div>
 
@@ -1420,6 +1436,10 @@ header{
   <div class="fld"><label>Court name</label><input class="inp" id="sgName" maxlength="80" placeholder="e.g. Tempe Reserve courts"></div>
   <div class="fld"><label>Where is it?</label><input class="inp" id="sgWhere" maxlength="200" placeholder="Suburb, cross-street or a Google Maps link"></div>
   <div class="fld"><label>Anything we should know? <span style="color:var(--dim)">(optional)</span></label><input class="inp" id="sgNote" maxlength="300" placeholder="2 full courts, lit at night, gets busy after 5…"></div>
+  <div class="fld"><label>Photo of the court <span style="color:var(--dim)">(optional — gets it added faster)</span></label>
+    <div class="sgphoto" id="sgPhotoBox">📷 Add a photo</div>
+    <input type="file" id="sgPhoto" accept="image/*" style="display:none">
+  </div>
   <button class="btn btn-v btn-block" id="sgGo">Send it to the desk</button>
   <p class="fine">The coach reviews every suggestion. Real courts only — no random pins.</p>
 </div></div>
@@ -1520,6 +1540,7 @@ function hooperCardHTML(d,own){
       <div class="pfp">${av}</div>
       <div class="who"><div class="nm">${esc(d.name)}${d.verified?'<span class="vk" title="verified">✓</span>':''}</div>
         ${d.ig?`<a class="ig" href="https://instagram.com/${esc(d.ig)}" target="_blank" rel="noopener">@${esc(d.ig)} ↗</a>`:''}
+        ${d.tiktok?`<a class="ig" href="https://tiktok.com/@${esc(d.tiktok)}" target="_blank" rel="noopener">🎵 @${esc(d.tiktok)} ↗</a>`:''}
         <div><span class="tierbadge"><span class="dot"></span>${esc(t.name)}</span></div></div>
       <div class="rt">${rt}</div>
     </div>
@@ -1602,33 +1623,44 @@ function confettiBurst(color){
 /* verification */
 const VERIFY_IG='lockdownlablive';            // swap when the Hoops Heaven IG page is live
 const VERIFY_EMAIL='aimanmaged88@gmail.com';  // for email sign-ups
+function vfSocial(){
+  if(OCP&&OCP.ig)return{label:'Instagram',at:'@'+OCP.ig,url:'https://instagram.com/'+OCP.ig};
+  if(OCP&&OCP.tiktok)return{label:'TikTok',at:'@'+OCP.tiktok,url:'https://tiktok.com/@'+OCP.tiktok};
+  return null;
+}
 function paintVf(){
   const el=$('#vfCard');
   if(!OCP){el.style.display='none';return}
   el.style.display='';
+  const s=vfSocial();
   if(OCP.vf){
-    el.innerHTML='<div style="font-weight:800;color:var(--ok)">✓ Verified account</div><div style="font-size:12.5px;color:var(--muted);margin-top:4px">Your name carries the ✓ everywhere. Full access — call runs, post clips.</div>';
+    el.innerHTML='<div style="font-weight:800;color:var(--ok)">✓ Verified</div><div style="font-size:12.5px;color:var(--muted);margin-top:4px">You\'re in. The ✓ rides on your name everywhere — you can call runs, add courts and post clips.</div>';
     return;
   }
   if(OCP.req){
-    el.innerHTML=`<div style="font-weight:800;color:#FFD24D">📨 Verification request sent</div>
-      <div style="font-size:12.5px;color:var(--muted);margin:6px 0 10px">The desk has it — you'll get your ✓ once they check you out. Want it faster? DM your code <b style="color:var(--volt)">${esc(OCP.code||'')}</b> to <b style="color:var(--volt)">@${VERIFY_IG}</b> from @${esc(OCP.ig||'your handle')} as extra proof.</div>
+    el.innerHTML=`<div style="font-weight:800;color:#FFD24D">⏳ We're checking you out</div>
+      <div style="font-size:12.5px;color:var(--muted);margin:6px 0 10px">A coach is having a look at ${s?`your <b>${s.label}</b>`:'your account'} — you'll get the ✓ soon. Make sure ${s?`<a href="${s.url}" target="_blank" rel="noopener" style="color:var(--volt)">${esc(s.at)}</a>`:'your page'} is public so they can see you're a real hooper.</div>
       <button class="btn btn-ghost btn-block" id="vfCheck">Check my status</button>`;
     $('#vfCheck').onclick=async()=>{const b=$('#vfCheck');b.disabled=true;b.textContent='Checking…';await refreshMe(true);};
     return;
   }
-  el.innerHTML=`<div style="font-weight:800">⏳ Verify your account</div>
-    <div style="font-size:12.5px;color:var(--muted);margin:6px 0 10px">You can join runs and check in now — verifying unlocks <b>calling runs</b> and <b>posting clips</b>, and puts the ✓ on your name. Send a request straight to the desk; they'll look at ${OCP.ig?`<b>@${esc(OCP.ig)}</b>`:'your account'} and wave you through.</div>
-    <input class="inp" id="vfMsg" maxlength="300" placeholder="Optional — who are you / where do you hoop?" style="margin-bottom:9px">
-    <button class="btn btn-v btn-block" id="vfSend">📨 Request verification</button>
-    <div style="font-size:11px;color:var(--dim);margin-top:8px;text-align:center">Extra proof (optional): DM code <b style="color:var(--volt)">${esc(OCP.code||'')}</b> to @${VERIFY_IG} from your @</div>`;
+  el.innerHTML=`<div style="font-weight:800">🔵 Get the ✓ — show us you're real</div>
+    <div class="vfsteps">
+      <div class="vfstep"><span class="n">1</span><span>Your ${s?s.label:'Instagram / TikTok'} is on your profile${s?` — <a href="${s.url}" target="_blank" rel="noopener" style="color:var(--volt)">${esc(s.at)}</a>`:''}. Keep it public.</span></div>
+      <div class="vfstep"><span class="n">2</span><span>Tap the button — your request goes straight to the desk.</span></div>
+      <div class="vfstep"><span class="n">3</span><span>A coach opens your page, sees you're a real hooper, and waves you in.</span></div>
+    </div>
+    <div style="font-size:12px;color:var(--dim);margin:0 0 10px">You can already join runs &amp; check in. The ✓ unlocks <b>calling runs</b> and <b>adding courts</b>.</div>
+    <button class="btn btn-v btn-block" id="vfSend">🔵 Request the ✓</button>
+    ${s?'':'<div style="font-size:11.5px;color:#FFB27A;margin-top:9px;text-align:center">Add an Instagram or TikTok to your profile first so we can check you — tap your name up top.</div>'}`;
   $('#vfSend').onclick=async()=>{
+    if(!vfSocial()){toast('Add your Instagram or TikTok first — tap your name up top',1);return}
     const b=$('#vfSend');b.disabled=true;b.textContent='Sending…';
     try{
-      await api({action:'verify_request',player:OCP,text:$('#vfMsg').value.trim()});
+      await api({action:'verify_request',player:OCP,text:''});
       OCP.req=true;localStorage.setItem('oc_profile',JSON.stringify(OCP));
       toast('Sent to the desk 🏀 Your ✓ is coming.');paintVf();
-    }catch(e){toast(e.message,1);b.disabled=false;b.textContent='📨 Request verification';}
+    }catch(e){toast(e.message,1);b.disabled=false;b.textContent='🔵 Request the ✓';}
   };
 }
 async function refreshMe(loud){
@@ -1637,6 +1669,7 @@ async function refreshMe(loud){
     const d=await api({action:'me',player_id:OCP.id});
     const was=OCP.vf;
     OCP.vf=d.verified;OCP.code=d.verify_code;OCP.req=!!d.requested;
+    if(d.tiktok!==undefined)OCP.tiktok=d.tiktok;
     localStorage.setItem('oc_profile',JSON.stringify(OCP));
     paintMe();paintVf();
     if(d.verified&&!was)toast("You're verified ✓ Full access unlocked 🏀",0,3800);
@@ -1667,14 +1700,15 @@ function ensureProfile(cb){
 function setIdMode(m){
   idMode=m;
   $('#igFld').style.display=m==='ig'?'':'none';
+  $('#ttFld').style.display=m==='tiktok'?'':'none';
   $('#emFld').style.display=m==='email'?'':'none';
-  $('#idSwap').textContent=m==='ig'?'No Instagram? Sign in with an email instead':'← Got Instagram? Use your handle instead';
+  document.querySelectorAll('#idPick button').forEach(x=>x.classList.toggle('on',x.dataset.id===m));
 }
-$('#idSwap').onclick=()=>setIdMode(idMode==='ig'?'email':'ig');
+document.querySelectorAll('#idPick button').forEach(b=>b.onclick=()=>setIdMode(b.dataset.id));
 function openMyEdit(){
   if(OCP){
-    $('#pfName').value=OCP.name;$('#pfIg').value=OCP.ig||'';$('#pfEmail').value=OCP.email||'';
-    setIdMode(OCP.ig||!OCP.email?'ig':'email');
+    $('#pfName').value=OCP.name;$('#pfIg').value=OCP.ig||'';$('#pfTiktok').value=OCP.tiktok||'';$('#pfEmail').value=OCP.email||'';
+    setIdMode(OCP.ig?'ig':(OCP.tiktok?'tiktok':(OCP.email?'email':'ig')));
     openEdit();
   }else if(termsOk())openGate();
   else openSheet('shTerms');
@@ -1686,17 +1720,20 @@ $('#pRules').onclick=()=>openSheet('shTerms');
 $('#pfSave').onclick=async()=>{
   if(!termsOk()){openSheet('shTerms');return}
   const name=$('#pfName').value.trim().slice(0,40);
-  const ig=idMode==='ig'?$('#pfIg').value.trim().replace(/^@+/,'').toLowerCase().replace(/[^a-z0-9._]/g,'').slice(0,30):'';
+  const handle=s=>s.trim().replace(/^@+/,'').toLowerCase().replace(/[^a-z0-9._]/g,'').slice(0,30);
+  const ig=idMode==='ig'?handle($('#pfIg').value):'';
+  const tiktok=idMode==='tiktok'?handle($('#pfTiktok').value):'';
   const email=idMode==='email'?$('#pfEmail').value.trim().toLowerCase().slice(0,120):'';
   if(!name){toast('Put a name on it',1);return}
   if(idMode==='ig'&&!ig){toast("Drop your @ — that's your jersey",1);return}
+  if(idMode==='tiktok'&&!tiktok){toast('Drop your TikTok @',1);return}
   if(idMode==='email'&&!/^[^\s@]+@[^\s@]+\.[a-z]{2,24}$/i.test(email)){toast("That email doesn't look right",1);return}
   const id=(OCP&&OCP.id)||crypto.randomUUID();
   const b=$('#pfSave'); b.disabled=true; b.textContent='Signing in…';
   try{
-    const d=await api({action:'register',accept:true,player:{id,name,ig,email}});
+    const d=await api({action:'register',accept:true,player:{id,name,ig,tiktok,email}});
     const fresh=!OCP;
-    OCP={id,name,ig,email,vf:!!d.verified,code:d.verify_code||''};
+    OCP={id,name,ig,tiktok,email,vf:!!d.verified,code:d.verify_code||''};
     localStorage.setItem('oc_profile',JSON.stringify(OCP));
     paintMe();paintVf();paintProfileTab();
     $('#shProfile').classList.remove('gate');
@@ -2413,16 +2450,32 @@ async function autoCheckout(){
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){autoCheckout();autoCheckin();}});
 
 /* ---------- suggest a court ---------- */
+let sgPhotoData='';
+function resetSuggest(){sgPhotoData='';const bx=$('#sgPhotoBox');bx.classList.remove('has');bx.style.backgroundImage='';bx.textContent='📷 Add a photo';$('#sgPhoto').value='';}
 function openSuggest(){ensureProfile(()=>openSheet('shSuggest'));}
 $('#suggestBtn2').onclick=openSuggest;
 document.addEventListener('click',e=>{const s=e.target.closest('[data-suggest]');if(s){e.preventDefault();openSuggest();}});
+$('#sgPhotoBox').onclick=()=>$('#sgPhoto').click();
+$('#sgPhoto').onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const img=new Image();
+  img.onload=()=>{
+    const scale=Math.min(1,1280/Math.max(img.width,img.height));
+    const cv=document.createElement('canvas');
+    cv.width=Math.round(img.width*scale);cv.height=Math.round(img.height*scale);
+    cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+    sgPhotoData=cv.toDataURL('image/jpeg',.8);
+    const bx=$('#sgPhotoBox');bx.classList.add('has');bx.style.backgroundImage=`url("${sgPhotoData}")`;bx.textContent='';
+  };
+  img.src=URL.createObjectURL(f);
+};
 $('#sgGo').onclick=()=>ensureProfile(async()=>{
   const court_name=$('#sgName').value.trim();
   if(!court_name){toast('What\'s the court called?',1);return}
   const b=$('#sgGo');b.disabled=true;b.textContent='Sending…';
   try{
-    await api({action:'court_suggest',player:OCP,court_name,where:$('#sgWhere').value.trim(),note:$('#sgNote').value.trim()});
-    $('#sgName').value='';$('#sgWhere').value='';$('#sgNote').value='';
+    await api({action:'court_suggest',player:OCP,court_name,where:$('#sgWhere').value.trim(),note:$('#sgNote').value.trim(),photo:sgPhotoData||undefined});
+    $('#sgName').value='';$('#sgWhere').value='';$('#sgNote').value='';resetSuggest();
     closeSheet('shSuggest');
     toast('Sent to the desk 🙏 We\'ll check it out',0,3600);
   }catch(e){toast(e.message,1);}

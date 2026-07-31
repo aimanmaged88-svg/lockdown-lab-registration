@@ -76,6 +76,23 @@ textarea.inp{resize:vertical;min-height:70px}
 .stat.warn b{color:var(--warn)}
 .stat.bad b{color:var(--bad)}
 .stat span{font-size:10.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);font-weight:800}
+.stat .sub{display:block;font-size:10px;letter-spacing:.4px;text-transform:none;color:var(--dim);font-weight:700;margin-top:1px}
+.stat.good b{color:var(--volt)}
+.todohead{font-family:'HHDisplay',sans-serif;font-weight:400;font-size:15px;letter-spacing:.5px;margin:6px 0 8px}
+.todos{display:flex;flex-direction:column;gap:9px;margin-bottom:18px}
+.todo{display:flex;align-items:center;gap:12px;width:100%;text-align:left;background:color-mix(in srgb, var(--warn) 12%, var(--card));border:1px solid color-mix(in srgb, var(--warn) 40%, transparent);border-radius:14px;padding:13px 15px;cursor:pointer;color:var(--text);font:inherit;transition:transform .14s cubic-bezier(.34,1.4,.5,1),background .14s}
+.todo:hover{transform:translateY(-1px);background:color-mix(in srgb, var(--warn) 18%, var(--card))}
+.todo:active{transform:scale(.99)}
+.todo .i{font-size:22px;flex:none}
+.todo .tx{flex:1;font-weight:700;font-size:13.5px}
+.todo .go{flex:none;font-weight:800;font-size:12px;color:var(--warn)}
+.newrow{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 13px;margin-bottom:7px}
+.newrow .av{flex:none;width:34px;height:34px;border-radius:50%;background:color-mix(in srgb, var(--volt) 18%, var(--card));display:flex;align-items:center;justify-content:center;font-weight:800;font-family:'HHDisplay',sans-serif}
+.newrow .nb{flex:1;min-width:0}
+.newrow .nb b{display:block;font-size:13.5px;font-weight:800}
+.newrow .nb span{font-size:11.5px;color:var(--muted)}
+.newrow .nb a{font-size:11.5px;color:var(--muted);text-decoration:none}
+.newrow .when{flex:none;font-size:11px;color:var(--dim);font-weight:700}
 .runrow{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 14px;margin-bottom:8px}
 .runrow .tm{flex:none;text-align:center;min-width:62px}
 .runrow .tm b{display:block;font-family:'HHDisplay',sans-serif;font-weight:400;font-size:16px}
@@ -152,6 +169,7 @@ textarea.inp{resize:vertical;min-height:70px}
       <section id="sec-overview">
         <h1>Overview</h1>
         <p class="sub">The pulse. Auto-refreshes every 30 seconds.</p>
+        <div id="todo"></div>
         <div class="stats" id="stats"></div>
         <div class="grid2">
           <div>
@@ -163,6 +181,8 @@ textarea.inp{resize:vertical;min-height:70px}
             <div id="boardList"></div>
           </div>
         </div>
+        <h2 style="margin-top:22px">🆕 Newest hoopers</h2>
+        <div id="newest"></div>
       </section>
 
       <section id="sec-players" style="display:none">
@@ -213,8 +233,9 @@ textarea.inp{resize:vertical;min-height:70px}
               <div><label class="lb">Suburb</label><input class="inp" id="cSuburb" maxlength="60" placeholder="Alexandria"></div>
               <div><label class="lb">Cost</label><input class="inp" id="cCost" maxlength="40" placeholder="Free"></div>
             </div>
-            <label class="lb">Location — paste "lat, lon" from Google Maps</label>
-            <input class="inp" id="cLatLon" placeholder="-33.90807, 151.19539">
+            <label class="lb">Location — paste a Google Maps link OR "lat, lon"</label>
+            <div class="bringrow"><input class="inp" id="cLatLon" placeholder="https://maps.app.goo.gl/… or -33.90807, 151.19539" style="margin-bottom:0"><button class="btn btn-g" id="cLocate" type="button">📍 Locate</button></div>
+            <p class="hint" id="cLocHint" style="margin-top:6px">Paste the share link from Google Maps and hit Locate — we'll pull the pin for you.</p>
 
             <label class="lb" style="margin-top:4px">Amenities</label>
             <div class="chkrow">
@@ -339,11 +360,28 @@ const runDay=r=>{
   const tmrw=new Date(Date.now()+864e5).toLocaleDateString('en-CA',{timeZone:SYD});
   return ymd===today?'Today':ymd===tmrw?'Tmrw':new Date(ymd+'T12:00:00').toLocaleDateString('en-AU',{weekday:'short',day:'numeric'});
 };
+// Every place a coach checks "are they real?": show tappable IG + TikTok links
+// (whichever they signed up with), or fall back to the email.
+function socialLinks(p){
+  const bits=[];
+  if(p.ig)bits.push(`<a href="https://instagram.com/${esc(p.ig)}" target="_blank" rel="noopener">📸 @${esc(p.ig)} ↗</a>`);
+  if(p.tiktok)bits.push(`<a href="https://tiktok.com/@${esc(p.tiktok)}" target="_blank" rel="noopener">🎵 @${esc(p.tiktok)} ↗</a>`);
+  if(!bits.length&&p.email)bits.push(`<span>${esc(p.email)}</span>`);
+  return bits.join(' &nbsp; ')||'<span style="color:var(--dim)">no socials on file</span>';
+}
+function joinAgo(ts){
+  const d=Math.floor((Date.now()-new Date(ts).getTime())/864e5);
+  if(d<=0)return 'today';
+  if(d===1)return 'yesterday';
+  if(d<7)return d+'d ago';
+  if(d<30)return Math.floor(d/7)+'w ago';
+  return Math.floor(d/30)+'mo ago';
+}
 function row(p,pending){
   return `<div class="row ${pending?'pending':''} ${p.banned?'banned':''}">
     <div class="who">
       <b>${esc(p.name)} ${p.verified?'<span class="vtick">✓</span>':''} ${p.banned?'<span class="tag b">BANNED</span>':pending?'<span class="tag p">PENDING</span>':''}</b>
-      ${p.ig?`<a href="https://instagram.com/${esc(p.ig)}" target="_blank" rel="noopener">@${esc(p.ig)} ↗</a>`:`<span>${esc(p.email)}</span>`}
+      ${socialLinks(p)}
     </div>
     ${!p.verified&&!p.banned?`<span class="code">${esc(p.verify_code||'—')}</span>`:''}
     ${p.banned
@@ -361,13 +399,40 @@ async function load(){
     const bb=$('#bReq');bb.textContent=inbox.length;bb.style.display=inbox.length?'':'none';
     renderSuggestions(d.court_reqs||[]);
     const fbn=+d.feedback_pending||0,bf=$('#bFeedback');if(bf){bf.textContent=fbn;bf.style.display=fbn?'':'none';}
+    const byId=new Map(ps.map(p=>[p.id,p]));
+    const sugg=(d.court_reqs||[]).length;
+    const active=ps.filter(p=>!p.banned);
+    const verified=ps.filter(p=>p.verified).length;
+    const verRate=active.length?Math.round(verified/active.length*100):0;
+    const tappedIn=runs.reduce((a,r)=>a+(r.players||[]).length,0);
+    const checkinsAll=ps.reduce((a,p)=>a+(+p.checkins_total||0),0);
+    const weekAgo=Date.now()-7*864e5;
+    const newWeek=ps.filter(p=>p.created_at&&new Date(p.created_at).getTime()>=weekAgo).length;
     $('#stats').innerHTML=`
-      <div class="stat"><b>${ps.filter(p=>!p.banned).length}</b><span>players</span></div>
-      <div class="stat"><b>${ps.filter(p=>p.verified).length}</b><span>verified</span></div>
+      <div class="stat"><b>${active.length}</b><span>players</span>${newWeek?`<span class="sub">+${newWeek} this week</span>`:''}</div>
+      <div class="stat good"><b>${verified}</b><span>verified</span><span class="sub">${verRate}% of players</span></div>
       <div class="stat warn"><b>${inbox.length}</b><span>requests</span></div>
-      <div class="stat bad"><b>${ps.filter(p=>p.banned).length}</b><span>banned</span></div>
+      <div class="stat"><b>${sugg}</b><span>court ideas</span></div>
+      <div class="stat"><b>${+d.courts_total||0}</b><span>courts live</span></div>
       <div class="stat"><b>${runs.length}</b><span>runs live</span></div>
-      <div class="stat"><b>${runs.reduce((a,r)=>a+(r.players||[]).length,0)}</b><span>tapped in</span></div>`;
+      <div class="stat"><b>${tappedIn}</b><span>tapped in</span></div>
+      <div class="stat"><b>${checkinsAll}</b><span>check-ins</span><span class="sub">all-time</span></div>
+      <div class="stat bad"><b>${ps.filter(p=>p.banned).length}</b><span>banned</span></div>`;
+    const todo=[];
+    if(inbox.length)todo.push({t:'players',ico:'📨',l:`${inbox.length} verification ${inbox.length===1?'request':'requests'} — check their page &amp; wave 'em in`});
+    if(sugg)todo.push({t:'courts',ico:'🏀',l:`${sugg} court ${sugg===1?'suggestion':'suggestions'} to review &amp; add`});
+    if(fbn)todo.push({t:'feedback',ico:'⭐',l:`${fbn} player ${fbn===1?'rating':'ratings'} to approve or reject`});
+    $('#todo').innerHTML=todo.length
+      ?`<div class="todohead">🔔 Needs your call</div><div class="todos">`+todo.map(x=>`<button class="todo" data-goto="${x.t}"><span class="i">${x.ico}</span><span class="tx">${x.l}</span><span class="go">Open →</span></button>`).join('')+`</div>`
+      :`<div class="todohead" style="color:var(--muted)">✅ All caught up — nothing needs you right now.</div>`;
+    $('#todo').querySelectorAll('[data-goto]').forEach(b=>b.onclick=()=>{const nv=document.querySelector('.nv[data-sec="'+b.dataset.goto+'"]');if(nv)nv.click();});
+    const newest=ps.slice(0,8);
+    $('#newest').innerHTML=newest.length?newest.map(p=>`
+      <div class="newrow">
+        <div class="av">${esc((p.name[0]||'?').toUpperCase())}</div>
+        <div class="nb"><b>${esc(p.name)} ${p.verified?'<span class="vtick">✓</span>':(p.banned?'<span class="tag b">BANNED</span>':'<span class="tag p">PENDING</span>')}</b>${socialLinks(p)}</div>
+        <div class="when">${p.created_at?joinAgo(p.created_at):''}</div>
+      </div>`).join(''):'<div class="empty">No players yet.</div>';
     $('#boardList').innerHTML=runs.length?runs.map(r=>`
       <div class="runrow">
         <div class="tm"><b>${esc(runTime(r))}</b><span>${esc(runDay(r))}</span></div>
@@ -375,15 +440,18 @@ async function load(){
           <span>${esc(r.format)} · by ${esc(r.host_name)}${(r.players||[]).length?' — '+(r.players||[]).map(p=>esc(p.name)).join(', '):''}</span></div>
         <div class="n">${(r.players||[]).length}/${r.cap}</div>
       </div>`).join(''):'<div class="empty">No runs on the board right now.</div>';
-    $('#inbox').innerHTML=inbox.length?inbox.map(m=>`
-      <div class="row pending"><div class="who">
+    $('#inbox').innerHTML=inbox.length?inbox.map(m=>{
+      const pp=byId.get(m.player_id)||m;
+      return `<div class="row pending"><div class="who">
         <b>${esc(m.name)} <span class="tag p">WANTS ✓</span></b>
-        ${m.ig?`<a href="https://instagram.com/${esc(m.ig)}" target="_blank" rel="noopener">@${esc(m.ig)} ↗ — check the profile is real</a>`:`<span>${esc(m.email)}</span>`}
+        ${socialLinks(pp)}
+        <span style="display:block;font-size:11px;color:var(--muted);margin-top:3px">👆 Open their page — real hooper? Hit verify.</span>
         ${m.text?`<span style="display:block;font-style:italic;margin-top:3px">“${esc(m.text)}”</span>`:''}
       </div>
       <button class="btn btn-v" data-verify="${esc(m.player_id)}">✓ Verify</button>
       <button class="btn btn-g" data-dismiss="${esc(m.player_id)}">Dismiss</button>
-      <button class="btn btn-r" data-ban="${esc(m.player_id)}">Ban</button></div>`).join('')
+      <button class="btn btn-r" data-ban="${esc(m.player_id)}">Ban</button></div>`;
+    }).join('')
       :'<div class="empty">No requests waiting. All quiet.</div>';
     const reqIds=new Set(inbox.map(m=>m.player_id));
     const pending=ps.filter(p=>!p.verified&&!p.banned&&!reqIds.has(p.id));
@@ -409,6 +477,8 @@ let OFFICIAL=[];           // the courts the coach has added (what players see)
 let CC=null;               // the meta row being edited, or null = adding new
 let CBRING=[];             // "what to bring" items being edited
 let SUGG=[];               // player court suggestions
+let CPHOTO='';             // a suggestion's photo to carry onto the new court
+let CFROMSUGG='';          // the suggestion id we're adding (auto-cleared on add)
 let courtsInit=false;
 async function initCourts(){
   if(courtsInit)return;courtsInit=true;
@@ -450,9 +520,10 @@ function blankForm(){
   ['cName','cSuburb','cCost','cLatLon','cParking','cSurface','cHoops','cRim','cBest','cTips','cedNotes','cKnown'].forEach(id=>$('#'+id).value='');
   ['cIndoor','cLit','cToilets','cShade','cSeating','cShop','cedHide'].forEach(id=>$('#'+id).checked=false);
   $('#cWater').value='';$('#cRadius').value=300;$('#cRadVal').textContent='300';
-  CBRING=[];renderBring();
+  CBRING=[];renderBring();CPHOTO='';CFROMSUGG='';
   const ph=$('#cedPhoto');ph.style.backgroundImage='';ph.textContent='No photo yet';
   $('#cKnownList').innerHTML='';
+  const h=$('#cLocHint');if(h){h.textContent='Paste the share link from Google Maps and hit Locate — we\'ll pull the pin for you.';h.style.color='';}
 }
 function newCourt(){
   CC=null;blankForm();
@@ -481,7 +552,7 @@ function editCourt(m){
   $('#cedNotes').value=m.notes||'';
   $('#cedHide').checked=!!m.hidden;
   const rad=m.radius_m||300;$('#cRadius').value=rad;$('#cRadVal').textContent=rad;
-  CBRING=Array.isArray(i.bring)?i.bring.slice(0,10):[];renderBring();
+  CBRING=Array.isArray(i.bring)?i.bring.slice(0,10):[];renderBring();CPHOTO='';CFROMSUGG='';
   const ph=$('#cedPhoto');
   if(m.photo_url){ph.style.backgroundImage=`url("${m.photo_url}")`;ph.textContent='';}
   else{ph.style.backgroundImage='';ph.textContent='No photo yet';}
@@ -489,6 +560,28 @@ function editCourt(m){
   $('#cedDel').style.display='';
   loadCourtReviews(m);paintCourts();
 }
+// Turn whatever's in the location box into [lat,lon]. Direct "lat, lon" is used
+// as-is; anything else (a Google Maps share link) is resolved server-side.
+async function resolveLoc(loud){
+  const raw=$('#cLatLon').value.trim();
+  if(!raw){if(loud)toast('Paste a Maps link or "lat, lon" first',1);return null;}
+  const h=$('#cLocHint');
+  const setPin=(la,lo)=>{$('#cLatLon').value=`${la}, ${lo}`;if(h){h.textContent=`📍 Pinned at ${(+la).toFixed(5)}, ${(+lo).toFixed(5)}`;h.style.color='var(--volt)';}};
+  // A pasted "lat, lon" (or a /@lat,lon/ Maps URL) is read directly — no round-trip.
+  const direct=raw.match(/(-?\d+\.\d+)[,\s]+(-?\d+\.\d+)/);
+  if(direct){setPin(+direct[1],+direct[2]);return[+direct[1],+direct[2]];}
+  // A short share link (maps.app.goo.gl / goo.gl) is resolved on the server.
+  const b=$('#cLocate'),lbl=b.textContent;b.disabled=true;b.textContent='Locating…';
+  try{
+    const d=await api({action:'resolve_maps',url:raw});
+    if(d&&Number.isFinite(d.lat)){setPin(d.lat,d.lon);return[d.lat,d.lon];}
+    if(loud)toast('Could not read that link',1);
+    if(h){h.textContent='Could not read that link — in Google Maps, right-click the court → click the coordinates to copy them, then paste.';h.style.color='#FF8A8A';}
+    return null;
+  }catch(e){if(loud)toast(e.message,1);return null;}
+  finally{b.disabled=false;b.textContent=lbl;}
+}
+$('#cLocate').onclick=()=>resolveLoc(true);
 function readForm(){
   const ll=$('#cLatLon').value.trim().match(/(-?\d+\.\d+)[,\s]+(-?\d+\.\d+)/);
   return {
@@ -506,12 +599,19 @@ function readForm(){
 $('#cedSave').onclick=async()=>{
   const f=readForm();
   if(!f.name){toast('Name the court',1);return}
-  if(!f.ll){toast('Paste "lat, lon" from Google Maps — right-click the court → copy the numbers',1);return}
+  let lat,lon;
+  if(f.ll){lat=+f.ll[1];lon=+f.ll[2];}
+  else{const c=await resolveLoc(true);if(!c){toast('Add the location — paste a Maps link and hit 📍 Locate',1);return}lat=c[0];lon=c[1];}
   const b=$('#cedSave');b.disabled=true;const label=b.textContent;b.textContent='Saving…';
-  const payload={name:f.name,suburb:f.suburb,lat:+f.ll[1],lon:+f.ll[2],indoor:f.indoor,lit:f.lit,hidden:f.hidden,notes:f.notes,radius_m:f.radius_m,info:f.info};
+  const payload={name:f.name,suburb:f.suburb,lat,lon,indoor:f.indoor,lit:f.lit,hidden:f.hidden,notes:f.notes,radius_m:f.radius_m,info:f.info};
+  if(CPHOTO)payload.photo_url=CPHOTO;
   try{
     if(CC){await api({action:'admin_court_edit',key:CC.key,...payload});}
-    else{const d=await api({action:'admin_court_add',...payload});CC={key:d.key};}
+    else{
+      const d=await api({action:'admin_court_add',...payload});CC={key:d.key};
+      if(CFROMSUGG){try{await api({action:'admin_court_req_done',id:CFROMSUGG});SUGG=SUGG.filter(x=>x.id!==CFROMSUGG);renderSuggestions();}catch(_e){}CFROMSUGG='';}
+    }
+    CPHOTO='';
     await refreshCourts(false);
     const fresh=OFFICIAL.find(c=>c.key===(CC&&CC.key));
     toast(label.indexOf('Add')>-1?'Court live 🏀 Players see it now':'Court saved 🏀');
@@ -594,10 +694,14 @@ function renderSuggestions(reqs){
   box.style.display=SUGG.length?'':'none';
   if(n){n.textContent=SUGG.length;n.style.display=SUGG.length?'':'none';}
   list.innerHTML=SUGG.length?SUGG.map(s=>`
-    <div class="row"><div class="who">
-      <b>${esc(s.court_name||'Court')}</b>
-      <span>${esc(s.where_txt||'')}${s.note?' — “'+esc(s.note)+'”':''}</span>
-      <span style="opacity:.65">by ${esc(s.name||'someone')}${s.ig?' · @'+esc(s.ig):''}</span>
+    <div class="row"><div class="who" style="display:flex;gap:10px;align-items:flex-start">
+      ${s.photo_url?`<a href="${esc(s.photo_url)}" target="_blank" rel="noopener" style="flex:0 0 auto"><img src="${esc(s.photo_url)}" alt="" style="width:56px;height:56px;object-fit:cover;border-radius:9px;border:1px solid var(--line)"></a>`:''}
+      <div style="min-width:0">
+        <b>${esc(s.court_name||'Court')}</b>
+        <span>${esc(s.where_txt||'')}${s.note?' — “'+esc(s.note)+'”':''}</span>
+        <span style="opacity:.7">by ${esc(s.name||'someone')}${s.ig?' · <a href="https://instagram.com/'+esc(s.ig)+'" target="_blank" rel="noopener">@'+esc(s.ig)+'</a>':''}</span>
+        ${(s.lat!=null&&s.lon!=null)?'<span style="display:inline-block;margin-top:5px;font-size:11px;font-weight:700;color:var(--volt);background:rgba(216,255,62,.12);border-radius:20px;padding:2px 9px">📍 Pinned from their link</span>':''}
+      </div>
     </div>
     <button class="btn btn-v" data-sadd="${esc(s.id)}">➕ Add it</button>
     <button class="btn btn-g" data-sdone="${esc(s.id)}">Dismiss</button></div>`).join('')
@@ -605,11 +709,18 @@ function renderSuggestions(reqs){
   list.querySelectorAll('[data-sadd]').forEach(b=>b.onclick=()=>{
     const s=SUGG.find(x=>x.id===b.dataset.sadd);if(!s)return;
     newCourt();
+    CFROMSUGG=s.id;
     $('#cName').value=s.court_name||'';
-    if(s.where_txt)$('#cKnown').value=s.where_txt;
+    const looksLoc=/https?:\/\/|\d+\.\d+/.test(s.where_txt||'');
+    if(s.lat!=null&&s.lon!=null)$('#cLatLon').value=`${s.lat}, ${s.lon}`;
+    else if(looksLoc)$('#cLatLon').value=s.where_txt;
+    if(s.where_txt&&!looksLoc)$('#cKnown').value=s.where_txt;
     if(s.note)$('#cTips').value=s.note;
+    if(s.photo_url){CPHOTO=s.photo_url;const ph=$('#cedPhoto');ph.style.backgroundImage=`url("${s.photo_url}")`;ph.textContent='';}
+    const h=$('#cLocHint');
+    if(h&&s.lat!=null){h.textContent='📍 Pinned from their Maps link — double-check the spot before you add.';h.style.color='var(--volt)';}
     $('#ced').scrollIntoView({behavior:'smooth',block:'start'});
-    toast('Prefilled from the suggestion — add the pin + details');
+    toast(s.lat!=null?'Prefilled + pinned — confirm the details + add':'Prefilled — hit 📍 Locate if they left a link, then add');
   });
   list.querySelectorAll('[data-sdone]').forEach(b=>b.onclick=async()=>{
     try{await api({action:'admin_court_req_done',id:b.dataset.sdone});SUGG=SUGG.filter(x=>x.id!==b.dataset.sdone);renderSuggestions();toast('Dismissed');}

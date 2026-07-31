@@ -555,6 +555,48 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   halted app boot, the viewer_id pending-leak, and check-in inflation. Verified
   E2E (15-check profile flow + 6-check fixes flow, all live; app boots clean,
   live NBA card + desk moderation screenshotted; all demo/test rows deleted).
+- **Maps-link courts + TikTok + verify redesign + in-depth desk (edge v20,
+  2026-07-31, Aiman asked).** Migration `opencourt_socials_suggest_extras`
+  (oc_players += `tiktok text`; oc_court_reqs += `photo_url`, `lat`, `lon`).
+  Edge v19→v20: `parseCoords`/`resolveMapsUrl` (SSRF-safe — only follows
+  google/goo.gl hosts, only ever returns coords) + `resolve_maps` action
+  (Sydney-bounded); TikTok flows through register/me/profile/guard/
+  admin_players/admin_ban; `court_suggest` resolves a pasted Maps link → stores
+  lat/lon and uploads an optional base64 photo to `heaven/suggest/*`;
+  `ownPhoto()` gate so `admin_court_add`/`_edit` accept a carried `photo_url`
+  ONLY when it's our own `heaven` bucket URL (blocks arbitrary/SSRF URLs);
+  `admin_players` returns `courts_total`. Stale "takes one DM" copy on the
+  run/clip verify-gates rewritten to "Request the ✓".
+  App (hoopsheaven.html): sign-up sheet now a 3-way **Instagram / TikTok /
+  Email** picker (`#idPick`, replaces the old ig↔email `#idSwap` link;
+  `#pfTiktok`); **verify card redesigned** — the old confusing DM-code flow is
+  gone, replaced by a clear "🔵 Get the ✓ — show us you're real" card with 1-2-3
+  steps that link the player's IG/TikTok page + a single "Request the ✓" button
+  (`vfSocial()` picks IG or TikTok); NBA card + edit prefill now link TikTok;
+  suggest sheet gained an optional **photo upload** (`#sgPhotoBox`,
+  client-downscaled to 1280px jpeg → `court_suggest` photo). NOTE: the theme
+  picker Aiman asked for ALREADY EXISTS (header 🎨 → `#shTheme` 8 presets +
+  custom, and Profile → 🎨 Colours) — pointed him to it, nothing to build.
+  Desk (hoopsheaven-desk.html): court editor location field takes a **Google
+  Maps link OR "lat, lon"** with a **📍 Locate** button (`resolveLoc()` →
+  `resolve_maps`, normalises the field + confirms the pin; save auto-resolves a
+  link if Locate wasn't tapped); **suggestions inbox** shows the player's photo
+  thumbnail + a "📍 Pinned from their link" chip, and **Add it** prefills
+  name/coords/photo/note (`CPHOTO` carries the photo onto the new court via
+  admin_court_add; `CFROMSUGG` auto-dismisses the suggestion once added);
+  **verification inbox + player rows show tappable IG AND TikTok links**
+  (`socialLinks()`, joined via player_id) with a "open their page — real
+  hooper? verify" nudge; **in-depth Overview** — 9 stat tiles (players +this
+  week / verified +% / requests / court ideas / courts live / runs live /
+  tapped in / all-time check-ins / banned), a "🔔 Needs your call" action panel
+  linking the request/suggestion/feedback queues, and a "🆕 Newest hoopers"
+  list. **Multiple approvers already work** — coachAuth accepts ANY active
+  ll_coaches row, so anyone Aiman adds as an active coach can approve
+  everything (confirmed, no change needed). Verified: 10/10 backend E2E
+  (photo carry-over + foreign-URL rejection + courts_total + resolve_maps +
+  suggest→approve loop) + Playwright app (7/7: TikTok sign-up, verify card,
+  TikTok link, suggest photo) + desk (7/7: 9-tile dashboard, needs-your-call,
+  newest, Locate normalise). All test rows + temp coach deleted.
 - v2 ideas discussed: KOTC proper, run chat, POTW weekly archive/all-time
   wall, PWA manifest + install, native app for background geofencing.
 
