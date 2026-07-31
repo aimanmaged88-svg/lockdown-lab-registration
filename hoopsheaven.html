@@ -1029,6 +1029,29 @@ header{
 .klead{display:flex;flex-direction:column;gap:6px;margin-top:12px;text-align:left}
 .klead .kr{display:flex;justify-content:space-between;font-size:13px;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:7px 11px}
 .klead .kr b{font-weight:800}
+.kingrow{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:11px 13px;margin-bottom:8px;cursor:pointer}
+.kingrow .rk{flex:none;width:30px;text-align:center;font-family:var(--disp);font-weight:400;font-size:19px}
+.kingrow .av{flex:none;width:38px;height:38px;border-radius:50%;background:var(--card2);color:var(--volt);display:grid;place-items:center;font-weight:900}
+.kingrow .in{flex:1;min-width:0}
+.kingrow .in b{display:block;font-size:14px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.kingrow .in span{font-size:11.5px;color:var(--muted)}
+.kingrow .ci{flex:none;text-align:right}
+.kingrow .ci b{display:block;font-family:var(--disp);font-weight:400;font-size:20px;color:var(--volt);line-height:1}
+.kingrow .ci span{font-size:9.5px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
+.tierchip{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.4px;padding:1px 7px;border-radius:20px;border:1px solid currentColor}
+.chatsec{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
+.chatlbl{font-family:var(--cond);font-size:14px;letter-spacing:1.5px;text-transform:uppercase;font-weight:800;color:var(--muted);margin-bottom:10px}
+.chatlist{display:flex;flex-direction:column;gap:8px;max-height:230px;overflow-y:auto;margin-bottom:10px}
+.chatlist .cm{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:8px 11px}
+.chatlist .cm.me{background:color-mix(in srgb, var(--volt) 12%, var(--card));border-color:color-mix(in srgb, var(--volt) 30%, transparent)}
+.chatlist .cm .who{font-size:11.5px;font-weight:800;color:var(--muted);margin-bottom:2px}
+.chatlist .cm .who .v{color:var(--volt)}
+.chatlist .cm .tx{font-size:13.5px;color:var(--text);word-wrap:break-word;overflow-wrap:anywhere}
+.chatempty{font-size:12.5px;color:var(--dim);text-align:center;padding:10px}
+.chatbox{display:flex;gap:8px}
+.chatbox input{flex:1;min-width:0;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 13px;color:var(--text);font:inherit;font-size:14px}
+.chatbox #rChatSend{flex:none;background:var(--volt);color:var(--onaccent,#0A0C0F);border:none;border-radius:12px;font:inherit;font-weight:800;padding:0 16px;cursor:pointer}
+.chathint{font-size:12.5px;color:var(--muted);text-align:center;padding:9px;background:var(--card);border:1px solid var(--line);border-radius:12px}
 .klead .kr span{color:var(--volt);font-weight:800}
 .droprow{display:flex;gap:8px;margin-top:9px}
 .droprow .inp{flex:1}
@@ -1113,6 +1136,13 @@ header{
 .idpick button:active{transform:scale(.95)}
 .sgphoto{border:1px dashed var(--line);border-radius:12px;padding:18px;text-align:center;color:var(--muted);font-weight:700;font-size:13px;cursor:pointer;background-size:cover;background-position:center;min-height:52px;display:flex;align-items:center;justify-content:center;transition:border-color .15s}
 .sgphoto.has{color:transparent;min-height:130px;border-style:solid;border-color:var(--line)}
+#installBar{position:fixed;left:12px;right:12px;bottom:98px;max-width:460px;margin:0 auto;z-index:60;display:flex;align-items:center;gap:11px;padding:12px 13px;border-radius:16px;background:var(--glass2,#14161c);border:1px solid var(--line);box-shadow:0 14px 40px rgba(0,0,0,.5);transform:translateY(140%);opacity:0;pointer-events:none;transition:transform .5s var(--ease-out,cubic-bezier(.16,1,.3,1)),opacity .35s}
+#installBar.show{transform:translateY(0);opacity:1;pointer-events:auto}
+#installBar img{width:40px;height:40px;border-radius:11px;flex:none}
+#installBar .it{flex:1;font-size:12.5px;line-height:1.35;color:var(--text)}
+#installBar .it b{color:var(--volt)}
+#installGo{flex:none;background:var(--volt);color:var(--onaccent,#0A0C0F);border:none;border-radius:11px;font:inherit;font-weight:800;font-size:12.5px;padding:9px 13px;cursor:pointer}
+#installX{flex:none;background:none;border:none;color:var(--muted);font-size:17px;cursor:pointer;padding:2px 4px;line-height:1}
 .swgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-top:6px}
 .swb{border:1px solid var(--line);background:var(--card);border-radius:16px;padding:12px 6px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:7px;font-family:inherit}
 .swb .dot{width:34px;height:34px;border-radius:50%}
@@ -1208,6 +1238,10 @@ header{
       <div class="seclbl"><h2>Runs <em style="color:var(--volt);font-style:normal">tonight</em></h2><button id="seeRuns">SEE ALL</button></div>
       <div id="popruns"></div>
     </div>
+    <div class="sect">
+      <div class="seclbl"><h2>🏆 City <em style="color:var(--volt);font-style:normal">Kings</em></h2><button id="seeKings">SEE ALL</button></div>
+      <div id="homeKings"></div>
+    </div>
     <div class="foot">
       <b>HOOPS HEAVEN</b> · built in Sydney · court data © OpenStreetMap contributors<br>
       Runs are player-called, never guaranteed. Pull up, play hard, look after each other.<br>
@@ -1255,7 +1289,8 @@ header{
     <div class="sect" style="margin-top:16px">
       <div id="myCard"></div>
       <div id="vfCard" style="display:none;margin-top:12px"></div>
-      <div class="prow" id="pEdit" style="margin-top:12px"><span class="ic">✏️</span><span>Edit name / socials</span><span class="ar">›</span></div>
+      <div class="prow" id="pShare" style="margin-top:12px"><span class="ic">📤</span><span>Share my card</span><span class="ar">›</span></div>
+      <div class="prow" id="pEdit"><span class="ic">✏️</span><span>Edit name / socials</span><span class="ar">›</span></div>
       <div class="prow" id="pTheme"><span class="ic">🎨</span><span>Colours</span><span class="ar">›</span></div>
       <div class="prow" id="pRules"><span class="ic">📜</span><span>House rules &amp; good vibes</span><span class="ar">›</span></div>
     </div>
@@ -1343,6 +1378,15 @@ header{
     <button class="btn btn-ghost" id="rShare">Share</button>
     <button class="btn btn-ghost" id="rMaps">Directions</button>
   </div>
+  <div class="chatsec">
+    <div class="chatlbl">💬 Run chat</div>
+    <div class="chatlist" id="rChat"></div>
+    <div class="chatbox" id="rChatBox">
+      <input id="rChatInput" maxlength="300" placeholder="Message the run…" autocomplete="off">
+      <button id="rChatSend">Send</button>
+    </div>
+    <div class="chathint" id="rChatHint">Tap in to join the chat 💬</div>
+  </div>
 </div></div>
 
 <!-- court page sheet -->
@@ -1394,8 +1438,8 @@ header{
   </div>
   <div class="subsect"><h4>👑 King of the Court</h4>
     <div class="kotc">
-      <div class="crown">👑</div><b>The throne unlocks soon</b>
-      <p>Every run you tap into at this court counts. Show up, get crowned.</p>
+      <div class="crown">👑</div><b id="ctKingHead">The throne is open</b>
+      <p id="ctKingSub">Every run you tap into at this court counts. Show up, get crowned.</p>
       <div class="klead" id="ctKotc"></div>
     </div>
   </div>
@@ -1443,6 +1487,20 @@ header{
   <button class="btn btn-v btn-block" id="sgGo">Send it to the desk</button>
   <p class="fine">The coach reviews every suggestion. Real courts only — no random pins.</p>
 </div></div>
+
+<!-- city-wide King of the Court leaderboard -->
+<div class="sheet" id="shKings"><div class="scrim" data-close></div><div class="panel">
+  <div class="grab"></div>
+  <div class="xrow"><div><h3>🏆 City Kings</h3><p class="sub">Sydney's most-active hoopers — ranked by check-ins. Show up to climb.</p></div><button class="x" data-close>✕</button></div>
+  <div id="kingsList"><div class="skel" style="height:64px;margin-bottom:8px"></div><div class="skel" style="height:64px;margin-bottom:8px"></div><div class="skel" style="height:64px"></div></div>
+</div></div>
+
+<div id="installBar">
+  <img src="assets/hh-icon-192.png" alt="">
+  <div class="it"></div>
+  <button id="installGo">Install</button>
+  <button id="installX" aria-label="Dismiss">✕</button>
+</div>
 
 <div id="toast"></div>
 
@@ -1564,6 +1622,7 @@ async function paintProfileTab(){
   if(!el.querySelector('.nbacard'))el.innerHTML='<div class="skel" style="height:210px;border-radius:22px"></div>';
   try{
     const d=await api({action:'profile',player_id:OCP.id,viewer_id:OCP.id});
+    MYCARD=d;
     el.innerHTML=hooperCardHTML(d,true);animateCard(el);
     if(d.tier&&d.tier.key==='legend')confettiBurst(d.tier.color);
   }catch(e){el.innerHTML=`<div class="pcard"><div class="av">${esc((OCP.name[0]||'?').toUpperCase())}</div><div class="in"><b>${esc(OCP.name)} ${OCP.vf?'<span style="color:var(--ok)">✓</span>':''}</b><span>${OCP.ig?'@'+esc(OCP.ig):esc(OCP.email||'')}</span></div></div>`;}
@@ -1888,7 +1947,7 @@ function openRun(id,push=true){
   else api({action:'run_get',run_id:id}).then(d=>{CUR=d.run;paintRun();openSheet('shRun');}).catch(e=>toast(e.message,1));
   if(push)history.replaceState(null,'','?run='+id);
 }
-$('#shRun').addEventListener('click',e=>{if(e.target.hasAttribute('data-close')||e.target.closest('[data-close]'))history.replaceState(null,'',location.pathname)});
+$('#shRun').addEventListener('click',e=>{if(e.target.hasAttribute('data-close')||e.target.closest('[data-close]')){history.replaceState(null,'',location.pathname);stopChatPoll();}});
 function paintRun(){
   const r=CUR,n=(r.players||[]).length,full=n>=r.cap,im=OCP&&(r.players||[]).some(p=>p.id===OCP.id);
   $('#rTime').textContent=`${dayLabel(runYmd(r))} · ${runTime(r)}`;
@@ -1907,7 +1966,44 @@ function paintRun(){
   else if(full){j.textContent='Run is full';j.className='btn btn-ghost';j.disabled=true;}
   else{j.textContent='Tap in';j.className='btn btn-v';j.style.flex='1.4';j.disabled=false;}
   paintRunWx();
+  paintChat();
 }
+/* ---------- run chat ---------- */
+let chatPoll=null;
+function renderChat(msgs){
+  const box=$('#rChat');if(!box)return;
+  const list=msgs||[];
+  if(!list.length){box.innerHTML='<div class="chatempty">No messages yet — say what\'s up 👋</div>';return;}
+  const nearBottom=box.scrollHeight-box.scrollTop-box.clientHeight<60;
+  box.innerHTML=list.map(m=>{
+    const me=OCP&&m.pid===OCP.id;
+    return `<div class="cm ${me?'me':''}"><div class="who">${esc(m.name||'Hooper')}${m.v?' <span class="v">✓</span>':''}</div><div class="tx">${esc(m.text)}</div></div>`;
+  }).join('');
+  if(nearBottom)box.scrollTop=box.scrollHeight;
+}
+async function loadChat(){
+  if(!CUR)return;
+  const rid=CUR.id;
+  try{const d=await api({action:'chat_get',run_id:rid});if(CUR&&CUR.id===rid)renderChat(d.messages);}catch(e){}
+}
+function paintChat(){
+  const im=OCP&&CUR&&(CUR.players||[]).some(p=>p.id===OCP.id);
+  $('#rChatBox').style.display=im?'flex':'none';
+  $('#rChatHint').style.display=im?'none':'block';
+  $('#rChat').innerHTML='<div class="chatempty">Loading…</div>';
+  loadChat();
+  startChatPoll();
+}
+function startChatPoll(){stopChatPoll();chatPoll=setInterval(()=>{if($('#shRun').classList.contains('open')&&!document.hidden)loadChat();},7000);}
+function stopChatPoll(){if(chatPoll){clearInterval(chatPoll);chatPoll=null;}}
+$('#rChatSend').onclick=()=>ensureProfile(async()=>{
+  const inp=$('#rChatInput'),text=inp.value.trim();if(!text||!CUR)return;
+  const b=$('#rChatSend');b.disabled=true;
+  try{const d=await api({action:'chat_send',player:OCP,run_id:CUR.id,text});inp.value='';renderChat(d.messages);}
+  catch(e){toast(e.message||'Could not send',1);}
+  b.disabled=false;
+});
+$('#rChatInput').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('#rChatSend').click();}});
 async function paintRunWx(){
   const r=CUR,el=$('#rWx');
   el.innerHTML='';
@@ -1933,11 +2029,150 @@ function syncRun(){const i=RUNS.findIndex(x=>x.id===CUR.id);if(i>-1)RUNS[i]=CUR;
 $('#rShare').onclick=async()=>{
   const r=CUR,url=location.origin+location.pathname+'?run='+r.id;
   const text=`🏀 ${r.format} at ${r.court_name}${r.suburb?' ('+r.suburb+')':''} — ${dayLabel(runYmd(r))} ${runTime(r)}. Tap in:`;
-  if(navigator.share){try{await navigator.share({title:'Hoops Heaven run',text,url})}catch(e){}}
-  else{await navigator.clipboard.writeText(text+' '+url);toast('Link copied — send it to the group chat');}
+  const b=$('#rShare');b.disabled=true;const lbl=b.textContent;b.textContent='…';
+  try{ const cv=await runShareCanvas(r); await shareImage(cv,'hoops-heaven-run.png',text,url); }
+  catch(e){ if(navigator.share){try{await navigator.share({title:'Hoops Heaven run',text,url})}catch(_e){}}else{try{await navigator.clipboard.writeText(text+' '+url);toast('Link copied — send it to the group chat');}catch(_e){}} }
+  b.disabled=false;b.textContent=lbl;
 };
 $('#rMaps').onclick=()=>{const r=CUR;window.open(`https://www.google.com/maps/dir/?api=1&destination=${r.lat},${r.lon}`,'_blank')};
 $('#rCourtLink').onclick=()=>{closeSheet('shRun');openCourtPage({key:CUR.court_key,name:CUR.court_name,suburb:CUR.suburb,lat:CUR.lat,lon:CUR.lon});};
+
+/* ---------- shareable branded cards (canvas → native share) ---------- */
+let MYCARD=null;
+// Draw the Hoops Heaven mark (haloed basketball) with canvas primitives — no
+// external image, so the canvas is never tainted and always exports.
+function drawMark(c,cx,cy,r){
+  c.save();
+  c.strokeStyle='#D8FF3E';c.lineWidth=r*0.16;c.beginPath();
+  c.ellipse(cx,cy-r*1.05,r*0.92,r*0.24,0,0,7);c.stroke();
+  const g=c.createRadialGradient(cx-r*0.3,cy-r*0.3,r*0.2,cx,cy,r);
+  g.addColorStop(0,'#FF8A4C');g.addColorStop(1,'#E4531B');
+  c.fillStyle=g;c.beginPath();c.arc(cx,cy,r,0,7);c.fill();
+  c.strokeStyle='#0A0C0F';c.lineWidth=r*0.09;c.lineCap='round';
+  c.beginPath();c.moveTo(cx,cy-r);c.lineTo(cx,cy+r);
+  c.moveTo(cx-r,cy);c.lineTo(cx+r,cy);c.stroke();
+  c.beginPath();c.arc(cx-r*1.4,cy,r*1.05,-0.9,0.9);c.stroke();
+  c.beginPath();c.arc(cx+r*1.4,cy,r*1.05,Math.PI-0.9,Math.PI+0.9);c.stroke();
+  c.restore();
+}
+function accentHex(){ const v=getComputedStyle(document.documentElement).getPropertyValue('--volt').trim(); return v||'#FF6A2B'; }
+function onAccentHex(){ const v=getComputedStyle(document.documentElement).getPropertyValue('--onaccent').trim(); return v||'#0A0C0F'; }
+function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+function fitFont(ctx,text,px,family,maxw,min){ let s=px; do{ ctx.font=`${family.w||800} ${s}px ${family.f}`; if(ctx.measureText(text).width<=maxw)break; s-=4; }while(s>(min||24)); return s; }
+async function cardBase(){
+  await (document.fonts?document.fonts.ready:Promise.resolve());
+  const W=1080,H=1350,cv=document.createElement('canvas');cv.width=W;cv.height=H;
+  const c=cv.getContext('2d');
+  const g=c.createLinearGradient(0,0,0,H);g.addColorStop(0,'#15171d');g.addColorStop(1,'#08090c');
+  c.fillStyle=g;c.fillRect(0,0,W,H);
+  // faint court lines
+  c.strokeStyle='rgba(255,255,255,.05)';c.lineWidth=4;
+  c.beginPath();c.arc(W/2,H/2,230,0,7);c.stroke();
+  c.beginPath();c.moveTo(70,H/2);c.lineTo(W-70,H/2);c.stroke();
+  // header wordmark
+  drawMark(c,104,116,40);
+  c.fillStyle='#fff';c.font='800 40px HHDisplay, system-ui';c.textBaseline='middle';
+  c.fillText('HOOPS',176,100); c.fillStyle=accentHex(); c.fillText('HEAVEN',176,146);
+  return {cv,c,W,H};
+}
+async function runShareCanvas(r){
+  const {cv,c,W}=await cardBase();
+  const ac=accentHex();
+  c.textBaseline='alphabetic';
+  // WHEN
+  c.fillStyle=ac;c.font='800 46px HHDisplay, system-ui';
+  c.fillText((dayLabel(runYmd(r))+' · '+runTime(r)).toUpperCase(),64,320);
+  // COURT
+  c.fillStyle='#fff';let fs=fitFont(c,r.court_name.toUpperCase(),120,{f:'HHDisplay, system-ui',w:800},W-128,48);
+  c.font=`800 ${fs}px HHDisplay, system-ui`;c.fillText(r.court_name.toUpperCase(),64,320+fs+18);
+  let y=320+fs+18;
+  if(r.suburb){c.fillStyle='rgba(255,255,255,.6)';c.font='600 40px HHBody, system-ui';c.fillText(r.suburb,66,y+56);y+=56;}
+  // format + spots chips
+  y+=110;const inN=(r.players||[]).length;
+  c.font='800 34px HHDisplay, system-ui';
+  const chip=(label,x,fill,tc)=>{const w=c.measureText(label).width+56;c.fillStyle=fill;rr(c,x,y-52,w,74,20);c.fill();c.fillStyle=tc;c.fillText(label,x+28,y);return x+w+16;};
+  let cx=chip((r.format||'5v5').toUpperCase(),64,ac,onAccentHex());
+  chip(`${inN}/${r.cap} IN`,cx,'rgba(255,255,255,.1)','#fff');
+  // roster
+  y+=90;const names=(r.players||[]).slice(0,8).map(p=>p.name).join('   •   ');
+  if(names){c.fillStyle='rgba(255,255,255,.72)';c.font='600 32px HHBody, system-ui';
+    c.fillText('WHO\'S IN',64,y);c.fillStyle='#fff';c.font='700 34px HHBody, system-ui';
+    wrapText(c,names,64,y+50,W-128,44);}
+  // footer CTA
+  const ac2=ac;c.fillStyle=ac2;rr(c,64,1180,W-128,96,26);c.fill();
+  c.fillStyle=onAccentHex();c.font='800 44px HHDisplay, system-ui';c.textAlign='center';
+  c.fillText('⚡ TAP IN ON HOOPS HEAVEN',W/2,1240);c.textAlign='left';
+  c.fillStyle='rgba(255,255,255,.5)';c.font='600 26px HHBody, system-ui';
+  c.fillText("Sydney's open run · link in the message",64,1320);
+  return cv;
+}
+async function cardShareCanvas(d){
+  const {cv,c,W}=await cardBase();
+  const tier=d.tier||{name:'Rookie',color:'#8A9099'};
+  c.textBaseline='alphabetic';
+  // name (reserve the right ~320px for the rating so they never collide)
+  c.fillStyle='#fff';let fs=fitFont(c,d.name.toUpperCase(),96,{f:'HHDisplay, system-ui',w:800},W-64-320,40);
+  c.font=`800 ${fs}px HHDisplay, system-ui`;c.fillText(d.name.toUpperCase(),64,325);
+  // verified + handle
+  let hy=390;c.font='600 36px HHBody, system-ui';c.fillStyle='rgba(255,255,255,.6)';
+  const handle=d.ig?('@'+d.ig):(d.tiktok?('@'+d.tiktok):'');
+  if(handle){c.fillText((d.ig?'📸 ':'🎵 ')+handle,64,hy);hy+=10;}
+  // tier badge
+  c.fillStyle=tier.color;c.font='800 34px HHDisplay, system-ui';
+  const tl=tier.name.toUpperCase(),tw=c.measureText(tl).width+56;
+  rr(c,64,430,tw,66,18);c.globalAlpha=.18;c.fill();c.globalAlpha=1;
+  c.strokeStyle=tier.color;c.lineWidth=3;rr(c,64,430,tw,66,18);c.stroke();
+  c.fillStyle=tier.color;c.fillText(tl,92,474);
+  // rating big
+  const r=d.rating||{show:false};
+  c.textAlign='right';
+  if(!r.show){c.fillStyle='rgba(255,255,255,.35)';c.font='800 60px HHDisplay, system-ui';c.fillText('UNRATED',W-64,330);}
+  else{c.fillStyle=accentHex();c.font='800 130px HHDisplay, system-ui';c.fillText(r.soft?'6−':r.label,W-64,340);
+    c.fillStyle='rgba(255,255,255,.5)';c.font='600 28px HHBody, system-ui';c.fillText(r.soft?'on the come-up':('/10 · '+r.count+' rating'+(r.count===1?'':'s')),W-64,385);}
+  c.textAlign='left';
+  // box score
+  const stats=[['CHECK-INS',d.checkins],['RUNS',d.runs],['CLIPS',d.clips],['🔥 FIRES',d.fires]];
+  const bw=(W-128-3*18)/4;let bx=64;const by=560;
+  stats.forEach(s=>{c.fillStyle='rgba(255,255,255,.06)';rr(c,bx,by,bw,190,22);c.fill();
+    c.fillStyle='#fff';c.font='800 66px HHDisplay, system-ui';c.textAlign='center';c.fillText(String(s[1]),bx+bw/2,by+108);
+    c.fillStyle='rgba(255,255,255,.55)';c.font='700 24px HHBody, system-ui';c.fillText(s[0],bx+bw/2,by+156);c.textAlign='left';bx+=bw+18;});
+  // scouting line
+  if(d.comments&&d.comments.length){const q=d.comments[0];c.fillStyle='rgba(255,255,255,.75)';c.font='italic 600 34px HHBody, system-ui';
+    wrapText(c,'“'+q.comment+'”',64,860,W-128,46,3);}
+  // footer
+  c.fillStyle=accentHex();rr(c,64,1180,W-128,96,26);c.fill();
+  c.fillStyle=onAccentHex();c.font='800 42px HHDisplay, system-ui';c.textAlign='center';
+  c.fillText('🏀 MY HOOPS HEAVEN CARD',W/2,1240);c.textAlign='left';
+  c.fillStyle='rgba(255,255,255,.5)';c.font='600 26px HHBody, system-ui';
+  c.fillText('Find your run — join the network',64,1320);
+  return cv;
+}
+function wrapText(ctx,text,x,y,maxw,lh,maxLines){
+  const words=text.split(' ');let line='',ln=0;
+  for(const w of words){const t=line?line+' '+w:w;
+    if(ctx.measureText(t).width>maxw&&line){ctx.fillText(line,x,y);line=w;y+=lh;ln++;if(maxLines&&ln>=maxLines-1){/*last*/}}else line=t;}
+  ctx.fillText(line,x,y);
+}
+async function shareImage(canvas,filename,text,url){
+  const blob=await new Promise(res=>canvas.toBlob(res,'image/png',.95));
+  if(!blob)throw new Error('no blob');
+  const file=new File([blob],filename,{type:'image/png'});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){
+    try{ await navigator.share({files:[file],text,url}); return; }
+    catch(e){ if(e.name==='AbortError')return; }
+  }
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  toast('Saved the image 📸 Post it to your story');
+}
+$('#pShare').onclick=async()=>{
+  if(!OCP){openMyEdit();return;}
+  const b=$('#pShare');b.style.opacity='.5';
+  try{ const d=MYCARD||await api({action:'profile',player_id:OCP.id,viewer_id:OCP.id}); const cv=await cardShareCanvas(d);
+    await shareImage(cv,'my-hoops-heaven-card.png',`My Hoops Heaven card 🏀 ${d.tier?d.tier.name:''}`,location.origin+location.pathname); }
+  catch(e){toast(e.message||'Could not make the card',1);}
+  b.style.opacity='';
+};
 
 /* ---------- courts dataset + overrides + activity ---------- */
 let COURTS=null,GEO=null,ACT={here:{},runs:{},ratings:{}};
@@ -2271,8 +2506,16 @@ function openCourtPage(c){
     paintHere(d.here||[],d.hereExtra||0);
     paintPlays(d.plays);
     paintReviews(d);
-    $('#ctKotc').innerHTML=(d.kotc||[]).filter(k=>k.runs>0).slice(0,3).map((k,i)=>`
-      <div class="kr"><b>${['👑','🥈','🥉'][i]||''} ${esc(k.name)}${k.ig?` <a style="color:var(--muted);text-decoration:none" href="https://instagram.com/${esc(k.ig)}" target="_blank" rel="noopener">@${esc(k.ig)}</a>`:''}</b><span>${k.runs} run${k.runs===1?'':'s'}</span></div>`).join('');
+    const kings=(d.kotc||[]).filter(k=>k.runs>0);
+    if(kings.length){
+      $('#ctKingHead').textContent=`👑 ${kings[0].name} runs this court`;
+      $('#ctKingSub').textContent='Most tap-ins here over the last 90 days. Show up more to take the crown.';
+    }else{
+      $('#ctKingHead').textContent='The throne is open';
+      $('#ctKingSub').textContent='Every run you tap into here counts. Show up, get crowned.';
+    }
+    $('#ctKotc').innerHTML=kings.slice(0,5).map((k,i)=>`
+      <div class="kr"><b>${['👑','🥈','🥉','④','⑤'][i]||''} ${esc(k.name)}${k.ig?` <a style="color:var(--muted);text-decoration:none" href="https://instagram.com/${esc(k.ig)}" target="_blank" rel="noopener">@${esc(k.ig)}</a>`:''}</b><span>${k.runs} run${k.runs===1?'':'s'}</span></div>`).join('');
   }).catch(e=>toast(e.message,1));
 }
 function paintPlays(plays){
@@ -2482,6 +2725,68 @@ $('#sgGo').onclick=()=>ensureProfile(async()=>{
   b.disabled=false;b.textContent='Send it to the desk';
 });
 
+/* ---------- City Kings (King of the Court leaderboard) ---------- */
+let KINGS=null;
+function kingRowHTML(k){
+  const t=k.tier||{name:'Rookie',color:'#8A9099'};
+  const medal=k.rank<=3?['🥇','🥈','🥉'][k.rank-1]:('#'+k.rank);
+  const handle=k.ig?('@'+k.ig):(k.tiktok?('@'+k.tiktok):'');
+  return `<div class="kingrow" data-hooper="${esc(k.id)}">
+    <div class="rk">${medal}</div>
+    <div class="av">${esc((k.name[0]||'?').toUpperCase())}</div>
+    <div class="in"><b>${esc(k.name)}${k.verified?' <span style="color:var(--volt)">✓</span>':''}</b>
+      <span><span class="tierchip" style="color:${t.color}">${esc(t.name)}</span>${handle?' · '+esc(handle):''}</span></div>
+    <div class="ci"><b>${k.checkins}</b><span>check-ins</span></div>
+  </div>`;
+}
+function renderKingsHome(){
+  const el=$('#homeKings'); if(!el)return;
+  if(!KINGS||!KINGS.length){el.innerHTML='<div class="empty" style="padding:14px">No kings yet — check in at a court to get on the board 👑</div>';return;}
+  el.innerHTML=KINGS.slice(0,3).map(kingRowHTML).join('');wireHoopers(el);
+}
+async function loadKings(force){
+  if(KINGS&&!force){renderKingsHome();return;}
+  try{const d=await api({action:'leaderboard'});KINGS=d.kings||[];renderKingsHome();}
+  catch(e){const el=$('#homeKings');if(el)el.innerHTML='';}
+}
+function openKings(){
+  openSheet('shKings');const box=$('#kingsList');
+  const paint=()=>{box.innerHTML=(KINGS&&KINGS.length)?KINGS.map(kingRowHTML).join(''):'<div class="empty" style="padding:20px">No kings yet. Be first — check in at a court and climb the board 👑</div>';wireHoopers(box);};
+  if(KINGS)paint();
+  else api({action:'leaderboard'}).then(d=>{KINGS=d.kings||[];paint();renderKingsHome();}).catch(()=>{box.innerHTML='<div class="empty" style="padding:20px">Could not load — try again.</div>';});
+}
+$('#seeKings').onclick=openKings;
+
+/* ---------- install to home screen ---------- */
+let deferredInstall=null;
+const isStandalone=()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+const isiOS=()=>/iphone|ipad|ipod/i.test(navigator.userAgent);
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferredInstall=e;});
+function showInstallBar(mode){
+  if(localStorage.getItem('oc_install')==='no'||isStandalone())return;
+  const bar=$('#installBar');if(!bar)return;
+  bar.querySelector('.it').innerHTML = mode==='ios'
+    ? "Add to your home screen — tap <b>Share</b>, then <b>Add to Home Screen</b>. Opens like a real app 🏀"
+    : "Install Hoops Heaven — one tap, opens fullscreen like a real app 🏀";
+  $('#installGo').style.display = mode==='ios'?'none':'';
+  bar.classList.add('show');
+}
+function maybeInstall(){
+  if(localStorage.getItem('oc_install')==='no'||isStandalone())return;
+  if(deferredInstall)showInstallBar('android');
+  else if(isiOS())showInstallBar('ios');
+}
+$('#installGo').onclick=async()=>{
+  if(!deferredInstall)return;
+  $('#installBar').classList.remove('show');
+  deferredInstall.prompt();
+  try{await deferredInstall.userChoice;}catch(e){}
+  deferredInstall=null;localStorage.setItem('oc_install','no');
+};
+$('#installX').onclick=()=>{$('#installBar').classList.remove('show');localStorage.setItem('oc_install','no');};
+setTimeout(maybeInstall,10000);
+window.addEventListener('appinstalled',()=>{$('#installBar').classList.remove('show');localStorage.setItem('oc_install','no');});
+
 /* ---------- colours ---------- */
 const THEMES=[['Blaze','#FF6A2B'],['Volt','#D8FF3E'],['Ice','#5BC9FF'],['Grape','#B98CFF'],
   ['Cherry','#FF5A7A'],['Mint','#4DE8A8'],['Gold','#FFD24D'],['Chalk','#F2F2F2']];
@@ -2517,6 +2822,7 @@ else if(!OCP)openGate();
 refreshMe(false);
 $('#rulesLink').onclick=()=>openSheet('shTerms');
 loadBoard().then(()=>{
+  loadKings();
   const q=new URLSearchParams(location.search);
   if(q.get('run'))openRun(q.get('run'),false);
   else if(q.get('court'))loadCourts().then(cs=>{

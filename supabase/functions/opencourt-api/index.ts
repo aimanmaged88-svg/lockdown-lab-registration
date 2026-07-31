@@ -306,6 +306,13 @@ async function ratingsFor(keys: string[] | null) {
   return out;
 }
 
+// Messages for a run's chat, oldest first, with a verified flag per author.
+async function chatFor(runId: string) {
+  const rows: Record<string, unknown>[] = await db(`oc_run_chat?run_id=eq.${encodeURIComponent(runId)}&select=id,player_id,name,ig,text,created_at&order=created_at.asc&limit=100`);
+  const vs = await verifiedSet((rows || []).map(r => r.player_id as string));
+  return (rows || []).map(r => ({ id: r.id, pid: r.player_id, name: r.name, ig: r.ig, text: r.text, at: r.created_at, v: vs.has(r.player_id as string) }));
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return J({ error: "POST only" }, 405);
@@ -420,6 +427,39 @@ Deno.serve(async (req: Request) => {
         await db(`oc_run_players?run_id=eq.${encodeURIComponent(id)}&player_id=eq.${encodeURIComponent(pid)}`, { method: "DELETE" });
         const rows = await db(`oc_runs?id=eq.${encodeURIComponent(id)}&select=*`);
         return J({ run: rows?.length ? (await withPlayers(rows))[0] : null });
+      }
+
+      // Run chat — coordinate a run ("running late", "who's got a ball"). You
+      // must be tapped into the run (or be its host) to post; reading is open.
+      case "chat_get": {
+        const runId = str(b.run_id, 64);
+        if (!runId) return J({ error: "bad run" }, 400);
+        return J({ messages: await chatFor(runId) });
+      }
+
+      case "chat_send": {
+        const g = await guard(((b.player || {}) as Record<string, unknown>).id as string);
+        if (g.err) return g.err;
+        const player = g.p!;
+        const runId = str(b.run_id, 64);
+        const text = str(b.text, 300);
+        if (!runId || !text) return J({ error: "type something" }, 400);
+        const run = (await db(`oc_runs?id=eq.${encodeURIComponent(runId)}&select=id,host_id`))?.[0];
+        if (!run) return J({ error: "run not found" }, 404);
+        const inRun = run.host_id === player.id || ((await db(`oc_run_players?run_id=eq.${encodeURIComponent(runId)}&player_id=eq.${encodeURIComponent(player.id)}&select=player_id`))?.length);
+        if (!inRun) return J({ error: "tap into the run first, then you can chat", code: "notin" }, 403);
+        // soft flood cap: 20 messages / run / device / 5 min
+        const win = new Date(Date.now() - 3e5).toISOString();
+        const recent = await db(`oc_run_chat?run_id=eq.${encodeURIComponent(runId)}&player_id=eq.${encodeURIComponent(player.id)}&created_at=gte.${win}&select=id`);
+        if ((recent?.length || 0) >= 20) return J({ error: "slow down a sec ✋" }, 429);
+        await db(`oc_run_chat`, { method: "POST", body: JSON.stringify({ run_id: runId, player_id: player.id, name: player.name, ig: player.ig, text, created_at: new Date().toISOString() }) });
+        return J({ messages: await chatFor(runId) });
+      }
+
+      // City-wide King of the Court: the top hoopers by lifetime check-ins.
+      case "leaderboard": {
+        const rows: Record<string, unknown>[] = (await db(`oc_players?banned=is.false&checkins_total=gt.0&select=id,name,ig,tiktok,verified,checkins_total&order=checkins_total.desc&limit=25`)) || [];
+        return J({ kings: rows.map((r, i) => ({ rank: i + 1, id: r.id, name: r.name, ig: r.ig, tiktok: r.tiktok || "", verified: !!r.verified, checkins: Number(r.checkins_total) || 0, tier: tierOf(Number(r.checkins_total) || 0) })), week: sydWeek() });
       }
 
 

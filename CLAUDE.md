@@ -597,6 +597,41 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   suggest→approve loop) + Playwright app (7/7: TikTok sign-up, verify card,
   TikTok link, suggest photo) + desk (7/7: 9-tile dashboard, needs-your-call,
   newest, Locate normalise). All test rows + temp coach deleted.
+- **"Next level" pack (edge v21, 2026-07-31, Aiman: "make it amazing… really
+  next level"). Four features shipped:**
+  - **📲 Installable PWA.** The manifest + apple meta + icons were already in
+    the head from a prior session (icons upgraded here to a glowing haloed
+    basketball — assets/hh-icon-{180,192,512}.png, rendered from scratchpad/
+    hh-icon.svg). NEW: a dismissible **install nudge** `#installBar`
+    (`beforeinstallprompt` → one-tap install on Android; a "tap Share → Add to
+    Home Screen" hint on iOS; `oc_install` localStorage; hidden when already
+    standalone). NO service worker (root sw.js is the Lab's — avoided the scope
+    clash; manifest-only install works on both platforms).
+  - **📸 Shareable cards.** Canvas-drawn branded images (1080×1350) via the Web
+    Share API (files) with a download fallback. `runShareCanvas(r)` = a run
+    card (when/court/format/spots/roster + CTA); `cardShareCanvas(d)` = the NBA
+    player card. Logo drawn with `drawMark()` canvas primitives (NOT an <img>)
+    so the canvas is never tainted → always exports. `#rShare` now shares the
+    image; Profile got a **"📤 Share my card"** row (`#pShare`, uses `MYCARD`).
+  - **👑 King of the Court, live.** Court page KOTC teaser now shows the real
+    king + top-5 (from the existing `kotc` 90-day tap-in data; header
+    `#ctKingHead` goes live when there's a king). NEW **City Kings** city-wide
+    leaderboard: edge `leaderboard` action (top 25 by `checkins_total`, tier +
+    verified), Home **🏆 City Kings** section (`#homeKings`, top 3) + full
+    `#shKings` sheet (`loadKings`/`openKings`/`kingRowHTML`, rows open the
+    hooper card via data-hooper). Medals + colour-coded tier chips.
+  - **💬 Run chat.** Migration `opencourt_run_chat` (table `oc_run_chat`, run_id
+    uuid). Edge: `chat_get` (open read) + `chat_send` (guarded, **must be tapped
+    into the run or be its host** → `notin` 403; 20 msgs/run/device/5min cap) +
+    `chatFor()` helper. App: chat thread inside the run sheet (`#rChat` +
+    `#rChatBox`/`#rChatHint`), `renderChat`/`loadChat`/`paintChat`, 7s poll
+    while the sheet is open (`startChatPoll`/`stopChatPoll`), own messages
+    highlighted, Enter-to-send. True closed-app PUSH is still the follow-up
+    (needs a HH-scoped SW + VAPID) — chat updates live only while the app is
+    open. Told Aiman.
+  - Verified: 10/10 (v20) + 7/7 (v21 chat/leaderboard) backend E2E, share-card
+    renders screenshotted, app 8/8 Playwright smoke (boots clean, City Kings +
+    run chat + install bar + share row). All test rows + temp coaches deleted.
 - v2 ideas discussed: KOTC proper, run chat, POTW weekly archive/all-time
   wall, PWA manifest + install, native app for background geofencing.
 
