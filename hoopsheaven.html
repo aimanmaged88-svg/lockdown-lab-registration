@@ -955,6 +955,11 @@ header{
 .pl .nm b{display:block;font-size:14px;font-weight:800}
 .pl .nm a{color:var(--muted);font-size:12.5px;text-decoration:none}
 .pl .nm a:hover{color:var(--volt)}
+.pl.clk{cursor:pointer;transition:border-color .18s var(--ease),transform .12s var(--spring)}
+.pl.clk:active{transform:scale(.985)}
+.pl.clk:hover{border-color:color-mix(in srgb,var(--volt) 40%,transparent)}
+.nm.clk{cursor:pointer}
+.pl .view{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--dim);font-weight:800;flex:none}
 .hcount{display:flex;align-items:center;gap:11px;background:var(--card);border:1px dashed var(--line);border-radius:13px;padding:9px 12px;margin-top:8px}
 .hcount .hcl{flex:1;min-width:0}
 .hcount .hcl b{display:block;font-size:13.5px;font-weight:800}
@@ -1038,6 +1043,66 @@ header{
 .prow .ic{flex:none}
 .prow span{flex:1}
 .prow .ar{color:var(--dim)}
+
+/* ===== NBA-style player card ===== */
+.nbacard{--tc:#8A9099;position:relative;border-radius:22px;padding:2px;background:
+   linear-gradient(150deg, color-mix(in srgb,var(--tc) 90%,#fff) 0%, var(--tc) 26%, #0c0e12 55%, color-mix(in srgb,var(--tc) 55%,#000) 100%);
+   box-shadow:0 18px 44px -20px color-mix(in srgb,var(--tc) 70%,transparent), 0 2px 0 rgba(255,255,255,.05) inset;
+   overflow:hidden;animation:cardIn .6s var(--ease-out) both}
+@keyframes cardIn{from{opacity:0;transform:translatey(16px) scale(.96)}}
+.nbacard .inner{position:relative;border-radius:20px;background:
+   radial-gradient(120% 90% at 50% -10%, color-mix(in srgb,var(--tc) 26%,#0d1014) 0%, #0b0d11 52%, #090b0e 100%);
+   padding:20px 18px 18px;overflow:hidden}
+/* holographic sheen sweep */
+.nbacard .holo{position:absolute;inset:0;border-radius:20px;pointer-events:none;opacity:.0;background:
+   linear-gradient(115deg,transparent 30%, color-mix(in srgb,var(--tc) 40%,#fff) 46%, rgba(255,255,255,.5) 50%, color-mix(in srgb,var(--tc) 40%,#fff) 54%, transparent 70%);
+   background-size:280% 280%;mix-blend-mode:overlay;animation:sheen 5.5s var(--ease) infinite}
+.nbacard.foil .holo{opacity:.55}.nbacard.foilhi .holo{opacity:.8;animation-duration:3.6s}
+@keyframes sheen{0%{background-position:140% 0}55%,100%{background-position:-60% 0}}
+.nbacard .court{position:absolute;inset:0;border-radius:20px;pointer-events:none;opacity:.10;
+   background:radial-gradient(circle at 50% 118%, var(--tc) 0 1px, transparent 1.5px) 0 0/16px 16px}
+.nbacard .toprow{display:flex;align-items:center;gap:14px;position:relative}
+.nbacard .pfp{width:66px;height:66px;border-radius:20px;flex:none;display:grid;place-items:center;font-family:var(--disp);font-size:30px;font-weight:400;color:#0A0C0F;
+   background:linear-gradient(150deg, color-mix(in srgb,var(--tc) 80%,#fff), var(--tc));box-shadow:0 6px 18px -6px var(--tc)}
+.nbacard .who{flex:1;min-width:0}
+.nbacard .who .nm{font-family:var(--disp);font-weight:400;font-size:24px;line-height:1;letter-spacing:.4px;text-transform:uppercase;display:flex;align-items:center;gap:7px}
+.nbacard .who .nm .vk{color:#5BC9FF;font-size:16px}
+.nbacard .who .ig{color:var(--muted);font-size:13px;text-decoration:none;display:inline-block;margin-top:3px}
+.nbacard .who .ig:hover{color:var(--tc)}
+.tierbadge{display:inline-flex;align-items:center;gap:6px;margin-top:7px;background:color-mix(in srgb,var(--tc) 20%,#000);border:1px solid color-mix(in srgb,var(--tc) 55%,transparent);
+   color:var(--tc);font-family:var(--cond);font-weight:800;font-size:12px;letter-spacing:2px;text-transform:uppercase;padding:4px 11px;border-radius:99px}
+.tierbadge .dot{width:6px;height:6px;border-radius:50%;background:var(--tc);box-shadow:0 0 8px var(--tc)}
+.nbacard .rt{text-align:center;flex:none;min-width:74px}
+.nbacard .rt .big{font-family:var(--disp);font-weight:400;font-size:40px;line-height:.9;color:#fff}
+.nbacard .rt .big.soft{color:var(--tc)}
+.nbacard .rt .out{font-size:11px;color:var(--dim);font-weight:700;letter-spacing:.5px;margin-top:2px}
+.nbacard .rt .new{font-family:var(--cond);font-weight:800;letter-spacing:2px;color:var(--tc);font-size:15px}
+/* box score */
+.boxscore{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px;position:relative}
+.boxscore .b{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:13px;padding:11px 4px;text-align:center}
+.boxscore .b .v{font-family:var(--disp);font-weight:400;font-size:24px;color:#fff;line-height:1}
+.boxscore .b .l{font-size:9.5px;letter-spacing:1.4px;text-transform:uppercase;color:var(--dim);font-weight:700;margin-top:4px}
+/* tier progress */
+.tierbar{margin-top:14px;position:relative}
+.tierbar .lab{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);font-weight:700;margin-bottom:6px}
+.tierbar .track{height:8px;border-radius:99px;background:rgba(255,255,255,.08);overflow:hidden}
+.tierbar .fill{height:100%;border-radius:99px;background:linear-gradient(90deg,color-mix(in srgb,var(--tc) 60%,#fff),var(--tc));width:0;transition:width 1.1s var(--ease-out)}
+.scout{margin-top:8px}
+.scoutrow{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--tc);border-radius:12px;padding:11px 13px;margin-top:8px}
+.scoutrow .top{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:800}
+.scoutrow .st{color:var(--tc);font-weight:900}
+.scoutrow .tx{font-size:13.5px;color:var(--text);margin-top:5px;line-height:1.45}
+.scoutrow a{color:var(--muted);text-decoration:none;font-size:12px}
+/* 1-10 star picker */
+.rate10{display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin:4px 0 10px}
+.rate10 button{background:none;border:none;font-size:26px;cursor:pointer;filter:grayscale(1) opacity(.4);transition:transform .2s var(--spring),filter .12s;padding:2px}
+.rate10 button.on{filter:none;transform:scale(1.12)}
+.rate10 button:active{transform:scale(.85)}
+/* celebration confetti */
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:200;overflow:hidden;display:none}
+#confetti.go{display:block}
+#confetti i{position:absolute;top:-12px;width:9px;height:14px;border-radius:2px;animation:conf 2.4s var(--ease) forwards}
+@keyframes conf{0%{transform:translateY(-10px) rotate(0);opacity:1}100%{transform:translateY(102vh) rotate(720deg);opacity:.9}}
 #vfCard{border:1px solid var(--line);border-radius:14px;padding:14px 15px;margin-bottom:14px;background:var(--card)}
 .swgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-top:6px}
 .swb{border:1px solid var(--line);background:var(--card);border-radius:16px;padding:12px 6px 10px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:7px;font-family:inherit}
@@ -1179,11 +1244,11 @@ header{
   <!-- ============ PROFILE ============ -->
   <section id="vProfile" style="display:none">
     <div class="sect" style="margin-top:16px">
-      <div class="pcard" id="pcard"></div>
-      <div id="vfCard" style="display:none"></div>
-      <div class="prow" id="pEdit"><span class="ic">✏️</span><span>Edit name / Instagram</span><span class="ar">›</span></div>
+      <div id="myCard"></div>
+      <div id="vfCard" style="display:none;margin-top:12px"></div>
+      <div class="prow" id="pEdit" style="margin-top:12px"><span class="ic">✏️</span><span>Edit name / Instagram</span><span class="ar">›</span></div>
       <div class="prow" id="pTheme"><span class="ic">🎨</span><span>Colours</span><span class="ar">›</span></div>
-      <div class="prow" id="pRules"><span class="ic">📜</span><span>House rules</span><span class="ar">›</span></div>
+      <div class="prow" id="pRules"><span class="ic">📜</span><span>House rules &amp; good vibes</span><span class="ar">›</span></div>
     </div>
   </section>
 </div>
@@ -1205,7 +1270,9 @@ header{
   <div class="rule"><span class="ic">🏀</span><span><b>Runs aren't confirmed or guaranteed.</b> Hoops Heaven doesn't run the runs — players call them, players show up (or don't). We're just here to help the community get together and get runs in.</span></div>
   <div class="rule"><span class="ic">⚠️</span><span><b>Play at your own risk.</b> Public courts, real basketball. Look after your body, your stuff, your people and the court.</span></div>
   <div class="rule"><span class="ic">🌱</span><span><b>The community IS the app.</b> It grows on the people in it. Bring good energy, welcome new hoopers, leave the court better than you found it.</span></div>
-  <div class="rule"><span class="ic">🧊</span><span><b>Zero tolerance on bad behaviour.</b> Disrespect, threats, abuse, discrimination — in the app or at a run — and you're gone. Banned indefinitely. One strike is enough.</span></div>
+  <div class="rule"><span class="ic">🙌</span><span><b>Good vibes only — non-negotiable.</b> This is a hype house. Everyone's welcome, every level, every body. Encourage, don't gatekeep. If someone's new or still finding their game, you build them up. That's the culture here.</span></div>
+  <div class="rule"><span class="ic">⭐</span><span><b>Ratings are to hype, never to hurt.</b> Player ratings exist to celebrate hoopers — not to tear anyone down. Low scores never show as a number, and the coach reads every rating and comment before it appears. Rate the run, respect the person.</span></div>
+  <div class="rule"><span class="ic">🧊</span><span><b>Zero tolerance on bad behaviour.</b> Disrespect, threats, abuse, discrimination, tearing people down — in the app or at a run — and you're gone. Banned indefinitely. One strike is enough.</span></div>
   <div class="rule"><span class="ic">🪪</span><span><b>Real accounts only.</b> Sign in with your Instagram — or a real email (Gmail, Apple ID, whatever) if you don't have IG. Burner and fake accounts get removed on sight.</span></div>
   <div class="rule"><span class="ic">🔨</span><span><b>Bans stick.</b> Break the rules and your handle, your email and your device are all blocked. A new account won't save you.</span></div>
   <div class="rule"><span class="ic">🧹</span><span>We can remove any run, clip or account at any time to protect the community.</span></div>
@@ -1326,6 +1393,26 @@ header{
   <input type="color" id="swCustom" value="#FF6A2B" style="position:absolute;width:0;height:0;opacity:0;border:0;padding:0">
 </div></div>
 
+<!-- view a hooper's NBA card -->
+<div class="sheet" id="shHooper"><div class="scrim" data-close></div><div class="panel">
+  <div class="grab"></div>
+  <div class="xrow"><div><h3>Hooper</h3></div><button class="x" data-close>✕</button></div>
+  <div id="hooperBody"><div class="skel" style="height:180px"></div></div>
+</div></div>
+
+<!-- rate a hooper -->
+<div class="sheet" id="shRate"><div class="scrim" data-close></div><div class="panel">
+  <div class="grab"></div>
+  <div class="xrow"><div><h3 id="rtTitle">Rate this hooper</h3><p class="sub">Rate the run, not the person. Good vibes only — the coach reads every rating before it shows. Low scores never show as a number.</p></div><button class="x" data-close>✕</button></div>
+  <div class="rate10" id="rt10"></div>
+  <div style="text-align:center;font-size:13px;color:var(--muted);margin-bottom:10px" id="rtWord">Tap the stars</div>
+  <input class="inp" id="rtComment" maxlength="300" placeholder="Add a hype comment (optional) — keep it love">
+  <button class="btn btn-v btn-block" id="rtGo" style="margin-top:9px">Send rating</button>
+  <p class="fine">One rating per hooper. You can update it anytime — it just goes back to the coach for a look.</p>
+</div></div>
+
+<div id="confetti"></div>
+
 <!-- suggest a court sheet -->
 <div class="sheet" id="shSuggest"><div class="scrim" data-close></div><div class="panel">
   <div class="grab"></div>
@@ -1403,13 +1490,114 @@ let afterProfile=null,idMode='ig';
 function paintMe(){
   if(OCP){$('#meAv').textContent=(OCP.name[0]||'?').toUpperCase();$('#meName').textContent=(OCP.ig?('@'+OCP.ig):OCP.name)+(OCP.vf?' ✓':'');}
   else{$('#meAv').textContent='?';$('#meName').textContent='Who are you?';}
-  paintProfileTab();
 }
-function paintProfileTab(){
-  const el=$('#pcard'); if(!el)return;
-  el.innerHTML=OCP
-    ?`<div class="av">${esc((OCP.name[0]||'?').toUpperCase())}</div><div class="in"><b>${esc(OCP.name)} ${OCP.vf?'<span style="color:var(--ok)">✓</span>':''}</b><span>${OCP.ig?'@'+esc(OCP.ig):esc(OCP.email||'')}</span></div>`
-    :`<div class="av">?</div><div class="in"><b>No account yet</b><span>Tap to sign in</span></div>`;
+/* ===== NBA player cards ===== */
+const RM=()=>matchMedia('(prefers-reduced-motion:reduce)').matches;
+function hooperCardHTML(d,own){
+  const t=d.tier||{key:'rookie',name:'Rookie',color:'#8A9099',min:0,next:null};
+  const foil=t.key==='legend'?' foilhi':(['allstar','franchise'].includes(t.key)?' foil':'');
+  const av=esc((d.name[0]||'?').toUpperCase());
+  const r=d.rating||{show:false};
+  let rt;
+  if(!r.show)rt=`<div class="new">${own?'UNRATED':'NEW'}</div><div class="out">${own?'hoop to get rated':'no ratings yet'}</div>`;
+  else if(r.soft)rt=`<div class="big soft" data-pop>6−</div><div class="out">on the come-up 📈</div>`;
+  else rt=`<div class="big" data-count="${r.value}" data-dec>0.0</div><div class="out">/10 · ${r.count} rating${r.count===1?'':'s'}</div>`;
+  const next=t.next;
+  const pct=next?Math.max(5,Math.min(100,Math.round((d.checkins-t.min)/((next.at-t.min)||1)*100))):100;
+  const bar=`<div class="tierbar"><div class="lab"><span>${esc(t.name)}</span><span>${next?Math.max(0,next.at-d.checkins)+' check-in'+((next.at-d.checkins)===1?'':'s')+' → '+esc(next.name):'👑 top tier'}</span></div><div class="track"><div class="fill" data-fill="${pct}"></div></div></div>`;
+  const box=`<div class="boxscore">
+    <div class="b"><div class="v" data-count="${d.checkins}">0</div><div class="l">Check-ins</div></div>
+    <div class="b"><div class="v" data-count="${d.runs}">0</div><div class="l">Runs</div></div>
+    <div class="b"><div class="v" data-count="${d.clips}">0</div><div class="l">Clips</div></div>
+    <div class="b"><div class="v" data-count="${d.fires}">0</div><div class="l">🔥 Fires</div></div></div>`;
+  const scout=(d.comments&&d.comments.length)
+    ?`<div class="scout"><h4 class="subsect" style="margin:18px 0 2px">📋 Scouting report</h4>`+d.comments.map(c=>`<div class="scoutrow"><div class="top"><span class="st">${'★'.repeat(Math.max(1,Math.min(10,c.stars)))}</span> <b>${esc(c.name)}</b>${c.ig?` <a href="https://instagram.com/${esc(c.ig)}" target="_blank" rel="noopener">@${esc(c.ig)}</a>`:''}</div>${c.comment?`<div class="tx">${esc(c.comment)}</div>`:''}</div>`).join('')+`</div>`
+    :'';
+  const rateBtn=(!own&&OCP)?`<button class="btn btn-v btn-block" id="rateHooperBtn" style="margin-top:14px">${d.mine?('✏️ Update your rating'+(d.mine.approved?'':' · pending')):'⭐ Rate this hooper'}</button>`:'';
+  return `<div class="nbacard${foil}" style="--tc:${t.color}"><div class="inner">
+    <div class="court"></div><div class="holo"></div>
+    <div class="toprow">
+      <div class="pfp">${av}</div>
+      <div class="who"><div class="nm">${esc(d.name)}${d.verified?'<span class="vk" title="verified">✓</span>':''}</div>
+        ${d.ig?`<a class="ig" href="https://instagram.com/${esc(d.ig)}" target="_blank" rel="noopener">@${esc(d.ig)} ↗</a>`:''}
+        <div><span class="tierbadge"><span class="dot"></span>${esc(t.name)}</span></div></div>
+      <div class="rt">${rt}</div>
+    </div>
+    ${box}${bar}${scout}
+  </div></div>${rateBtn}`;
+}
+function animateCard(root){
+  root.querySelectorAll('[data-count]').forEach(el=>{
+    const target=+el.dataset.count,dec=el.hasAttribute('data-dec');
+    if(RM()||!(target>0)){el.textContent=dec?(+target).toFixed(1):target;return}
+    const dur=900,t0=performance.now();
+    const step=now=>{const p=Math.min(1,(now-t0)/dur),e=1-Math.pow(1-p,3),v=target*e;el.textContent=dec?v.toFixed(1):Math.round(v);if(p<1)requestAnimationFrame(step);};
+    requestAnimationFrame(step);
+  });
+  root.querySelectorAll('[data-fill]').forEach(el=>requestAnimationFrame(()=>{el.style.width=el.dataset.fill+'%';}));
+  if(!RM())root.querySelectorAll('[data-pop]').forEach(el=>el.animate&&el.animate([{transform:'scale(.6)',opacity:0},{transform:'scale(1)',opacity:1}],{duration:420,easing:'cubic-bezier(.34,1.4,.5,1)'}));
+}
+async function paintProfileTab(){
+  const el=$('#myCard'); if(!el)return;
+  if(!OCP){el.innerHTML='<div class="pcard" id="pcardEmpty" style="cursor:pointer"><div class="av">?</div><div class="in"><b>No account yet</b><span>Tap to create your card</span></div></div>';const e=$('#pcardEmpty');if(e)e.onclick=openMyEdit;return;}
+  if(!el.querySelector('.nbacard'))el.innerHTML='<div class="skel" style="height:210px;border-radius:22px"></div>';
+  try{
+    const d=await api({action:'profile',player_id:OCP.id,viewer_id:OCP.id});
+    el.innerHTML=hooperCardHTML(d,true);animateCard(el);
+    if(d.tier&&d.tier.key==='legend')confettiBurst(d.tier.color);
+  }catch(e){el.innerHTML=`<div class="pcard"><div class="av">${esc((OCP.name[0]||'?').toUpperCase())}</div><div class="in"><b>${esc(OCP.name)} ${OCP.vf?'<span style="color:var(--ok)">✓</span>':''}</b><span>${OCP.ig?'@'+esc(OCP.ig):esc(OCP.email||'')}</span></div></div>`;}
+}
+// make any element with data-hooper open that player's card (inner links still work)
+function wireHoopers(root){
+  root.querySelectorAll('[data-hooper]').forEach(x=>{
+    x.querySelectorAll('a').forEach(a=>a.addEventListener('click',e=>e.stopPropagation()));
+    x.onclick=e=>{if(e.target.closest('a'))return;const id=x.dataset.hooper;if(id)openHooper(id);};
+  });
+}
+let HOOPER=null;
+async function openHooper(id){
+  if(!id)return;
+  $('#hooperBody').innerHTML='<div class="skel" style="height:210px"></div>';
+  openSheet('shHooper');
+  try{
+    const d=await api({action:'profile',player_id:id,viewer_id:OCP?OCP.id:''});
+    HOOPER=d;const own=OCP&&OCP.id===id;
+    $('#hooperBody').innerHTML=hooperCardHTML(d,own);animateCard($('#hooperBody'));
+    const rb=$('#rateHooperBtn');if(rb)rb.onclick=()=>openRate(d);
+  }catch(e){$('#hooperBody').innerHTML=`<div class="empty" style="padding:20px">${esc(e.message)}</div>`;}
+}
+/* rate a hooper 1-10 */
+let RATEE=null,RSTARS=0;
+const RWORDS={1:'Everyone starts somewhere 🌱',2:'On the come-up',3:'Building the game',4:'Getting there',5:'Solid role player',6:'Reliable bucket',7:'Real problem 🔥',8:'Cold — All-Star stuff',9:'Elite. Certified hooper',10:'👑 Untouchable'};
+function paintRate10(){
+  $('#rt10').innerHTML=[1,2,3,4,5,6,7,8,9,10].map(s=>`<button class="${s<=RSTARS?'on':''}" data-s="${s}">⭐</button>`).join('');
+  $('#rt10').querySelectorAll('button').forEach(b=>b.onclick=()=>{RSTARS=+b.dataset.s;paintRate10();$('#rtWord').textContent=RWORDS[RSTARS]||'';});
+}
+function openRate(d){
+  RATEE=d;RSTARS=(d.mine&&d.mine.stars)||0;
+  $('#rtTitle').textContent='Rate '+d.name;
+  $('#rtComment').value=(d.mine&&d.mine.comment)||'';
+  $('#rtWord').textContent=RSTARS?(RWORDS[RSTARS]||''):'Tap the stars';
+  paintRate10();openSheet('shRate');
+}
+$('#rtGo').onclick=()=>ensureProfile(async()=>{
+  if(!RATEE)return;
+  if(!RSTARS){toast('Tap the stars first',1);return}
+  const b=$('#rtGo');b.disabled=true;b.textContent='Sending…';
+  try{
+    await api({action:'rate_player',player:OCP,ratee:RATEE.id,stars:RSTARS,comment:$('#rtComment').value.trim()});
+    closeSheet('shRate');
+    toast('Rating sent 🙏 The coach reads it, then it hypes their card',0,3900);
+    if($('#shHooper').classList.contains('open'))openHooper(RATEE.id);
+  }catch(e){toast(e.message,1);}
+  b.disabled=false;b.textContent='Send rating';
+});
+function confettiBurst(color){
+  if(RM())return;
+  const c=$('#confetti'),cols=[color||'#FF6A2B','#fff','#FFC93C','#5BC9FF'];
+  let h='';for(let i=0;i<70;i++){h+=`<i style="left:${(i*1.43+ (i*37%13))%100}vw;background:${cols[i%cols.length]};animation-delay:${(i%9)*.09}s;animation-duration:${1.9+(i%7)*.18}s"></i>`;}
+  c.innerHTML=h;c.classList.add('go');
+  setTimeout(()=>{c.classList.remove('go');c.innerHTML='';},3400);
 }
 /* verification */
 const VERIFY_IG='lockdownlablive';            // swap when the Hoops Heaven IG page is live
@@ -1493,7 +1681,6 @@ function openMyEdit(){
 }
 $('#meChip').onclick=openMyEdit;
 $('#pEdit').onclick=openMyEdit;
-$('#pcard').onclick=openMyEdit;
 $('#pTheme').onclick=()=>{paintSw(localStorage.getItem('oc_accent')||'#FF6A2B');openSheet('shTheme')};
 $('#pRules').onclick=()=>openSheet('shTerms');
 $('#pfSave').onclick=async()=>{
@@ -1511,7 +1698,7 @@ $('#pfSave').onclick=async()=>{
     const fresh=!OCP;
     OCP={id,name,ig,email,vf:!!d.verified,code:d.verify_code||''};
     localStorage.setItem('oc_profile',JSON.stringify(OCP));
-    paintMe();paintVf();
+    paintMe();paintVf();paintProfileTab();
     $('#shProfile').classList.remove('gate');
     closeSheet('shProfile');
     toast(fresh?'Account created. Welcome to Hoops Heaven 🏀':'Saved 🏀');
@@ -1674,9 +1861,10 @@ function paintRun(){
   $('#rSpots').textContent=full?'Run is FULL':`${r.cap-n} spot${r.cap-n===1?'':'s'} left`;
   $('#rHost').textContent=`called by ${r.host_name}`;
   $('#rRoster').innerHTML=(r.players||[]).map(p=>`
-    <div class="pl"><div class="av">${esc((p.name[0]||'?').toUpperCase())}</div>
+    <div class="pl clk" data-hooper="${esc(p.id)}"><div class="av">${esc((p.name[0]||'?').toUpperCase())}</div>
       <div class="nm"><b>${esc(p.name)}${p.v?' <span style="color:var(--volt)" title="verified account">✓</span>':''}</b>${p.ig?`<a href="https://instagram.com/${esc(p.ig)}" target="_blank" rel="noopener">@${esc(p.ig)}</a>`:''}</div>
-      ${p.id===r.host_id?'<span class="host">CALLED IT</span>':''}</div>`).join('');
+      ${p.id===r.host_id?'<span class="host">CALLED IT</span>':'<span class=" view">card ›</span>'}</div>`).join('');
+  wireHoopers($('#rRoster'));
   const j=$('#rJoin');
   if(im){j.textContent="I'm out";j.className='btn btn-out';j.style.flex='1.4';j.disabled=false;}
   else if(full){j.textContent='Run is full';j.className='btn btn-ghost';j.disabled=true;}
@@ -2054,7 +2242,7 @@ function paintPlays(plays){
   $('#ctPlays').innerHTML=(plays&&plays.length)?plays.map((p,i)=>`
     <div class="play ${i===0&&p.fires>0?'top':''}">
       <span class="rk">${i===0&&p.fires>0?'🏆':'#'+(i+1)}</span>
-      <div class="nm"><b>${esc(p.name)}${p.v?' <span style="color:var(--volt)" title="verified account">✓</span>':''}</b>${p.ig?`<a href="https://instagram.com/${esc(p.ig)}" target="_blank" rel="noopener">@${esc(p.ig)}</a>`:''}</div>
+      <div class="nm clk" data-hooper="${esc(p.player_id)}"><b>${esc(p.name)}${p.v?' <span style="color:var(--volt)" title="verified account">✓</span>':''}</b>${p.ig?`<a href="https://instagram.com/${esc(p.ig)}" target="_blank" rel="noopener">@${esc(p.ig)}</a>`:''}</div>
       <a class="watch" href="${esc(p.clip_url)}" target="_blank" rel="noopener">▶ Watch</a>
       <button class="fire ${p.fired?'on':''}" data-fire="${esc(p.id)}">🔥 ${p.fires}</button>
     </div>`).join('')
@@ -2063,6 +2251,7 @@ function paintPlays(plays){
     try{const d=await api({action:'play_fire',play_id:b.dataset.fire,player_id:OCP.id});paintPlays(d.plays);}
     catch(e){toast(e.message,1)}
   }));
+  wireHoopers($('#ctPlays'));
 }
 $('#ctDrop').onclick=()=>ensureProfile(async()=>{
   const url=$('#ctClip').value.trim();
@@ -2136,10 +2325,11 @@ function paintHere(list,extra){
     $('#ctHereN').textContent=`${total} here now`+(HEXTRA?` · ${HEXTRA} off-app`:'');
   }else live.style.display='none';
   $('#ctHere').innerHTML=list.length?list.map(h=>`
-    <div class="pl" style="margin-bottom:7px"><div class="av">${esc((h.name[0]||'?').toUpperCase())}</div>
+    <div class="pl clk" data-hooper="${esc(h.id)}" style="margin-bottom:7px"><div class="av">${esc((h.name[0]||'?').toUpperCase())}</div>
       <div class="nm"><b>${esc(h.name)}${h.verified?' <span title="location verified" style="color:#4DE8A8">✓</span>':''}</b>${h.ig?`<a href="https://instagram.com/${esc(h.ig)}" target="_blank" rel="noopener">@${esc(h.ig)}</a>`:''}</div>
       <span style="font-size:11.5px;color:var(--dim)">${OCP&&h.id===OCP.id?'auto-out '+esc(sinceHM(new Date(h.at).getTime()+72e5)):'since '+esc(sinceHM(h.at))}</span></div>`).join('')
     :(HEXTRA?'<div class="empty" style="padding:14px">Only off-app players right now — check in when you pull up.</div>':'<div class="empty" style="padding:14px">Nobody\'s checked in right now.</div>');
+  wireHoopers($('#ctHere'));
   const b=$('#ciBtn'),mine=OCP&&list.find(h=>h.id===OCP.id);
   const ex=$('#ctExtra');
   if(mine){ex.style.display='';$('#ctExtraN').textContent=(mine.extra||0);}

@@ -123,14 +123,31 @@ async function verifiedSet(ids: string[]) {
 
 // The write gate: device must be registered (terms accepted) and clean.
 // Returns {p} with the REGISTERED identity, or {err} as a ready Response.
-async function guard(pid: string): Promise<{ p?: { id: string; name: string; ig: string; verified: boolean }; err?: Response }> {
+async function guard(pid: string): Promise<{ p?: { id: string; name: string; ig: string; verified: boolean; checkins: number }; err?: Response }> {
   const id = str(pid, 64);
   if (!id || id.length < 8) return { err: J({ error: "sign in first", code: "terms" }, 401) };
-  const rows = await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=id,name,ig,email,accepted_at,banned,verified`);
+  const rows = await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=id,name,ig,email,accepted_at,banned,verified,checkins_total`);
   const row = rows?.[0];
   if (!row || !row.accepted_at) return { err: J({ error: "sign in and accept the house rules first", code: "terms" }, 401) };
   if (row.banned || await bansHit([row.id, row.ig, row.email])) return { err: J({ error: BANNED_MSG, code: "banned" }, 403) };
-  return { p: { id: row.id, name: row.name, ig: row.ig, verified: !!row.verified } };
+  return { p: { id: row.id, name: row.name, ig: row.ig, verified: !!row.verified, checkins: Number(row.checkins_total) || 0 } };
+}
+
+// NBA-style tier from lifetime check-ins. Purely for hype — the community
+// rating is separate. Each tier has a colour the card glows with.
+function tierOf(n: number) {
+  const T = [
+    { min: 100, key: "legend", name: "Legend", color: "#FFC93C" },
+    { min: 50, key: "franchise", name: "Franchise", color: "#B98CFF" },
+    { min: 25, key: "allstar", name: "All-Star", color: "#FF6A2B" },
+    { min: 10, key: "starter", name: "Starter", color: "#2ECC71" },
+    { min: 3, key: "rotation", name: "Rotation", color: "#5BC9FF" },
+    { min: 0, key: "rookie", name: "Rookie", color: "#8A9099" },
+  ];
+  const idx = T.findIndex(t => n >= t.min);
+  const cur = T[idx];
+  const nextUp = idx > 0 ? T[idx - 1] : null; // the tier above (T is high→low)
+  return { key: cur.key, name: cur.name, color: cur.color, min: cur.min, next: nextUp ? { name: nextUp.name, at: nextUp.min } : null };
 }
 
 // ISO week of the current Sydney date, e.g. "2026-W31" — the POTW window.
@@ -431,8 +448,13 @@ Deno.serve(async (req: Request) => {
           method: "POST",
           body: JSON.stringify({ court_key: court.key, court_name: court.name, suburb: court.suburb, lat: coords ? coords[0] : court.lat, lon: coords ? coords[1] : court.lon, player_id: player.id, name: player.name, ig: player.ig, verified, via }),
         });
+        // Atomic + durable: the DB function counts this only as a genuine fresh
+        // arrival (different court, or >6h since last here) so tap-out/tap-in and
+        // GPS flapping at the same court can't farm the tally. Returns new total.
+        let ciTotal = player.checkins;
+        try { ciTotal = Number(await db(`rpc/oc_checkin_bump`, { method: "POST", body: JSON.stringify({ p_id: player.id, p_court: court.key }) })) || player.checkins; } catch (_e) { /* keep prior on failure */ }
         const h = await hereFor(court.key);
-        return J({ here: h.list, hereTotal: h.total, hereExtra: h.extra, verified });
+        return J({ here: h.list, hereTotal: h.total, hereExtra: h.extra, verified, checkins: ciTotal });
       }
 
       case "checkout": {
@@ -485,6 +507,77 @@ Deno.serve(async (req: Request) => {
         await db(`oc_inbox?on_conflict=player_id`, {
           method: "POST", headers: { Prefer: "resolution=merge-duplicates" },
           body: JSON.stringify({ player_id: player.id, name: player.name, ig: player.ig, email: rows?.[0]?.email || "", text: str(b.text, 300), created_at: new Date().toISOString() }),
+        });
+        return J({ ok: true });
+      }
+
+      // NBA-style profile for any hooper: tier from check-ins, box score, and
+      // the community rating + approved scouting reports. The rating is kept
+      // POSITIVE by design — anything under 7 shows as "6−", never a low number.
+      case "profile": {
+        const id = str(b.player_id, 64);
+        if (!id) return J({ error: "bad request" }, 400);
+        const viewer = str(b.viewer_id, 64);
+        const prow = (await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=id,name,ig,verified,checkins_total,created_at`))?.[0];
+        if (!prow) return J({ error: "hooper not found" }, 404);
+        const runs = (await db(`oc_run_players?player_id=eq.${encodeURIComponent(id)}&select=run_id`)) || [];
+        const clips = (await db(`oc_plays?player_id=eq.${encodeURIComponent(id)}&select=id`)) || [];
+        let fires = 0;
+        if (clips.length) {
+          const f = await db(`oc_play_fires?play_id=in.(${clips.map((c: Record<string, unknown>) => `"${sid(c.id)}"`).join(",")})&select=play_id`);
+          fires = (f || []).length;
+        }
+        // approved feedback only counts toward the rating + shows as comments
+        const fb: Record<string, unknown>[] = (await db(`oc_pfeedback?ratee_id=eq.${encodeURIComponent(id)}&approved=is.true&select=rater_id,stars,comment,created_at&order=created_at.desc`)) || [];
+        const rcount = fb.length;
+        const avg = rcount ? fb.reduce((a, r) => a + (r.stars as number), 0) / rcount : 0;
+        const raterIds = [...new Set(fb.map(r => r.rater_id as string))];
+        const rnames: Record<string, { name: string; ig: string }> = {};
+        if (raterIds.length) for (const p of await db(`oc_players?id=in.(${raterIds.map(i => `"${sid(i)}"`).join(",")})&select=id,name,ig`) || []) rnames[p.id] = { name: p.name, ig: p.ig };
+        const comments = fb.filter(r => String(r.comment || "").trim()).map(r => ({ stars: r.stars, comment: r.comment, at: r.created_at, name: rnames[r.rater_id as string]?.name || "A hooper", ig: rnames[r.rater_id as string]?.ig || "" }));
+        // Whether the viewer has already rated this player, so the app can label
+        // the button. viewer_id is client-supplied and device ids are public, so
+        // we NEVER echo back un-approved content here (that would leak the exact
+        // pending comment the moderation queue exists to gate). Approved content
+        // is already public via `comments`, so it's safe to prefill; pending
+        // ratings only surface as {pending:true}.
+        let mine: Record<string, unknown> | null = null;
+        if (viewer && viewer !== id) {
+          const m = (await db(`oc_pfeedback?rater_id=eq.${encodeURIComponent(viewer)}&ratee_id=eq.${encodeURIComponent(id)}&select=stars,comment,approved`))?.[0];
+          if (m) mine = m.approved ? { stars: m.stars, comment: m.comment, approved: true } : { pending: true };
+        }
+        // anti-disheartening rating display
+        let rating: Record<string, unknown>;
+        if (!rcount) rating = { show: false, label: "Unrated", value: null, count: 0 };
+        else if (avg < 7) rating = { show: true, label: "6−", value: null, count: rcount, soft: true };
+        else rating = { show: true, label: (Math.round(avg * 10) / 10).toFixed(1), value: Math.round(avg * 10) / 10, count: rcount, soft: false };
+        return J({ id: prow.id, name: prow.name, ig: prow.ig, verified: !!prow.verified, checkins: Number(prow.checkins_total) || 0, runs: runs.length, clips: clips.length, fires, tier: tierOf(Number(prow.checkins_total) || 0), rating, comments: comments.slice(0, 30), mine, joined: prow.created_at });
+      }
+
+      // Rate another hooper 1-10 (+ optional scouting note). Coach-moderated:
+      // every rating lands PENDING and only counts once approved. One rating per
+      // pair (resubmit updates + re-enters moderation). Can't rate yourself.
+      case "rate_player": {
+        const g = await guard(((b.player || {}) as Record<string, unknown>).id as string);
+        if (g.err) return g.err;
+        const rater = g.p!;
+        const ratee = str(b.ratee, 64);
+        if (!ratee || ratee === rater.id) return J({ error: "you can't rate yourself 😅" }, 400);
+        const exists = (await db(`oc_players?id=eq.${encodeURIComponent(ratee)}&select=id`))?.[0];
+        if (!exists) return J({ error: "hooper not found" }, 404);
+        const stars = num(b.stars, 1, 10, 0);
+        if (!stars) return J({ error: "pick 1–10 stars" }, 400);
+        // Anti-flood: at most 20 NEW hoopers rated per device per day (updating an
+        // existing rating is always allowed). Keeps the moderation queue sane.
+        const dayAgo = new Date(Date.now() - 864e5).toISOString();
+        const already = (await db(`oc_pfeedback?rater_id=eq.${encodeURIComponent(rater.id)}&ratee_id=eq.${encodeURIComponent(ratee)}&select=ratee_id`))?.length;
+        if (!already) {
+          const todays = await db(`oc_pfeedback?rater_id=eq.${encodeURIComponent(rater.id)}&created_at=gte.${dayAgo}&select=ratee_id`);
+          if ((todays?.length || 0) >= 20) return J({ error: "easy — that's a lot of ratings for one day, come back tomorrow" }, 429);
+        }
+        await db(`oc_pfeedback?on_conflict=rater_id,ratee_id`, {
+          method: "POST", headers: { Prefer: "resolution=merge-duplicates" },
+          body: JSON.stringify({ rater_id: rater.id, ratee_id: ratee, stars, comment: str(b.comment, 300), approved: false, created_at: new Date().toISOString() }),
         });
         return J({ ok: true });
       }
@@ -617,7 +710,33 @@ Deno.serve(async (req: Request) => {
         const rows = await db(`oc_players?select=id,name,ig,email,verified,verify_code,banned,created_at&order=created_at.desc&limit=200`);
         const inbox = await db(`oc_inbox?select=*&order=created_at.asc&limit=100`);
         const court_reqs = await db(`oc_court_reqs?select=*&order=created_at.desc&limit=100`);
-        return J({ players: rows || [], inbox: inbox || [], court_reqs: court_reqs || [] });
+        const fb_pending = await db(`oc_pfeedback?approved=is.false&select=id`);
+        return J({ players: rows || [], inbox: inbox || [], court_reqs: court_reqs || [], feedback_pending: (fb_pending || []).length });
+      }
+
+      // Feedback moderation queue: player→player ratings + comments. Pending
+      // first. The coach approves the good vibes, rejects the rest.
+      case "admin_feedback": {
+        if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
+        const rows: Record<string, unknown>[] = await db(`oc_pfeedback?select=*&order=approved.asc,created_at.desc&limit=300`) || [];
+        const ids = [...new Set(rows.flatMap(r => [r.rater_id as string, r.ratee_id as string]))];
+        const names: Record<string, { name: string; ig: string }> = {};
+        if (ids.length) for (const p of await db(`oc_players?id=in.(${ids.map(i => `"${sid(i)}"`).join(",")})&select=id,name,ig`) || []) names[p.id] = { name: p.name, ig: p.ig };
+        return J({ feedback: rows.map(r => ({ id: r.id, stars: r.stars, comment: r.comment, approved: r.approved, at: r.created_at, rater: names[r.rater_id as string] || { name: "?" }, ratee: names[r.ratee_id as string] || { name: "?" } })) });
+      }
+
+      case "admin_feedback_set": {
+        if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
+        const id = str(b.id, 64);
+        if (!id) return J({ error: "bad request" }, 400);
+        await db(`oc_pfeedback?id=eq.${encodeURIComponent(id)}`, { method: "PATCH", body: JSON.stringify({ approved: b.on !== false }) });
+        return J({ ok: true });
+      }
+
+      case "admin_feedback_del": {
+        if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
+        await db(`oc_pfeedback?id=eq.${encodeURIComponent(str(b.id, 64))}`, { method: "DELETE" });
+        return J({ ok: true });
       }
 
       case "admin_verify": {
