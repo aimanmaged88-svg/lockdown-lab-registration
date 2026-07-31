@@ -48,6 +48,7 @@ textarea.inp{resize:vertical;min-height:70px}
 .btn{border:none;border-radius:11px;font-weight:800;font-size:13.5px;padding:10px 16px;cursor:pointer;font-family:inherit}
 .btn-v{background:var(--volt);color:#0A0C0F}
 .btn-g{background:var(--card2);color:var(--text);border:1px solid var(--line)}
+.btn-g.on{background:var(--volt);color:#0A0C0F;border-color:var(--volt)}
 .btn-r{background:var(--card2);color:var(--bad);border:1px solid color-mix(in srgb, var(--bad) 35%, transparent)}
 .btn-block{width:100%;padding:13px}
 .btn[disabled]{opacity:.55;pointer-events:none}
@@ -129,6 +130,7 @@ textarea.inp{resize:vertical;min-height:70px}
       <button class="nv on" data-sec="overview">🏠 Overview <span class="b" id="bReq"></span></button>
       <button class="nv" data-sec="players">👥 Players</button>
       <button class="nv" data-sec="courts">🏀 Courts <span class="b" id="bCourts"></span></button>
+      <button class="nv" data-sec="feedback">⭐ Feedback <span class="b" id="bFeedback"></span></button>
     </nav>
     <div class="sb-foot">
       <button class="btn btn-g" id="modeBtn">☀️ Light</button>
@@ -265,6 +267,16 @@ textarea.inp{resize:vertical;min-height:70px}
           </div>
         </div>
       </section>
+
+      <section id="sec-feedback" style="display:none">
+        <h1>Feedback</h1>
+        <p class="sub">Player-to-player ratings + comments. Nothing shows on a player's card until you approve it. Good vibes only — keep the culture right.</p>
+        <div style="display:flex;gap:8px;margin:4px 0 14px">
+          <button class="btn btn-g on" id="fbTabPending" data-fbtab="pending">Pending <span id="fbPN"></span></button>
+          <button class="btn btn-g" id="fbTabAll" data-fbtab="all">All</button>
+        </div>
+        <div id="fbList"><div class="empty">Loading…</div></div>
+      </section>
     </div>
   </main>
 </div>
@@ -300,6 +312,7 @@ document.querySelectorAll('.nv').forEach(n=>n.onclick=()=>{
   document.querySelectorAll('main section').forEach(s=>s.style.display='none');
   $('#sec-'+n.dataset.sec).style.display='';
   if(n.dataset.sec==='courts')initCourts();
+  if(n.dataset.sec==='feedback')loadFeedback();
 });
 
 function show(){
@@ -347,6 +360,7 @@ async function load(){
     const ps=d.players||[],inbox=d.inbox||[],runs=bd.runs||[];
     const bb=$('#bReq');bb.textContent=inbox.length;bb.style.display=inbox.length?'':'none';
     renderSuggestions(d.court_reqs||[]);
+    const fbn=+d.feedback_pending||0,bf=$('#bFeedback');if(bf){bf.textContent=fbn;bf.style.display=fbn?'':'none';}
     $('#stats').innerHTML=`
       <div class="stat"><b>${ps.filter(p=>!p.banned).length}</b><span>players</span></div>
       <div class="stat"><b>${ps.filter(p=>p.verified).length}</b><span>verified</span></div>
@@ -602,6 +616,40 @@ function renderSuggestions(reqs){
     catch(e){toast(e.message,1)}
   });
 }
+
+/* ---------- feedback moderation ---------- */
+let FB=[],FBTAB='pending';
+async function loadFeedback(){
+  $('#fbList').innerHTML='<div class="empty">Loading…</div>';
+  try{const d=await api({action:'admin_feedback'});FB=d.feedback||[];renderFeedback();}
+  catch(e){$('#fbList').innerHTML='<div class="empty">'+esc(e.message)+'</div>';}
+}
+function renderFeedback(){
+  const pend=FB.filter(f=>!f.approved);
+  const pn=$('#fbPN');if(pn){pn.textContent=pend.length?'('+pend.length+')':'';}
+  document.querySelectorAll('[data-fbtab]').forEach(b=>b.classList.toggle('on',b.dataset.fbtab===FBTAB));
+  const rows=FBTAB==='pending'?pend:FB;
+  $('#fbList').innerHTML=rows.length?rows.map(f=>`
+    <div class="row ${f.approved?'':'pending'}">
+      <div class="who">
+        <b><span style="color:#FFC24D">${'★'.repeat(Math.max(1,Math.min(10,f.stars)))}</span> ${f.stars}/10 · ${esc(f.rater.name||'?')} → <b style="color:var(--volt)">${esc(f.ratee.name||'?')}</b> ${f.approved?'<span class="tag g">LIVE</span>':'<span class="tag p">PENDING</span>'}</b>
+        ${f.comment?`<span style="display:block;font-style:italic;margin-top:3px">“${esc(f.comment)}”</span>`:'<span style="display:block;color:var(--dim);margin-top:3px">no comment — just a rating</span>'}
+        ${f.rater.ig?`<a href="https://instagram.com/${esc(f.rater.ig)}" target="_blank" rel="noopener">@${esc(f.rater.ig)} ↗</a>`:''}
+      </div>
+      ${f.approved
+        ?`<button class="btn btn-g" data-fbun="${esc(f.id)}">Un-approve</button>`
+        :`<button class="btn btn-v" data-fbok="${esc(f.id)}">✓ Approve</button>`}
+      <button class="btn btn-r" data-fbdel="${esc(f.id)}">Reject</button></div>`).join('')
+    :`<div class="empty">${FBTAB==='pending'?'No feedback waiting. All caught up ✨':'No feedback yet.'}</div>`;
+  document.querySelectorAll('[data-fbok]').forEach(b=>b.onclick=()=>fbAct('admin_feedback_set',{id:b.dataset.fbok,on:true},'Approved ⭐ It\'s on their card'));
+  document.querySelectorAll('[data-fbun]').forEach(b=>b.onclick=()=>fbAct('admin_feedback_set',{id:b.dataset.fbun,on:false},'Taken off their card'));
+  document.querySelectorAll('[data-fbdel]').forEach(b=>b.onclick=()=>{if(confirm('Reject and delete this feedback?'))fbAct('admin_feedback_del',{id:b.dataset.fbdel},'Rejected');});
+}
+async function fbAct(action,body,msg){
+  try{await api({action,...body});toast(msg);await loadFeedback();load();}
+  catch(e){toast(e.message,1);}
+}
+document.querySelectorAll('[data-fbtab]').forEach(b=>b.onclick=()=>{FBTAB=b.dataset.fbtab;renderFeedback();});
 
 show();
 setInterval(()=>{if(CREDS&&!document.hidden)load()},30000);
