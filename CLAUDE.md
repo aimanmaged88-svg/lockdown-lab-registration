@@ -522,6 +522,39 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   Marker (HHMarker) accent unchanged. Old anton/barlow + bebas/inter woff2
   deleted. Verified live (chakrapetch 200, old refs gone). To change again:
   swap the 3 @font-face src blocks (same names) + drop new woff2 in assets/fonts.
+- **NBA-style player profiles + peer ratings + coach moderation (edge v18,
+  2026-07-31, Aiman asked — "NBA style profile… depending on check-ins…
+  feedback from other players I approve… stars out of 10… under 6 doesn't
+  register, just says 6−… not disheartening… good vibes as a rule").**
+  Migrations `opencourt_profiles` (oc_players.checkins_total; oc_pfeedback
+  [rater/ratee/stars 1-10/comment/approved, unique pair]) + `opencourt_checkin_bump`
+  (oc_players.last_ci_court/last_ci_at + `oc_checkin_bump()` RPC).
+  Edge: `profile` (tier from check-ins via tierOf[] Rookie→Rotation→Starter→
+  All-Star→Franchise→Legend; box score check-ins/runs/clips/fires; community
+  rating from APPROVED oc_pfeedback only; **anti-disheartening display** — avg
+  <7 → "6−" soft, no ratings → "Unrated", never a low number; approved
+  comments = scouting report; `mine` never echoes UN-approved content — a
+  security fix so client-spoofed viewer_id can't harvest pending moderation
+  text). `rate_player` (guarded, self-block, 1 per pair upsert→pending, 20
+  new-ratees/day cap). `admin_feedback`/`_set`/`_del` (coach moderation
+  queue). checkin now bumps checkins_total via the atomic+durable RPC (dedups
+  tap-out/tap-in + GPS flap at the same court within 6h — no farming).
+  admin_players returns feedback_pending.
+  App (hoopsheaven.html): Profile tab = your NBA trading-card (tier-coloured
+  foil/glow, holographic sheen, count-up box score, tier-progress bar, Legend
+  confetti). `openHooper(id)` #shHooper sheet views ANY player — wired from
+  run rosters / here-now / Play-of-the-Week (data-hooper + wireHoopers).
+  `#shRate` 1-10 star picker (positive word per score) → rate_player. Community
+  **good-vibes rules added to House Rules** (non-negotiable: hype not hurt,
+  ratings celebrate not tear down, all levels welcome). All animations under
+  prefers-reduced-motion.
+  Desk (hoopsheaven-desk.html): ⭐ Feedback section (Pending/All tabs,
+  Approve/Reject, nav badge).
+  QUALITY: ran an adversarial 5-lens review workflow (13 agents) → 7 confirmed
+  findings, ALL fixed incl. a CRITICAL stale `$('#pcard')` selector that
+  halted app boot, the viewer_id pending-leak, and check-in inflation. Verified
+  E2E (15-check profile flow + 6-check fixes flow, all live; app boots clean,
+  live NBA card + desk moderation screenshotted; all demo/test rows deleted).
 - v2 ideas discussed: KOTC proper, run chat, POTW weekly archive/all-time
   wall, PWA manifest + install, native app for background geofencing.
 
