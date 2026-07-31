@@ -632,6 +632,38 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   - Verified: 10/10 (v20) + 7/7 (v21 chat/leaderboard) backend E2E, share-card
     renders screenshotted, app 8/8 Playwright smoke (boots clean, City Kings +
     run chat + install bar + share row). All test rows + temp coaches deleted.
+- **Closed-app push notifications — SHIPPED (edge v22, 2026-07-31, Aiman:
+  "do all three").** True background pings, three events. Migration
+  `opencourt_push_notif_saves`: `oc_push` (device push subscription, unique
+  player_id), `oc_notif` (per-player notification queue), `oc_saves`
+  (server-side saved courts). REUSES the Lab's VAPID keypair (hardcoded in
+  app-api — same Supabase project, no new keys/cost). Pattern mirrors the Lab:
+  a **payload-free "tickle" push** wakes the SW, which then **pulls the exact
+  message** (`notif_pull`) so pings say what actually happened.
+  Edge: `vapidAuth`/`sendHH(pids,notif)` (queues a notif for each target that
+  has push on, then tickles their endpoints; drops 404/410 endpoints).
+  Actions: `push_sub`/`push_unsub`, `notif_pull` (SW pulls newest unshown +
+  marks shown; unauth — device ids public, notifs non-sensitive), `save_court`
+  (server saved-courts sync). Three triggers: **chat_send** → other players in
+  the run ("💬 New message in your run"); **run_create** → everyone who saved
+  that court ("⚡ Run at a court you saved"); **admin_verify** (on) → that
+  player ("✓ You're verified").
+  **hh-sw.js** (NEW) — dedicated HH service worker registered at a UNIQUE scope
+  `hh-push/` so it NEVER collides with the Lab's root `/sw.js` (scope "/");
+  controls no pages, exists only for push. On push: reads device id from the
+  `hh-meta` cache, `notif_pull`s the message, `showNotification` loud
+  (vibrate + requireInteraction). notificationclick opens the ping's url.
+  App (hoopsheaven.html): `enableHHNotifs()` (permission → register hh-sw at
+  `hh-push/` scope → subscribe with VAPID pub key → `push_sub` → stamp device
+  id in `hh-meta` cache for the SW); Profile **🔔 toggle** (`#pNotif`) +
+  one-time prompt bar `#ntfBar` (needs a tap — permission can't auto-request);
+  `refreshNotifs()` on boot keeps the sub fresh; `toggleSaved` now also syncs
+  to `oc_saves` + one-time `syncSaves()` back-fills pre-existing local saves.
+  Verified: 15/15 backend E2E (subs, save_court, all 3 triggers queue to the
+  RIGHT players only, notif_pull returns+clears, unsave stops pings) + app 5/5
+  smoke (boots clean, toggle + prompt present). NOTE: actual on-device delivery
+  needs a real phone test (identical mechanism to the Lab's proven push) — told
+  Aiman to allow + confirm the buzz. All test rows + temp coach deleted.
 - v2 ideas discussed: KOTC proper, run chat, POTW weekly archive/all-time
   wall, PWA manifest + install, native app for background geofencing.
 

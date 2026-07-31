@@ -313,6 +313,49 @@ async function chatFor(runId: string) {
   return (rows || []).map(r => ({ id: r.id, pid: r.player_id, name: r.name, ig: r.ig, text: r.text, at: r.created_at, v: vs.has(r.player_id as string) }));
 }
 
+// ---- Closed-app web push (payload-free "tickle"; the SW pulls the exact
+// message via notif_pull). Reuses the Lab's VAPID keypair — same Supabase
+// project, no new keys needed. Every send is best-effort: a dead endpoint is
+// dropped and never blocks the request that triggered it.
+const VAPID_PUB_B64U = "BIyZs-g6WqeAhyk4NQsAZ7rq-AoyWOTptKUZkE5z-hvvn61vVW9F1Ord5VbySnizrNu9OrLD4kOE0SMRzbcZRgI";
+const VAPID_PRIV_PKCS8_B64 = "MIGHAgEAMBMGByqGSM49AgEGCCqGSM49AwEHBG0wawIBAQQgqooHymUAWgKq2V6W4tZmxqY6bpDs6fLPJJDlwHBcabihRANCAASMmbPoOlqngIcpODULAGe66vgKMljk6bSlGZBOc/ob75+tb1VvRdTq3eVW8kp4s6zbvTqyw+JDhNEjEc23GUYC";
+let vapidKey: CryptoKey | null = null;
+async function getVapidKey() {
+  if (!vapidKey) {
+    const raw = Uint8Array.from(atob(VAPID_PRIV_PKCS8_B64), c => c.charCodeAt(0));
+    vapidKey = await crypto.subtle.importKey("pkcs8", raw, { name: "ECDSA", namedCurve: "P-256" }, false, ["sign"]);
+  }
+  return vapidKey;
+}
+const b64u = (x: ArrayBuffer | Uint8Array) => btoa(String.fromCharCode(...new Uint8Array(x))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+async function vapidAuth(endpoint: string) {
+  const aud = new URL(endpoint).origin;
+  const enc = new TextEncoder();
+  const header = b64u(enc.encode(JSON.stringify({ typ: "JWT", alg: "ES256" })));
+  const claims = b64u(enc.encode(JSON.stringify({ aud, exp: Math.floor(Date.now() / 1000) + 12 * 3600, sub: "mailto:aimanmaged88@gmail.com" })));
+  const unsigned = header + "." + claims;
+  const sig = await crypto.subtle.sign({ name: "ECDSA", hash: "SHA-256" }, await getVapidKey(), enc.encode(unsigned));
+  return `vapid t=${unsigned}.${b64u(sig)}, k=${VAPID_PUB_B64U}`;
+}
+async function sendHH(pids: string[], notif: { title: string; body: string; tag?: string; url?: string }) {
+  try {
+    const uniq = [...new Set(pids.filter(Boolean))];
+    if (!uniq.length) return;
+    const subs: Record<string, unknown>[] = await db(`oc_push?player_id=in.(${uniq.map(i => `"${sid(i)}"`).join(",")})&select=id,player_id,sub`) || [];
+    if (!subs.length) return;
+    const withSub = [...new Set(subs.map(s => s.player_id as string))];
+    await db(`oc_notif`, { method: "POST", body: JSON.stringify(withSub.map(pid => ({ player_id: pid, title: notif.title, body: notif.body, tag: notif.tag || "hh", url: notif.url || "", shown: false, created_at: new Date().toISOString() }))) });
+    await Promise.all(subs.map(async row => {
+      try {
+        const ep = (row.sub as Record<string, unknown>)?.endpoint as string;
+        if (!ep) return;
+        const r = await fetch(ep, { method: "POST", headers: { Authorization: await vapidAuth(ep), TTL: "86400", Urgency: "high" } });
+        if (r.status === 404 || r.status === 410) await db(`oc_push?id=eq.${row.id}`, { method: "DELETE" });
+      } catch (_e) { /* one dead endpoint never blocks the rest */ }
+    }));
+  } catch (_e) { /* push is always best-effort */ }
+}
+
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return J({ error: "POST only" }, 405);
@@ -397,6 +440,12 @@ Deno.serve(async (req: Request) => {
         });
         // The host is automatically first in.
         await db(`oc_run_players`, { method: "POST", body: JSON.stringify({ run_id: run.id, player_id: player.id, name: player.name, ig: player.ig }) });
+        // Ping everyone who saved this court (closed-app push).
+        try {
+          const savers = await db(`oc_saves?court_key=eq.${encodeURIComponent(court.key)}&select=player_id`);
+          const ids = (savers || []).map((r: Record<string, unknown>) => r.player_id as string).filter(id => id !== player.id);
+          await sendHH(ids, { title: "⚡ Run at a court you saved", body: `${player.name} called a ${format} at ${court.name}${court.suburb ? " · " + court.suburb : ""}`, tag: "hh-run", url: `/hoopsheaven.html?court=${court.key}` });
+        } catch (_e) { /* best-effort */ }
         return J({ run: (await withPlayers([run]))[0] });
       }
 
@@ -453,6 +502,12 @@ Deno.serve(async (req: Request) => {
         const recent = await db(`oc_run_chat?run_id=eq.${encodeURIComponent(runId)}&player_id=eq.${encodeURIComponent(player.id)}&created_at=gte.${win}&select=id`);
         if ((recent?.length || 0) >= 20) return J({ error: "slow down a sec ✋" }, 429);
         await db(`oc_run_chat`, { method: "POST", body: JSON.stringify({ run_id: runId, player_id: player.id, name: player.name, ig: player.ig, text, created_at: new Date().toISOString() }) });
+        // Ping everyone else in the run (closed-app push).
+        try {
+          const roster = await db(`oc_run_players?run_id=eq.${encodeURIComponent(runId)}&select=player_id`);
+          const others = (roster || []).map((r: Record<string, unknown>) => r.player_id as string).filter(id => id !== player.id);
+          await sendHH(others, { title: "💬 New message in your run", body: `${player.name}: ${text.slice(0, 90)}`, tag: "hh-chat", url: `/hoopsheaven.html?run=${runId}` });
+        } catch (_e) { /* best-effort */ }
         return J({ messages: await chatFor(runId) });
       }
 
@@ -460,6 +515,47 @@ Deno.serve(async (req: Request) => {
       case "leaderboard": {
         const rows: Record<string, unknown>[] = (await db(`oc_players?banned=is.false&checkins_total=gt.0&select=id,name,ig,tiktok,verified,checkins_total&order=checkins_total.desc&limit=25`)) || [];
         return J({ kings: rows.map((r, i) => ({ rank: i + 1, id: r.id, name: r.name, ig: r.ig, tiktok: r.tiktok || "", verified: !!r.verified, checkins: Number(r.checkins_total) || 0, tier: tierOf(Number(r.checkins_total) || 0) })), week: sydWeek() });
+      }
+
+      // Store this device's push subscription (enables closed-app notifications).
+      case "push_sub": {
+        const g = await guard(((b.player || {}) as Record<string, unknown>).id as string);
+        if (g.err) return g.err;
+        const sub = b.sub;
+        if (!sub || typeof sub !== "object" || !(sub as Record<string, unknown>).endpoint) return J({ error: "bad subscription" }, 400);
+        await db(`oc_push?on_conflict=player_id`, { method: "POST", headers: { Prefer: "resolution=merge-duplicates" }, body: JSON.stringify({ player_id: g.p!.id, sub, created_at: new Date().toISOString() }) });
+        return J({ ok: true });
+      }
+
+      case "push_unsub": {
+        const id = str(b.player_id, 64);
+        if (id) await db(`oc_push?player_id=eq.${encodeURIComponent(id)}`, { method: "DELETE" });
+        return J({ ok: true });
+      }
+
+      // The SW calls this on a push tickle to get the exact message to show, then
+      // it marks the device's pending notifs as shown. Unauthenticated (device
+      // ids are public and notifs are non-sensitive coordination pings).
+      case "notif_pull": {
+        const id = str(b.player_id, 64);
+        if (!id) return J({ notif: null });
+        const rows: Record<string, unknown>[] = await db(`oc_notif?player_id=eq.${encodeURIComponent(id)}&shown=is.false&select=id,title,body,tag,url&order=created_at.desc&limit=6`) || [];
+        if (!rows.length) return J({ notif: null });
+        await db(`oc_notif?player_id=eq.${encodeURIComponent(id)}&shown=is.false`, { method: "PATCH", body: JSON.stringify({ shown: true }) });
+        const top = rows[0];
+        const more = rows.length > 1 ? ` (+${rows.length - 1} more)` : "";
+        return J({ notif: { title: top.title, body: String(top.body || "") + more, tag: top.tag || "hh", url: top.url || "" } });
+      }
+
+      // Server-side saved court (so run_create can ping everyone who saved it).
+      case "save_court": {
+        const g = await guard(((b.player || {}) as Record<string, unknown>).id as string);
+        if (g.err) return g.err;
+        const key = str(b.court_key, 64);
+        if (!key || !/^oc_[a-zA-Z0-9._-]+$/.test(key)) return J({ error: "bad court" }, 400);
+        if (b.on === false) await db(`oc_saves?player_id=eq.${encodeURIComponent(g.p!.id)}&court_key=eq.${encodeURIComponent(key)}`, { method: "DELETE" });
+        else await db(`oc_saves?on_conflict=player_id,court_key`, { method: "POST", headers: { Prefer: "resolution=merge-duplicates,return=minimal" }, body: JSON.stringify({ player_id: g.p!.id, court_key: key, created_at: new Date().toISOString() }) });
+        return J({ ok: true });
       }
 
 
@@ -860,7 +956,11 @@ Deno.serve(async (req: Request) => {
         const pid = str(b.pid, 64);
         if (!pid) return J({ error: "bad request" }, 400);
         await db(`oc_players?id=eq.${encodeURIComponent(pid)}`, { method: "PATCH", body: JSON.stringify({ verified: b.on !== false }) });
-        if (b.on !== false) await db(`oc_inbox?player_id=eq.${encodeURIComponent(pid)}`, { method: "DELETE" });
+        if (b.on !== false) {
+          await db(`oc_inbox?player_id=eq.${encodeURIComponent(pid)}`, { method: "DELETE" });
+          // Ping the player that they're in (closed-app push).
+          try { await sendHH([pid], { title: "✓ You're verified on Hoops Heaven", body: "Full access unlocked — call runs, add courts & post clips 🏀", tag: "hh-verify", url: "/hoopsheaven.html" }); } catch (_e) { /* best-effort */ }
+        }
         return J({ ok: true });
       }
 
