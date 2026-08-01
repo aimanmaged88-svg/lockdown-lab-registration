@@ -1,0 +1,38 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+
+# next
+/.next/
+/out/
+
+# production
+/build
+
+# testing
+/coverage
+/test-results
+/playwright-report
+/playwright/.cache
+
+# database (local SQLite — never commit real data)
+/prisma/*.db
+/prisma/*.db-journal
+/prisma/dev.db*
+
+# local uploads / backups
+/storage/*
+!/storage/.gitkeep
+
+# env
+.env
+.env*.local
+
+# misc
+.DS_Store
+*.log
+next-env.d.ts
+
+# ts build info
+tsconfig.tsbuildinfo
