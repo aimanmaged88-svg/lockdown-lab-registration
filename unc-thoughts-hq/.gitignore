@@ -36,3 +36,6 @@ next-env.d.ts
 
 # ts build info
 tsconfig.tsbuildinfo
+
+# screenshot output (dev tour)
+/screenshots
