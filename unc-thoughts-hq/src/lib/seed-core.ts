@@ -40,42 +40,34 @@ export async function seed(prisma: PrismaClient = sharedPrisma): Promise<{ ok: t
     });
   }
 
+  // Reference data — delete + bulk insert (fast, one round-trip each). Safe to
+  // re-run: it's reference content, not user data.
   const research = researchRaw as Array<Record<string, string | boolean>>;
-  if ((await prisma.researchEntry.count({ where: { orgId: org.id } })) === 0) {
-    for (const r of research) {
-      await prisma.researchEntry.create({
-        data: {
-          orgId: org.id, recommendation: String(r.recommendation), platform: String(r.platform),
-          category: String(r.category), sourceName: String(r.sourceName), sourceUrl: String(r.sourceUrl),
-          dateChecked: new Date(String(r.dateChecked)), ruleType: String(r.ruleType),
-          whyForUnc: String(r.whyForUnc), confidence: String(r.confidence),
-          reviewBy: new Date(String(r.reviewBy)), verified: Boolean(r.verified),
-        },
-      });
-    }
-  }
+  await prisma.researchEntry.deleteMany({ where: { orgId: org.id } });
+  await prisma.researchEntry.createMany({
+    data: research.map((r) => ({
+      orgId: org.id, recommendation: String(r.recommendation), platform: String(r.platform),
+      category: String(r.category), sourceName: String(r.sourceName), sourceUrl: String(r.sourceUrl),
+      dateChecked: new Date(String(r.dateChecked)), ruleType: String(r.ruleType),
+      whyForUnc: String(r.whyForUnc), confidence: String(r.confidence),
+      reviewBy: new Date(String(r.reviewBy)), verified: Boolean(r.verified),
+    })),
+  });
 
-  if ((await prisma.practiceLesson.count({ where: { orgId: org.id } })) === 0) {
-    for (const l of PRACTICE_LESSONS) {
-      await prisma.practiceLesson.create({
-        data: {
-          orgId: org.id, topic: l.topic, title: l.title, quickVersion: l.quickVersion, deep: l.deep,
-          whyMatters: l.whyMatters, checklist: JSON.stringify(l.checklist), exercise: l.exercise,
-          sourceName: l.sourceName, sourceUrl: l.sourceUrl,
-          dateChecked: l.sourceUrl ? new Date("2026-08-01") : null, confidence: l.confidence ?? "medium",
-        },
-      });
-    }
-  }
+  await prisma.practiceLesson.deleteMany({ where: { orgId: org.id } });
+  await prisma.practiceLesson.createMany({
+    data: PRACTICE_LESSONS.map((l) => ({
+      orgId: org.id, topic: l.topic, title: l.title, quickVersion: l.quickVersion, deep: l.deep,
+      whyMatters: l.whyMatters, checklist: JSON.stringify(l.checklist), exercise: l.exercise,
+      sourceName: l.sourceName, sourceUrl: l.sourceUrl,
+      dateChecked: l.sourceUrl ? new Date("2026-08-01") : null, confidence: l.confidence ?? "medium",
+    })),
+  });
 
-  let order = 0;
-  for (const s of SPACES) {
-    await prisma.space.upsert({
-      where: { orgId_key: { orgId: org.id, key: s.key } },
-      update: { name: s.name },
-      create: { orgId: org.id, key: s.key, name: s.name, order: order++ },
-    });
-  }
+  const existingSpaces = new Set((await prisma.space.findMany({ where: { orgId: org.id }, select: { key: true } })).map((s) => s.key));
+  await prisma.space.createMany({
+    data: SPACES.filter((s) => !existingSpaces.has(s.key)).map((s, i) => ({ orgId: org.id, key: s.key, name: s.name, order: i })),
+  });
 
   for (const c of CHALLENGE_TEMPLATES) {
     const existing = await prisma.challenge.findFirst({ where: { orgId: org.id, title: c.title } });
@@ -149,16 +141,12 @@ export async function seed(prisma: PrismaClient = sharedPrisma): Promise<{ ok: t
     }
 
     if (offset === 0 && (await prisma.dayTask.count({ where: { contentId: content.id } })) === 0) {
-      let idx = 0;
-      for (const step of CHECKLIST_STEPS) {
-        await prisma.dayTask.create({
-          data: {
-            orgId: org.id, contentId: content.id, kind: step.kind, label: step.label,
-            done: idx < 4, doneAt: idx < 4 ? new Date() : null, dueDate: at(date, 17, 30), priority: idx < 7 ? 2 : 1,
-          },
-        });
-        idx++;
-      }
+      await prisma.dayTask.createMany({
+        data: CHECKLIST_STEPS.map((step, idx) => ({
+          orgId: org.id, contentId: content.id, kind: step.kind, label: step.label,
+          done: idx < 4, doneAt: idx < 4 ? new Date() : null, dueDate: at(date, 17, 30), priority: idx < 7 ? 2 : 1,
+        })),
+      });
     }
   }
 
