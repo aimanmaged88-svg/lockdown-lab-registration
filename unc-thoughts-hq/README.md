@@ -49,6 +49,19 @@ The voice is the uncle voice: direct, useful, honest, supportive, conversational
 - **Settings** — roadmap import, exports, backup/restore, feature flags, roles,
   privacy notes, optional-AI status.
 
+## Ask Unk — the member experience (`/member`)
+
+A deliberately small member-facing layer: **Ask Unk** (one question, answered
+in a 5-part structure from UNC's approved teaching), quick **Game/Training
+day** flows with time-band awareness, **What should I eat?** general
+education, **Mindset reset**, **Recovery**, a daily **Thought of the Day**
+with private-first accountability, and **My answers** (encrypted private
+reflection history). Answers come ONLY from the owner-controlled knowledge
+base **Unk's Brain** (`/brain`) — safety questions escalate to humans,
+supplement/quick-fix asks get the approved no-shortcut response, and if the
+Brain can't support an answer it says so instead of inventing. Full detail:
+`docs/ASK-UNK.md`.
+
 ## Release B — adult community beta (behind a flag, **off by default**)
 
 Invite-only, **adults 18+ only**. Topic spaces, threaded posts, "useful"

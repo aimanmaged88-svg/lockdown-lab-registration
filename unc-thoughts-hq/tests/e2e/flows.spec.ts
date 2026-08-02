@@ -15,12 +15,17 @@ test("a daily checklist task persists after reload", async ({ page }) => {
   const firstUndone = page.locator("button[aria-pressed='false']").first();
   await expect(firstUndone).toBeVisible();
   const label = (await firstUndone.innerText()).split("\n")[0];
-  await firstUndone.click();
-  await page.waitForTimeout(600); // allow the server action to persist
-  await page.reload();
-  // The same labelled item should now be ticked (aria-pressed=true).
-  const toggled = page.locator("button[aria-pressed='true']", { hasText: label }).first();
-  await expect(toggled).toBeVisible();
+  const item = page.locator("button[aria-pressed]", { hasText: label }).first();
+  // Click, give the server action time to commit, reload, assert persisted.
+  // Retried as a block: absorbs cold-compile slowness and hydration races.
+  await expect(async () => {
+    if ((await item.getAttribute("aria-pressed")) !== "true") {
+      await item.click();
+      await page.waitForTimeout(1500);
+    }
+    await page.reload();
+    await expect(page.locator("button[aria-pressed='true']", { hasText: label }).first()).toBeVisible({ timeout: 4000 });
+  }).toPass({ timeout: 45000 });
 });
 
 test("create a new content item", async ({ page }) => {

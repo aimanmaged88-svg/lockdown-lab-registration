@@ -5,7 +5,7 @@ import { cn } from "@/lib/cn";
 import { Logo } from "./logo";
 import {
   CalendarDays, Home, Film, Video, BarChart3, Users, Mic, FlaskConical,
-  BookOpen, ClipboardCheck, Settings, Menu, X,
+  BookOpen, ClipboardCheck, Settings, Menu, X, Brain,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -18,6 +18,7 @@ const NAV = [
   { href: "/community", label: "Community", icon: Users },
   { href: "/talks", label: "Talks", icon: Mic },
   { href: "/growth", label: "Growth Lab", icon: FlaskConical },
+  { href: "/brain", label: "Unk's Brain", icon: Brain },
   { href: "/practice", label: "Practice Library", icon: BookOpen },
   { href: "/review", label: "Weekly Review", icon: ClipboardCheck },
   { href: "/settings", label: "Settings", icon: Settings },
@@ -50,14 +51,17 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 export function Sidebar() {
+  const path = usePathname();
+  if (path.startsWith("/member")) return null; // member area has its own minimal chrome
   return (
     <aside className="hidden lg:flex w-60 shrink-0 flex-col gap-6 border-r border-ink-line px-4 py-6 sticky top-0 h-screen">
       <Link href="/" className="flex items-center gap-2 px-1">
         <Logo size={30} />
       </Link>
       <NavList />
-      <div className="mt-auto text-[11px] text-grey px-2 leading-relaxed">
+      <div className="mt-auto text-[11px] text-grey px-2 leading-relaxed space-y-2">
         <p>One useful idea in under 20 seconds, followed by one real question.</p>
+        <Link href="/member" className="block underline text-paper-dim">Open member view →</Link>
       </div>
     </aside>
   );
@@ -65,6 +69,8 @@ export function Sidebar() {
 
 export function MobileHeader() {
   const [open, setOpen] = useState(false);
+  const path = usePathname();
+  if (path.startsWith("/member")) return null;
   return (
     <>
       <header className="lg:hidden sticky top-0 z-30 flex items-center justify-between border-b border-ink-line bg-ink/95 backdrop-blur px-4 py-3">

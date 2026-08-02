@@ -1,6 +1,7 @@
 import { prisma, getOrgId } from "@/lib/db";
 import { Card, Section, Badge, Stat, Empty, pillarTone } from "@/components/ui";
 import { AddQuestionForm, QuestionActions, InboxActions } from "@/components/community/widgets";
+import { ShareModeration } from "@/components/community/share-moderation";
 import { CommunityBeta } from "@/components/community/beta";
 import { FlagToggle } from "@/components/flag-toggle";
 import { isEnabled } from "@/lib/flags";
@@ -113,15 +114,15 @@ export default async function CommunityPage() {
         ) : (
           <div className="space-y-2">
             {inbox.map((it) => (
-              <Card key={it.id} className="flex items-center justify-between gap-3">
+              <Card key={it.id} className="flex flex-wrap items-center justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <Badge tone={it.type === "report" ? "bad" : "default"}>{it.type}</Badge>
+                    <Badge tone={it.type === "report" ? "bad" : it.type === "approval" ? "warn" : "default"}>{it.type}</Badge>
                     <span className="text-sm truncate">{it.title}</span>
                   </div>
                   {it.body && <p className="text-xs text-grey mt-0.5">{it.body}</p>}
                 </div>
-                <InboxActions id={it.id} />
+                {it.type === "approval" && it.refId ? <ShareModeration reflectionId={it.refId} /> : <InboxActions id={it.id} />}
               </Card>
             ))}
           </div>

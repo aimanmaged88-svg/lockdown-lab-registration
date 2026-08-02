@@ -43,6 +43,10 @@ model Organisation {
   featureFlags     FeatureFlag[]
   batchSessions    BatchSession[]
   importRuns       ImportRun[]
+  members          Member[]
+  knowledgeItems   KnowledgeItem[]
+  thoughtPrompts   ThoughtPrompt[]
+  askLogs          AskLog[]
 }
 
 // ── People & roles ──────────────────────────────────────────────────────────
@@ -607,4 +611,118 @@ model ImportRun {
   skipped   Int      @default(0)
   summary   String?  // json preview
   createdAt DateTime @default(now())
+}
+
+// ── Ask Unk: lightweight members (cookie identity, minimal data) ────────────
+// Deliberately NOT accounts: an anonymous device id. We collect only what makes
+// answers useful — age band (never DOB), optional allergies/diet notes. Never
+// weight, measurements, medical history, exact location or school.
+model Member {
+  id           String   @id
+  orgId        String
+  org          Organisation @relation(fields: [orgId], references: [id])
+  ageBand      String?  // u13 | 13-15 | 16-17 | 18+ | parent_coach
+  allergies    String?
+  dietaryNotes String?
+  createdAt    DateTime @default(now())
+  lastSeenAt   DateTime?
+
+  reflections Reflection[]
+  askLogs     AskLog[]
+}
+
+// Private accountability answers. answerEnc/voicePath are ENCRYPTED at rest
+// (AES-256-GCM, key derived from AUTH_SECRET). Never public unless the member
+// explicitly shares AND a moderator approves (shareStatus flow).
+model Reflection {
+  id           String   @id @default(cuid())
+  memberId     String
+  member       Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  promptText   String
+  answerEnc    String?  // encrypted private text answer
+  voicePath    String?  // storage key of encrypted voice note
+  actionChosen String?
+  reminderAt   DateTime?
+  followUp     String?  // yes | partly | not_yet | changed_plan
+  followUpAt   DateTime?
+  shareStatus  String   @default("none") // none | pending | approved | declined
+  sharedText   String?  // the exact text the member chose to make public
+  sharedPostId String?
+  createdAt    DateTime @default(now())
+
+  @@index([memberId, createdAt])
+}
+
+// Thought of the Day prompts (owner-editable bank; rotates deterministically).
+model ThoughtPrompt {
+  id      String  @id @default(cuid())
+  orgId   String
+  org     Organisation @relation(fields: [orgId], references: [id])
+  text    String
+  pillar  String  @default("Mindset")
+  actions String  // json array of suggested one-action options
+  active  Boolean @default(true)
+  order   Int     @default(0)
+}
+
+// ── Unk's Brain: owner-controlled knowledge base (the ONLY source of member
+// answers). Only approval="approved" items are ever retrieved. ──────────────
+model KnowledgeItem {
+  id          String   @id @default(cuid())
+  orgId       String
+  org         Organisation @relation(fields: [orgId], references: [id])
+  kind        String   // lesson | caption | transcript | teaching_note | mindset | nutrition | faq | source_link | playbook
+  title       String
+  pillar      String
+  audience    String   @default("General") // General | u13 | 13-15 | 16-17 | 18+ | parent_coach
+  body        String   // playbooks use labelled sections: DO NOW / FOOD / MINDSET / CAREFUL / PRIVATE / WHY
+  tags        String?  // json array, e.g. ["intent:game_day","band:1-2h"]
+  source      String?
+  sourceUrl   String?
+  author      String   @default("UNC")
+  addedAt     DateTime @default(now())
+  reviewedAt  DateTime?
+  approval    String   @default("draft") // draft | approved | archived
+  safetyClass String   @default("general") // general | nutrition | youth_sensitive
+  version     Int      @default(1)
+
+  versions KnowledgeVersion[]
+
+  @@index([orgId, approval])
+}
+
+model KnowledgeVersion {
+  id       String   @id @default(cuid())
+  itemId   String
+  item     KnowledgeItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  version  Int
+  title    String
+  body     String
+  note     String?
+  editedAt DateTime @default(now())
+}
+
+// Learning loop: every Ask Unk answer is logged with the knowledge items that
+// informed it (owner-visible), plus member feedback. Used for insights only —
+// never for medical inference.
+model AskLog {
+  id           String   @id @default(cuid())
+  orgId        String
+  org          Organisation @relation(fields: [orgId], references: [id])
+  memberId     String?
+  member       Member?  @relation(fields: [memberId], references: [id])
+  question     String
+  intent       String
+  timeBand     String?
+  usedItemIds  String?  // json array of KnowledgeItem ids
+  supported    Boolean  @default(true) // false = KB couldn't support an answer
+  escalated    Boolean  @default(false)
+  guardianNote Boolean  @default(false)
+  useful       Boolean?
+  unclear      Boolean?
+  followed     Boolean?
+  hadAvailable String?
+  createdAt    DateTime @default(now())
+
+  @@index([orgId, createdAt])
 }

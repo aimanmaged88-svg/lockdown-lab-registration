@@ -1,18 +1,30 @@
 import { randomUUID } from "crypto";
 import { addDays } from "date-fns";
+import { formatInTimeZone, fromZonedTime } from "date-fns-tz";
 import { CHECKLIST_STEPS, SPACES, WEEKLY_RHYTHM } from "./enums";
 import { CHALLENGE_TEMPLATES } from "./coach-content";
 import { PRACTICE_LESSONS } from "../../prisma/data/practice";
+import { BRAIN_ITEMS, THOUGHT_PROMPTS } from "../../prisma/data/brain";
 import researchRaw from "../../prisma/data/research.json";
 import { prisma as sharedPrisma } from "./db";
 import type { PrismaClient } from "@prisma/client";
 
 const ORG_SLUG = "unc-thoughts";
+const TZ = "Australia/Sydney";
 
-function at(d: Date, h: number, m = 0): Date {
-  const x = new Date(d);
-  x.setHours(h, m, 0, 0);
-  return x;
+// Sample dates are anchored to the CREATOR's timezone (Australia/Sydney), not
+// the server's — hosted seeds run on UTC boxes, and "today at 5:30pm" must
+// mean Sydney's today, or the Today screen shows nothing.
+function sydneyCalendar(offsetDays: number): { ymd: string; weekday: string } {
+  const todayStr = formatInTimeZone(new Date(), TZ, "yyyy-MM-dd");
+  const [y, mo, d] = todayStr.split("-").map(Number);
+  const dt = new Date(Date.UTC(y, mo - 1, d, 12) + offsetDays * 864e5);
+  const ymd = dt.toISOString().slice(0, 10);
+  return { ymd, weekday: WEEKLY_RHYTHM[(dt.getUTCDay() + 6) % 7].day };
+}
+
+function sydneyAt(ymd: string, h: number, m = 0): Date {
+  return fromZonedTime(`${ymd} ${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:00`, TZ);
 }
 
 // Idempotent seed shared by the CLI (prisma/seed.ts) and the guarded
@@ -85,8 +97,6 @@ export async function seed(prisma: PrismaClient = sharedPrisma): Promise<{ ok: t
     }
   }
 
-  const today0 = new Date();
-  today0.setHours(0, 0, 0, 0);
   const rhythmIdeas: Record<string, { title: string; pillar: string; hook: string; question: string; seconds: number }> = {
     Monday: { title: "The next-play reset", pillar: "Mindset", hook: "After a mistake, your next job is this.", question: "What's your reset after a bad play?", seconds: 10 },
     Tuesday: { title: "Pre-game fuel, kept simple", pillar: "Nutrition", hook: "Before training, keep this simple.", question: "What's your pre-game meal?", seconds: 12 },
@@ -102,8 +112,6 @@ export async function seed(prisma: PrismaClient = sharedPrisma): Promise<{ ok: t
     { offset: 1, posted: false }, { offset: 2, posted: false }, { offset: 3, posted: false },
     { offset: 4, posted: false }, { offset: 7, posted: false }, { offset: 8, posted: false }, { offset: 9, posted: false },
   ];
-  const dayName = (d: Date) => WEEKLY_RHYTHM[(d.getDay() + 6) % 7].day;
-
   // Rebuild sample content in as few round-trips as possible (the seed may run
   // over a pooled connection with real latency). Delete + bulk insert with
   // explicit ids so tasks/analytics can reference them without extra reads.
@@ -115,19 +123,18 @@ export async function seed(prisma: PrismaClient = sharedPrisma): Promise<{ ok: t
   const analyticsRows: Array<Record<string, unknown>> = [];
 
   for (const { offset, posted } of daysToSeed) {
-    const date = addDays(today0, offset);
-    const dn = dayName(date);
-    const idea = rhythmIdeas[dn];
+    const { ymd, weekday } = sydneyCalendar(offset);
+    const idea = rhythmIdeas[weekday];
     if (!idea) continue;
-    const rhythm = WEEKLY_RHYTHM.find((r) => r.day === dn)!;
+    const rhythm = WEEKLY_RHYTHM.find((r) => r.day === weekday)!;
     const id = randomUUID();
     contentRows.push({
       id, orgId: org.id, ownerId: owner.id, title: idea.title, pillar: idea.pillar, series: rhythm.series,
       audience: idea.pillar === "Basketball" ? "Players13-17" : "General",
-      format: dn === "Sunday" ? "Story" : "Reel", reelSeconds: idea.seconds || null,
+      format: weekday === "Sunday" ? "Story" : "Reel", reelSeconds: idea.seconds || null,
       hook: idea.hook, question: idea.question, highlight: posted ? idea.pillar : null,
-      plannedDate: at(date, 17, 30), postedAt: posted ? at(date, 17, 45) : null,
-      status: posted ? "Complete" : "Planned", importKey: `seed_${date.toISOString().slice(0, 10)}`,
+      plannedDate: sydneyAt(ymd, 17, 30), postedAt: posted ? sydneyAt(ymd, 17, 45) : null,
+      status: posted ? "Complete" : "Planned", importKey: `seed_${ymd}`,
       isTrialReel: offset === -4, updatedAt: new Date(),
     });
     if (posted) {
@@ -144,7 +151,7 @@ export async function seed(prisma: PrismaClient = sharedPrisma): Promise<{ ok: t
     if (offset === 0) {
       CHECKLIST_STEPS.forEach((step, idx) => taskRows.push({
         orgId: org.id, contentId: id, kind: step.kind, label: step.label,
-        done: idx < 4, doneAt: idx < 4 ? new Date() : null, dueDate: at(date, 17, 30), priority: idx < 7 ? 2 : 1,
+        done: idx < 4, doneAt: idx < 4 ? new Date() : null, dueDate: sydneyAt(ymd, 17, 30), priority: idx < 7 ? 2 : 1,
         updatedAt: new Date(),
       }));
     }
@@ -202,6 +209,38 @@ export async function seed(prisma: PrismaClient = sharedPrisma): Promise<{ ok: t
         orgId: org.id, topic: "Pre-game fuel", format: "Reel", hook: "Before training, keep this simple.",
         duration: 12, audience: "Parents", evidence: "Nutrition prep Reels are saving above the recent median.",
       },
+    });
+  }
+
+  // ── Unk's Brain + Thought prompts ─────────────────────────────
+  // OWNER data: seed only when empty so edits/approvals are never clobbered.
+  if ((await prisma.knowledgeItem.count({ where: { orgId: org.id } })) === 0) {
+    await prisma.knowledgeItem.createMany({
+      data: BRAIN_ITEMS.map((b) => ({
+        orgId: org.id,
+        kind: b.kind,
+        title: b.title,
+        pillar: b.pillar,
+        audience: b.audience ?? "General",
+        body: b.body,
+        tags: JSON.stringify(b.tags),
+        source: b.source ?? null,
+        sourceUrl: b.sourceUrl ?? null,
+        safetyClass: b.safetyClass ?? "general",
+        approval: "approved",
+        reviewedAt: b.reviewed ? new Date() : null, // unreviewed sources show a "review" badge
+      })),
+    });
+  }
+  if ((await prisma.thoughtPrompt.count({ where: { orgId: org.id } })) === 0) {
+    await prisma.thoughtPrompt.createMany({
+      data: THOUGHT_PROMPTS.map((p, i) => ({
+        orgId: org.id,
+        text: p.text,
+        pillar: p.pillar,
+        actions: JSON.stringify(p.actions),
+        order: i,
+      })),
     });
   }
 
