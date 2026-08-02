@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import { addDays } from "date-fns";
 import { CHECKLIST_STEPS, SPACES, WEEKLY_RHYTHM } from "./enums";
 import { CHALLENGE_TEMPLATES } from "./coach-content";
@@ -103,53 +104,57 @@ export async function seed(prisma: PrismaClient = sharedPrisma): Promise<{ ok: t
   ];
   const dayName = (d: Date) => WEEKLY_RHYTHM[(d.getDay() + 6) % 7].day;
 
+  // Rebuild sample content in as few round-trips as possible (the seed may run
+  // over a pooled connection with real latency). Delete + bulk insert with
+  // explicit ids so tasks/analytics can reference them without extra reads.
+  // Deleting content cascades its tasks/analytics/preflight.
+  await prisma.content.deleteMany({ where: { orgId: org.id } });
+
+  const contentRows: Array<Record<string, unknown>> = [];
+  const taskRows: Array<Record<string, unknown>> = [];
+  const analyticsRows: Array<Record<string, unknown>> = [];
+
   for (const { offset, posted } of daysToSeed) {
     const date = addDays(today0, offset);
     const dn = dayName(date);
     const idea = rhythmIdeas[dn];
     if (!idea) continue;
     const rhythm = WEEKLY_RHYTHM.find((r) => r.day === dn)!;
-    const importKey = `seed_${date.toISOString().slice(0, 10)}`;
-    const content = await prisma.content.upsert({
-      where: { importKey },
-      update: {},
-      create: {
-        orgId: org.id, ownerId: owner.id, title: idea.title, pillar: idea.pillar, series: rhythm.series,
-        audience: idea.pillar === "Basketball" ? "Players13-17" : "General",
-        format: dn === "Sunday" ? "Story" : "Reel", reelSeconds: idea.seconds || null,
-        hook: idea.hook, question: idea.question, highlight: posted ? idea.pillar : null,
-        plannedDate: at(date, 17, 30), postedAt: posted ? at(date, 17, 45) : null,
-        status: posted ? "Complete" : "Planned", importKey, isTrialReel: offset === -4,
-      },
+    const id = randomUUID();
+    contentRows.push({
+      id, orgId: org.id, ownerId: owner.id, title: idea.title, pillar: idea.pillar, series: rhythm.series,
+      audience: idea.pillar === "Basketball" ? "Players13-17" : "General",
+      format: dn === "Sunday" ? "Story" : "Reel", reelSeconds: idea.seconds || null,
+      hook: idea.hook, question: idea.question, highlight: posted ? idea.pillar : null,
+      plannedDate: at(date, 17, 30), postedAt: posted ? at(date, 17, 45) : null,
+      status: posted ? "Complete" : "Planned", importKey: `seed_${date.toISOString().slice(0, 10)}`,
+      isTrialReel: offset === -4, updatedAt: new Date(),
     });
-
     if (posted) {
-      const has = await prisma.analyticsSnapshot.count({ where: { contentId: content.id } });
-      if (has === 0) {
-        const base = 800 + Math.abs(offset) * 120;
-        const saves = idea.pillar === "Nutrition" ? 60 + Math.abs(offset) * 6 : 24 + Math.abs(offset) * 3;
-        await prisma.analyticsSnapshot.create({
-          data: {
-            contentId: content.id, window: "24h", reach: base, views: base + 300, plays: base + 260,
-            avgWatchSec: (idea.seconds || 10) * 0.7, reelSeconds: idea.seconds || 10,
-            completionPct: 62 + (offset % 3) * 4, likes: Math.round(base * 0.06), comments: 8 + Math.abs(offset),
-            saves, shares: Math.round(saves * 0.4), profileVisits: Math.round(base * 0.05),
-            follows: 4 + Math.abs(offset), wasTrialReel: offset === -4, source: "manual", confirmed: true,
-          },
-        });
-      }
-    }
-
-    if (offset === 0 && (await prisma.dayTask.count({ where: { contentId: content.id } })) === 0) {
-      await prisma.dayTask.createMany({
-        data: CHECKLIST_STEPS.map((step, idx) => ({
-          orgId: org.id, contentId: content.id, kind: step.kind, label: step.label,
-          done: idx < 4, doneAt: idx < 4 ? new Date() : null, dueDate: at(date, 17, 30), priority: idx < 7 ? 2 : 1,
-        })),
+      const base = 800 + Math.abs(offset) * 120;
+      const saves = idea.pillar === "Nutrition" ? 60 + Math.abs(offset) * 6 : 24 + Math.abs(offset) * 3;
+      analyticsRows.push({
+        contentId: id, window: "24h", reach: base, views: base + 300, plays: base + 260,
+        avgWatchSec: (idea.seconds || 10) * 0.7, reelSeconds: idea.seconds || 10,
+        completionPct: 62 + (offset % 3) * 4, likes: Math.round(base * 0.06), comments: 8 + Math.abs(offset),
+        saves, shares: Math.round(saves * 0.4), profileVisits: Math.round(base * 0.05),
+        follows: 4 + Math.abs(offset), wasTrialReel: offset === -4, source: "manual", confirmed: true,
       });
     }
+    if (offset === 0) {
+      CHECKLIST_STEPS.forEach((step, idx) => taskRows.push({
+        orgId: org.id, contentId: id, kind: step.kind, label: step.label,
+        done: idx < 4, doneAt: idx < 4 ? new Date() : null, dueDate: at(date, 17, 30), priority: idx < 7 ? 2 : 1,
+        updatedAt: new Date(),
+      }));
+    }
   }
+  await prisma.content.createMany({ data: contentRows as never });
+  if (taskRows.length) await prisma.dayTask.createMany({ data: taskRows as never });
+  if (analyticsRows.length) await prisma.analyticsSnapshot.createMany({ data: analyticsRows as never });
 
+  // Community questions + matching inbox items (explicit ids link them).
+  await prisma.communityQuestion.deleteMany({ where: { orgId: org.id } });
   const questions = [
     { text: "What should my 14-year-old eat before a Saturday morning game?", pillar: "Nutrition", audience: "Parents", problem: "pre-game fuel", frequency: 4, source: "comment" },
     { text: "How do I stop rushing my free throws when I'm tired?", pillar: "Basketball", audience: "Players13-17", problem: "free-throw routine", frequency: 3, source: "comment" },
@@ -157,18 +162,14 @@ export async function seed(prisma: PrismaClient = sharedPrisma): Promise<{ ok: t
     { text: "Best ball-handling drill for small spaces at home?", pillar: "Basketball", audience: "Players13-17", problem: "ball-handling", frequency: 2, source: "comment" },
     { text: "Is it OK to eat pasta the night before?", pillar: "Nutrition", audience: "General", problem: "pre-game fuel", frequency: 1, source: "comment" },
   ];
-  for (const q of questions) {
-    const existing = await prisma.communityQuestion.findFirst({ where: { orgId: org.id, text: q.text } });
-    if (!existing) {
-      const created = await prisma.communityQuestion.create({ data: { orgId: org.id, ...q, status: "open" } });
-      await prisma.inboxItem.create({
-        data: {
-          orgId: org.id, type: "question", title: q.text, body: `From ${q.source} · asked ${q.frequency}×`,
-          priority: q.frequency, questionId: created.id, tags: JSON.stringify([q.pillar]),
-        },
-      });
-    }
-  }
+  const qRows = questions.map((q) => ({ id: randomUUID(), orgId: org.id, ...q, status: "open" }));
+  await prisma.communityQuestion.createMany({ data: qRows as never });
+  await prisma.inboxItem.createMany({
+    data: qRows.map((q) => ({
+      orgId: org.id, type: "question", title: q.text, body: `From ${q.source} · asked ${q.frequency}×`,
+      priority: q.frequency, questionId: q.id, tags: JSON.stringify([q.pillar]), updatedAt: new Date(),
+    })) as never,
+  });
 
   if (!(await prisma.talk.findFirst({ where: { orgId: org.id, title: "Ask UNC — Pre-season nutrition" } }))) {
     await prisma.talk.create({
