@@ -19,6 +19,10 @@ const schema = z.object({
   AI_API_KEY: z.string().default(""),
   AI_MODEL: z.string().default(""),
   AUTH_SECRET: z.string().default("dev-secret-change-me"),
+  // Optional cloud file storage (Supabase). When unset, uploads use local disk.
+  SUPABASE_URL: z.string().default(""),
+  SUPABASE_ANON_KEY: z.string().default(""),
+  SUPABASE_STORAGE_BUCKET: z.string().default("media"),
 });
 
 const parsed = schema.safeParse(process.env);

@@ -52,49 +52,56 @@ async function main() {
   const researchRaw = JSON.parse(
     readFileSync(path.join(__dirname, "data", "research.json"), "utf8"),
   ) as Array<Record<string, string | boolean>>;
-  // Idempotent: clear + reload research (it's reference data, not user data).
-  await prisma.researchEntry.deleteMany({ where: { orgId: org.id } });
-  for (const r of researchRaw) {
-    await prisma.researchEntry.create({
-      data: {
-        orgId: org.id,
-        recommendation: String(r.recommendation),
-        platform: String(r.platform),
-        category: String(r.category),
-        sourceName: String(r.sourceName),
-        sourceUrl: String(r.sourceUrl),
-        dateChecked: new Date(String(r.dateChecked)),
-        ruleType: String(r.ruleType),
-        whyForUnc: String(r.whyForUnc),
-        confidence: String(r.confidence),
-        reviewBy: new Date(String(r.reviewBy)),
-        verified: Boolean(r.verified),
-      },
-    });
+  // Reference data — seed only when empty so re-running (incl. on every deploy)
+  // never wipes edits or duplicates.
+  if ((await prisma.researchEntry.count({ where: { orgId: org.id } })) === 0) {
+    for (const r of researchRaw) {
+      await prisma.researchEntry.create({
+        data: {
+          orgId: org.id,
+          recommendation: String(r.recommendation),
+          platform: String(r.platform),
+          category: String(r.category),
+          sourceName: String(r.sourceName),
+          sourceUrl: String(r.sourceUrl),
+          dateChecked: new Date(String(r.dateChecked)),
+          ruleType: String(r.ruleType),
+          whyForUnc: String(r.whyForUnc),
+          confidence: String(r.confidence),
+          reviewBy: new Date(String(r.reviewBy)),
+          verified: Boolean(r.verified),
+        },
+      });
+    }
+    console.log(`  · ${researchRaw.length} research entries`);
+  } else {
+    console.log(`  · research already present — skipping`);
   }
-  console.log(`  · ${researchRaw.length} research entries`);
 
   // ── Practice library ────────────────────────────────────────────
-  await prisma.practiceLesson.deleteMany({ where: { orgId: org.id } });
-  for (const l of PRACTICE_LESSONS) {
-    await prisma.practiceLesson.create({
-      data: {
-        orgId: org.id,
-        topic: l.topic,
-        title: l.title,
-        quickVersion: l.quickVersion,
-        deep: l.deep,
-        whyMatters: l.whyMatters,
-        checklist: JSON.stringify(l.checklist),
-        exercise: l.exercise,
-        sourceName: l.sourceName,
-        sourceUrl: l.sourceUrl,
-        dateChecked: l.sourceUrl ? new Date("2026-08-01") : null,
-        confidence: l.confidence ?? "medium",
-      },
-    });
+  if ((await prisma.practiceLesson.count({ where: { orgId: org.id } })) === 0) {
+    for (const l of PRACTICE_LESSONS) {
+      await prisma.practiceLesson.create({
+        data: {
+          orgId: org.id,
+          topic: l.topic,
+          title: l.title,
+          quickVersion: l.quickVersion,
+          deep: l.deep,
+          whyMatters: l.whyMatters,
+          checklist: JSON.stringify(l.checklist),
+          exercise: l.exercise,
+          sourceName: l.sourceName,
+          sourceUrl: l.sourceUrl,
+          dateChecked: l.sourceUrl ? new Date("2026-08-01") : null,
+          confidence: l.confidence ?? "medium",
+        },
+      });
+    }
+    console.log(`  · ${PRACTICE_LESSONS.length} practice lessons`);
+  } else {
+    console.log(`  · practice lessons already present — skipping`);
   }
-  console.log(`  · ${PRACTICE_LESSONS.length} practice lessons`);
 
   // ── Community spaces (data exists even while Release B is flagged off) ──
   let order = 0;

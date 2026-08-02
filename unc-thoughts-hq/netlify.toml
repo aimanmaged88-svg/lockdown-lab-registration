@@ -1,0 +1,19 @@
+# Netlify config for the UNC Thoughts HQ Next.js app.
+# This site's "base directory" in Netlify is set to `unc-thoughts-hq`, so all
+# paths here are relative to that folder. It is a SEPARATE site from the root
+# Lockdown Lab static site and does not affect it.
+
+[build]
+  command = "npm run netlify:build"
+  # The Next.js runtime plugin manages the publish dir + serverless functions.
+  publish = ".next"
+
+[build.environment]
+  # Ship Prisma's engine for Netlify's Linux runtime and skip the Playwright
+  # browser download during install.
+  PRISMA_CLI_BINARY_TARGETS = "rhel-openssl-3.0.x"
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD = "1"
+  NODE_VERSION = "20"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
