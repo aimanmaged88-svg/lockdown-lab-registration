@@ -1,7 +1,7 @@
-// UNC Thoughts HQ — minimal offline service worker.
+// UNC Thoughts HQ — offline shell + owner phone notifications.
 // Network-first for navigations (so you always get fresh data when online),
 // falling back to a cached shell offline. Static assets are cache-first.
-const CACHE = "unc-hq-v1";
+const CACHE = "unc-hq-v2";
 const SHELL = ["/", "/manifest.webmanifest", "/brand/icon.svg"];
 
 self.addEventListener("install", (e) => {
@@ -43,5 +43,34 @@ self.addEventListener("fetch", (e) => {
       caches.open(CACHE).then((c) => c.put(request, copy)).catch(() => {});
       return res;
     })),
+  );
+});
+
+// ── Owner phone notifications ────────────────────────────────
+self.addEventListener("push", (e) => {
+  let data = { title: "UNC Thoughts HQ", body: "", url: "/", tag: "unc" };
+  try { data = { ...data, ...e.data.json() }; } catch {}
+  e.waitUntil(
+    self.registration.showNotification(data.title, {
+      body: data.body,
+      tag: data.tag,
+      icon: "/brand/icon-192.png",
+      badge: "/brand/icon-192.png",
+      data: { url: data.url },
+      vibrate: [180, 80, 180],
+    }),
+  );
+});
+
+self.addEventListener("notificationclick", (e) => {
+  e.notification.close();
+  const url = (e.notification.data && e.notification.data.url) || "/";
+  e.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
+      for (const c of list) {
+        if ("focus" in c) { c.navigate(url); return c.focus(); }
+      }
+      return clients.openWindow(url);
+    }),
   );
 });

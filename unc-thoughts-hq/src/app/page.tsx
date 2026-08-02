@@ -2,23 +2,28 @@ import { Card, Section, Badge, Stat, Empty, LinkButton, Progress, pillarTone } f
 import { Checklist } from "@/components/checklist";
 import { ContentActions } from "@/components/content-actions";
 import { TwentyMinuteMode } from "@/components/twenty-minute";
+import { PostNowButton } from "@/components/post-now";
+import { NotifyButton } from "@/components/notify-button";
 import { getTodayContent, getOverdue, getWeekProgress, getRecommendations, getInboxCounts } from "@/lib/queries";
+import { prisma, getOrgId } from "@/lib/db";
 import { CHECKLIST_STEPS } from "@/lib/enums";
 import { fmt } from "@/lib/time";
 import Link from "next/link";
-import { AlertTriangle, MessageSquare, Sparkles } from "lucide-react";
+import { AlertTriangle, MessageSquare, Sparkles, Zap } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 const WHY = Object.fromEntries(CHECKLIST_STEPS.map((s) => [s.kind, s.why]));
 
 export default async function TodayPage() {
-  const [todays, overdue, week, { recs, nba }, inbox] = await Promise.all([
+  const orgId = await getOrgId();
+  const [todays, overdue, week, { recs, nba }, inbox, readyBank] = await Promise.all([
     getTodayContent(),
     getOverdue(),
     getWeekProgress(),
     getRecommendations(),
     getInboxCounts(),
+    prisma.content.findMany({ where: { orgId, status: "Ready", postedAt: null }, orderBy: { createdAt: "desc" }, take: 5 }),
   ]);
 
   const focus = todays[0];
@@ -83,6 +88,47 @@ export default async function TodayPage() {
         focusId={focus?.id}
         openQuestions={inbox.openQuestions}
       />
+
+      {/* Ready to go — the Post Bank shelf. Never be caught with nothing. */}
+      <Section
+        title="Ready to go"
+        desc="Word posts from your bank — pick one, post it, tap done."
+        action={<LinkButton href="/compose" primary>+ Compose</LinkButton>}
+      >
+        {readyBank.length === 0 ? (
+          <Card className="flex items-center justify-between gap-3">
+            <p className="text-sm text-grey">The bank is empty. Two minutes in Compose fixes that.</p>
+            <LinkButton href="/compose">Make 5 drafts</LinkButton>
+          </Card>
+        ) : (
+          <div className="space-y-2">
+            {readyBank.map((c) => (
+              <Card key={c.id} className="flex flex-wrap items-center justify-between gap-3">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5">
+                    <Zap size={13} className="text-paper-dim shrink-0" />
+                    <Link href={`/content/${c.id}`} className="text-sm font-medium hover:underline truncate">{c.title}</Link>
+                  </div>
+                  {c.caption && <p className="text-xs text-grey mt-0.5 line-clamp-2 whitespace-pre-wrap max-w-xl">{c.caption}</p>}
+                </div>
+                <div className="flex items-center gap-2 shrink-0">
+                  <Badge tone={pillarTone(c.pillar)}>{c.pillar}</Badge>
+                  <PostNowButton id={c.id} />
+                </div>
+              </Card>
+            ))}
+          </div>
+        )}
+      </Section>
+
+      {/* Phone notifications */}
+      <Card className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <div className="font-medium text-sm">Phone notifications</div>
+          <p className="text-xs text-grey">Morning brief + evening check-in. Calm, not needy.</p>
+        </div>
+        <NotifyButton compact />
+      </Card>
 
       {/* Overdue */}
       {overdue.length > 0 && (

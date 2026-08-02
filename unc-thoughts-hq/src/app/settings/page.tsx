@@ -1,4 +1,5 @@
 import { Card, Section, Badge } from "@/components/ui";
+import { NotifyButton } from "@/components/notify-button";
 import { ImportTool } from "@/components/settings/import-tool";
 import { BackupTool } from "@/components/settings/backup-tool";
 import { FlagToggle } from "@/components/flag-toggle";
@@ -23,6 +24,10 @@ export default async function SettingsPage() {
         <p className="eyebrow">Data, safety and configuration</p>
         <h1>Settings</h1>
       </div>
+
+      <Section title="Phone notifications" desc="Two calm pings max per day, only when there's something to do.">
+        <Card><NotifyButton /></Card>
+      </Section>
 
       <Section title="Import the roadmap" desc="Idempotent — re-running updates in place, never duplicates.">
         <Card><ImportTool /></Card>

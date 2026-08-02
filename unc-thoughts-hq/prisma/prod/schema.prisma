@@ -704,6 +704,20 @@ model KnowledgeVersion {
   editedAt DateTime @default(now())
 }
 
+// Phone push subscriptions (owner devices). Payloads are calm and rate-limited
+// by the dispatch route — max a morning brief and an evening nudge.
+model PushSub {
+  id        String   @id @default(cuid())
+  orgId     String
+  endpoint  String   @unique
+  p256dh    String
+  auth      String
+  role      String   @default("owner") // owner (member push not built — privacy promise)
+  label     String?  // device hint, e.g. "iPhone"
+  createdAt DateTime @default(now())
+  lastOkAt  DateTime?
+}
+
 // Learning loop: every Ask Unk answer is logged with the knowledge items that
 // informed it (owner-visible), plus member feedback. Used for insights only —
 // never for medical inference.

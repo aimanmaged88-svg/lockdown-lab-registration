@@ -17,3 +17,7 @@
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
+
+# Scheduled functions (owner phone notifications) live alongside the Next app.
+[functions]
+  directory = "netlify/functions"

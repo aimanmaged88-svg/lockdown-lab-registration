@@ -69,6 +69,18 @@ body {
   }
 }
 
+/* App-like touch feel: instant tap feedback, no blue flash, no rubber-band
+   surprises. Still calm — feedback, not fireworks. */
+html, body {
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
+}
+@media (hover: none) {
+  .btn:active, .chip:active { transform: scale(0.97); }
+  a.card:active, button.card:active { transform: scale(0.99); }
+  .btn, .chip { transition: transform 0.06s ease-out, background-color 0.15s; }
+}
+
 /* Minimal, calm motion only. */
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }

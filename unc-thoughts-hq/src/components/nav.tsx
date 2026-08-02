@@ -5,12 +5,13 @@ import { cn } from "@/lib/cn";
 import { Logo } from "./logo";
 import {
   CalendarDays, Home, Film, Video, BarChart3, Users, Mic, FlaskConical,
-  BookOpen, ClipboardCheck, Settings, Menu, X, Brain,
+  BookOpen, ClipboardCheck, Settings, Menu, X, Brain, PenSquare,
 } from "lucide-react";
 import { useState } from "react";
 
 const NAV = [
   { href: "/", label: "Today", icon: Home },
+  { href: "/compose", label: "Compose", icon: PenSquare },
   { href: "/calendar", label: "Calendar", icon: CalendarDays },
   { href: "/content", label: "Content", icon: Film },
   { href: "/studio", label: "Recording Studio", icon: Video },
@@ -23,6 +24,48 @@ const NAV = [
   { href: "/review", label: "Weekly Review", icon: ClipboardCheck },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
+
+// Phone-first bottom tab bar (creator side). The five things he actually taps
+// daily; everything else stays behind the ☰ drawer.
+const TABS = [
+  { href: "/", label: "Today", icon: Home },
+  { href: "/compose", label: "Compose", icon: PenSquare },
+  { href: "/content", label: "Content", icon: Film },
+  { href: "/analytics", label: "Numbers", icon: BarChart3 },
+  { href: "/brain", label: "Brain", icon: Brain },
+];
+
+export function BottomTabs() {
+  const path = usePathname();
+  if (path.startsWith("/member")) return null;
+  return (
+    <nav
+      aria-label="Quick"
+      className="lg:hidden fixed bottom-0 inset-x-0 z-30 border-t border-ink-line bg-ink/95 backdrop-blur"
+      style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
+    >
+      <div className="grid grid-cols-5">
+        {TABS.map(({ href, label, icon: Icon }) => {
+          const active = href === "/" ? path === "/" : path.startsWith(href);
+          return (
+            <Link
+              key={href}
+              href={href}
+              aria-current={active ? "page" : undefined}
+              className={cn(
+                "flex flex-col items-center gap-0.5 py-2.5 text-[10px] transition-colors active:scale-95",
+                active ? "text-paper" : "text-grey",
+              )}
+            >
+              <Icon size={19} strokeWidth={active ? 2.4 : 1.8} />
+              {label}
+            </Link>
+          );
+        })}
+      </div>
+    </nav>
+  );
+}
 
 function NavList({ onNavigate }: { onNavigate?: () => void }) {
   const path = usePathname();
