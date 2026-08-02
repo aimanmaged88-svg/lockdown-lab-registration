@@ -13,6 +13,9 @@ export default defineConfig({
   use: {
     baseURL: process.env.LIVE_URL || "https://unc-thoughts-hq.netlify.app",
     trace: "retain-on-failure",
+    // Sandboxed/CI environments often route egress through an HTTPS proxy that
+    // re-signs TLS — honour it and accept its CA.
+    ...(process.env.HTTPS_PROXY ? { proxy: { server: process.env.HTTPS_PROXY }, ignoreHTTPSErrors: true } : {}),
   },
   projects: [
     {
