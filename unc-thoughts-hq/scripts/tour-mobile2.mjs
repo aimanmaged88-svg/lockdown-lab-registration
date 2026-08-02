@@ -1,0 +1,14 @@
+import { chromium } from "@playwright/test";
+const b = await chromium.launch({ executablePath: "/opt/pw-browsers/chromium" });
+const m = await b.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true });
+const p = await m.newPage();
+await p.goto("http://localhost:3600/compose", { waitUntil: "domcontentloaded" });
+await p.waitForSelector("img[alt='Post card preview']", { timeout: 25000 }).catch(() => {});
+await p.waitForTimeout(1200);
+await p.screenshot({ path: "screenshots/v1-compose.png", fullPage: true });
+console.log("shot compose");
+await p.goto("http://localhost:3600/", { waitUntil: "domcontentloaded" });
+await p.waitForTimeout(1000);
+await p.screenshot({ path: "screenshots/v2-today-mobile.png" });
+console.log("shot today");
+await m.close(); await b.close();
