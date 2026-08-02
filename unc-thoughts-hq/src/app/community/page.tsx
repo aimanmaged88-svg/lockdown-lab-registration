@@ -2,6 +2,7 @@ import { prisma, getOrgId } from "@/lib/db";
 import { Card, Section, Badge, Stat, Empty, pillarTone } from "@/components/ui";
 import { AddQuestionForm, QuestionActions, InboxActions } from "@/components/community/widgets";
 import { ShareModeration } from "@/components/community/share-moderation";
+import { QuickReply } from "@/components/community/quick-reply";
 import { CommunityBeta } from "@/components/community/beta";
 import { FlagToggle } from "@/components/flag-toggle";
 import { isEnabled } from "@/lib/flags";
@@ -102,7 +103,10 @@ export default async function CommunityPage() {
                   </div>
                 </div>
               </div>
-              <div className="mt-3"><QuestionActions id={q.id} status={q.status} /></div>
+              <div className="mt-3 flex flex-wrap items-start gap-2">
+                {q.status === "open" && <QuickReply questionId={q.id} />}
+                <QuestionActions id={q.id} status={q.status} />
+              </div>
             </Card>
           ))}
         </div>

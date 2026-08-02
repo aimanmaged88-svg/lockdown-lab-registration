@@ -226,6 +226,68 @@ export async function updateKnowledge(id: string, input: KnowledgeInput) {
   revalidatePath("/brain");
 }
 
+// One-box reply: UNC answers a community question once and it goes everywhere —
+// into Unk's Brain (approved, so members get this answer from now on), the
+// question is closed + credited, and optionally it becomes a Ready text post.
+export async function replyToQuestion(questionId: string, answer: string, alsoPost: boolean) {
+  const orgId = await getOrgId();
+  const text = answer.trim();
+  if (!text) throw new Error("Write the answer first.");
+  const q = await prisma.communityQuestion.findUnique({ where: { id: questionId } });
+  if (!q) throw new Error("Question not found.");
+
+  const pillar = q.pillar && ["Basketball", "Nutrition", "Mindset", "Community"].includes(q.pillar) ? q.pillar : "Mindset";
+  const item = await prisma.knowledgeItem.create({
+    data: {
+      orgId,
+      kind: "faq",
+      title: q.text.slice(0, 110),
+      pillar,
+      body: `DO NOW: ${text}\nPRIVATE: What would you add from your own experience?\nWHY: UNC answered this one directly for the community.`,
+      tags: JSON.stringify(["reply", pillar.toLowerCase()]),
+      source: "UNC reply",
+      author: "UNC",
+      approval: "approved",
+      reviewedAt: new Date(),
+      safetyClass: pillar === "Nutrition" ? "nutrition" : "general",
+    },
+  });
+
+  await prisma.communityQuestion.update({
+    where: { id: q.id },
+    data: { status: "answered", contributorAcknowledged: true },
+  });
+  await prisma.inboxItem.updateMany({ where: { questionId: q.id }, data: { status: "done" } });
+
+  let postId: string | null = null;
+  if (alsoPost) {
+    const owner = await prisma.user.findFirst({ where: { orgId, role: "owner" } });
+    const post = await prisma.content.create({
+      data: {
+        orgId,
+        ownerId: owner?.id,
+        title: `Answer: ${q.text.slice(0, 60)}`,
+        pillar,
+        series: "Post Bank",
+        format: "Text post",
+        caption: `Got asked: “${q.text}”\n\nStraight answer: ${text}`,
+        question: "What would you add from your own experience?",
+        status: "Ready",
+        notes: "From a one-tap reply",
+        inspirationSource: "Community question",
+        sourceQuestionId: q.id,
+      },
+    });
+    postId = post.id;
+  }
+
+  await audit("question.replied", { entity: "CommunityQuestion", entityId: q.id, detail: { brainItem: item.id, postId } });
+  revalidatePath("/community");
+  revalidatePath("/brain");
+  revalidatePath("/");
+  return { brainItemId: item.id, postId };
+}
+
 export async function setKnowledgeApproval(id: string, approval: "draft" | "approved" | "archived") {
   await prisma.knowledgeItem.update({
     where: { id },

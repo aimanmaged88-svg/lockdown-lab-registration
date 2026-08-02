@@ -37,7 +37,7 @@ const TABS = [
 
 export function BottomTabs() {
   const path = usePathname();
-  if (path.startsWith("/member")) return null;
+  if (path.startsWith("/member") || path.startsWith("/unlock")) return null;
   return (
     <nav
       aria-label="Quick"
@@ -95,7 +95,7 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
 
 export function Sidebar() {
   const path = usePathname();
-  if (path.startsWith("/member")) return null; // member area has its own minimal chrome
+  if (path.startsWith("/member") || path.startsWith("/unlock")) return null; // member area + lock screen: no desk chrome
   return (
     <aside className="hidden lg:flex w-60 shrink-0 flex-col gap-6 border-r border-ink-line px-4 py-6 sticky top-0 h-screen">
       <Link href="/" className="flex items-center gap-2 px-1">
@@ -113,7 +113,7 @@ export function Sidebar() {
 export function MobileHeader() {
   const [open, setOpen] = useState(false);
   const path = usePathname();
-  if (path.startsWith("/member")) return null;
+  if (path.startsWith("/member") || path.startsWith("/unlock")) return null;
   return (
     <>
       <header className="lg:hidden sticky top-0 z-30 flex items-center justify-between border-b border-ink-line bg-ink/95 backdrop-blur px-4 py-3">
