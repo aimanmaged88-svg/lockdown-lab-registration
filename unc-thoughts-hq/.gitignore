@@ -39,3 +39,6 @@ tsconfig.tsbuildinfo
 
 # screenshot output (dev tour)
 /screenshots
+
+# netlify deploy upload artifacts
+deploy-*.zip
