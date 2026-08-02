@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Card, Section, Badge, LinkButton, pillarTone } from "@/components/ui";
 import { Checklist } from "@/components/checklist";
 import { ContentActions } from "@/components/content-actions";
+import { CopyCaption } from "@/components/copy-caption";
 import { EnsureTasksButton } from "@/components/ensure-tasks";
 import { CHECKLIST_STEPS } from "@/lib/enums";
 import { fmt } from "@/lib/time";
@@ -62,6 +63,9 @@ export default async function ContentDetail({ params }: { params: Promise<{ id: 
         </div>
       </div>
 
+      <div className="flex flex-wrap items-center gap-2">
+        {c.caption && <CopyCaption caption={c.caption} question={c.question} />}
+      </div>
       <ContentActions id={c.id} />
 
       <div className="grid lg:grid-cols-2 gap-6">

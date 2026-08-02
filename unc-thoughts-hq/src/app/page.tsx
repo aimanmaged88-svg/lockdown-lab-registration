@@ -3,6 +3,7 @@ import { Checklist } from "@/components/checklist";
 import { ContentActions } from "@/components/content-actions";
 import { TwentyMinuteMode } from "@/components/twenty-minute";
 import { PostNowButton } from "@/components/post-now";
+import { CopyCaption } from "@/components/copy-caption";
 import { NotifyButton } from "@/components/notify-button";
 import { getTodayContent, getOverdue, getWeekProgress, getRecommendations, getInboxCounts } from "@/lib/queries";
 import { prisma, getOrgId } from "@/lib/db";
@@ -113,6 +114,7 @@ export default async function TodayPage() {
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   <Badge tone={pillarTone(c.pillar)}>{c.pillar}</Badge>
+                  {c.caption && <CopyCaption caption={c.caption} question={c.question} />}
                   <PostNowButton id={c.id} />
                 </div>
               </Card>

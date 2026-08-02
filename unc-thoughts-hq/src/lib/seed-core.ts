@@ -15,7 +15,7 @@ const TZ = "Australia/Sydney";
 // Sample dates are anchored to the CREATOR's timezone (Australia/Sydney), not
 // the server's — hosted seeds run on UTC boxes, and "today at 5:30pm" must
 // mean Sydney's today, or the Today screen shows nothing.
-function sydneyCalendar(offsetDays: number): { ymd: string; weekday: string } {
+export function sydneyCalendar(offsetDays: number): { ymd: string; weekday: string } {
   const todayStr = formatInTimeZone(new Date(), TZ, "yyyy-MM-dd");
   const [y, mo, d] = todayStr.split("-").map(Number);
   const dt = new Date(Date.UTC(y, mo - 1, d, 12) + offsetDays * 864e5);
@@ -23,7 +23,7 @@ function sydneyCalendar(offsetDays: number): { ymd: string; weekday: string } {
   return { ymd, weekday: WEEKLY_RHYTHM[(dt.getUTCDay() + 6) % 7].day };
 }
 
-function sydneyAt(ymd: string, h: number, m = 0): Date {
+export function sydneyAt(ymd: string, h: number, m = 0): Date {
   return fromZonedTime(`${ymd} ${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:00`, TZ);
 }
 

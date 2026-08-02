@@ -1,5 +1,6 @@
 import { prisma, getOrgId } from "@/lib/db";
 import { Card, Badge, LinkButton, pillarTone } from "@/components/ui";
+import { PlanWeekButton } from "@/components/plan-week-button";
 import { WEEKLY_RHYTHM } from "@/lib/enums";
 import { weekStart, isoDate, fmt } from "@/lib/time";
 import { addDays } from "date-fns";
@@ -33,7 +34,10 @@ export default async function CalendarPage() {
           <p className="eyebrow">Five weeks at a glance</p>
           <h1>Calendar</h1>
         </div>
-        <LinkButton href="/content/new" primary>+ New content</LinkButton>
+        <div className="flex items-center gap-2">
+          <PlanWeekButton />
+          <LinkButton href="/content/new">+ New content</LinkButton>
+        </div>
       </div>
 
       {/* Weekly rhythm reference */}
