@@ -2,11 +2,11 @@ import Link from "next/link";
 import { getMember } from "@/lib/member";
 import { prisma } from "@/lib/db";
 import { ContextCard } from "@/components/member/context-card";
-import { MessageCircleQuestion, Trophy, Dumbbell, Apple, Brain, BatteryCharging, Lightbulb, Lock } from "lucide-react";
+import { MessageCircleQuestion, Trophy, Dumbbell, Apple, Brain, BatteryCharging, Lightbulb, Lock, Flame } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
-// The member home. Deliberately small: eight things, no feed.
+// The member home. Deliberately small: nine things, no feed.
 const TILES = [
   { href: "/member/game", label: "Game today", note: "Quick game-day prep", icon: Trophy },
   { href: "/member/training", label: "Training today", note: "Quick training prep", icon: Dumbbell },
@@ -53,7 +53,18 @@ export default async function MemberHome() {
         ))}
       </div>
 
-      {/* 8. My answers */}
+      {/* 8. Consistency Chart */}
+      <Link href="/member/consistency" className="card p-4 flex items-center justify-between hover:bg-ink-soft transition-colors">
+        <span className="flex items-center gap-3">
+          <Flame size={16} className="text-paper-dim" />
+          <span>
+            <span className="block font-medium text-sm">Consistency Chart</span>
+            <span className="block text-[11px] text-grey">Tag your day. Your own data shows what works.</span>
+          </span>
+        </span>
+      </Link>
+
+      {/* 9. My answers */}
       <Link href="/member/answers" className="card p-4 flex items-center justify-between hover:bg-ink-soft transition-colors">
         <span className="flex items-center gap-3">
           <Lock size={16} className="text-paper-dim" />

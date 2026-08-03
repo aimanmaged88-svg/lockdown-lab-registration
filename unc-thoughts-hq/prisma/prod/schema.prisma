@@ -631,6 +631,23 @@ model Member {
 
   reflections Reflection[]
   askLogs     AskLog[]
+  habitLogs   HabitLog[]
+}
+
+// Consistency Chart: one row per member per Sydney day. Tags come from the
+// fixed HABIT_TAGS set; energy is how the day felt (1-5). Deliberately no
+// streak mechanics — showing up is counted, gaps are never shamed.
+model HabitLog {
+  id        String   @id @default(cuid())
+  memberId  String
+  member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  day       String   // Sydney YYYY-MM-DD
+  tags      String   @default("") // comma-separated ids from HABIT_TAGS
+  energy    Int?     // 1-5
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([memberId, day])
 }
 
 // Private accountability answers. answerEnc/voicePath are ENCRYPTED at rest
