@@ -1,0 +1,719 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F3EFE4">
+<title>Together — Amanda's Talker</title>
+</head>
+<body>
+<style>
+  :root{
+    --bg:#F3EFE4; --card:#FFFFFF; --card2:#FAF7EE;
+    --ink:#253322; --muted:#6E7B67; --line:#E2DCC9;
+    --sage:#7E9C77; --sage-deep:#5A7854; --sage-soft:#E4EBDF;
+    --coral:#DD7154; --sun:#F4E9CD;
+    --yes:#3A7D4E; --no:#BF5B3F;
+    --calm-bg:#131B26; --calm-ink:#C6D2E2;
+    --r:26px; --rs:18px;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg); color:var(--ink);
+    font-family:ui-rounded,"SF Pro Rounded",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    -webkit-user-select:none;user-select:none;
+    padding-bottom:112px; min-height:100vh;
+  }
+  button{font-family:inherit;color:inherit;border:0;background:none;padding:0;cursor:pointer;touch-action:manipulation}
+  button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--sage-deep);outline-offset:2px}
+  input,select{font-family:inherit;font-size:17px;color:var(--ink)}
+
+  /* ---------- header ---------- */
+  .top{display:flex;align-items:center;gap:10px;padding:14px 96px 6px 18px}
+  .brand{font-family:Georgia,"Times New Roman",serif;font-weight:700;font-size:22px;letter-spacing:.2px}
+  .brand i{font-style:italic}
+  .kid{background:var(--sage-soft);border:2px solid var(--sage);border-radius:999px;padding:6px 14px;font-weight:800;font-size:15px}
+
+  /* ---------- calm bubble (always there) ---------- */
+  #calmBtn{
+    position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);right:12px;z-index:70;
+    width:76px;height:76px;border-radius:50%;
+    background:var(--sage-deep);color:#fff;box-shadow:0 6px 18px rgba(37,51,34,.28);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;
+    border:3px solid rgba(255,255,255,.55);
+  }
+  #calmBtn .e{font-size:28px;line-height:1}
+  #calmBtn .w{font-size:12px;font-weight:800;letter-spacing:.4px}
+  #calmBtn:active{transform:scale(.94)}
+
+  main{padding:0 14px;max-width:900px;margin:0 auto}
+  .view{display:none}
+  .view.show{display:block;animation:fadeIn .18s ease}
+  @keyframes fadeIn{from{opacity:.4}to{opacity:1}}
+
+  /* ---------- sentence bar ---------- */
+  .said{
+    width:100%;display:flex;align-items:center;gap:12px;text-align:left;
+    background:var(--card);border:2px solid var(--line);border-radius:var(--r);
+    padding:16px 18px;min-height:78px;margin:8px 0 12px;
+  }
+  .said .mic{font-size:26px;flex:0 0 auto}
+  .said #said{font-size:24px;font-weight:800;line-height:1.15}
+  .said.empty #said{color:var(--muted);font-weight:700;font-size:18px}
+  .said.pulse{border-color:var(--sage);background:var(--sage-soft)}
+
+  /* ---------- big buttons ---------- */
+  .bb{
+    background:var(--card);border:2px solid var(--line);border-radius:var(--r);
+    min-height:104px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+    padding:12px 8px;box-shadow:0 2px 0 rgba(37,51,34,.05);
+    transition:transform .1s ease;
+  }
+  .bb:active{transform:scale(.95)}
+  .bb .e{font-size:42px;line-height:1}
+  .bb .w{font-size:19px;font-weight:800;letter-spacing:.2px}
+  .core{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+  .core .bb{min-height:128px}
+  .core .bb .e{font-size:52px}
+  .core .bb .w{font-size:24px}
+  .bb.yes{background:var(--yes);border-color:var(--yes);color:#fff}
+  .bb.no{background:var(--no);border-color:var(--no);color:#fff}
+  .core3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+  .core3 .bb{min-height:92px;background:var(--card2)}
+  .core3 .bb .e{font-size:34px}
+  .core3 .bb .w{font-size:16px}
+
+  /* ---------- favourites shelf ---------- */
+  .faves{margin:2px 0 12px}
+  .faves h4{margin:0 0 8px;font-size:14px;color:var(--muted);letter-spacing:.6px;text-transform:uppercase}
+  .frow{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+  .fchip{flex:0 0 auto;background:var(--sun);border:2px solid #E6D8AC;border-radius:999px;padding:12px 16px;font-size:17px;font-weight:800}
+  .fchip:active{transform:scale(.95)}
+
+  /* ---------- tabs + grid ---------- */
+  .tabs{display:flex;gap:8px;overflow-x:auto;margin:4px 0 12px;padding-bottom:4px}
+  .tab{flex:0 0 auto;background:var(--card);border:2px solid var(--line);border-radius:999px;padding:10px 16px;font-size:16px;font-weight:800;color:var(--muted)}
+  .tab.on{background:var(--sage);border-color:var(--sage);color:#fff}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+
+  /* ---------- generic cards / views ---------- */
+  .vh{font-size:26px;font-weight:900;margin:14px 2px 4px}
+  .vsub{margin:0 2px 14px;color:var(--muted);font-size:16px;line-height:1.35}
+  .card{background:var(--card);border:2px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:14px}
+  .card h3{margin:0 0 10px;font-size:17px}
+  .tiny{font-size:13px;color:var(--muted);font-weight:600}
+  .cta{
+    width:100%;background:var(--sage-deep);color:#fff;border-radius:var(--rs);
+    padding:16px;font-size:19px;font-weight:900;margin-top:10px;
+  }
+  .cta:active{transform:scale(.98)}
+  .ghost{width:100%;background:var(--card2);border:2px dashed var(--line);border-radius:var(--rs);padding:14px;font-size:16px;font-weight:800;color:var(--muted);margin-top:10px}
+
+  /* ---------- ask (caregiver) ---------- */
+  .plist{display:flex;flex-direction:column;gap:8px}
+  .preset{background:var(--card2);border:2px solid var(--line);border-radius:var(--rs);padding:14px 14px;text-align:left;font-size:18px;font-weight:800;display:flex;gap:10px;align-items:center}
+  .preset:active{transform:scale(.98);background:var(--sage-soft)}
+  .preset .e{font-size:24px}
+  input[type=text]{width:100%;border:2px solid var(--line);border-radius:var(--rs);padding:14px;background:var(--card2)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+  .chip{background:var(--card2);border:2px solid var(--line);border-radius:999px;padding:10px 14px;font-size:15px;font-weight:800;color:var(--muted)}
+  .chip.sel{background:var(--sun);border-color:#E0C877;color:var(--ink)}
+  .optrow{margin:10px 0 4px}
+
+  /* ---------- ask (child answers) ---------- */
+  .kidview{position:relative;padding-top:10px;text-align:center}
+  .cx{position:absolute;top:6px;left:2px;width:44px;height:44px;border-radius:50%;background:var(--card);border:2px solid var(--line);font-size:18px;font-weight:900;color:var(--muted)}
+  .eyebrow{margin:18px 0 6px;color:var(--muted);font-weight:800;letter-spacing:.6px;text-transform:uppercase;font-size:13px}
+  #qBig{font-size:clamp(30px,7.5vw,44px);font-weight:900;line-height:1.12;margin:0 6px 10px;text-wrap:balance}
+  .rebig{background:var(--card);border:2px solid var(--line);border-radius:999px;padding:10px 18px;font-size:16px;font-weight:800;color:var(--muted);margin-bottom:18px}
+  .ynrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+  .huge{border-radius:var(--r);min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;font-size:34px;font-weight:900;color:#fff}
+  .huge .e{font-size:58px}
+  .huge.yes{background:var(--yes)}
+  .huge.no{background:var(--no)}
+  .huge:active{transform:scale(.96)}
+  .nsbtn{width:100%;background:var(--card);border:2px solid var(--line);border-radius:var(--rs);padding:18px;font-size:22px;font-weight:900;margin-bottom:12px}
+  .chgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:16px}
+
+  /* ---------- answer confirm ---------- */
+  .donecard{text-align:center;padding-top:40px}
+  .bigE{font-size:96px;line-height:1;margin-bottom:8px}
+  .donecard p{color:var(--muted);font-weight:800;font-size:18px;margin:0}
+  .donecard h1{font-size:56px;margin:6px 0 30px;font-weight:900}
+  .donecard .cta{max-width:420px}
+
+  /* ---------- Amanda / personal tab ---------- */
+  .tile{display:flex;gap:12px;align-items:flex-start;background:var(--card2);border:2px solid var(--line);border-radius:var(--rs);padding:14px;margin-top:10px;cursor:pointer}
+  .tile:active{transform:scale(.99)}
+  .tile .e{font-size:30px;flex:0 0 auto}
+  .tile b{display:block;font-size:16px;margin-bottom:2px}
+  .tile span{font-size:13.5px;color:var(--muted);line-height:1.35;font-weight:600}
+  .demochip{display:inline-block;background:var(--sun);border:2px solid #E0C877;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:900;letter-spacing:.5px;vertical-align:middle;margin-left:8px}
+  .insight{background:var(--sage-soft);border:2px solid var(--sage);border-radius:var(--r);padding:16px 18px;margin-bottom:14px}
+  .insight h3{margin:0 0 8px;font-size:16px}
+  .insight ul{margin:0;padding-left:18px;font-size:15px;line-height:1.6;font-weight:600}
+  .linky{background:none;border:0;color:var(--muted);font-weight:800;font-size:14px;text-decoration:underline;margin:4px auto 20px;display:block}
+
+  /* ---------- grown-ups ---------- */
+  .lockcard{text-align:center;padding:30px 18px}
+  .lockcard .e{font-size:52px}
+  #holdBtn{margin-top:14px;background:var(--sage-deep);color:#fff;border-radius:var(--rs);padding:18px 26px;font-size:18px;font-weight:900;position:relative;overflow:hidden;width:100%}
+  #holdBtn .fill{position:absolute;inset:0;background:rgba(255,255,255,.25);transform-origin:left;transform:scaleX(0)}
+  #holdBtn.holding .fill{transform:scaleX(1);transition:transform 1.6s linear}
+  .setrow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1.5px solid var(--line)}
+  .setrow:last-child{border-bottom:0}
+  .setrow label{font-weight:800;font-size:16px}
+  .setrow input[type=text]{max-width:170px}
+  .setrow select{max-width:190px;border:2px solid var(--line);border-radius:12px;padding:10px;background:var(--card2)}
+  input[type=range]{width:150px;accent-color:var(--sage-deep)}
+  .danger{color:var(--no);font-weight:800;background:none;border:2px solid var(--line);border-radius:12px;padding:10px 14px;font-size:14px}
+
+  /* ---------- calm mode ---------- */
+  .calm{
+    position:fixed;inset:0;z-index:80;display:none;flex-direction:column;align-items:center;
+    background:var(--calm-bg);color:var(--calm-ink);padding:20px 16px 24px;overflow-y:auto;
+  }
+  .calm.show{display:flex}
+  .calm .cx{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.15);color:var(--calm-ink);position:absolute;top:14px;left:14px}
+  .binner{margin-top:40px;height:150px;display:flex;align-items:center;justify-content:center}
+  .bc{width:96px;height:96px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#3E5D7A,#22374D);box-shadow:0 0 60px rgba(94,140,190,.35);animation:bre 9s ease-in-out infinite}
+  @keyframes bre{0%,100%{transform:scale(1)}50%{transform:scale(1.5)}}
+  .bhint{margin:14px 0 26px;font-size:16px;font-weight:700;color:#8FA5BD;letter-spacing:.3px}
+  .cgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;width:100%;max-width:560px}
+  .cbb{background:rgba(255,255,255,.07);border:2px solid rgba(255,255,255,.14);border-radius:var(--r);min-height:120px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--calm-ink)}
+  .cbb .e{font-size:44px}
+  .cbb .w{font-size:18px;font-weight:800}
+  .cbb:active{transform:scale(.95);background:rgba(255,255,255,.12)}
+  .okbtn{margin-top:16px;width:100%;max-width:560px;background:#2E5B41;color:#DFF2E4;border-radius:var(--r);padding:20px;font-size:22px;font-weight:900}
+  .okbtn:active{transform:scale(.97)}
+  .cnote{margin-top:22px;font-size:13px;color:#5F738C;font-weight:700;text-align:center;line-height:1.5}
+
+  /* ---------- nav ---------- */
+  nav{
+    position:fixed;left:0;right:0;bottom:0;z-index:60;
+    display:grid;grid-template-columns:repeat(4,1fr);gap:2px;
+    background:var(--card);border-top:2px solid var(--line);
+    padding:8px 8px calc(env(safe-area-inset-bottom,0px) + 8px);
+  }
+  nav button{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border-radius:16px;font-size:12.5px;font-weight:800;color:var(--muted)}
+  nav button .e{font-size:26px;line-height:1}
+  nav button.on{background:var(--sage-soft);color:var(--sage-deep)}
+
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+  }
+  @media (min-width:700px){
+    .core .bb{min-height:150px}
+    .grid{grid-template-columns:repeat(auto-fill,minmax(170px,1fr))}
+    .huge{min-height:220px}
+  }
+</style>
+
+<header class="top">
+  <div class="brand">T<i>ogether</i> 💬</div>
+  <div class="kid">🧒 <span class="nm">Amanda</span></div>
+</header>
+
+<button id="calmBtn" aria-label="Open calm mode"><span class="e">🫧</span><span class="w">Calm</span></button>
+
+<main>
+
+  <!-- ============ TALK ============ -->
+  <section id="vTalk" class="view show">
+    <button class="said empty" id="saidBar" aria-label="Say it again"><span class="mic">🔊</span><span id="said">Tap a word — it talks out loud</span></button>
+
+    <div class="core">
+      <button class="bb yes" data-say="Yes" data-w="Yes" data-e="✅"><span class="e">✅</span><span class="w">YES</span></button>
+      <button class="bb no" data-say="No" data-w="No" data-e="❌"><span class="e">❌</span><span class="w">NO</span></button>
+    </div>
+    <div class="core3">
+      <button class="bb" data-say="Help me please" data-w="Help" data-e="🙋"><span class="e">🙋</span><span class="w">HELP</span></button>
+      <button class="bb" data-say="Stop please" data-w="Stop" data-e="🛑"><span class="e">🛑</span><span class="w">STOP</span></button>
+      <button class="bb" data-say="I need a break please" data-w="Break" data-e="😌"><span class="e">😌</span><span class="w">BREAK</span></button>
+    </div>
+
+    <div class="faves" id="faves" hidden>
+      <h4>⭐ <span class="nm">Amanda</span>'s favourites</h4>
+      <div class="frow" id="frow"></div>
+    </div>
+
+    <div class="tabs" id="tabs"></div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <!-- ============ ASK (caregiver) ============ -->
+  <section id="vAsk" class="view">
+    <h2 class="vh">Ask <span class="nm">Amanda</span> a question</h2>
+    <p class="vsub">Tap a question, then hand the screen over — it flips to a giant YES / NO for her.</p>
+
+    <div class="card">
+      <div class="plist" id="plist"></div>
+    </div>
+
+    <div class="card">
+      <h3>Your own question</h3>
+      <input type="text" id="qCustom" placeholder="Type it… e.g. Do you want pasta tonight?">
+      <div class="optrow">
+        <button class="chip" id="togNS">🤷 add a “Not sure” button</button>
+      </div>
+      <h3 style="margin-top:14px">Extra choices <span class="tiny">(optional — gives her more than yes/no)</span></h3>
+      <div class="chips" id="chChips"></div>
+      <button class="cta" id="askNow">Ask now →</button>
+    </div>
+  </section>
+
+  <!-- ============ ASK (child view) ============ -->
+  <section id="vAskGo" class="view kidview">
+    <button class="cx" id="askBack" aria-label="Back">✕</button>
+    <p class="eyebrow">A question for <span class="nm">Amanda</span></p>
+    <h1 id="qBig"></h1>
+    <button class="rebig" id="qSay">🔊 Hear it again</button>
+    <div class="ynrow">
+      <button class="huge yes" data-ans="Yes" data-anssay="Yes" data-anse="✅"><span class="e">✅</span>YES</button>
+      <button class="huge no" data-ans="No" data-anssay="No" data-anse="❌"><span class="e">❌</span>NO</button>
+    </div>
+    <button class="nsbtn" id="nsBtn" data-ans="Not sure" data-anssay="I'm not sure" data-anse="🤷" hidden>🤷 Not sure</button>
+    <div class="chgrid" id="chGrid"></div>
+  </section>
+
+  <!-- ============ ANSWER CONFIRM ============ -->
+  <section id="vDone" class="view">
+    <div class="donecard">
+      <div class="bigE" id="doneE">💬</div>
+      <p><span class="nm">Amanda</span> said</p>
+      <h1 id="doneW"></h1>
+      <button class="cta" id="askAgain">❓ Ask another question</button>
+      <button class="ghost" id="doneTalk" style="max-width:420px;margin:10px auto 0">🗣 Back to talking</button>
+    </div>
+  </section>
+
+  <!-- ============ PERSONAL (AI) ============ -->
+  <section id="vAmanda" class="view">
+    <h2 class="vh">⭐ <span class="nm">Amanda</span>'s own board</h2>
+    <div id="aiSetup">
+      <p class="vsub">The AI learns her — her words, her loves, her hard moments — and builds a board that's actually hers.</p>
+      <div class="card">
+        <label class="tile"><span class="e">📱</span><div><b>WhatsApp chat between parents</b><span>Export the chat, drop it here. The AI reads how you talk about her day and learns what matters.</span></div><input type="file" hidden id="fWa" accept=".txt,.zip"></label>
+        <label class="tile"><span class="e">📋</span><div><b>Behaviour support plan</b><span>The AI reads triggers, calming strategies and goals — and puts them one tap away.</span></div><input type="file" hidden id="fBsp" accept=".pdf,.doc,.docx,.txt"></label>
+        <button class="cta" id="demoBtn">👀 Show me with demo info</button>
+        <p class="tiny" style="margin-top:12px">🔒 Tonight this is a walk-through — files stay on this device and aren't read or sent anywhere yet. The real AI hook-up is next.</p>
+      </div>
+    </div>
+    <div id="aiBoard" hidden>
+      <p class="vsub">Built from her chats + support plan <span class="demochip">DEMO</span></p>
+      <div class="faves"><h4>💛 Things she loves</h4></div>
+      <div class="grid" id="loveGrid" style="margin-bottom:16px"></div>
+      <div class="faves"><h4>😮‍💨 Helps her calm down</h4></div>
+      <div class="grid" id="calmGrid" style="margin-bottom:16px"></div>
+      <div class="insight">
+        <h3>🧠 What the AI noticed <span class="demochip">DEMO</span></h3>
+        <ul>
+          <li>Changing activities is the hard moment — a 5-minute warning helps.</li>
+          <li>Loud places overwhelm her fast — headphones settle it.</li>
+          <li>Deep-pressure hugs and her blanket work best in a meltdown.</li>
+          <li>Trampoline, Bluey and Nanna's house are her happy places.</li>
+        </ul>
+      </div>
+      <button class="linky" id="aiReset">↺ Set it up differently</button>
+    </div>
+  </section>
+
+  <!-- ============ GROWN-UPS ============ -->
+  <section id="vGrown" class="view">
+    <h2 class="vh">⚙️ Grown-ups</h2>
+    <div class="card lockcard" id="lockCard">
+      <div class="e">🔒</div>
+      <p class="vsub" style="margin:8px 0 0">This bit is for grown-ups.<br>Hold the button to open it.</p>
+      <button id="holdBtn"><span class="fill"></span>Hold to open (2 seconds)</button>
+    </div>
+    <div id="grownPanel" hidden>
+      <div class="card">
+        <div class="setrow"><label>Her name</label><input type="text" id="setName" maxlength="18"></div>
+        <div class="setrow"><label>Voice</label><select id="voiceSel"><option value="">Auto (Aussie if there)</option></select></div>
+        <div class="setrow"><label>Talking speed</label><input type="range" id="setRate" min="0.7" max="1.2" step="0.05"></div>
+        <div class="setrow"><label>Try it</label><button class="chip sel" id="testVoice">🔊 Test the voice</button></div>
+      </div>
+      <div class="card">
+        <h3>Data</h3>
+        <p class="tiny" style="margin:0 0 12px">Everything lives on this device only. Nothing is uploaded anywhere.</p>
+        <button class="danger" id="resetFaves">Clear favourites</button>
+        <button class="danger" id="resetAll" style="margin-left:8px">Start completely fresh</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ============ CALM OVERLAY ============ -->
+<div id="calm" class="calm" role="dialog" aria-label="Calm mode">
+  <button class="cx" id="calmExit" aria-label="Close calm mode">✕</button>
+  <div class="binner"><div class="bc"></div></div>
+  <p class="bhint">Breathe with the circle… in… and out…</p>
+  <div class="cgrid">
+    <button class="cbb" data-say="I need space please" data-w="Space" data-e="🚪"><span class="e">🚪</span><span class="w">I need space</span></button>
+    <button class="cbb" data-say="It's too loud" data-w="Too loud" data-e="🎧"><span class="e">🎧</span><span class="w">Too loud</span></button>
+    <button class="cbb" data-say="Squeeze hug please" data-w="Hug" data-e="🤗"><span class="e">🤗</span><span class="w">Hug please</span></button>
+    <button class="cbb" data-say="Blanket please" data-w="Blanket" data-e="🧸"><span class="e">🧸</span><span class="w">Blanket</span></button>
+  </div>
+  <button class="okbtn" id="okBtn" data-say="I'm okay now" data-w="Okay now" data-e="💛">💛 I'm okay now</button>
+  <p class="cnote">For grown-ups: quiet voice · fewer words · no questions · give space.<br>Sound stays off unless she taps a button.</p>
+</div>
+
+<nav>
+  <button data-nav="vTalk" class="on"><span class="e">🗣</span>Talk</button>
+  <button data-nav="vAsk"><span class="e">❓</span>Ask</button>
+  <button data-nav="vAmanda"><span class="e">⭐</span><span class="nm">Amanda</span></button>
+  <button data-nav="vGrown"><span class="e">⚙️</span>Grown-ups</button>
+</nav>
+
+<script>
+(function(){
+  "use strict";
+  var $=function(s){return document.querySelector(s)};
+  var $$=function(s){return Array.prototype.slice.call(document.querySelectorAll(s))};
+
+  /* ---------------- state ---------------- */
+  var S={name:"Amanda",rate:0.95,voiceURI:"",trained:false,counts:{}};
+  try{
+    var raw=localStorage.getItem("tg1");
+    if(raw){var p=JSON.parse(raw);for(var k in p){S[k]=p[k]}}
+  }catch(e){}
+  function save(){try{localStorage.setItem("tg1",JSON.stringify(S))}catch(e){}}
+
+  /* ---------------- words ---------------- */
+  var CATS={
+    needs:{ico:"🍎",name:"I need",items:[
+      {e:"🍽️",w:"Eat",say:"I'm hungry"},
+      {e:"💧",w:"Drink",say:"I'm thirsty"},
+      {e:"🚽",w:"Toilet",say:"I need the toilet"},
+      {e:"😴",w:"Sleep",say:"I'm tired"},
+      {e:"🥵",w:"Hot",say:"I'm hot"},
+      {e:"🥶",w:"Cold",say:"I'm cold"},
+      {e:"🤕",w:"Hurts",say:"Something hurts"},
+      {e:"🧸",w:"Blanket",say:"Blanket please"}
+    ]},
+    feel:{ico:"💛",name:"I feel",items:[
+      {e:"😊",w:"Happy",say:"I feel happy"},
+      {e:"😢",w:"Sad",say:"I feel sad"},
+      {e:"😠",w:"Angry",say:"I feel angry"},
+      {e:"😨",w:"Scared",say:"I feel scared"},
+      {e:"🥱",w:"Tired",say:"I feel tired"},
+      {e:"🤒",w:"Sick",say:"I feel sick"},
+      {e:"🌊",w:"Too much",say:"It's too much for me"},
+      {e:"🤩",w:"Excited",say:"I'm excited"}
+    ]},
+    dothing:{ico:"⚽",name:"I want to",items:[
+      {e:"🧩",w:"Play",say:"I want to play"},
+      {e:"🌳",w:"Outside",say:"I want to go outside"},
+      {e:"🎵",w:"Music",say:"I want music"},
+      {e:"📱",w:"iPad",say:"I want the iPad"},
+      {e:"📚",w:"Book",say:"Read a book with me"},
+      {e:"🛝",w:"Swing",say:"I want the swing"},
+      {e:"🚶",w:"Walk",say:"I want to go for a walk"},
+      {e:"🏠",w:"Home",say:"I want to go home"}
+    ]},
+    people:{ico:"👨‍👩‍👧",name:"People",items:[
+      {e:"👩",w:"Mum",say:"I want Mum"},
+      {e:"👨",w:"Dad",say:"I want Dad"},
+      {e:"👵",w:"Nanna",say:"I want Nanna"},
+      {e:"🧑‍🤝‍🧑",w:"Friend",say:"I want my friend"}
+    ]},
+    social:{ico:"👋",name:"Say hi",items:[
+      {e:"👋",w:"Hello",say:"Hello!"},
+      {e:"🙋",w:"Bye",say:"Bye bye"},
+      {e:"🥺",w:"Please",say:"Please"},
+      {e:"💖",w:"Thank you",say:"Thank you"},
+      {e:"➕",w:"More",say:"More please"},
+      {e:"✅",w:"All done",say:"All done"},
+      {e:"⏳",w:"Wait",say:"I need a minute"},
+      {e:"🥰",w:"Love you",say:"I love you"}
+    ]}
+  };
+  var curTab="needs";
+
+  var PRESETS=[
+    {e:"🧩",q:"Do you want to play?"},
+    {e:"🍽️",q:"Are you hungry?"},
+    {e:"💧",q:"Do you want a drink?"},
+    {e:"🤕",q:"Does something hurt?"},
+    {e:"🏠",q:"Do you want to go home?"},
+    {e:"😌",q:"Do you need a break?"},
+    {e:"🚽",q:"Do you need the toilet?"},
+    {e:"💛",q:"Are you okay?"}
+  ];
+  var CHOICES=[
+    {e:"🌳",w:"Outside",say:"I want to go outside"},
+    {e:"📱",w:"iPad",say:"I want the iPad"},
+    {e:"🤸",w:"Trampoline",say:"I want the trampoline"},
+    {e:"🎵",w:"Music",say:"I want music"},
+    {e:"💧",w:"Water",say:"Water please"},
+    {e:"🍪",w:"Snack",say:"Snack please"},
+    {e:"📚",w:"Book",say:"A book please"},
+    {e:"🛁",w:"Bath",say:"Bath time"}
+  ];
+  var LOVES=[
+    {e:"🤸",w:"Trampoline",say:"I want to jump on the trampoline"},
+    {e:"🍗",w:"Nuggets",say:"Can I have chicken nuggets please"},
+    {e:"📺",w:"Bluey",say:"I want to watch Bluey"},
+    {e:"🏊",w:"Swimming",say:"I want to go swimming"},
+    {e:"👵",w:"Nanna's",say:"I want to go to Nanna's house"},
+    {e:"🎨",w:"Drawing",say:"I want to do drawing"}
+  ];
+  var CALMS=[
+    {e:"🧸",w:"Blanket",say:"Blanket please"},
+    {e:"🎧",w:"Headphones",say:"Headphones please, it's too loud"},
+    {e:"🤗",w:"Deep hug",say:"Squeeze hug please"},
+    {e:"💡",w:"Lights down",say:"Lights down please"}
+  ];
+
+  /* ---------------- speech ---------------- */
+  var voices=[];
+  function loadVoices(){
+    if(!window.speechSynthesis)return;
+    voices=speechSynthesis.getVoices()||[];
+    var sel=$("#voiceSel");
+    while(sel.options.length>1)sel.remove(1);
+    voices.forEach(function(v){
+      if(!/^en/i.test(v.lang))return;
+      var o=document.createElement("option");
+      o.value=v.voiceURI;o.textContent=v.name+" ("+v.lang+")";
+      sel.appendChild(o);
+    });
+    sel.value=S.voiceURI||"";
+  }
+  if(window.speechSynthesis){
+    loadVoices();
+    speechSynthesis.onvoiceschanged=loadVoices;
+  }
+  var calmOpen=false;
+  function speak(t){
+    if(!window.speechSynthesis)return;
+    try{
+      speechSynthesis.cancel();
+      var u=new SpeechSynthesisUtterance(t);
+      u.rate=calmOpen?Math.max(0.7,S.rate*0.88):S.rate;
+      u.pitch=1.02;
+      var v=null,i;
+      for(i=0;i<voices.length;i++){if(voices[i].voiceURI===S.voiceURI){v=voices[i];break}}
+      if(!v){for(i=0;i<voices.length;i++){if(/en[-_]AU/i.test(voices[i].lang)){v=voices[i];break}}}
+      if(v)u.voice=v;
+      speechSynthesis.speak(u);
+    }catch(e){}
+  }
+  function buzz(){try{if(navigator.vibrate)navigator.vibrate(25)}catch(e){}}
+
+  var lastSaid="";
+  function banner(t){
+    lastSaid=t;
+    var bar=$("#saidBar");
+    $("#said").textContent=t;
+    bar.classList.remove("empty","pulse");
+    void bar.offsetWidth;
+    bar.classList.add("pulse");
+    setTimeout(function(){bar.classList.remove("pulse")},600);
+  }
+
+  /* ---------------- favourites ---------------- */
+  function bump(w,say,e){
+    var c=S.counts[w]||{n:0,say:say,e:e};
+    c.n++;c.say=say;c.e=e;
+    S.counts[w]=c;save();renderFaves();
+  }
+  function renderFaves(){
+    var keys=Object.keys(S.counts).filter(function(k){return S.counts[k].n>=2});
+    keys.sort(function(a,b){return S.counts[b].n-S.counts[a].n});
+    keys=keys.slice(0,6);
+    var box=$("#faves");
+    if(!keys.length){box.hidden=true;return}
+    box.hidden=false;
+    $("#frow").innerHTML=keys.map(function(k){
+      var c=S.counts[k];
+      return '<button class="fchip" data-say="'+esc(c.say)+'" data-w="'+esc(k)+'" data-e="'+c.e+'">'+c.e+" "+esc(k)+"</button>";
+    }).join("");
+  }
+  function esc(s){return String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+
+  /* ---------------- talk board ---------------- */
+  function bbtn(it){
+    return '<button class="bb" data-say="'+esc(it.say)+'" data-w="'+esc(it.w)+'" data-e="'+it.e+'"><span class="e">'+it.e+'</span><span class="w">'+esc(it.w)+"</span></button>";
+  }
+  function renderTabs(){
+    $("#tabs").innerHTML=Object.keys(CATS).map(function(k){
+      var c=CATS[k];
+      return '<button class="tab'+(k===curTab?" on":"")+'" data-tab="'+k+'">'+c.ico+" "+c.name+"</button>";
+    }).join("");
+    $("#grid").innerHTML=CATS[curTab].items.map(bbtn).join("");
+  }
+
+  /* ---------------- ask flow ---------------- */
+  var ask={q:"",notSure:false,choices:[]};
+  function renderAsk(){
+    $("#plist").innerHTML=PRESETS.map(function(p,i){
+      return '<button class="preset" data-preset="'+i+'"><span class="e">'+p.e+"</span>"+esc(p.q)+"</button>";
+    }).join("");
+    $("#chChips").innerHTML=CHOICES.map(function(c,i){
+      var on=ask.choices.indexOf(i)>-1;
+      return '<button class="chip'+(on?" sel":"")+'" data-ch="'+i+'">'+c.e+" "+esc(c.w)+"</button>";
+    }).join("");
+    $("#togNS").classList.toggle("sel",ask.notSure);
+  }
+  function startAsk(q){
+    ask.q=q;
+    $("#qBig").textContent=q;
+    $("#nsBtn").hidden=!ask.notSure;
+    $("#chGrid").innerHTML=ask.choices.map(function(i){
+      var c=CHOICES[i];
+      return '<button class="bb" data-ans="'+esc(c.w)+'" data-anssay="'+esc(c.say)+'" data-anse="'+c.e+'"><span class="e">'+c.e+'</span><span class="w">'+esc(c.w)+"</span></button>";
+    }).join("");
+    showView("vAskGo");
+    setTimeout(function(){speak(q)},350);
+  }
+  function answered(w,sayT,e){
+    speak(sayT);buzz();
+    bump(w,sayT,e);
+    $("#doneE").textContent=e;
+    $("#doneW").textContent=w;
+    showView("vDone");
+  }
+
+  /* ---------------- personal board ---------------- */
+  function renderAmanda(){
+    $("#aiSetup").style.display=S.trained?"none":"block";
+    $("#aiBoard").hidden=!S.trained;
+    if(S.trained){
+      $("#loveGrid").innerHTML=LOVES.map(bbtn).join("");
+      $("#calmGrid").innerHTML=CALMS.map(bbtn).join("");
+    }
+  }
+
+  /* ---------------- views / nav ---------------- */
+  function showView(id){
+    $$(".view").forEach(function(v){v.classList.remove("show")});
+    $("#"+id).classList.add("show");
+    var navMap={vAskGo:"vAsk",vDone:"vAsk"};
+    var navId=navMap[id]||id;
+    $$("nav button").forEach(function(b){b.classList.toggle("on",b.getAttribute("data-nav")===navId)});
+    window.scrollTo(0,0);
+  }
+
+  /* ---------------- name ---------------- */
+  function applyName(){
+    $$(".nm").forEach(function(el){el.textContent=S.name});
+    $("#setName").value=S.name;
+  }
+
+  /* ---------------- events ---------------- */
+  document.addEventListener("click",function(ev){
+    var t=ev.target;
+
+    var sayBtn=t.closest("[data-say]");
+    if(sayBtn){
+      var txt=sayBtn.getAttribute("data-say");
+      speak(txt);buzz();
+      if(!calmOpen)banner(txt);
+      bump(sayBtn.getAttribute("data-w")||txt,txt,sayBtn.getAttribute("data-e")||"💬");
+      if(sayBtn.id==="okBtn"){setTimeout(closeCalm,700)}
+      return;
+    }
+
+    var ansBtn=t.closest("[data-ans]");
+    if(ansBtn){
+      answered(ansBtn.getAttribute("data-ans"),ansBtn.getAttribute("data-anssay"),ansBtn.getAttribute("data-anse"));
+      return;
+    }
+
+    var navBtn=t.closest("[data-nav]");
+    if(navBtn){showView(navBtn.getAttribute("data-nav"));return}
+
+    var tabBtn=t.closest("[data-tab]");
+    if(tabBtn){curTab=tabBtn.getAttribute("data-tab");renderTabs();return}
+
+    var pre=t.closest("[data-preset]");
+    if(pre){startAsk(PRESETS[+pre.getAttribute("data-preset")].q);return}
+
+    var ch=t.closest("[data-ch]");
+    if(ch){
+      var i=+ch.getAttribute("data-ch");
+      var at=ask.choices.indexOf(i);
+      if(at>-1)ask.choices.splice(at,1);
+      else if(ask.choices.length<4)ask.choices.push(i);
+      renderAsk();return;
+    }
+  });
+
+  $("#saidBar").addEventListener("click",function(){if(lastSaid){speak(lastSaid);buzz()}});
+  $("#qSay").addEventListener("click",function(){if(ask.q)speak(ask.q)});
+  $("#askBack").addEventListener("click",function(){showView("vAsk")});
+  $("#askAgain").addEventListener("click",function(){showView("vAsk")});
+  $("#doneTalk").addEventListener("click",function(){showView("vTalk")});
+  $("#togNS").addEventListener("click",function(){ask.notSure=!ask.notSure;renderAsk()});
+  $("#askNow").addEventListener("click",function(){
+    var q=$("#qCustom").value.trim();
+    if(!q){$("#qCustom").focus();return}
+    startAsk(q);
+  });
+
+  /* calm */
+  function openCalm(){
+    calmOpen=true;
+    try{if(window.speechSynthesis)speechSynthesis.cancel()}catch(e){}
+    buzz();
+    $("#calm").classList.add("show");
+  }
+  function closeCalm(){calmOpen=false;$("#calm").classList.remove("show")}
+  $("#calmBtn").addEventListener("click",openCalm);
+  $("#calmExit").addEventListener("click",closeCalm);
+
+  /* personal */
+  function trainDemo(){S.trained=true;save();renderAmanda()}
+  $("#demoBtn").addEventListener("click",trainDemo);
+  $("#fWa").addEventListener("change",trainDemo);
+  $("#fBsp").addEventListener("change",trainDemo);
+  $("#aiReset").addEventListener("click",function(){S.trained=false;save();renderAmanda()});
+
+  /* grown-ups */
+  var holdT=null;
+  var hb=$("#holdBtn");
+  function unlock(){
+    $("#lockCard").style.display="none";
+    $("#grownPanel").hidden=false;
+  }
+  function holdStart(ev){
+    ev.preventDefault();
+    hb.classList.add("holding");
+    holdT=setTimeout(function(){hb.classList.remove("holding");unlock()},1600);
+  }
+  function holdEnd(){hb.classList.remove("holding");if(holdT){clearTimeout(holdT);holdT=null}}
+  hb.addEventListener("pointerdown",holdStart);
+  hb.addEventListener("pointerup",holdEnd);
+  hb.addEventListener("pointerleave",holdEnd);
+
+  $("#setName").addEventListener("change",function(){
+    var v=this.value.trim()||"Amanda";
+    S.name=v;save();applyName();
+  });
+  $("#voiceSel").addEventListener("change",function(){S.voiceURI=this.value;save()});
+  $("#setRate").addEventListener("input",function(){S.rate=+this.value;save()});
+  $("#testVoice").addEventListener("click",function(){speak("Hi "+S.name+"! Let's talk together.")});
+  $("#resetFaves").addEventListener("click",function(){
+    if(confirm("Clear the favourites shelf?")){S.counts={};save();renderFaves()}
+  });
+  $("#resetAll").addEventListener("click",function(){
+    if(confirm("Wipe everything and start fresh?")){
+      try{localStorage.removeItem("tg1")}catch(e){}
+      location.reload();
+    }
+  });
+
+  /* ---------------- boot ---------------- */
+  $("#setRate").value=S.rate;
+  applyName();
+  renderTabs();
+  renderFaves();
+  renderAsk();
+  renderAmanda();
+})();
+</script>
+</body>
+</html>
