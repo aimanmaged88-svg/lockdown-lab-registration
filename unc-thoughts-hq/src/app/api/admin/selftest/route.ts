@@ -25,7 +25,8 @@ export async function GET(req: NextRequest) {
 
   try {
     const items = await approvedItems();
-    add("brain has approved items", items.length >= 10, `${items.length} approved`);
+    // Ground-up mode (owner curates from scratch): any approved teaching counts.
+    add("brain has approved items", items.length >= 1, `${items.length} approved`);
 
     // 1+2+10: 7:30 PM game — structured, correctly time-banded, quick shape.
     const a1 = compose({ question: "My game is at 7:30 PM. What should I do now?", items, youth: true });
