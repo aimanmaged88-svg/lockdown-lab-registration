@@ -2,6 +2,8 @@ import { prisma, getOrgId } from "@/lib/db";
 import { Card, Section, Badge, Stat, Empty } from "@/components/ui";
 import { AddQuestionForm, InboxActions } from "@/components/community/widgets";
 import { QuestionInbox } from "@/components/community/question-inbox";
+import { HuddleModeration } from "@/components/community/huddle-mod";
+import { huddleQueue } from "@/lib/huddle-actions";
 import { ShareModeration } from "@/components/community/share-moderation";
 import { CommunityBeta } from "@/components/community/beta";
 import { FlagToggle } from "@/components/flag-toggle";
@@ -17,6 +19,7 @@ export default async function CommunityPage() {
   const betaOn = await isEnabled("community_beta");
 
   const questions = await prisma.communityQuestion.findMany({ where: { orgId }, orderBy: [{ status: "asc" }, { createdAt: "desc" }] });
+  const huddle = await huddleQueue();
   const inbox = await prisma.inboxItem.findMany({ where: { orgId, status: "open" }, orderBy: { priority: "desc" }, take: 20 });
 
   // Community Signal Map — group open questions by pillar + problem.
@@ -69,7 +72,7 @@ export default async function CommunityPage() {
           <ol className="list-decimal pl-5 space-y-1.5 text-sm text-paper-dim">
             <li><a className="underline" href="/member/question" target="_blank" rel="noreferrer">Open the member app in a new tab</a> — that tab is &quot;the kid&quot;. Pick a category, write a test question, tick <em>ping this phone</em>.</li>
             <li>Send it. Your phone buzzes (&quot;New question&quot;) and it lands in the inbox below — filter it by category.</li>
-            <li>Tap <strong>Reply</strong> under it, write an answer, send. That one tap: teaches Unk&apos;s brain, closes the loop, pings the asker.</li>
+            <li>Tap <strong>Reply</strong> under it, write an answer, send. That one tap: teaches UNC&apos;s brain, closes the loop, pings the asker.</li>
             <li>Go back to the member tab: your question now shows <strong>✓ answered</strong> with your words under &quot;UNC says&quot;.</li>
           </ol>
           <p className="text-xs text-grey mt-2">Test questions are just questions — answer them or archive them from the inbox when you&apos;re done.</p>
@@ -98,7 +101,7 @@ export default async function CommunityPage() {
         )}
       </Section>
 
-      <Section title="Question inbox" desc="Members ask from the app (anonymous by default). Answer once: it teaches Unk, closes the loop, and pings the asker if they opted in.">
+      <Section title="Question inbox" desc="Members ask from the app (anonymous by default). Answer once: it teaches UNC, closes the loop, and pings the asker if they opted in.">
         <QuestionInbox
           questions={questions.map((q) => ({
             id: q.id, text: q.text, pillar: q.pillar, subcat: q.problem,
@@ -108,6 +111,10 @@ export default async function CommunityPage() {
             createdAt: isoDate(q.createdAt),
           }))}
         />
+      </Section>
+
+      <Section title={`The Huddle — verify the conversation${huddle.pending.length ? ` (${huddle.pending.length} waiting)` : ""}`} desc="Topic talk from members. Nothing shows in the app until you tick it.">
+        <HuddleModeration pending={huddle.pending} recentLive={huddle.recentLive} />
       </Section>
 
       <Section title="Unified inbox" desc="Comments, questions, reports and reminders in one place.">

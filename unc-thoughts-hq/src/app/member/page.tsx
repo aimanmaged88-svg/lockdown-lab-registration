@@ -32,13 +32,13 @@ export default async function MemberHome() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl">Ask Unk</h1>
+        <h1 className="text-2xl">Ask UNC</h1>
         <p className="text-sm text-grey mt-1">Straight answers for today. Private reflection by default.</p>
       </div>
 
-      {/* 1. Ask Unk — one question field */}
+      {/* 1. Ask UNC — one question field */}
       <form action="/member/ask" method="get" className="flex gap-2">
-        <input name="q" className="input flex-1" placeholder="Ask Unk anything about today…" aria-label="Ask Unk" />
+        <input name="q" className="input flex-1" placeholder="Ask UNC anything about today…" aria-label="Ask UNC" />
         <button className="btn btn-primary" type="submit">Ask</button>
       </form>
 
@@ -63,6 +63,17 @@ export default async function MemberHome() {
           </Link>
         ))}
       </div>
+
+      {/* The Huddle — verified community talk */}
+      <Link href="/member/huddle" className="card p-4 flex items-center justify-between hover:bg-ink-soft transition-colors">
+        <span className="flex items-center gap-3">
+          <MessageCircleQuestion size={16} className="text-paper-dim" />
+          <span>
+            <span className="block font-medium text-sm">The Huddle</span>
+            <span className="block text-[11px] text-grey">Community talk by topic — every post checked by UNC</span>
+          </span>
+        </span>
+      </Link>
 
       {/* 8. Consistency Chart */}
       <Link href="/member/consistency" className="card p-4 flex items-center justify-between hover:bg-ink-soft transition-colors">
@@ -91,7 +102,7 @@ export default async function MemberHome() {
 
       <p className="text-[11px] text-grey flex items-start gap-1.5">
         <MessageCircleQuestion size={13} className="shrink-0 mt-0.5" />
-        Unk answers only from UNC&apos;s approved teaching and Australian sport-nutrition guidance. If it doesn&apos;t know, it says so.
+        UNC answers only from UNC&apos;s approved teaching and Australian sport-nutrition guidance. If it doesn&apos;t know, it says so.
       </p>
     </div>
   );

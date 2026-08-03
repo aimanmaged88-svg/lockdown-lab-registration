@@ -8,7 +8,7 @@ import { Badge, pillarTone } from "@/components/ui";
 import { RefreshCw, Download, Check, Zap, Lightbulb } from "lucide-react";
 
 // The Post Bank: five fresh word-posts on tap, each editable, each one tap
-// from "Ready". Built from Unk's Brain + real member questions — so the bank
+// from "Ready". Built from UNC's Brain + real member questions — so the bank
 // gets smarter every time the community talks.
 export function ComposeClient() {
   const router = useRouter();

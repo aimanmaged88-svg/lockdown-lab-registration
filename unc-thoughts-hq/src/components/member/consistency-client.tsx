@@ -121,7 +121,7 @@ export function ConsistencyClient({
         <div className="font-medium text-sm mb-1">Your patterns</div>
         {insights.length === 0 ? (
           <p className="text-xs text-grey">
-            Nothing to report yet — and Unk won&apos;t make one up. Keep tagging honestly for a couple of weeks and your own
+            Nothing to report yet — and UNC won&apos;t make one up. Keep tagging honestly for a couple of weeks and your own
             numbers will start talking. That&apos;s the experiment: fuel right two days out, then watch your game-day energy.
           </p>
         ) : (

@@ -31,3 +31,6 @@ export const QUESTION_TREE: Record<string, { icon: string; subcats: string[] }> 
 
 // Optional third layer: who's asking. Never required — anonymity is the default.
 export const WHO_OPTIONS = ["Player", "Parent", "Coach"] as const;
+
+// The Huddle's conversation topics.
+export const HUDDLE_TOPICS = ["Basketball", "Nutrition", "Mindset", "General"] as const;

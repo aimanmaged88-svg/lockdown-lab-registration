@@ -27,7 +27,7 @@ export default function TermsPage() {
       <ul className="list-disc pl-5 space-y-1">
         <LI>This app shares one person&apos;s lived experience in basketball, nutrition and mindset. It&apos;s general education — <strong>not</strong> medical, dietary, psychological or other professional advice.</LI>
         <LI>You can use almost everything <strong>anonymously</strong>. We don&apos;t ask for your name, email or school.</LI>
-        <LI>Every question sent to UNC is read and moderated by a human before anything is shared.</LI>
+        <LI>Every question sent to UNC — and every community (Huddle) post — is read and verified by a human before anyone else sees it.</LI>
         <LI>Be decent. Zero tolerance for bullying, hate or creepy behaviour.</LI>
         <LI>Under 18? You&apos;re welcome here — and we&apos;d love a parent or guardian to know you use the app.</LI>
       </ul>
@@ -42,7 +42,7 @@ export default function TermsPage() {
 
       <H>What this app is (and isn&apos;t)</H>
       <P>UNC Thoughts provides general information and education based on personal experience and publicly available Australian sport and nutrition guidance. It is not a substitute for advice from a doctor, dietitian, psychologist, or other qualified professional who knows your circumstances. Always check with a professional before changing diet, training or health routines — especially for young, growing athletes.</P>
-      <P>The AI feature (&quot;Ask Unk&quot;) only answers from UNC&apos;s approved teaching notes. When it doesn&apos;t know, it says so. Questions that touch on health crises, injuries, eating concerns or safety are deliberately not answered in-app — instead we point you to real help (see below).</P>
+      <P>The AI feature (&quot;Ask UNC&quot;) only answers from UNC&apos;s approved teaching notes. When it doesn&apos;t know, it says so. Questions that touch on health crises, injuries, eating concerns or safety are deliberately not answered in-app — instead we point you to real help (see below).</P>
 
       <H>If things are heavy</H>
       <P>If you or someone you know is struggling, talk to a real person today: <strong>000</strong> in an emergency · <strong>Kids Helpline 1800 55 1800</strong> (free, 24/7, for ages 5–25) · <strong>Lifeline 13 11 14</strong> · <strong>13YARN 13 92 76</strong> (Aboriginal &amp; Torres Strait Islander crisis support). A coach&apos;s corner is no replacement for proper support.</P>

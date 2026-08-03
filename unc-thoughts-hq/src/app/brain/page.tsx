@@ -6,7 +6,7 @@ import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
-// Unk's Brain: the owner-controlled knowledge base behind every member answer,
+// UNC's Brain: the owner-controlled knowledge base behind every member answer,
 // plus the learning-loop insights. Only APPROVED items are used in answers.
 export default async function BrainPage({ searchParams }: { searchParams: Promise<{ tab?: string }> }) {
   const { tab: tabParam } = await searchParams;
@@ -50,7 +50,7 @@ export default async function BrainPage({ searchParams }: { searchParams: Promis
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="eyebrow">Only approved teaching reaches members</p>
-          <h1>Unk&apos;s Brain</h1>
+          <h1>UNC&apos;s Brain</h1>
         </div>
         <Link href="/member" className="btn">Open member view</Link>
       </div>

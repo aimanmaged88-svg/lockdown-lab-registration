@@ -29,7 +29,7 @@ export default async function AnswersPage() {
       <p className="text-sm text-grey">Private to this device. Encrypted at rest. Delete anything, any time.</p>
 
       {reflections.length === 0 ? (
-        <Empty title="Nothing here yet." hint="Answer a Thought of the Day, or the private question under any Unk answer." />
+        <Empty title="Nothing here yet." hint="Answer a Thought of the Day, or the private question under any UNC answer." />
       ) : (
         <div className="space-y-2.5">
           {reflections.map((r) => {

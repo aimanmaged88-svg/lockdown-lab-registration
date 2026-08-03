@@ -45,6 +45,7 @@ model Organisation {
   importRuns       ImportRun[]
   members          Member[]
   knowledgeItems   KnowledgeItem[]
+  huddlePosts      HuddlePost[]
   thoughtPrompts   ThoughtPrompt[]
   askLogs          AskLog[]
 }
@@ -738,6 +739,24 @@ model PushSub {
   label     String?  // device hint, e.g. "iPhone"
   createdAt DateTime @default(now())
   lastOkAt  DateTime?
+}
+
+// The Huddle: topic-based community conversation, youth-safe by construction —
+// EVERY post and reply is checked by the owner before anyone sees it
+// (pending -> live). Anonymous by default, same device identity as questions.
+model HuddlePost {
+  id        String   @id @default(cuid())
+  orgId     String
+  org       Organisation @relation(fields: [orgId], references: [id])
+  memberId  String
+  parentId  String?  // reply-to post id (one level deep)
+  topic     String   // Basketball | Nutrition | Mindset | General
+  body      String
+  name      String?  // optional display name; null = "Hooper"
+  status    String   @default("pending") // pending | live | hidden
+  createdAt DateTime @default(now())
+
+  @@index([orgId, status, topic])
 }
 
 // Learning loop: every Ask Unk answer is logged with the knowledge items that

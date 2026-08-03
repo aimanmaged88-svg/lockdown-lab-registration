@@ -6,7 +6,7 @@ import { ReflectionComposer } from "./reflection-composer";
 import { cn } from "@/lib/cn";
 import { AlertTriangle, HelpCircle } from "lucide-react";
 
-// Renders an Ask Unk answer: readable in ~20 seconds, Why? for depth.
+// Renders an Ask UNC answer: readable in ~20 seconds, Why? for depth.
 export function AnswerCard({ answer, logId, question }: { answer: UnkAnswer; logId?: string; question?: string }) {
   const [why, setWhy] = useState(false);
   const [fb, setFb] = useState<string | null>(null);
@@ -75,7 +75,7 @@ export function AnswerCard({ answer, logId, question }: { answer: UnkAnswer; log
               {answer.why}
               {answer.usedItems.length > 0 && (
                 <p className="text-xs text-grey mt-2">
-                  From Unk&apos;s approved teaching: {answer.usedItems.map((u) => u.title).join(" · ")}
+                  From UNC&apos;s approved teaching: {answer.usedItems.map((u) => u.title).join(" · ")}
                   {answer.usedItems.some((u) => u.source) && ` — sources: ${[...new Set(answer.usedItems.map((u) => u.source).filter(Boolean))].join("; ")}`}
                 </p>
               )}
@@ -84,13 +84,13 @@ export function AnswerCard({ answer, logId, question }: { answer: UnkAnswer; log
         </div>
       )}
 
-      {/* The funnel to the man himself — always available, loudest when Unk couldn't help. */}
+      {/* The funnel to the man himself — always available, loudest when UNC couldn't help. */}
       {question && answer.mode !== "escalate" && (
         <a
           href={`/member/question?q=${encodeURIComponent(question.slice(0, 400))}`}
           className={cn("block text-sm underline", answer.mode === "unsupported" ? "text-paper" : "text-grey text-xs")}
         >
-          {answer.mode === "unsupported" ? "Unk couldn't back this one — send it to UNC himself →" : "Want the man himself? Send this to UNC →"}
+          {answer.mode === "unsupported" ? "UNC couldn't back this one — send it to UNC himself →" : "Want the man himself? Send this to UNC →"}
         </a>
       )}
 

@@ -13,7 +13,7 @@ export default function MemberLayout({ children }: { children: React.ReactNode }
       <header className="flex items-center justify-between py-1 mb-5">
         <Link href="/member" className="flex items-center gap-2">
           <Logo size={44} />
-          <span className="eyebrow">Ask Unk</span>
+          <span className="eyebrow">Ask UNC</span>
         </Link>
         <Link href="/member/answers" className="text-xs text-grey underline">My answers</Link>
       </header>

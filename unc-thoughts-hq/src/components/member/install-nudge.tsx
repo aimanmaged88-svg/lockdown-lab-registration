@@ -4,7 +4,7 @@ import { Download, X } from "lucide-react";
 
 type BIPEvent = Event & { prompt: () => Promise<void>; userChoice: Promise<{ outcome: string }> };
 
-// "Save Unk as an app": one-tap install on Android/desktop, a Share→Add hint on
+// "Save UNC as an app": one-tap install on Android/desktop, a Share→Add hint on
 // iOS. Dismissable, remembers the choice, invisible once installed.
 export function InstallNudge() {
   const [bip, setBip] = useState<BIPEvent | null>(null);
@@ -34,7 +34,7 @@ export function InstallNudge() {
     <div className="card p-4 mt-6 flex items-start gap-3">
       <Download size={18} className="text-paper-dim shrink-0 mt-0.5" />
       <div className="min-w-0 flex-1">
-        <p className="text-sm font-medium">Save Unk as an app</p>
+        <p className="text-sm font-medium">Save UNC as an app</p>
         <p className="text-xs text-grey mt-0.5">
           {ios
             ? "Tap the Share button, then “Add to Home Screen”. Full screen, one tap away, and pings can reach you."

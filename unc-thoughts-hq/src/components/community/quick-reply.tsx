@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { replyToQuestion } from "@/lib/unk/actions";
 import { Reply, Check } from "lucide-react";
 
-// One box, one tap: the answer teaches Unk forever, closes the question, and
+// One box, one tap: the answer teaches UNC forever, closes the question, and
 // (optionally) drops a ready-to-post answer into the bank.
 export function QuickReply({ questionId }: { questionId: string }) {
   const router = useRouter();
@@ -41,7 +41,7 @@ export function QuickReply({ questionId }: { questionId: string }) {
           onClick={() => start(async () => {
             try {
               const r = await replyToQuestion(questionId, text, alsoPost);
-              const bits = ["Unk knows the answer now"];
+              const bits = ["UNC knows the answer now"];
               if (r.postId) bits.push("it's in your Post Bank");
               if (r.pinged > 0) bits.push("the asker's phone got the ping");
               setDone(`Done — ${bits.join(", ")}.`);

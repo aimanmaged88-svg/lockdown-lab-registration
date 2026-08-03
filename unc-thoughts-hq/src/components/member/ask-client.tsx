@@ -49,10 +49,10 @@ export function AskClient({ initialQuestion, autorun }: { initialQuestion?: stri
       >
         <input
           className="input flex-1"
-          placeholder="Ask Unk anything about today…"
+          placeholder="Ask UNC anything about today…"
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          aria-label="Ask Unk"
+          aria-label="Ask UNC"
           autoFocus
         />
         <button className="btn btn-primary" disabled={pending || !q.trim()} type="submit">

@@ -6,7 +6,7 @@ export default async function AskPage({ searchParams }: { searchParams: Promise<
   const { q } = await searchParams;
   return (
     <div className="space-y-4">
-      <h1 className="text-xl">Ask Unk</h1>
+      <h1 className="text-xl">Ask UNC</h1>
       <AskClient initialQuestion={q} autorun={!!q} />
     </div>
   );

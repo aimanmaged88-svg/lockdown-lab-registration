@@ -1,7 +1,7 @@
 {
-  "name": "UNC Thoughts \u2014 Ask Unk",
+  "name": "UNC Thoughts",
   "short_name": "UNC",
-  "description": "Basketball, nutrition and mindset from lived experience. Ask anonymously, get straight answers.",
+  "description": "Basketball, nutrition and mindset from lived experience. Ask UNC anonymously, get straight answers.",
   "id": "/member",
   "start_url": "/member",
   "scope": "/",

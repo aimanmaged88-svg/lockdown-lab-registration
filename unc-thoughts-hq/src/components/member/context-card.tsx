@@ -18,7 +18,7 @@ export function ContextCard({ ageBand, allergies }: { ageBand: string | null; al
     return (
       <button className="w-full text-left card p-3 hover:bg-ink-soft transition-colors" onClick={() => setOpen(true)}>
         <span className="text-sm text-paper-dim">
-          {ageBand ? `Age band: ${AGE_BANDS.find((a) => a.key === ageBand)?.label ?? ageBand}` : "Tell Unk the basics (optional, 10 seconds)"}
+          {ageBand ? `Age band: ${AGE_BANDS.find((a) => a.key === ageBand)?.label ?? ageBand}` : "Tell UNC the basics (optional, 10 seconds)"}
           {allergies ? ` · allergies noted` : ""}
         </span>
         <span className="block text-[11px] text-grey mt-0.5">Only an age band and optional allergies — never your birth date, weight, school or location.</span>

@@ -16,7 +16,7 @@ export default async function QuestionPage({ searchParams }: { searchParams: Pro
         <h1 className="text-2xl">Ask UNC himself</h1>
         <p className="text-sm text-grey mt-1">
           A real question to the real person — answered from lived experience, not a script.
-          You don&apos;t have to say who you are. Good answers get added to Unk&apos;s brain, always anonymously.
+          You don&apos;t have to say who you are. Good answers get added to UNC&apos;s brain, always anonymously.
         </p>
       </div>
 

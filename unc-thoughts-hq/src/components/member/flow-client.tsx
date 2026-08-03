@@ -61,7 +61,7 @@ export function FlowClient({ kind, allergies }: { kind: "game" | "training"; all
           <input id="favail" className="input" placeholder="e.g. banana, sandwiches, water" value={available} onChange={(e) => setAvailable(e.target.value)} />
         </div>
         {allergies && (
-          <p className="text-xs text-grey">Your allergy note is on file: <span className="text-paper-dim">{allergies}</span> — Unk will remind you to stick to known-safe options. Update it on the member home screen.</p>
+          <p className="text-xs text-grey">Your allergy note is on file: <span className="text-paper-dim">{allergies}</span> — UNC will remind you to stick to known-safe options. Update it on the member home screen.</p>
         )}
         <button className="btn btn-primary w-full" onClick={go} disabled={pending || !time}>
           {pending ? "Thinking…" : `What should I do now?`}

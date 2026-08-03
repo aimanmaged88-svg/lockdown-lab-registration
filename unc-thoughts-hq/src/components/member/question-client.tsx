@@ -96,7 +96,7 @@ export function QuestionClient({ prefill, mine }: { prefill: string; mine: Mine[
           <div className="flex items-center gap-2 text-good font-medium"><Check size={16} /> Sent straight to UNC.</div>
           <p className="text-sm text-grey">
             He reads every one. The answer lands below on this page{notify ? " — and this phone gets a ping" : ""}.
-            If it&apos;s a question that helps everyone, it also teaches Unk&apos;s brain — always anonymously.
+            If it&apos;s a question that helps everyone, it also teaches UNC&apos;s brain — always anonymously.
           </p>
           {note && <p className="text-xs text-grey">{note}</p>}
           <button className="btn text-xs" onClick={() => { setSent(false); setText(""); setSubcat(null); setWho(null); }}>Ask another</button>

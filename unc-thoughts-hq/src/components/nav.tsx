@@ -19,7 +19,7 @@ const NAV = [
   { href: "/community", label: "Community", icon: Users },
   { href: "/talks", label: "Talks", icon: Mic },
   { href: "/growth", label: "Growth Lab", icon: FlaskConical },
-  { href: "/brain", label: "Unk's Brain", icon: Brain },
+  { href: "/brain", label: "UNC's Brain", icon: Brain },
   { href: "/practice", label: "Practice Library", icon: BookOpen },
   { href: "/review", label: "Weekly Review", icon: ClipboardCheck },
   { href: "/settings", label: "Settings", icon: Settings },
