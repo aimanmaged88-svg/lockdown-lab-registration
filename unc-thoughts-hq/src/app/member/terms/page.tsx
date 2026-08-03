@@ -40,6 +40,12 @@ export default function TermsPage() {
         <LI><strong>Answers may be shared.</strong> A great question can be answered publicly (in the app or on social media) — always <strong>anonymised</strong>, never with your name or details unless you explicitly gave a name and we ask you first.</LI>
       </ul>
 
+      <H>Beta — help us make it better</H>
+      <P>UNC Thoughts is in <strong>beta</strong>: features will change, and occasionally something may be wrong, missing or broken. Content and features are provided on an &quot;as available&quot; basis while we build. If you spot a discrepancy — a wrong detail, a bug, anything off — please tell us via &quot;Ask UNC himself&quot; in the app or DM <a className="underline" href="https://instagram.com/uncthoughts" target="_blank" rel="noreferrer">@uncthoughts</a>. Reports genuinely shape what gets fixed first.</P>
+
+      <H>Age &amp; access</H>
+      <P>You must tell the truth about your age at the door. Under 13, you can only use the app together with a parent or guardian who accepts these terms on your behalf — on your own, you can&apos;t proceed. If we discover an age was misrepresented, we may remove content and block access. Community features are human-verified before anything is visible, whatever your age.</P>
+
       <H>What this app is (and isn&apos;t)</H>
       <P>UNC Thoughts provides general information and education based on personal experience and publicly available Australian sport and nutrition guidance. It is not a substitute for advice from a doctor, dietitian, psychologist, or other qualified professional who knows your circumstances. Always check with a professional before changing diet, training or health routines — especially for young, growing athletes.</P>
       <P>The AI feature (&quot;Ask UNC&quot;) only answers from UNC&apos;s approved teaching notes. When it doesn&apos;t know, it says so. Questions that touch on health crises, injuries, eating concerns or safety are deliberately not answered in-app — instead we point you to real help (see below).</P>

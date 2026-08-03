@@ -13,7 +13,7 @@ const TILES = [
   { href: "/member/eat", label: "What should I eat?", note: "Time-aware, general education", icon: Apple },
   { href: "/member/mindset", label: "Mindset reset", note: "One cue, one action", icon: Brain },
   { href: "/member/recovery", label: "Recovery", note: "Post-session basics", icon: BatteryCharging },
-  { href: "/member/thought", label: "Thought of the Day", note: "Private accountability", icon: Lightbulb },
+  { href: "/member/thought", label: "Today's thoughts", note: "Morning · afternoon · evening + your library", icon: Lightbulb },
 ];
 
 export default async function MemberHome() {

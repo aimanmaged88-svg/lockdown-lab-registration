@@ -2,21 +2,31 @@ import { prisma, getOrgId } from "@/lib/db";
 import { getMember } from "@/lib/member";
 import { ReflectionComposer } from "@/components/member/reflection-composer";
 import { FollowUp } from "@/components/member/follow-up";
+import { SaveThoughtButton, LibraryList } from "@/components/member/thought-library";
 import { PRIVACY_LINE } from "@/lib/unk/safety";
-import { isoDate, fmt } from "@/lib/time";
+import { fmt } from "@/lib/time";
+import { currentSlot, pickThought } from "@/lib/thought-slots";
 import { Card } from "@/components/ui";
 
 export const dynamic = "force-dynamic";
 
-// Thought of the Day: one private accountability prompt, rotating daily.
+// Thoughts through the day (morning / afternoon / evening), tuned by the
+// member's own library: save what hits, get more of what sounds like you.
 export default async function ThoughtPage() {
   const orgId = await getOrgId();
   const prompts = await prisma.thoughtPrompt.findMany({ where: { orgId, active: true }, orderBy: { order: "asc" } });
   const member = await getMember();
 
-  const day = isoDate(new Date());
-  const prompt = prompts.length ? prompts[[...day].reduce((a, c) => a + c.charCodeAt(0), 0) % prompts.length] : null;
+  const slot = currentSlot();
+  const saved = member
+    ? await prisma.savedThought.findMany({ where: { memberId: member.id }, orderBy: { createdAt: "desc" } })
+    : [];
+  const pillarCounts: Record<string, number> = {};
+  for (const s of saved) pillarCounts[s.pillar] = (pillarCounts[s.pillar] ?? 0) + 1;
+
+  const prompt = member ? pickThought(prompts, pillarCounts, member.id, slot.key) : prompts[0] ?? null;
   const actions = prompt?.actions ? (JSON.parse(prompt.actions) as string[]) : [];
+  const savedIds = new Set(saved.map((s) => s.promptId));
 
   const due = member
     ? await prisma.reflection.findMany({
@@ -32,17 +42,28 @@ export default async function ThoughtPage() {
 
   return (
     <div className="space-y-4">
-      <h1 className="text-xl">Thought of the Day</h1>
+      <div>
+        <h1 className="text-xl">{slot.label}</h1>
+        <p className="text-xs text-grey mt-0.5">A new one each morning, afternoon and evening — shaped by what you save.</p>
+      </div>
 
       {prompt ? (
         <Card className="space-y-3">
           <p className="text-base text-paper leading-relaxed">{prompt.text}</p>
-          <p className="text-xs text-grey">{PRIVACY_LINE}</p>
+          <div className="flex items-center justify-between gap-2">
+            <p className="text-xs text-grey">{PRIVACY_LINE}</p>
+            <SaveThoughtButton promptId={prompt.id} saved={savedIds.has(prompt.id)} />
+          </div>
           <ReflectionComposer promptText={prompt.text} actions={actions} />
         </Card>
       ) : (
         <p className="text-sm text-grey">No prompts loaded yet.</p>
       )}
+
+      <div className="space-y-2">
+        <div className="eyebrow">Your library ({saved.length})</div>
+        <LibraryList items={saved.map((s) => ({ id: s.id, text: s.text, pillar: s.pillar }))} />
+      </div>
 
       {due.length > 0 && (
         <div className="space-y-2">

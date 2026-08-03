@@ -639,6 +639,7 @@ model Member {
   reflections Reflection[]
   askLogs     AskLog[]
   habitLogs   HabitLog[]
+  savedThoughts SavedThought[]
 }
 
 // Consistency Chart: one row per member per Sydney day. Tags come from the
@@ -677,6 +678,21 @@ model Reflection {
   createdAt    DateTime @default(now())
 
   @@index([memberId, createdAt])
+}
+
+// Personal thought library: thoughts a member saves become taste signals —
+// the daily rotation leans toward the pillars they keep coming back to.
+// Morning / afternoon / evening slots serve a different thought each.
+model SavedThought {
+  id        String   @id @default(cuid())
+  memberId  String
+  member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  promptId  String?
+  text      String   // denormalised copy, survives prompt edits
+  pillar    String   @default("Mindset")
+  createdAt DateTime @default(now())
+
+  @@unique([memberId, promptId])
 }
 
 // Thought of the Day prompts (owner-editable bank; rotates deterministically).
