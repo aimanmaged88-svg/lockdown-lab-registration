@@ -61,7 +61,7 @@ export function AskClient({ initialQuestion, autorun }: { initialQuestion?: stri
       </form>
 
       {err && <p className="text-sm text-accent-soft">{err}</p>}
-      {result && <AnswerCard answer={result} logId={result.logId} />}
+      {result && <AnswerCard answer={result} logId={result.logId} question={q} />}
 
       {!result && !pending && (
         <div>

@@ -7,7 +7,7 @@ import { cn } from "@/lib/cn";
 import { AlertTriangle, HelpCircle } from "lucide-react";
 
 // Renders an Ask Unk answer: readable in ~20 seconds, Why? for depth.
-export function AnswerCard({ answer, logId }: { answer: UnkAnswer; logId?: string }) {
+export function AnswerCard({ answer, logId, question }: { answer: UnkAnswer; logId?: string; question?: string }) {
   const [why, setWhy] = useState(false);
   const [fb, setFb] = useState<string | null>(null);
   const [avail, setAvail] = useState("");
@@ -82,6 +82,16 @@ export function AnswerCard({ answer, logId }: { answer: UnkAnswer; logId?: strin
             </div>
           )}
         </div>
+      )}
+
+      {/* The funnel to the man himself — always available, loudest when Unk couldn't help. */}
+      {question && answer.mode !== "escalate" && (
+        <a
+          href={`/member/question?q=${encodeURIComponent(question.slice(0, 400))}`}
+          className={cn("block text-sm underline", answer.mode === "unsupported" ? "text-paper" : "text-grey text-xs")}
+        >
+          {answer.mode === "unsupported" ? "Unk couldn't back this one — send it to UNC himself →" : "Want the man himself? Send this to UNC →"}
+        </a>
       )}
 
       {logId && answer.mode !== "escalate" && (

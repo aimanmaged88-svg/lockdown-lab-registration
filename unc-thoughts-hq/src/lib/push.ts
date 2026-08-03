@@ -48,6 +48,30 @@ export async function sendToOwnerDevices(payload: PushPayload): Promise<{ sent: 
   return { sent, pruned };
 }
 
+// Ping one anonymous asker device: "UNC answered your question". Only fires for
+// members who explicitly opted in when sending their question.
+export async function sendToMemberDevices(memberId: string, payload: PushPayload): Promise<{ sent: number }> {
+  if (!configured()) return { sent: 0 };
+  setup();
+  const subs = await prisma.pushSub.findMany({ where: { role: "member", memberId } });
+  let sent = 0;
+  for (const s of subs) {
+    try {
+      await webpush.sendNotification(
+        { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
+        JSON.stringify(payload),
+        { TTL: 24 * 3600 },
+      );
+      sent++;
+      await prisma.pushSub.update({ where: { id: s.id }, data: { lastOkAt: new Date() } }).catch(() => {});
+    } catch (e: unknown) {
+      const code = (e as { statusCode?: number }).statusCode;
+      if (code === 404 || code === 410) await prisma.pushSub.delete({ where: { id: s.id } }).catch(() => {});
+    }
+  }
+  return { sent };
+}
+
 // Once-per-Sydney-day dedupe, recorded in the audit trail.
 async function alreadySentToday(kind: string): Promise<boolean> {
   const orgId = await getOrgId();

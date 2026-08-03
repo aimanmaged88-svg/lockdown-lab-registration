@@ -41,7 +41,10 @@ export function QuickReply({ questionId }: { questionId: string }) {
           onClick={() => start(async () => {
             try {
               const r = await replyToQuestion(questionId, text, alsoPost);
-              setDone(r.postId ? "Done — Unk knows the answer now, and it's in your Post Bank." : "Done — Unk knows the answer now.");
+              const bits = ["Unk knows the answer now"];
+              if (r.postId) bits.push("it's in your Post Bank");
+              if (r.pinged > 0) bits.push("the asker's phone got the ping");
+              setDone(`Done — ${bits.join(", ")}.`);
               router.refresh();
             } catch (e) { setErr(e instanceof Error ? e.message : "Failed"); }
           })}

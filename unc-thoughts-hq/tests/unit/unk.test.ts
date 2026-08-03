@@ -56,6 +56,21 @@ describe("safety", () => {
       if (r.kind === "escalate") expect(r.topic, q).toBe(topic);
     }
   });
+  it("self-harm / crisis language escalates with real helplines", () => {
+    for (const q of ["I want to hurt myself and I don't know what to do", "sometimes I think about suicide", "I don't want to be here anymore"]) {
+      const r = assess(q);
+      expect(r.kind, q).toBe("escalate");
+      if (r.kind === "escalate") {
+        expect(r.topic, q).toBe("mental_crisis");
+        expect(r.emergency, q).toBe(true);
+        const msg = escalationMessage(r.topic, r.emergency, true);
+        const all = msg.headline + " " + msg.body.join(" ");
+        expect(all).toMatch(/1800 55 1800/); // Kids Helpline
+        expect(all).toMatch(/13 11 14/); // Lifeline
+        expect(all).toMatch(/000/);
+      }
+    }
+  });
   it("chest pain / collapse is an emergency directing to 000", () => {
     const r = assess("my mate fainted at training");
     expect(r.kind).toBe("escalate");

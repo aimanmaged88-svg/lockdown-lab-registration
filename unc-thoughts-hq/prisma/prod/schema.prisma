@@ -262,12 +262,18 @@ model CommunityQuestion {
   askedBy     String?  // free text (a commenter handle) — never scraped
   pillar      String?
   audience    String?
-  problem     String?  // grouped problem label for the Signal Map
+  problem     String?  // grouped problem label for the Signal Map (= subcategory for member asks)
   frequency   Int      @default(1)
   source      String   @default("comment") // comment | dm | talk | member
   status      String   @default("open") // open | planned | answered | archived
   answeredContentId String? // Loop Closer: which reel/post answered it
   contributorAcknowledged Boolean @default(false)
+  // Ask-UNC-directly (member questions): asker's anonymous device, whether they
+  // want a ping when answered, and UNC's answer text shown back to them.
+  memberId    String?
+  notify      Boolean  @default(false)
+  answerText  String?
+  answeredAt  DateTime?
   createdAt   DateTime @default(now())
 
   contentFrom Content[]
@@ -729,7 +735,8 @@ model PushSub {
   endpoint  String   @unique
   p256dh    String
   auth      String
-  role      String   @default("owner") // owner (member push not built — privacy promise)
+  role      String   @default("owner") // owner | member (member = opt-in "ping me when UNC answers" only)
+  memberId  String?  // set when role=member — links the ping to the anonymous asker device
   label     String?  // device hint, e.g. "iPhone"
   createdAt DateTime @default(now())
   lastOkAt  DateTime?

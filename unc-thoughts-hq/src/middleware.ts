@@ -14,6 +14,7 @@ const PUBLIC_PREFIXES = [
   "/api/admin",       // AUTH_SECRET-guarded
   "/api/notify",      // AUTH_SECRET-guarded
   "/manifest.webmanifest",
+  "/unk.webmanifest",
   "/sw.js",
   "/brand",
   "/favicon",
@@ -49,6 +50,13 @@ export async function middleware(req: NextRequest) {
   if (req.cookies.get("unc_desk")?.value === expected) return res;
 
   const url = req.nextUrl.clone();
+  // The bare domain is the public front door: visitors without the desk cookie
+  // get the member app, not a lock screen. The owner unlocks at /unlock.
+  if (pathname === "/") {
+    url.pathname = "/member";
+    url.search = "";
+    return NextResponse.redirect(url);
+  }
   url.pathname = "/unlock";
   url.search = "";
   return NextResponse.redirect(url);
@@ -56,5 +64,5 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   // Everything except Next internals + static files with extensions.
-  matcher: ["/((?!_next/|.*\\..*).*)", "/manifest.webmanifest", "/sw.js"],
+  matcher: ["/((?!_next/|.*\\..*).*)", "/manifest.webmanifest", "/unk.webmanifest", "/sw.js"],
 };

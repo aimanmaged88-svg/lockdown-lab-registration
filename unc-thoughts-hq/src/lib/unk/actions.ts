@@ -255,9 +255,23 @@ export async function replyToQuestion(questionId: string, answer: string, alsoPo
 
   await prisma.communityQuestion.update({
     where: { id: q.id },
-    data: { status: "answered", contributorAcknowledged: true },
+    data: { status: "answered", contributorAcknowledged: true, answerText: text, answeredAt: new Date() },
   });
   await prisma.inboxItem.updateMany({ where: { questionId: q.id }, data: { status: "done" } });
+
+  // Close the loop with the asker: their answer shows in the app, and if they
+  // opted in, their phone gets the ping.
+  let pinged = 0;
+  if (q.memberId && q.notify) {
+    const { sendToMemberDevices } = await import("../push");
+    const r = await sendToMemberDevices(q.memberId, {
+      title: "UNC answered your question 🤝",
+      body: text.slice(0, 140),
+      url: "/member/question",
+      tag: "unc-answer",
+    }).catch(() => ({ sent: 0 }));
+    pinged = r.sent;
+  }
 
   let postId: string | null = null;
   if (alsoPost) {
@@ -281,11 +295,12 @@ export async function replyToQuestion(questionId: string, answer: string, alsoPo
     postId = post.id;
   }
 
-  await audit("question.replied", { entity: "CommunityQuestion", entityId: q.id, detail: { brainItem: item.id, postId } });
+  await audit("question.replied", { entity: "CommunityQuestion", entityId: q.id, detail: { brainItem: item.id, postId, pinged } });
   revalidatePath("/community");
   revalidatePath("/brain");
   revalidatePath("/");
-  return { brainItemId: item.id, postId };
+  revalidatePath("/member/question");
+  return { brainItemId: item.id, postId, pinged };
 }
 
 export async function setKnowledgeApproval(id: string, approval: "draft" | "approved" | "archived") {

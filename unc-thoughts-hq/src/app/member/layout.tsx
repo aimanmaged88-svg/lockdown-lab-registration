@@ -1,5 +1,10 @@
 import Link from "next/link";
 import { Logo } from "@/components/logo";
+import { InstallNudge } from "@/components/member/install-nudge";
+
+// The member app installs as its own PWA (start screen = /member), separate
+// from the owner's desk manifest.
+export const metadata = { manifest: "/unk.webmanifest" };
 
 // Member chrome: deliberately minimal. No creator nav, no feed, no noise.
 export default function MemberLayout({ children }: { children: React.ReactNode }) {
@@ -13,9 +18,11 @@ export default function MemberLayout({ children }: { children: React.ReactNode }
         <Link href="/member/answers" className="text-xs text-grey underline">My answers</Link>
       </header>
       {children}
+      <InstallNudge />
       <footer className="mt-10 pb-6 text-[11px] text-grey leading-relaxed space-y-1">
         <p>General education, not personal medical advice. Emergencies: call 000 (Australia).</p>
         <p>Your reflections are private by default, stored encrypted, never used to train AI, and never shared unless you explicitly choose to.</p>
+        <p><Link href="/member/terms" className="underline">House Rules, Terms &amp; Privacy</Link></p>
       </footer>
     </div>
   );

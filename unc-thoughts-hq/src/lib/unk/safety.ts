@@ -14,6 +14,7 @@ export type SafetyOutcome =
   | { kind: "escalate"; topic: EscalationTopic; emergency: boolean };
 
 export type EscalationTopic =
+  | "mental_crisis"
   | "allergic_reaction"
   | "diabetes_glucose"
   | "eating_disorder"
@@ -27,6 +28,7 @@ type Rule = { topic: EscalationTopic; emergency: boolean; test: RegExp };
 
 // Order matters: emergencies first.
 const ESCALATIONS: Rule[] = [
+  { topic: "mental_crisis", emergency: true, test: /\b(kill (myself|me)|suicid\w*|self[- ]?harm|hurt(ing)? myself|end (it all|my life)|don'?t want to (live|be here|exist)|no reason to live|better off without me|cut(ting)? myself)\b/i },
   { topic: "collapse_chest_breathing", emergency: true, test: /\b(chest pain|can'?t breathe|trouble breathing|breathing difficulty|passed out|fainted|fainting|collapsed?|unconscious)\b/i },
   { topic: "allergic_reaction", emergency: true, test: /\b(allergic reaction|anaphyla|epipen|throat (is )?(closing|swelling)|hives all over|swelling (up|badly))\b/i },
   { topic: "severe_dehydration", emergency: false, test: /\b(severely dehydrated|haven'?t (peed|urinated)|no urine|dark urine and dizzy|vomiting and can'?t keep|heat ?stroke)\b/i },
@@ -54,6 +56,17 @@ export function assess(question: string): SafetyOutcome {
 // Plain-language escalation copy. Australian context (000).
 export function escalationMessage(topic: EscalationTopic, emergency: boolean, youth: boolean): { headline: string; body: string[] } {
   const adult = youth ? "Tell a parent, guardian or coach right now." : "Get help from a person, not an app.";
+  if (topic === "mental_crisis") {
+    return {
+      headline: "You matter more than any game.",
+      body: [
+        "Please talk to a real person today — you don't have to carry this alone.",
+        "Kids Helpline 1800 55 1800 (free, 24/7, ages 5–25) · Lifeline 13 11 14 · 13YARN 13 92 76. If you're in danger right now, call 000.",
+        adult,
+        "The court will still be there. You come first.",
+      ],
+    };
+  }
   if (emergency) {
     return {
       headline: "This needs a person, right now — not an app.",
@@ -65,6 +78,7 @@ export function escalationMessage(topic: EscalationTopic, emergency: boolean, yo
     };
   }
   const map: Record<EscalationTopic, string> = {
+    mental_crisis: "You matter more than any game.", // handled above — kept for exhaustiveness
     allergic_reaction: "Allergic reactions need a doctor's plan, not general tips.",
     diabetes_glucose: "Anything involving diabetes, blood sugar or insulin needs your doctor or diabetes team — general food tips aren't safe here.",
     eating_disorder: "Food should never feel like fear or punishment. Please talk to a parent or guardian and a doctor. In Australia, the Butterfly Foundation is on 1800 33 4673.",

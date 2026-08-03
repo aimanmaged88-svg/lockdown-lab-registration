@@ -1,8 +1,8 @@
 import { prisma, getOrgId } from "@/lib/db";
-import { Card, Section, Badge, Stat, Empty, pillarTone } from "@/components/ui";
-import { AddQuestionForm, QuestionActions, InboxActions } from "@/components/community/widgets";
+import { Card, Section, Badge, Stat, Empty } from "@/components/ui";
+import { AddQuestionForm, InboxActions } from "@/components/community/widgets";
+import { QuestionInbox } from "@/components/community/question-inbox";
 import { ShareModeration } from "@/components/community/share-moderation";
-import { QuickReply } from "@/components/community/quick-reply";
 import { CommunityBeta } from "@/components/community/beta";
 import { FlagToggle } from "@/components/flag-toggle";
 import { isEnabled } from "@/lib/flags";
@@ -16,7 +16,7 @@ export default async function CommunityPage() {
   const orgId = await getOrgId();
   const betaOn = await isEnabled("community_beta");
 
-  const questions = await prisma.communityQuestion.findMany({ where: { orgId }, orderBy: [{ status: "asc" }, { frequency: "desc" }] });
+  const questions = await prisma.communityQuestion.findMany({ where: { orgId }, orderBy: [{ status: "asc" }, { createdAt: "desc" }] });
   const inbox = await prisma.inboxItem.findMany({ where: { orgId, status: "open" }, orderBy: { priority: "desc" }, take: 20 });
 
   // Community Signal Map — group open questions by pillar + problem.
@@ -64,6 +64,18 @@ export default async function CommunityPage() {
         <Stat label="Signal groups" value={signalSorted.length} />
       </div>
 
+      <Section title="🧪 Test drive — see it like a member" desc="Run the whole loop yourself in two minutes. What you see is exactly what they see.">
+        <Card>
+          <ol className="list-decimal pl-5 space-y-1.5 text-sm text-paper-dim">
+            <li><a className="underline" href="/member/question" target="_blank" rel="noreferrer">Open the member app in a new tab</a> — that tab is &quot;the kid&quot;. Pick a category, write a test question, tick <em>ping this phone</em>.</li>
+            <li>Send it. Your phone buzzes (&quot;New question&quot;) and it lands in the inbox below — filter it by category.</li>
+            <li>Tap <strong>Reply</strong> under it, write an answer, send. That one tap: teaches Unk&apos;s brain, closes the loop, pings the asker.</li>
+            <li>Go back to the member tab: your question now shows <strong>✓ answered</strong> with your words under &quot;UNC says&quot;.</li>
+          </ol>
+          <p className="text-xs text-grey mt-2">Test questions are just questions — answer them or archive them from the inbox when you&apos;re done.</p>
+        </Card>
+      </Section>
+
       <Section title="Log a comment or question" desc="If one person asked it, dozens wondered it.">
         <Card><AddQuestionForm /></Card>
       </Section>
@@ -86,30 +98,16 @@ export default async function CommunityPage() {
         )}
       </Section>
 
-      <Section title="Question inbox" desc="Comment-to-Content: one click turns a question into a Reply Reel.">
-        <div className="space-y-2">
-          {questions.map((q) => (
-            <Card key={q.id}>
-              <div className="flex flex-wrap items-start justify-between gap-2">
-                <div className="min-w-0">
-                  <p className="text-sm">{q.text}</p>
-                  <div className="flex flex-wrap items-center gap-2 mt-1">
-                    {q.pillar && <Badge tone={pillarTone(q.pillar)}>{q.pillar}</Badge>}
-                    <Badge>{q.source}</Badge>
-                    <Badge>asked {q.frequency}×</Badge>
-                    <Badge tone={q.status === "answered" ? "good" : q.status === "planned" ? "warn" : "default"}>{q.status}</Badge>
-                    {q.answeredContentId && <Link href={`/content/${q.answeredContentId}`} className="text-xs underline text-paper-dim">see the reel</Link>}
-                    {q.contributorAcknowledged && <Badge tone="good">loop closed</Badge>}
-                  </div>
-                </div>
-              </div>
-              <div className="mt-3 flex flex-wrap items-start gap-2">
-                {q.status === "open" && <QuickReply questionId={q.id} />}
-                <QuestionActions id={q.id} status={q.status} />
-              </div>
-            </Card>
-          ))}
-        </div>
+      <Section title="Question inbox" desc="Members ask from the app (anonymous by default). Answer once: it teaches Unk, closes the loop, and pings the asker if they opted in.">
+        <QuestionInbox
+          questions={questions.map((q) => ({
+            id: q.id, text: q.text, pillar: q.pillar, subcat: q.problem,
+            audience: q.audience, askedBy: q.askedBy, source: q.source, frequency: q.frequency,
+            status: q.status, notify: q.notify, fromMember: q.source === "member",
+            answeredContentId: q.answeredContentId, contributorAcknowledged: q.contributorAcknowledged,
+            createdAt: isoDate(q.createdAt),
+          }))}
+        />
       </Section>
 
       <Section title="Unified inbox" desc="Comments, questions, reports and reminders in one place.">

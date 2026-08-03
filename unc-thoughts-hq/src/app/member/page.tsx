@@ -42,6 +42,17 @@ export default async function MemberHome() {
         <button className="btn btn-primary" type="submit">Ask</button>
       </form>
 
+      {/* Ask UNC himself — the human behind the app */}
+      <Link href="/member/question" className="card p-4 flex items-center justify-between hover:bg-ink-soft transition-colors border-paper/20">
+        <span className="flex items-center gap-3">
+          <MessageCircleQuestion size={18} className="text-paper-dim" />
+          <span>
+            <span className="block font-medium text-sm">Ask UNC himself</span>
+            <span className="block text-[11px] text-grey">Real question → real answer from the man. Anonymous if you want.</span>
+          </span>
+        </span>
+      </Link>
+
       {/* 2–7 */}
       <div className="grid grid-cols-2 gap-2.5">
         {TILES.map(({ href, label, note, icon: Icon }) => (
