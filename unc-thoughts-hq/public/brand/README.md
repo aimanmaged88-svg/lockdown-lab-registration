@@ -1,23 +1,14 @@
-# Brand assets — drop the official logo here
+# Brand assets — official UNC Thoughts logo
 
-This app must use the **official UNC Thoughts logo unmodified**. It is not bundled
-because it lives in your brand pack, not in this repository.
+`logo.png`, `icon-512/192/180.png` and the favicon are generated from the
+owner's official logo (the Instagram profile mark). The ONLY modification is
+one the owner explicitly asked for on 2026-08-03: the four broken-circle ring
+arcs were removed ("take off the four little quadrant things"). The hooded
+figure, UNC THOUGHTS wordmark, underline and "Basketball. Nutrition. Mindset."
+tagline are untouched, pixel-for-pixel from the 1080×1080 original.
 
-## What to do
+Do not redraw, retouch or reinterpret the logo beyond that. To update, replace
+these files with exports from the owner's original artwork only.
 
-1. Copy your official logo file to this folder and name it exactly:
-
-   ```
-   public/brand/logo.png
-   ```
-
-   Source (from your workspace):
-   `outputs/unc-thoughts-instagram/assets/final-logo/unc-thoughts-simple-border-option-06-final.png`
-
-2. (Optional) For the installable app icon, also drop square PNGs named
-   `icon-192.png` and `icon-512.png` in `public/brand/`. If you don't, the app
-   uses a neutral placeholder mark — never a redrawn version of your logo.
-
-Do **not** modify, regenerate, redraw, retouch or reinterpret the logo. The app
-displays it as-is. Until `logo.png` is present, the header shows the text
-wordmark "UNC THOUGHTS" as a safe fallback.
+`icon.svg` is the old pre-logo placeholder — kept only as a fallback, no longer
+referenced by the manifests.

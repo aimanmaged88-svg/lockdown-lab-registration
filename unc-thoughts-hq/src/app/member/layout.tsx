@@ -12,7 +12,7 @@ export default function MemberLayout({ children }: { children: React.ReactNode }
     <div className="mx-auto max-w-xl">
       <header className="flex items-center justify-between py-1 mb-5">
         <Link href="/member" className="flex items-center gap-2">
-          <Logo size={22} />
+          <Logo size={44} />
           <span className="eyebrow">Ask Unk</span>
         </Link>
         <Link href="/member/answers" className="text-xs text-grey underline">My answers</Link>

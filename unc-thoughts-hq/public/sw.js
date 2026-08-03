@@ -1,8 +1,8 @@
 // UNC Thoughts HQ — offline shell + owner phone notifications.
 // Network-first for navigations (so you always get fresh data when online),
 // falling back to a cached shell offline. Static assets are cache-first.
-const CACHE = "unc-hq-v2";
-const SHELL = ["/", "/manifest.webmanifest", "/brand/icon.svg"];
+const CACHE = "unc-hq-v3";
+const SHELL = ["/", "/manifest.webmanifest", "/brand/logo.png", "/brand/icon-192.png"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).catch(() => {}));
