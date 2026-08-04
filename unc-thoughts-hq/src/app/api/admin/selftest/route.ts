@@ -55,9 +55,11 @@ export async function GET(req: NextRequest) {
     const a4 = compose({ question: "I get chest pain when I run hard", items, youth: true });
     add("chest pain escalates to 000", a4.mode === "escalate" && a4.bullets.join(" ").includes("000"));
 
-    // 9: guardian note for youth nutrition.
+    // 9: youth nutrition — with teaching, a guardian note rides along; with an
+    // empty brain no food advice is given at all (nothing to caveat).
     const a5 = compose({ question: "What should I eat before my game?", items, youth: true, eventMinutesOverride: 90 });
-    add("guardian note on youth nutrition", !!a5.guardianNote);
+    if (items.length > 0) add("guardian note on youth nutrition", !!a5.guardianNote);
+    else add("empty brain gives no food advice to youth", a5.mode !== "answer" && !a5.sections.food, a5.mode);
 
     // 5: private answer round-trip — encrypted at rest, scoped to its member.
     const orgId = await getOrgId();
