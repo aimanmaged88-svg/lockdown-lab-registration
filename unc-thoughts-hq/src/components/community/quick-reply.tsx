@@ -4,9 +4,24 @@ import { useRouter } from "next/navigation";
 import { replyToQuestion } from "@/lib/unk/actions";
 import { Reply, Check } from "lucide-react";
 
+// Owner's cover for out-of-lane questions: one tap drops the honest
+// "I'm not a professional" reply, pointed at the RIGHT professional, editable
+// before sending. The right pro depends on the question's pillar.
+function proTemplate(pillar?: string | null): string {
+  const pro =
+    pillar === "Nutrition"
+      ? "your GP or an Accredited Sports Dietitian — especially with allergies or anything medical in the mix"
+      : pillar === "Mindset"
+        ? "a psychologist or counsellor. If you're under 25, Kids Helpline is free, 24/7: 1800 55 1800"
+        : pillar === "Basketball"
+          ? "a qualified coach or physio who can actually see you play"
+          : "a qualified professional";
+  return `Real talk: I'm not a professional — just a man sharing what lived experience taught him. This one deserves better than my opinion, so please take it to ${pro}. What I can tell you in general: stick to what's familiar, look after the basics (food, sleep, water, warm-up), and never push through something that feels wrong. Sort it with the pros first — the game will wait for you. 🤝`;
+}
+
 // One box, one tap: the answer teaches UNC forever, closes the question, and
 // (optionally) drops a ready-to-post answer into the bank.
-export function QuickReply({ questionId }: { questionId: string }) {
+export function QuickReply({ questionId, pillar }: { questionId: string; pillar?: string | null }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
@@ -21,6 +36,9 @@ export function QuickReply({ questionId }: { questionId: string }) {
   return (
     <div className="mt-2 w-full space-y-2">
       {err && <p className="text-xs text-accent-soft">{err}</p>}
+      <button type="button" className="btn btn-ghost text-[11px]" onClick={() => setText(proTemplate(pillar))}>
+        🩺 Not my lane → insert &quot;see a professional&quot; reply (edit before sending)
+      </button>
       <textarea
         className="input text-sm"
         rows={3}

@@ -10,6 +10,19 @@ type Mine = {
   status: string; answerText: string | null; answeredAt: string | null; createdAt: string;
 };
 
+// Honesty up front, right where they choose: UNC shares lived experience, not
+// professional advice. Each pillar names the actual professionals.
+const PILLAR_TAG: Record<string, string> = {
+  Basketball: "the game, lived",
+  Nutrition: "fuel that works",
+  Mindset: "headspace, real talk",
+};
+const PILLAR_HONESTY: Record<string, string> = {
+  Basketball: "Straight from UNC's lived experience of the game — not professional coaching or a training prescription.",
+  Nutrition: "General food-for-the-game talk, not dietetics. Allergies, conditions or anything medical: that's for your GP or an Accredited Sports Dietitian.",
+  Mindset: "Real talk from the journey — not therapy. For the heavy stuff, psychologists and counsellors are the pros (Kids Helpline 1800 55 1800 is free, 24/7).",
+};
+
 function b64ToU8(b64: string) {
   const pad = "=".repeat((4 - (b64.length % 4)) % 4);
   const raw = atob((b64 + pad).replace(/-/g, "+").replace(/_/g, "/"));
@@ -103,26 +116,39 @@ export function QuestionClient({ prefill, mine }: { prefill: string; mine: Mine[
         </div>
       ) : (
         <div className="card p-4 space-y-4">
-          {/* Layer 1: pillar */}
+          {/* Layer 1: pillar — big tappable cards, honest by design */}
           <div className="space-y-2">
             <span className="label">What&apos;s it about?</span>
-            <div className="flex gap-2">
-              {Object.entries(QUESTION_TREE).map(([p, cfg]) => (
-                <button key={p} type="button" className={`btn flex-1 ${pillar === p ? "btn-primary" : ""}`}
-                  onClick={() => { setPillar(p); setSubcat(null); }}>
-                  {cfg.icon} {p}
+            <div className="grid grid-cols-3 gap-2">
+              {Object.entries(QUESTION_TREE).map(([p, cfg], i) => (
+                <button
+                  key={p} type="button"
+                  className={`pcard q-in card p-3 text-center border ${pillar === p ? "on border-paper/70 bg-ink-soft" : "border-ink-line2"}`}
+                  style={{ animationDelay: `${i * 70}ms` }}
+                  aria-pressed={pillar === p}
+                  onClick={() => { setPillar(p); setSubcat(null); }}
+                >
+                  <span className="block text-2xl leading-none">{cfg.icon}</span>
+                  <span className="block font-semibold text-[13px] mt-1.5">{p}</span>
+                  <span className="block text-[10px] text-grey mt-0.5 leading-tight">{PILLAR_TAG[p]}</span>
                 </button>
               ))}
             </div>
+            {pillar && (
+              <p key={pillar} className="q-in text-[11px] text-grey leading-relaxed pt-1">
+                {PILLAR_HONESTY[pillar]}
+              </p>
+            )}
           </div>
 
           {/* Layer 2: subcategory */}
           {pillar && (
-            <div className="space-y-2">
+            <div className="space-y-2" key={`sub-${pillar}`}>
               <span className="label">Narrow it down</span>
               <div className="flex flex-wrap gap-2">
-                {subcats.map((s) => (
-                  <button key={s} type="button" className={`chip ${subcat === s ? "btn-primary" : ""}`} onClick={() => setSubcat(subcat === s ? null : s)}>
+                {subcats.map((s, i) => (
+                  <button key={s} type="button" style={{ animationDelay: `${i * 45}ms` }}
+                    className={`q-in chip ${subcat === s ? "btn-primary" : ""}`} onClick={() => setSubcat(subcat === s ? null : s)}>
                     {s}
                   </button>
                 ))}

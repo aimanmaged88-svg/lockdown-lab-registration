@@ -81,9 +81,18 @@ html, body {
   .btn, .chip { transition: transform 0.06s ease-out, background-color 0.15s; }
 }
 
+/* Ask-flow fluidity: staggered entrances + tactile pillar cards. */
+@keyframes qin { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+.q-in { opacity: 0; animation: qin 0.4s cubic-bezier(0.2, 0.7, 0.2, 1) forwards; }
+.pcard { transition: transform 0.16s cubic-bezier(0.2, 0.7, 0.2, 1), border-color 0.16s, background-color 0.16s; }
+.pcard:active { transform: scale(0.95); }
+.pcard.on { transform: scale(1.03); }
+
 /* Minimal, calm motion only. */
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
+  /* Elements that animate FROM hidden must land visible when motion is off. */
+  .q-in { opacity: 1 !important; transform: none !important; }
 }
 
 /* Off-white "light" surface used sparingly for print/exports if needed. */

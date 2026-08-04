@@ -92,7 +92,7 @@ export function QuestionInbox({ questions }: { questions: InboxQuestion[] }) {
             {q.contributorAcknowledged && <Badge tone="good">loop closed</Badge>}
           </div>
           <div className="mt-3 flex flex-wrap items-start gap-2">
-            {q.status === "open" && <QuickReply questionId={q.id} />}
+            {q.status === "open" && <QuickReply questionId={q.id} pillar={q.pillar} />}
             <QuestionActions id={q.id} status={q.status} />
           </div>
         </div>

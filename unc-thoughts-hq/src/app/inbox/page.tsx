@@ -54,7 +54,7 @@ export default async function InboxPage() {
                 <span className="text-[11px] text-grey ml-auto">{fmt(q.createdAt)}</span>
               </div>
               <div className="mt-3">
-                <QuickReply questionId={q.id} />
+                <QuickReply questionId={q.id} pillar={q.pillar} />
               </div>
             </div>
           ))}
