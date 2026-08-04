@@ -73,7 +73,14 @@ export default async function ThoughtPage() {
           <ReflectionComposer promptText={prompt.text} actions={actions} />
         </Card>
       ) : (
-        <p className="text-sm text-grey">No prompts loaded yet.</p>
+        <Card className="space-y-2">
+          <p className="text-base text-paper leading-relaxed">The first thoughts are being written right now — by you.</p>
+          <p className="text-sm text-grey">
+            Every question the community sends UNC becomes a real answer, and the best of
+            those become the thoughts that land here morning, afternoon and evening.
+            No recycled quotes — lived answers only. Ask him something and start the engine.
+          </p>
+        </Card>
       )}
 
       <div className="space-y-2">

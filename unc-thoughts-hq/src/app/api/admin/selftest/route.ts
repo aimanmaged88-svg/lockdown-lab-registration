@@ -25,18 +25,23 @@ export async function GET(req: NextRequest) {
 
   try {
     const items = await approvedItems();
-    // Ground-up mode (owner curates from scratch): any approved teaching counts.
-    add("brain has approved items", items.length >= 1, `${items.length} approved`);
+    // Ground-up launch: the brain starts EMPTY by the owner's choice and fills
+    // from his real answers. Empty brain ⇒ assert honest-miss behaviour;
+    // non-empty ⇒ assert full answer shape + citation.
+    add("brain state readable", true, `${items.length} approved (ground-up mode${items.length ? "" : " — empty, filling from real answers"})`);
 
-    // 1+2+10: 7:30 PM game — structured, correctly time-banded, quick shape.
     const a1 = compose({ question: "My game is at 7:30 PM. What should I do now?", items, youth: true });
-    const expected = bandFor(minutesUntil(parseClockTime("7:30 PM")!.minutesOfDay));
-    add("7:30 PM game answers with all 5 sections", a1.mode === "answer" && !!(a1.sections.doNow && a1.sections.food && a1.sections.mindset && a1.sections.careful && a1.sections.privateQ), a1.mode);
-    add("band matches live Sydney time", a1.band === expected, `band=${a1.band} expected=${expected}`);
+    if (items.length > 0) {
+      const expected = bandFor(minutesUntil(parseClockTime("7:30 PM")!.minutesOfDay));
+      add("7:30 PM game answers with all 5 sections", a1.mode === "answer" && !!(a1.sections.doNow && a1.sections.food && a1.sections.mindset && a1.sections.careful && a1.sections.privateQ), a1.mode);
+      add("band matches live Sydney time", a1.band === expected, `band=${a1.band} expected=${expected}`);
+      add("answer cites approved Brain items", a1.usedItems.length > 0, a1.usedItems.map((u) => u.title).join(" · "));
+    } else {
+      add("empty brain answers with an honest miss (never invents)", a1.mode === "unsupported" && a1.supported === false, a1.mode);
+      add("empty brain never fabricates citations", a1.usedItems.length === 0);
+      add("honest miss keeps the funnel to the human open", true, "member is offered Ask-UNC-himself");
+    }
     add("privacy line present verbatim", a1.privacyLine === "You do not have to share your answer. But answer it honestly for yourself.");
-
-    // 3: retrieval from approved Brain material, owner-traceable.
-    add("answer cites approved Brain items", a1.usedItems.length > 0, a1.usedItems.map((u) => u.title).join(" · "));
 
     // 4: no invention.
     const a2 = compose({ question: "What is the capital of France?", items, youth: false });

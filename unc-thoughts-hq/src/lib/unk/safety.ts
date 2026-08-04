@@ -73,7 +73,7 @@ export function escalationMessage(topic: EscalationTopic, emergency: boolean, yo
       body: [
         adult,
         "If someone has chest pain, trouble breathing, a serious allergic reaction, or has collapsed or fainted: call 000 (Australia) or get to the nearest adult immediately.",
-        "Unk can't help with emergencies. People can.",
+        "UNC can't help with emergencies. People can.",
       ],
     };
   }
@@ -86,17 +86,17 @@ export function escalationMessage(topic: EscalationTopic, emergency: boolean, yo
     severe_dehydration: "Those symptoms need a real check-up — see a doctor or tell an adult today, and don't train until you have.",
     injury_diagnosis: "Diagnosing an injury or deciding whether to play needs a physio or doctor who can actually see you. Guessing wrong makes small injuries big.",
     medication: "Never mix food, sport and medication advice from an app — ask your doctor or pharmacist, they answer this exact question every day.",
-    supplement_dosing: "Individual supplement doses aren't something Unk will ever give. The AIS position is that athletes should involve a sports doctor or Accredited Sports Dietitian, because safety, effectiveness and sport eligibility all matter.",
+    supplement_dosing: "Individual supplement doses aren't something UNC will ever give. The AIS position is that athletes should involve a sports doctor or Accredited Sports Dietitian, because safety, effectiveness and sport eligibility all matter.",
   };
   return {
-    headline: "Unk won't guess at this one.",
-    body: [map[topic], adult, "When you've spoken to the right person, come back and Unk will help with the basics — preparation, familiar food, fluids and mindset."],
+    headline: "UNC won't guess at this one.",
+    body: [map[topic], adult, "When you've spoken to the right person, come back and UNC will help with the basics — preparation, familiar food, fluids and mindset."],
   };
 }
 
 // The approved no-shortcut response for supplement / quick-speed asks.
 export function redirectMessage(topic: "supplement" | "quick_speed" | "weight_change", youth: boolean): { headline: string; body: string[] } {
-  const guardian = youth ? "If you're under 18: supplements aren't for you, and that's not Unk being soft — it's the AIS position. Talk to a parent or guardian first about anything like this." : "";
+  const guardian = youth ? "If you're under 18: supplements aren't for you, and that's not UNC being soft — it's the AIS position. Talk to a parent or guardian first about anything like this." : "";
   if (topic === "quick_speed") {
     return {
       headline: "Straight answer: nothing gives you an instant burst of speed.",
@@ -110,7 +110,7 @@ export function redirectMessage(topic: "supplement" | "quick_speed" | "weight_ch
   }
   if (topic === "weight_change") {
     return {
-      headline: "Unk doesn't do fast weight change. Ever.",
+      headline: "UNC doesn't do fast weight change. Ever.",
       body: [
         "Rapid weight change hurts performance and health, especially for young athletes.",
         "Fuel for the sport you play, sleep, train, and let your body do its thing.",
@@ -119,12 +119,12 @@ export function redirectMessage(topic: "supplement" | "quick_speed" | "weight_ch
     };
   }
   return {
-    headline: "Unk doesn't recommend supplements.",
+    headline: "UNC doesn't recommend supplements.",
     body: [
       "No supplement turns an unprepared player into a prepared one. Food, fluids, sleep and training do the heavy lifting.",
       "The AIS advice: involve a sports doctor or Accredited Sports Dietitian before touching supplements — safety, whether it works, and sport eligibility all have to be checked.",
       guardian || "Under 18s shouldn't use them at all.",
-      "What Unk will help with: familiar pre-game food, fluids, warm-up and one clear mindset cue.",
+      "What UNC will help with: familiar pre-game food, fluids, warm-up and one clear mindset cue.",
     ].filter(Boolean),
   };
 }

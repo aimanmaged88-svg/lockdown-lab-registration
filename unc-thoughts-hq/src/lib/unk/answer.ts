@@ -67,7 +67,7 @@ export function compose(input: ComposeInput): UnkAnswer {
     const t = bandFromText(question, input.now);
     if (t && (intent === "game_day" || intent === "training_before" || intent === "nutrition" || intent === "recovery")) {
       band = t.band;
-      if (t.parsed.assumedPm) timeNote = `Assuming ${t.parsed.display} — if it's a morning session, tell Unk "${t.parsed.display.replace("pm", "am")}".`;
+      if (t.parsed.assumedPm) timeNote = `Assuming ${t.parsed.display} — if it's a morning session, tell UNC "${t.parsed.display.replace("pm", "am")}".`;
     } else {
       const d = bandFromDuration(question);
       if (d) band = d;
@@ -83,12 +83,12 @@ export function compose(input: ComposeInput): UnkAnswer {
     // Honest miss — never invent, especially for food/health.
     return {
       mode: "unsupported", intent, band, bandLabel: band ? BAND_LABEL[band] : null, timeNote,
-      headline: "Unk's Brain doesn't cover that one yet.",
+      headline: "UNC's brain doesn't cover that one yet.",
       sections: {},
       bullets: [
-        "Rather than guess, Unk won't make something up.",
+        "Rather than guess, UNC won't make something up.",
         "Try rephrasing (say what the session is and when), or ask one of the quick buttons on the home screen.",
-        "This question has been flagged so UNC can add proper teaching for it.",
+        "Send it to UNC himself — real answers are exactly how his brain grows.",
       ],
       why: null,
       guardianNote: youth && intent === "nutrition" ? GUARDIAN_NOTE : null,
