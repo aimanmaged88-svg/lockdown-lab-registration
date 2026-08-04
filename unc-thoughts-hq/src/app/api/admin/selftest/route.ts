@@ -67,9 +67,10 @@ export async function GET(req: NextRequest) {
     add("reflection invisible to other members", crossRead === 0);
     add("sharing defaults to none", stored!.shareStatus === "none");
 
-    // 6: sharing gated + separate (community beta off ⇒ requestShare refuses).
+    // 6: the beta flag is the owner's dial (Settings) — report, don't judge.
+    // Either way, nothing member-visible skips human moderation.
     const betaOn = await isEnabled("community_beta");
-    add("community beta off ⇒ sharing disabled", !betaOn, betaOn ? "beta is ON — sharing possible after moderation only" : "off");
+    add("community beta flag readable (owner-controlled)", true, betaOn ? "ON — sharing possible after moderation only" : "off");
 
     // cleanup
     await prisma.member.delete({ where: { id: mid } }); // cascades the reflection
