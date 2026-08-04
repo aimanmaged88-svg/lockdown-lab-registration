@@ -14,7 +14,20 @@ export const dynamic = "force-dynamic";
 // member's own library: save what hits, get more of what sounds like you.
 export default async function ThoughtPage() {
   const orgId = await getOrgId();
-  const prompts = await prisma.thoughtPrompt.findMany({ where: { orgId, active: true }, orderBy: { order: "asc" } });
+  const [bank, answered] = await Promise.all([
+    prisma.thoughtPrompt.findMany({ where: { orgId, active: true }, orderBy: { order: "asc" } }),
+    // UNC's brain as a wisdom feed: short real answers he's given become
+    // servable thoughts — the rotation literally grows every time he replies.
+    prisma.communityQuestion.findMany({
+      where: { orgId, status: "answered", answerText: { not: null } },
+      orderBy: { answeredAt: "desc" },
+      take: 120,
+    }),
+  ]);
+  const answerThoughts = answered
+    .filter((q) => (q.answerText ?? "").length >= 30 && (q.answerText ?? "").length <= 300)
+    .map((q) => ({ id: `q_${q.id}`, text: q.answerText!, pillar: q.pillar ?? "Mindset", actions: "[]" }));
+  const prompts = [...bank, ...answerThoughts];
   const member = await getMember();
 
   const slot = currentSlot();
@@ -49,6 +62,9 @@ export default async function ThoughtPage() {
 
       {prompt ? (
         <Card className="space-y-3">
+          {prompt.id.startsWith("q_") && (
+            <p className="text-[11px] text-grey">🧠 From UNC&apos;s brain — a real answer to a real question from the community.</p>
+          )}
           <p className="text-base text-paper leading-relaxed">{prompt.text}</p>
           <div className="flex items-center justify-between gap-2">
             <p className="text-xs text-grey">{PRIVACY_LINE}</p>

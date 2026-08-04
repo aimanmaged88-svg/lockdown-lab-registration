@@ -266,7 +266,7 @@ export async function replyToQuestion(questionId: string, answer: string, alsoPo
     const { sendToMemberDevices } = await import("../push");
     const r = await sendToMemberDevices(q.memberId, {
       title: "UNC answered your question 🤝",
-      body: text.slice(0, 140),
+      body: `${text.slice(0, 110)} — and your question just taught UNC's brain.`,
       url: "/member/question",
       tag: "unc-answer",
     }).catch(() => ({ sent: 0 }));

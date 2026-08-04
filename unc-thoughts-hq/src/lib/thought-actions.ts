@@ -11,12 +11,26 @@ import { revalidatePath } from "next/cache";
 export async function saveThought(promptId: string) {
   const member = await requireMember();
   const orgId = await getOrgId();
-  const prompt = await prisma.thoughtPrompt.findFirst({ where: { id: promptId, orgId } });
-  if (!prompt) throw new Error("That thought isn't in the bank.");
+
+  // Two kinds of thoughts: the curated bank, and UNC's real answers (q_<id>).
+  let text: string | null = null;
+  let pillar = "Mindset";
+  if (promptId.startsWith("q_")) {
+    const q = await prisma.communityQuestion.findFirst({ where: { id: promptId.slice(2), orgId, status: "answered" } });
+    if (!q?.answerText) throw new Error("That thought isn't in the bank.");
+    text = q.answerText;
+    pillar = q.pillar ?? "Mindset";
+  } else {
+    const prompt = await prisma.thoughtPrompt.findFirst({ where: { id: promptId, orgId } });
+    if (!prompt) throw new Error("That thought isn't in the bank.");
+    text = prompt.text;
+    pillar = prompt.pillar;
+  }
+
   await prisma.savedThought.upsert({
     where: { memberId_promptId: { memberId: member.id, promptId } },
     update: {},
-    create: { memberId: member.id, promptId, text: prompt.text, pillar: prompt.pillar },
+    create: { memberId: member.id, promptId, text, pillar },
   });
   revalidatePath("/member/thought");
   return { ok: true };

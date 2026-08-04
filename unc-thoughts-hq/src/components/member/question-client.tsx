@@ -187,6 +187,7 @@ export function QuestionClient({ prefill, mine }: { prefill: string; mine: Mine[
                 <div className="rounded-lg bg-ink-soft border border-ink-line2 p-3">
                   <p className="text-[11px] text-grey mb-1">UNC says:</p>
                   <p className="text-sm whitespace-pre-wrap">{q.answerText}</p>
+                  <p className="text-[11px] text-grey mt-2">🧠 Your question is part of UNC&apos;s brain now — anonymously helping the next player who asks.</p>
                 </div>
               )}
             </div>

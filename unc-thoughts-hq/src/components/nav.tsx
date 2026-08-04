@@ -5,12 +5,13 @@ import { cn } from "@/lib/cn";
 import { Logo } from "./logo";
 import {
   CalendarDays, Home, Film, Video, BarChart3, Users, Mic, FlaskConical,
-  BookOpen, ClipboardCheck, Settings, Menu, X, Brain, PenSquare,
+  BookOpen, ClipboardCheck, Settings, Menu, X, Brain, PenSquare, Inbox,
 } from "lucide-react";
 import { useState } from "react";
 
 const NAV = [
   { href: "/", label: "Today", icon: Home },
+  { href: "/inbox", label: "Inbox", icon: Inbox },
   { href: "/compose", label: "Compose", icon: PenSquare },
   { href: "/calendar", label: "Calendar", icon: CalendarDays },
   { href: "/content", label: "Content", icon: Film },
@@ -29,9 +30,9 @@ const NAV = [
 // daily; everything else stays behind the ☰ drawer.
 const TABS = [
   { href: "/", label: "Today", icon: Home },
+  { href: "/inbox", label: "Inbox", icon: Inbox },
   { href: "/compose", label: "Compose", icon: PenSquare },
   { href: "/content", label: "Content", icon: Film },
-  { href: "/analytics", label: "Numbers", icon: BarChart3 },
   { href: "/brain", label: "Brain", icon: Brain },
 ];
 
