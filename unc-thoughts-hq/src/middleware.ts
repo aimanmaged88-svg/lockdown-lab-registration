@@ -51,11 +51,11 @@ export async function middleware(req: NextRequest) {
 
   const url = req.nextUrl.clone();
   // The bare domain is the public front door: visitors without the desk cookie
-  // get the member app, not a lock screen. The owner unlocks at /unlock.
+  // get the static landing (CDN-served, instant — no redirect hop, no DB).
+  // The owner unlocks at /unlock and keeps the desk at /.
   if (pathname === "/") {
-    url.pathname = "/member";
-    url.search = "";
-    return NextResponse.redirect(url);
+    url.pathname = "/start.html";
+    return NextResponse.rewrite(url);
   }
   url.pathname = "/unlock";
   url.search = "";
