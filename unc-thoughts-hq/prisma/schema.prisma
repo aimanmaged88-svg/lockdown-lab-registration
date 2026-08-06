@@ -46,6 +46,7 @@ model Organisation {
   members          Member[]
   knowledgeItems   KnowledgeItem[]
   huddlePosts      HuddlePost[]
+  deskNotes        DeskNote[]
   thoughtPrompts   ThoughtPrompt[]
   askLogs          AskLog[]
 }
@@ -691,6 +692,22 @@ model SavedThought {
   createdAt DateTime @default(now())
 
   @@unique([memberId, promptId])
+}
+
+// Owner's quick banks: topic ideas and Instagram post drafts, one table.
+// kind: topic | igpost. Deliberately tiny — a jot, a list, done.
+model DeskNote {
+  id        String   @id @default(cuid())
+  orgId     String
+  org       Organisation @relation(fields: [orgId], references: [id])
+  kind      String
+  title     String?
+  body      String
+  pillar    String?
+  status    String   @default("saved") // saved | used
+  createdAt DateTime @default(now())
+
+  @@index([orgId, kind, status])
 }
 
 // Thought of the Day prompts (owner-editable bank; rotates deterministically).

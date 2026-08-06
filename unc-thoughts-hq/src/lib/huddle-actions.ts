@@ -4,26 +4,14 @@
 // because NOTHING goes live until UNC verifies it. Anonymous by default —
 // same device identity as questions, an optional display name, no accounts.
 
-import { cookies } from "next/headers";
 import { prisma, getOrgId } from "./db";
 import { audit } from "./audit";
 import { requireMember } from "./member";
+import { requireDesk } from "./desk-auth";
 import { assess, escalationMessage } from "./unk/safety";
 import { isYouthBand, HUDDLE_TOPICS } from "./member-shared";
 import { sendToOwnerDevices, sendToMemberDevices } from "./push";
 import { revalidatePath } from "next/cache";
-
-// Server actions are invokable from any route, so owner-only moderation must
-// verify the desk cookie itself — mirrors the middleware's token derivation.
-async function requireDesk(): Promise<void> {
-  const password = process.env.DESK_PASSWORD;
-  if (!password) return; // local dev runs unlocked, same as middleware
-  const data = new TextEncoder().encode(`${password}:${process.env.AUTH_SECRET || "dev-secret-change-me"}:desk`);
-  const hash = await crypto.subtle.digest("SHA-256", data);
-  const expected = Array.from(new Uint8Array(hash)).map((b) => b.toString(16).padStart(2, "0")).join("");
-  const jar = await cookies();
-  if (jar.get("unc_desk")?.value !== expected) throw new Error("Desk only.");
-}
 
 export type HuddlePostResult =
   | { ok: true }

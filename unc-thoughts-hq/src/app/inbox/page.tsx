@@ -15,9 +15,14 @@ export const dynamic = "force-dynamic";
 // leaves. The full Community desk (filters, Signal Map, history) stays put.
 export default async function InboxPage() {
   const orgId = await getOrgId();
-  const [questions, huddle] = await Promise.all([
+  const [questions, huddle, recent] = await Promise.all([
     prisma.communityQuestion.findMany({ where: { orgId, status: "open" }, orderBy: { createdAt: "asc" } }),
     huddleQueue(),
+    prisma.communityQuestion.findMany({
+      where: { orgId, status: "answered", answerText: { not: null } },
+      orderBy: { answeredAt: "desc" },
+      take: 8,
+    }),
   ]);
   const waiting = questions.length + huddle.pending.length;
 
@@ -65,6 +70,25 @@ export default async function InboxPage() {
         <div className="eyebrow mb-2">Huddle — waiting for your tick ({huddle.pending.length})</div>
         <HuddleModeration pending={huddle.pending} recentLive={[]} />
       </div>
+
+      {/* The part that feels good: real people, conversating. */}
+      {recent.length > 0 && (
+        <div className="space-y-2">
+          <div className="eyebrow">The conversation so far</div>
+          {recent.map((q) => (
+            <div key={q.id} className="space-y-1.5">
+              <div className="card p-3 max-w-[92%]">
+                <p className="text-[11px] text-grey mb-0.5">{q.askedBy || "Anonymous"} · {q.pillar ?? "General"}</p>
+                <p className="text-sm">{q.text}</p>
+              </div>
+              <div className="card p-3 max-w-[92%] ml-auto bg-ink-soft border-paper/20">
+                <p className="text-[11px] text-grey mb-0.5">You</p>
+                <p className="text-sm whitespace-pre-wrap">{q.answerText}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <p className="text-xs text-grey">
         Need filters, history or the Signal Map? <Link href="/community" className="underline">Open the full Community desk →</Link>

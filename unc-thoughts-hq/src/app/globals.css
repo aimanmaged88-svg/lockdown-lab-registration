@@ -1,3 +1,18 @@
+/* Self-hosted brand fonts (latin, variable) — previously fetched from Google
+   at runtime, which render-blocked every desk load. */
+@font-face {
+  font-family: "Oswald";
+  src: url("/brand/fonts/oswald-latin.woff2") format("woff2");
+  font-weight: 200 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter";
+  src: url("/brand/fonts/inter-latin.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

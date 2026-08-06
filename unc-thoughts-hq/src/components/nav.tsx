@@ -6,12 +6,15 @@ import { Logo } from "./logo";
 import {
   CalendarDays, Home, Film, Video, BarChart3, Users, Mic, FlaskConical,
   BookOpen, ClipboardCheck, Settings, Menu, X, Brain, PenSquare, Inbox,
+  Lightbulb, Instagram,
 } from "lucide-react";
 import { useState } from "react";
 
 const NAV = [
   { href: "/", label: "Today", icon: Home },
   { href: "/inbox", label: "Inbox", icon: Inbox },
+  { href: "/topics", label: "Topics", icon: Lightbulb },
+  { href: "/instagram", label: "Instagram", icon: Instagram },
   { href: "/compose", label: "Compose", icon: PenSquare },
   { href: "/calendar", label: "Calendar", icon: CalendarDays },
   { href: "/content", label: "Content", icon: Film },
@@ -26,14 +29,12 @@ const NAV = [
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
-// Phone-first bottom tab bar (creator side). The five things he actually taps
-// daily; everything else stays behind the ☰ drawer.
+// Phone = three things: the conversations, the topic bank, the IG shop.
+// Everything else lives behind the ☰ drawer (and full-fat on desktop).
 const TABS = [
-  { href: "/", label: "Today", icon: Home },
   { href: "/inbox", label: "Inbox", icon: Inbox },
-  { href: "/compose", label: "Compose", icon: PenSquare },
-  { href: "/content", label: "Content", icon: Film },
-  { href: "/brain", label: "Brain", icon: Brain },
+  { href: "/topics", label: "Topics", icon: Lightbulb },
+  { href: "/instagram", label: "Instagram", icon: Instagram },
 ];
 
 export function BottomTabs() {
@@ -45,7 +46,7 @@ export function BottomTabs() {
       className="lg:hidden fixed bottom-0 inset-x-0 z-30 border-t border-ink-line bg-ink/95 backdrop-blur"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <div className="grid grid-cols-5">
+      <div className="grid grid-cols-3">
         {TABS.map(({ href, label, icon: Icon }) => {
           const active = href === "/" ? path === "/" : path.startsWith(href);
           return (

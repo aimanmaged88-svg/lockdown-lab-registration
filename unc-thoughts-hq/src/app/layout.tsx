@@ -22,13 +22,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en-AU">
       <head>
-        {/* Progressive enhancement only — app has full fallback stacks if offline. */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&display=swap"
-          rel="stylesheet"
-        />
+        {/* Fonts self-hosted (declared in globals.css) — no third-party fetch
+            in the critical path; full fallback stacks if they're slow. */}
+        <link rel="preload" as="font" type="font/woff2" href="/brand/fonts/oswald-latin.woff2" crossOrigin="anonymous" />
+        <link rel="preload" as="font" type="font/woff2" href="/brand/fonts/inter-latin.woff2" crossOrigin="anonymous" />
         <link rel="apple-touch-icon" href="/brand/icon-180.png" />
       </head>
       <body>
