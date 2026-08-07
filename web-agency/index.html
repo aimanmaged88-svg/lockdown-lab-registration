@@ -136,6 +136,9 @@
   .price li::before{content:"✓"; color:var(--accent); font-weight:900; flex:0 0 auto}
   .price .btn{width:100%; justify-content:center}
   .price-note{text-align:center; color:var(--dim); font-size:14px; margin-top:26px}
+  .incl{display:grid; grid-template-columns:repeat(2,1fr); gap:11px 26px; font-size:15px; color:var(--muted); font-weight:600}
+  .incl span{display:flex; gap:8px}
+  @media(max-width:640px){ .incl{grid-template-columns:1fr} }
 
   /* testimonials */
   .quotes{display:grid; grid-template-columns:repeat(3,1fr); gap:20px}
@@ -216,10 +219,10 @@
         <a href="#work" class="btn btn-ghost">See our work</a>
       </div>
       <div class="trustline">
-        <span>✔ Live in <b>5 days</b></span>
-        <span>✔ From <b>$799</b></span>
+        <span>✔ Live in <b>5 days</b> or it's free</span>
+        <span>✔ <b>$0</b> upfront option</span>
         <span>✔ Built for <b>phones first</b></span>
-        <span>✔ No lock-in contracts</span>
+        <span>✔ No lock-in, ever</span>
       </div>
     </div>
   </section>
@@ -301,42 +304,63 @@
   <section id="pricing">
     <div class="wrap">
       <div class="section-head reveal">
-        <div class="eyebrow">Simple pricing</div>
-        <h2>One clear price. No surprises.</h2>
-        <p>A one-time build fee to create your site, then a small monthly care plan so it stays live, updated and looked after.</p>
+        <div class="eyebrow">The best deal in local web</div>
+        <h2>Everything included. You pick how you pay.</h2>
+        <p>Most Sydney agencies charge <b>$2,000–$8,000</b> to build, then <b>$200+/month</b> to maintain — and lock you in. We bundle the whole lot for a fraction of that, with no lock-in, ever.</p>
       </div>
+
       <div class="prices">
         <div class="price reveal">
-          <div class="k">The build</div>
-          <div class="amt">$799<small> once-off</small></div>
-          <p class="muted" style="font-size:14px">Everything to get you online and looking sharp.</p>
+          <div class="k">Pay once · own it</div>
+          <div class="amt">$749<small> to build</small></div>
+          <p class="muted" style="font-size:14px">Then just <b>$79</b>/month to host &amp; look after it.</p>
           <ul>
-            <li>Up to 3 pages, custom designed</li>
-            <li>Written for you (you don't write a word)</li>
-            <li>Mobile-first &amp; fast</li>
-            <li>Contact / booking / quote forms</li>
-            <li>Google &amp; Maps setup</li>
+            <li>Custom-designed site (up to 3 pages)</li>
+            <li>Written for you — you don't lift a finger</li>
             <li>Live in 5 days</li>
+            <li>You own the site outright, day one</li>
+            <li>Everything in "what's included" below</li>
           </ul>
           <a href="#book" class="btn btn-ghost">Get started</a>
         </div>
         <div class="price feature reveal">
-          <span class="tag">Keeps you sorted</span>
-          <div class="k">Care plan</div>
-          <div class="amt">$79<small>/month</small></div>
-          <p class="muted" style="font-size:14px">Cancel anytime. This is what keeps it effortless.</p>
+          <span class="tag">Nothing down</span>
+          <div class="k">Pay monthly · $0 upfront</div>
+          <div class="amt">$119<small>/month</small></div>
+          <p class="muted" style="font-size:14px">No build fee. <b>Cancel anytime</b> — truly no lock-in.</p>
           <ul>
-            <li>Hosting &amp; domain handled</li>
-            <li>Unlimited small edits &amp; updates</li>
-            <li>Security &amp; backups</li>
-            <li>Business email (you@yourbusiness)</li>
-            <li>Priority human support</li>
-            <li>Seasonal refreshes</li>
+            <li>Same site, same 5-day build</li>
+            <li>$0 to get started</li>
+            <li>Everything below, all rolled in</li>
+            <li>Cancel anytime — no exit fees</li>
+            <li>The site is yours after 12 months</li>
           </ul>
           <a href="#book" class="btn btn-primary">Book a free call</a>
         </div>
       </div>
-      <p class="price-note">Need something bigger — online store, more pages, bookings system? We do those too. Ask on the call.</p>
+
+      <div class="card reveal" style="max-width:840px; margin:24px auto 0">
+        <h3 style="margin-bottom:18px">Everything's included — no hidden add-ons</h3>
+        <div class="incl">
+          <span>✓ Free domain (first year)</span>
+          <span>✓ Business email (you@yourbusiness)</span>
+          <span>✓ Google Business + Maps setup</span>
+          <span>✓ Hosting, security &amp; backups</span>
+          <span>✓ Unlimited small edits</span>
+          <span>✓ Mobile-first &amp; lightning fast</span>
+          <span>✓ Contact / booking / quote forms</span>
+          <span>✓ Priority human support</span>
+        </div>
+      </div>
+
+      <div class="grid g3" style="margin-top:24px">
+        <div class="card reveal"><div class="ico">⚡</div><h3>Live in 5 days — or it's free</h3><p>Once you've sent your details, if we miss the 5-day deadline you don't pay the build. Simple as that.</p></div>
+        <div class="card reveal"><div class="ico">💚</div><h3>Don't love it? Don't pay</h3><p>You approve the design first. If you're not happy and we can't make it right, you pay nothing.</p></div>
+        <div class="card reveal"><div class="ico">🔓</div><h3>No lock-in, ever</h3><p>Month-to-month. Cancel anytime and we hand your site over. No contracts, no exit fees.</p></div>
+      </div>
+
+      <p class="price-note"><b>⭐ Founding offer:</b> the first 5 Sydney businesses get the build for <b>$499</b> (save $250) in exchange for a review. 🚀</p>
+      <p class="price-note" style="margin-top:8px">Want an <b>online store</b> or a <b>booking system</b>? We set those up on trusted platforms (Shopify, Stripe, Calendly) — quoted on the call.</p>
     </div>
   </section>
 
@@ -380,8 +404,8 @@
         <details><summary>What if I don't have a logo or photos?</summary><p>No problem. We can design a clean text-based logo and use professional stock imagery that fits your business, at no extra cost.</p></details>
         <details><summary>Do I own the website?</summary><p>Yes. The site is yours. The care plan covers hosting, updates and support — but you're never locked in, and you can cancel anytime.</p></details>
         <details><summary>What does the $79/month actually cover?</summary><p>Hosting, your domain, business email, security, backups, and unlimited small changes — swap a price, add a photo, update your hours — just message us. It's the "set and forget" part.</p></details>
-        <details><summary>Can you do more than a landing page?</summary><p>Absolutely. Multi-page sites, online booking, simple online stores and more. The 5-day landing page is our starting point — we scope bigger projects on the call.</p></details>
-        <details><summary>How do I pay?</summary><p>A 50% deposit to start, the rest when your site goes live. The monthly care plan begins once you're live. Bank transfer or card.</p></details>
+        <details><summary>Can you do more than a landing page?</summary><p>Absolutely. Online stores, booking systems, multi-page sites and more. We build those on trusted platforms (Shopify, Stripe, Calendly) so they're rock-solid and easy to run — quoted separately on the call. The 5-day landing page is just our starting point.</p></details>
+        <details><summary>How do I pay?</summary><p>Two ways: <b>pay once</b> ($749 to build — 50% deposit to start, the rest when it's live — then $79/month), or <b>pay monthly</b> ($0 upfront, $119/month, cancel anytime). Bank transfer or card.</p></details>
       </div>
     </div>
   </section>

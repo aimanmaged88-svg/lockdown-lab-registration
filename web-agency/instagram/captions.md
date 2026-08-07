@@ -21,10 +21,11 @@ Set your bio to:
 
 ### Post 2 — `02-offer.jpg`
 > Here's the whole deal, no surprises 👇
-> 💻 $799 to build your site
-> 🔧 $79/month to host it, update it & handle all the tech
-> 🔓 No lock-in — cancel anytime
-> That's it. A proper website for less than most people spend on coffee in a year. **DM "SITE"** to start.
+> ⚡ Live in 5 days — **or it's free**
+> 💰 Pay once ($749) OR $0 upfront & pay monthly
+> 📦 Domain, email, hosting, Google setup, unlimited edits — all included
+> 🔓 No lock-in. Cancel anytime.
+> Most Sydney agencies charge $2,000–$8,000 for this. We don't. **DM "SITE"** to start.
 
 ### Post 3 — `03-before-after.jpg`
 > The difference a website makes 👀

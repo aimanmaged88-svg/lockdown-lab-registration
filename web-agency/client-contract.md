@@ -15,9 +15,13 @@ We'll design and build a website for your business — up to **[3] pages** — i
 We aim to have your site ready to review within **5 business days** of receiving everything we need from you (your completed intake form, logo, photos and any text). Delays in getting content from you may move this date.
 
 ## 3. Price & payment
-- **Build fee:** $[799] once-off. A **50% deposit ($[400])** is due before we start. The remaining 50% is due when the site is ready to go live.
-- **Care plan:** $[79]/month, starting when your site goes live. This covers hosting, your domain, business email, security, backups, and unlimited small edits. **You can cancel anytime** with 30 days' notice.
+Choose one:
+- **Pay once:** Build fee **$[749]** once-off — a **50% deposit ($[375])** before we start, the rest when the site goes live — then a **$[79]/month** care plan.
+- **Pay monthly:** **$0 upfront**, **$[119]/month**, cancel anytime. The website becomes yours outright after 12 months.
+- Either way the care/monthly plan covers hosting, your domain, business email, security, backups, and unlimited small edits. **No lock-in — cancel anytime** with 30 days' notice.
 - Payment by bank transfer or card to: [your payment details].
+
+**Our guarantees:** Live in 5 business days of receiving your content or the build is free · you approve the design before you pay · no lock-in.
 
 ## 4. What we need from you
 Your business details, logo (if you have one), photos, and any specific text — via the intake form. If you don't have a logo or photos, we'll use a clean text logo and suitable stock imagery.

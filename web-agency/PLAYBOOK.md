@@ -23,11 +23,24 @@ Your one-stop guide. Everything you need to make money is in this folder. Follow
 
 ## The offer (memorise this)
 
-> **"A simple, beautiful website for your business, live in 5 days. $799 to build it, $79/month to keep it looked after. No lock-in."**
+> **"A simple, beautiful website for your business, live in 5 days — or it's free. Pay once ($749 + $79/mo) or pay monthly ($0 upfront, $119/mo). Everything included. No lock-in."**
+
+**Two ways for the client to pay** (offer both — some want to own it, some want nothing down):
+1. **Pay once** — $749 build + $79/month care plan. They own the site outright.
+2. **Pay monthly** — $0 upfront, $119/month, cancel anytime. The site becomes theirs after 12 months.
+
+**Your three guarantees** (this is what makes you the best deal — competitors don't offer these):
+- ⚡ **Live in 5 days or the build is free**
+- 💚 **Don't love the design? You don't pay** (they approve first)
+- 🔓 **No lock-in, ever** — cancel anytime, no exit fees
+
+**What's always included** (free): domain (yr 1), business email, Google Business setup, hosting, security, backups, unlimited small edits.
+
+**Founding offer:** first 5 clients get the build for **$499** (save $250) for a review.
 
 Two revenue streams:
-1. **Build fee** — $799 once-off (your quick cash).
-2. **Care plan** — $79/month recurring (the real business — this is what stacks).
+1. **Build fee** — $749 once-off, or spread into the monthly (your quick cash).
+2. **Care plan** — $79–$119/month recurring (the real business — this is what stacks).
 
 **Do the maths:** 20 clients on care plans = **$1,580/month recurring**, before you build a single new site. That's the goal. Chase the monthly plans on every single client.
 
