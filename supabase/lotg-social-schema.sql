@@ -12,14 +12,20 @@
 -- the crew feed only needs the four tables below.
 --
 -- Two sides, two rules (Aiman, 2026-08-07):
---   PLAYS — anyone can submit a clip link with NO login. It lands in the coach's
---           approval queue (approved=false) and only shows once he approves it.
---           Voting is open too (one per device). Clip URLs are stored, never fetched.
+--   PLAYS — anyone can UPLOAD a short clip (a video file, no login). It lands in
+--           the coach's approval queue (approved=false) and only shows once he
+--           approves it. Voting is open too (one per device).
 --   CHAT  — to post you sign in with a social handle: Instagram, Facebook or TikTok
 --           (NO email). The handle only ever LINKS to the profile — never posts.
 -- Coach approval/moderation is authed as any ACTIVE ll_coaches account (same
 -- sha256 scheme as coach_login; Aiman logs in with his email + PIN).
 -- Ban a member: set lotg_crew.banned = true.
+--
+-- Clip videos live in the public Storage bucket `lotg-clips` (50MB file limit,
+-- video/mp4|quicktime|webm). Upload is two-step so bytes never pass through the
+-- function: play_upload_init returns a short-lived SIGNED URL the browser PUTs
+-- the file straight to; play_submit then records the (pending) play. Rejecting a
+-- clip deletes its Storage object.
 
 create table if not exists public.lotg_crew (
   id          text primary key,                 -- device uuid: [a-zA-Z0-9._-]{8,64}
@@ -38,8 +44,10 @@ create table if not exists public.lotg_plays (
   name        text not null,                    -- optional attribution, else 'Anonymous'
   ig          text not null default '',
   caption     text not null,                    -- one line: what happened (<=140)
-  url         text not null,                    -- clip link (IG/YT/TikTok/FB) — STORED, never fetched
-  platform    text not null default 'Clip',
+  url         text not null,                    -- public URL of the uploaded video (lotg-clips bucket)
+  video       boolean not null default false,   -- true for uploaded video clips
+  clip_path   text not null default '',         -- storage object path (deleted on reject)
+  platform    text not null default 'Video',
   week        text not null,                    -- Sydney ISO week, e.g. 2026-W32
   approved    boolean not null default false,   -- coach must approve before it's visible
   hidden      boolean not null default false,   -- coach take-down of an approved clip
@@ -76,9 +84,10 @@ alter table public.lotg_chat       enable row level security;
 -- Edge actions (POST { action, ... } to /functions/v1/lotg-social):
 --   PUBLIC
 --     register    {device,name,provider,handle}  -> chat sign-in (social only, no email)
---     board       {device}                       -> { me, plays[], pending[], chat[], week }  (poll)
---     play_submit {device,url,caption,name?}      -> OPEN (no login); lands pending; <=12/day/device
---     play_vote   {device,play}                   -> OPEN; toggle 1 vote/device on an APPROVED play
+--     board            {device}                  -> { me, plays[], pending[], chat[], week }  (poll)
+--     play_upload_init {device,contentType}       -> OPEN; { uploadUrl (signed), path, maxBytes }
+--     play_submit      {device,path,caption,name?}-> OPEN; verifies the upload, lands pending; <=12/day
+--     play_vote        {device,play}              -> OPEN; toggle 1 vote/device on an APPROVED play
 --     chat_get    {device}                        -> { chat[] }
 --     chat_send   {device,body}                   -> requires social sign-in (guard); <=20/5min
 --   COACH (auth = active ll_coaches user + PIN)

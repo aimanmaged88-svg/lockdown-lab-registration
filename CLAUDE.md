@@ -26,38 +26,42 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
 - **Frontend: lotg-crew.html** (repo root, self-contained single file, references
   /assets/fonts/chakrapetch + permanentmarker). Night-court look (warm black
   #12120f + basketball orange #F97316 + gold crown; Chakra Petch scoreboard type,
-  Permanent Marker hype accent). Two tabs — **Top Plays** (clip links, vote
-  toggle, #1 of the current week auto-crowned **Play of the Week**, "voting
-  closes Sun 9 PM") and **Group Chat** (one room, all teams). Third "Games" tab
-  links out to the live scoreboard. Optimistic votes/chat, 8s board polling,
-  real empty states (NO seed data — the feed starts empty by design).
-- **Two rules Aiman set (2026-08-07):** (1) **clips are coach-approval-gated** —
-  anyone submits a clip with NO login (open, rate-limited), it lands in UNC's
-  queue and only shows once approved; the submitter sees their own "⏳ Waiting"
-  strip. (2) **chat/community needs social sign-in** — Instagram, Facebook OR
-  TikTok (NO email); the handle only ever LINKS to the profile, never posts.
-  **Voting is open** (device-based, one/play) — told him, easy to gate later.
-  UNC approves in-app: footer **"UNC access"** → coach login (his Lab coach
-  email + PIN, same ll_coaches creds) → pending queue (Approve/Reject) + live
-  plays (Take down).
-- **Backend: edge fn `lotg-social` (v3, verify_jwt on — anon key as Bearer +
-  apikey).** Tables `lotg_crew` (+provider/handle) / `lotg_plays` (+approved) /
-  `lotg_play_votes` / `lotg_chat` (+provider/handle) (RLS on, no policies,
-  service-role only). Public actions: register (social sign-in) / board (returns
-  approved plays + your pending + chat) / play_submit (OPEN, lands pending,
-  <=12/day) / play_vote (OPEN, 1/device, approved plays only) / chat_get /
-  chat_send (guard = social sign-in, <=20/5min). Coach actions (coachAuth =
-  active ll_coaches user+PIN): admin_pending / admin_approve / admin_reject /
-  admin_takedown. Server computes `mine` so device ids never leak; ids sanitized
-  via sid() before filters (the opencourt v13 lesson). Source committed at
-  supabase/functions/lotg-social/index.ts; doc supabase/lotg-social-schema.sql.
+  Permanent Marker hype accent). **Video-forward feed** — **Top Plays** tab: the
+  #1 clip of the week is the auto-crowned **Play of the Week** hero (autoplays
+  muted/loop), the rest are TikTok-style video cards; **Group Chat** tab (one
+  room, all teams); a "Games" tab links to the live scoreboard. Big "Upload a
+  clip" button → sheet with file pick + inline **preview** + **upload progress
+  bar**. Optimistic votes/chat, 8s board polling, real empty states (NO seed
+  data). Fluid/spring motion, large tap targets, a11y (focus, reduced-motion) —
+  Aiman: "make it amazing, these guys are ballers."
+- **Two rules Aiman set (2026-08-07):** (1) **clips are UPLOADED videos,
+  coach-approval-gated** — anyone uploads a clip with NO login (open, ≤50MB via a
+  signed Storage URL, rate-limited), it lands in UNC's queue and only shows once
+  approved; the submitter sees their own "⏳ Waiting" strip with a preview.
+  (2) **chat/community needs social sign-in** — Instagram, Facebook OR TikTok
+  (NO email); the handle only ever LINKS to the profile, never posts. **Voting
+  is open** (device-based, one/play). UNC approves in-app: footer **"UNC access"**
+  → coach login (his Lab coach email + PIN, same ll_coaches creds) → pending
+  queue with inline video (Approve/Reject) + live plays (Take down).
+- **Backend: edge fn `lotg-social` (v4, verify_jwt on — anon key as Bearer +
+  apikey).** Tables `lotg_crew` (+provider/handle) / `lotg_plays`
+  (+approved/+video/clip_path) / `lotg_play_votes` / `lotg_chat` (+provider/
+  handle); public Storage bucket **`lotg-clips`** (50MB, video mimes). Public
+  actions: register / board / **play_upload_init** (OPEN → signed upload URL) /
+  play_submit (OPEN {path}, verifies the upload, lands pending, <=12/day) /
+  play_vote (OPEN, 1/device, approved only) / chat_get / chat_send (guard =
+  social sign-in). Coach (coachAuth = active ll_coaches user+PIN): admin_pending
+  / admin_approve / admin_reject (deletes the Storage object) / admin_takedown.
+  Signed-upload flow keeps video bytes out of the function; server computes
+  `mine` so device ids never leak; ids sanitized via sid() (opencourt v13).
+  Source supabase/functions/lotg-social/index.ts; doc lotg-social-schema.sql.
   Ban a member = set lotg_crew.banned=true.
-- **Verified E2E** against live v3: 14-check curl flow (register needs a social
-  → open submit lands pending, invisible to others → vote on unapproved rejected
-  → admin_approve → appears w/ auto-vote → open 2nd-device vote → chat needs
-  sign-in → social chat works → wrong-PIN + takedown) + Playwright app (open
-  submit → pending strip → coach login + approve in-app → live + vote → social
-  sign-in gate → TikTok author links). Temp test coach + all test rows deleted.
+- **Verified E2E** against live v4: 8-check upload curl flow (signed init → PUT
+  video → 206 range → submit pending → approve → board video → reject deletes
+  the Storage object → bad mime rejected) + Playwright app (file pick + preview →
+  upload progress → pending strip w/ thumbnail → coach login + inline-video
+  review + approve → POTW video hero + vote). Storage confirmed empty after;
+  temp test coach + all test rows/objects deleted.
 - **LIVE at https://lotg-crew.netlify.app** (Aiman picked "a dedicated crew
   link"). Standalone Netlify site `lotg-crew` (site id
   c3a8e875-0c2c-4b9d-b3a3-f363e393a5d0) — SEPARATE from the Lab site and the

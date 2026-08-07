@@ -7,16 +7,20 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 // role); the browser only ever sends the public anon key as Bearer + apikey.
 //
 // Two sides, two rules (Aiman, 2026-08-07):
-//   PLAYS  — anyone can submit a clip link with NO login. It lands in the coach's
-//            approval queue (approved=false) and only appears once he approves it.
-//            Voting is open too (one per device). We never fetch the clip URL.
+//   PLAYS  — anyone can UPLOAD a short clip (a video file, no login). It lands in
+//            the coach's approval queue (approved=false) and only appears once he
+//            approves it. Uploads go straight to Storage via a signed URL (the
+//            function never carries the video bytes). Voting is open (1/device).
 //   CHAT   — to be part of the community you sign in with a social handle:
-//            Instagram, Facebook or TikTok (NO email). The handle is how the crew
-//            connects — we only ever LINK to the profile, never log in or post.
+//            Instagram, Facebook or TikTok (NO email). The handle only ever LINKS
+//            to the profile, never posts.
 // Coach approval/moderation is authed as any ACTIVE Lab coach (ll_coaches, same
 // sha256 scheme as coach_login). Ban a member: set lotg_crew.banned = true.
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const CLIP_BUCKET = "lotg-clips";
+const MAX_BYTES = 52428800; // 50MB — a short highlight fits comfortably
+const EXT: Record<string, string> = { "video/mp4": "mp4", "video/quicktime": "mov", "video/webm": "webm" };
 
 const cors = {
   "Access-Control-Allow-Origin": "*",
@@ -36,19 +40,34 @@ async function db(path: string, init: RequestInit = {}) {
 }
 
 const str = (v: unknown, max = 120) => String(v ?? "").slice(0, max).trim();
-// Sanitize an id for safe interpolation into a PostgREST in.(...) / eq. filter.
 const sid = (v: unknown) => String(v ?? "").replace(/[^a-zA-Z0-9._-]/g, "");
-// Social handle: strip a leading @, keep the chars handles actually use.
 const handleClean = (v: unknown) => String(v ?? "").replace(/^@+/, "").toLowerCase().replace(/[^a-z0-9._-]/g, "").slice(0, 40);
 const PROVIDERS = ["instagram", "facebook", "tiktok"];
 
-// Platform label from a clip URL — for the chip. We never fetch the URL.
-function platformOf(url: string) {
-  if (/instagram\.com/i.test(url)) return "Instagram";
-  if (/tiktok\.com/i.test(url)) return "TikTok";
-  if (/(youtube\.com|youtu\.be)/i.test(url)) return "YouTube";
-  if (/facebook\.com|fb\.watch/i.test(url)) return "Facebook";
-  return "Clip";
+// ---- Storage (clips) ----
+const publicUrl = (p: string) => `${SUPABASE_URL}/storage/v1/object/public/${CLIP_BUCKET}/${p}`;
+// A short-lived signed URL the browser PUTs the video straight to — the bytes
+// never pass through this function.
+async function signUpload(path: string) {
+  const r = await fetch(`${SUPABASE_URL}/storage/v1/object/upload/sign/${CLIP_BUCKET}/${path}`, {
+    method: "POST",
+    headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({}),
+  });
+  if (!r.ok) throw new Error(`sign ${r.status}: ${await r.text()}`);
+  return (await r.json()).url as string; // "/object/upload/sign/<bucket>/<path>?token=..."
+}
+// Confirm the object landed (public HEAD) and how big it is.
+async function objectSize(path: string): Promise<number | false> {
+  const r = await fetch(publicUrl(path), { method: "HEAD" });
+  if (!r.ok) return false;
+  return Number(r.headers.get("content-length") || 0);
+}
+async function deleteObject(path: string) {
+  if (!path) return;
+  await fetch(`${SUPABASE_URL}/storage/v1/object/${CLIP_BUCKET}/${path}`, {
+    method: "DELETE", headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` },
+  }).catch(() => {});
 }
 
 // Sydney ISO week, e.g. "2026-W32" — the Play-of-the-Week window.
@@ -67,8 +86,6 @@ async function sha256(s: string) {
   const d = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
   return Array.from(new Uint8Array(d)).map(b => b.toString(16).padStart(2, "0")).join("");
 }
-// Coach/admin auth: any ACTIVE ll_coaches account (same sha256 scheme + claim-on-
-// first-PIN as coach_login). Aiman logs in with his email + PIN.
 async function coachAuth(user: unknown, pin: unknown) {
   const u = str(user, 120).toLowerCase(), p = str(pin, 8);
   if (!u || !/^\d{4,8}$/.test(p)) return false;
@@ -79,8 +96,7 @@ async function coachAuth(user: unknown, pin: unknown) {
   return rows[0].pin_hash === h;
 }
 
-// Chat gate: device must be a registered, unbanned crew member who signed in with
-// a social handle. Returns the REGISTERED identity, or a ready error Response.
+// Chat gate: registered, unbanned crew member who signed in with a social handle.
 async function guard(device: unknown): Promise<{ p?: { id: string; name: string; provider: string; handle: string }; err?: Response }> {
   const id = str(device, 64);
   if (!id || id.length < 8) return { err: J({ error: "sign in to join the chat", code: "signin" }, 401) };
@@ -91,14 +107,22 @@ async function guard(device: unknown): Promise<{ p?: { id: string; name: string;
   db(`lotg_crew?id=eq.${encodeURIComponent(id)}`, { method: "PATCH", body: JSON.stringify({ seen_at: new Date().toISOString() }) }).catch(() => {});
   return { p: { id: row.id, name: row.name, provider: row.provider, handle: row.handle } };
 }
+async function isBanned(device: string) {
+  const b = await db(`lotg_crew?id=eq.${encodeURIComponent(device)}&select=banned`);
+  return !!b?.[0]?.banned;
+}
+async function clipsToday(device: string) {
+  const dayAgo = new Date(Date.now() - 864e5).toISOString();
+  const mine = await db(`lotg_plays?device_id=eq.${encodeURIComponent(device)}&created_at=gte.${dayAgo}&select=id`);
+  return mine?.length || 0;
+}
 
-// APPROVED plays (last 14 days), ranked by votes, plus the viewer's OWN still-
-// pending clips so a submitter can see "waiting for approval". Device ids never
-// leak — only names/handles and computed booleans go out.
+// APPROVED plays (last 14 days) ranked by votes, plus the viewer's OWN pending
+// clips so they can see "waiting for approval". Device ids never leak.
 async function playsPayload(viewerId: string) {
   const vid = sid(viewerId);
   const since = new Date(Date.now() - 14 * 864e5).toISOString();
-  const live = await db(`lotg_plays?approved=is.true&hidden=is.false&created_at=gte.${since}&select=id,name,caption,url,platform,week,device_id,created_at&order=created_at.desc&limit=80`) || [];
+  const live = await db(`lotg_plays?approved=is.true&hidden=is.false&created_at=gte.${since}&select=id,name,caption,url,video,platform,week,device_id,created_at&order=created_at.desc&limit=80`) || [];
   let votes: Record<string, unknown>[] = [];
   if (live.length) {
     const ids = live.map((p: Record<string, unknown>) => `"${p.id}"`).join(",");
@@ -111,14 +135,13 @@ async function playsPayload(viewerId: string) {
     if (v.device_id === vid) mine.add(pid);
   }
   const plays = live.map((p: Record<string, unknown>) => ({
-    id: p.id, name: p.name, caption: p.caption, url: p.url, platform: p.platform, week: p.week,
+    id: p.id, name: p.name, caption: p.caption, url: p.url, video: p.video, platform: p.platform, week: p.week,
     votes: tally.get(p.id as string) || 0, mine: mine.has(p.id as string),
   })).sort((a, b) => b.votes - a.votes || (a.id < b.id ? 1 : -1));
-  // The viewer's own clips still awaiting the coach's approval.
   let pending: Record<string, unknown>[] = [];
   if (vid) {
-    const rows = await db(`lotg_plays?approved=is.false&hidden=is.false&device_id=eq.${encodeURIComponent(vid)}&select=id,caption,url,platform,created_at&order=created_at.desc&limit=10`) || [];
-    pending = rows.map((p: Record<string, unknown>) => ({ id: p.id, caption: p.caption, url: p.url, platform: p.platform }));
+    const rows = await db(`lotg_plays?approved=is.false&hidden=is.false&device_id=eq.${encodeURIComponent(vid)}&select=id,caption,url,video,created_at&order=created_at.desc&limit=10`) || [];
+    pending = rows.map((p: Record<string, unknown>) => ({ id: p.id, caption: p.caption, url: p.url, video: p.video }));
   }
   return { plays, pending };
 }
@@ -130,10 +153,8 @@ async function chatPayload(viewerId: string) {
     id: m.id, name: m.name, provider: m.provider, handle: m.handle, body: m.body, created_at: m.created_at, mine: m.device_id === vid,
   }));
 }
-
 async function pendingList() {
-  const rows = await db(`lotg_plays?approved=is.false&hidden=is.false&select=id,name,caption,url,platform,created_at&order=created_at.asc&limit=100`) || [];
-  return rows;
+  return await db(`lotg_plays?approved=is.false&hidden=is.false&select=id,name,caption,url,video,platform,created_at&order=created_at.asc&limit=100`) || [];
 }
 
 Deno.serve(async (req: Request) => {
@@ -146,8 +167,6 @@ Deno.serve(async (req: Request) => {
   try {
     switch (action) {
 
-      // Community sign-in: name + a social handle (instagram | facebook | tiktok).
-      // No email. The handle only ever LINKS to the profile — never posts.
       case "register": {
         const id = str(b.device, 64), name = str(b.name, 40);
         const provider = str(b.provider, 20).toLowerCase(), handle = handleClean(b.handle);
@@ -163,7 +182,6 @@ Deno.serve(async (req: Request) => {
         return J({ ok: true, me: { name, provider, handle, registered: true } });
       }
 
-      // Hydrate: who am I (chat identity), approved plays + my pending clips, chat.
       case "board": {
         const id = str(b.device, 64);
         let me: Record<string, unknown> = { registered: false };
@@ -175,24 +193,37 @@ Deno.serve(async (req: Request) => {
         return J({ me, plays: pp.plays, pending: pp.pending, chat, week: sydWeek() });
       }
 
-      // Drop a play — NO login. Lands in the coach's approval queue (approved=false).
-      // A device id is still required (rate-limit + your-pending + your starting vote).
+      // Step 1 of an upload — hand back a signed URL to PUT the video straight to
+      // Storage. NO login. Rate-limited per device.
+      case "play_upload_init": {
+        const device = str(b.device, 64);
+        if (!device || !/^[a-zA-Z0-9._-]{8,64}$/.test(device)) return J({ error: "bad device" }, 400);
+        if (await isBanned(device)) return J({ error: "you're removed from the LOTG crew feed", code: "banned" }, 403);
+        const ext = EXT[str(b.contentType, 40).toLowerCase()];
+        if (!ext) return J({ error: "that's not a clip we can take — use an MP4, MOV or WebM" }, 400);
+        if (await clipsToday(device) >= 12) return J({ error: "easy — that's 12 clips today already" }, 429);
+        const path = `clips/${device}-${crypto.randomUUID().slice(0, 8)}.${ext}`;
+        const url = await signUpload(path);
+        return J({ uploadUrl: `${SUPABASE_URL}/storage/v1${url}`, path, maxBytes: MAX_BYTES });
+      }
+
+      // Step 2 — after the video is uploaded, record the (pending) play.
       case "play_submit": {
         const device = str(b.device, 64);
         if (!device || !/^[a-zA-Z0-9._-]{8,64}$/.test(device)) return J({ error: "bad device" }, 400);
-        const ban = await db(`lotg_crew?id=eq.${encodeURIComponent(device)}&select=banned`);
-        if (ban?.[0]?.banned) return J({ error: "you're removed from the LOTG crew feed", code: "banned" }, 403);
-        const url = str(b.url, 300), caption = str(b.caption, 140), name = str(b.name, 40) || "Anonymous";
-        if (!/^https?:\/\/\S+\.\S+/i.test(url)) return J({ error: "paste a full clip link (starts with https://)" }, 400);
+        if (await isBanned(device)) return J({ error: "you're removed from the LOTG crew feed", code: "banned" }, 403);
+        const caption = str(b.caption, 140), name = str(b.name, 40) || "Anonymous", path = str(b.path, 200);
         if (!caption) return J({ error: "add a line on what happened" }, 400);
-        const dayAgo = new Date(Date.now() - 864e5).toISOString();
-        const mine = await db(`lotg_plays?device_id=eq.${encodeURIComponent(device)}&created_at=gte.${dayAgo}&select=id`);
-        if ((mine?.length || 0) >= 12) return J({ error: "easy — that's 12 clips today already" }, 429);
+        // The path must be this device's own upload.
+        if (!path || !path.startsWith(`clips/${device}-`)) return J({ error: "upload your clip first" }, 400);
+        const size = await objectSize(path);
+        if (size === false) return J({ error: "we couldn't find your upload — try again" }, 400);
+        if (size > MAX_BYTES) { await deleteObject(path); return J({ error: "that clip's too big — keep it to a short highlight (max 50MB)" }, 413); }
+        if (await clipsToday(device) >= 12) { await deleteObject(path); return J({ error: "easy — that's 12 clips today already" }, 429); }
         const [play] = await db(`lotg_plays`, {
           method: "POST", headers: { Prefer: "return=representation" },
-          body: JSON.stringify({ device_id: device, name, ig: "", caption, url, platform: platformOf(url), week: sydWeek(), approved: false }),
+          body: JSON.stringify({ device_id: device, name, caption, url: publicUrl(path), clip_path: path, video: true, platform: "Video", week: sydWeek(), approved: false }),
         });
-        // Your own starting vote (counts once the coach approves it).
         await db(`lotg_play_votes?on_conflict=play_id,device_id`, {
           method: "POST", headers: { Prefer: "resolution=merge-duplicates" },
           body: JSON.stringify({ play_id: play.id, device_id: device }),
@@ -201,12 +232,10 @@ Deno.serve(async (req: Request) => {
         return J({ plays: pp.plays, pending: pp.pending, week: sydWeek() });
       }
 
-      // Vote toggle — open (one per device), only on an approved, visible play.
       case "play_vote": {
         const device = str(b.device, 64);
         if (!device || device.length < 8) return J({ error: "bad device" }, 400);
-        const ban = await db(`lotg_crew?id=eq.${encodeURIComponent(device)}&select=banned`);
-        if (ban?.[0]?.banned) return J({ error: "you're removed from the LOTG crew feed", code: "banned" }, 403);
+        if (await isBanned(device)) return J({ error: "you're removed from the LOTG crew feed", code: "banned" }, 403);
         const play = str(b.play, 64);
         const rows = await db(`lotg_plays?id=eq.${encodeURIComponent(play)}&approved=is.true&hidden=is.false&select=id`);
         if (!rows?.length) return J({ error: "that play isn't available" }, 404);
@@ -220,11 +249,9 @@ Deno.serve(async (req: Request) => {
         return J({ plays: pp.plays, pending: pp.pending, week: sydWeek() });
       }
 
-      // Group chat — reading is open; posting needs a social sign-in. 20/5min/device.
       case "chat_get": {
         return J({ chat: await chatPayload(str(b.device, 64)) });
       }
-
       case "chat_send": {
         const g = await guard(b.device); if (g.err) return g.err;
         const me = g.p!;
@@ -244,21 +271,20 @@ Deno.serve(async (req: Request) => {
       }
       case "admin_approve": {
         if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong coach login", code: "auth" }, 401);
-        const play = str(b.play, 64);
-        await db(`lotg_plays?id=eq.${encodeURIComponent(play)}`, { method: "PATCH", body: JSON.stringify({ approved: true }) });
+        await db(`lotg_plays?id=eq.${encodeURIComponent(str(b.play, 64))}`, { method: "PATCH", body: JSON.stringify({ approved: true }) });
         return J({ ok: true, pending: await pendingList() });
       }
       case "admin_reject": {
         if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong coach login", code: "auth" }, 401);
         const play = str(b.play, 64);
+        const rows = await db(`lotg_plays?id=eq.${encodeURIComponent(play)}&select=clip_path`);
+        if (rows?.[0]?.clip_path) await deleteObject(rows[0].clip_path);
         await db(`lotg_plays?id=eq.${encodeURIComponent(play)}`, { method: "DELETE" });
         return J({ ok: true, pending: await pendingList() });
       }
-      // Pull an already-approved clip back down.
       case "admin_takedown": {
         if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong coach login", code: "auth" }, 401);
-        const play = str(b.play, 64);
-        await db(`lotg_plays?id=eq.${encodeURIComponent(play)}`, { method: "PATCH", body: JSON.stringify({ hidden: true }) });
+        await db(`lotg_plays?id=eq.${encodeURIComponent(str(b.play, 64))}`, { method: "PATCH", body: JSON.stringify({ hidden: true }) });
         return J({ ok: true, pending: await pendingList() });
       }
 
