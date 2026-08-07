@@ -664,6 +664,37 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   smoke (boots clean, toggle + prompt present). NOTE: actual on-device delivery
   needs a real phone test (identical mechanism to the Lab's proven push) — told
   Aiman to allow + confirm the buzz. All test rows + temp coach deleted.
+- **Launch prep (2026-08-07):** Aiman wants a simple, amazing app for a **1 Sep
+  launch** with 5 testers. Launch-plan artifact:
+  https://claude.ai/code/artifact/1fc1e747-44a3-4a66-9f05-a48aab04b9b9 (verdict:
+  don't strip features, hide the empty ones for launch; Supabase Pro + Sydney
+  region easily handles 1000 users; 4-week roadmap). Backend org is **Pro**,
+  project region **ap-southeast-2 (Sydney)**. Seeded **12 official courts**
+  (Green Square, The Cage/Rushcutters Bay, Prince Alfred Park, Alexandria Park,
+  Victoria Park, Waterloo Oval, Pirrama Park, Enmore Park, Heffron Park, North
+  Steyne, Parramatta Park, Francis Park) via direct oc_courts inserts (coords
+  from the vetted courts.json). Aiman's desk PIN reset to unclaimed again (he
+  claims on next login).
+- **Desk tap-a-map location picker (2026-08-07).** The court editor's location
+  box only took "lat, lon" or a share link; a Google *search* link (no coords)
+  failed confusingly. Now hoopsheaven-desk.html inlines **Leaflet 1.9.4**
+  (extracted from the app, CARTO dark tiles) and the editor shows a **tappable
+  map** (`#cMap`): tap to drop the pin, drag to fine-tune. `setCourtPin()` is the
+  single source of truth — the map tap, paste/Locate, known-court quick-search
+  and suggestion prefill all route through it. Clear "just tap the map" message
+  when a link can't be read. E2E 7/7.
+- **UNC intro splash + premium polish (2026-08-07, app).** Aiman: "proudly
+  brought to you by UNC" + his logo (silhouette face + UNC only, no other
+  words); "go really hard on animations, make it amazing." Shipped `#uncIntro`
+  full-screen splash on every app open: eyebrow "Proudly brought to you by" →
+  **vector silhouette** (beanie/beard bust, a placeholder for his real logo —
+  swap the one SVG block in the intro) inside an animated **clock-tick ring** →
+  bold **UNC** with an orange underline draw → dissolves and `body.appin` makes
+  the home content rise in. Tap-to-skip, ~2.2s (600ms under reduced-motion),
+  fully under prefers-reduced-motion. Plus home-hero ambient float glow + a slow
+  shine sweep across the "Your game." script (accent-adaptive). All live on
+  main. E2E 7/7 + screenshots. NOTE: Aiman still to send his real logo file to
+  swap the vector silhouette (attachments don't reach disk — he'll re-send).
 - v2 ideas discussed: KOTC proper, run chat, POTW weekly archive/all-time
   wall, PWA manifest + install, native app for background geofencing.
 
