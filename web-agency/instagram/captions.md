@@ -7,7 +7,7 @@ Nine posts, ready to go. The images are in `instagram/posts/`. Post them in this
 
 Set your bio to:
 > 🌐 Websites for local business
-> ⚡ Live in 5 days · from $799
+> ⚡ Live in 5 days · from $749
 > 📍 Sydney · DM us "SITE" to start 👇
 > sitefive.com.au
 
@@ -15,7 +15,7 @@ Set your bio to:
 
 ### Post 1 — `01-launch.jpg` (post this FIRST, tonight)
 > New in Sydney: SiteFive. 🌐
-> We build simple, sharp websites for local businesses — live in **5 days**, from $799.
+> We build simple, sharp websites for local businesses — live in **5 days**, from $749.
 > No jargon, no drawn-out projects. You send a few details, we do the rest, you're online this week.
 > Got a business with no website (or one that's looking tired)? **DM us "SITE"** 👇
 
@@ -63,7 +63,7 @@ Set your bio to:
 
 ### Post 9 — `09-cta.jpg`
 > Want to be online by the weekend? ⚡
-> DM us **"SITE"** and we'll get your business a proper website this week. From $799, no lock-in, all the tech handled.
+> DM us **"SITE"** and we'll get your business a proper website this week. From $749, no lock-in, all the tech handled.
 > Sydney local businesses — let's go. 🙌
 
 ---

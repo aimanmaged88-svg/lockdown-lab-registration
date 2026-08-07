@@ -25,13 +25,13 @@ Replace `[...]` bits. Drop in your links: your site + the 3 demos.
 > Hi [Business], I'm [Your Name] — I build websites for local businesses here in [area]. I actually put together a quick sample homepage for [Business] to show what it could look like — no charge, no obligation. Want me to send it over?
 
 **Step 3:** When they say yes, send the link:
-> Here you go: [demo-link] 😃 This is just a rough first version. If you like the direction, I can have the full site live within 5 days — it's $799 to build plus $79/month to host it, keep it updated and handle all the tech (no lock-in). Want to jump on a quick 15-min call?
+> Here you go: [demo-link] 😃 This is just a rough first version. If you like the direction, I can have the full site live within 5 days — it's $749 to build plus $79/month to host it, keep it updated and handle all the tech (no lock-in). Want to jump on a quick 15-min call?
 
 ---
 
 ## 3. Cold DM / email (Instagram, no demo)
 
-> Hi [Business]! Love what you do 🙌 I noticed you [don't have a website yet / your site could use a refresh]. I build clean, mobile-friendly sites for local businesses — live in 5 days, from $799. Here's some recent work: [your-site-link]. Keen to have a quick chat?
+> Hi [Business]! Love what you do 🙌 I noticed you [don't have a website yet / your site could use a refresh]. I build clean, mobile-friendly sites for local businesses — live in 5 days, from $749. Here's some recent work: [your-site-link]. Keen to have a quick chat?
 
 ---
 
@@ -45,7 +45,7 @@ Then get their number/IG and follow up with script #2 or #3.
 
 ## 5. The "founding client" discount (to land your first 1–2)
 
-> Since I'm just launching, I'm doing my first couple of sites at a **founding rate — $499 to build** (normally $799) in exchange for a testimonial once you're happy. Same site, same care. Want in?
+> Since I'm just launching, I'm doing my first couple of sites at a **founding rate — $499 to build** (normally $749) in exchange for a testimonial once you're happy. Same site, same care. Want in?
 
 Use this ONLY for your first 1–2 clients. After that, full price.
 
