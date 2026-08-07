@@ -1177,6 +1177,45 @@ header{
 
 .foot{margin-top:44px;text-align:center;color:var(--dim);font-size:11.5px;line-height:1.7;padding-bottom:10px}
 .foot b{color:var(--muted)}
+
+/* ===== UNC intro splash — proudly brought to you by UNC ===== */
+#uncIntro{position:fixed;inset:0;z-index:220;overflow:hidden;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(130% 100% at 50% 42%,#14161c 0%,#090a0c 55%,#050506 100%);}
+#uncIntro .grain{position:absolute;inset:0;opacity:.5;background:radial-gradient(120% 80% at 50% 30%,color-mix(in srgb,var(--volt) 8%,transparent),transparent 60%);pointer-events:none}
+#uncIntro.gone{animation:uncOut .8s var(--ease-out) forwards;pointer-events:none}
+@keyframes uncOut{to{opacity:0;transform:scale(1.05);filter:blur(7px);visibility:hidden}}
+.unc-stage{position:relative;display:flex;flex-direction:column;align-items:center;gap:20px;padding:20px}
+.unc-eyebrow{font-family:var(--disp);font-weight:700;letter-spacing:.44em;font-size:11px;text-transform:uppercase;
+  color:rgba(255,255,255,.5);padding-left:.44em;opacity:0;animation:uncEye .9s var(--ease-out) .15s both}
+@keyframes uncEye{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+.unc-badge{position:relative;width:250px;height:250px;display:grid;place-items:center}
+.unc-glow{position:absolute;width:290px;height:290px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.16),transparent 60%);opacity:0;animation:uncGlow 2.6s ease-in-out .4s both;mix-blend-mode:screen;pointer-events:none}
+@keyframes uncGlow{0%{opacity:0;transform:scale(.5)}45%{opacity:.9}100%{opacity:.5;transform:scale(1)}}
+.unc-ring{position:absolute;inset:0;width:100%;height:100%;overflow:visible;animation:uncSpin 70s linear infinite}
+.unc-ring line{stroke:#fff;stroke-linecap:round;opacity:0;animation:uncTick .55s ease forwards}
+@keyframes uncTick{to{opacity:.9}}
+@keyframes uncSpin{to{transform:rotate(360deg)}}
+.unc-face{position:relative;width:172px;height:184px;opacity:0;transform:scale(.8) translateY(6px);
+  animation:uncFace 1.1s var(--spring) .3s both;filter:drop-shadow(0 6px 34px rgba(255,255,255,.14))}
+@keyframes uncFace{to{opacity:1;transform:none}}
+.unc-word{font-family:var(--disp);font-weight:700;font-size:66px;letter-spacing:.05em;color:#fff;line-height:1;
+  text-shadow:0 0 34px rgba(255,255,255,.2);opacity:0;transform:translateY(16px) scale(.88);animation:uncWord 1s var(--spring) .72s both}
+.unc-word::after{content:"";display:block;height:2px;width:0;margin:14px auto 0;border-radius:2px;
+  background:linear-gradient(90deg,transparent,var(--volt),transparent);animation:uncLine 1s var(--ease-out) 1.1s both}
+@keyframes uncWord{to{opacity:1;transform:none}}
+@keyframes uncLine{to{width:118px}}
+#uncIntro .skip{position:absolute;bottom:34px;left:0;right:0;text-align:center;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:rgba(255,255,255,.28);opacity:0;animation:uncEye .8s ease 1.8s both}
+/* app rises in once, right after the splash dissolves */
+body.appin #vHome>.hero,body.appin #vHome>.search,body.appin #vHome>.pills-h,body.appin #vHome>.sect{animation:homeRise .6s var(--ease-out) both}
+body.appin #vHome>.search{animation-delay:.05s}
+body.appin #vHome>.pills-h{animation-delay:.1s}
+body.appin #vHome>.sect:nth-of-type(1){animation-delay:.15s}
+body.appin #vHome>.sect:nth-of-type(2){animation-delay:.22s}
+body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
+@keyframes homeRise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 
 /* ---------- desktop ---------- */
@@ -1204,6 +1243,58 @@ header{
 </style>
 </head>
 <body>
+
+<!-- ===== UNC intro splash ===== -->
+<div id="uncIntro">
+  <div class="grain"></div>
+  <div class="unc-stage">
+    <div class="unc-eyebrow">Proudly brought to you by</div>
+    <div class="unc-badge">
+      <div class="unc-glow"></div>
+      <svg class="unc-ring" viewBox="0 0 300 300" aria-hidden="true"></svg>
+      <svg class="unc-face" viewBox="0 0 172 190" aria-label="UNC">
+        <defs>
+          <linearGradient id="uncSil" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#454a55"/><stop offset=".55" stop-color="#20232b"/><stop offset="1" stop-color="#0a0b0e"/>
+          </linearGradient>
+        </defs>
+        <g fill="url(#uncSil)">
+          <path d="M6 190 C 8 140, 42 122, 86 122 C 130 122, 164 140, 166 190 Z"/>
+          <rect x="71" y="102" width="30" height="26" rx="11"/>
+          <path d="M50 60 C 50 34, 122 34, 122 60 L 122 84 C 122 110, 106 126, 86 126 C 66 126, 50 110, 50 84 Z"/>
+          <path d="M53 86 C 57 118, 72 128, 86 128 C 100 128, 115 118, 119 86 C 112 103, 100 109, 86 109 C 72 109, 60 103, 53 86 Z"/>
+          <path d="M46 60 C 46 20, 126 20, 126 60 Z"/>
+          <rect x="44" y="54" width="84" height="16" rx="7"/>
+        </g>
+        <g fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.6" stroke-linecap="round">
+          <path d="M49 52 C 55 30, 96 24, 120 44"/>
+          <path d="M12 184 C 16 146, 40 130, 66 126"/>
+        </g>
+      </svg>
+    </div>
+    <div class="unc-word">UNC</div>
+  </div>
+  <div class="skip">tap to enter</div>
+</div>
+<script>
+(function(){
+  var el=document.getElementById('uncIntro'); if(!el)return;
+  var ring=el.querySelector('.unc-ring'), s='';
+  for(var i=0;i<60;i++){
+    var major=i%5===0, a=i*6*Math.PI/180, r1=major?112:120, r2=134,
+      x1=(150+r1*Math.sin(a)).toFixed(1), y1=(150-r1*Math.cos(a)).toFixed(1),
+      x2=(150+r2*Math.sin(a)).toFixed(1), y2=(150-r2*Math.cos(a)).toFixed(1),
+      del=(0.2+i*0.011).toFixed(3);
+    s+='<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke-width="'+(major?2.8:1.4)+'" style="animation-delay:'+del+'s"/>';
+  }
+  ring.innerHTML=s;
+  var rm=matchMedia('(prefers-reduced-motion:reduce)').matches, done=false;
+  function go(){ if(done)return; done=true; document.body.classList.add('appin'); el.classList.add('gone'); setTimeout(function(){ el.parentNode&&el.parentNode.removeChild(el); },820); }
+  var t=setTimeout(go, rm?600:2200);
+  el.addEventListener('click',function(){ clearTimeout(t); go(); });
+})();
+</script>
+
 <div class="wrap">
 
   <header>
