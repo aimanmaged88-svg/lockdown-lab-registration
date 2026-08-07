@@ -46,9 +46,16 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   auto-vote → 2nd-device vote → chat) + Playwright app (empty states → join →
   submit [TikTok detected, POTW crowned] → vote toggle → chat mine-styling),
   all test rows deleted. Deployed fn matches local byte-for-byte.
-- **NOT yet published to a public URL** — pushed to the working branch. Going
-  live on the Lab domain means a main merge (auto-deploys — the usual "make sure
-  main carries the live state first" caveat applies). Backend is already live.
+- **LIVE at https://lotg-crew.netlify.app** (Aiman picked "a dedicated crew
+  link"). Standalone Netlify site `lotg-crew` (site id
+  c3a8e875-0c2c-4b9d-b3a3-f363e393a5d0) — SEPARATE from the Lab site and the
+  scoreboard site, touches neither. Deployed a **self-contained build** of
+  lotg-crew.html (the 4 woff2 fonts inlined as base64, since a bare site has no
+  /assets/fonts) as the site's index.html; app.html etc. are NOT exposed (404).
+  To redeploy: rebuild self-contained (inline fonts) + `deploy-site` to that
+  site id. The repo copy (lotg-crew.html, /assets/fonts refs) is the source of
+  truth; it's also ready to drop onto the Lab or scoreboard domain later if he
+  wants it consolidated. Backend (edge fn + tables) is shared and already live.
 
 ## Badge economy + Money desk (2026-07-19)
 
