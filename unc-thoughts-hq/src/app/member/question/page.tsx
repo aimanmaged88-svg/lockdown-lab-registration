@@ -20,6 +20,13 @@ export default async function QuestionPage({ searchParams }: { searchParams: Pro
         </p>
       </div>
 
+      <Link href="/member/library" className="card p-3 flex items-center gap-2.5 hover:bg-ink-soft transition-colors">
+        <span aria-hidden>📚</span>
+        <span className="text-xs text-paper-dim">
+          <span className="font-medium text-paper">Check the Library first</span> — your question might already be answered. Browse what&apos;s been asked →
+        </span>
+      </Link>
+
       <QuestionClient prefill={q?.slice(0, 500) ?? ""} mine={mine} />
 
       <p className="text-[11px] text-grey leading-relaxed">

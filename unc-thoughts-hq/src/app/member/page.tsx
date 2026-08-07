@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getMember } from "@/lib/member";
 import { prisma } from "@/lib/db";
 import { ContextCard } from "@/components/member/context-card";
-import { MessageCircleQuestion, Trophy, Dumbbell, Apple, Brain, BatteryCharging, Lightbulb, Lock, Flame } from "lucide-react";
+import { MessageCircleQuestion, Trophy, Dumbbell, Apple, Brain, BatteryCharging, Lightbulb, Lock, Flame, BookOpen } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
@@ -63,6 +63,17 @@ export default async function MemberHome() {
           </Link>
         ))}
       </div>
+
+      {/* The Library — every approved Q&A, categorised */}
+      <Link href="/member/library" className="card p-4 flex items-center justify-between hover:bg-ink-soft transition-colors">
+        <span className="flex items-center gap-3">
+          <BookOpen size={16} className="text-paper-dim" />
+          <span>
+            <span className="block font-medium text-sm">The Library</span>
+            <span className="block text-[11px] text-grey">Questions already asked + answered by UNC — browse by category</span>
+          </span>
+        </span>
+      </Link>
 
       {/* The Huddle — verified community talk */}
       <Link href="/member/huddle" className="card p-4 flex items-center justify-between hover:bg-ink-soft transition-colors">

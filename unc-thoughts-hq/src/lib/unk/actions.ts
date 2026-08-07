@@ -229,7 +229,7 @@ export async function updateKnowledge(id: string, input: KnowledgeInput) {
 // One-box reply: UNC answers a community question once and it goes everywhere —
 // into Unk's Brain (approved, so members get this answer from now on), the
 // question is closed + credited, and optionally it becomes a Ready text post.
-export async function replyToQuestion(questionId: string, answer: string, alsoPost: boolean) {
+export async function replyToQuestion(questionId: string, answer: string, alsoPost: boolean, toBrain: boolean = true) {
   const orgId = await getOrgId();
   const text = answer.trim();
   if (!text) throw new Error("Write the answer first.");
@@ -237,25 +237,31 @@ export async function replyToQuestion(questionId: string, answer: string, alsoPo
   if (!q) throw new Error("Question not found.");
 
   const pillar = q.pillar && ["Basketball", "Nutrition", "Mindset", "Community"].includes(q.pillar) ? q.pillar : "Mindset";
-  const item = await prisma.knowledgeItem.create({
-    data: {
-      orgId,
-      kind: "faq",
-      title: q.text.slice(0, 110),
-      pillar,
-      body: `DO NOW: ${text}\nPRIVATE: What would you add from your own experience?\nWHY: UNC answered this one directly for the community.`,
-      tags: JSON.stringify(["reply", pillar.toLowerCase()]),
-      source: "UNC reply",
-      author: "UNC",
-      approval: "approved",
-      reviewedAt: new Date(),
-      safetyClass: pillar === "Nutrition" ? "nutrition" : "general",
-    },
-  });
+
+  // toBrain is the owner's approval: the Q&A joins the AI brain AND the public
+  // library. Unticked = the answer stays between UNC and the asker.
+  let item: { id: string } | null = null;
+  if (toBrain) {
+    item = await prisma.knowledgeItem.create({
+      data: {
+        orgId,
+        kind: "faq",
+        title: q.text.slice(0, 110),
+        pillar,
+        body: `DO NOW: ${text}\nPRIVATE: What would you add from your own experience?\nWHY: UNC answered this one directly for the community.`,
+        tags: JSON.stringify(["reply", pillar.toLowerCase()]),
+        source: "UNC reply",
+        author: "UNC",
+        approval: "approved",
+        reviewedAt: new Date(),
+        safetyClass: pillar === "Nutrition" ? "nutrition" : "general",
+      },
+    });
+  }
 
   await prisma.communityQuestion.update({
     where: { id: q.id },
-    data: { status: "answered", contributorAcknowledged: true, answerText: text, answeredAt: new Date() },
+    data: { status: "answered", contributorAcknowledged: true, answerText: text, answeredAt: new Date(), inLibrary: toBrain },
   });
   await prisma.inboxItem.updateMany({ where: { questionId: q.id }, data: { status: "done" } });
 
@@ -295,12 +301,13 @@ export async function replyToQuestion(questionId: string, answer: string, alsoPo
     postId = post.id;
   }
 
-  await audit("question.replied", { entity: "CommunityQuestion", entityId: q.id, detail: { brainItem: item.id, postId, pinged } });
+  await audit("question.replied", { entity: "CommunityQuestion", entityId: q.id, detail: { brainItem: item?.id ?? null, toBrain, postId, pinged } });
   revalidatePath("/community");
   revalidatePath("/brain");
   revalidatePath("/");
   revalidatePath("/member/question");
-  return { brainItemId: item.id, postId, pinged };
+  revalidatePath("/member/library");
+  return { brainItemId: item?.id ?? null, postId, pinged, toBrain };
 }
 
 export async function setKnowledgeApproval(id: string, approval: "draft" | "approved" | "archived") {

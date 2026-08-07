@@ -25,7 +25,8 @@ export function QuickReply({ questionId, pillar }: { questionId: string; pillar?
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [text, setText] = useState("");
-  const [alsoPost, setAlsoPost] = useState(true);
+  const [alsoPost, setAlsoPost] = useState(false);
+  const [toBrain, setToBrain] = useState(true);
   const [done, setDone] = useState<string | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [pending, start] = useTransition();
@@ -48,6 +49,10 @@ export function QuickReply({ questionId, pillar }: { questionId: string; pillar?
         onChange={(e) => setText(e.target.value)}
         aria-label="Your reply"
       />
+      <label className="flex items-center gap-2 text-xs text-paper-dim">
+        <input type="checkbox" checked={toBrain} onChange={(e) => setToBrain(e.target.checked)} />
+        🧠 Approve into UNC&apos;s brain + the public library (anonymised) — untick to answer this one privately
+      </label>
       <label className="flex items-center gap-2 text-xs text-grey">
         <input type="checkbox" checked={alsoPost} onChange={(e) => setAlsoPost(e.target.checked)} />
         Also drop it in the Post Bank as a Ready text post
@@ -58,8 +63,8 @@ export function QuickReply({ questionId, pillar }: { questionId: string; pillar?
           disabled={pending || !text.trim()}
           onClick={() => start(async () => {
             try {
-              const r = await replyToQuestion(questionId, text, alsoPost);
-              const bits = ["UNC knows the answer now"];
+              const r = await replyToQuestion(questionId, text, alsoPost, toBrain);
+              const bits = [r.toBrain ? "in the brain + public library" : "answered privately (library skipped)"];
               if (r.postId) bits.push("it's in your Post Bank");
               if (r.pinged > 0) bits.push("the asker's phone got the ping");
               setDone(`Done — ${bits.join(", ")}.`);

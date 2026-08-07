@@ -274,6 +274,7 @@ model CommunityQuestion {
   notify      Boolean  @default(false)
   answerText  String?
   answeredAt  DateTime?
+  inLibrary   Boolean  @default(false) // owner-approved into the public Q&A library
   createdAt   DateTime @default(now())
 
   contentFrom Content[]
