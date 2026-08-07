@@ -1,10 +1,10 @@
-# Website Agreement — FiveDay
+# Website Agreement — SiteFive
 
 *A plain-English 1-page agreement. Fill in the `[brackets]`, send it to the client (email or PDF), and get a "yes, agreed" reply before you start. Keep it simple — this protects you and sets expectations. It is not legal advice; for anything large, get a lawyer to check it.*
 
 ---
 
-**Between:** FiveDay ("we", "us") — [Your full name / business name], [your email]
+**Between:** SiteFive ("we", "us") — [Your full name / business name], [your email]
 **And:** [Client name], [Business name] ("you", "the client") — [client email/phone]
 **Date:** [date]
 

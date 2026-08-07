@@ -1,4 +1,4 @@
-# Client Intake Form — FiveDay
+# Client Intake Form — SiteFive
 
 *Send this to a client the moment they say yes. Getting everything up front is the single biggest time-saver — it stops the endless back-and-forth that kills web projects. Paste it into an email, a Google Form, or a shared doc.*
 

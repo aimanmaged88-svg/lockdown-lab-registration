@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SiteFive — Instagram mockup</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+  body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#c9ccd1;display:flex;justify-content:center;padding:26px}
+  .phone{width:430px;background:#fff;border-radius:0;overflow:hidden;color:#0a0a0a}
+  /* IG top bar */
+  .top{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid #efefef}
+  .top .handle{display:flex;align-items:center;gap:6px;font-weight:700;font-size:19px}
+  .top .handle .lock{font-size:13px}
+  .top .handle .chev{font-size:12px;opacity:.7}
+  .top .icons{display:flex;gap:20px;font-size:22px}
+  /* profile */
+  .prof{padding:16px 16px 0}
+  .prow{display:flex;align-items:center;gap:26px}
+  .av{width:88px;height:88px;border-radius:50%;flex:0 0 auto;display:grid;place-items:center;
+      background:linear-gradient(135deg,#4ade80,#22d3ee);color:#04140a;font-weight:900;font-size:34px;
+      border:2px solid #fff;box-shadow:0 0 0 2px #efefef}
+  .stats{display:flex;flex:1;justify-content:space-around;text-align:center}
+  .stats .n{font-weight:800;font-size:18px}
+  .stats .l{font-size:13px;color:#333}
+  .bio{padding:12px 2px 0}
+  .bio .nm{font-weight:700;font-size:14px}
+  .bio .cat{font-size:13px;color:#666;margin-bottom:3px}
+  .bio p{font-size:13.5px;line-height:1.5}
+  .bio .link{color:#00376b;font-weight:600;font-size:13.5px;margin-top:2px;display:inline-block}
+  /* buttons */
+  .btns{display:flex;gap:7px;padding:14px 2px 4px}
+  .btns button{flex:1;border:0;border-radius:9px;padding:9px 0;font-weight:700;font-size:14px;cursor:pointer}
+  .btns .follow{background:#0095f6;color:#fff;flex:2}
+  .btns .msg{background:#efefef;color:#0a0a0a}
+  .btns .more{background:#efefef;color:#0a0a0a;flex:0 0 42px}
+  /* highlights */
+  .hl{display:flex;gap:18px;padding:16px 16px 14px;overflow-x:auto}
+  .hl .h{text-align:center;flex:0 0 auto}
+  .hl .ring{width:64px;height:64px;border-radius:50%;border:1px solid #dbdbdb;display:grid;place-items:center;font-size:24px;background:#fafafa}
+  .hl .cap{font-size:12px;margin-top:5px;color:#222}
+  /* tabs */
+  .tabs{display:flex;border-top:1px solid #efefef}
+  .tabs div{flex:1;text-align:center;padding:11px 0;font-size:20px;color:#bbb;border-bottom:1px solid transparent}
+  .tabs div.on{color:#0a0a0a;border-bottom:1px solid #0a0a0a}
+  /* grid */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
+  .cell{position:relative;aspect-ratio:1/1;overflow:hidden;display:flex;flex-direction:column;justify-content:center;padding:12px;color:#fff}
+  .cell .k{font-size:9px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;opacity:.85;margin-bottom:5px}
+  .cell .t{font-size:14px;font-weight:800;line-height:1.18;letter-spacing:-.01em}
+  .cell .s{font-size:10.5px;opacity:.9;margin-top:5px;font-weight:600}
+  .cell .badge{position:absolute;top:7px;right:7px;font-size:13px}
+  .g1{background:linear-gradient(150deg,#0b0d12,#171b26)}
+  .g2{background:linear-gradient(150deg,#1b2c1f,#0e1a12)}
+  .g3{background:linear-gradient(150deg,#4ade80,#22d3ee);color:#04140a}
+  .g4{background:linear-gradient(150deg,#2a1f18,#191410)}
+  .g5{background:linear-gradient(150deg,#0f2133,#0a1622)}
+  .g6{background:linear-gradient(150deg,#171b26,#0b0d12)}
+  .g7{background:linear-gradient(150deg,#22d3ee,#4ade80);color:#04140a}
+  .g8{background:linear-gradient(150deg,#3a2a12,#1a1408)}
+  .g9{background:linear-gradient(150deg,#241a2e,#120b1a)}
+  .cell .t .hl2{color:#4ade80}
+  .g3 .t .hl2,.g7 .t .hl2{color:#0a3d1a}
+  /* bottom nav */
+  .nav{display:flex;justify-content:space-around;padding:12px 0 14px;border-top:1px solid #efefef;font-size:22px;margin-top:2px}
+  .nav .me{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#4ade80,#22d3ee)}
+</style>
+</head>
+<body>
+  <div class="phone">
+    <div class="top">
+      <div class="handle"><span class="lock">🔒</span> sitefive.co <span class="chev">▾</span></div>
+      <div class="icons"><span>＋</span><span>☰</span></div>
+    </div>
+
+    <div class="prof">
+      <div class="prow">
+        <div class="av">5</div>
+        <div class="stats">
+          <div><div class="n">14</div><div class="l">posts</div></div>
+          <div><div class="n">312</div><div class="l">followers</div></div>
+          <div><div class="n">180</div><div class="l">following</div></div>
+        </div>
+      </div>
+      <div class="bio">
+        <div class="nm">SiteFive</div>
+        <div class="cat">Web Designer</div>
+        <p>🌐 Websites for local business<br>
+        ⚡ Live in 5 days · from $799<br>
+        📍 Sydney · DM us <b>"SITE"</b> to start 👇</p>
+        <a class="link">↗ sitefive.com.au</a>
+      </div>
+      <div class="btns">
+        <button class="follow">Follow</button>
+        <button class="msg">Message</button>
+        <button class="more">▾</button>
+      </div>
+    </div>
+
+    <div class="hl">
+      <div class="h"><div class="ring">🏆</div><div class="cap">Our Work</div></div>
+      <div class="h"><div class="ring">💸</div><div class="cap">Prices</div></div>
+      <div class="h"><div class="ring">⭐</div><div class="cap">Reviews</div></div>
+      <div class="h"><div class="ring">⚡</div><div class="cap">5 Days</div></div>
+      <div class="h"><div class="ring">🔄</div><div class="cap">Before/After</div></div>
+    </div>
+
+    <div class="tabs">
+      <div class="on">▦</div>
+      <div>🎬</div>
+      <div>👤</div>
+    </div>
+
+    <div class="grid">
+      <div class="cell g3"><div class="k">Start here</div><div class="t">Your website, LIVE in 5 days ⚡</div><div class="s">From $799 · tap to learn how</div></div>
+      <div class="cell g2"><span class="badge">🔄</span><div class="k">Before → After</div><div class="t">This café went from <span class="hl2">no site</span> to booked out</div></div>
+      <div class="cell g6"><span class="badge">📸</span><div class="k">Client win</div><div class="t">"5 new enquiries in a week"</div><div class="s">— Jess, PT</div></div>
+
+      <div class="cell g5"><span class="badge">🎬</span><div class="k">Demo</div><div class="t">A plumber's site built for <span class="hl2">phone calls</span></div></div>
+      <div class="cell g7"><div class="k">Real talk</div><div class="t">3 signs your biz needs a website</div><div class="s">Swipe →</div></div>
+      <div class="cell g1"><span class="badge">📸</span><div class="k">Showcase</div><div class="t">Westside Strength — PT studio site</div></div>
+
+      <div class="cell g4"><span class="badge">🎬</span><div class="k">Behind the scenes</div><div class="t">Building a site start → finish</div></div>
+      <div class="cell g9"><div class="k">Tip</div><div class="t">Your Google listing is <span class="hl2">losing</span> you customers</div></div>
+      <div class="cell g3"><div class="k">Pricing</div><div class="t">$799. That's it. 🙌</div><div class="s">+ $79/mo, no lock-in</div></div>
+
+      <div class="cell g8"><span class="badge">📸</span><div class="k">Menu site</div><div class="t">Grind &amp; Co. — Newtown café</div></div>
+      <div class="cell g6"><div class="k">FAQ</div><div class="t">"Do I have to do anything?" Barely 😅</div></div>
+      <div class="cell g7"><div class="k">CTA</div><div class="t">DM us <span class="hl2">"SITE"</span> to get started 👇</div></div>
+    </div>
+
+    <div class="nav"><span>🏠</span><span>🔍</span><span>＋</span><span>🎬</span><span class="me"></span></div>
+  </div>
+</body>
+</html>

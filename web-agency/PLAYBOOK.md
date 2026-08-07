@@ -1,8 +1,8 @@
-# FiveDay — Business Playbook
+# SiteFive — Business Playbook
 
 Your one-stop guide. Everything you need to make money is in this folder. Follow it in order.
 
-> **The name "FiveDay" is a placeholder.** Love it? Keep it. Want your own? See "Renaming" at the bottom — it's a one-line swap.
+> **Your business name is SiteFive** — it says "website" and bakes in the 5-day promise. Want to change it later? See "Renaming" at the bottom — it's a one-line swap.
 
 ---
 
@@ -100,8 +100,8 @@ Your site is plain HTML files — they host anywhere for free. Easiest option, *
 
 1. Go to **app.netlify.com/drop**
 2. Drag the whole `web-agency` folder onto the page.
-3. Done — you get a free live link like `fiveday.netlify.app`.
-4. Later: buy a domain (~$15/yr from Netlify or GoDaddy — e.g. `fiveday.com.au`) and point it at the site. Netlify walks you through it.
+3. Done — you get a free live link like `sitefive.netlify.app`.
+4. Later: buy a domain (~$15/yr from Netlify or GoDaddy — e.g. `sitefive.com.au`) and point it at the site. Netlify walks you through it.
 
 The demo links inside your site already point to `demos/...`, so they'll work automatically once the folder is deployed.
 
@@ -113,11 +113,11 @@ The demo links inside your site already point to `demos/...`, so they'll work au
 
 If you want a different name, here are strong options (all say "fast, simple, local"):
 
-- **FiveDay** (current) — the promise is baked in.
+- **SiteFive** (current) — the promise is baked in.
 - **Sharp Sites** — clean, memorable.
 - **Bright** / **BrightSite** — friendly, positive.
 - **Local Loud** — punchy, on-brand for helping small businesses stand out.
 - **Kickoff** — fresh start energy.
 - **Harbour Sites** — Sydney flavour.
 
-To swap: open `index.html` and the three demo files, find-and-replace `FiveDay` with your name. That's it. (Ask me and I'll do it for you in one go.)
+To swap: open `index.html` and the three demo files, find-and-replace `SiteFive` with your name. That's it. (Ask me and I'll do it for you in one go.)

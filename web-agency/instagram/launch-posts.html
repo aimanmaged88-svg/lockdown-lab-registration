@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SiteFive — Instagram launch posts</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+  body{background:#3a3d42;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;display:flex;flex-wrap:wrap;gap:26px;padding:26px;justify-content:center}
+  .post{width:1080px;height:1080px;position:relative;overflow:hidden;color:#f4f6fb;display:flex;flex-direction:column;padding:96px}
+  /* base dark */
+  .dark{background:radial-gradient(1200px 700px at 15% -10%,rgba(74,222,128,.16),transparent 60%),radial-gradient(1000px 700px at 100% 110%,rgba(34,211,238,.14),transparent 60%),#0b0d12}
+  .grad{background:linear-gradient(135deg,#4ade80,#22d3ee);color:#04140a}
+  .navy{background:radial-gradient(1000px 700px at 90% -10%,rgba(34,211,238,.18),transparent 60%),#0a1622}
+  .warm{background:radial-gradient(1000px 700px at 10% -10%,rgba(230,168,107,.18),transparent 60%),#191410}
+  /* shared bits */
+  .brandrow{display:flex;align-items:center;gap:16px;font-weight:900;font-size:34px;letter-spacing:-.02em}
+  .brandrow .dot{width:56px;height:56px;border-radius:15px;background:linear-gradient(135deg,#4ade80,#22d3ee);color:#04140a;display:grid;place-items:center;font-size:30px;font-weight:900}
+  .grad .brandrow .dot{background:#04140a;color:#4ade80}
+  .tagpill{align-self:flex-start;font-size:24px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:12px 24px;border-radius:999px;border:2px solid rgba(255,255,255,.28);color:#fff}
+  .grad .tagpill{border-color:rgba(4,20,10,.35);color:#04140a}
+  .spacer{flex:1}
+  .kick{font-size:30px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#4ade80;margin-bottom:26px}
+  .grad .kick,.warm .kick{color:inherit;opacity:.7}
+  h1{font-size:104px;line-height:.98;font-weight:900;letter-spacing:-.03em}
+  h1 .g{background:linear-gradient(120deg,#4ade80,#22d3ee);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .grad h1 .g{background:#04140a;-webkit-background-clip:text;color:transparent}
+  .sub{font-size:44px;font-weight:600;line-height:1.28;margin-top:34px;color:#c7cede}
+  .grad .sub{color:#063d1c}
+  .foot{display:flex;align-items:center;justify-content:space-between;font-size:30px;font-weight:700;margin-top:10px}
+  .foot .handle{opacity:.85}
+  .foot .cta{background:linear-gradient(135deg,#4ade80,#22d3ee);color:#04140a;padding:16px 30px;border-radius:999px;font-weight:900}
+  .grad .foot .cta{background:#04140a;color:#4ade80}
+  /* list */
+  .list{display:flex;flex-direction:column;gap:30px;margin-top:14px}
+  .li{display:flex;gap:22px;align-items:flex-start;font-size:46px;font-weight:700;line-height:1.15}
+  .li .num{flex:0 0 auto;width:66px;height:66px;border-radius:16px;background:rgba(74,222,128,.16);color:#4ade80;display:grid;place-items:center;font-size:34px;font-weight:900}
+  /* before/after */
+  .ba{display:flex;gap:34px;margin-top:10px;flex:1}
+  .ba .col{flex:1;border-radius:28px;padding:44px;display:flex;flex-direction:column;justify-content:center}
+  .ba .before{background:#14171f;border:2px dashed rgba(255,255,255,.18)}
+  .ba .after{background:linear-gradient(150deg,rgba(74,222,128,.16),rgba(34,211,238,.12));border:2px solid rgba(74,222,128,.5)}
+  .ba .lbl{font-size:28px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;margin-bottom:22px;color:#8b93a5}
+  .ba .after .lbl{color:#4ade80}
+  .ba .big{font-size:56px;font-weight:900;line-height:1.05}
+  .ba .before .big{color:#6b7688}
+  .ba .em{font-size:120px;margin-bottom:14px}
+  /* quote */
+  .quote{font-size:72px;font-weight:900;line-height:1.12;letter-spacing:-.02em}
+  .stars{font-size:52px;color:#ffce54;letter-spacing:8px;margin-bottom:30px}
+  .who{font-size:36px;font-weight:700;color:#c7cede;margin-top:36px}
+  .price-line{font-size:130px;font-weight:900;letter-spacing:-.03em;line-height:1.02}
+  .price-line small{font-size:52px;color:#9aa3b5;font-weight:700}
+  .mini{font-size:38px;color:#c7cede;font-weight:600;margin-top:26px}
+</style>
+</head>
+<body>
+
+<!-- 1 · LAUNCH -->
+<div class="post dark" id="p1">
+  <div class="brandrow"><span class="dot">5</span> SiteFive</div>
+  <div class="spacer"></div>
+  <div class="tagpill">Now open</div>
+  <h1 style="margin-top:34px">We build <span class="g">websites</span> for local business.</h1>
+  <div class="sub">Simple. Beautiful. Live in 5 days.</div>
+  <div class="spacer"></div>
+  <div class="foot"><span class="handle">@sitefive.co</span><span class="cta">DM us "SITE"</span></div>
+</div>
+
+<!-- 2 · OFFER -->
+<div class="post grad" id="p2">
+  <div class="brandrow"><span class="dot">5</span> SiteFive</div>
+  <div class="spacer"></div>
+  <div class="kick">The whole deal</div>
+  <div class="price-line">$799<small> to build</small></div>
+  <div class="price-line" style="font-size:96px;margin-top:10px">+ $79<small>/month to look after</small></div>
+  <div class="mini" style="color:#063d1c;font-weight:800">No lock-in. Cancel anytime.</div>
+  <div class="spacer"></div>
+  <div class="foot"><span class="handle">@sitefive.co</span><span class="cta">Live in 5 days ⚡</span></div>
+</div>
+
+<!-- 3 · BEFORE / AFTER -->
+<div class="post dark" id="p3">
+  <div class="kick">Before → After</div>
+  <div class="ba">
+    <div class="col before"><div class="lbl">Before</div><div class="em">😶‍🌫️</div><div class="big">No website. Losing customers to Google.</div></div>
+    <div class="col after"><div class="lbl">After</div><div class="em">🚀</div><div class="big">Booked out. Found &amp; trusted.</div></div>
+  </div>
+  <div class="foot" style="margin-top:44px"><span class="handle">@sitefive.co</span><span class="cta">Your turn?</span></div>
+</div>
+
+<!-- 4 · DEMO PT -->
+<div class="post navy" id="p4">
+  <div class="brandrow"><span class="dot">5</span> SiteFive</div>
+  <div class="spacer"></div>
+  <div class="kick">Recent build</div>
+  <h1>A PT studio site<br>built to <span class="g">book sessions</span>.</h1>
+  <div class="sub">Westside Strength · Marrickville</div>
+  <div class="spacer"></div>
+  <div class="foot"><span class="handle">@sitefive.co</span><span class="cta">See the demo</span></div>
+</div>
+
+<!-- 5 · DEMO PLUMBER -->
+<div class="post dark" id="p5">
+  <div class="brandrow"><span class="dot">5</span> SiteFive</div>
+  <div class="spacer"></div>
+  <div class="kick">Recent build</div>
+  <h1>A tradie site<br>built for <span class="g">phone calls</span> 📞</h1>
+  <div class="sub">Tap-to-call on every screen. Jobs straight to your phone.</div>
+  <div class="spacer"></div>
+  <div class="foot"><span class="handle">@sitefive.co</span><span class="cta">See the demo</span></div>
+</div>
+
+<!-- 6 · SOCIAL PROOF -->
+<div class="post navy" id="p6">
+  <div class="stars">★★★★★</div>
+  <div class="quote">"5 new enquiries in the first week."</div>
+  <div class="who">— Jess, Personal Trainer</div>
+  <div class="spacer"></div>
+  <div class="brandrow" style="font-size:28px"><span class="dot" style="width:44px;height:44px;font-size:24px;border-radius:12px">5</span> SiteFive</div>
+  <div class="foot"><span class="handle">@sitefive.co</span><span class="cta">DM us "SITE"</span></div>
+</div>
+
+<!-- 7 · VALUE / LIST -->
+<div class="post dark" id="p7">
+  <div class="kick">Real talk</div>
+  <h1 style="font-size:76px">3 signs your business needs a website 👇</h1>
+  <div class="list">
+    <div class="li"><span class="num">1</span><span>People ask "do you have a website?" — and you don't.</span></div>
+    <div class="li"><span class="num">2</span><span>Your only "site" is a Facebook page.</span></div>
+    <div class="li"><span class="num">3</span><span>Competitors show up on Google. You don't.</span></div>
+  </div>
+  <div class="spacer"></div>
+  <div class="foot"><span class="handle">@sitefive.co</span><span class="cta">We fix all 3</span></div>
+</div>
+
+<!-- 8 · GOOGLE TIP -->
+<div class="post grad" id="p8">
+  <div class="brandrow"><span class="dot">5</span> SiteFive</div>
+  <div class="spacer"></div>
+  <div class="kick">Did you know</div>
+  <h1 style="color:#04140a">Most locals check you online <span style="text-decoration:underline">before</span> they visit.</h1>
+  <div class="sub" style="font-weight:800">What do they find when they look you up?</div>
+  <div class="spacer"></div>
+  <div class="foot"><span class="handle">@sitefive.co</span><span class="cta">Let's fix that</span></div>
+</div>
+
+<!-- 9 · CTA -->
+<div class="post dark" id="p9">
+  <div class="spacer"></div>
+  <div class="brandrow" style="font-size:44px"><span class="dot" style="width:70px;height:70px;font-size:38px">5</span> SiteFive</div>
+  <h1 style="margin-top:44px">DM us <span class="g">"SITE"</span><br>and you'll be live this week.</h1>
+  <div class="sub">Websites for local business · from $799 · Sydney</div>
+  <div class="spacer"></div>
+  <div class="foot"><span class="handle">@sitefive.co</span><span class="cta">Start tonight →</span></div>
+</div>
+
+</body>
+</html>
