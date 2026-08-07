@@ -15,6 +15,41 @@ redeploying). Before deploying, make sure your branch contains main's extras
 Keeping main in sync with the live state is the only durable protection.
 Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
 
+## LOTG Crew feed — Top Plays + group chat (2026-08-07)
+
+- **NEW companion to the LOTG Wednesday-night scoreboard** (Aiman: "make it
+  pleasant… everyone using it every Wednesday, all teams together… a community
+  section for chats… top plays where people submit clips… vote for the play of
+  the week"). The tournament scoreboard stays exactly as-is on its own Netlify
+  site/Netlify DB — this is a SEPARATE additive social layer. Prototype he
+  reacted to: https://claude.ai/code/artifact/15e27f64-c6aa-4c3e-88a3-0ff3acb5f4b8
+- **Frontend: lotg-crew.html** (repo root, self-contained single file, references
+  /assets/fonts/chakrapetch + permanentmarker). Night-court look (warm black
+  #12120f + basketball orange #F97316 + gold crown; Chakra Petch scoreboard type,
+  Permanent Marker hype accent). Two tabs — **Top Plays** (crowd-submitted clip
+  links, vote toggle, #1 of the current week auto-crowned **Play of the Week**,
+  "voting closes Sun 9 PM") and **Group Chat** (one room, all teams). Third
+  "Games" tab links out to the live scoreboard. Light sign-in: "Join the crew"
+  = name + Instagram handle (handle only ever LINKS to instagram.com/<h>, never
+  posts). Optimistic votes/chat, 8s board polling, real empty states (NO seed
+  data — the feed starts empty by design).
+- **Backend: edge fn `lotg-social` (v2, verify_jwt on — anon key as Bearer +
+  apikey).** New tables `lotg_crew` / `lotg_plays` / `lotg_play_votes` /
+  `lotg_chat` (RLS on, no policies, service-role only). Actions: register /
+  board / play_submit (guarded, url validated+stored-never-fetched, auto-votes
+  own, <=12/day) / play_vote (toggle, 1/device/play) / chat_get / chat_send
+  (guarded, <=20/5min). Server computes `mine`/`own` so device ids never leak;
+  ids sanitized via sid() before any filter (the opencourt v13 lesson). Source
+  committed at supabase/functions/lotg-social/index.ts; doc supabase/lotg-social-schema.sql.
+  Ban a troll = set lotg_crew.banned=true (no admin UI yet — SQL it).
+- **Verified E2E** against live v2: curl flow (guard reject → register → submit
+  auto-vote → 2nd-device vote → chat) + Playwright app (empty states → join →
+  submit [TikTok detected, POTW crowned] → vote toggle → chat mine-styling),
+  all test rows deleted. Deployed fn matches local byte-for-byte.
+- **NOT yet published to a public URL** — pushed to the working branch. Going
+  live on the Lab domain means a main merge (auto-deploys — the usual "make sure
+  main carries the live state first" caveat applies). Backend is already live.
+
 ## Badge economy + Money desk (2026-07-19)
 
 - **Money desk** — SHIPPED in admin.html (sidebar 💰 Money). Live calc:

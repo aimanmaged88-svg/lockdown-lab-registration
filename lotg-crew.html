@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#12120f"/>
+<title>LOTG — Crew · Plays & Group Chat</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%23F97316'/><text x='16' y='22' text-anchor='middle' font-size='11' font-weight='900' fill='%23140c04'>LOTG</text></svg>"/>
+<style>
+@font-face{font-family:'Court';font-weight:400;font-display:swap;src:url('/assets/fonts/chakrapetch-400.woff2') format('woff2')}
+@font-face{font-family:'Court';font-weight:600;font-display:swap;src:url('/assets/fonts/chakrapetch-600.woff2') format('woff2')}
+@font-face{font-family:'Court';font-weight:700;font-display:swap;src:url('/assets/fonts/chakrapetch-700.woff2') format('woff2')}
+@font-face{font-family:'Hype';font-weight:400;font-display:swap;src:url('/assets/fonts/permanentmarker-400.woff2') format('woff2')}
+
+:root{
+  color-scheme:dark;
+  --ink:#12120f;--card:#1a1916;--card2:#221f1b;--line:#2c2925;--line2:#3a352e;
+  --cream:#F3EEE6;--muted:#9c968a;--dim:#736d62;
+  --blaze:#F97316;--blaze-soft:#3a2413;--gold:#F5B94A;--live:#f26a5a;
+  --disp:'Court',system-ui,sans-serif;--hype:'Hype','Court',cursive;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:radial-gradient(120% 80% at 50% -10%, #1c1a15 0%, var(--ink) 46%, #0d0d0b 100%) fixed, var(--ink);
+  color:var(--cream);font-family:var(--disp);font-weight:400;font-size:15px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;letter-spacing:.005em;
+}
+.grain{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.05;mix-blend-mode:soft-light;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+.wrap{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:0 16px 130px;min-height:100vh}
+@media(min-width:520px){.wrap{padding-top:8px}}
+
+header{display:flex;align-items:center;justify-content:space-between;padding:20px 2px 14px;gap:12px}
+.brand{display:flex;align-items:center;gap:11px;min-width:0}
+.mark{font-family:var(--disp);font-weight:700;font-size:30px;letter-spacing:.02em;line-height:1;color:var(--cream)}
+.mark .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--blaze);margin-left:2px;box-shadow:0 0 14px 1px var(--blaze)}
+.brand small{display:block;font-size:10.5px;font-weight:600;letter-spacing:.19em;text-transform:uppercase;color:var(--muted);margin-top:5px}
+#idctl{flex-shrink:0}
+.joinbtn{appearance:none;cursor:pointer;background:transparent;border:1.5px solid var(--blaze);color:var(--blaze);
+  font-family:var(--disp);font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:9px 14px;border-radius:11px;transition:.16s}
+.joinbtn:hover{background:var(--blaze);color:#160c04}
+.idchip{appearance:none;cursor:pointer;display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);
+  border-radius:999px;padding:5px 12px 5px 5px;color:var(--cream);font-family:var(--disp)}
+.idchip:hover{border-color:var(--line2)}
+.av2{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;color:#160c04;background:var(--blaze)}
+.idname{font-size:12.5px;font-weight:600;max-width:12ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.tabs{position:sticky;top:0;z-index:6;display:flex;gap:6px;padding:10px 0 12px;background:linear-gradient(var(--ink) 62%,transparent);backdrop-filter:blur(6px)}
+.tab{flex:1;appearance:none;border:1px solid var(--line);background:var(--card);color:var(--muted);
+  font-family:var(--disp);font-weight:700;font-size:12.5px;letter-spacing:.13em;text-transform:uppercase;padding:11px 8px;border-radius:12px;cursor:pointer;transition:.18s;text-decoration:none;text-align:center}
+.tab[aria-selected="true"]{background:var(--blaze);border-color:var(--blaze);color:#160c04;box-shadow:0 6px 22px -8px var(--blaze)}
+.tab.ghost{flex:0 0 auto;padding:11px 14px;color:var(--dim);display:flex;align-items:center;gap:6px}
+.tab.ghost svg{width:13px;height:13px;stroke:currentColor}
+.tab:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+.pane{display:none;animation:fade .3s ease both}
+.pane.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.lbl{font-family:var(--disp);font-weight:600;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.section-head{margin:22px 2px 12px}
+.section-head p{margin:5px 0 0;font-size:12.5px;color:var(--dim);line-height:1.45;max-width:34ch}
+
+.potw{position:relative;overflow:hidden;border-radius:20px;padding:18px 18px 20px;
+  background:radial-gradient(130% 120% at 100% 0%, rgba(245,185,74,.14), transparent 55%), linear-gradient(180deg,#211d16,#191713);border:1px solid #4a3d21}
+.potw.empty{border-style:dashed;border-color:#413a2a;background:linear-gradient(180deg,#1a1813,#161410)}
+.potw::after{content:"";position:absolute;top:-40%;left:-30%;width:60%;height:180%;background:linear-gradient(105deg,transparent,rgba(245,185,74,.16),transparent);transform:skewX(-18deg);animation:sheen 5.5s ease-in-out infinite}
+.potw.empty::after{display:none}
+@keyframes sheen{0%,72%{left:-40%}100%{left:130%}}
+.crown{display:inline-flex;align-items:center;gap:8px;font-family:var(--hype);font-size:22px;color:var(--gold);line-height:1;transform:rotate(-2deg)}
+.crown svg{width:22px;height:22px;filter:drop-shadow(0 0 8px rgba(245,185,74,.5))}
+.potw .cap{font-family:var(--disp);font-weight:700;font-size:21px;line-height:1.16;margin:12px 0 0;letter-spacing:.004em;text-wrap:balance}
+.potw .by{margin:9px 0 0;font-size:12.5px;color:var(--muted)}
+.potw .by b{color:var(--cream);font-weight:600}
+.potw .by a,.watch{color:var(--muted)}
+.potw-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:16px}
+.tally{display:flex;align-items:center;gap:9px}
+.tally .n{font-family:var(--disp);font-weight:700;font-size:26px;color:var(--gold);font-variant-numeric:tabular-nums;line-height:1}
+.tally .t{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.1em;max-width:9ch;line-height:1.25}
+.closes{font-size:11px;color:var(--dim);text-align:right;line-height:1.35}
+.closes b{color:var(--gold);font-weight:600}
+.potw .invite{font-family:var(--disp);font-weight:700;font-size:19px;margin:12px 0 6px;color:var(--cream)}
+.potw .invite-sub{font-size:13px;color:var(--dim);line-height:1.45}
+
+.plays{display:flex;flex-direction:column;gap:11px}
+.play{position:relative;display:grid;grid-template-columns:34px 1fr auto;gap:13px;align-items:center;padding:14px;border-radius:16px;background:var(--card);border:1px solid var(--line);transition:.32s cubic-bezier(.2,.7,.3,1)}
+.play:hover{border-color:var(--line2)}
+.rank{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-family:var(--disp);font-weight:700;font-size:16px;font-variant-numeric:tabular-nums;background:#211f1b;color:var(--dim);border:1px solid var(--line)}
+.play[data-rank="1"] .rank{background:linear-gradient(160deg,#f5c95a,#d99521);color:#2a1c00;border-color:#f5c95a}
+.play[data-rank="2"] .rank{background:linear-gradient(160deg,#d7d2c6,#a29c8d);color:#20201b;border-color:#d7d2c6}
+.play[data-rank="3"] .rank{background:linear-gradient(160deg,#cf9560,#9c6533);color:#20140a;border-color:#cf9560}
+.play .body{min-width:0}
+.play .cap{font-size:15px;line-height:1.32;color:var(--cream)}
+.play .meta{margin-top:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:600;letter-spacing:.05em;padding:3px 8px;border-radius:999px;background:#221f1b;color:var(--muted);border:1px solid var(--line);text-transform:uppercase}
+.chip.who{color:var(--cream);background:#26221c}
+.chip.who a{color:var(--cream);text-decoration:none}
+.chip.plat{color:var(--blaze);border-color:#4a2f16;background:var(--blaze-soft)}
+.watch{font-size:11.5px;text-decoration:none;border-bottom:1px dashed var(--line2);padding-bottom:1px}
+.watch:hover{color:var(--blaze);border-color:var(--blaze)}
+.fill{position:absolute;left:0;bottom:0;height:2px;background:linear-gradient(90deg,var(--blaze),#f7b26a);border-radius:0 0 0 16px;transition:width .5s cubic-bezier(.2,.7,.3,1);opacity:.8}
+.vote{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:52px;appearance:none;cursor:pointer;border:1px solid var(--line2);background:#221f1b;color:var(--cream);border-radius:13px;padding:8px 6px 7px;font-family:var(--disp);transition:.16s}
+.vote:hover{border-color:var(--blaze);background:#2a2118}
+.vote:active{transform:scale(.93)}
+.vote svg{width:16px;height:16px;stroke:var(--blaze)}
+.vote .vn{font-weight:700;font-size:16px;font-variant-numeric:tabular-nums;line-height:1}
+.vote .vt{font-size:8.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+.vote.done{background:var(--blaze);border-color:var(--blaze);color:#160c04}
+.vote.done svg{stroke:#160c04}
+.vote.done .vt{color:#5a3410}
+.vote:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.28)}100%{transform:scale(1)}}
+.bump{animation:pop .42s ease}
+.empty-invite{text-align:center;padding:26px 18px;border:1.5px dashed var(--line2);border-radius:16px;color:var(--dim);font-size:13.5px;line-height:1.5}
+.add{margin:14px 0 4px;width:100%;display:flex;align-items:center;justify-content:center;gap:9px;border:1.5px dashed var(--line2);background:transparent;color:var(--cream);font-family:var(--disp);font-weight:700;font-size:13px;letter-spacing:.06em;text-transform:uppercase;padding:15px;border-radius:15px;cursor:pointer;transition:.18s}
+.add:hover{border-color:var(--blaze);color:var(--blaze);background:#1c1712}
+.add svg{width:17px;height:17px;stroke:currentColor}
+
+.chatwrap{display:flex;flex-direction:column;gap:12px;margin-top:6px}
+.msgs{display:flex;flex-direction:column;gap:9px;padding:4px 2px 2px;min-height:220px}
+.msg{max-width:82%;padding:9px 13px;border-radius:15px;background:var(--card);border:1px solid var(--line);animation:rise .3s ease both}
+.msg .nm{font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;margin-bottom:3px;color:var(--blaze)}
+.msg .tx{font-size:14.5px;line-height:1.4;color:var(--cream);overflow-wrap:anywhere}
+.msg.mine{align-self:flex-end;background:linear-gradient(160deg,#F97316,#e0620f);border-color:#F97316}
+.msg.mine .nm{color:#5a3410}
+.msg.mine .tx{color:#180d03}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.chat-empty{text-align:center;color:var(--dim);font-size:13.5px;line-height:1.5;padding:46px 20px}
+.composer{position:sticky;bottom:16px;display:flex;gap:8px;padding:9px;border-radius:16px;background:rgba(24,22,18,.92);backdrop-filter:blur(10px);border:1px solid var(--line2);box-shadow:0 14px 34px -14px #000}
+.composer input{flex:1;min-width:0;background:#0f0e0c;border:1px solid var(--line);border-radius:11px;padding:11px 13px;color:var(--cream);font-family:var(--disp);font-size:15px}
+.composer input::placeholder{color:var(--dim)}
+.composer input:focus{outline:none;border-color:var(--blaze)}
+.send{flex:0 0 auto;appearance:none;border:none;cursor:pointer;background:var(--blaze);color:#160c04;width:44px;border-radius:11px;display:grid;place-items:center;transition:.16s}
+.send:hover{filter:brightness(1.08)}.send:active{transform:scale(.92)}
+.send svg{width:19px;height:19px}
+.namehint{font-size:11.5px;color:var(--dim);padding:0 4px 2px}
+.namehint b{color:var(--muted)}
+
+.scrim{position:fixed;inset:0;z-index:20;background:rgba(8,8,6,.66);backdrop-filter:blur(3px);opacity:0;pointer-events:none;transition:.25s}
+.scrim.open{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:21;max-width:480px;margin:0 auto;background:linear-gradient(180deg,#1d1a16,#161410);border:1px solid var(--line2);border-bottom:none;border-radius:22px 22px 0 0;padding:8px 18px calc(20px + env(safe-area-inset-bottom));transform:translateY(102%);transition:transform .32s cubic-bezier(.2,.8,.25,1)}
+.sheet.open{transform:none}
+.grip{width:40px;height:4px;border-radius:99px;background:var(--line2);margin:8px auto 14px}
+.sheet h3{font-family:var(--disp);font-weight:700;font-size:20px;margin:0 0 4px;letter-spacing:.01em}
+.sheet .note{font-size:12px;color:var(--dim);line-height:1.5;margin:0 0 8px}
+.sheet label{display:block;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin:14px 0 6px;font-weight:600}
+.sheet input{width:100%;background:#0f0e0c;border:1px solid var(--line);border-radius:12px;padding:12px 13px;color:var(--cream);font-family:var(--disp);font-size:15px}
+.sheet input:focus{outline:none;border-color:var(--blaze)}
+.sheet .err{color:var(--live);font-size:12px;margin:10px 0 0;min-height:1px}
+.primary{margin-top:18px;width:100%;appearance:none;border:none;cursor:pointer;background:var(--blaze);color:#160c04;font-family:var(--disp);font-weight:700;font-size:14px;letter-spacing:.05em;text-transform:uppercase;padding:14px;border-radius:13px;transition:.16s}
+.primary:hover{filter:brightness(1.07)}.primary:active{transform:scale(.98)}
+.primary[disabled]{opacity:.55;cursor:default}
+
+.toast{position:fixed;left:50%;bottom:26px;z-index:40;transform:translate(-50%,26px);pointer-events:none;background:#241f18;border:1px solid var(--line2);color:var(--cream);padding:11px 16px;border-radius:12px;font-size:13px;font-weight:600;box-shadow:0 16px 40px -12px #000;opacity:0;transition:.28s;max-width:88vw;text-align:center}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast.gold{border-color:#5a4a24;color:var(--gold)}
+.foot{text-align:center;color:var(--dim);font-size:11px;letter-spacing:.05em;margin:30px 0 4px}
+.foot a{color:var(--muted)}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important}.potw::after{display:none}}
+</style>
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+
+<div class="wrap">
+  <header>
+    <div class="brand">
+      <div class="mark">LOTG<span class="dot"></span></div>
+      <small>Wednesday Night Basketball</small>
+    </div>
+    <div id="idctl"></div>
+  </header>
+
+  <nav class="tabs" role="tablist" aria-label="Sections">
+    <button class="tab" role="tab" id="tab-plays" aria-selected="true" aria-controls="pane-plays">Top Plays</button>
+    <button class="tab" role="tab" id="tab-chat" aria-selected="false" aria-controls="pane-chat">Group Chat</button>
+    <a class="tab ghost" id="tab-games" href="https://lotg-wednesday-night-basketball.netlify.app/" target="_blank" rel="noopener" title="Tonight's scoreboard & ladder">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v14H4zM12 5v14M4 9h4M4 15h4M16 9h4M16 15h4"/></svg>Games
+    </a>
+  </nav>
+
+  <section class="pane on" id="pane-plays" role="tabpanel" aria-labelledby="tab-plays">
+    <div class="lbl" style="margin:6px 2px 10px">This week</div>
+    <div class="potw" id="potw"></div>
+    <div class="section-head">
+      <div class="lbl">Top Plays</div>
+      <p>Drop your best clip. The crew votes. Sunday 9 PM, the leader takes the crown.</p>
+    </div>
+    <div class="plays" id="plays"></div>
+    <button class="add" id="openAdd" type="button">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+      Drop a play
+    </button>
+  </section>
+
+  <section class="pane" id="pane-chat" role="tabpanel" aria-labelledby="tab-chat">
+    <div class="section-head">
+      <div class="lbl">The Group Chat</div>
+      <p>One room. Every team. All week — not just Wednesday.</p>
+    </div>
+    <div class="chatwrap">
+      <div class="msgs" id="msgs"></div>
+      <div class="namehint" id="namehint"></div>
+      <div class="composer">
+        <input id="chatIn" placeholder="Message the crew…" autocomplete="off" aria-label="Message" maxlength="300"/>
+        <button class="send" id="chatSend" type="button" aria-label="Send">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#160c04" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l16-8-6 16-3-6-7-2z"/></svg>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <div class="foot">The crew feed · <a href="https://lotg-wednesday-night-basketball.netlify.app/" target="_blank" rel="noopener">tonight's scoreboard ↗</a></div>
+</div>
+
+<div class="scrim" id="scrim"></div>
+
+<div class="sheet" id="sheetAdd" role="dialog" aria-modal="true" aria-labelledby="addH">
+  <div class="grip"></div>
+  <h3 id="addH">Drop a play</h3>
+  <p class="note">Paste a link to your clip — Instagram, YouTube or TikTok. We only ever link out to it; we never post to or log into your Instagram.</p>
+  <label for="fLink">Clip link</label>
+  <input id="fLink" placeholder="https://instagram.com/reel/…" inputmode="url"/>
+  <label for="fCap">What happened</label>
+  <input id="fCap" placeholder="Chase-down block on the break 😤" maxlength="140"/>
+  <p class="err" id="addErr"></p>
+  <button class="primary" id="doAdd" type="button">Add to Top Plays</button>
+</div>
+
+<div class="sheet" id="sheetJoin" role="dialog" aria-modal="true" aria-labelledby="joinH">
+  <div class="grip"></div>
+  <h3 id="joinH">Join the crew</h3>
+  <p class="note">Your name shows on your plays and messages. Your Instagram is how the crew connects — we only ever link to it, never post.</p>
+  <label for="jName">Your name</label>
+  <input id="jName" placeholder="e.g. Huss" maxlength="40" autocomplete="off"/>
+  <label for="jIg">Instagram <span style="color:var(--dim);text-transform:none;letter-spacing:0">(optional)</span></label>
+  <input id="jIg" placeholder="@yourhandle" maxlength="30" autocomplete="off"/>
+  <p class="err" id="joinErr"></p>
+  <button class="primary" id="doJoin" type="button">Join the crew</button>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+const SB="https://ymuwuhvqqftgpxwhzoub.supabase.co/functions/v1/lotg-social";
+const KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltdXd1aHZxcWZ0Z3B4d2h6b3ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NjUyMzgsImV4cCI6MjA5OTI0MTIzOH0.sOkWQpulWj_ZSqMNSV7YP55T70UFSm2mP5e5xapQyQo";
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+const reduce=matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+async function api(action,payload){
+  const r=await fetch(SB,{method:'POST',headers:{Authorization:'Bearer '+KEY,apikey:KEY,'Content-Type':'application/json'},body:JSON.stringify({action,...payload})});
+  let d={}; try{d=await r.json()}catch(e){}
+  if(!r.ok) throw new Error(d.error||'the feed had a hiccup — try again');
+  return d;
+}
+
+function deviceId(){
+  let d; try{d=localStorage.getItem('lotg_device')}catch(e){}
+  if(!d||!/^[a-zA-Z0-9._-]{8,64}$/.test(d)){
+    d='lotg-'+Math.random().toString(36).slice(2,12)+Math.random().toString(36).slice(2,8);
+    try{localStorage.setItem('lotg_device',d)}catch(e){}
+  }
+  return d;
+}
+const DV=deviceId();
+
+const state={me:{registered:false},plays:[],chat:[],week:'',pending:null};
+
+/* ---------- identity ---------- */
+function renderIdentity(){
+  const el=$('#idctl');
+  if(state.me.registered){
+    el.innerHTML=`<button class="idchip" id="idBtn" title="Edit your name"><span class="av2">${esc((state.me.name||'?').trim()[0]||'?').toUpperCase()}</span><span class="idname">${esc(state.me.name)}</span></button>`;
+    $('#idBtn').onclick=()=>openJoin();
+  }else{
+    el.innerHTML=`<button class="joinbtn" id="joinBtn">Join the crew</button>`;
+    $('#joinBtn').onclick=()=>openJoin();
+  }
+}
+
+/* ---------- plays ---------- */
+function weekPlays(){return state.plays.filter(p=>!state.week||p.week===state.week);}
+
+function renderPOTW(){
+  const wk=weekPlays(), top=wk[0];
+  const el=$('#potw');
+  if(!top){
+    el.className='potw empty';
+    el.innerHTML=`<div class="crown"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 8l4.5 3L12 5l4.5 6L21 8l-1.6 10H4.6L3 8z"/></svg> Play of the Week</div>
+      <p class="invite">Up for grabs.</p>
+      <p class="invite-sub">No clips yet this week. Drop the first one and you're top of the board — the crew votes, and Sunday 9 PM the leader takes the crown.</p>`;
+    return;
+  }
+  el.className='potw';
+  el.innerHTML=`<div class="crown"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 8l4.5 3L12 5l4.5 6L21 8l-1.6 10H4.6L3 8z"/></svg> Play of the Week</div>
+    <p class="cap">${esc(top.caption)}</p>
+    <p class="by">by <b>${esc(top.name)}</b>${top.ig?` · <a class="watch" href="https://instagram.com/${esc(top.ig)}" target="_blank" rel="noopener">@${esc(top.ig)}</a>`:''} · <a class="watch" href="${esc(top.url)}" target="_blank" rel="noopener">Watch the clip ↗</a></p>
+    <div class="potw-foot">
+      <div class="tally"><span class="n">${top.votes}</span><span class="t">${top.votes===1?'vote':'votes'} so far</span></div>
+      <div class="closes">Voting closes<br><b>Sunday 9:00 PM</b></div>
+    </div>`;
+}
+
+function renderPlays(){
+  const list=weekPlays();
+  const box=$('#plays');
+  if(!list.length){
+    box.innerHTML=`<div class="empty-invite">No plays yet this week.<br>Tap <b style="color:var(--cream)">Drop a play</b> and get the board started 🎬</div>`;
+    return;
+  }
+  const max=Math.max(...list.map(p=>p.votes),1);
+  box.innerHTML=list.map((p,i)=>`
+    <article class="play" data-rank="${i+1}">
+      <div class="rank">${i+1}</div>
+      <div class="body">
+        <div class="cap">${esc(p.caption)}</div>
+        <div class="meta">
+          <span class="chip who">${p.ig?`<a href="https://instagram.com/${esc(p.ig)}" target="_blank" rel="noopener">${esc(p.name)}</a>`:esc(p.name)}</span>
+          <span class="chip plat">${esc(p.platform)}</span>
+          <a class="watch" href="${esc(p.url)}" target="_blank" rel="noopener">Watch ↗</a>
+        </div>
+      </div>
+      <button class="vote ${p.mine?'done':''}" data-vote="${p.id}" aria-label="Vote for this play">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+        <span class="vn">${p.votes}</span><span class="vt">${p.mine?'Voted':'Vote'}</span>
+      </button>
+      <div class="fill" style="width:${Math.round(p.votes/max*100)}%"></div>
+    </article>`).join('');
+  document.querySelectorAll('[data-vote]').forEach(b=>b.addEventListener('click',()=>doVote(b.dataset.vote)));
+}
+
+async function doVote(id){
+  if(!state.me.registered){openJoin(()=>doVote(id));return;}
+  const p=state.plays.find(x=>x.id===id); if(!p)return;
+  const beforeTop=weekPlays()[0]?.id;
+  p.mine=!p.mine; p.votes+=p.mine?1:-1;               // optimistic
+  renderPOTW();renderPlays();
+  const vn=document.querySelector(`[data-vote="${id}"] .vn`);
+  if(vn&&!reduce){vn.classList.add('bump');setTimeout(()=>vn.classList.remove('bump'),450);}
+  try{
+    const d=await api('play_vote',{device:DV,play:id});
+    state.plays=d.plays; state.week=d.week||state.week;
+    renderPOTW();renderPlays();
+    const afterTop=weekPlays()[0]?.id;
+    if(p.mine&&afterTop===id&&afterTop!==beforeTop) toast('👑 New Play of the Week leader',true);
+  }catch(e){ toast(e.message); refresh(); }
+}
+
+/* ---------- chat ---------- */
+function nearBottom(el){return el.scrollHeight-el.scrollTop-el.clientHeight<60;}
+function renderChat(keepScroll){
+  const box=$('#msgs');
+  const stick=nearBottom(box);
+  if(!state.chat.length){
+    box.innerHTML=`<div class="chat-empty">Nobody's said anything yet 👀<br>Be the one to start it — GG's, callouts, next week's plan.</div>`;
+  }else{
+    box.innerHTML=state.chat.map(m=>`<div class="msg ${m.mine?'mine':''}"><div class="nm">${esc(m.name)}</div><div class="tx">${esc(m.body)}</div></div>`).join('');
+  }
+  if(stick||!keepScroll) box.scrollTop=box.scrollHeight;
+  $('#namehint').innerHTML=state.me.registered?`You're in as <b>${esc(state.me.name)}</b>`:`Say something and we'll get your name first`;
+}
+
+async function sendChat(){
+  const inp=$('#chatIn'); const v=inp.value.trim(); if(!v)return;
+  if(!state.me.registered){openJoin(()=>{$('#chatIn').value=v;sendChat();});return;}
+  inp.value='';
+  state.chat.push({name:state.me.name,body:v,mine:true});   // optimistic
+  renderChat();
+  try{ const d=await api('chat_send',{device:DV,body:v}); state.chat=d.chat; renderChat(); }
+  catch(e){ toast(e.message); refresh(); }
+}
+
+/* ---------- board / poll ---------- */
+function apply(d){
+  if(d.me)state.me=d.me;
+  if(d.week)state.week=d.week;
+  if(Array.isArray(d.plays))state.plays=d.plays;
+  if(Array.isArray(d.chat))state.chat=d.chat;
+  renderIdentity();renderPOTW();renderPlays();renderChat(true);
+}
+async function refresh(){ try{ apply(await api('board',{device:DV})); }catch(e){} }
+
+/* ---------- join ---------- */
+function openJoin(after){
+  state.pending=after||null;
+  $('#joinErr').textContent='';
+  $('#jName').value=state.me.name||'';
+  $('#jIg').value=state.me.ig||'';
+  $('#joinH').textContent=state.me.registered?'Your name':'Join the crew';
+  $('#doJoin').textContent=state.me.registered?'Save':'Join the crew';
+  openSheet('sheetJoin',true);
+  setTimeout(()=>$('#jName').focus(),260);
+}
+async function doJoin(){
+  const name=$('#jName').value.trim(), ig=$('#jIg').value.trim();
+  if(!name){$('#joinErr').textContent='Add your name so the crew knows who’s who.';return;}
+  const btn=$('#doJoin'); btn.disabled=true;
+  try{
+    const d=await api('register',{device:DV,name,ig});
+    state.me={registered:true,name:d.me.name,ig:d.me.ig};
+    renderIdentity();
+    openSheet('sheetJoin',false);
+    toast(`You’re in, ${esc(state.me.name)} 🤝`);
+    const after=state.pending; state.pending=null;
+    refresh();
+    if(after)setTimeout(after,120);
+  }catch(e){ $('#joinErr').textContent=e.message; }
+  finally{ btn.disabled=false; }
+}
+
+/* ---------- sheets / tabs ---------- */
+function openSheet(id,open){
+  const anyOpen=open||document.querySelector('.sheet.open:not(#'+id+')');
+  $('#'+id).classList.toggle('open',open);
+  $('#scrim').classList.toggle('open',!!open);
+}
+$('#scrim').addEventListener('click',()=>{document.querySelectorAll('.sheet.open').forEach(s=>s.classList.remove('open'));$('#scrim').classList.remove('open');});
+$('#openAdd').addEventListener('click',()=>{ if(!state.me.registered){openJoin(()=>$('#openAdd').click());return;} $('#addErr').textContent='';openSheet('sheetAdd',true);setTimeout(()=>$('#fLink').focus(),260); });
+$('#doAdd').addEventListener('click',doAdd);
+$('#doJoin').addEventListener('click',doJoin);
+$('#jName').addEventListener('keydown',e=>{if(e.key==='Enter')doJoin();});
+$('#jIg').addEventListener('keydown',e=>{if(e.key==='Enter')doJoin();});
+
+async function doAdd(){
+  const url=$('#fLink').value.trim(), caption=$('#fCap').value.trim();
+  if(!/^https?:\/\/\S+\.\S+/.test(url)){$('#addErr').textContent='Paste a full clip link (starts with https://).';return;}
+  if(!caption){$('#addErr').textContent='Add a line on what happened.';return;}
+  $('#addErr').textContent=''; const btn=$('#doAdd'); btn.disabled=true;
+  try{
+    const d=await api('play_submit',{device:DV,url,caption});
+    state.plays=d.plays; state.week=d.week||state.week;
+    $('#fLink').value=$('#fCap').value='';
+    openSheet('sheetAdd',false);
+    renderPOTW();renderPlays();
+    toast('Play added — you’re on the board 🔥');
+  }catch(e){ $('#addErr').textContent=e.message; }
+  finally{ btn.disabled=false; }
+}
+
+function pick(which){
+  const onPlays=which==='plays';
+  $('#tab-plays').setAttribute('aria-selected',onPlays);
+  $('#tab-chat').setAttribute('aria-selected',!onPlays);
+  $('#pane-plays').classList.toggle('on',onPlays);
+  $('#pane-chat').classList.toggle('on',!onPlays);
+  if(!onPlays)setTimeout(()=>{$('#msgs').scrollTop=$('#msgs').scrollHeight;},60);
+}
+$('#tab-plays').addEventListener('click',()=>pick('plays'));
+$('#tab-chat').addEventListener('click',()=>pick('chat'));
+$('#chatSend').addEventListener('click',sendChat);
+$('#chatIn').addEventListener('keydown',e=>{if(e.key==='Enter')sendChat();});
+
+function toast(msg,gold){
+  const t=$('#toast'); t.textContent=msg; t.className='toast show'+(gold?' gold':'');
+  clearTimeout(toast.t); toast.t=setTimeout(()=>t.className='toast',2600);
+}
+
+/* boot + live polling */
+renderIdentity();renderPOTW();renderPlays();renderChat();
+refresh();
+let poll=setInterval(()=>{if(!document.hidden)refresh();},8000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});
+</script>
+</body>
+</html>
