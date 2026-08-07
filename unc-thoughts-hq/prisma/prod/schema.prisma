@@ -819,3 +819,18 @@ model AskLog {
 
   @@index([orgId, createdAt])
 }
+model StudioSession {
+  id           String    @id @default(cuid())
+  orgId        String
+  title        String
+  topic        String?
+  date         DateTime?
+  pricePerSeat Int       @default(10)
+  capacity     Int       @default(20)
+  seatsSold    Int       @default(0)
+  status       String    @default("planned") // planned | done
+  notes        String?
+  createdAt    DateTime  @default(now())
+
+  @@index([orgId, status])
+}

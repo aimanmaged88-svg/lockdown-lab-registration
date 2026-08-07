@@ -23,58 +23,58 @@ model Organisation {
   slug      String   @unique
   createdAt DateTime @default(now())
 
-  users            User[]
-  content          Content[]
-  tasks            DayTask[]
-  researchEntries  ResearchEntry[]
-  practiceLessons  PracticeLesson[]
-  questions        CommunityQuestion[]
-  inboxItems       InboxItem[]
-  talks            Talk[]
-  challenges       Challenge[]
-  collaborators    Collaborator[]
-  experiments      Experiment[]
-  winningPatterns  WinningPattern[]
-  weeklyReviews    WeeklyReview[]
-  spaces           Space[]
-  posts            Post[]
-  reports          Report[]
-  auditEvents      AuditEvent[]
-  featureFlags     FeatureFlag[]
-  batchSessions    BatchSession[]
-  importRuns       ImportRun[]
-  members          Member[]
-  knowledgeItems   KnowledgeItem[]
-  huddlePosts      HuddlePost[]
-  deskNotes        DeskNote[]
-  thoughtPrompts   ThoughtPrompt[]
-  askLogs          AskLog[]
+  users           User[]
+  content         Content[]
+  tasks           DayTask[]
+  researchEntries ResearchEntry[]
+  practiceLessons PracticeLesson[]
+  questions       CommunityQuestion[]
+  inboxItems      InboxItem[]
+  talks           Talk[]
+  challenges      Challenge[]
+  collaborators   Collaborator[]
+  experiments     Experiment[]
+  winningPatterns WinningPattern[]
+  weeklyReviews   WeeklyReview[]
+  spaces          Space[]
+  posts           Post[]
+  reports         Report[]
+  auditEvents     AuditEvent[]
+  featureFlags    FeatureFlag[]
+  batchSessions   BatchSession[]
+  importRuns      ImportRun[]
+  members         Member[]
+  knowledgeItems  KnowledgeItem[]
+  huddlePosts     HuddlePost[]
+  deskNotes       DeskNote[]
+  thoughtPrompts  ThoughtPrompt[]
+  askLogs         AskLog[]
 }
 
 // ── People & roles ──────────────────────────────────────────────────────────
 // Roles: owner | admin | moderator | contributor | member | guest
 model User {
-  id             String   @id @default(cuid())
-  orgId          String
-  org            Organisation @relation(fields: [orgId], references: [id])
-  email          String   @unique
-  displayName    String
-  handle         String?  // instagram handle, no automation ever
-  role           String   @default("owner")
-  passwordHash   String?  // Release B accounts; owner may run passwordless locally
-  isAdult        Boolean  @default(true) // community is 18+ only
-  adultConfirmedAt DateTime?
-  verifiedExpert Boolean  @default(false)
+  id                String       @id @default(cuid())
+  orgId             String
+  org               Organisation @relation(fields: [orgId], references: [id])
+  email             String       @unique
+  displayName       String
+  handle            String? // instagram handle, no automation ever
+  role              String       @default("owner")
+  passwordHash      String? // Release B accounts; owner may run passwordless locally
+  isAdult           Boolean      @default(true) // community is 18+ only
+  adultConfirmedAt  DateTime?
+  verifiedExpert    Boolean      @default(false)
   verificationBasis String? // recorded reason for manual expert verification
-  bio            String?
-  status         String   @default("active") // active | suspended | deleted
-  createdAt      DateTime @default(now())
-  lastSeenAt     DateTime?
+  bio               String?
+  status            String       @default("active") // active | suspended | deleted
+  createdAt         DateTime     @default(now())
+  lastSeenAt        DateTime?
 
-  authoredContent Content[]        @relation("ContentOwner")
+  authoredContent Content[]         @relation("ContentOwner")
   posts           Post[]
-  reportsMade     Report[]         @relation("Reporter")
-  reportsHandled  Report[]         @relation("ReportHandler")
+  reportsMade     Report[]          @relation("Reporter")
+  reportsHandled  Report[]          @relation("ReportHandler")
   auditEvents     AuditEvent[]
   feedback        MemberFeedback[]
   spaceRoles      SpaceMembership[]
@@ -84,58 +84,58 @@ model User {
 
 // ── Content records (the roadmap + everything created) ──────────────────────
 model Content {
-  id          String   @id @default(cuid())
-  orgId       String
-  org         Organisation @relation(fields: [orgId], references: [id])
-  ownerId     String?
-  owner       User?    @relation("ContentOwner", fields: [ownerId], references: [id])
+  id      String       @id @default(cuid())
+  orgId   String
+  org     Organisation @relation(fields: [orgId], references: [id])
+  ownerId String?
+  owner   User?        @relation("ContentOwner", fields: [ownerId], references: [id])
 
-  title       String
-  pillar      String   // Basketball | Nutrition | Mindset | Community
-  series      String?  // e.g. "UNC Thought", "For Your Stage", "UNC Explains"
-  audience    String   @default("General") // General | Players13-17 | Parents | Coaches | Adults
-  format      String   @default("Reel")    // Reel | Story | Carousel | Talk | ReplyReel
-  reelSeconds Int?
-  hook        String?
-  script      String?  // spoken script
-  teachingPoints String? // newline or json list
-  shotList    String?  // json array of shots
-  caption     String?
-  question    String?  // the "one real question" conversation CTA
-  highlight   String?  // highlight destination
-  plannedDate DateTime?
-  postedAt    DateTime?
-  instagramUrl String?
-  status      String   @default("Idea")
-  notes       String?
+  title             String
+  pillar            String // Basketball | Nutrition | Mindset | Community
+  series            String? // e.g. "UNC Thought", "For Your Stage", "UNC Explains"
+  audience          String        @default("General") // General | Players13-17 | Parents | Coaches | Adults
+  format            String        @default("Reel") // Reel | Story | Carousel | Talk | ReplyReel
+  reelSeconds       Int?
+  hook              String?
+  script            String? // spoken script
+  teachingPoints    String? // newline or json list
+  shotList          String? // json array of shots
+  caption           String?
+  question          String? // the "one real question" conversation CTA
+  highlight         String? // highlight destination
+  plannedDate       DateTime?
+  postedAt          DateTime?
+  instagramUrl      String?
+  status            String        @default("Idea")
+  notes             String?
   inspirationSource String?
-  collaboratorId String?
-  collaborator Collaborator? @relation(fields: [collaboratorId], references: [id])
+  collaboratorId    String?
+  collaborator      Collaborator? @relation(fields: [collaboratorId], references: [id])
   recordingLocation String?
-  equipmentUsed String?
-  isExperiment Boolean @default(false)
-  isTrialReel  Boolean @default(false)
-  followUpOfId String?  // content this is a follow-up to
-  followUpOf   Content? @relation("FollowUp", fields: [followUpOfId], references: [id])
-  followUps    Content[] @relation("FollowUp")
-  repurposedFromId String?
-  repurposedFrom Content? @relation("Repurpose", fields: [repurposedFromId], references: [id])
-  repurposes   Content[] @relation("Repurpose")
+  equipmentUsed     String?
+  isExperiment      Boolean       @default(false)
+  isTrialReel       Boolean       @default(false)
+  followUpOfId      String? // content this is a follow-up to
+  followUpOf        Content?      @relation("FollowUp", fields: [followUpOfId], references: [id])
+  followUps         Content[]     @relation("FollowUp")
+  repurposedFromId  String?
+  repurposedFrom    Content?      @relation("Repurpose", fields: [repurposedFromId], references: [id])
+  repurposes        Content[]     @relation("Repurpose")
 
   // Import bookkeeping (idempotency): a stable natural key from the workbook.
-  importKey   String?  @unique
+  importKey String? @unique
 
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  tasks       DayTask[]
-  media       MediaAsset[]
-  analytics   AnalyticsSnapshot[]
-  experiment  Experiment?
-  preflight   PreflightResult?
+  tasks            DayTask[]
+  media            MediaAsset[]
+  analytics        AnalyticsSnapshot[]
+  experiment       Experiment?
+  preflight        PreflightResult?
   sourceQuestionId String?
-  sourceQuestion CommunityQuestion? @relation(fields: [sourceQuestionId], references: [id])
-  batchItems  BatchItem[]
+  sourceQuestion   CommunityQuestion?  @relation(fields: [sourceQuestionId], references: [id])
+  batchItems       BatchItem[]
 
   @@index([orgId, plannedDate])
   @@index([orgId, status])
@@ -144,19 +144,19 @@ model Content {
 
 // The single set of daily checklist steps for a piece of content.
 model DayTask {
-  id        String   @id @default(cuid())
+  id        String       @id @default(cuid())
   orgId     String
   org       Organisation @relation(fields: [orgId], references: [id])
   contentId String?
-  content   Content? @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  content   Content?     @relation(fields: [contentId], references: [id], onDelete: Cascade)
 
-  kind      String   // one of the 20 checklist step keys (see enums.ts CHECKLIST_STEPS)
-  label     String
-  done      Boolean  @default(false)
-  doneAt    DateTime?
-  dueDate   DateTime?
-  priority  Int      @default(0) // higher = more urgent (for the 3 priority actions)
-  note      String?
+  kind     String // one of the 20 checklist step keys (see enums.ts CHECKLIST_STEPS)
+  label    String
+  done     Boolean   @default(false)
+  doneAt   DateTime?
+  dueDate  DateTime?
+  priority Int       @default(0) // higher = more urgent (for the 3 priority actions)
+  note     String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -169,22 +169,22 @@ model MediaAsset {
   id        String   @id @default(cuid())
   contentId String?
   content   Content? @relation(fields: [contentId], references: [id], onDelete: Cascade)
-  kind      String   // video | image | screenshot | audio
-  path      String   // storage-relative path (StorageProvider abstracts local/cloud)
+  kind      String // video | image | screenshot | audio
+  path      String // storage-relative path (StorageProvider abstracts local/cloud)
   filename  String
   mime      String?
   bytes     Int?
-  meta      String?  // json: probe output (duration/orientation/etc) or OCR text
+  meta      String? // json: probe output (duration/orientation/etc) or OCR text
   createdAt DateTime @default(now())
 }
 
 // ── Analytics ───────────────────────────────────────────────────────────────
 model AnalyticsSnapshot {
-  id            String   @id @default(cuid())
-  contentId     String
-  content       Content  @relation(fields: [contentId], references: [id], onDelete: Cascade)
-  window        String   // "24h" | "7d" | "30d"
-  capturedAt    DateTime @default(now())
+  id         String   @id @default(cuid())
+  contentId  String
+  content    Content  @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  window     String // "24h" | "7d" | "30d"
+  capturedAt DateTime @default(now())
 
   views         Int?
   reach         Int?
@@ -200,19 +200,19 @@ model AnalyticsSnapshot {
   profileVisits Int?
   follows       Int?
   storyShares   Int?
-  wasTrialReel  Boolean  @default(false)
-  sharedToAll   Boolean  @default(false)
+  wasTrialReel  Boolean @default(false)
+  sharedToAll   Boolean @default(false)
 
-  source        String   @default("manual") // manual | screenshot_ocr | api
-  screenshotPath String?  // preserved original
-  confirmed     Boolean  @default(false) // OCR values must be confirmed before trusted
+  source         String  @default("manual") // manual | screenshot_ocr | api
+  screenshotPath String? // preserved original
+  confirmed      Boolean @default(false) // OCR values must be confirmed before trusted
 
   @@index([contentId, window])
 }
 
 // ── Research library ────────────────────────────────────────────────────────
 model ResearchEntry {
-  id             String   @id @default(cuid())
+  id             String       @id @default(cuid())
   orgId          String
   org            Organisation @relation(fields: [orgId], references: [id])
   recommendation String
@@ -221,61 +221,61 @@ model ResearchEntry {
   sourceName     String
   sourceUrl      String
   dateChecked    DateTime
-  ruleType       String   // official_rule | informed_practice | experiment
+  ruleType       String // official_rule | informed_practice | experiment
   whyForUnc      String
-  confidence     String   // high | medium | low
+  confidence     String // high | medium | low
   reviewBy       DateTime
-  verified       Boolean  @default(false) // false => "needs verification" badge
+  verified       Boolean      @default(false) // false => "needs verification" badge
   supersededById String?
-  createdAt      DateTime @default(now())
+  createdAt      DateTime     @default(now())
 
   @@index([orgId, category])
 }
 
 // ── Practice library ────────────────────────────────────────────────────────
 model PracticeLesson {
-  id          String   @id @default(cuid())
-  orgId       String
-  org         Organisation @relation(fields: [orgId], references: [id])
-  topic       String   // Recording | Speaking | Hooks | Lighting | Audio | ...
-  title       String
-  quickVersion String  // two-minute quick version
-  deep        String   // deeper explanation
-  whyMatters  String
-  checklist   String   // json array
-  exercise    String
-  sourceName  String?
-  sourceUrl   String?
-  dateChecked DateTime?
-  confidence  String   @default("medium")
-  createdAt   DateTime @default(now())
+  id           String       @id @default(cuid())
+  orgId        String
+  org          Organisation @relation(fields: [orgId], references: [id])
+  topic        String // Recording | Speaking | Hooks | Lighting | Audio | ...
+  title        String
+  quickVersion String // two-minute quick version
+  deep         String // deeper explanation
+  whyMatters   String
+  checklist    String // json array
+  exercise     String
+  sourceName   String?
+  sourceUrl    String?
+  dateChecked  DateTime?
+  confidence   String       @default("medium")
+  createdAt    DateTime     @default(now())
 
   @@index([orgId, topic])
 }
 
 // ── Community: questions inbox & unified inbox ──────────────────────────────
 model CommunityQuestion {
-  id          String   @id @default(cuid())
-  orgId       String
-  org         Organisation @relation(fields: [orgId], references: [id])
-  text        String
-  askedBy     String?  // free text (a commenter handle) — never scraped
-  pillar      String?
-  audience    String?
-  problem     String?  // grouped problem label for the Signal Map (= subcategory for member asks)
-  frequency   Int      @default(1)
-  source      String   @default("comment") // comment | dm | talk | member
-  status      String   @default("open") // open | planned | answered | archived
-  answeredContentId String? // Loop Closer: which reel/post answered it
-  contributorAcknowledged Boolean @default(false)
+  id                      String       @id @default(cuid())
+  orgId                   String
+  org                     Organisation @relation(fields: [orgId], references: [id])
+  text                    String
+  askedBy                 String? // free text (a commenter handle) — never scraped
+  pillar                  String?
+  audience                String?
+  problem                 String? // grouped problem label for the Signal Map (= subcategory for member asks)
+  frequency               Int          @default(1)
+  source                  String       @default("comment") // comment | dm | talk | member
+  status                  String       @default("open") // open | planned | answered | archived
+  answeredContentId       String? // Loop Closer: which reel/post answered it
+  contributorAcknowledged Boolean      @default(false)
   // Ask-UNC-directly (member questions): asker's anonymous device, whether they
   // want a ping when answered, and UNC's answer text shown back to them.
-  memberId    String?
-  notify      Boolean  @default(false)
-  answerText  String?
-  answeredAt  DateTime?
-  inLibrary   Boolean  @default(false) // owner-approved into the public Q&A library
-  createdAt   DateTime @default(now())
+  memberId                String?
+  notify                  Boolean      @default(false)
+  answerText              String?
+  answeredAt              DateTime?
+  inLibrary               Boolean      @default(false) // owner-approved into the public Q&A library
+  createdAt               DateTime     @default(now())
 
   contentFrom Content[]
   inboxItem   InboxItem?
@@ -285,134 +285,134 @@ model CommunityQuestion {
 
 // Unified admin inbox across comments/questions/reports/etc.
 model InboxItem {
-  id          String   @id @default(cuid())
+  id          String             @id @default(cuid())
   orgId       String
-  org         Organisation @relation(fields: [orgId], references: [id])
-  type        String   // comment | question | report | talk_submission | collab_request | analytics_reminder | approval
+  org         Organisation       @relation(fields: [orgId], references: [id])
+  type        String // comment | question | report | talk_submission | collab_request | analytics_reminder | approval
   title       String
   body        String?
-  priority    Int      @default(0)
-  tags        String?  // json array
-  status      String   @default("open") // open | snoozed | done
+  priority    Int                @default(0)
+  tags        String? // json array
+  status      String             @default("open") // open | snoozed | done
   snoozeUntil DateTime?
   assigneeId  String?
-  refId       String?  // id of the related entity
-  questionId  String?  @unique
+  refId       String? // id of the related entity
+  questionId  String?            @unique
   question    CommunityQuestion? @relation(fields: [questionId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
 
   @@index([orgId, status])
 }
 
 // ── Talks ───────────────────────────────────────────────────────────────────
 model Talk {
-  id          String   @id @default(cuid())
-  orgId       String
-  org         Organisation @relation(fields: [orgId], references: [id])
-  title       String
-  template    String?  // Ask UNC | Coach Conversation | ...
-  pillar      String?
-  guestName   String?
-  guestCredentials String?
-  scheduledAt DateTime?
-  externalLink String? // external live event link (no custom streaming infra)
-  runSheet    String?  // json array of segments
-  recordingConsent Boolean @default(false)
-  attendance  Int?
-  recordingPath String?
-  transcript  String?
-  chapters    String?  // json array {t,d}
-  summary     String?
-  status      String   @default("planned") // planned | live | recorded | published
-  isMedicalDisclaimer Boolean @default(false) // nutrition talks flag
-  createdAt   DateTime @default(now())
+  id                  String       @id @default(cuid())
+  orgId               String
+  org                 Organisation @relation(fields: [orgId], references: [id])
+  title               String
+  template            String? // Ask UNC | Coach Conversation | ...
+  pillar              String?
+  guestName           String?
+  guestCredentials    String?
+  scheduledAt         DateTime?
+  externalLink        String? // external live event link (no custom streaming infra)
+  runSheet            String? // json array of segments
+  recordingConsent    Boolean      @default(false)
+  attendance          Int?
+  recordingPath       String?
+  transcript          String?
+  chapters            String? // json array {t,d}
+  summary             String?
+  status              String       @default("planned") // planned | live | recorded | published
+  isMedicalDisclaimer Boolean      @default(false) // nutrition talks flag
+  createdAt           DateTime     @default(now())
 
-  clips       TalkClip[]
-  questions   TalkQuestion[]
+  clips     TalkClip[]
+  questions TalkQuestion[]
 }
 
 model TalkQuestion {
-  id      String @id @default(cuid())
-  talkId  String
-  talk    Talk   @relation(fields: [talkId], references: [id], onDelete: Cascade)
-  text    String
-  votes   Int    @default(0)
+  id        String   @id @default(cuid())
+  talkId    String
+  talk      Talk     @relation(fields: [talkId], references: [id], onDelete: Cascade)
+  text      String
+  votes     Int      @default(0)
   createdAt DateTime @default(now())
 }
 
 model TalkClip {
-  id        String @id @default(cuid())
-  talkId    String
-  talk      Talk   @relation(fields: [talkId], references: [id], onDelete: Cascade)
-  idea      String
-  script    String?
-  caption   String?
+  id                  String   @id @default(cuid())
+  talkId              String
+  talk                Talk     @relation(fields: [talkId], references: [id], onDelete: Cascade)
+  idea                String
+  script              String?
+  caption             String?
   turnedIntoContentId String? // becomes a Reel task
-  createdAt DateTime @default(now())
+  createdAt           DateTime @default(now())
 }
 
 // ── Challenges ──────────────────────────────────────────────────────────────
 model Challenge {
-  id          String   @id @default(cuid())
-  orgId       String
-  org         Organisation @relation(fields: [orgId], references: [id])
-  title       String
-  description String
-  days        Int      @default(7)
-  safetyNote  String
+  id                 String       @id @default(cuid())
+  orgId              String
+  org                Organisation @relation(fields: [orgId], references: [id])
+  title              String
+  description        String
+  days               Int          @default(7)
+  safetyNote         String
   conversationPrompt String
-  optIn       Boolean  @default(true)
-  status      String   @default("draft") // draft | active | complete
-  startsAt    DateTime?
-  createdAt   DateTime @default(now())
+  optIn              Boolean      @default(true)
+  status             String       @default("draft") // draft | active | complete
+  startsAt           DateTime?
+  createdAt          DateTime     @default(now())
 }
 
 // ── Collaborators ───────────────────────────────────────────────────────────
 model Collaborator {
-  id          String   @id @default(cuid())
-  orgId       String
-  org         Organisation @relation(fields: [orgId], references: [id])
-  name        String
-  expertise   String   // Coach | Player | Parent | Dietitian | Physio | ...
-  topic       String?
-  proposed    String?
-  contactStatus String @default("prospect") // prospect | contacted | agreed | declined
-  contactPrivate String? // private contact info — never exposed to members
-  permission  Boolean  @default(false)
-  recordingDate DateTime?
-  releaseForm Boolean  @default(false)
-  clipsCreated Int     @default(0)
-  followUp    String?
+  id                String       @id @default(cuid())
+  orgId             String
+  org               Organisation @relation(fields: [orgId], references: [id])
+  name              String
+  expertise         String // Coach | Player | Parent | Dietitian | Physio | ...
+  topic             String?
+  proposed          String?
+  contactStatus     String       @default("prospect") // prospect | contacted | agreed | declined
+  contactPrivate    String? // private contact info — never exposed to members
+  permission        Boolean      @default(false)
+  recordingDate     DateTime?
+  releaseForm       Boolean      @default(false)
+  clipsCreated      Int          @default(0)
+  followUp          String?
   communityResponse String?
-  createdAt   DateTime @default(now())
+  createdAt         DateTime     @default(now())
 
-  content     Content[]
+  content Content[]
 }
 
 // ── Experiments ─────────────────────────────────────────────────────────────
 model Experiment {
-  id          String   @id @default(cuid())
-  orgId       String
-  org         Organisation @relation(fields: [orgId], references: [id])
-  contentId   String?  @unique
-  content     Content? @relation(fields: [contentId], references: [id])
-  type        String   // two_hooks | two_lengths | face_vs_demo | caption | cover | window | question | trial_vs_standard | age_framing
-  hypothesis  String
-  variable    String
+  id           String       @id @default(cuid())
+  orgId        String
+  org          Organisation @relation(fields: [orgId], references: [id])
+  contentId    String?      @unique
+  content      Content?     @relation(fields: [contentId], references: [id])
+  type         String // two_hooks | two_lengths | face_vs_demo | caption | cover | window | question | trial_vs_standard | age_framing
+  hypothesis   String
+  variable     String
   heldConstant String
-  minSample   Int      @default(3)
-  result      String?
-  confidence  String?  // high | medium | low
-  decision    String?  // share_all | revise | rerecord | archive
-  nextTest    String?
-  status      String   @default("running") // running | reviewed | decided
-  createdAt   DateTime @default(now())
+  minSample    Int          @default(3)
+  result       String?
+  confidence   String? // high | medium | low
+  decision     String? // share_all | revise | rerecord | archive
+  nextTest     String?
+  status       String       @default("running") // running | reviewed | decided
+  createdAt    DateTime     @default(now())
 }
 
 // ── Winning patterns ────────────────────────────────────────────────────────
 model WinningPattern {
-  id        String @id @default(cuid())
+  id        String       @id @default(cuid())
   orgId     String
   org       Organisation @relation(fields: [orgId], references: [id])
   topic     String
@@ -420,73 +420,73 @@ model WinningPattern {
   hook      String
   duration  Int
   audience  String
-  evidence  String?  // why we believe it repeats (median comparison etc)
-  createdAt DateTime @default(now())
+  evidence  String? // why we believe it repeats (median comparison etc)
+  createdAt DateTime     @default(now())
 }
 
 // ── Weekly reviews ──────────────────────────────────────────────────────────
 model WeeklyReview {
-  id          String   @id @default(cuid())
-  orgId       String
-  org         Organisation @relation(fields: [orgId], references: [id])
-  weekStart   DateTime // Monday, Australia/Sydney
-  posted      Int      @default(0)
-  planned     Int      @default(0)
-  completed   Int      @default(0)
-  highlights  String?
-  learnings   String?
-  nextFocus   String?
-  markdown    String?  // rendered report
-  createdAt   DateTime @default(now())
+  id         String       @id @default(cuid())
+  orgId      String
+  org        Organisation @relation(fields: [orgId], references: [id])
+  weekStart  DateTime // Monday, Australia/Sydney
+  posted     Int          @default(0)
+  planned    Int          @default(0)
+  completed  Int          @default(0)
+  highlights String?
+  learnings  String?
+  nextFocus  String?
+  markdown   String? // rendered report
+  createdAt  DateTime     @default(now())
 
   @@unique([orgId, weekStart])
 }
 
 // ── Batch recording day ─────────────────────────────────────────────────────
 model BatchSession {
-  id        String   @id @default(cuid())
+  id        String       @id @default(cuid())
   orgId     String
   org       Organisation @relation(fields: [orgId], references: [id])
   name      String
-  minutes   Int      @default(60) // 30 | 60 | 90
-  groupBy   String   @default("location") // location | clothing | equipment | camera | pillar | demo | collaborator
-  status    String   @default("planned") // planned | in_progress | done
-  createdAt DateTime @default(now())
+  minutes   Int          @default(60) // 30 | 60 | 90
+  groupBy   String       @default("location") // location | clothing | equipment | camera | pillar | demo | collaborator
+  status    String       @default("planned") // planned | in_progress | done
+  createdAt DateTime     @default(now())
   items     BatchItem[]
 }
 
 model BatchItem {
-  id        String @id @default(cuid())
+  id        String       @id @default(cuid())
   sessionId String
   session   BatchSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
   contentId String
-  content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
-  order     Int    @default(0)
-  done      Boolean @default(false)
+  content   Content      @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  order     Int          @default(0)
+  done      Boolean      @default(false)
 }
 
 // ── Preflight ───────────────────────────────────────────────────────────────
 model PreflightResult {
-  id        String @id @default(cuid())
-  contentId String @unique
-  content   Content @relation(fields: [contentId], references: [id], onDelete: Cascade)
-  results   String  // json array {key,label,pass,overrideReason?}
-  passed    Boolean @default(false)
+  id        String   @id @default(cuid())
+  contentId String   @unique
+  content   Content  @relation(fields: [contentId], references: [id], onDelete: Cascade)
+  results   String // json array {key,label,pass,overrideReason?}
+  passed    Boolean  @default(false)
   checkedAt DateTime @default(now())
 }
 
 // ── Release B: community spaces, posts, moderation ──────────────────────────
 model Space {
-  id          String   @id @default(cuid())
+  id          String       @id @default(cuid())
   orgId       String
   org         Organisation @relation(fields: [orgId], references: [id])
-  key         String   // basketball | nutrition | mindset | prep | parents_coaches | questions | talks | challenges | wins
+  key         String // basketball | nutrition | mindset | prep | parents_coaches | questions | talks | challenges | wins
   name        String
   description String?
-  slowModeSec Int      @default(0)
-  locked      Boolean  @default(false)
-  readOnly    Boolean  @default(false) // announcements
-  order       Int      @default(0)
+  slowModeSec Int          @default(0)
+  locked      Boolean      @default(false)
+  readOnly    Boolean      @default(false) // announcements
+  order       Int          @default(0)
 
   posts       Post[]
   memberships SpaceMembership[]
@@ -506,77 +506,77 @@ model SpaceMembership {
 }
 
 model Post {
-  id        String   @id @default(cuid())
-  orgId     String
-  org       Organisation @relation(fields: [orgId], references: [id])
-  spaceId   String
-  space     Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
-  authorId  String
-  author    User     @relation(fields: [authorId], references: [id])
-  parentId  String?  // threaded replies
-  parent    Post?    @relation("Thread", fields: [parentId], references: [id])
-  replies   Post[]   @relation("Thread")
-  body      String
-  tags      String?  // json array
-  pinned    Boolean  @default(false)
-  usefulCount Int    @default(0) // "useful" reaction, not "like"
-  status    String   @default("visible") // visible | hidden | removed
+  id            String       @id @default(cuid())
+  orgId         String
+  org           Organisation @relation(fields: [orgId], references: [id])
+  spaceId       String
+  space         Space        @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  authorId      String
+  author        User         @relation(fields: [authorId], references: [id])
+  parentId      String? // threaded replies
+  parent        Post?        @relation("Thread", fields: [parentId], references: [id])
+  replies       Post[]       @relation("Thread")
+  body          String
+  tags          String? // json array
+  pinned        Boolean      @default(false)
+  usefulCount   Int          @default(0) // "useful" reaction, not "like"
+  status        String       @default("visible") // visible | hidden | removed
   removalReason String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
 
-  reports   Report[]
+  reports Report[]
 
   @@index([spaceId, createdAt])
 }
 
 model Report {
-  id          String   @id @default(cuid())
-  orgId       String
-  org         Organisation @relation(fields: [orgId], references: [id])
-  postId      String?
-  post        Post?    @relation(fields: [postId], references: [id])
-  reporterId  String
-  reporter    User     @relation("Reporter", fields: [reporterId], references: [id])
-  reason      String
-  detail      String?
-  status      String   @default("open") // open | actioned | dismissed
-  handlerId   String?
-  handler     User?    @relation("ReportHandler", fields: [handlerId], references: [id])
-  resolution  String?  // transparent enforcement reason
+  id            String       @id @default(cuid())
+  orgId         String
+  org           Organisation @relation(fields: [orgId], references: [id])
+  postId        String?
+  post          Post?        @relation(fields: [postId], references: [id])
+  reporterId    String
+  reporter      User         @relation("Reporter", fields: [reporterId], references: [id])
+  reason        String
+  detail        String?
+  status        String       @default("open") // open | actioned | dismissed
+  handlerId     String?
+  handler       User?        @relation("ReportHandler", fields: [handlerId], references: [id])
+  resolution    String? // transparent enforcement reason
   moderatorNote String?
-  createdAt   DateTime @default(now())
-  resolvedAt  DateTime?
+  createdAt     DateTime     @default(now())
+  resolvedAt    DateTime?
 
   @@index([orgId, status])
 }
 
 model MemberFeedback {
-  id        String @id @default(cuid())
+  id        String   @id @default(cuid())
   userId    String
-  user      User   @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
   text      String
   createdAt DateTime @default(now())
 }
 
 model Invite {
-  id         String   @id @default(cuid())
-  code       String   @unique
-  email      String?
-  role       String   @default("member")
-  adultOnly  Boolean  @default(true)
+  id          String    @id @default(cuid())
+  code        String    @unique
+  email       String?
+  role        String    @default("member")
+  adultOnly   Boolean   @default(true)
   invitedById String
-  invitedBy  User     @relation(fields: [invitedById], references: [id])
-  acceptedAt DateTime?
-  expiresAt  DateTime
-  createdAt  DateTime @default(now())
+  invitedBy   User      @relation(fields: [invitedById], references: [id])
+  acceptedAt  DateTime?
+  expiresAt   DateTime
+  createdAt   DateTime  @default(now())
 }
 
 model ConsentRecord {
   id        String   @id @default(cuid())
   userId    String
   user      User     @relation(fields: [userId], references: [id])
-  kind      String   // adult_18 | community_guidelines | recording_appearance | data_processing
+  kind      String // adult_18 | community_guidelines | recording_appearance | data_processing
   granted   Boolean  @default(true)
   detail    String?
   createdAt DateTime @default(now())
@@ -584,42 +584,42 @@ model ConsentRecord {
 
 // ── Cross-cutting: audit, flags, import runs ────────────────────────────────
 model AuditEvent {
-  id        String   @id @default(cuid())
+  id        String       @id @default(cuid())
   orgId     String
   org       Organisation @relation(fields: [orgId], references: [id])
   actorId   String?
-  actor     User?    @relation(fields: [actorId], references: [id])
-  action    String   // e.g. content.update, report.resolve, invite.create
+  actor     User?        @relation(fields: [actorId], references: [id])
+  action    String // e.g. content.update, report.resolve, invite.create
   entity    String?
   entityId  String?
-  detail    String?  // json diff / reason
-  createdAt DateTime @default(now())
+  detail    String? // json diff / reason
+  createdAt DateTime     @default(now())
 
   @@index([orgId, createdAt])
 }
 
 model FeatureFlag {
-  id        String   @id @default(cuid())
+  id        String       @id @default(cuid())
   orgId     String
   org       Organisation @relation(fields: [orgId], references: [id])
   key       String
-  enabled   Boolean  @default(false)
-  updatedAt DateTime @updatedAt
+  enabled   Boolean      @default(false)
+  updatedAt DateTime     @updatedAt
 
   @@unique([orgId, key])
 }
 
 model ImportRun {
-  id        String   @id @default(cuid())
+  id        String       @id @default(cuid())
   orgId     String
   org       Organisation @relation(fields: [orgId], references: [id])
   filename  String
-  added     Int      @default(0)
-  changed   Int      @default(0)
-  conflicts Int      @default(0)
-  skipped   Int      @default(0)
-  summary   String?  // json preview
-  createdAt DateTime @default(now())
+  added     Int          @default(0)
+  changed   Int          @default(0)
+  conflicts Int          @default(0)
+  skipped   Int          @default(0)
+  summary   String? // json preview
+  createdAt DateTime     @default(now())
 }
 
 // ── Ask Unk: lightweight members (cookie identity, minimal data) ────────────
@@ -627,18 +627,18 @@ model ImportRun {
 // answers useful — age band (never DOB), optional allergies/diet notes. Never
 // weight, measurements, medical history, exact location or school.
 model Member {
-  id           String   @id
+  id           String       @id
   orgId        String
   org          Organisation @relation(fields: [orgId], references: [id])
-  ageBand      String?  // u13 | 13-15 | 16-17 | 18+ | parent_coach
+  ageBand      String? // u13 | 13-15 | 16-17 | 18+ | parent_coach
   allergies    String?
   dietaryNotes String?
-  createdAt    DateTime @default(now())
+  createdAt    DateTime     @default(now())
   lastSeenAt   DateTime?
 
-  reflections Reflection[]
-  askLogs     AskLog[]
-  habitLogs   HabitLog[]
+  reflections   Reflection[]
+  askLogs       AskLog[]
+  habitLogs     HabitLog[]
   savedThoughts SavedThought[]
 }
 
@@ -649,9 +649,9 @@ model HabitLog {
   id        String   @id @default(cuid())
   memberId  String
   member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
-  day       String   // Sydney YYYY-MM-DD
+  day       String // Sydney YYYY-MM-DD
   tags      String   @default("") // comma-separated ids from HABIT_TAGS
-  energy    Int?     // 1-5
+  energy    Int? // 1-5
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -662,20 +662,20 @@ model HabitLog {
 // (AES-256-GCM, key derived from AUTH_SECRET). Never public unless the member
 // explicitly shares AND a moderator approves (shareStatus flow).
 model Reflection {
-  id           String   @id @default(cuid())
+  id           String    @id @default(cuid())
   memberId     String
-  member       Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  member       Member    @relation(fields: [memberId], references: [id], onDelete: Cascade)
   promptText   String
-  answerEnc    String?  // encrypted private text answer
-  voicePath    String?  // storage key of encrypted voice note
+  answerEnc    String? // encrypted private text answer
+  voicePath    String? // storage key of encrypted voice note
   actionChosen String?
   reminderAt   DateTime?
-  followUp     String?  // yes | partly | not_yet | changed_plan
+  followUp     String? // yes | partly | not_yet | changed_plan
   followUpAt   DateTime?
-  shareStatus  String   @default("none") // none | pending | approved | declined
-  sharedText   String?  // the exact text the member chose to make public
+  shareStatus  String    @default("none") // none | pending | approved | declined
+  sharedText   String? // the exact text the member chose to make public
   sharedPostId String?
-  createdAt    DateTime @default(now())
+  createdAt    DateTime  @default(now())
 
   @@index([memberId, createdAt])
 }
@@ -688,7 +688,7 @@ model SavedThought {
   memberId  String
   member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
   promptId  String?
-  text      String   // denormalised copy, survives prompt edits
+  text      String // denormalised copy, survives prompt edits
   pillar    String   @default("Mindset")
   createdAt DateTime @default(now())
 
@@ -698,51 +698,51 @@ model SavedThought {
 // Owner's quick banks: topic ideas and Instagram post drafts, one table.
 // kind: topic | igpost. Deliberately tiny — a jot, a list, done.
 model DeskNote {
-  id        String   @id @default(cuid())
+  id        String       @id @default(cuid())
   orgId     String
   org       Organisation @relation(fields: [orgId], references: [id])
   kind      String
   title     String?
   body      String
   pillar    String?
-  status    String   @default("saved") // saved | used
-  createdAt DateTime @default(now())
+  status    String       @default("saved") // saved | used
+  createdAt DateTime     @default(now())
 
   @@index([orgId, kind, status])
 }
 
 // Thought of the Day prompts (owner-editable bank; rotates deterministically).
 model ThoughtPrompt {
-  id      String  @id @default(cuid())
+  id      String       @id @default(cuid())
   orgId   String
   org     Organisation @relation(fields: [orgId], references: [id])
   text    String
-  pillar  String  @default("Mindset")
-  actions String  // json array of suggested one-action options
-  active  Boolean @default(true)
-  order   Int     @default(0)
+  pillar  String       @default("Mindset")
+  actions String // json array of suggested one-action options
+  active  Boolean      @default(true)
+  order   Int          @default(0)
 }
 
 // ── Unk's Brain: owner-controlled knowledge base (the ONLY source of member
 // answers). Only approval="approved" items are ever retrieved. ──────────────
 model KnowledgeItem {
-  id          String   @id @default(cuid())
+  id          String       @id @default(cuid())
   orgId       String
   org         Organisation @relation(fields: [orgId], references: [id])
-  kind        String   // lesson | caption | transcript | teaching_note | mindset | nutrition | faq | source_link | playbook
+  kind        String // lesson | caption | transcript | teaching_note | mindset | nutrition | faq | source_link | playbook
   title       String
   pillar      String
-  audience    String   @default("General") // General | u13 | 13-15 | 16-17 | 18+ | parent_coach
-  body        String   // playbooks use labelled sections: DO NOW / FOOD / MINDSET / CAREFUL / PRIVATE / WHY
-  tags        String?  // json array, e.g. ["intent:game_day","band:1-2h"]
+  audience    String       @default("General") // General | u13 | 13-15 | 16-17 | 18+ | parent_coach
+  body        String // playbooks use labelled sections: DO NOW / FOOD / MINDSET / CAREFUL / PRIVATE / WHY
+  tags        String? // json array, e.g. ["intent:game_day","band:1-2h"]
   source      String?
   sourceUrl   String?
-  author      String   @default("UNC")
-  addedAt     DateTime @default(now())
+  author      String       @default("UNC")
+  addedAt     DateTime     @default(now())
   reviewedAt  DateTime?
-  approval    String   @default("draft") // draft | approved | archived
-  safetyClass String   @default("general") // general | nutrition | youth_sensitive
-  version     Int      @default(1)
+  approval    String       @default("draft") // draft | approved | archived
+  safetyClass String       @default("general") // general | nutrition | youth_sensitive
+  version     Int          @default(1)
 
   versions KnowledgeVersion[]
 
@@ -750,28 +750,28 @@ model KnowledgeItem {
 }
 
 model KnowledgeVersion {
-  id       String   @id @default(cuid())
+  id       String        @id @default(cuid())
   itemId   String
   item     KnowledgeItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
   version  Int
   title    String
   body     String
   note     String?
-  editedAt DateTime @default(now())
+  editedAt DateTime      @default(now())
 }
 
 // Phone push subscriptions (owner devices). Payloads are calm and rate-limited
 // by the dispatch route — max a morning brief and an evening nudge.
 model PushSub {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   orgId     String
-  endpoint  String   @unique
+  endpoint  String    @unique
   p256dh    String
   auth      String
-  role      String   @default("owner") // owner | member (member = opt-in "ping me when UNC answers" only)
-  memberId  String?  // set when role=member — links the ping to the anonymous asker device
-  label     String?  // device hint, e.g. "iPhone"
-  createdAt DateTime @default(now())
+  role      String    @default("owner") // owner | member (member = opt-in "ping me when UNC answers" only)
+  memberId  String? // set when role=member — links the ping to the anonymous asker device
+  label     String? // device hint, e.g. "iPhone"
+  createdAt DateTime  @default(now())
   lastOkAt  DateTime?
 }
 
@@ -779,16 +779,16 @@ model PushSub {
 // EVERY post and reply is checked by the owner before anyone sees it
 // (pending -> live). Anonymous by default, same device identity as questions.
 model HuddlePost {
-  id        String   @id @default(cuid())
+  id        String       @id @default(cuid())
   orgId     String
   org       Organisation @relation(fields: [orgId], references: [id])
   memberId  String
-  parentId  String?  // reply-to post id (one level deep)
-  topic     String   // Basketball | Nutrition | Mindset | General
+  parentId  String? // reply-to post id (one level deep)
+  topic     String // Basketball | Nutrition | Mindset | General
   body      String
-  name      String?  // optional display name; null = "Hooper"
-  status    String   @default("pending") // pending | live | hidden
-  createdAt DateTime @default(now())
+  name      String? // optional display name; null = "Hooper"
+  status    String       @default("pending") // pending | live | hidden
+  createdAt DateTime     @default(now())
 
   @@index([orgId, status, topic])
 }
@@ -797,23 +797,39 @@ model HuddlePost {
 // informed it (owner-visible), plus member feedback. Used for insights only —
 // never for medical inference.
 model AskLog {
-  id           String   @id @default(cuid())
+  id           String       @id @default(cuid())
   orgId        String
   org          Organisation @relation(fields: [orgId], references: [id])
   memberId     String?
-  member       Member?  @relation(fields: [memberId], references: [id])
+  member       Member?      @relation(fields: [memberId], references: [id])
   question     String
   intent       String
   timeBand     String?
-  usedItemIds  String?  // json array of KnowledgeItem ids
-  supported    Boolean  @default(true) // false = KB couldn't support an answer
-  escalated    Boolean  @default(false)
-  guardianNote Boolean  @default(false)
+  usedItemIds  String? // json array of KnowledgeItem ids
+  supported    Boolean      @default(true) // false = KB couldn't support an answer
+  escalated    Boolean      @default(false)
+  guardianNote Boolean      @default(false)
   useful       Boolean?
   unclear      Boolean?
   followed     Boolean?
   hadAvailable String?
-  createdAt    DateTime @default(now())
+  createdAt    DateTime     @default(now())
 
   @@index([orgId, createdAt])
+}
+
+model StudioSession {
+  id           String    @id @default(cuid())
+  orgId        String
+  title        String
+  topic        String?
+  date         DateTime?
+  pricePerSeat Int       @default(10)
+  capacity     Int       @default(20)
+  seatsSold    Int       @default(0)
+  status       String    @default("planned") // planned | done
+  notes        String?
+  createdAt    DateTime  @default(now())
+
+  @@index([orgId, status])
 }
