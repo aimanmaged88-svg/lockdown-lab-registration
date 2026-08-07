@@ -1337,7 +1337,7 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
       <div class="seclbl"><h2>Runs <em style="color:var(--volt);font-style:normal">tonight</em></h2><button id="seeRuns">SEE ALL</button></div>
       <div id="popruns"></div>
     </div>
-    <div class="sect">
+    <div class="sect" id="kingsSect" style="display:none">
       <div class="seclbl"><h2>🏆 City <em style="color:var(--volt);font-style:normal">Kings</em></h2><button id="seeKings">SEE ALL</button></div>
       <div id="homeKings"></div>
     </div>
@@ -1499,6 +1499,7 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
     <div class="starline" id="ctStars" style="display:none"></div>
   </div><button class="x" data-close>✕</button></div>
   <div class="amen" id="ctAmen"></div>
+  <div id="ctBest" style="display:none;font-size:12.5px;color:var(--muted);margin:8px 2px 0"></div>
   <div id="ctNotes" style="display:none;font-size:13px;color:var(--muted);background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 13px;margin:8px 0 4px"></div>
   <div class="subsect gearsect" id="ctGearWrap" style="display:none"><h4>🎒 Before you leave</h4>
     <div id="ctGear" class="gear"></div>
@@ -2527,14 +2528,17 @@ $('#callGo').onclick=()=>ensureProfile(async()=>{
 let CC=null;
 function amenTiles(c){
   const i=c.info||{};
-  const water=i.water==='bubbler'?['🚰','Bubbler']:i.water==='tap'?['🚰','Tap water']:i.water==='none'?['🚱','No water',1]:null;
   const t=[];
+  // Positives only — we never assert "No toilets"/"No lights" for a field we haven't
+  // verified. The one useful known-negative is "Bring water" when water is set to none.
   t.push(c.indoor?['🏟️','Indoor']:['☀️','Outdoor']);
   if(i.surface)t.push(['🧱',i.surface]);
   if(i.hoops)t.push(['🏀',i.hoops+(i.hoops===1?' hoop':' hoops')]);
-  t.push(c.lit?['💡','Lights']:['🌙','No lights',1]);
-  if(water)t.push(water);
-  t.push(i.toilets?['🚻','Toilets']:['🚻','No toilets',1]);
+  if(c.lit)t.push(['💡','Lights']);
+  if(i.water==='bubbler')t.push(['🚰','Bubbler']);
+  else if(i.water==='tap')t.push(['🚰','Tap water']);
+  else if(i.water==='none')t.push(['🚱','Bring water',1]);
+  if(i.toilets)t.push(['🚻','Toilets']);
   if(i.parking)t.push(['🅿️',i.parking]);
   if(i.shade)t.push(['⛱️','Shade']);
   if(i.seating)t.push(['🪑','Seating']);
@@ -2548,12 +2552,11 @@ function gearList(c){
   const i=c.info||{};
   const g=[
     {t:'Basketball',why:''},
-    {t:'Water bottle',why:i.water==='none'?'no water here':(i.water?'refill on site':'')},
+    {t:'Water bottle',why:i.water==='none'?'no water here':(i.water==='bubbler'||i.water==='tap'?'refill on site':'')},
     {t:'Court shoes',why:i.surface||''},
     {t:'Phone — to check in',why:''}
   ];
   if(!c.indoor)g.push({t:'Cap / sunscreen',why:'outdoor court'});
-  if(!c.lit&&!c.indoor)g.push({t:'Get there before dark',why:'no lights'});
   (i.bring||[]).forEach(b=>g.push({t:b,why:'coach says'}));
   return g;
 }
@@ -2580,6 +2583,9 @@ function openCourtPage(c){
   const tips=(c.info&&c.info.tips)||'';
   $('#ctTipsWrap').style.display=tips?'':'none';
   if(tips)$('#ctTips').textContent=tips;
+  const best=(c.info&&c.info.best)||'';
+  $('#ctBest').style.display=best?'':'none';
+  if(best)$('#ctBest').innerHTML='🕐 <b style="color:var(--muted);font-weight:700">Busiest / best times:</b> '+esc(best);
   const bk=$('#ctBkm');bk.classList.toggle('on',isSaved(c.key));
   bk.onclick=()=>{toggleSaved(c.key);bk.classList.toggle('on',isSaved(c.key));};
   $('#ctRuns').innerHTML='<div class="skel" style="height:56px"></div>';
@@ -2857,7 +2863,11 @@ function kingRowHTML(k){
 }
 function renderKingsHome(){
   const el=$('#homeKings'); if(!el)return;
-  if(!KINGS||!KINGS.length){el.innerHTML='<div class="empty" style="padding:14px">No kings yet — check in at a court to get on the board 👑</div>';return;}
+  const sect=$('#kingsSect');
+  // Launch-clean: hide the whole City Kings block until someone's actually on the board,
+  // so a fresh app never shows an empty leaderboard. It appears the moment there's a king.
+  if(!KINGS||!KINGS.length){if(sect)sect.style.display='none';el.innerHTML='';return;}
+  if(sect)sect.style.display='';
   el.innerHTML=KINGS.slice(0,3).map(kingRowHTML).join('');wireHoopers(el);
 }
 async function loadKings(force){
