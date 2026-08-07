@@ -15,8 +15,12 @@ export const dynamic = "force-dynamic";
 // leaves. The full Community desk (filters, Signal Map, history) stays put.
 export default async function InboxPage() {
   const orgId = await getOrgId();
-  const [questions, huddle, recent] = await Promise.all([
-    prisma.communityQuestion.findMany({ where: { orgId, status: "open" }, orderBy: { createdAt: "asc" } }),
+  // Cap the rendered list so a big backlog can't bog the page down; the true
+  // count comes from a cheap count() so "waiting" is always accurate.
+  const SHOWN = 60;
+  const [questions, openCount, huddle, recent] = await Promise.all([
+    prisma.communityQuestion.findMany({ where: { orgId, status: "open" }, orderBy: { createdAt: "asc" }, take: SHOWN }),
+    prisma.communityQuestion.count({ where: { orgId, status: "open" } }),
     huddleQueue(),
     prisma.communityQuestion.findMany({
       // Real people conversating — not the Library seed set (which has no memberId).
@@ -25,7 +29,7 @@ export default async function InboxPage() {
       take: 8,
     }),
   ]);
-  const waiting = questions.length + huddle.pending.length;
+  const waiting = openCount + huddle.pending.length;
 
   return (
     <div className="space-y-6 max-w-xl mx-auto">
@@ -48,6 +52,9 @@ export default async function InboxPage() {
         <div className="card p-5 text-sm text-grey">No open questions. When one lands, your phone buzzes and it shows up here — oldest first, so nobody waits longest.</div>
       ) : (
         <div className="space-y-3">
+          {openCount > questions.length && (
+            <p className="text-xs text-grey">Showing the oldest {questions.length} of {openCount} open — clear these and the next batch loads.</p>
+          )}
           {questions.map((q) => (
             <div key={q.id} className="card p-4">
               <p className="text-[15px] leading-relaxed">{q.text}</p>

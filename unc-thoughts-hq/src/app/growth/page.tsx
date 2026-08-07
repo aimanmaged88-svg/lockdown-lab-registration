@@ -10,7 +10,7 @@ export default async function GrowthPage() {
   const orgId = await getOrgId();
 
   const [questions, snaps, talks, replyReels, followups, experiments, patterns, contentOptions] = await Promise.all([
-    prisma.communityQuestion.findMany({ where: { orgId } }),
+    prisma.communityQuestion.findMany({ where: { orgId }, select: { frequency: true } }),
     prisma.analyticsSnapshot.findMany({ where: { content: { orgId } } }),
     prisma.talk.findMany({ where: { orgId }, include: { questions: true } }),
     prisma.content.count({ where: { orgId, format: "ReplyReel" } }),

@@ -18,7 +18,16 @@ export default async function CommunityPage() {
   const orgId = await getOrgId();
   const betaOn = await isEnabled("community_beta");
 
-  const questions = await prisma.communityQuestion.findMany({ where: { orgId }, orderBy: [{ status: "asc" }, { createdAt: "desc" }] });
+  // Accurate totals from cheap counts; render a capped, open-first slice so a
+  // large backlog never bogs the desk down. Open questions are what need action,
+  // so they come first (oldest first); recent answered give context.
+  const [openCount, answeredCount, openQs, answeredQs] = await Promise.all([
+    prisma.communityQuestion.count({ where: { orgId, status: "open" } }),
+    prisma.communityQuestion.count({ where: { orgId, status: "answered" } }),
+    prisma.communityQuestion.findMany({ where: { orgId, status: "open" }, orderBy: { createdAt: "asc" }, take: 250 }),
+    prisma.communityQuestion.findMany({ where: { orgId, status: "answered" }, orderBy: { answeredAt: "desc" }, take: 50 }),
+  ]);
+  const questions = [...openQs, ...answeredQs];
   const huddle = await huddleQueue();
   const inbox = await prisma.inboxItem.findMany({ where: { orgId, status: "open" }, orderBy: { priority: "desc" }, take: 20 });
 
@@ -61,8 +70,8 @@ export default async function CommunityPage() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <Stat label="Open questions" value={open.length} />
-        <Stat label="Answered" value={questions.filter((q) => q.status === "answered").length} />
+        <Stat label="Open questions" value={openCount} />
+        <Stat label="Answered" value={answeredCount} />
         <Stat label="Inbox" value={inbox.length} sub="needs attention" />
         <Stat label="Signal groups" value={signalSorted.length} />
       </div>
