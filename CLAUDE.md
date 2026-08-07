@@ -695,6 +695,36 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   shine sweep across the "Your game." script (accent-adaptive). All live on
   main. E2E 7/7 + screenshots. NOTE: Aiman still to send his real logo file to
   swap the vector silhouette (attachments don't reach disk — he'll re-send).
+- **Phase 1 launch prep — 12 courts enriched + cold-start cleanup (2026-08-07,
+  app + DB).** Aiman: "run Phase 1 so we can go hard… add the twelve courts,
+  enrich them, make them perfect."
+  - **12 courts enriched** with researched, source-backed detail (3 parallel
+    research agents over council pages / Courts of the World / Red Bull / Time
+    Out). Direct oc_courts SQL updates to `info` (surface/hoops/water/toilets/
+    parking/shade/seating/shop/best/tips) + top-level `lit`. **No fabrication:**
+    `lit` set true ONLY where verified (Green Square, Prince Alfred, Heffron,
+    Parramatta); unknown fields left empty. Standouts: Prince Alfred 5 hoops +
+    lit; Heffron concrete full court, dunk rims, lights, bubbler, car park;
+    Parramatta = CommBank Stadium outdoor gym (concrete, lit, 24/7). **FLAGGED
+    to Aiman — 3 courts whose exact pin couldn't be source-confirmed as a marked
+    court:** Pirrama Park (nearest confirmed = Maybanke Community Centre, Harris
+    St), Enmore Park (no formal court listed), North Steyne (nearest = Nolan
+    Reserve, North Manly). Enriched with verified PARK amenities; awaiting his
+    call to repin/rename/keep/hide (he's the vetter).
+  - **Cold-start cleanup so a fresh app never looks dead for the 5 testers:**
+    City Kings home block (`#kingsSect`) now HIDDEN until there's ≥1 king
+    (renderKingsHome toggles display; auto-appears on first check-in). Runs/board
+    empty states already actionable CTAs, kept.
+  - **Amenity honesty pass:** `amenTiles()` shows POSITIVES only — no more
+    asserting "No toilets"/"No lights" for unverified fields (the one kept
+    known-negative is "Bring water" when water=none). Same on the before-you-
+    leave checklist (dropped the auto "no lights" line). Court page now surfaces
+    **best/busiest times** (`#ctBest`).
+  - Shipped to main (auto-deploy), verified live (kingsSect hide + amenity code
+    served; courts_meta returns all 12 enriched). DB clean: 2 real accounts, 12
+    courts, 0 test rows. All Playwright tests used a local-only fake profile
+    (never registered → no writes). Screenshots taken. **Phase 1 done; Phase
+    2 = closed alpha with the 5 testers (per launch-plan artifact).**
 - v2 ideas discussed: KOTC proper, run chat, POTW weekly archive/all-time
   wall, PWA manifest + install, native app for background geofencing.
 
