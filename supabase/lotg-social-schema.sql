@@ -2,29 +2,31 @@
 -- Live in Supabase project ymuwuhvqqftgpxwhzoub (same project as the Lab).
 -- This file DOCUMENTS what is already deployed — it is not run by CI.
 --
--- Frontend: lotg-crew.html (Top Plays + one group chat for the whole crew).
+-- Frontend: lotg-crew.html  (live at https://lotg-crew.netlify.app)
 -- Backend:  edge function `lotg-social` (supabase/functions/lotg-social/index.ts),
---           verify_jwt ON — the browser sends the public anon key as Bearer +
---           apikey, exactly like app-api / opencourt-api. All table access is
---           server-side (service role); RLS is ON with NO policies so the anon
---           key can never touch these tables directly.
+--           verify_jwt ON — browser sends the public anon key as Bearer + apikey.
+--           All table access is server-side (service role); RLS ON, NO policies.
 --
--- This is SEPARATE from the tournament scoreboard. The live scoreboard app
--- (lotg-wednesday-night-basketball.netlify.app) runs on its own Netlify DB; the
--- lotg_teams / lotg_games / lotg_admin tables here are the older Supabase mirror.
--- The crew feed below shares neither — it only needs its own four tables.
+-- SEPARATE from the tournament scoreboard (that runs on its own Netlify DB).
+-- The lotg_teams / lotg_games / lotg_admin tables are the older Supabase mirror;
+-- the crew feed only needs the four tables below.
 --
--- Identity: no passwords. A device registers once with a name + (encouraged)
--- Instagram handle. The handle is how the crew connects — we only ever LINK to
--- instagram.com/<handle>, never log in or post. Every write goes through guard():
--- the device must be registered and not banned, and the server always uses the
--- REGISTERED name/handle (client-sent ones are ignored) so nobody can post as
--- someone else. To remove a troll: set lotg_crew.banned = true (no admin UI yet).
+-- Two sides, two rules (Aiman, 2026-08-07):
+--   PLAYS — anyone can submit a clip link with NO login. It lands in the coach's
+--           approval queue (approved=false) and only shows once he approves it.
+--           Voting is open too (one per device). Clip URLs are stored, never fetched.
+--   CHAT  — to post you sign in with a social handle: Instagram, Facebook or TikTok
+--           (NO email). The handle only ever LINKS to the profile — never posts.
+-- Coach approval/moderation is authed as any ACTIVE ll_coaches account (same
+-- sha256 scheme as coach_login; Aiman logs in with his email + PIN).
+-- Ban a member: set lotg_crew.banned = true.
 
 create table if not exists public.lotg_crew (
   id          text primary key,                 -- device uuid: [a-zA-Z0-9._-]{8,64}
   name        text not null,
-  ig          text not null default '',         -- instagram handle, no @
+  ig          text not null default '',         -- legacy; handle stored below now
+  provider    text not null default '',         -- instagram | facebook | tiktok
+  handle      text not null default '',          -- social handle, no @ (community sign-in)
   banned      boolean not null default false,
   created_at  timestamptz not null default now(),
   seen_at     timestamptz not null default now()
@@ -32,21 +34,23 @@ create table if not exists public.lotg_crew (
 
 create table if not exists public.lotg_plays (
   id          uuid primary key default gen_random_uuid(),
-  device_id   text not null,                    -- submitter (lotg_crew.id)
-  name        text not null,                    -- registered name at submit time
+  device_id   text not null,                    -- submitter's device (no login needed)
+  name        text not null,                    -- optional attribution, else 'Anonymous'
   ig          text not null default '',
   caption     text not null,                    -- one line: what happened (<=140)
-  url         text not null,                    -- clip link (IG/YouTube/TikTok) — STORED, never fetched
-  platform    text not null default 'Clip',     -- derived label for the chip
-  week        text not null,                    -- Sydney ISO week, e.g. 2026-W32 (the POTW window)
-  hidden      boolean not null default false,   -- coach can soft-hide a play (SQL for now)
+  url         text not null,                    -- clip link (IG/YT/TikTok/FB) — STORED, never fetched
+  platform    text not null default 'Clip',
+  week        text not null,                    -- Sydney ISO week, e.g. 2026-W32
+  approved    boolean not null default false,   -- coach must approve before it's visible
+  hidden      boolean not null default false,   -- coach take-down of an approved clip
   created_at  timestamptz not null default now()
 );
-create index if not exists lotg_plays_recent_idx on public.lotg_plays(created_at desc) where hidden = false;
+create index if not exists lotg_plays_pending_idx on public.lotg_plays(created_at) where approved = false and hidden = false;
+create index if not exists lotg_plays_live_idx on public.lotg_plays(created_at desc) where approved = true and hidden = false;
 
 create table if not exists public.lotg_play_votes (
   play_id     uuid not null references public.lotg_plays(id) on delete cascade,
-  device_id   text not null,                    -- one vote per device per play
+  device_id   text not null,                    -- one vote per device per play (open)
   created_at  timestamptz not null default now(),
   primary key (play_id, device_id)
 );
@@ -56,6 +60,8 @@ create table if not exists public.lotg_chat (
   device_id   text not null,
   name        text not null,
   ig          text not null default '',
+  provider    text not null default '',         -- author's social, for the profile link
+  handle      text not null default '',
   body        text not null,                    -- <=300
   created_at  timestamptz not null default now()
 );
@@ -68,13 +74,18 @@ alter table public.lotg_chat       enable row level security;
 -- No policies on purpose: all reads/writes flow through the lotg-social edge fn.
 
 -- Edge actions (POST { action, ... } to /functions/v1/lotg-social):
---   register    {device,name,ig}            -> upsert crew, returns me
---   board       {device}                    -> { me, plays[], chat[], week }  (poll this)
---   play_submit {device,url,caption}        -> guarded; validates url, detects platform,
---                                              inserts + auto-adds your own vote; <=12/day
---   play_vote   {device,play}               -> guarded; toggle one vote per device per play
---   chat_get    {device}                    -> { chat[] }  (mine computed from device)
---   chat_send   {device,body}               -> guarded; insert; <=20 / 5 min
--- plays[]/chat[] carry a server-computed `mine` (and plays `own`) so the client
--- never sees anyone else's device id. Play of the Week = top-voted play of the
--- current Sydney week; the leaderboard shows this week's plays, ranked by votes.
+--   PUBLIC
+--     register    {device,name,provider,handle}  -> chat sign-in (social only, no email)
+--     board       {device}                       -> { me, plays[], pending[], chat[], week }  (poll)
+--     play_submit {device,url,caption,name?}      -> OPEN (no login); lands pending; <=12/day/device
+--     play_vote   {device,play}                   -> OPEN; toggle 1 vote/device on an APPROVED play
+--     chat_get    {device}                        -> { chat[] }
+--     chat_send   {device,body}                   -> requires social sign-in (guard); <=20/5min
+--   COACH (auth = active ll_coaches user + PIN)
+--     admin_pending  {user,pin}                   -> plays awaiting approval
+--     admin_approve  {user,pin,play}              -> make a clip live
+--     admin_reject   {user,pin,play}              -> delete a pending clip
+--     admin_takedown {user,pin,play}              -> hide an already-approved clip
+-- board.plays are APPROVED clips ranked by votes (Play of the Week = #1 this week);
+-- board.pending is the viewer's OWN clips still awaiting approval. plays/chat carry a
+-- server-computed `mine`; device ids never leave the server.
