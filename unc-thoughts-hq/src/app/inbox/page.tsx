@@ -19,7 +19,8 @@ export default async function InboxPage() {
     prisma.communityQuestion.findMany({ where: { orgId, status: "open" }, orderBy: { createdAt: "asc" } }),
     huddleQueue(),
     prisma.communityQuestion.findMany({
-      where: { orgId, status: "answered", answerText: { not: null } },
+      // Real people conversating — not the Library seed set (which has no memberId).
+      where: { orgId, status: "answered", answerText: { not: null }, memberId: { not: null } },
       orderBy: { answeredAt: "desc" },
       take: 8,
     }),
