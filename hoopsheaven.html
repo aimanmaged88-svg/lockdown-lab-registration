@@ -742,9 +742,14 @@ header{
 .me b{color:var(--text);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
 /* ---------- hero ---------- */
-.hero{padding:24px 2px 4px}
+.hero{padding:24px 2px 4px;position:relative}
+.hero::before{content:"";position:absolute;left:-46px;top:-34px;width:300px;height:300px;border-radius:50%;z-index:-1;pointer-events:none;
+  background:radial-gradient(circle,color-mix(in srgb,var(--volt) 13%,transparent),transparent 62%);filter:blur(8px);opacity:.75;animation:heroFloat 9s ease-in-out infinite alternate}
+@keyframes heroFloat{from{transform:translate(0,0) scale(1)}to{transform:translate(26px,12px) scale(1.1)}}
 .hero h1{font-family:var(--disp);font-weight:400;font-size:clamp(36px,10vw,48px);line-height:1.04;text-transform:uppercase;letter-spacing:.5px}
-.hero .scripty{display:block;color:var(--volt);font-family:'HHMarker',cursive;font-style:normal;text-transform:none;letter-spacing:0;font-size:.86em;transform:rotate(-2deg);transform-origin:left;padding:6px 0 4px}
+.hero .scripty{display:block;font-family:'HHMarker',cursive;font-style:normal;text-transform:none;letter-spacing:0;font-size:.86em;transform:rotate(-2deg);transform-origin:left;padding:6px 0 4px;
+  color:var(--volt);background:linear-gradient(100deg,var(--volt) 34%,#fff 50%,var(--volt) 66%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:scriptShine 6.5s ease-in-out infinite}
+@keyframes scriptShine{0%,72%,100%{background-position:210% 0}86%{background-position:-10% 0}}
 .hero p{color:var(--muted);margin-top:10px;font-size:15px}
 .herostat{display:none;margin-top:14px;gap:8px;flex-wrap:wrap}
 .herostat.on{display:flex}
@@ -1188,7 +1193,8 @@ header{
 .unc-eyebrow{font-family:var(--disp);font-weight:700;letter-spacing:.44em;font-size:11px;text-transform:uppercase;
   color:rgba(255,255,255,.5);padding-left:.44em;opacity:0;animation:uncEye .9s var(--ease-out) .15s both}
 @keyframes uncEye{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
-.unc-badge{position:relative;width:250px;height:250px;display:grid;place-items:center}
+.unc-badge{position:relative;width:250px;height:250px;display:grid;place-items:center;animation:uncFloat 5.5s ease-in-out .8s infinite alternate}
+@keyframes uncFloat{from{transform:translateY(0)}to{transform:translateY(-8px)}}
 .unc-glow{position:absolute;width:290px;height:290px;border-radius:50%;
   background:radial-gradient(circle,rgba(255,255,255,.16),transparent 60%);opacity:0;animation:uncGlow 2.6s ease-in-out .4s both;mix-blend-mode:screen;pointer-events:none}
 @keyframes uncGlow{0%{opacity:0;transform:scale(.5)}45%{opacity:.9}100%{opacity:.5;transform:scale(1)}}
@@ -1255,7 +1261,7 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
       <svg class="unc-face" viewBox="0 0 172 190" aria-label="UNC">
         <defs>
           <linearGradient id="uncSil" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stop-color="#454a55"/><stop offset=".55" stop-color="#20232b"/><stop offset="1" stop-color="#0a0b0e"/>
+            <stop offset="0" stop-color="#3a3f4a"/><stop offset=".5" stop-color="#181b22"/><stop offset="1" stop-color="#07080b"/>
           </linearGradient>
         </defs>
         <g fill="url(#uncSil)">
