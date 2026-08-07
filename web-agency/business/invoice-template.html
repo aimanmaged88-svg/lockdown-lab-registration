@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SiteFive — Invoice [0001]</title>
+<style>
+  :root{
+    --ink:#0c111c;
+    --muted:#55607a;
+    --hair:#e6e9f0;
+    --green:#0F9D66;
+    --paper:#ffffff;
+    --backdrop:#eef0f4;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--backdrop);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    font-size:14px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+    padding:28px 16px;
+  }
+
+  /* The sheet */
+  .sheet{
+    background:var(--paper);
+    width:210mm;
+    min-height:297mm;
+    max-width:100%;
+    margin:0 auto;
+    padding:18mm 16mm;
+    box-shadow:0 10px 40px rgba(12,17,28,.14), 0 2px 8px rgba(12,17,28,.08);
+    border-radius:2px;
+  }
+
+  /* Header */
+  .top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:24px;
+    padding-bottom:20px;
+    border-bottom:2px solid var(--green);
+  }
+  .brand{display:flex;align-items:center;gap:12px;}
+  .logo{
+    width:46px;height:46px;
+    border-radius:14%;
+    background:linear-gradient(135deg,#4ade80,#22d3ee);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:900;font-size:28px;line-height:1;
+    color:#04140a;
+    flex:0 0 auto;
+  }
+  .wordmark{font-size:24px;font-weight:800;letter-spacing:-.02em;}
+  .tagline{font-size:11.5px;color:var(--muted);margin-top:2px;font-weight:500;}
+
+  .invhead{text-align:right;}
+  .invhead h1{
+    margin:0 0 6px;
+    font-size:30px;
+    font-weight:800;
+    letter-spacing:.06em;
+    color:var(--ink);
+  }
+  .meta{font-size:12.5px;color:var(--muted);}
+  .meta .row{display:flex;justify-content:flex-end;gap:8px;margin-top:2px;}
+  .meta .lbl{color:var(--muted);}
+  .meta .val{color:var(--ink);font-weight:600;min-width:96px;text-align:right;}
+
+  /* Parties */
+  .parties{
+    display:flex;
+    gap:32px;
+    margin-top:22px;
+  }
+  .party{flex:1;}
+  .party h3{
+    margin:0 0 6px;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.09em;
+    color:var(--green);
+    font-weight:700;
+  }
+  .party .name{font-weight:700;font-size:15px;margin-bottom:2px;}
+  .party .line{color:var(--muted);font-size:13px;}
+
+  /* Line items */
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:26px;
+  }
+  thead th{
+    text-align:left;
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.07em;
+    color:var(--muted);
+    font-weight:700;
+    padding:0 0 8px;
+    border-bottom:2px solid var(--hair);
+  }
+  th.num,td.num{text-align:right;}
+  tbody td{
+    padding:12px 0;
+    border-bottom:1px solid var(--hair);
+    vertical-align:top;
+    font-size:13.5px;
+  }
+  tbody tr{page-break-inside:avoid;break-inside:avoid;}
+  td.desc .t{font-weight:600;color:var(--ink);}
+  td.desc .sub{color:var(--muted);font-size:12px;margin-top:2px;}
+  td.num{white-space:nowrap;color:var(--ink);font-variant-numeric:tabular-nums;}
+  .altnote{
+    color:var(--muted);
+    font-size:11.5px;
+    font-style:italic;
+    padding:8px 0 0;
+  }
+
+  /* Totals */
+  .totalsWrap{
+    display:flex;
+    justify-content:flex-end;
+    margin-top:18px;
+  }
+  .totals{width:300px;max-width:100%;}
+  .totals .trow{
+    display:flex;justify-content:space-between;
+    padding:6px 0;font-size:13.5px;
+  }
+  .totals .trow .k{color:var(--muted);}
+  .totals .trow .v{font-variant-numeric:tabular-nums;font-weight:600;}
+  .totals .gstnote{font-size:11px;color:var(--muted);font-style:italic;margin:-2px 0 4px;}
+  .totals .grand{
+    display:flex;justify-content:space-between;
+    padding:12px 0 6px;
+    margin-top:6px;
+    border-top:2px solid var(--green);
+    font-size:18px;font-weight:800;
+  }
+  .totals .grand .v{color:var(--green);font-variant-numeric:tabular-nums;}
+  .split{
+    font-size:12px;color:var(--muted);
+    background:#f6f8fb;
+    border:1px solid var(--hair);
+    border-radius:8px;
+    padding:9px 11px;
+    margin-top:10px;
+  }
+  .split b{color:var(--ink);}
+
+  /* Payment box */
+  .paybox{
+    margin-top:26px;
+    border:1px solid var(--hair);
+    border-radius:10px;
+    padding:16px 18px;
+    background:#fbfcfe;
+  }
+  .paybox h3{
+    margin:0 0 10px;
+    font-size:11px;text-transform:uppercase;letter-spacing:.09em;
+    color:var(--green);font-weight:700;
+  }
+  .paygrid{
+    display:flex;flex-wrap:wrap;gap:6px 28px;
+    font-size:13px;
+  }
+  .paygrid .pi{min-width:150px;}
+  .paygrid .pi .k{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em;}
+  .paygrid .pi .v{font-weight:600;}
+
+  /* Terms + footer */
+  .terms{
+    margin-top:22px;
+    font-size:12.5px;
+    color:var(--muted);
+  }
+  .terms .guarantee{
+    color:var(--green);
+    font-weight:600;
+    margin-top:4px;
+  }
+  .foot{
+    margin-top:28px;
+    padding-top:14px;
+    border-top:1px solid var(--hair);
+    text-align:center;
+    font-size:11.5px;
+    color:var(--muted);
+  }
+  .foot b{color:var(--ink);font-weight:700;}
+
+  /* Print */
+  @page{ size:A4; margin:16mm; }
+  @media print{
+    html,body{ background:#fff !important; }
+    body{ padding:0; }
+    .sheet{
+      width:auto;
+      min-height:0;
+      margin:0;
+      padding:0;
+      box-shadow:none;
+      border-radius:0;
+    }
+    *{
+      -webkit-print-color-adjust:exact;
+      print-color-adjust:exact;
+    }
+  }
+</style>
+</head>
+<body>
+  <div class="sheet">
+
+    <!-- Header -->
+    <div class="top">
+      <div class="brand">
+        <div class="logo">5</div>
+        <div>
+          <div class="wordmark">SiteFive</div>
+          <div class="tagline">Websites for local business. Live in 5 days.</div>
+        </div>
+      </div>
+      <div class="invhead">
+        <h1>INVOICE</h1>
+        <div class="meta">
+          <div class="row"><span class="lbl">Invoice #</span><span class="val">[0001]</span></div>
+          <div class="row"><span class="lbl">Issue date</span><span class="val">[date]</span></div>
+          <div class="row"><span class="lbl">Due date</span><span class="val">[date]</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Parties -->
+    <div class="parties">
+      <div class="party">
+        <h3>From</h3>
+        <div class="name">SiteFive</div>
+        <div class="line">[Your Name]</div>
+        <div class="line">[hello@sitefive.com.au]</div>
+        <div class="line">[sitefive.com.au]</div>
+        <div class="line">ABN [your ABN]</div>
+      </div>
+      <div class="party">
+        <h3>Bill to</h3>
+        <div class="name">[Client business]</div>
+        <div class="line">[Client name]</div>
+        <div class="line">[client email]</div>
+      </div>
+    </div>
+
+    <!-- Line items -->
+    <table>
+      <thead>
+        <tr>
+          <th class="desc">Description</th>
+          <th class="num">Qty</th>
+          <th class="num">Unit price</th>
+          <th class="num">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="desc">
+            <div class="t">Website build — up to 3 pages</div>
+            <div class="sub">Design, copy, setup, Google Business listing</div>
+          </td>
+          <td class="num">1</td>
+          <td class="num">$749.00</td>
+          <td class="num">$749.00</td>
+        </tr>
+        <tr>
+          <td class="desc">
+            <div class="t">Care plan — monthly</div>
+            <div class="sub">Hosting, domain, email, security, unlimited edits</div>
+          </td>
+          <td class="num">1</td>
+          <td class="num">$79.00</td>
+          <td class="num">$79.00</td>
+        </tr>
+        <!--
+          ALTERNATE / EXAMPLE ROWS — edit or swap in as needed:
+
+          PAY-ONCE MODEL (single up-front build):
+          <tr>
+            <td class="desc"><div class="t">Website build — up to 5 pages</div>
+              <div class="sub">Design, copy, setup, Google, contact form</div></td>
+            <td class="num">1</td><td class="num">$1,199.00</td><td class="num">$1,199.00</td>
+          </tr>
+
+          MONTHLY MODEL (subscription — no big up-front):
+          <tr>
+            <td class="desc"><div class="t">Website subscription — monthly</div>
+              <div class="sub">Build + hosting + edits, all-in, no lock-in</div></td>
+            <td class="num">1</td><td class="num">$99.00</td><td class="num">$99.00</td>
+          </tr>
+
+          EXTRAS you can add as their own line:
+          <tr>
+            <td class="desc"><div class="t">Extra page</div>
+              <div class="sub">Additional page beyond the base build</div></td>
+            <td class="num">2</td><td class="num">$120.00</td><td class="num">$240.00</td>
+          </tr>
+        -->
+      </tbody>
+    </table>
+    <div class="altnote">Tip: this invoice shows both models — a one-off build line and a monthly care-plan line. Delete whichever doesn't apply, or use the commented examples in the HTML source.</div>
+
+    <!-- Totals -->
+    <div class="totalsWrap">
+      <div class="totals">
+        <div class="trow"><span class="k">Subtotal</span><span class="v">$828.00</span></div>
+        <div class="trow"><span class="k">GST (10%)</span><span class="v">$82.80</span></div>
+        <div class="gstnote">[remove GST line if not registered for GST]</div>
+        <div class="grand"><span class="k">TOTAL (AUD)</span><span class="v">$910.80</span></div>
+        <div class="split">
+          <b>Deposit due now (50%):</b> $455.40 &nbsp;·&nbsp; <b>Balance on go-live:</b> $455.40
+          <br>Applies to the pay-once build. Monthly care plan is billed separately each month.
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment details -->
+    <div class="paybox">
+      <h3>Payment details</h3>
+      <div class="paygrid">
+        <div class="pi"><div class="k">Bank</div><div class="v">[Bank name]</div></div>
+        <div class="pi"><div class="k">BSB</div><div class="v">[000-000]</div></div>
+        <div class="pi"><div class="k">Account</div><div class="v">[00000000]</div></div>
+        <div class="pi"><div class="k">Account name</div><div class="v">[Your Name / Business]</div></div>
+        <div class="pi"><div class="k">Reference</div><div class="v">[invoice #]</div></div>
+        <div class="pi"><div class="k">Card</div><div class="v">[payment link]</div></div>
+      </div>
+    </div>
+
+    <!-- Terms -->
+    <div class="terms">
+      Payment due within 7 days. Thank you for your business.
+      <div class="guarantee">Live in 5 days or the build is free · no lock-in.</div>
+    </div>
+
+    <!-- Footer -->
+    <div class="foot">
+      <b>SiteFive</b> · websites for local business · [sitefive.com.au]
+    </div>
+
+  </div>
+</body>
+</html>

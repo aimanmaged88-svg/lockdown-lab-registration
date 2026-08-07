@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SiteFive — Proposal</title>
+<style>
+  :root{
+    --ink:#0c111c;
+    --muted:#55607a;
+    --hair:#e6e9f0;
+    --accent:#0F9D66;
+    --paper:#ffffff;
+    --backdrop:#eef0f4;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{
+    background:var(--backdrop);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    line-height:1.5;
+  }
+  .sheet{
+    background:var(--paper);
+    width:210mm;
+    min-height:297mm;
+    margin:24px auto;
+    padding:16mm 15mm 12mm;
+    box-shadow:0 12px 40px rgba(12,17,28,.14),0 2px 8px rgba(12,17,28,.06);
+    border-radius:2px;
+  }
+
+  /* ---------- header ---------- */
+  .top{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    padding-bottom:14px;
+    border-bottom:2px solid var(--ink);
+  }
+  .brand{display:flex;align-items:center;gap:11px}
+  .logo{
+    width:40px;height:40px;
+    border-radius:14%;
+    background:linear-gradient(135deg,#4ade80,#22d3ee);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:900;font-size:26px;color:#04140a;
+    line-height:1;
+  }
+  .wordmark{font-size:24px;font-weight:800;letter-spacing:-.4px}
+  .tagline{font-size:11px;color:var(--muted);font-weight:600;margin-top:1px}
+  .meta{text-align:right;font-size:11.5px;color:var(--muted);line-height:1.7}
+  .meta .kicker{
+    font-size:12px;font-weight:800;letter-spacing:2px;color:var(--ink);
+    margin-bottom:4px;
+  }
+  .meta b{color:var(--ink);font-weight:700}
+  .valid{
+    display:inline-block;margin-top:5px;
+    font-size:10px;font-weight:700;color:var(--accent);
+    border:1px solid var(--accent);border-radius:20px;
+    padding:2px 9px;
+  }
+
+  /* ---------- intro ---------- */
+  .intro{
+    margin:20px 0 22px;
+    font-size:16px;line-height:1.55;font-weight:600;
+    color:var(--ink);
+  }
+
+  /* ---------- section headings ---------- */
+  h2{
+    font-size:12px;font-weight:800;letter-spacing:1.6px;text-transform:uppercase;
+    color:var(--accent);
+    margin-bottom:12px;
+  }
+  section{margin-bottom:22px}
+
+  /* ---------- what you'll get ---------- */
+  .ticks{
+    columns:2;column-gap:34px;
+    list-style:none;
+  }
+  .ticks li{
+    display:flex;gap:9px;align-items:flex-start;
+    font-size:13px;
+    padding:4px 0;
+    break-inside:avoid;
+  }
+  .ticks .ck{
+    color:var(--accent);font-weight:900;flex:0 0 auto;
+    font-size:13px;line-height:1.5;
+  }
+
+  /* ---------- investment cards ---------- */
+  .cards{display:flex;gap:16px}
+  .card{
+    flex:1;
+    border:1px solid var(--hair);
+    border-radius:12px;
+    padding:18px 18px 20px;
+    position:relative;
+    background:var(--paper);
+  }
+  .card.pop{
+    border:2px solid var(--accent);
+    box-shadow:0 6px 22px rgba(15,157,102,.12);
+  }
+  .badge{
+    position:absolute;top:-11px;left:18px;
+    background:var(--accent);color:#fff;
+    font-size:10px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;
+    padding:3px 10px;border-radius:20px;
+  }
+  .card h3{font-size:14px;font-weight:800;margin-bottom:2px}
+  .card .sub{font-size:11.5px;color:var(--muted);margin-bottom:12px}
+  .price{
+    font-size:30px;font-weight:900;color:var(--accent);
+    line-height:1.05;letter-spacing:-.5px;
+  }
+  .price small{font-size:13px;font-weight:700;color:var(--muted)}
+  .plus{
+    font-size:13px;font-weight:700;color:var(--ink);
+    margin-top:6px;
+  }
+  .plus span{color:var(--muted);font-weight:600}
+  .own{
+    margin-top:12px;padding-top:11px;border-top:1px solid var(--hair);
+    font-size:11.5px;color:var(--muted);font-weight:600;
+  }
+  .own b{color:var(--ink)}
+  .gstnote{font-size:10.5px;color:var(--muted);margin-top:10px}
+
+  /* ---------- guarantees ---------- */
+  .guars{display:flex;gap:14px}
+  .guar{
+    flex:1;
+    border:1px solid var(--hair);
+    border-radius:10px;
+    padding:13px 14px;
+    background:#fbfcfd;
+  }
+  .guar .g-ic{font-size:18px;line-height:1}
+  .guar .g-t{font-size:12.5px;font-weight:800;margin:6px 0 2px}
+  .guar .g-d{font-size:11px;color:var(--muted)}
+
+  /* ---------- how it works ---------- */
+  .steps{display:flex;gap:10px;align-items:stretch}
+  .step{
+    flex:1;text-align:center;
+    position:relative;
+  }
+  .step .num{
+    width:26px;height:26px;border-radius:50%;
+    background:var(--accent);color:#fff;
+    font-size:13px;font-weight:800;
+    display:flex;align-items:center;justify-content:center;
+    margin:0 auto 7px;
+  }
+  .step .st-t{font-size:12px;font-weight:700}
+  .step .st-d{font-size:10.5px;color:var(--muted);margin-top:2px}
+  .step:not(:last-child)::after{
+    content:"→";
+    position:absolute;top:5px;right:-8px;
+    color:var(--hair);font-size:16px;font-weight:900;
+  }
+
+  /* ---------- addons ---------- */
+  .addons{
+    font-size:11.5px;color:var(--muted);
+    background:#fbfcfd;border:1px solid var(--hair);border-radius:8px;
+    padding:11px 14px;
+  }
+  .addons b{color:var(--ink)}
+
+  /* ---------- acceptance ---------- */
+  .accept{
+    border:1px solid var(--hair);
+    border-radius:12px;
+    padding:18px 20px;
+    background:#fbfcfd;
+  }
+  .accept .a-t{font-size:14px;font-weight:800;margin-bottom:4px}
+  .accept .a-d{font-size:12px;color:var(--muted);margin-bottom:16px}
+  .siglines{display:flex;gap:34px;margin-bottom:16px}
+  .sig{flex:1}
+  .sig .line{border-bottom:1.5px solid var(--ink);height:26px}
+  .sig .lbl{font-size:10.5px;color:var(--muted);font-weight:600;margin-top:5px}
+  .contact{
+    font-size:11.5px;color:var(--ink);font-weight:600;
+    padding-top:12px;border-top:1px solid var(--hair);
+  }
+  .contact span{color:var(--muted);margin:0 6px;font-weight:400}
+  .contact a{color:var(--accent);text-decoration:none;font-weight:700}
+
+  /* ---------- footer ---------- */
+  .foot{
+    margin-top:18px;padding-top:12px;
+    border-top:1px solid var(--hair);
+    display:flex;justify-content:space-between;align-items:center;
+    font-size:10.5px;color:var(--muted);
+  }
+  .foot .fb{display:flex;align-items:center;gap:7px;font-weight:700;color:var(--ink)}
+  .foot .flogo{
+    width:18px;height:18px;border-radius:14%;
+    background:linear-gradient(135deg,#4ade80,#22d3ee);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:900;font-size:12px;color:#04140a;
+  }
+
+  .keep{break-inside:avoid;page-break-inside:avoid}
+
+  /* ---------- print ---------- */
+  @page{size:A4;margin:14mm}
+  @media print{
+    html,body{background:#fff}
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    .sheet{
+      width:auto;min-height:0;margin:0;padding:0;
+      box-shadow:none;border-radius:0;
+    }
+  }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <!-- HEADER -->
+  <div class="top">
+    <div class="brand">
+      <div class="logo">5</div>
+      <div>
+        <div class="wordmark">SiteFive</div>
+        <div class="tagline">Websites for local business. Live in 5 days.</div>
+      </div>
+    </div>
+    <div class="meta">
+      <div class="kicker">PROPOSAL</div>
+      Prepared for <b>[Client business]</b><br>
+      Date <b>[date]</b>
+      <div class="valid">Valid for 14 days</div>
+    </div>
+  </div>
+
+  <!-- INTRO -->
+  <p class="intro">
+    Here's how we'll get <b>[Client business]</b> a website that wins you
+    customers — live in 5 days.
+  </p>
+
+  <!-- WHAT YOU'LL GET -->
+  <section>
+    <h2>What you'll get</h2>
+    <ul class="ticks">
+      <li><span class="ck">&#10003;</span> Custom-designed site (up to 3 pages)</li>
+      <li><span class="ck">&#10003;</span> Written-for-you copy</li>
+      <li><span class="ck">&#10003;</span> Mobile-first &amp; fast</li>
+      <li><span class="ck">&#10003;</span> Contact / booking / quote forms</li>
+      <li><span class="ck">&#10003;</span> Free domain (1st year)</li>
+      <li><span class="ck">&#10003;</span> Business email</li>
+      <li><span class="ck">&#10003;</span> Google Business + Maps setup</li>
+      <li><span class="ck">&#10003;</span> Hosting, security &amp; backups</li>
+      <li><span class="ck">&#10003;</span> Unlimited small edits</li>
+    </ul>
+  </section>
+
+  <!-- INVESTMENT -->
+  <section class="keep">
+    <h2>Your investment</h2>
+    <div class="cards">
+      <div class="card pop">
+        <div class="badge">Most popular</div>
+        <h3>Pay once</h3>
+        <div class="sub">Own it day one</div>
+        <div class="price">$749 <small>build</small></div>
+        <div class="plus">+ $79<span>/month care plan</span></div>
+        <div class="own">Yours to keep from <b>day one</b> — care plan covers hosting, security, backups &amp; small edits.</div>
+      </div>
+      <div class="card">
+        <h3>Pay monthly</h3>
+        <div class="sub">$0 upfront</div>
+        <div class="price">$119 <small>/month</small></div>
+        <div class="plus">Cancel anytime</div>
+        <div class="own">Everything included, nothing upfront. The site is <b>yours after 12 months</b>.</div>
+      </div>
+    </div>
+    <div class="gstnote">Prices include everything above. AUD. GST [if applicable].</div>
+  </section>
+
+  <!-- GUARANTEES -->
+  <section class="keep">
+    <h2>Our guarantees</h2>
+    <div class="guars">
+      <div class="guar">
+        <div class="g-ic">&#9889;</div>
+        <div class="g-t">Live in 5 days</div>
+        <div class="g-d">Or the build is free.</div>
+      </div>
+      <div class="guar">
+        <div class="g-ic">&#128154;</div>
+        <div class="g-t">Approve before you pay</div>
+        <div class="g-d">You sign off the design first.</div>
+      </div>
+      <div class="guar">
+        <div class="g-ic">&#128275;</div>
+        <div class="g-t">No lock-in</div>
+        <div class="g-d">Cancel anytime.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="keep">
+    <h2>How it works</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="num">1</div>
+        <div class="st-t">Free call</div>
+        <div class="st-d">We learn your business</div>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <div class="st-t">You send details</div>
+        <div class="st-d">30 min, that's it</div>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <div class="st-t">We build</div>
+        <div class="st-d">5 days</div>
+      </div>
+      <div class="step">
+        <div class="num">4</div>
+        <div class="st-t">Go live</div>
+        <div class="st-d">You're online</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ADD-ONS -->
+  <section>
+    <h2>Optional add-ons</h2>
+    <div class="addons">
+      <b>Online store</b> (Shopify) &nbsp;·&nbsp;
+      <b>Booking system</b> (Calendly / Square) &nbsp;·&nbsp;
+      <b>Extra pages</b> — quoted separately.
+    </div>
+  </section>
+
+  <!-- ACCEPTANCE -->
+  <section class="keep">
+    <div class="accept">
+      <div class="a-t">Ready to go?</div>
+      <div class="a-d">Reply "Yes, let's do it" or sign below.</div>
+      <div class="siglines">
+        <div class="sig">
+          <div class="line"></div>
+          <div class="lbl">Signature</div>
+        </div>
+        <div class="sig">
+          <div class="line"></div>
+          <div class="lbl">Date</div>
+        </div>
+      </div>
+      <div class="contact">
+        [Your Name]
+        <span>·</span> <a href="mailto:hello@sitefive.com.au">hello@sitefive.com.au</a>
+        <span>·</span> <a href="https://sitefive.com.au">sitefive.com.au</a>
+        <span>·</span> @sitefive.co
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <div class="foot">
+    <div class="fb"><span class="flogo">5</span> SiteFive</div>
+    <div>Websites for local business.</div>
+  </div>
+
+</div>
+</body>
+</html>

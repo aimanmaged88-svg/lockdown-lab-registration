@@ -18,7 +18,7 @@ Everything's built. This is the exact order to go live tonight. ~1 hour, mostly 
 
 1. Make a new Instagram account (or convert one): handle **@sitefive.co** (or `@sitefive.sydney` / `@getsitefive` if taken).
 2. Switch to a **Business/Professional account** (Settings → Account type). Free, and unlocks contact buttons + insights.
-3. Set the profile pic to your logo (a "5" in a green→cyan gradient — I can export you one; for tonight a solid green square with a white "5" is fine).
+3. Set the profile pic to your logo — use **`brand/ig-profile.png`** (your finished SiteFive icon). Done.
 4. Paste this bio:
    > 🌐 Websites for local business
    > ⚡ Live in 5 days · from $799
@@ -56,6 +56,10 @@ The website and the posts are your shopfront. **The messages are the business.**
 ### Everything in this folder
 - `index.html` — your website (deploy this)
 - `demos/` — 3 portfolio sites
+- `brand/` — **logo, favicon, Instagram profile pic (`ig-profile.png`), share image + brand guide**
+- `business/invoice-template.html` — **branded, print-to-PDF invoice**
+- `business/proposal-template.html` — **branded one-page proposal to win clients**
+- `business/email-templates.md` — **professional email scripts + your signature**
 - `instagram/posts/` — 9 ready-to-post images
 - `instagram/captions.md` — captions for all 9
 - `instagram/profile-mockup.html` — what your IG page should look like
