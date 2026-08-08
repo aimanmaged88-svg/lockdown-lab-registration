@@ -66,6 +66,13 @@ Set your bio to:
 > DM us **"SITE"** and we'll get your business a proper website this week. From $749, no lock-in, all the tech handled.
 > Sydney local businesses — let's go. 🙌
 
+### Post 10 — `10-customise.jpg`
+> Your website, your way. 🎨
+> We build it *exactly* how you want — your colours, your style, your vibe. It's yours, not a template.
+> And it's not a $5,000 agency job — just **$749**, or spread it monthly across the year.
+> ⚡ Live in 5 days or it's free · 🔓 No lock-in
+> Ready when you are — **DM us "SITE"** 👇
+
 ---
 
 **Tips:**
