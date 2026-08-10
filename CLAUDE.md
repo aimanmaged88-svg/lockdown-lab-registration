@@ -693,8 +693,28 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   the home content rise in. Tap-to-skip, ~2.2s (600ms under reduced-motion),
   fully under prefers-reduced-motion. Plus home-hero ambient float glow + a slow
   shine sweep across the "Your game." script (accent-adaptive). All live on
-  main. E2E 7/7 + screenshots. NOTE: Aiman still to send his real logo file to
-  swap the vector silhouette (attachments don't reach disk — he'll re-send).
+  main. E2E 7/7 + screenshots.
+- **Real UNC logo landed (2026-08-10).** Aiman sent his actual "UNC THOUGHTS —
+  Basketball. Nutrition. Mindset." logo (backlit silhouette). Attachments still
+  don't reach disk — the image was EXTRACTED FROM THE SESSION TRANSCRIPT JSONL
+  (base64 in /root/.claude/projects/.../<session>.jsonl; that trick works, use
+  it again). Per his ask, the four circle arc segments were removed (Chromium
+  canvas connected-component pass: far-from-center + large ⇒ arc; glow
+  remnants cleared, near-black→#000, tight crop) → assets/unc-logo.webp (18KB,
+  preloaded) + .png fallback. #uncIntro rebuilt: pure-black stage, real logo
+  <picture> fades/rises with a screen-blend halo (no rect edges — halo sits ON
+  TOP with mix-blend-mode:screen), float, tap-to-skip, 2.2s, reduced-motion.
+  Old tick ring / vector face / UNC wordmark deleted. E2E 8/8, live on main.
+- **HH vibe themes + hero copy (2026-08-10, Aiman picked).** Hero is now
+  "Sydney's playing. / You in?" (invitation angle). 🎨 sheet = "Your vibe":
+  TWO full themes — Retro (90s purple+neon, DEFAULT; pink script) and
+  Concrete (street grit, spray-yellow script) via data-theme on <html>,
+  persisted `oc_theme`; accent swatches kept underneath as fine-tune
+  (custom accent stored `oc_accent` applies on top). applyTheme()/renderVibe()
+  next to the old applyAccent(). Also that day: City Kings home section hidden
+  when empty (#kingsSect), amenity tiles positives-only, court page shows
+  best-times (#ctBest), 12 courts enriched in DB (source-backed, no
+  fabrication). All live on main, E2E'd.
 - **Phase 1 launch prep — 12 courts enriched + cold-start cleanup (2026-08-07,
   app + DB).** Aiman: "run Phase 1 so we can go hard… add the twelve courts,
   enrich them, make them perfect."
