@@ -9,9 +9,18 @@ const state = {
   wizard: null,
   toast: "",
   adminRoute: window.location.pathname.startsWith("/admin"),
+  adminOk: false,
 };
 
-const canEdit = () => state.adminRoute;
+const ADMIN_PIN = "1234";
+const canEdit = () => state.adminRoute && state.adminOk;
+function checkAdminPin() {
+  if (!state.adminRoute) return;
+  if (localStorage.getItem("lotg_admin_pin") === ADMIN_PIN) { state.adminOk = true; return; }
+  const entry = window.prompt("Admin PIN:") || "";
+  if (entry.trim() === ADMIN_PIN) { localStorage.setItem("lotg_admin_pin", ADMIN_PIN); state.adminOk = true; }
+  else window.location.replace("/");
+}
 
 const icon = (name) => {
   const paths = {
@@ -578,6 +587,7 @@ function editScore(gameId) {
 }
 
 async function init() {
+  checkAdminPin();
   try {
     const data = await api();
     state.tournament = data.tournament || null;
