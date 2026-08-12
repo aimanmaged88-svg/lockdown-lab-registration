@@ -382,7 +382,42 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
 - v2 ideas discussed: KOTC proper, run chat, POTW weekly archive/all-time
   wall, PWA manifest + install, native app for background geofencing.
 
-## LOTG — Wednesday Night Basketball scoreboard (repo'd 2026-07-29)
+## LOTG WNB v3 — app REPLACED outside this repo (discovered 2026-08-12)
+
+- **The scoreboard at lotg-wednesday-night-basketball.netlify.app is NO LONGER
+  the app documented below.** Another Claude session (Aiman runs several)
+  rebuilt it at least twice: v2 (single-file React bundle, gold theme, weeks +
+  WK ladder, code-unlock reading lotg_admin) then **v3 (current): vanilla JS
+  split files (index.html/app.js/styles.css), NO password — admin = the
+  `/admin` PATH (share the bare link for view-only, /admin to score), one
+  night at a time, per-court RR4 wizard + auto playoffs (QF/semis/final),
+  7:15 PM start hardcoded, 13-min cadence.**
+- **The Netlify site is now GIT-LINKED to a repo NOT in the
+  aimanmaged88-svg account** (not listed by list_repos — likely created by a
+  Cowork/other-account flow). The deploy-site MCP proxy therefore REBUILDS
+  THAT REPO'S MAIN and IGNORES uploaded files — file deploys to this site no
+  longer work from here. Code fixes require finding that repo (unknown) or
+  asking the session that owns it.
+- **v3 data = `/api/tournament` Netlify Function (NOT Supabase).** GET/PUT,
+  fully open (no auth). Whole-tournament JSON: shape mirrors
+  createTournament() in app.js (teams {id,name,abbr,order,arrivingLate},
+  games {id,phase,group,round,slot,court,homeId,awayId,scores,complete},
+  groups, playoff flags, scheduleVersion 2). To seed a night server-side:
+  extract app.js's builder fns (scratchpad v3-builder.cjs pattern), build,
+  PUT — done for 2026-08-12 (SYL/Erkan/Mousa/Unique · Yohanna/LOTG/
+  Herbalife/JJC). KNOWN BUG in deployed v3: createTournament does
+  `groups.flatMap(roundRobin)` so flatMap's index lands in roundRobin's
+  existingGames param → the in-app wizard CRASHES; seed via API instead.
+  Aug 5 night (real results) snapshotted: lotg/night-2026-08-05.json.
+- **Supabase lotg_* tables are LEGACY for this product** (v1/v2 only). On
+  2026-08-12, to serve v2's client-side unlock, RLS was OPENED: public
+  SELECT on lotg_admin + public writes on lotg_games/lotg_teams, and
+  lotg_games gained `week int`; admin password set to '1234'. v3 ignores
+  Supabase entirely — tighten or drop these whenever, nothing user-facing
+  depends on them now. LOTG league points (SJ's weekly graphic) live outside
+  the app either way.
+
+## LOTG — Wednesday Night Basketball scoreboard v1 (repo'd 2026-07-29, SUPERSEDED — see v3 note above)
 
 - **LOTG = "Love of the Game"**, a separate Sydney brand Aiman is involved
   with (its own landing PWA lives at love-of-the-game-lotg.netlify.app —
