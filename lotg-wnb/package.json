@@ -1,0 +1,7 @@
+{
+  "name": "lotg-wnb",
+  "private": true,
+  "dependencies": {
+    "@netlify/blobs": "*"
+  }
+}

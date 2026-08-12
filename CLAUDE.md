@@ -392,12 +392,28 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   `/admin` PATH (share the bare link for view-only, /admin to score), one
   night at a time, per-court RR4 wizard + auto playoffs (QF/semis/final),
   7:15 PM start hardcoded, 13-min cadence.**
-- **The Netlify site is now GIT-LINKED to a repo NOT in the
-  aimanmaged88-svg account** (not listed by list_repos — likely created by a
-  Cowork/other-account flow). The deploy-site MCP proxy therefore REBUILDS
-  THAT REPO'S MAIN and IGNORES uploaded files — file deploys to this site no
-  longer work from here. Code fixes require finding that repo (unknown) or
-  asking the session that owns it.
+- **CORRECTION (later same day): the site is NOT git-linked.** Deploy
+  metadata shows "Deploy triggered by upload", no commit refs — v2/v3 were
+  API uploads from other sessions' machines. (My earlier single-file upload
+  "succeeding" but serving old files was the npx @netlify/mcp CLI failing to
+  pick up a bare one-file dir and republishing the previous file set — the
+  summary said "All files already uploaded". Staging a REAL project — git
+  init + netlify.toml + package.json — deploys fine.)
+- **v4 SHIPPED from THIS repo (2026-08-12, deploy 6a7c0fbc…): source lives in
+  `lotg-wnb/`** (netlify.toml publish "site", command "npm install";
+  site/{index.html,app.js,styles.css,lotg-logo.jpg,manifest.json,icons};
+  netlify/functions/tournament.mjs — rebuilt blobs store "lotg-wnb"/key
+  "tournament", strong consistency, GET/PUT {tournament,previousTeams}).
+  v4 changes (all Aiman-asked): ONE combined 8-team ladder (groupStandings
+  kept — playoff seeding still per-court), schedule = Court 1/Court 2 TAP
+  PILLS single column (no sideways scroll), first-open UNC welcome overlay
+  (localStorage lotg_welcome_seen_v1) with add-to-home-screen guide, PWA
+  manifest + icons, and the wizard flatMap crash FIXED
+  (groups.flatMap((g)=>roundRobin(g))). E2E: scratchpad lotg-v4-e2e.mjs
+  (fake-origin route interception; note /app.js absolute paths break
+  file:// testing). Deploy = stage lotg-wnb/ as its own git repo, then the
+  npx proxy command from deploy-site. Blobs are per-site (old function's
+  store orphaned; re-PUT data after function swaps).
 - **v3 data = `/api/tournament` Netlify Function (NOT Supabase).** GET/PUT,
   fully open (no auth). Whole-tournament JSON: shape mirrors
   createTournament() in app.js (teams {id,name,abbr,order,arrivingLate},
