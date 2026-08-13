@@ -756,6 +756,15 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   Redfern NOT added (researched pin = duplicate of Waterloo Oval court).
   Aiman claimed his desk PIN + called the first real run (Green Square, Fri 14
   Aug 7am). Roadmap: testers wk Aug 18-24, FEATURE FREEZE Aug 27, launch Sep 1.
+- **Fresh slate #2 + flash tutorial (2026-08-13, Aiman asked).** ALL oc_ user
+  data wiped again at his ask (2 accounts incl. his own + his Green Sq run;
+  courts/court_reqs/desk kept) — he's re-launching signups with his Thursday
+  team group (~8 ppl) doing test runs. NEW **#flashTut**: 3-slide first-open
+  tutorial (Every court mapped / See who's on, join the run / Real ones only
+  — IG or email = your jersey) with dots/skip/tap-advance, CTA → house rules
+  → sign-up gate. Shows ONLY when no terms + no profile; stale wiped devices
+  self-heal via the me-action 'terms' recovery (re-register on I'm-in). E2E
+  10/10, live on main.
 - v2 ideas discussed: KOTC proper, run chat, POTW weekly archive/all-time
   wall, PWA manifest + install, native app for background geofencing.
 
