@@ -380,14 +380,25 @@ Deno.serve(async (req: Request) => {
         // A banned device row stays banned even if they re-register.
         const prev = await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=banned`);
         if (prev?.[0]?.banned) return J({ error: BANNED_MSG, code: "banned" }, 403);
-        const cur = await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=verified,verify_code`);
+        const cur = await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=verified,verify_code,player_num`);
         const verified = !!cur?.[0]?.verified;
         const verify_code = cur?.[0]?.verify_code || mkCode();
         await db(`oc_players?on_conflict=id`, {
           method: "POST", headers: { Prefer: "resolution=merge-duplicates" },
           body: JSON.stringify({ id, name, ig, tiktok, email, accepted_at: new Date().toISOString(), verify_code }),
         });
-        return J({ ok: true, player: { id, name, ig, tiktok }, verified, verify_code });
+        // Every hooper gets a random unique 4-digit player number — their public
+        // ID in the app ("Player #4358"), worn on the card like a jersey.
+        let player_num = cur?.[0]?.player_num ?? null;
+        for (let i = 0; i < 30 && player_num == null; i++) {
+          const cand = 1000 + Math.floor(Math.random() * 9000);
+          try {
+            await db(`oc_players?id=eq.${encodeURIComponent(id)}&player_num=is.null`, { method: "PATCH", body: JSON.stringify({ player_num: cand }) });
+            const chk = await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=player_num`);
+            player_num = chk?.[0]?.player_num ?? null;
+          } catch (_e) { /* number taken — roll again */ }
+        }
+        return J({ ok: true, player: { id, name, ig, tiktok }, verified, verify_code, player_num });
       }
 
       // Log back in on a NEW phone: handle/email + the account's 5-digit code
@@ -404,7 +415,9 @@ Deno.serve(async (req: Request) => {
         }
         await new Promise((r) => setTimeout(r, 650));
         const w = encodeURIComponent(who);
-        const rows = await db(`oc_players?or=(ig.eq.${w},tiktok.eq.${w},email.eq.${w})&select=id,name,ig,tiktok,email,verified,verify_code,banned`);
+        const rows = /^\d{4}$/.test(who)
+          ? await db(`oc_players?player_num=eq.${w}&select=id,name,ig,tiktok,email,verified,verify_code,banned,player_num`)
+          : await db(`oc_players?or=(ig.eq.${w},tiktok.eq.${w},email.eq.${w})&select=id,name,ig,tiktok,email,verified,verify_code,banned,player_num`);
         const hit = (rows || []).find((p: { verify_code?: string }) => p.verify_code === code);
         if (!hit) {
           const fails = (g0?.fails || 0) + 1;
@@ -416,7 +429,7 @@ Deno.serve(async (req: Request) => {
         }
         if (hit.banned || await bansHit([hit.id, hit.ig, hit.tiktok, hit.email])) return J({ error: BANNED_MSG, code: "banned" }, 403);
         if (g0) await db(`oc_login_guard?who=eq.${w}`, { method: "DELETE" });
-        return J({ ok: true, player: { id: hit.id, name: hit.name, ig: hit.ig || "", tiktok: hit.tiktok || "", email: hit.email || "" }, verified: !!hit.verified, verify_code: hit.verify_code });
+        return J({ ok: true, player: { id: hit.id, name: hit.name, ig: hit.ig || "", tiktok: hit.tiktok || "", email: hit.email || "" }, verified: !!hit.verified, verify_code: hit.verify_code, player_num: hit.player_num ?? null });
       }
 
       // Resolve a Google Maps link (or plain "lat, lon") to coordinates so the
@@ -715,13 +728,13 @@ Deno.serve(async (req: Request) => {
       case "me": {
         const id = str(b.player_id, 64);
         if (!id) return J({ error: "bad request" }, 400);
-        const rows = await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=name,ig,tiktok,email,verified,verify_code,banned`);
+        const rows = await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=name,ig,tiktok,email,verified,verify_code,banned,player_num`);
         const row = rows?.[0];
         if (!row) return J({ error: "no account", code: "terms" }, 404);
         let code = row.verify_code;
         if (!code) { code = mkCode(); await db(`oc_players?id=eq.${encodeURIComponent(id)}`, { method: "PATCH", body: JSON.stringify({ verify_code: code }) }); }
         const req = await db(`oc_inbox?player_id=eq.${encodeURIComponent(id)}&select=player_id`);
-        return J({ name: row.name, ig: row.ig, tiktok: row.tiktok || "", verified: !!row.verified, verify_code: code, banned: !!row.banned, requested: !!req?.length });
+        return J({ name: row.name, ig: row.ig, tiktok: row.tiktok || "", verified: !!row.verified, verify_code: code, banned: !!row.banned, requested: !!req?.length, player_num: row.player_num ?? null });
       }
 
 
@@ -753,7 +766,7 @@ Deno.serve(async (req: Request) => {
         const id = str(b.player_id, 64);
         if (!id) return J({ error: "bad request" }, 400);
         const viewer = str(b.viewer_id, 64);
-        const prow = (await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=id,name,ig,tiktok,verified,checkins_total,created_at`))?.[0];
+        const prow = (await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=id,name,ig,tiktok,verified,checkins_total,created_at,player_num`))?.[0];
         if (!prow) return J({ error: "hooper not found" }, 404);
         const runs = (await db(`oc_run_players?player_id=eq.${encodeURIComponent(id)}&select=run_id`)) || [];
         const clips = (await db(`oc_plays?player_id=eq.${encodeURIComponent(id)}&select=id`)) || [];
@@ -786,7 +799,7 @@ Deno.serve(async (req: Request) => {
         if (!rcount) rating = { show: false, label: "Unrated", value: null, count: 0 };
         else if (avg < 7) rating = { show: true, label: "6−", value: null, count: rcount, soft: true };
         else rating = { show: true, label: (Math.round(avg * 10) / 10).toFixed(1), value: Math.round(avg * 10) / 10, count: rcount, soft: false };
-        return J({ id: prow.id, name: prow.name, ig: prow.ig, tiktok: prow.tiktok || "", verified: !!prow.verified, checkins: Number(prow.checkins_total) || 0, runs: runs.length, clips: clips.length, fires, tier: tierOf(Number(prow.checkins_total) || 0), rating, comments: comments.slice(0, 30), mine, joined: prow.created_at });
+        return J({ id: prow.id, name: prow.name, ig: prow.ig, tiktok: prow.tiktok || "", verified: !!prow.verified, num: prow.player_num ?? null, checkins: Number(prow.checkins_total) || 0, runs: runs.length, clips: clips.length, fires, tier: tierOf(Number(prow.checkins_total) || 0), rating, comments: comments.slice(0, 30), mine, joined: prow.created_at });
       }
 
       // Rate another hooper 1-10 (+ optional scouting note). Coach-moderated:
@@ -954,7 +967,7 @@ Deno.serve(async (req: Request) => {
       // Heaven desk (Lab coach credentials): review + verify + ban + suggestions.
       case "admin_players": {
         if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
-        const rows = await db(`oc_players?select=id,name,ig,tiktok,email,verified,verify_code,banned,checkins_total,created_at&order=created_at.desc&limit=300`);
+        const rows = await db(`oc_players?select=id,name,ig,tiktok,email,verified,verify_code,banned,checkins_total,created_at,player_num&order=created_at.desc&limit=300`);
         const inbox = await db(`oc_inbox?select=*&order=created_at.asc&limit=100`);
         const court_reqs = await db(`oc_court_reqs?select=*&order=created_at.desc&limit=100`);
         const fb_pending = await db(`oc_pfeedback?approved=is.false&select=id`);

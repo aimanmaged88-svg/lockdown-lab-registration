@@ -1228,6 +1228,10 @@ header{
 @keyframes uncLogo{to{opacity:1;transform:none}}
 #uncIntro .skip{position:absolute;bottom:34px;left:0;right:0;text-align:center;font-size:11px;letter-spacing:.2em;
   text-transform:uppercase;color:rgba(255,255,255,.28);opacity:0;animation:uncEye .8s ease 1.8s both}
+/* jersey number — every hooper's public ID, worn like a real card number */
+.nbacard .jersey{position:absolute;right:16px;bottom:8px;font-family:var(--disp);font-weight:700;font-size:46px;line-height:1;color:var(--tc);opacity:.18;letter-spacing:.02em;pointer-events:none}
+.pnumchip{display:inline-block;margin-left:7px;font-family:var(--cond);font-weight:800;font-size:11.5px;letter-spacing:.08em;color:var(--muted);background:color-mix(in srgb,var(--tc) 14%,transparent);border:1px solid color-mix(in srgb,var(--tc) 30%,transparent);border-radius:99px;padding:2px 9px;vertical-align:middle}
+
 /* ===== flash tutorial — 3 quick slides for brand-new players ===== */
 #flashTut{position:fixed;inset:0;z-index:205;display:none;flex-direction:column;background:var(--bg)}
 #flashTut.on{display:flex}
@@ -1479,7 +1483,7 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
 <div class="sheet" id="shLogin"><div class="scrim" data-close></div><div class="panel">
   <div class="grab"></div>
   <div class="xrow"><div><h3>Log back in</h3><p class="sub">Your profile follows your account, not your phone. Enter the @ (or email) you signed up with + your 5-digit code.</p></div><button class="x" data-close>✕</button></div>
-  <div class="fld"><label>Your @ or email</label><input class="inp" id="lgWho" autocapitalize="none" placeholder="@yourhandle — or you@gmail.com"></div>
+  <div class="fld"><label>Your @, email or player number</label><input class="inp" id="lgWho" autocapitalize="none" placeholder="@yourhandle · you@gmail.com · 4358"></div>
   <div class="fld"><label>Your 5-digit code</label><input class="inp" id="lgCode" inputmode="numeric" maxlength="6" placeholder="12345"></div>
   <button class="btn btn-v btn-block" id="lgGo">Log me in 🏀</button>
   <p class="fine" style="margin-top:10px">Your code lives in Profile → 🔑 Phone-switch code. Lost it? Message the coach on IG and we'll sort you.</p>
@@ -1759,12 +1763,13 @@ function hooperCardHTML(d,own){
   const rateBtn=(!own&&OCP)?`<button class="btn btn-v btn-block" id="rateHooperBtn" style="margin-top:14px">${d.mine?('✏️ Update your rating'+(d.mine.approved?'':' · pending')):'⭐ Rate this hooper'}</button>`:'';
   return `<div class="nbacard${foil}" style="--tc:${t.color}"><div class="inner">
     <div class="court"></div><div class="holo"></div>
+    ${d.num!=null?`<div class="jersey">#${d.num}</div>`:''}
     <div class="toprow">
       <div class="pfp">${av}</div>
       <div class="who"><div class="nm">${esc(d.name)}${d.verified?'<span class="vk" title="verified">✓</span>':''}</div>
         ${d.ig?`<a class="ig" href="https://instagram.com/${esc(d.ig)}" target="_blank" rel="noopener">@${esc(d.ig)} ↗</a>`:''}
         ${d.tiktok?`<a class="ig" href="https://tiktok.com/@${esc(d.tiktok)}" target="_blank" rel="noopener">🎵 @${esc(d.tiktok)} ↗</a>`:''}
-        <div><span class="tierbadge"><span class="dot"></span>${esc(t.name)}</span></div></div>
+        <div><span class="tierbadge"><span class="dot"></span>${esc(t.name)}</span>${d.num!=null?`<span class="pnumchip">#${d.num}</span>`:''}</div></div>
       <div class="rt">${rt}</div>
     </div>
     ${box}${bar}${scout}
@@ -1893,7 +1898,7 @@ async function refreshMe(loud){
   try{
     const d=await api({action:'me',player_id:OCP.id});
     const was=OCP.vf;
-    OCP.vf=d.verified;OCP.code=d.verify_code;OCP.req=!!d.requested;
+    OCP.vf=d.verified;OCP.code=d.verify_code;OCP.req=!!d.requested;if(d.player_num!=null)OCP.num=d.player_num;
     if(d.tiktok!==undefined)OCP.tiktok=d.tiktok;
     localStorage.setItem('oc_profile',JSON.stringify(OCP));
     paintMe();paintVf();
@@ -1911,7 +1916,7 @@ $('#lgGo').onclick=async()=>{
   const b=$('#lgGo');b.disabled=true;b.textContent='Checking…';
   try{
     const d=await api({action:'login',who,code});
-    OCP={id:d.player.id,name:d.player.name,ig:d.player.ig||'',tiktok:d.player.tiktok||'',email:d.player.email||'',vf:!!d.verified,code:d.verify_code||''};
+    OCP={id:d.player.id,name:d.player.name,ig:d.player.ig||'',tiktok:d.player.tiktok||'',email:d.player.email||'',vf:!!d.verified,code:d.verify_code||'',num:d.player_num??null};
     localStorage.setItem('oc_profile',JSON.stringify(OCP));
     localStorage.setItem('oc_terms',TERMS_V);
     closeSheet('shLogin');$('#shProfile').classList.remove('gate');closeSheet('shProfile');
@@ -1979,7 +1984,7 @@ $('#pfSave').onclick=async()=>{
   try{
     const d=await api({action:'register',accept:true,player:{id,name,ig,tiktok,email}});
     const fresh=!OCP;
-    OCP={id,name,ig,tiktok,email,vf:!!d.verified,code:d.verify_code||''};
+    OCP={id,name,ig,tiktok,email,vf:!!d.verified,code:d.verify_code||'',num:d.player_num??null};
     localStorage.setItem('oc_profile',JSON.stringify(OCP));
     paintMe();paintVf();paintProfileTab();paintNotifRow();syncSaves();
     if(fresh)setTimeout(maybeNtfPrompt,3500);
@@ -1988,7 +1993,7 @@ $('#pfSave').onclick=async()=>{
     if(fresh&&!OCP.vf)api({action:'verify_request',player:{id:OCP.id},text:'auto: new signup — check my page and verify me'}).catch(()=>{});
     $('#shProfile').classList.remove('gate');
     closeSheet('shProfile');
-    toast(fresh?'Account created. Welcome to Hoops Heaven 🏀':'Saved 🏀');
+    toast(fresh?('Welcome to Hoops Heaven — you\'re Player #'+(OCP.num??'?')+' 🏀'):'Saved 🏀');
     if(afterProfile){const f=afterProfile;afterProfile=null;f();}
   }catch(e){toast(e.message,1)}
   b.disabled=false; b.textContent='Lock it in';

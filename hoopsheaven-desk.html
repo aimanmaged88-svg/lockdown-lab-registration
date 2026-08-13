@@ -1051,7 +1051,7 @@ function joinAgo(ts){
 function row(p,pending){
   return `<div class="row ${pending?'pending':''} ${p.banned?'banned':''}">
     <div class="who">
-      <b>${esc(p.name)} ${p.verified?'<span class="vtick">✓</span>':''} ${p.banned?'<span class="tag b">BANNED</span>':pending?'<span class="tag p">PENDING</span>':''}</b>
+      <b>${esc(p.name)} ${p.player_num?`<span style="color:var(--dim);font-weight:700">#${p.player_num}</span>`:''} ${p.verified?'<span class="vtick">✓</span>':''} ${p.banned?'<span class="tag b">BANNED</span>':pending?'<span class="tag p">PENDING</span>':''}</b>
       ${socialLinks(p)}
     </div>
     ${!p.verified&&!p.banned?`<span class="code">${esc(p.verify_code||'—')}</span>`:''}
@@ -1117,7 +1117,7 @@ async function load(){
     $('#inbox').innerHTML=inbox.length?inbox.map(m=>{
       const pp=byId.get(m.player_id)||m;
       return `<div class="row pending"><div class="who">
-        <b>${esc(m.name)} <span class="tag p">WANTS ✓</span></b>
+        <b>${esc(m.name)} ${(byId.get(m.player_id)||{}).player_num?`<span style="color:var(--dim);font-weight:700">#${(byId.get(m.player_id)||{}).player_num}</span>`:''} <span class="tag p">WANTS ✓</span></b>
         ${socialLinks(pp)}
         <span style="display:block;font-size:11px;color:var(--muted);margin-top:3px">👆 Open their page — real hooper? Hit verify.</span>
         ${m.text?`<span style="display:block;font-style:italic;margin-top:3px">“${esc(m.text)}”</span>`:''}
