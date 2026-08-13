@@ -765,6 +765,18 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   → sign-up gate. Shows ONLY when no terms + no profile; stale wiped devices
   self-heal via the me-action 'terms' recovery (re-register on I'm-in). E2E
   10/10, live on main.
+- **Silent self-heal + auto-verify requests (2026-08-13).** Aiman's screen
+  recording showed red "sign in first" toasts on his stale post-wipe device.
+  Fix: api() catches code:'terms' on non-register actions and (when the device
+  has OCP + accepted terms) silently re-registers, fires a re-verify request
+  to the desk, and retries the original call once (_retried guard) — no error,
+  no rules popup. pfSave also auto-submits verify_request on every NEW signup,
+  so all accounts land in the desk inbox for the ✓ without asking. His two
+  re-made accounts (@lockdownlab33, @uncsthoughts) re-verified via SQL.
+  Real IG/TikTok OAuth investigated + parked post-launch: Meta killed the
+  Instagram Basic Display API (no consumer IG login for 3rd parties); TikTok
+  Login Kit needs a dev app + review (weeks). The ✓ human loop IS the identity
+  lock. Heal E2E + tut regression 10/10, live on main. Test rows cleaned.
 - v2 ideas discussed: KOTC proper, run chat, POTW weekly archive/all-time
   wall, PWA manifest + install, native app for background geofencing.
 
