@@ -1660,10 +1660,23 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const SYD='Australia/Sydney';
 
-async function api(body){
+async function api(body,_retried){
   const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+ANON,'apikey':ANON},body:JSON.stringify(body)});
   const d=await r.json().catch(()=>({error:'network error'}));
   if(!r.ok||d.error){
+    // Self-heal: this device has an identity + accepted rules, but the server
+    // doesn't know it (e.g. after a data reset). Quietly re-register and retry
+    // once — the player never sees an error for something that isn't their fault.
+    if(d.code==='terms'&&body.action!=='register'&&!_retried&&OCP&&OCP.id&&termsOk()){
+      try{
+        const rr=await api({action:'register',accept:true,player:{id:OCP.id,name:OCP.name||'Hooper',ig:OCP.ig||'',tiktok:OCP.tiktok||'',email:OCP.email||''}},true);
+        OCP.vf=!!rr.verified;OCP.code=rr.verify_code||'';
+        localStorage.setItem('oc_profile',JSON.stringify(OCP));
+        paintMe();
+        if(!OCP.vf)api({action:'verify_request',player:{id:OCP.id},text:'auto: account restored — please re-verify me'},true).catch(()=>{});
+        return await api(body,true);
+      }catch(e2){}
+    }
     if(d.code==='terms'&&body.action!=='register'){localStorage.removeItem('oc_terms');openSheet('shTerms');}
     if(d.code==='verify'){view('Profile');paintVf();toast('Verify your account to unlock that — tap Request verification',1);}
     const e=new Error(d.error||'something broke'); e.code=d.code; throw e;
@@ -1935,6 +1948,9 @@ $('#pfSave').onclick=async()=>{
     localStorage.setItem('oc_profile',JSON.stringify(OCP));
     paintMe();paintVf();paintProfileTab();paintNotifRow();syncSaves();
     if(fresh)setTimeout(maybeNtfPrompt,3500);
+    // every new signup lands in the coach's desk automatically — nobody has to
+    // ask for the ✓, the coach just checks their page and approves the real ones
+    if(fresh&&!OCP.vf)api({action:'verify_request',player:{id:OCP.id},text:'auto: new signup — check my page and verify me'}).catch(()=>{});
     $('#shProfile').classList.remove('gate');
     closeSheet('shProfile');
     toast(fresh?'Account created. Welcome to Hoops Heaven 🏀':'Saved 🏀');
