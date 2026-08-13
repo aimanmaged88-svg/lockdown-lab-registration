@@ -821,7 +821,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
   <main class="main">
     <div id="login" class="card" style="max-width:420px;margin:8vh auto">
       <h1>Heaven <span>desk</span></h1>
-      <p class="sub">Your command centre — verifications, players, courts.</p>
+      <p class="sub">Your command centre. Wave in the real ones, run the courts, watch the city play.</p>
       <input class="inp" id="lu" placeholder="Coach email / username" autocapitalize="none">
       <input class="inp" id="lp" placeholder="PIN (4 digits)" type="password" inputmode="numeric" maxlength="8">
       <button class="btn btn-v btn-block" id="loginBtn">Open the desk</button>
@@ -831,29 +831,29 @@ svg.leaflet-image-layer.leaflet-interactive path {
     <div id="desk" style="display:none">
       <section id="sec-overview">
         <h1>Overview</h1>
-        <p class="sub">The pulse. Auto-refreshes every 30 seconds.</p>
+        <p class="sub">Your city at a glance — live numbers, refreshes itself every 30s.</p>
         <div id="todo"></div>
         <div class="stats" id="stats"></div>
         <div class="grid2">
           <div>
-            <h2>📨 Inbox — verification requests</h2>
+            <h2>📨 The door — who wants in</h2>
             <div id="inbox"></div>
           </div>
           <div>
-            <h2>📋 Live board — every run called</h2>
+            <h2>📋 The board — every run in Sydney</h2>
             <div id="boardList"></div>
           </div>
         </div>
-        <h2 style="margin-top:22px">🆕 Newest hoopers</h2>
+        <h2 style="margin-top:22px">🆕 Fresh through the door</h2>
         <div id="newest"></div>
       </section>
 
       <section id="sec-players" style="display:none">
         <h1>Players</h1>
-        <p class="sub">Verify, un-verify, ban. Bans block handle + email + device.</p>
+        <p class="sub">Your community, your call. ✓ the real ones, ✏️ fix their details, ban the trouble — bans block handle, email + device. 🗑 wipes every trace of them.</p>
         <div class="grid2">
-          <div><h2>⏳ Not verified yet</h2><div id="pending"></div></div>
-          <div><h2>Everyone</h2><div id="all"></div></div>
+          <div><h2>⏳ Waiting on the ✓</h2><div id="pending"></div></div>
+          <div><h2>🏀 The whole roster</h2><div id="all"></div></div>
         </div>
       </section>
 
@@ -1060,13 +1060,16 @@ function row(p,pending){
       :`${p.verified
           ?`<button class="btn btn-g" data-unverify="${esc(p.id)}">Un-verify</button>`
           :`<button class="btn btn-v" data-verify="${esc(p.id)}">✓ Verify</button>`}
+        <button class="btn btn-g" data-edit="${esc(p.id)}" title="Edit their details">✏️</button>
         <button class="btn btn-r" data-ban="${esc(p.id)}">Ban</button>`}
+    <button class="btn btn-r" data-del="${esc(p.id)}" title="Delete completely — every trace">🗑</button>
   </div>`;
 }
 async function load(){
   try{
     const [d,bd]=await Promise.all([api({action:'admin_players'}),api({action:'board'})]);
     const ps=d.players||[],inbox=d.inbox||[],runs=bd.runs||[];
+    PS=ps;
     const bb=$('#bReq');bb.textContent=inbox.length;bb.style.display=inbox.length?'':'none';
     renderSuggestions(d.court_reqs||[]);
     const fbn=+d.feedback_pending||0,bf=$('#bFeedback');if(bf){bf.textContent=fbn;bf.style.display=fbn?'':'none';}
@@ -1080,13 +1083,13 @@ async function load(){
     const weekAgo=Date.now()-7*864e5;
     const newWeek=ps.filter(p=>p.created_at&&new Date(p.created_at).getTime()>=weekAgo).length;
     $('#stats').innerHTML=`
-      <div class="stat"><b>${active.length}</b><span>players</span>${newWeek?`<span class="sub">+${newWeek} this week</span>`:''}</div>
+      <div class="stat"><b>${active.length}</b><span>hoopers</span>${newWeek?`<span class="sub">+${newWeek} this week</span>`:''}</div>
       <div class="stat good"><b>${verified}</b><span>verified</span><span class="sub">${verRate}% of players</span></div>
-      <div class="stat warn"><b>${inbox.length}</b><span>requests</span></div>
+      <div class="stat warn"><b>${inbox.length}</b><span>want the ✓</span></div>
       <div class="stat"><b>${sugg}</b><span>court ideas</span></div>
       <div class="stat"><b>${+d.courts_total||0}</b><span>courts live</span></div>
       <div class="stat"><b>${runs.length}</b><span>runs live</span></div>
-      <div class="stat"><b>${tappedIn}</b><span>tapped in</span></div>
+      <div class="stat"><b>${tappedIn}</b><span>at courts now</span></div>
       <div class="stat"><b>${checkinsAll}</b><span>check-ins</span><span class="sub">all-time</span></div>
       <div class="stat bad"><b>${ps.filter(p=>p.banned).length}</b><span>banned</span></div>`;
     const todo=[];
@@ -1103,14 +1106,14 @@ async function load(){
         <div class="av">${esc((p.name[0]||'?').toUpperCase())}</div>
         <div class="nb"><b>${esc(p.name)} ${p.verified?'<span class="vtick">✓</span>':(p.banned?'<span class="tag b">BANNED</span>':'<span class="tag p">PENDING</span>')}</b>${socialLinks(p)}</div>
         <div class="when">${p.created_at?joinAgo(p.created_at):''}</div>
-      </div>`).join(''):'<div class="empty">No players yet.</div>';
+      </div>`).join(''):'<div class="empty">Nobody yet — send the crew the link 📲</div>';
     $('#boardList').innerHTML=runs.length?runs.map(r=>`
       <div class="runrow">
         <div class="tm"><b>${esc(runTime(r))}</b><span>${esc(runDay(r))}</span></div>
         <div class="inf"><b>${esc(r.court_name)}${r.suburb?' · '+esc(r.suburb):''}</b>
           <span>${esc(r.format)} · by ${esc(r.host_name)}${(r.players||[]).length?' — '+(r.players||[]).map(p=>esc(p.name)).join(', '):''}</span></div>
         <div class="n">${(r.players||[]).length}/${r.cap}</div>
-      </div>`).join(''):'<div class="empty">No runs on the board right now.</div>';
+      </div>`).join(''):'<div class="empty">Board&#39;s quiet — someone call a run 🏀</div>';
     $('#inbox').innerHTML=inbox.length?inbox.map(m=>{
       const pp=byId.get(m.player_id)||m;
       return `<div class="row pending"><div class="who">
@@ -1127,7 +1130,7 @@ async function load(){
     const reqIds=new Set(inbox.map(m=>m.player_id));
     const pending=ps.filter(p=>!p.verified&&!p.banned&&!reqIds.has(p.id));
     $('#pending').innerHTML=pending.length?pending.map(p=>row(p,true)).join(''):'<div class="empty">Nobody else waiting.</div>';
-    $('#all').innerHTML=ps.length?ps.map(p=>row(p,false)).join(''):'<div class="empty">No players yet.</div>';
+    $('#all').innerHTML=ps.length?ps.map(p=>row(p,false)).join(''):'<div class="empty">Nobody yet — send the crew the link 📲</div>';
     document.querySelectorAll('[data-verify]').forEach(b=>b.onclick=()=>act({action:'admin_verify',pid:b.dataset.verify},'Verified ✓ — they get full access'));
     document.querySelectorAll('[data-unverify]').forEach(b=>b.onclick=()=>act({action:'admin_verify',pid:b.dataset.unverify,on:false},'Verification removed'));
     document.querySelectorAll('[data-ban]').forEach(b=>b.onclick=()=>{
@@ -1136,11 +1139,56 @@ async function load(){
     });
     document.querySelectorAll('[data-unban]').forEach(b=>b.onclick=()=>act({action:'admin_ban',pid:b.dataset.unban,on:false},'Unbanned — they\'re back'));
     document.querySelectorAll('[data-dismiss]').forEach(b=>b.onclick=()=>act({action:'admin_inbox_done',pid:b.dataset.dismiss},'Request dismissed'));
+    document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>{const p=PS.find(x=>x.id===b.dataset.edit);if(p)openPedit(p);});
+    document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{
+      const p=PS.find(x=>x.id===b.dataset.del);const nm=p?p.name:'this player';
+      if(!confirm('Delete '+nm+' COMPLETELY? Profile, runs, check-ins, stats — gone forever.\n\n(For troublemakers use Ban instead — delete lets them sign straight back up.)'))return;
+      act({action:'admin_player_del',pid:b.dataset.del},'Deleted — every trace gone');
+    });
   }catch(e){toast(e.message,1)}
 }
 async function act(body,msg){
   try{await api(body);toast(msg);load();}catch(e){toast(e.message,1)}
 }
+
+/* ---------- player editor ---------- */
+let PS=[],PEID=null;
+function openPedit(p){
+  PEID=p.id;
+  $('#peName').value=p.name||'';$('#peIg').value=p.ig||'';$('#peTt').value=p.tiktok||'';$('#peEm').value=p.email||'';
+  $('#peWho').textContent=p.name+(p.ig?' · @'+p.ig:'');
+  $('#pedit').style.display='flex';
+}
+function closePedit(){$('#pedit').style.display='none';PEID=null;}
+(function(){
+  const pe=document.createElement('div');
+  pe.id='pedit';
+  pe.style.cssText='display:none;position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.6);backdrop-filter:blur(5px);align-items:center;justify-content:center;padding:18px';
+  pe.innerHTML=`<div class="card" style="max-width:430px;width:100%">
+    <h2 style="margin-top:0">✏️ Edit player</h2>
+    <p class="sub" id="peWho" style="margin-top:2px"></p>
+    <input class="inp" id="peName" placeholder="Name" maxlength="40">
+    <input class="inp" id="peIg" placeholder="Instagram handle (no @)" autocapitalize="none" maxlength="30">
+    <input class="inp" id="peTt" placeholder="TikTok handle (no @)" autocapitalize="none" maxlength="30">
+    <input class="inp" id="peEm" placeholder="Email" autocapitalize="none" maxlength="120">
+    <div style="display:flex;gap:8px;margin-top:10px">
+      <button class="btn btn-v" id="peSave" style="flex:1">Save changes</button>
+      <button class="btn btn-g" id="peCancel">Cancel</button>
+    </div>
+    <p style="font-size:11px;color:var(--dim);margin-top:8px">They keep their ✓, stats and code — this just fixes their details.</p>
+  </div>`;
+  document.body.appendChild(pe);
+  pe.onclick=e=>{if(e.target===pe)closePedit();};
+  $('#peCancel').onclick=closePedit;
+  $('#peSave').onclick=async()=>{
+    if(!PEID)return;
+    const clean=v=>v.trim().replace(/^@+/,'').toLowerCase().replace(/[^a-z0-9._]/g,'').slice(0,30);
+    try{
+      await api({action:'admin_player_edit',pid:PEID,name:$('#peName').value.trim().slice(0,40),ig:clean($('#peIg').value),tiktok:clean($('#peTt').value),email:$('#peEm').value.trim().toLowerCase().slice(0,120)});
+      toast('Saved — their profile\'s updated');closePedit();load();
+    }catch(e){toast(e.message,1)}
+  };
+})();
 
 /* ---------- courts manager (official-only) ---------- */
 let KNOWN=[];              // the 971 courts.json entries — only used to prefill

@@ -1015,6 +1015,45 @@ Deno.serve(async (req: Request) => {
         return J({ ok: true });
       }
 
+      // Coach edits a player's details (typo'd handle, name change, add email).
+      case "admin_player_edit": {
+        if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
+        const pid = str(b.pid, 64);
+        if (!pid) return J({ error: "bad request" }, 400);
+        const name = str(b.name, 40), ig = igClean(b.ig), tiktok = igClean(b.tiktok), email = emailClean(b.email);
+        if (!name) return J({ error: "name can't be empty" }, 400);
+        if (!ig && !tiktok && !email) return J({ error: "they need at least one of IG / TikTok / email" }, 400);
+        await db(`oc_players?id=eq.${encodeURIComponent(pid)}`, { method: "PATCH", body: JSON.stringify({ name, ig, tiktok, email }) });
+        return J({ ok: true });
+      }
+
+      // Full delete: the player + every trace of them (runs they host included).
+      // For duplicates, test accounts and delete-my-data asks — bans are for
+      // troublemakers (a deleted troublemaker could just sign up again).
+      case "admin_player_del": {
+        if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
+        const pid = str(b.pid, 64);
+        if (!pid) return J({ error: "bad request" }, 400);
+        const e = encodeURIComponent(pid);
+        const runs = await db(`oc_runs?host_id=eq.${e}&select=id`) || [];
+        for (const r of runs) {
+          const re = encodeURIComponent(String(r.id));
+          await db(`oc_run_chat?run_id=eq.${re}`, { method: "DELETE" });
+          await db(`oc_run_players?run_id=eq.${re}`, { method: "DELETE" });
+        }
+        await db(`oc_runs?host_id=eq.${e}`, { method: "DELETE" });
+        for (const q of [
+          `oc_run_players?player_id=eq.${e}`, `oc_run_chat?player_id=eq.${e}`,
+          `oc_checkins?player_id=eq.${e}`, `oc_plays?player_id=eq.${e}`,
+          `oc_play_fires?player_id=eq.${e}`, `oc_ratings?player_id=eq.${e}`,
+          `oc_pfeedback?rater_id=eq.${e}`, `oc_pfeedback?ratee_id=eq.${e}`,
+          `oc_inbox?player_id=eq.${e}`, `oc_court_reqs?player_id=eq.${e}`,
+          `oc_push?player_id=eq.${e}`, `oc_notif?player_id=eq.${e}`,
+          `oc_saves?player_id=eq.${e}`, `oc_players?id=eq.${e}`,
+        ]) await db(q, { method: "DELETE" });
+        return J({ ok: true });
+      }
+
       // Play of the Week: one clip per player per court per week (resubmit replaces).
       case "play_submit": {
         const g = await guard(((b.player || {}) as Record<string, unknown>).id as string);
