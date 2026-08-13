@@ -1227,6 +1227,24 @@ header{
 @keyframes uncLogo{to{opacity:1;transform:none}}
 #uncIntro .skip{position:absolute;bottom:34px;left:0;right:0;text-align:center;font-size:11px;letter-spacing:.2em;
   text-transform:uppercase;color:rgba(255,255,255,.28);opacity:0;animation:uncEye .8s ease 1.8s both}
+/* ===== flash tutorial — 3 quick slides for brand-new players ===== */
+#flashTut{position:fixed;inset:0;z-index:205;display:none;flex-direction:column;background:var(--bg)}
+#flashTut.on{display:flex}
+#flashTut .skip{position:absolute;top:max(16px,env(safe-area-inset-top));right:18px;z-index:2;background:none;border:none;color:var(--dim);font-family:var(--cond);font-size:13px;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;padding:8px}
+.tslide{flex:1;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:34px 30px;gap:18px}
+.tslide.on{display:flex;animation:tutIn .5s var(--ease-out) both}
+@keyframes tutIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+.tslide .big{font-size:74px;line-height:1;animation:uncFloat 4.5s ease-in-out infinite alternate}
+.tslide h2{font-family:var(--disp);font-size:clamp(30px,8.6vw,40px);line-height:1.08;text-transform:uppercase;letter-spacing:.04em}
+.tslide h2 em{font-style:normal;color:var(--volt)}
+.tslide p{color:var(--muted);font-size:16px;line-height:1.55;max-width:340px}
+.tfoot{padding:0 26px calc(26px + env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;gap:16px}
+.tdots{display:flex;gap:8px}
+.tdots span{width:8px;height:8px;border-radius:99px;background:var(--line);transition:all .25s var(--ease)}
+.tdots span.on{background:var(--volt);width:24px}
+#tutNext{width:100%;max-width:420px;background:var(--volt);color:var(--onaccent);border:none;border-radius:16px;padding:17px;font-family:var(--cond);font-weight:800;font-size:17px;letter-spacing:1.6px;text-transform:uppercase;cursor:pointer}
+#tutNext:active{transform:scale(.97)}
+
 /* app rises in once, right after the splash dissolves */
 body.appin #vHome>.hero,body.appin #vHome>.search,body.appin #vHome>.pills-h,body.appin #vHome>.sect{animation:homeRise .6s var(--ease-out) both}
 body.appin #vHome>.search{animation-delay:.05s}
@@ -1287,6 +1305,30 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
   el.addEventListener('click',function(){ clearTimeout(t); go(); });
 })();
 </script>
+
+<!-- flash tutorial: first-open only, 3 quick slides → house rules → sign-up -->
+<div id="flashTut">
+  <button class="skip" id="tutSkip">Skip</button>
+  <div class="tslide on" data-t="0">
+    <div class="big">🏀</div>
+    <h2>Every court.<br><em>Mapped.</em></h2>
+    <p>13 vetted Sydney courts — lights, hoops, water, the lot. Pick one, get directions, pull up. More dropping every week.</p>
+  </div>
+  <div class="tslide" data-t="1">
+    <div class="big">⚡</div>
+    <h2>See who's on.<br><em>Join the run.</em></h2>
+    <p>Live check-ins show who's at the court right now. Call a run, share the link, squad up. No more hooping alone.</p>
+  </div>
+  <div class="tslide" data-t="2">
+    <div class="big">✓</div>
+    <h2>Real ones<br><em>only.</em></h2>
+    <p>Sign up with your <b style="color:var(--text)">Instagram</b> or a real <b style="color:var(--text)">email</b> — that's your jersey on every run. It keeps the community real hoopers, no randoms.</p>
+  </div>
+  <div class="tfoot">
+    <div class="tdots" id="tutDots"><span class="on"></span><span></span><span></span></div>
+    <button id="tutNext">Next</button>
+  </div>
+</div>
 
 <div class="wrap">
 
@@ -3018,9 +3060,25 @@ $('#themeBtn').onclick=()=>{renderVibe();paintSw(localStorage.getItem('oc_accent
 applyTheme(curTheme(),false);
 {const a=localStorage.getItem('oc_accent');if(a)applyAccent(a,false);}
 
+/* ---------- flash tutorial (first-timers only) ---------- */
+let TUTN=0;
+function tutPaint(){
+  document.querySelectorAll('#flashTut .tslide').forEach(s=>s.classList.toggle('on',+s.dataset.t===TUTN));
+  document.querySelectorAll('#tutDots span').forEach((d,i)=>d.classList.toggle('on',i===TUTN));
+  $('#tutNext').textContent=TUTN===2?'Create my account 🏀':'Next';
+}
+function tutDone(){
+  $('#flashTut').classList.remove('on');
+  openSheet('shTerms');
+}
+function showTut(){$('#flashTut').classList.add('on');TUTN=0;tutPaint();}
+$('#tutNext').onclick=()=>{if(TUTN<2){TUTN++;tutPaint();}else tutDone();};
+$('#tutSkip').onclick=tutDone;
+document.querySelectorAll('#flashTut .tslide').forEach(s=>s.onclick=()=>{if(TUTN<2){TUTN++;tutPaint();}});
+
 /* ---------- boot ---------- */
 paintMe();
-if(!termsOk())openSheet('shTerms');
+if(!termsOk()){ if(!OCP)showTut(); else openSheet('shTerms'); }
 else if(!OCP)openGate();
 refreshMe(false);
 $('#rulesLink').onclick=()=>openSheet('shTerms');
