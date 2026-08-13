@@ -736,6 +736,13 @@ Deno.serve(async (req: Request) => {
           method: "POST", headers: { Prefer: "resolution=merge-duplicates" },
           body: JSON.stringify({ player_id: player.id, name: player.name, ig: player.ig, email: rows?.[0]?.email || "", text: str(b.text, 300), created_at: new Date().toISOString() }),
         });
+        // Buzz the coach's phone(s): every account flagged coach=true gets a
+        // push pointing straight at the desk. Best-effort — never blocks.
+        try {
+          const coaches = await db(`oc_players?coach=is.true&select=id`) || [];
+          const pids = coaches.map((c: { id: string }) => c.id).filter((id: string) => id !== player.id);
+          if (pids.length) await sendHH(pids, { title: `📨 ${player.name} wants the ✓`, body: `${player.ig ? "@" + player.ig : "New signup"} — check their page, tap verify`, tag: "hh-desk", url: "/hoopsheaven-desk.html" });
+        } catch (_e) { /* best-effort */ }
         return J({ ok: true });
       }
 
