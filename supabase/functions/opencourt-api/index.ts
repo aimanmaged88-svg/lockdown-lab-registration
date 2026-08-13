@@ -390,6 +390,35 @@ Deno.serve(async (req: Request) => {
         return J({ ok: true, player: { id, name, ig, tiktok }, verified, verify_code });
       }
 
+      // Log back in on a NEW phone: handle/email + the account's 5-digit code
+      // moves the whole profile across devices. Brute-force guarded: 650ms
+      // constant delay + per-target lockout after 8 misses (1 hour).
+      case "login": {
+        const who = str(b.who, 120).toLowerCase().replace(/^@+/, "").replace(/[^a-z0-9._@+-]/g, "");
+        const code = str(b.code, 8).replace(/\D/g, "");
+        if (!who || code.length < 4) return J({ error: "enter your @ (or email) and your 5-digit code" }, 400);
+        const g = await db(`oc_login_guard?who=eq.${encodeURIComponent(who)}`);
+        const g0 = g?.[0];
+        if (g0?.locked_until && new Date(g0.locked_until) > new Date()) {
+          return J({ error: "too many tries — this account's locked for a bit. Try again in an hour." }, 429);
+        }
+        await new Promise((r) => setTimeout(r, 650));
+        const w = encodeURIComponent(who);
+        const rows = await db(`oc_players?or=(ig.eq.${w},tiktok.eq.${w},email.eq.${w})&select=id,name,ig,tiktok,email,verified,verify_code,banned`);
+        const hit = (rows || []).find((p: { verify_code?: string }) => p.verify_code === code);
+        if (!hit) {
+          const fails = (g0?.fails || 0) + 1;
+          await db(`oc_login_guard?on_conflict=who`, {
+            method: "POST", headers: { Prefer: "resolution=merge-duplicates" },
+            body: JSON.stringify({ who, fails, locked_until: fails >= 8 ? new Date(Date.now() + 3600e3).toISOString() : null }),
+          });
+          return J({ error: "no match — check your @ (or email) and your code" }, 401);
+        }
+        if (hit.banned || await bansHit([hit.id, hit.ig, hit.tiktok, hit.email])) return J({ error: BANNED_MSG, code: "banned" }, 403);
+        if (g0) await db(`oc_login_guard?who=eq.${w}`, { method: "DELETE" });
+        return J({ ok: true, player: { id: hit.id, name: hit.name, ig: hit.ig || "", tiktok: hit.tiktok || "", email: hit.email || "" }, verified: !!hit.verified, verify_code: hit.verify_code });
+      }
+
       // Resolve a Google Maps link (or plain "lat, lon") to coordinates so the
       // coach doesn't have to dig lat/lon out by hand. Sydney-bounded.
       case "resolve_maps": {

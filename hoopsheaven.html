@@ -1418,6 +1418,7 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
       <div id="myCard"></div>
       <div id="vfCard" style="display:none;margin-top:12px"></div>
       <div class="prow" id="pNotif" style="margin-top:12px"><span class="ic">🔔</span><span class="lbl">Turn on notifications</span><span class="ar">›</span></div>
+      <div class="prow" id="pCode"><span class="ic">🔑</span><span>Phone-switch code</span><span class="ar" id="pCodeVal" style="letter-spacing:2px;font-weight:800">•••••</span></div>
       <div class="prow" id="pShare"><span class="ic">📤</span><span>Share my card</span><span class="ar">›</span></div>
       <div class="prow" id="pEdit"><span class="ic">✏️</span><span>Edit name / socials</span><span class="ar">›</span></div>
       <div class="prow" id="pTheme"><span class="ic">🎨</span><span>Your vibe &amp; colours</span><span class="ar">›</span></div>
@@ -1470,6 +1471,17 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
   <div class="fld" id="ttFld" style="display:none"><label>TikTok handle</label><div class="igwrap"><span class="at">@</span><input class="inp" id="pfTiktok" maxlength="30" autocapitalize="none" placeholder="yourhandle"></div></div>
   <div class="fld" id="emFld" style="display:none"><label>Email (Gmail / Apple ID / any real inbox)</label><input class="inp" id="pfEmail" type="email" autocapitalize="none" placeholder="you@gmail.com"></div>
   <button class="btn btn-v btn-block" id="pfSave">Lock it in</button>
+  <button class="linky" id="pfLogin" style="display:none;margin:14px auto 0;text-align:center;width:100%">Already got an account? Switched phones? <b style="color:var(--volt)">Log in</b></button>
+</div></div>
+
+<!-- log back in (new phone / reinstalled) -->
+<div class="sheet" id="shLogin"><div class="scrim" data-close></div><div class="panel">
+  <div class="grab"></div>
+  <div class="xrow"><div><h3>Log back in</h3><p class="sub">Your profile follows your account, not your phone. Enter the @ (or email) you signed up with + your 5-digit code.</p></div><button class="x" data-close>✕</button></div>
+  <div class="fld"><label>Your @ or email</label><input class="inp" id="lgWho" autocapitalize="none" placeholder="@yourhandle — or you@gmail.com"></div>
+  <div class="fld"><label>Your 5-digit code</label><input class="inp" id="lgCode" inputmode="numeric" maxlength="6" placeholder="12345"></div>
+  <button class="btn btn-v btn-block" id="lgGo">Log me in 🏀</button>
+  <p class="fine" style="margin-top:10px">Your code lives in Profile → 🔑 Phone-switch code. Lost it? Message the coach on IG and we'll sort you.</p>
 </div></div>
 
 <!-- call-a-run sheet -->
@@ -1769,6 +1781,7 @@ function animateCard(root){
   if(!RM())root.querySelectorAll('[data-pop]').forEach(el=>el.animate&&el.animate([{transform:'scale(.6)',opacity:0},{transform:'scale(1)',opacity:1}],{duration:420,easing:'cubic-bezier(.34,1.4,.5,1)'}));
 }
 async function paintProfileTab(){
+  const cv=$('#pCodeVal');if(cv)cv.textContent=(OCP&&OCP.code)?OCP.code:'•••••';
   const el=$('#myCard'); if(!el)return;
   if(!OCP){el.innerHTML='<div class="pcard" id="pcardEmpty" style="cursor:pointer"><div class="av">?</div><div class="in"><b>No account yet</b><span>Tap to create your card</span></div></div>';const e=$('#pcardEmpty');if(e)e.onclick=openMyEdit;return;}
   if(!el.querySelector('.nbacard'))el.innerHTML='<div class="skel" style="height:210px;border-radius:22px"></div>';
@@ -1888,8 +1901,28 @@ async function refreshMe(loud){
   }catch(e){if(loud)toast(e.message,1);paintVf();}
 }
 /* gate / edit */
+/* log back in on a new phone: who + 5-digit code moves the profile over */
+$('#pfLogin').onclick=()=>openSheet('shLogin');
+$('#lgGo').onclick=async()=>{
+  const who=$('#lgWho').value.trim().toLowerCase().replace(/^@+/,'');
+  const code=$('#lgCode').value.trim();
+  if(!who||code.length<4){toast('Need both — your @/email and your code',1);return}
+  const b=$('#lgGo');b.disabled=true;b.textContent='Checking…';
+  try{
+    const d=await api({action:'login',who,code});
+    OCP={id:d.player.id,name:d.player.name,ig:d.player.ig||'',tiktok:d.player.tiktok||'',email:d.player.email||'',vf:!!d.verified,code:d.verify_code||''};
+    localStorage.setItem('oc_profile',JSON.stringify(OCP));
+    localStorage.setItem('oc_terms',TERMS_V);
+    closeSheet('shLogin');$('#shProfile').classList.remove('gate');closeSheet('shProfile');
+    paintMe();paintVf();paintProfileTab();paintNotifRow();syncSaves();refreshNotifs();loadBoard();
+    toast('Welcome back, '+OCP.name+' — same profile, new phone 🏀',0,3400);
+  }catch(e){toast(e.message,1,3400)}
+  b.disabled=false;b.textContent='Log me in 🏀';
+};
+
 function openGate(){
   $('#shProfile').classList.add('gate');
+  $('#pfLogin').style.display='';
   $('#pfTitle').textContent='Create your account';
   $('#pfSub').innerHTML='Hoops Heaven runs on real people — you need an account before you play. Your <b style="color:var(--volt)">@</b> is your jersey; no Instagram, use a real email. One account, this stays your device\'s key to every court in Sydney.';
   $('#pfSave').textContent='Create my account 🏀';
@@ -1898,6 +1931,7 @@ function openGate(){
 }
 function openEdit(){
   $('#shProfile').classList.remove('gate');
+  $('#pfLogin').style.display='none';
   $('#pfTitle').textContent='Who\'s pulling up?';
   $('#pfSub').innerHTML='Your <b style="color:var(--volt)">@</b> is your jersey — it shows on every run so people can find you. Real accounts only (house rules).';
   $('#pfSave').textContent='Lock it in';
@@ -3005,6 +3039,11 @@ function paintNotifRow(){
   row.classList.toggle('on',on);
 }
 $('#pNotif').onclick=()=>{ if(notifOn())disableHHNotifs(); else enableHHNotifs(); };
+$('#pCode').onclick=()=>{
+  if(!OCP||!OCP.code){toast('Sign in first to get your code',1);return}
+  try{navigator.clipboard.writeText(OCP.code)}catch(e){}
+  toast('Your phone-switch code: '+OCP.code+' — copied. Save it somewhere safe; it logs you in on a new phone.',0,4600);
+};
 // keep the subscription fresh + pid stamped on boot when already enabled
 async function refreshNotifs(){
   paintNotifRow();
