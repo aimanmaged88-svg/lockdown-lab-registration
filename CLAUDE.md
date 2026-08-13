@@ -745,6 +745,17 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
     courts, 0 test rows. All Playwright tests used a local-only fake profile
     (never registered → no writes). Screenshots taken. **Phase 1 done; Phase
     2 = closed alpha with the 5 testers (per launch-plan artifact).**
+- **Launch push (2026-08-13).** Name vote pending: 25-logo pack (pin mark, UNC
+  style) sent for Aiman's WhatsApp crew vote — winner triggers full rebrand
+  (clash-check first). Backend load-tested live: 600/600 requests, 0 errors,
+  30 concurrent / 10 rps sustained. **Watchdog Routine live**
+  (trig_01MKiP5uhDHV96DMzg5CRpSY, hourly :32, fresh-session): curls board +
+  courts_meta + Netlify page; loud "🚨 HOOPS HEAVEN IS DOWN" + push notification
+  to Aiman only after 2 retries; silent when healthy. **Camperdown Park Courts
+  added** (oc_c_5d1a48a2, 2 lit concrete full courts, enriched) → 13 official.
+  Redfern NOT added (researched pin = duplicate of Waterloo Oval court).
+  Aiman claimed his desk PIN + called the first real run (Green Square, Fri 14
+  Aug 7am). Roadmap: testers wk Aug 18-24, FEATURE FREEZE Aug 27, launch Sep 1.
 - v2 ideas discussed: KOTC proper, run chat, POTW weekly archive/all-time
   wall, PWA manifest + install, native app for background geofencing.
 
