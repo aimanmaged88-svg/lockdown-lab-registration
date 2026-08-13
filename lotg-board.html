@@ -76,7 +76,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
 .weekline .fmt{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
 
 /* schedule board */
-.slotrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.slotrow{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:12px}
 .slottime{grid-column:1/-1;font-family:var(--disp);font-size:12px;letter-spacing:.12em;color:var(--dim);text-transform:uppercase;margin:6px 2px 0}
 .gcard{border:var(--bw) solid var(--line);background:var(--card);border-radius:var(--r);padding:11px 12px;min-height:74px;transition:.2s var(--ease);box-shadow:4px 4px 0 var(--shadow);position:relative}
 .gcard.editable{cursor:pointer}
@@ -94,8 +94,10 @@ td.tn .tlogo{vertical-align:-4px;margin-right:7px}
 .tline .sc{font-family:var(--disp);font-weight:700;font-size:19px;font-variant-numeric:tabular-nums;color:var(--muted)}
 .tline.w .sc{color:var(--acc)}
 .open-court{border:var(--bw) dashed var(--line);border-radius:var(--r);min-height:74px;display:grid;place-items:center;color:var(--dim);font-size:12px;letter-spacing:.08em;text-transform:uppercase}
-.courthead{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 2px}
-.courthead div{font-family:var(--disp);font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--acc);text-align:center;padding:7px;border:var(--bw) solid var(--line);border-radius:10px;background:var(--card2);box-shadow:3px 3px 0 var(--shadow)}
+.courthead{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 14px}
+.courthead button{appearance:none;cursor:pointer;font-family:var(--disp);font-size:13.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);text-align:center;padding:11px;border:var(--bw) solid var(--line);border-radius:11px;background:var(--card2);box-shadow:3px 3px 0 var(--shadow);transition:.16s var(--ease)}
+.courthead button:active{transform:scale(.97)}
+.courthead button[aria-pressed="true"]{background:var(--acc);border-color:var(--acc);color:var(--onacc)}
 .gedit{margin-top:9px;border-top:var(--bw) dashed var(--line);padding-top:9px;display:none}
 .gcard.editing .gedit{display:block}
 .scores{display:flex;gap:8px;align-items:center}
@@ -199,7 +201,7 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
   </nav>
 
   <section class="pane on" id="pane-sched">
-    <div class="courthead"><div>Court 1</div><div>Court 2</div></div>
+    <div class="courthead"><button id="cSel1" aria-pressed="true">Court 1</button><button id="cSel2" aria-pressed="false">Court 2</button></div>
     <div id="board"><div class="slotrow"><div class="skel"></div><div class="skel"></div></div><div class="slotrow"><div class="skel"></div><div class="skel"></div></div></div>
   </section>
 
@@ -294,7 +296,8 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
 const SLOT_MIN=13;
 
-const state={teams:[],games:[],wk:1,tn:1,settings:{start:"7:15 PM"},admin:false,pass:null,editing:null,imp:[],fmt:'full'};
+const state={teams:[],games:[],wk:1,tn:1,settings:{start:"7:15 PM"},admin:false,pass:null,editing:null,imp:[],fmt:'full',court:1};
+try{state.court=+localStorage.getItem('lotg_court')||1}catch(e){}
 try{state.pass=localStorage.getItem('lotg_pass')||null}catch(e){}
 state.admin=!!state.pass;
 
@@ -375,17 +378,15 @@ function gameCard(g){
 function renderSchedule(){
   const box=$('#board');
   const wg=weekGames();
+  $('#cSel1').setAttribute('aria-pressed',state.court===1);
+  $('#cSel2').setAttribute('aria-pressed',state.court===2);
+  const cg=wg.filter(g=>g.court===state.court).sort((a,b)=>a.slot_index-b.slot_index);
   if(!wg.length){
     box.innerHTML=`<div class="empty">No games yet.<br>${state.admin?'Add the teams, then hit <b>Generate the night</b>.':'The schedule drops before tip-off — check back soon 🏀'}</div>`;
+  }else if(!cg.length){
+    box.innerHTML=`<div class="empty">No games on Court ${state.court} tonight.</div>`;
   }else{
-    const slots=[...new Set(wg.map(g=>g.slot_index))].sort((a,b)=>a-b);
-    box.innerHTML=slots.map(si=>{
-      const sg=wg.filter(g=>g.slot_index===si);
-      const c1=sg.find(g=>g.court===1),c2=sg.find(g=>g.court===2);
-      return `<div class="slotrow">
-        <div>${c1?gameCard(c1):'<div class="open-court">Court open</div>'}</div>
-        <div>${c2?gameCard(c2):'<div class="open-court">Court open</div>'}</div></div>`;
-    }).join('');
+    box.innerHTML=cg.map(g=>`<div class="slotrow">${gameCard(g)}</div>`).join('');
   }
   wireGames();renderChrome();
 }
@@ -712,6 +713,8 @@ function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');cl
 
 /* wires */
 $('#tab-sched').onclick=()=>pick('sched');
+$('#cSel1').onclick=()=>{state.court=1;try{localStorage.setItem('lotg_court','1')}catch(e){}renderSchedule();};
+$('#cSel2').onclick=()=>{state.court=2;try{localStorage.setItem('lotg_court','2')}catch(e){}renderSchedule();};
 $('#tab-stand').onclick=()=>pick('stand');
 $('#tab-teams').onclick=()=>pick('teams');
 $('#scrim').onclick=closeSheets;
