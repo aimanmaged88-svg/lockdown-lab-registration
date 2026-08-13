@@ -81,11 +81,16 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   Netlify-agent app we can't edit; it moved the lotg_* tables to Supabase direct
   (anon key + client-checked password) and added lotg_games.week/tournament.
   **Rebuilt as lotg-board.html** (repo root, single file, master source) on the
-  SAME tables — deployed standalone (Chakra fonts inlined) to **Netlify site
-  `lotg-board` (bec4a996-302f-4d01-8541-3bfe9258a746) →
-  https://lotg-board.netlify.app** as a PREVIEW; flip to the official URL only
-  on Aiman's go (deploy same build to site 71a72434). Passcode = lotg_admin.token
-  (shared password; **he changed it to "1234" on 2026-08-13** — was LOTG2026).
+  SAME tables — **LIVE ON THE OFFICIAL URL
+  https://lotg-wednesday-night-basketball.netlify.app (site 71a72434) since
+  2026-08-13** — Aiman: "one link, brother." Deployed standalone (Chakra fonts +
+  the real LOTG logo assets/lotg-logo.jpg inlined; logo CSS-inverted per mode).
+  lotg-board.netlify.app (bec4a996) is now a 301 stub to the official URL.
+  Passcode = lotg_admin.token = **"2024"** (Aiman set it 2026-08-13; shared with
+  whoever keeps score). Crew feed intentionally NOT linked from the board
+  (Aiman: chat stays on Instagram; lotg-crew.netlify.app still live, unlinked).
+  Week numbers are internal-only (UI shows just "the night" — his ask); weekly
+  history still accrues in lotg_games.week.
 - Features: weekly nights (shows max week; generate = replace current unscored
   week OR next week once scored — history never touched), formats **all-play-all
   (28 games, auto-detected)** or court pools, optimizer (perms ≤7 matchups else
@@ -96,9 +101,9 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   **themes: '96 Retro / 2026 Modern × light/dark** (per device), 10s poll +
   cache-paint. Writes send x-lotg-admin (RLS lotg_is_admin()).
 - Migration lotg_board_late_settings: lotg_teams.arriving_late, lotg_admin.settings
-  jsonb + admin-update policy. **SECURITY NOTE: the compiled app added OPEN write
-  policies (qual=true) on lotg_teams/lotg_games — anyone can write. Left in place
-  so the compiled app keeps working; DROP them when the official URL flips.**
+  jsonb + admin-update policy. Open write policies
+  (qual=true) that the compiled app relied on were **DROPPED at flip time**
+  (migration lotg_drop_open_write_policies) — writes now require x-lotg-admin.
 - Verified E2E vs live DB (bridged Playwright): week detect, 28-card board,
   combined ladder, retro/light, unlock, score→standings, generate→week 3,
   import parse w/ late detect. All test rows removed, one test score reset —

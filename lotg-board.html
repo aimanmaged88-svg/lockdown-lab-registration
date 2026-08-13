@@ -42,10 +42,11 @@ button{font-family:inherit}
 
 /* header */
 header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:20px 2px 12px}
-.brand h1{font-family:var(--disp);font-weight:700;font-size:26px;margin:0;line-height:1;letter-spacing:.01em}
-[data-theme="retro"] .brand h1{font-weight:400;font-size:24px;transform:rotate(-1.2deg)}
-.brand h1 .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--acc);margin-left:3px;box-shadow:0 0 12px 1px var(--acc)}
-.brand small{display:block;font-size:10.5px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:4px}
+.logoimg{height:72px;width:auto;display:block}
+[data-mode="dark"] .logoimg{filter:invert(1);mix-blend-mode:screen}
+[data-mode="light"] .logoimg{mix-blend-mode:multiply}
+[data-theme="retro"] .logoimg{transform:rotate(-1.2deg)}
+.brand small{display:block;font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--acc);margin-top:6px}
 .hbtns{display:flex;gap:8px}
 .icobtn{appearance:none;cursor:pointer;width:40px;height:40px;border-radius:12px;border:var(--bw) solid var(--line);background:var(--card);color:var(--ink);display:grid;place-items:center;font-size:17px;transition:.16s var(--ease);box-shadow:3px 3px 0 var(--shadow)}
 .icobtn:active{transform:scale(.93)}
@@ -173,7 +174,7 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
 <div class="wrap">
   <header>
     <div class="brand">
-      <h1>LOTG<span class="dot"></span></h1>
+      <img class="logoimg" src="/assets/lotg-logo.jpg" alt="Love of the Game"/>
       <small>Wednesday Night Basketball</small>
     </div>
     <div class="hbtns">
@@ -189,7 +190,6 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
   </nav>
 
   <section class="pane on" id="pane-sched">
-    <div class="weekline"><span class="wk" id="wkLbl"></span><span class="fmt" id="fmtLbl"></span></div>
     <div class="courthead"><div>Court 1</div><div>Court 2</div></div>
     <div id="board"><div class="slotrow"><div class="skel"></div><div class="skel"></div></div><div class="slotrow"><div class="skel"></div><div class="skel"></div></div></div>
   </section>
@@ -208,7 +208,6 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
   </section>
 
   <div class="foot">
-    <a href="https://lotg-crew.netlify.app" target="_blank" rel="noopener">Top plays & chat ↗</a>
     <span id="verline">LOTG board</span>
   </div>
 </div>
@@ -340,9 +339,7 @@ function renderChrome(){
   $('#lockBtn').textContent=state.admin?'🔓':'🔒';
   $('#tab-teams').style.display=state.admin?'':'none';
   $('#genHint').textContent=state.admin?`${state.teams.length} teams in · first tip-off ${state.settings.start}`:'';
-  $('#wkLbl').textContent=weekGames().length?`Week ${state.wk}`:'';
-  $('#fmtLbl').textContent=weekGames().length?(isCross()?'Everyone plays everyone':'Court pools'):'';
-  $('#verline').textContent=`LOTG board · wk ${state.wk}`;
+  $('#verline').textContent='Love of the Game · Wednesday nights';
 }
 function gameCard(g){
   const tm=teamMap();
@@ -374,8 +371,7 @@ function renderSchedule(){
     box.innerHTML=slots.map(si=>{
       const sg=wg.filter(g=>g.slot_index===si);
       const c1=sg.find(g=>g.court===1),c2=sg.find(g=>g.court===2);
-      const t=(c1||c2)?.game_time||'';
-      return `<div class="slottime">${esc(t)}</div><div class="slotrow">
+      return `<div class="slotrow">
         <div>${c1?gameCard(c1):'<div class="open-court">Court open</div>'}</div>
         <div>${c2?gameCard(c2):'<div class="open-court">Court open</div>'}</div></div>`;
     }).join('');
@@ -406,7 +402,7 @@ function renderStandings(){
   if(!wg.length){$('#standings').innerHTML='<div class="empty">Standings appear once the night is generated.</div>';return;}
   const playing=[...new Set(wg.flatMap(g=>[g.team1_id,g.team2_id]))].map(id=>tm.get(id)).filter(Boolean);
   if(isCross()){
-    $('#standings').innerHTML=tableHTML(`Week ${state.wk} · The Ladder`,computeTable(playing,wg),anyFinal);
+    $('#standings').innerHTML=tableHTML(`The Ladder`,computeTable(playing,wg),anyFinal);
   }else{
     $('#standings').innerHTML=[1,2].map(cg=>{
       const rows=computeTable(playing.filter(t=>t.court_group===cg),wg);
@@ -595,7 +591,7 @@ async function generateNight(){
     await rest('lotg_games',{method:'POST',body:JSON.stringify(payload)},true);
     await rest('lotg_admin?id=eq.1',{method:'PATCH',body:JSON.stringify({settings:{...state.settings,start:fmtTime(start)}})},true);
     closeSheets();await loadAll();pick('sched');
-    toast(`Week ${targetWeek} is live 🏀`);
+    toast('Tonight\'s schedule is live 🏀');
   }catch(e){$('#genErr').textContent=e.message;}
   finally{$('#genGo').disabled=false;$('#genGo').textContent='Build the schedule';}
 }
@@ -735,9 +731,9 @@ $('#impApply').onclick=applyImport;
 $('#genBtn').onclick=()=>{
   const scored=weekGames().some(g=>g.status==='final');
   $('#genNote').textContent=weekGames().length
-    ?(scored?`Week ${state.wk} has scores saved, so this builds Week ${state.wk+1} — a fresh night. History stays.`
-            :`Week ${state.wk} hasn't started, so this rebuilds its draw with the teams as set now.`)
-    :`Builds the first night for ${state.teams.length} teams across both courts.`;
+    ?(scored?'Last night is done and its results stay saved — this builds a fresh night with the teams as set now.'
+            :'Tonight hasn\'t started, so this rebuilds the draw with the teams as set now.')
+    :`Builds the night for ${state.teams.length} teams across both courts.`;
   $('#startIn').value=state.settings.start||'7:15 PM';$('#genErr').textContent='';
   setFmt(weekGames().length?(isCross()?'full':'pools'):'full');
   openSheet('shGen');
