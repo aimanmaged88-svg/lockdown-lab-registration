@@ -777,6 +777,21 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   Instagram Basic Display API (no consumer IG login for 3rd parties); TikTok
   Login Kit needs a dev app + review (weeks). The ✓ human loop IS the identity
   lock. Heal E2E + tut regression 10/10, live on main. Test rows cleaned.
+- **Cross-phone account login — SHIPPED (edge v23, 2026-08-13, Aiman: "what if
+  they switch phones?").** Migration `opencourt_login_guard` (oc_login_guard:
+  who pk / fails / locked_until). Edge `login` action: @handle-or-email +
+  the account's existing 5-digit verify_code → returns the full profile for
+  device adoption; 650ms constant delay + 8-miss/1h per-target lockout;
+  banned blocked. App: gate gains "Already got an account? Log in" (#pfLogin,
+  gate-mode only) → **#shLogin** sheet (z-index:72 — MUST sit above the gate's
+  70, was a caught bug) → adopts profile into localStorage (+ oc_terms),
+  closes gate; Profile tab gains **🔑 Phone-switch code** row (#pCode, tap =
+  copy). Edge deployed via a subagent (66.5KB file — content stays out of main
+  context; SHA-256 verified byte-identical, VAPID intact). E2E on live: backend
+  6/6, in-app new-phone journey 7/7, tut 10/10, heal 4/4. His 4 device rows
+  all re-verified; test rows + guard rows cleaned. NOTE: deno check has 4
+  PRE-EXISTING type nits in v21 code (plays created_at, two implicit-any) —
+  cosmetic, deploys fine.
 - v2 ideas discussed: KOTC proper, run chat, POTW weekly archive/all-time
   wall, PWA manifest + install, native app for background geofencing.
 
