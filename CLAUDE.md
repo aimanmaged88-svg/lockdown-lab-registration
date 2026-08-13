@@ -73,6 +73,37 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   truth; it's also ready to drop onto the Lab or scoreboard domain later if he
   wants it consolidated. Backend (edge fn + tables) is shared and already live.
 
+## LOTG Board rebuild — the official Wednesday-night app (2026-08-13)
+
+- **Aiman: "officially the Wednesday night app… court 1 & 2, schedule, standings,
+  run it every week, very smooth."** The live scoreboard
+  (lotg-wednesday-night-basketball.netlify.app, site 71a72434-…) is a COMPILED
+  Netlify-agent app we can't edit; it moved the lotg_* tables to Supabase direct
+  (anon key + client-checked password) and added lotg_games.week/tournament.
+  **Rebuilt as lotg-board.html** (repo root, single file, master source) on the
+  SAME tables — deployed standalone (Chakra fonts inlined) to **Netlify site
+  `lotg-board` (bec4a996-302f-4d01-8541-3bfe9258a746) →
+  https://lotg-board.netlify.app** as a PREVIEW; flip to the official URL only
+  on Aiman's go (deploy same build to site 71a72434). Passcode = lotg_admin.token
+  (shared password; **he changed it to "1234" on 2026-08-13** — was LOTG2026).
+- Features: weekly nights (shows max week; generate = replace current unscored
+  week OR next week once scored — history never touched), formats **all-play-all
+  (28 games, auto-detected)** or court pools, optimizer (perms ≤7 matchups else
+  sampled; late teams never in slot 1 via lotg_teams.arriving_late, idle/b2b
+  minimized), 13-min slots, per-court schedule, combined or per-court ladder
+  (2/1/0 pts, draws real), score save/live/reset, **Import from WhatsApp**
+  (paste-parse + Tesseract CDN OCR → review chips → upsert-by-name, no deletes),
+  **themes: '96 Retro / 2026 Modern × light/dark** (per device), 10s poll +
+  cache-paint. Writes send x-lotg-admin (RLS lotg_is_admin()).
+- Migration lotg_board_late_settings: lotg_teams.arriving_late, lotg_admin.settings
+  jsonb + admin-update policy. **SECURITY NOTE: the compiled app added OPEN write
+  policies (qual=true) on lotg_teams/lotg_games — anyone can write. Left in place
+  so the compiled app keeps working; DROP them when the official URL flips.**
+- Verified E2E vs live DB (bridged Playwright): week detect, 28-card board,
+  combined ladder, retro/light, unlock, score→standings, generate→week 3,
+  import parse w/ late detect. All test rows removed, one test score reset —
+  DB restored byte-identical (40 games, all upcoming, max week 2).
+
 ## Badge economy + Money desk (2026-07-19)
 
 - **Money desk** — SHIPPED in admin.html (sidebar 💰 Money). Live calc:
