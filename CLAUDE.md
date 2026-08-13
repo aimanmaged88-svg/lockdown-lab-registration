@@ -808,6 +808,24 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   Restored: unbanned+re-verified all 4, oc_bans cleared. Court photos ALREADY
   existed (desk court editor) — pointed him to it. IG page: HIS CALL = wait
   until name/design locked. Name vote still pending.
+- **Coach pings + player numbers (edge v25+v26, 2026-08-13, Aiman asked).**
+  v25: `verify_request` now pushes every oc_players row with new col
+  `coach=true` ("📨 <name> wants the ✓" → opens the desk) via the existing
+  sendHH pipeline — coach pings ride the APP's push subscription, so Aiman
+  must enable 🔔 in the app on his phone; desk itself = Chrome ⋮ → Add to
+  Home screen. Migration `opencourt_coach_flag`. NOTE: Aiman deleted ALL his
+  own accounts again (incl the 2 coach-flagged ones) — when he re-signs-up,
+  FLAG HIS NEW ACCOUNT coach=true or desk pings target nobody.
+  v26: migration `opencourt_player_num` (oc_players.player_num int unique).
+  Register assigns a random unused 1000-9999 (retry loop, PATCH guarded
+  player_num=is.null, keeps existing on re-register); me/login/profile/
+  admin_players carry it; login accepts the 4-digit number as `who`. App:
+  jersey on the NBA card (.jersey ghost watermark + .pnumchip by tier badge),
+  welcome toast "you're Player #NNNN", OCP.num plumbed. Desk: #num next to
+  names + inbox. Both deploys via subagent, SHA-256 byte-identical, VAPID
+  intact. E2E 5/5 (assign/persist/login-by-number/profile). FIRST REAL
+  TESTER: Musa @mu5a_11 signed up 19:08 (pre-v26 → num 8520 backfilled by
+  SQL), waiting in the desk inbox for Aiman's ✓.
 - v2 ideas discussed: KOTC proper, run chat, POTW weekly archive/all-time
   wall, PWA manifest + install, native app for background geofencing.
 
