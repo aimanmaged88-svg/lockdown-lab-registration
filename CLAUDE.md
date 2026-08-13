@@ -792,6 +792,22 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   all re-verified; test rows + guard rows cleaned. NOTE: deno check has 4
   PRE-EXISTING type nits in v21 code (plays created_at, two implicit-any) —
   cosmetic, deploys fine.
+- **Desk player edit/delete + copy polish (edge v24, 2026-08-13, Aiman asked).**
+  Edge: `admin_player_edit` {pid,name,ig,tiktok,email} and `admin_player_del`
+  — full cascade wipe (their hosted runs incl. chat+roster, memberships,
+  checkins, plays, fires, ratings, pfeedback both ways, inbox, court_reqs,
+  push, notif, saves, then the row). Desk: ✏️ opens `#pedit` editor overlay
+  (built by IIFE — NOT DOMContentLoaded, script runs after DOM), 🗑 on every
+  row behind confirm; copy pass ("The door — who wants in", "The whole
+  roster", "Fresh through the door", hoopers/want-the-✓ stat labels, livelier
+  empties). v24 deployed via subagent (SHA-256 identical, VAPID intact).
+  Desk E2E 9/9 w/ temp coach (edit persists, delete wipes; temp rows+coach
+  deleted). INCIDENT during test: all 4 of Aiman's device accounts turned up
+  banned+unverified — near-certain he was Ban-ing his own duplicates in the
+  desk (Ban was the only remove tool — the very reason he asked for delete).
+  Restored: unbanned+re-verified all 4, oc_bans cleared. Court photos ALREADY
+  existed (desk court editor) — pointed him to it. IG page: HIS CALL = wait
+  until name/design locked. Name vote still pending.
 - v2 ideas discussed: KOTC proper, run chat, POTW weekly archive/all-time
   wall, PWA manifest + install, native app for background geofencing.
 
