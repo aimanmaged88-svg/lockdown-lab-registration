@@ -1,0 +1,984 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#08090B">
+<title>The Engine — affiliate content machine</title>
+<meta name="description" content="Turn one proven 40-second product reel into a repeatable content system.">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#08090B; --pan:#0E1014; --pan2:#14171D; --line:#1F242C; --line2:#2A313B;
+  --tx:#EDF0F4; --mut:#8A93A0; --dim:#5A626E;
+  --ac:#00E87A; --ac2:#00B85F; --warn:#FFB020; --bad:#FF4D5E; --info:#4DA6FF;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --ease:cubic-bezier(.22,.61,.36,1);
+}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--tx);font-family:var(--sans);font-size:15px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;padding-bottom:60px}
+h1,h2,h3,h4{margin:0;font-weight:800;letter-spacing:-.02em}
+a{color:var(--ac);text-decoration:none}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+
+/* ---------- chrome ---------- */
+.top{position:sticky;top:0;z-index:40;background:rgba(8,9,11,.86);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line)}
+.topin{max-width:1180px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:14px}
+.logo{display:flex;align-items:center;gap:9px;font-weight:900;letter-spacing:-.03em;font-size:17px}
+.logo i{width:26px;height:26px;border-radius:7px;background:linear-gradient(140deg,var(--ac),var(--ac2));
+  display:grid;place-items:center;font-style:normal;font-size:14px;color:#04140C;font-weight:900}
+.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none;margin-left:auto}
+.tabs::-webkit-scrollbar{display:none}
+.tab{background:none;border:0;padding:8px 12px;border-radius:8px;color:var(--mut);font-weight:700;
+  font-size:13.5px;cursor:pointer;white-space:nowrap;transition:.16s var(--ease)}
+.tab:hover{color:var(--tx);background:var(--pan2)}
+.tab.on{color:var(--ac);background:rgba(0,232,122,.1)}
+.wrap{max-width:1180px;margin:0 auto;padding:22px 16px 40px}
+section{display:none;animation:fade .3s var(--ease)}
+section.on{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* ---------- blocks ---------- */
+.card{background:var(--pan);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px}
+.card.tight{padding:14px}
+.ch{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.ch h3{font-size:15px}
+.ch .sub{color:var(--mut);font-size:13px;font-weight:500}
+.eyebrow{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim);font-weight:800;
+  margin-bottom:7px}
+.grid{display:grid;gap:12px}
+.g2{grid-template-columns:repeat(2,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:820px){.g3,.g4{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.g2,.g3,.g4{grid-template-columns:1fr}}
+.muted{color:var(--mut)}.dim{color:var(--dim)}
+.small{font-size:13px}.xs{font-size:12px}
+hr{border:0;border-top:1px solid var(--line);margin:16px 0}
+
+/* ---------- controls ---------- */
+label.f{display:block;margin-bottom:11px}
+label.f span{display:block;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--dim);font-weight:800;margin-bottom:5px}
+input,select,textarea{width:100%;background:var(--pan2);border:1px solid var(--line2);border-radius:9px;
+  padding:9px 11px;outline:0;transition:.16s var(--ease)}
+input:focus,select:focus,textarea:focus{border-color:var(--ac);background:#171B22}
+textarea{resize:vertical;min-height:64px;line-height:1.5}
+.btn{background:var(--ac);color:#04140C;border:0;border-radius:9px;padding:10px 16px;font-weight:800;
+  cursor:pointer;transition:.16s var(--ease);font-size:14px}
+.btn:hover{filter:brightness(1.1)}
+.btn:active{transform:scale(.97)}
+.btn.gh{background:transparent;color:var(--tx);border:1px solid var(--line2)}
+.btn.gh:hover{border-color:var(--ac);color:var(--ac);filter:none}
+.btn.sm{padding:6px 11px;font-size:12.5px;border-radius:7px}
+.btn.dngr{background:transparent;border:1px solid var(--line2);color:var(--bad)}
+.btn.dngr:hover{border-color:var(--bad)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.pill{background:var(--pan2);border:1px solid var(--line2);border-radius:999px;padding:6px 12px;
+  font-size:12.5px;font-weight:700;cursor:pointer;transition:.16s var(--ease);color:var(--mut)}
+.pill:hover{color:var(--tx);border-color:var(--line2)}
+.pill.on{background:rgba(0,232,122,.13);border-color:var(--ac);color:var(--ac)}
+.tag{display:inline-block;background:var(--pan2);border:1px solid var(--line);border-radius:6px;
+  padding:2px 8px;font-size:11.5px;font-weight:700;color:var(--mut)}
+.tag.ac{color:var(--ac);border-color:rgba(0,232,122,.35);background:rgba(0,232,122,.08)}
+.tag.warn{color:var(--warn);border-color:rgba(255,176,32,.35);background:rgba(255,176,32,.08)}
+.tag.bad{color:var(--bad);border-color:rgba(255,77,94,.35);background:rgba(255,77,94,.08)}
+
+/* ---------- stats ---------- */
+.stat{background:var(--pan2);border:1px solid var(--line);border-radius:11px;padding:13px}
+.stat .k{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--dim);font-weight:800}
+.stat .v{font-size:25px;font-weight:900;letter-spacing:-.03em;font-family:var(--mono);margin-top:3px}
+.stat .n{font-size:12px;color:var(--mut);margin-top:2px}
+.stat.hi .v{color:var(--ac)}
+.stat.lo .v{color:var(--bad)}
+
+/* ---------- script output ---------- */
+.beat{display:grid;grid-template-columns:74px 1fr;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.beat:first-child{border-top:0}
+.beat .tm{font-family:var(--mono);font-size:12px;color:var(--ac);font-weight:700;padding-top:2px}
+.beat .lb{font-size:11px;letter-spacing:.09em;text-transform:uppercase;color:var(--dim);font-weight:800;
+  margin-bottom:4px}
+.beat .ln{font-size:15.5px;line-height:1.55}
+.beat .mt{font-size:12.5px;color:var(--mut);margin-top:6px;display:flex;gap:14px;flex-wrap:wrap}
+.beat .mt b{color:var(--mut);font-weight:800;letter-spacing:.05em;font-size:10.5px;text-transform:uppercase}
+@media(max-width:560px){.beat{grid-template-columns:1fr;gap:4px}}
+pre.out{background:#050608;border:1px solid var(--line);border-radius:10px;padding:14px;overflow:auto;
+  font-family:var(--mono);font-size:12.5px;line-height:1.65;white-space:pre-wrap;color:#C8D0DA;max-height:520px}
+
+/* ---------- tables ---------- */
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{text-align:left;font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--dim);
+  font-weight:800;padding:0 8px 8px;border-bottom:1px solid var(--line)}
+td{padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+tr:last-child td{border-bottom:0}
+td.num,th.num{text-align:right;font-family:var(--mono)}
+.tscroll{overflow-x:auto}
+
+/* ---------- misc ---------- */
+.hookline{padding:9px 11px;border:1px solid var(--line);border-radius:9px;background:var(--pan2);
+  margin-bottom:7px;cursor:pointer;transition:.16s var(--ease);display:flex;gap:10px;align-items:flex-start}
+.hookline:hover{border-color:var(--ac)}
+.hookline .n{font-family:var(--mono);font-size:11px;color:var(--dim);padding-top:2px;min-width:20px}
+.empty{text-align:center;padding:34px 16px;color:var(--dim)}
+.toast{position:fixed;left:50%;bottom:22px;transform:translate(-50%,80px);background:var(--ac);
+  color:#04140C;padding:11px 20px;border-radius:11px;font-weight:800;z-index:90;opacity:0;
+  transition:.28s var(--ease);pointer-events:none;font-size:14px;box-shadow:0 8px 30px rgba(0,0,0,.5)}
+.toast.on{transform:translate(-50%,0);opacity:1}
+.note{border-left:3px solid var(--warn);background:rgba(255,176,32,.06);padding:11px 13px;
+  border-radius:0 9px 9px 0;font-size:13.5px;color:#E4DCC8;margin:12px 0}
+.note.good{border-color:var(--ac);background:rgba(0,232,122,.06);color:#CFE8DA}
+.note.bad{border-color:var(--bad);background:rgba(255,77,94,.06);color:#F0D3D6}
+.step{display:grid;grid-template-columns:30px 1fr;gap:12px;padding:11px 0;border-top:1px solid var(--line)}
+.step:first-of-type{border-top:0}
+.step .i{width:24px;height:24px;border-radius:7px;background:var(--pan2);border:1px solid var(--line2);
+  display:grid;place-items:center;font-family:var(--mono);font-size:12px;font-weight:800;color:var(--ac)}
+.step h4{font-size:14px;margin-bottom:3px}
+.step p{margin:0;font-size:13.5px;color:var(--mut)}
+.bar{height:6px;background:var(--pan2);border-radius:99px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:var(--ac);border-radius:99px;transition:.4s var(--ease)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="top"><div class="topin">
+  <div class="logo"><i>▶</i>THE&nbsp;ENGINE</div>
+  <div class="tabs" id="tabs"></div>
+</div></div>
+
+<div class="wrap">
+
+<!-- ================= PLAY ================= -->
+<section id="s-play" class="on">
+  <div class="card">
+    <div class="eyebrow">The teardown</div>
+    <h2 style="font-size:22px;margin-bottom:6px">What that 41-second video actually is</h2>
+    <p class="muted" style="margin:0 0 14px">One take, one product, a kitchen bench and a phone. No edit, no
+      studio, no ad spend. It works because of its <b style="color:var(--tx)">structure</b> — and structure is
+      the one thing you can copy legally, forever, on any product.</p>
+
+    <div class="grid g4">
+      <div class="stat"><div class="k">Run time</div><div class="v">41s</div><div class="n">under the 60s bar</div></div>
+      <div class="stat"><div class="k">Cuts</div><div class="v">0</div><div class="n">single unbroken take</div></div>
+      <div class="stat"><div class="k">Production cost</div><div class="v">$0</div><div class="n">phone + daylight</div></div>
+      <div class="stat"><div class="k">Sell language</div><div class="v">0</div><div class="n">never asks for the sale</div></div>
+    </div>
+
+    <hr>
+    <div class="eyebrow">The 8 beats it runs on</div>
+    <div id="teardown"></div>
+
+    <div class="note good"><b>The reason it converts:</b> the whole video is advice, not an ad. The product is
+      the answer to a problem the viewer recognises in themselves ("some of you are just patting body wash on
+      yourself"). The mechanism line — <i>your fragrance sticks to skin instead of dead skin</i> — is the payload.
+      It teaches something. Nobody is asked to buy anything. The link lives in the bio and the pinned comment.</div>
+  </div>
+
+  <div class="card">
+    <div class="eyebrow">Straight talk</div>
+    <h3 style="font-size:19px;margin-bottom:10px">Three things you need to know before you spend a dollar</h3>
+
+    <div class="note bad"><b>1. You cannot re-upload this video.</b> It's @HEMZZ.6's face and footage.
+      Re-posting it gets the account killed and gets you rejected from every affiliate program you apply to.
+      You copy the <i>formula</i>, film your own. That part is completely fair game — nobody owns a script structure.</div>
+
+    <div class="note bad"><b>2. TikTok Shop does not exist in Australia.</b> The thing you're picturing — tag a
+      product in the video, viewer taps, you get paid — isn't available here, and TikTok has said there's no
+      confirmed local rollout. So the AU route is bio-link affiliate: Amazon Associates AU, or brand programs
+      through Commission Factory.</div>
+
+    <div class="note bad"><b>3. Affiliate maths on a $25 scrubber is brutal.</b> AU beauty programs pay around
+      5% on an ~$80 basket — roughly $4 a sale. A million dollars of commission at $4 a sale is 250,000 sales.
+      That's not a content problem, it's an arithmetic problem. The Money tab shows you the real curve.</div>
+
+    <div class="note good"><b>So here's the actual play.</b> Affiliate is not the business — it's the
+      <i>instrument</i>. You post the content, watch which product genuinely makes strangers pull out a card,
+      and let the affiliate links tell you for free which one wins. Then you white-label the winner. A silicone
+      scrubber lands at roughly $1–3 a unit; the same video that earned you $4 in commission now earns you $20+
+      in margin, and you own the customer instead of renting them. Same face, same script, same 41 seconds —
+      five times the money. Run affiliate for 90 days to find the winner, then flip.</div>
+  </div>
+
+  <div class="card">
+    <div class="eyebrow">The 90-day route</div>
+    <h3 style="font-size:19px;margin-bottom:12px">What you actually do, in order</h3>
+    <div id="route"></div>
+  </div>
+</section>
+
+<!-- ================= SCRIPT ================= -->
+<section id="s-script">
+  <div class="grid g2" style="align-items:start">
+    <div>
+      <div class="card">
+        <div class="ch"><h3>The product</h3><span class="sub">fill this in once per product</span></div>
+        <label class="f"><span>Product</span><input id="p_name" placeholder="Silicone body scrubber"></label>
+        <label class="f"><span>The outcome they want</span><input id="p_out" placeholder="smell good all day"></label>
+        <label class="f"><span>The enemy (what they use / do now)</span><input id="p_en" placeholder="your loofah"></label>
+        <div class="grid g3" style="gap:8px">
+          <label class="f"><span>Reason 1</span><input id="p_r1" placeholder="smaller"></label>
+          <label class="f"><span>Reason 2</span><input id="p_r2" placeholder="doesn't hold bacteria"></label>
+          <label class="f"><span>Reason 3</span><input id="p_r3" placeholder="lasts years"></label>
+        </div>
+        <label class="f"><span>The mechanism — <i>why</i> it works (your best line)</span>
+          <textarea id="p_mech" placeholder="whatever you put on after actually sticks to skin, instead of sitting on a layer of dead skin"></textarea></label>
+        <label class="f"><span>The bad habit you're calling out</span>
+          <input id="p_bad" placeholder="just patting body wash on yourself"></label>
+        <div class="grid g2" style="gap:8px">
+          <label class="f"><span>Price</span><input id="p_price" placeholder="$18"></label>
+          <label class="f"><span>Niche</span><select id="p_niche"></select></label>
+        </div>
+        <div class="row">
+          <button class="btn" id="gen">Generate script</button>
+          <button class="btn gh sm" id="loadDemo">Load the teardown as an example</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="ch"><h3>Format</h3><span class="sub">rotate these — never post the same shape twice in a row</span></div>
+        <div class="row" id="fmts"></div>
+        <p class="small muted" id="fmtDesc" style="margin:11px 0 0"></p>
+      </div>
+    </div>
+
+    <div>
+      <div class="card" id="scriptCard">
+        <div class="ch">
+          <h3 id="scriptTitle">Your script</h3>
+          <div class="row" style="margin-left:auto">
+            <button class="btn gh sm" id="copyScript">Copy</button>
+            <button class="btn gh sm" id="reHook">New hook</button>
+          </div>
+        </div>
+        <div id="scriptOut"><div class="empty">Fill the product in and hit <b>Generate script</b>.</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= HOOKS ================= -->
+<section id="s-hooks">
+  <div class="card">
+    <div class="ch"><h3>Hook bank</h3><span class="sub">the first 3 seconds decide everything else</span></div>
+    <p class="small muted" style="margin:-4px 0 14px">Same product, same script, different opening line — that's
+      the whole game. When a video flops, the hook flopped; re-shoot the first 3 seconds before you throw the
+      product out. Tap any line to copy it with your product filled in.</p>
+    <div class="row" style="margin-bottom:14px" id="hookCats"></div>
+    <div id="hookList"></div>
+  </div>
+</section>
+
+<!-- ================= PRODUCTS ================= -->
+<section id="s-prod">
+  <div class="card">
+    <div class="ch"><h3>Product pipeline</h3><span class="sub">what you're covering and what each one pays</span>
+      <button class="btn sm" id="addProd" style="margin-left:auto">＋ Add product</button></div>
+    <div class="tscroll"><table id="prodTable"></table></div>
+  </div>
+  <div class="card" id="prodForm" style="display:none">
+    <div class="ch"><h3 id="pfTitle">Add a product</h3></div>
+    <div class="grid g3">
+      <label class="f"><span>Product</span><input id="f_name"></label>
+      <label class="f"><span>Niche</span><select id="f_niche"></select></label>
+      <label class="f"><span>Where to buy</span><input id="f_where" placeholder="Amazon AU"></label>
+      <label class="f"><span>Retail price $</span><input id="f_price" type="number" step="0.01"></label>
+      <label class="f"><span>Commission %</span><input id="f_comm" type="number" step="0.1" placeholder="5"></label>
+      <label class="f"><span>Unit cost if you made it $</span><input id="f_cogs" type="number" step="0.01" placeholder="2.50"></label>
+      <label class="f"><span>Affiliate link</span><input id="f_link" placeholder="https://"></label>
+      <label class="f"><span>Status</span><select id="f_status">
+        <option>Researching</option><option>Ordered</option><option>Filming</option>
+        <option>Posted</option><option>Winner</option><option>Dead</option></select></label>
+      <label class="f"><span>Note</span><input id="f_note"></label>
+    </div>
+    <div class="row"><button class="btn" id="saveProd">Save</button>
+      <button class="btn gh" id="cancelProd">Cancel</button></div>
+  </div>
+</section>
+
+<!-- ================= BATCH ================= -->
+<section id="s-batch">
+  <div class="card">
+    <div class="ch"><h3>Batch day</h3><span class="sub">one afternoon = a month of content</span></div>
+    <p class="small muted" style="margin:-4px 0 14px">This is the only real automation that matters. You don't
+      film daily — you film 30 in one session, then post one a day. Pick the products, get a full shoot
+      sheet: every script, every hook, every caption, in shooting order, grouped so you don't change your shirt
+      more than you have to.</p>
+    <div class="row" style="margin-bottom:12px">
+      <label class="f" style="margin:0"><span>Posts per day</span>
+        <select id="b_ppd"><option>1</option><option selected>2</option><option>3</option></select></label>
+      <label class="f" style="margin:0"><span>Days to cover</span>
+        <select id="b_days"><option>7</option><option>14</option><option selected>30</option></select></label>
+      <label class="f" style="margin:0"><span>Start date</span><input id="b_start" type="date"></label>
+    </div>
+    <div id="batchPick"></div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn" id="genBatch">Build the shoot sheet</button>
+      <button class="btn gh" id="dlBatch">Download .txt</button>
+    </div>
+  </div>
+  <div class="card" id="batchCard" style="display:none">
+    <div class="ch"><h3>Shoot sheet</h3><button class="btn gh sm" id="copyBatch" style="margin-left:auto">Copy all</button></div>
+    <pre class="out" id="batchOut"></pre>
+  </div>
+</section>
+
+<!-- ================= MONEY ================= -->
+<section id="s-money">
+  <div class="card">
+    <div class="ch"><h3>The real curve</h3><span class="sub">what the numbers actually do</span></div>
+    <div class="grid g4">
+      <label class="f"><span>Views per post</span><input id="m_views" type="number" value="15000"></label>
+      <label class="f"><span>Posts per week</span><input id="m_posts" type="number" value="14"></label>
+      <label class="f"><span>Bio-link click rate %</span><input id="m_ctr" type="number" step="0.1" value="1.5"></label>
+      <label class="f"><span>Click → buy %</span><input id="m_cvr" type="number" step="0.1" value="3"></label>
+    </div>
+    <div class="grid g4">
+      <label class="f"><span>Affiliate basket $</span><input id="m_basket" type="number" value="80"></label>
+      <label class="f"><span>Commission %</span><input id="m_comm" type="number" step="0.1" value="5"></label>
+      <label class="f"><span>Your product price $</span><input id="m_price" type="number" value="29"></label>
+      <label class="f"><span>Your unit + ship + fees $</span><input id="m_cogs" type="number" step="0.01" value="9"></label>
+    </div>
+    <div class="note">These are the levers, and they're honest defaults — a 1.5% bio-link click rate is
+      already decent, and 3% of those buying is a healthy store. Change them to whatever you believe and watch
+      what happens. The point of this tab is that <b>views are not the lever you think they are.</b></div>
+
+    <div class="grid g2" style="margin-top:16px">
+      <div>
+        <div class="eyebrow">Affiliate — renting someone else's product</div>
+        <div class="grid g2" style="gap:10px">
+          <div class="stat"><div class="k">Per month</div><div class="v" id="o_aff_m">—</div><div class="n" id="o_aff_s">—</div></div>
+          <div class="stat"><div class="k">Per year</div><div class="v" id="o_aff_y">—</div><div class="n">before tax</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="eyebrow">Your own product — same videos</div>
+        <div class="grid g2" style="gap:10px">
+          <div class="stat hi"><div class="k">Per month</div><div class="v" id="o_own_m">—</div><div class="n" id="o_own_s">—</div></div>
+          <div class="stat hi"><div class="k">Per year</div><div class="v" id="o_own_y">—</div><div class="n">gross margin</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid g3" style="margin-top:12px">
+      <div class="stat"><div class="k">Multiple</div><div class="v" id="o_mult">—</div><div class="n">own vs affiliate</div></div>
+      <div class="stat"><div class="k">Views for $1M affiliate</div><div class="v" id="o_m1">—</div><div class="n">at these rates</div></div>
+      <div class="stat"><div class="k">Views for $1M own</div><div class="v" id="o_m2">—</div><div class="n">at these rates</div></div>
+    </div>
+    <div id="verdict"></div>
+  </div>
+
+  <div class="card">
+    <div class="ch"><h3>What each product is worth to you</h3><span class="sub">from your pipeline</span></div>
+    <div class="tscroll"><table id="moneyTable"></table></div>
+  </div>
+</section>
+
+<!-- ================= LOG ================= -->
+<section id="s-log">
+  <div class="card">
+    <div class="ch"><h3>Post log</h3><span class="sub">the only way you find out what works</span>
+      <button class="btn sm" id="addPost" style="margin-left:auto">＋ Log a post</button></div>
+    <p class="small muted" style="margin:-4px 0 14px">Fill this in weekly. After ~30 posts it tells you which
+      format and which hook type carry your account — and that's when you stop guessing.</p>
+    <div class="grid g4" id="logStats"></div>
+    <div class="tscroll" style="margin-top:14px"><table id="logTable"></table></div>
+  </div>
+  <div class="card" id="postForm" style="display:none">
+    <div class="ch"><h3>Log a post</h3></div>
+    <div class="grid g4">
+      <label class="f"><span>Date</span><input id="l_date" type="date"></label>
+      <label class="f"><span>Product</span><input id="l_prod"></label>
+      <label class="f"><span>Format</span><select id="l_fmt"></select></label>
+      <label class="f"><span>Hook type</span><select id="l_hook"></select></label>
+      <label class="f"><span>Views</span><input id="l_views" type="number"></label>
+      <label class="f"><span>Link clicks</span><input id="l_clicks" type="number"></label>
+      <label class="f"><span>Sales</span><input id="l_sales" type="number"></label>
+      <label class="f"><span>Earned $</span><input id="l_rev" type="number" step="0.01"></label>
+    </div>
+    <div class="row"><button class="btn" id="savePost">Save</button>
+      <button class="btn gh" id="cancelPost">Cancel</button></div>
+  </div>
+  <div class="card">
+    <div class="ch"><h3>What's carrying you</h3></div>
+    <div class="grid g2"><div id="byFmt"></div><div id="byHook"></div></div>
+  </div>
+</section>
+
+<!-- ================= RULES ================= -->
+<section id="s-rules">
+  <div class="card">
+    <div class="ch"><h3>Rules that keep you paid</h3><span class="sub">break these and the account goes, not the video</span></div>
+    <div id="rules"></div>
+  </div>
+  <div class="card">
+    <div class="ch"><h3>Your data</h3><span class="sub">everything here lives in this browser only</span></div>
+    <p class="small muted" style="margin:-4px 0 12px">Nothing is sent anywhere — no account, no server. That
+      also means clearing your browser wipes it, so export a backup now and then.</p>
+    <div class="row">
+      <button class="btn gh" id="expData">Export backup</button>
+      <button class="btn gh" id="impData">Import backup</button>
+      <button class="btn dngr" id="wipeData">Wipe everything</button>
+    </div>
+    <input type="file" id="impFile" accept=".json" style="display:none">
+  </div>
+</section>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============================================================
+   THE ENGINE — affiliate content machine
+   Single file, no backend, localStorage only.
+   ============================================================ */
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const money=n=>'$'+Math.round(n).toLocaleString();
+const big=n=>n>=1e9?(n/1e9).toFixed(1)+'B':n>=1e6?(n/1e6).toFixed(1)+'M':n>=1e3?(n/1e3).toFixed(1)+'K':String(Math.round(n));
+let toastT;
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),1900)}
+async function copy(text,msg){
+  try{await navigator.clipboard.writeText(text);toast(msg||'Copied')}
+  catch(e){const a=document.createElement('textarea');a.value=text;document.body.appendChild(a);
+    a.select();try{document.execCommand('copy');toast(msg||'Copied')}catch(_){toast('Copy failed')}
+    a.remove()}
+}
+
+/* ---------- store ---------- */
+const KEY='engine_v1';
+const DEF={products:[],posts:[],draft:{},fmt:'swap'};
+let S=load();
+function load(){try{return Object.assign({},DEF,JSON.parse(localStorage.getItem(KEY)||'{}'))}
+  catch(e){return structuredClone(DEF)}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('Storage full')}}
+const uid=()=>Math.random().toString(36).slice(2,9);
+
+/* ---------- niches ---------- */
+const NICHES={
+  grooming:{name:'Grooming & fragrance',tags:['grooming','smellgood','fragrance','selfcare','glowup','mensgrooming','hygiene','fyp']},
+  skin:{name:'Skin & hair',tags:['skincare','haircare','skintok','routine','glowup','beauty','fyp']},
+  fitness:{name:'Fitness & recovery',tags:['fitness','gymtok','recovery','training','gymessentials','fyp']},
+  home:{name:'Home & cleaning',tags:['cleantok','homehacks','organisation','cleaninghacks','homefinds','fyp']},
+  kitchen:{name:'Kitchen & food',tags:['kitchenhacks','cooking','mealprep','kitchenfinds','foodtok','fyp']},
+  tech:{name:'Tech & gadgets',tags:['techtok','gadgets','amazonfinds','techfinds','fyp']},
+  sleep:{name:'Sleep & wellness',tags:['sleep','wellness','recovery','routine','selfcare','fyp']}
+};
+
+/* ---------- the teardown ---------- */
+const TEARDOWN=[
+  ['0:00–0:04','Promise + enemy','Names the outcome and kills what they currently use, in one breath. On-screen text carries the promise so it lands with sound off.'],
+  ['0:04–0:07','The swap','One instruction. Not three options — one. "You need a silicone body scrubber."'],
+  ['0:07–0:14','Three fast reasons','Smaller, cleaner, better looking. Product is up, in hand, turning. Three is the number — two feels thin, four feels like a pitch.'],
+  ['0:14–0:20','The callout','"I know some of you are just patting body wash on yourself." This is the comment section. People argue with it or tag someone who does it.'],
+  ['0:20–0:26','The real job','Reframes the task: it was never about soap, it\'s about getting dead skin off.'],
+  ['0:26–0:35','The mechanism','The payload. WHY it works — products stick to skin, not to dead skin. This is the line people screenshot, and the reason it reads as knowledge instead of an ad.'],
+  ['0:35–0:41','Repeat the instruction','Closes on the action, not on a link. "Make sure you\'re rubbing properly."'],
+  ['—','Where the sell lives','Nowhere in the audio. Bio link + pinned comment. The video\'s whole job is to make them want it, not to sell it.']
+];
+
+const ROUTE=[
+  ['Pick the niche and stay in it','One lane for 90 days. Grooming is a good one — cheap products, universal problem, endless angles. An account that reviews scrubbers and cologne and protein powder and desk lamps teaches the algorithm nothing.'],
+  ['Set up the accounts properly','A new handle for this — do not run it off a personal or an existing brand page. Apply to Amazon Associates AU and Commission Factory. Both are free. Approval wants an active account with real content, so post ~10 videos before you apply.'],
+  ['Buy 10–15 cheap products yourself','Under $30 each. You have to own it to hold it on camera, and you can\'t describe a mechanism you haven\'t felt. This is your only real cost — call it $300.'],
+  ['One batch day','Same shirt, same bench, same light. Film all 15 in an afternoon using the shoot sheet. Filming daily is what kills people by week three.'],
+  ['Post daily for 60 days, no exceptions','Two a day if you can. Most will do nothing. You are not looking for an average — you are waiting for one to break, and you cannot predict which.'],
+  ['Read the log weekly, not daily','Which format, which hook, which product. Kill what doesn\'t move. Re-shoot flops with a new first 3 seconds before you write the product off.'],
+  ['Find the winner, then flip it','When one product outsells everything else for a month straight, that\'s the signal. Sample it from a supplier, brand it, put it on a Shopify page, and point the same content at your own link. That\'s when the maths changes.'],
+];
+
+const RULES=[
+  ['Never re-upload someone else\'s video','Not with a filter, not zoomed, not "duetted" as your own. It ends the account and disqualifies you from every program. Copy structure, film your own.'],
+  ['Disclose the affiliate link','#ad or "commissions earned" — required by the ACCC in Australia and by Amazon\'s own terms. It costs you nothing in performance and skipping it can cost you the account.'],
+  ['Never make a health claim','"Gets dead skin off" is fine. "Cures acne", "kills bacteria", "clinically proven" is a TGA problem and a lawsuit. Describe what it does, not what it heals.'],
+  ['Don\'t automate posting or DMs','Bulk-posting tools and engagement bots are the fastest way to get reach-limited. The automation is in the writing and the batching, not the button.'],
+  ['Amazon has specific rules','No prices in the video (they change), no links in email, no shortened links that hide the destination, and you must call it an affiliate link. Read their operating agreement once — it\'s short.'],
+  ['Buy the product before you talk about it','Reviewing something you\'ve never held shows on camera within about four seconds, and it is the single fastest way to burn an audience you spent a year building.'],
+];
+
+/* ---------- formats ---------- */
+const D=d=>({name:d.name||'this',out:d.out||'get the result',en:d.en||'what you\'re using now',
+  r1:d.r1||'better',r2:d.r2||'cleaner',r3:d.r3||'lasts',mech:d.mech||'it actually does the job properly',
+  bad:d.bad||'skipping the step',price:d.price||'',niche:d.niche||'grooming'});
+
+const FORMATS=[
+{id:'swap',name:'The Swap',desc:'The exact shape of the video you sent. You\'re using the wrong thing — here\'s the right thing, and here\'s why it works. Your highest-conversion format; use it for your best products.',
+ beats:d=>[
+  ['0:00–0:04','Promise + enemy',`${cap(d.out)} starts before you think it does — and ${d.en} isn't going to cut it anymore.`,`HOW TO ${d.out.toUpperCase()}`,'Straight to camera, product just out of frame'],
+  ['0:04–0:08','The swap',`So you need to get yourself a ${d.name}.`,'','Bring the product up into frame'],
+  ['0:08–0:15','Three reasons',`These are better because they're ${d.r1}, they ${d.r2}, and they ${d.r3}.`,'','Hold it up, turn it, let them see it'],
+  ['0:15–0:21','The callout',`And I know some of you are still ${d.bad} — that's not going to cut it.`,'','Point at the lens, slight lean in'],
+  ['0:21–0:27','The real job',`What you actually need to be doing is the bit everyone skips.`,'','Demo the motion on your arm'],
+  ['0:27–0:36','The mechanism',`Because ${d.mech}.`,'','Slow down here — this is the line that lands'],
+  ['0:36–0:41','Repeat it',`So get one, and actually use it properly.`,'','Product back up, hold the last beat'],
+ ]},
+{id:'mistake',name:'The Mistakes',desc:'Three things they\'re doing wrong, your product is the fix for the third. Saves and shares well because it feels like a checklist, not a pitch.',
+ beats:d=>[
+  ['0:00–0:04','The count',`Three reasons you don't ${d.out} — and the third one's the one nobody tells you.`,`3 REASONS YOU DON'T ${d.out.toUpperCase()}`,'Hold up three fingers'],
+  ['0:04–0:11','Mistake one',`One — you're ${d.bad}. That does nothing.`,'ONE','Fingers count down as you go'],
+  ['0:11–0:18','Mistake two',`Two — you're relying on ${d.en}, which was never built for this.`,'TWO',''],
+  ['0:18–0:28','Mistake three',`Three, and this is the big one — ${d.mech}. That's the whole thing.`,'THREE','Bring the product in on "three"'],
+  ['0:28–0:36','The fix',`Fix is a ${d.name}. ${cap(d.r1)}, ${d.r2}, ${d.r3}.`,'','Product up, turn it once'],
+  ['0:36–0:41','Close',`Sort the third one out and you'll notice within a week.`,'','Hold, no smile'],
+ ]},
+{id:'callout',name:'The Callout',desc:'Opens by accusing the viewer. Highest comment rate of any format — people defend themselves in the replies, which is exactly what you want.',
+ beats:d=>[
+  ['0:00–0:04','The accusation',`I can tell just by looking at you that you're still ${d.bad}.`,`STOP ${d.bad.toUpperCase()}`,'Dead straight to camera, no smile'],
+  ['0:04–0:10','Twist the knife',`And you're wondering why you can't ${d.out}. That's why.`,'',''],
+  ['0:10–0:18','The reason',`${cap(d.en)} was never going to do it. ${cap(d.mech)}.`,'','Lean in'],
+  ['0:18–0:28','The answer',`What you want is a ${d.name}. ${cap(d.r1)}, ${d.r2}, and ${d.r3}.`,'','Product up'],
+  ['0:28–0:36','Proof of use',`I've had mine ages and it's the one thing in there I'd actually replace immediately.`,'','Show wear / show it in use'],
+  ['0:36–0:41','Close',`Go and fix it.`,'',''],
+ ]},
+{id:'routine',name:'The Routine',desc:'Your full stack, your product as one step. Lower conversion per video but it builds the account — people follow routines, they don\'t follow ads.',
+ beats:d=>[
+  ['0:00–0:04','The promise',`This is everything I do to ${d.out}, in order.`,`MY ${d.out.toUpperCase()} ROUTINE`,'Products lined up on the bench behind you'],
+  ['0:04–0:10','Step one',`Starts in the shower — and it starts by binning ${d.en}.`,'STEP 1',''],
+  ['0:10–0:20','Step two — the hero',`This is the ${d.name}. ${cap(d.r1)}, ${d.r2}, ${d.r3}. This is the one that actually matters.`,'STEP 2','Longest hold of the video on this one'],
+  ['0:20–0:29','Why it matters',`${cap(d.mech)} — which is why everything after it works better.`,'',''],
+  ['0:29–0:36','Step three',`Then everything after — and it all lands, because you did step two.`,'STEP 3','Gesture at the rest of the line-up'],
+  ['0:36–0:41','Close',`That's it. That's the whole routine.`,'',''],
+ ]},
+{id:'myth',name:'The Myth',desc:'Kill a belief they hold. Strong for the first video on a new account — it announces you know something they don\'t.',
+ beats:d=>[
+  ['0:00–0:05','The myth',`${cap(d.en)} is not going to make you ${d.out}. It never was.`,`${d.en.toUpperCase()} ISN'T THE ANSWER`,'Straight to camera'],
+  ['0:05–0:13','Why they believe it',`Everyone tells you it is, so you keep doing it, and you keep wondering why nothing changes.`,'',''],
+  ['0:13–0:24','The truth',`Here's what's actually happening: ${d.mech}.`,'','Slow, this is the payload'],
+  ['0:24–0:33','The fix',`Which is why you want a ${d.name}. ${cap(d.r1)}, ${d.r2}, ${d.r3}.`,'','Product up'],
+  ['0:33–0:41','Close',`Try it for a week. You'll know.`,'',''],
+ ]},
+{id:'demo',name:'The Demo',desc:'Almost no talking — show the thing doing the thing. Use for products with a visible, satisfying result. Travels furthest on watch time.',
+ beats:d=>[
+  ['0:00–0:03','Visual hook',`Watch this.`,`${d.name.toUpperCase()}`,'Start mid-action — never start still'],
+  ['0:03–0:12','The demo','(no line — let it play)','','The actual result, unbroken, no cuts'],
+  ['0:12–0:20','Name it',`That's a ${d.name}. ${cap(d.r1)} and ${d.r2}.`,'',''],
+  ['0:20–0:30','The mechanism',`${cap(d.mech)}.`,'','Back to the demo underneath'],
+  ['0:30–0:38','The comparison',`Versus ${d.en}, which does about a third of that.`,'','Hold both up if you can'],
+  ['0:38–0:41','Close',`${cap(d.out)}. That's it.`,'',''],
+ ]},
+];
+const cap=s=>String(s||'').charAt(0).toUpperCase()+String(s||'').slice(1);
+
+/* ---------- hooks ---------- */
+const HOOKS={
+  problem:['{OUT} starts way earlier than you think.','You\'re not going to {out} while you\'re still using {en}.','The reason you don\'t {out} has nothing to do with what you\'re buying.','Nobody\'s told you this, but {en} is working against you.','If you can\'t {out}, this is why.','{cap_en} is the reason, and you\'ve never once suspected it.'],
+  callout:['I can tell you\'re still {bad}.','Some of you are genuinely still {bad} and it shows.','If you\'re {bad}, this one\'s for you.','Be honest — you\'re {bad}, aren\'t you.','This is going to upset the people who are {bad}.','You\'re doing this wrong and I can prove it in 30 seconds.'],
+  authority:['I\'ve tried every {name} there is. Get this one.','Three years of this and I\'d only replace one thing immediately.','Everyone gets this backwards, including me for a long time.','I\'m not going to pretend this is complicated. It\'s one product.','If I had to start over with $20, this is what I\'d buy first.'],
+  curiosity:['This is the cheapest thing in my routine and the only one that matters.','$20 and it does more than anything else in that shower.','Nobody talks about this and I don\'t know why.','This looks stupid. It isn\'t.','The thing that changed it for me cost less than lunch.','There\'s one step everyone skips and it\'s the only one that does anything.'],
+  direct:['Bin {en}. Here\'s what to use instead.','Stop {bad}. Do this.','If you do one thing this week, do this.','Throw {en} out. I\'m serious.','Replace {en} today.'],
+  result:['{cap_out}, every single day, from one $20 thing.','This is how you actually {out}.','How to {out} without buying more product.','You can {out} with one swap.','The whole thing is one product and about 30 seconds a day.'],
+};
+const HOOKCATS={problem:'Problem',callout:'Callout',authority:'Authority',curiosity:'Curiosity',direct:'Direct',result:'Result'};
+let hookCat='problem';
+
+function fillHook(h,d){
+  return h.replace(/\{OUT\}/g,cap(d.out)).replace(/\{out\}/g,d.out)
+          .replace(/\{cap_out\}/g,cap(d.out)).replace(/\{cap_en\}/g,cap(d.en))
+          .replace(/\{en\}/g,d.en).replace(/\{bad\}/g,d.bad).replace(/\{name\}/g,d.name);
+}
+
+/* ---------- captions ---------- */
+function caption(d,fmtName){
+  const n=NICHES[d.niche]||NICHES.grooming;
+  const tags=n.tags.map(t=>'#'+t).join(' ');
+  return `${cap(d.out)} — the one swap nobody makes.\n\n`+
+    `${cap(d.mech)}. That's the whole reason it works.\n\n`+
+    `Link's in my bio. #ad — I earn a commission if you buy through it, costs you nothing extra.\n\n`+tags;
+}
+
+/* ============================================================
+   TABS
+   ============================================================ */
+const TABS=[['play','The Play'],['script','Script'],['hooks','Hooks'],['prod','Products'],
+            ['batch','Batch'],['money','Money'],['log','Log'],['rules','Rules']];
+function buildTabs(){
+  $('#tabs').innerHTML=TABS.map((t,i)=>
+    `<button class="tab${i===0?' on':''}" data-t="${t[0]}">${t[1]}</button>`).join('');
+  $$('#tabs .tab').forEach(b=>b.onclick=()=>go(b.dataset.t));
+}
+function go(id){
+  $$('#tabs .tab').forEach(b=>b.classList.toggle('on',b.dataset.t===id));
+  $$('section').forEach(s=>s.classList.toggle('on',s.id==='s-'+id));
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(id==='money')calcMoney();
+  if(id==='log')renderLog();
+  if(id==='prod')renderProds();
+  if(id==='batch')renderBatchPick();
+}
+
+/* ============================================================
+   PLAY
+   ============================================================ */
+function renderPlay(){
+  $('#teardown').innerHTML=TEARDOWN.map(b=>
+    `<div class="beat"><div class="tm">${b[0]}</div><div>
+      <div class="lb">${esc(b[1])}</div><div class="ln small muted">${esc(b[2])}</div></div></div>`).join('');
+  $('#route').innerHTML=ROUTE.map((r,i)=>
+    `<div class="step"><div class="i">${i+1}</div><div><h4>${esc(r[0])}</h4><p>${esc(r[1])}</p></div></div>`).join('');
+  $('#rules').innerHTML=RULES.map((r,i)=>
+    `<div class="step"><div class="i">${i+1}</div><div><h4>${esc(r[0])}</h4><p>${esc(r[1])}</p></div></div>`).join('');
+}
+
+/* ============================================================
+   SCRIPT
+   ============================================================ */
+const DEMO={name:'silicone body scrubber',out:'smell good all day',en:'your loofah',
+  r1:'smaller',r2:'don\'t hold onto bacteria the way loofahs do',r3:'last for years',
+  mech:'whatever you put on after actually sticks to your skin, instead of sitting on top of a layer of dead skin cells',
+  bad:'just patting body wash on yourself',price:'$18',niche:'grooming'};
+
+function readDraft(){
+  const d={name:$('#p_name').value.trim(),out:$('#p_out').value.trim(),en:$('#p_en').value.trim(),
+    r1:$('#p_r1').value.trim(),r2:$('#p_r2').value.trim(),r3:$('#p_r3').value.trim(),
+    mech:$('#p_mech').value.trim(),bad:$('#p_bad').value.trim(),price:$('#p_price').value.trim(),
+    niche:$('#p_niche').value};
+  S.draft=d;save();return D(d);
+}
+function writeDraft(d){
+  $('#p_name').value=d.name||'';$('#p_out').value=d.out||'';$('#p_en').value=d.en||'';
+  $('#p_r1').value=d.r1||'';$('#p_r2').value=d.r2||'';$('#p_r3').value=d.r3||'';
+  $('#p_mech').value=d.mech||'';$('#p_bad').value=d.bad||'';$('#p_price').value=d.price||'';
+  $('#p_niche').value=d.niche||'grooming';
+}
+function renderFmts(){
+  $('#fmts').innerHTML=FORMATS.map(f=>
+    `<button class="pill${f.id===S.fmt?' on':''}" data-f="${f.id}">${esc(f.name)}</button>`).join('');
+  $$('#fmts .pill').forEach(b=>b.onclick=()=>{S.fmt=b.dataset.f;save();renderFmts();genScript()});
+  const f=FORMATS.find(x=>x.id===S.fmt)||FORMATS[0];
+  $('#fmtDesc').textContent=f.desc;
+}
+let curHook='';
+function genScript(newHook){
+  const d=readDraft();
+  const f=FORMATS.find(x=>x.id===S.fmt)||FORMATS[0];
+  const beats=f.beats(d);
+  const pool=HOOKS[hookCat]||HOOKS.problem;
+  if(newHook||!curHook)curHook=fillHook(pool[Math.floor(Math.random()*pool.length)],d);
+  $('#scriptTitle').textContent=f.name+(d.name!=='this'?' — '+d.name:'');
+  const cap_=caption(d,f.name);
+  $('#scriptOut').innerHTML=
+    `<div class="note good" style="margin-top:0"><b>Alt hook to test:</b> "${esc(curHook)}"<br>
+      <span class="xs dim">Shoot the same script twice with two different openings. Post them 4 days apart.
+      Whichever wins, that's your hook type for the next month.</span></div>`+
+    beats.map(b=>`<div class="beat">
+      <div class="tm">${esc(b[0])}</div>
+      <div><div class="lb">${esc(b[1])}</div>
+        <div class="ln">${esc(b[2])}</div>
+        <div class="mt">
+          ${b[3]?`<span><b>On screen</b> ${esc(b[3])}</span>`:''}
+          ${b[4]?`<span><b>Shot</b> ${esc(b[4])}</span>`:''}
+        </div></div></div>`).join('')+
+    `<hr><div class="eyebrow">Caption</div>
+     <pre class="out" style="max-height:200px">${esc(cap_)}</pre>
+     <div class="row" style="margin-top:10px">
+       <button class="btn gh sm" id="copyCap">Copy caption</button>
+       <span class="xs dim">Disclosure is in there — leave it in.</span>
+     </div>`;
+  $('#copyCap').onclick=()=>copy(cap_,'Caption copied');
+}
+function scriptText(){
+  const d=readDraft(), f=FORMATS.find(x=>x.id===S.fmt)||FORMATS[0];
+  return `${f.name.toUpperCase()} — ${d.name}\nHOOK OPTION: ${curHook}\n\n`+
+    f.beats(d).map(b=>`[${b[0]}] ${b[1].toUpperCase()}\n${b[2]}`+
+      (b[3]?`\n   ON SCREEN: ${b[3]}`:'')+(b[4]?`\n   SHOT: ${b[4]}`:'')).join('\n\n')+
+    `\n\n--- CAPTION ---\n${caption(d,f.name)}`;
+}
+
+/* ============================================================
+   HOOKS
+   ============================================================ */
+function renderHooks(){
+  $('#hookCats').innerHTML=Object.entries(HOOKCATS).map(([k,v])=>
+    `<button class="pill${k===hookCat?' on':''}" data-h="${k}">${v}</button>`).join('');
+  $$('#hookCats .pill').forEach(b=>b.onclick=()=>{hookCat=b.dataset.h;renderHooks()});
+  const d=D(S.draft||{});
+  $('#hookList').innerHTML=(HOOKS[hookCat]||[]).map((h,i)=>{
+    const t=fillHook(h,d);
+    return `<div class="hookline" data-c="${esc(t)}"><span class="n">${String(i+1).padStart(2,'0')}</span>
+      <span>${esc(t)}</span></div>`;
+  }).join('');
+  $$('#hookList .hookline').forEach(el=>el.onclick=()=>copy(el.dataset.c,'Hook copied'));
+}
+
+/* ============================================================
+   PRODUCTS
+   ============================================================ */
+let editId=null;
+function renderProds(){
+  const t=$('#prodTable');
+  if(!S.products.length){
+    t.innerHTML=`<tr><td><div class="empty">Nothing in the pipeline yet.<br>
+      <span class="xs">Add the 10–15 products you're going to buy and film.</span></div></td></tr>`;return}
+  t.innerHTML=`<thead><tr><th>Product</th><th>Niche</th><th>Where</th><th class="num">Price</th>
+    <th class="num">Comm</th><th class="num">Per sale</th><th class="num">If yours</th><th>Status</th><th></th></tr></thead><tbody>`+
+    S.products.map(p=>{
+      const per=(+p.price||0)*(+p.comm||0)/100;
+      const own=(+p.price||0)-(+p.cogs||0);
+      const st={Winner:'ac',Dead:'bad',Posted:'ac',Filming:'warn'}[p.status]||'';
+      return `<tr><td><b>${esc(p.name)}</b>${p.note?`<div class="xs dim">${esc(p.note)}</div>`:''}</td>
+        <td class="xs muted">${esc((NICHES[p.niche]||{}).name||p.niche||'')}</td>
+        <td class="xs muted">${p.link?`<a href="${esc(p.link)}" target="_blank" rel="noopener">${esc(p.where||'link')}</a>`:esc(p.where||'—')}</td>
+        <td class="num">${p.price?'$'+(+p.price).toFixed(2):'—'}</td>
+        <td class="num">${p.comm?(+p.comm)+'%':'—'}</td>
+        <td class="num" style="color:var(--mut)">${per?'$'+per.toFixed(2):'—'}</td>
+        <td class="num" style="color:var(--ac)">${own>0&&p.cogs?'$'+own.toFixed(2):'—'}</td>
+        <td><span class="tag ${st}">${esc(p.status||'')}</span></td>
+        <td style="text-align:right;white-space:nowrap">
+          <button class="btn gh sm" data-ed="${p.id}">Edit</button>
+          <button class="btn gh sm" data-del="${p.id}">✕</button></td></tr>`}).join('')+'</tbody>';
+  $$('[data-ed]',t).forEach(b=>b.onclick=()=>editProd(b.dataset.ed));
+  $$('[data-del]',t).forEach(b=>b.onclick=()=>{
+    if(!confirm('Remove this product?'))return;
+    S.products=S.products.filter(x=>x.id!==b.dataset.del);save();renderProds();calcMoney()});
+}
+function editProd(id){
+  const p=S.products.find(x=>x.id===id);if(!p)return;
+  editId=id;$('#pfTitle').textContent='Edit product';
+  $('#f_name').value=p.name||'';$('#f_niche').value=p.niche||'grooming';$('#f_where').value=p.where||'';
+  $('#f_price').value=p.price||'';$('#f_comm').value=p.comm||'';$('#f_cogs').value=p.cogs||'';
+  $('#f_link').value=p.link||'';$('#f_status').value=p.status||'Researching';$('#f_note').value=p.note||'';
+  $('#prodForm').style.display='';$('#prodForm').scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+/* ============================================================
+   BATCH
+   ============================================================ */
+function renderBatchPick(){
+  if(!S.products.length){
+    $('#batchPick').innerHTML=`<div class="empty">Add products first — the shoot sheet is built from your pipeline.
+      <br><button class="btn sm" style="margin-top:10px" onclick="go('prod')">Go to Products</button></div>`;return}
+  $('#batchPick').innerHTML=`<div class="eyebrow">Include</div><div class="row">`+
+    S.products.map(p=>`<button class="pill on" data-b="${p.id}">${esc(p.name)}</button>`).join('')+`</div>`;
+  $$('#batchPick .pill').forEach(b=>b.onclick=()=>b.classList.toggle('on'));
+}
+let batchText='';
+function buildBatch(){
+  const picked=$$('#batchPick .pill.on').map(b=>b.dataset.b);
+  const prods=S.products.filter(p=>picked.includes(p.id));
+  if(!prods.length){toast('Pick at least one product');return}
+  const ppd=+$('#b_ppd').value, days=+$('#b_days').value, total=ppd*days;
+  const start=$('#b_start').value?new Date($('#b_start').value+'T00:00:00'):new Date();
+  let out=`SHOOT SHEET — ${total} posts over ${days} days (${ppd}/day)\n`+
+    `Products: ${prods.length}   Generated: ${new Date().toLocaleDateString('en-AU')}\n`+
+    `${'='.repeat(64)}\n\n`+
+    `HOW TO USE THIS\n`+
+    `Film everything in one session. Same shirt, same spot, same light — nobody\n`+
+    `notices and it saves you the whole afternoon. Shoot in the order below: all\n`+
+    `of one product's angles together, then move to the next. Post one per slot\n`+
+    `and log the result.\n\n${'='.repeat(64)}\n\n`;
+
+  const cats=Object.keys(HOOKS);
+  for(let i=0;i<total;i++){
+    const p=prods[i%prods.length];
+    const f=FORMATS[i%FORMATS.length];
+    const dt=new Date(start.getTime()+Math.floor(i/ppd)*864e5);
+    const slot=i%ppd;
+    const d=D({name:p.name,out:p.out||'get the result',en:p.en||'what you use now',
+      r1:p.r1||'better made',r2:p.r2||'do the job properly',r3:p.r3||'last longer',
+      mech:p.mech||'it actually does what the cheap version pretends to',
+      bad:p.bad||'skipping it',niche:p.niche});
+    const cat=cats[i%cats.length];
+    const hk=fillHook(HOOKS[cat][i%HOOKS[cat].length],d);
+    out+=`#${String(i+1).padStart(2,'0')}  ${dt.toLocaleDateString('en-AU',{weekday:'short',day:'numeric',month:'short'})}`+
+      (ppd>1?`  slot ${slot+1}`:'')+`\n`+
+      `PRODUCT: ${p.name}\nFORMAT:  ${f.name}\nHOOK (${HOOKCATS[cat]}): ${hk}\n\n`+
+      f.beats(d).map(b=>`  [${b[0]}] ${b[2]}`+(b[3]?`\n      SCREEN: ${b[3]}`:'')+
+        (b[4]?`\n      SHOT: ${b[4]}`:'')).join('\n')+
+      `\n\n  CAPTION:\n  ${caption(d,f.name).split('\n').join('\n  ')}\n\n${'-'.repeat(64)}\n\n`;
+  }
+  batchText=out;
+  $('#batchOut').textContent=out;
+  $('#batchCard').style.display='';
+  $('#batchCard').scrollIntoView({behavior:'smooth',block:'start'});
+  toast(total+' posts planned');
+}
+
+/* ============================================================
+   MONEY
+   ============================================================ */
+function calcMoney(){
+  const v=+$('#m_views').value||0, pw=+$('#m_posts').value||0,
+        ctr=(+$('#m_ctr').value||0)/100, cvr=(+$('#m_cvr').value||0)/100,
+        basket=+$('#m_basket').value||0, comm=(+$('#m_comm').value||0)/100,
+        price=+$('#m_price').value||0, cogs=+$('#m_cogs').value||0;
+  const viewsM=v*pw*4.33;
+  const buyers=viewsM*ctr*cvr;
+  const affM=buyers*basket*comm, ownM=buyers*Math.max(0,price-cogs);
+  $('#o_aff_m').textContent=money(affM);
+  $('#o_aff_s').textContent=Math.round(buyers).toLocaleString()+' sales · '+money(basket*comm)+' each';
+  $('#o_aff_y').textContent=money(affM*12);
+  $('#o_own_m').textContent=money(ownM);
+  $('#o_own_s').textContent=Math.round(buyers).toLocaleString()+' orders · '+money(price-cogs)+' each';
+  $('#o_own_y').textContent=money(ownM*12);
+  const mult=affM>0?(ownM/affM):0;
+  $('#o_mult').textContent=mult?mult.toFixed(1)+'×':'—';
+  const perView1=ctr*cvr*basket*comm, perView2=ctr*cvr*Math.max(0,price-cogs);
+  $('#o_m1').textContent=perView1>0?big(1e6/perView1):'∞';
+  $('#o_m2').textContent=perView2>0?big(1e6/perView2):'∞';
+
+  const yr=affM*12;
+  let msg;
+  if(yr<5000) msg=`<div class="note bad"><b>At these numbers this is a hobby, not a business.</b>
+    ${money(yr)} a year of affiliate commission before tax. Either the views have to go up by an order of
+    magnitude, or the thing you're selling has to be worth more. The second one is far easier to control.</div>`;
+  else if(yr<60000) msg=`<div class="note"><b>Real money, not life-changing money.</b> ${money(yr)} a year
+    of commission — a solid side income for a few hours a week, and genuinely good validation. This is the
+    point where you stop asking whether it works and start asking what you'd sell instead of someone
+    else's scrubber.</div>`;
+  else msg=`<div class="note good"><b>That's a business.</b> ${money(yr)} a year in commission alone — which
+    also means the same audience buying your own product would be worth about ${money(ownM*12)}. If you're
+    genuinely hitting these numbers, launching your own product is not a risk, it's the obvious next move.</div>`;
+  if(mult>1.5) msg+=`<div class="note good">Owning the product is worth <b>${mult.toFixed(1)}×</b> the affiliate
+    version of the exact same video. Every sale you send to someone else's checkout leaves
+    <b>${((1-1/mult)*100).toFixed(0)}%</b> of the money on their side of the counter.</div>`;
+  $('#verdict').innerHTML=msg;
+
+  const t=$('#moneyTable');
+  if(!S.products.length){t.innerHTML=`<tr><td><div class="empty">Add products to compare them.</div></td></tr>`;return}
+  const rows=S.products.map(p=>{
+    const per=(+p.price||0)*(+p.comm||0)/100, own=(+p.price||0)-(+p.cogs||0);
+    return {...p,per,own,mult:per>0?own/per:0}}).sort((a,b)=>b.own-a.own);
+  t.innerHTML=`<thead><tr><th>Product</th><th class="num">Affiliate / sale</th><th class="num">Yours / sale</th>
+    <th class="num">Multiple</th><th>Worth owning?</th></tr></thead><tbody>`+
+    rows.map(r=>`<tr><td><b>${esc(r.name)}</b></td>
+      <td class="num">${r.per?'$'+r.per.toFixed(2):'—'}</td>
+      <td class="num" style="color:var(--ac)">${r.cogs?'$'+r.own.toFixed(2):'—'}</td>
+      <td class="num">${r.mult?r.mult.toFixed(1)+'×':'—'}</td>
+      <td>${!r.cogs?'<span class="xs dim">add a unit cost</span>':
+        r.mult>=4?'<span class="tag ac">Yes — big gap</span>':
+        r.mult>=2?'<span class="tag warn">Maybe</span>':'<span class="tag">Not worth it</span>'}</td></tr>`).join('')+'</tbody>';
+}
+
+/* ============================================================
+   LOG
+   ============================================================ */
+function renderLog(){
+  const P=S.posts;
+  const tot=P.reduce((a,p)=>({v:a.v+(+p.views||0),c:a.c+(+p.clicks||0),
+    s:a.s+(+p.sales||0),r:a.r+(+p.rev||0)}),{v:0,c:0,s:0,r:0});
+  $('#logStats').innerHTML=[
+    ['Posts',P.length,''],
+    ['Total views',big(tot.v),''],
+    ['Click rate',tot.v?((tot.c/tot.v)*100).toFixed(2)+'%':'—','of views'],
+    ['Earned','$'+tot.r.toFixed(0),tot.s+' sales'],
+  ].map(s=>`<div class="stat"><div class="k">${s[0]}</div><div class="v">${s[1]}</div>
+    <div class="n">${s[2]}</div></div>`).join('');
+
+  const t=$('#logTable');
+  if(!P.length){t.innerHTML=`<tr><td><div class="empty">No posts logged yet.<br>
+    <span class="xs">Log every post — after 30 the pattern shows up on its own.</span></div></td></tr>`}
+  else{
+    t.innerHTML=`<thead><tr><th>Date</th><th>Product</th><th>Format</th><th>Hook</th>
+      <th class="num">Views</th><th class="num">Clicks</th><th class="num">Sales</th>
+      <th class="num">$</th><th></th></tr></thead><tbody>`+
+      [...P].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).map(p=>
+        `<tr><td class="xs muted">${esc(p.date||'')}</td><td><b>${esc(p.prod||'')}</b></td>
+         <td class="xs">${esc((FORMATS.find(f=>f.id===p.fmt)||{}).name||p.fmt||'')}</td>
+         <td class="xs">${esc(HOOKCATS[p.hook]||p.hook||'')}</td>
+         <td class="num">${big(+p.views||0)}</td><td class="num">${(+p.clicks||0)}</td>
+         <td class="num">${(+p.sales||0)}</td>
+         <td class="num" style="color:var(--ac)">${p.rev?'$'+(+p.rev).toFixed(0):'—'}</td>
+         <td style="text-align:right"><button class="btn gh sm" data-dp="${p.id}">✕</button></td></tr>`).join('')+'</tbody>';
+    $$('[data-dp]',t).forEach(b=>b.onclick=()=>{
+      S.posts=S.posts.filter(x=>x.id!==b.dataset.dp);save();renderLog()});
+  }
+  $('#byFmt').innerHTML=breakdown('fmt',FORMATS.reduce((o,f)=>(o[f.id]=f.name,o),{}),'By format');
+  $('#byHook').innerHTML=breakdown('hook',HOOKCATS,'By hook type');
+}
+function breakdown(field,names,title){
+  const P=S.posts;
+  if(P.length<3)return `<div class="eyebrow">${title}</div>
+    <div class="empty xs">Log at least 3 posts to see this.</div>`;
+  const g={};
+  P.forEach(p=>{const k=p[field]||'?';(g[k]=g[k]||{n:0,v:0,r:0});g[k].n++;g[k].v+=+p.views||0;g[k].r+=+p.rev||0});
+  const rows=Object.entries(g).map(([k,x])=>({k,n:x.n,avg:x.v/x.n,r:x.r})).sort((a,b)=>b.avg-a.avg);
+  const max=Math.max(...rows.map(r=>r.avg),1);
+  return `<div class="eyebrow">${title}</div>`+rows.map(r=>
+    `<div style="margin-bottom:11px">
+      <div class="row" style="justify-content:space-between">
+        <span class="small"><b>${esc(names[r.k]||r.k)}</b> <span class="dim xs">${r.n} post${r.n>1?'s':''}</span></span>
+        <span class="small" style="font-family:var(--mono)">${big(r.avg)} avg${r.r?' · $'+r.r.toFixed(0):''}</span>
+      </div><div class="bar"><i style="width:${(r.avg/max*100).toFixed(0)}%"></i></div></div>`).join('');
+}
+
+/* ============================================================
+   INIT
+   ============================================================ */
+function fillSelect(el,obj){el.innerHTML=Object.entries(obj).map(([k,v])=>
+  `<option value="${k}">${esc(v.name||v)}</option>`).join('')}
+
+function init(){
+  buildTabs();renderPlay();renderFmts();
+  fillSelect($('#p_niche'),NICHES);fillSelect($('#f_niche'),NICHES);
+  $('#l_fmt').innerHTML=FORMATS.map(f=>`<option value="${f.id}">${esc(f.name)}</option>`).join('');
+  $('#l_hook').innerHTML=Object.entries(HOOKCATS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('');
+  writeDraft(S.draft||{});
+  renderHooks();renderProds();
+  if((S.draft||{}).name)genScript(true);   // pick up where they left off
+
+  const today=new Date().toISOString().slice(0,10);
+  $('#b_start').value=today;$('#l_date').value=today;
+
+  $('#gen').onclick=()=>{genScript(true);renderHooks()};
+  $('#reHook').onclick=()=>genScript(true);
+  $('#loadDemo').onclick=()=>{writeDraft(DEMO);S.draft=DEMO;save();genScript(true);renderHooks();
+    toast('Loaded — this is the video you sent')};
+  $('#copyScript').onclick=()=>copy(scriptText(),'Script copied');
+  $$('#s-script input,#s-script textarea,#s-script select').forEach(el=>
+    el.addEventListener('change',()=>{readDraft();renderHooks()}));
+
+  $('#addProd').onclick=()=>{editId=null;$('#pfTitle').textContent='Add a product';
+    ['f_name','f_where','f_price','f_comm','f_cogs','f_link','f_note'].forEach(i=>$('#'+i).value='');
+    $('#f_status').value='Researching';$('#prodForm').style.display='';
+    $('#prodForm').scrollIntoView({behavior:'smooth',block:'center'})};
+  $('#cancelProd').onclick=()=>{$('#prodForm').style.display='none';editId=null};
+  $('#saveProd').onclick=()=>{
+    const name=$('#f_name').value.trim();
+    if(!name){toast('Give it a name');return}
+    const rec={name,niche:$('#f_niche').value,where:$('#f_where').value.trim(),
+      price:$('#f_price').value,comm:$('#f_comm').value,cogs:$('#f_cogs').value,
+      link:$('#f_link').value.trim(),status:$('#f_status').value,note:$('#f_note').value.trim()};
+    if(editId){Object.assign(S.products.find(x=>x.id===editId),rec)}
+    else{S.products.push({id:uid(),...rec})}
+    save();editId=null;$('#prodForm').style.display='none';renderProds();toast('Saved')};
+
+  $('#genBatch').onclick=buildBatch;
+  $('#copyBatch').onclick=()=>batchText?copy(batchText,'Shoot sheet copied'):toast('Build it first');
+  $('#dlBatch').onclick=()=>{
+    if(!batchText){toast('Build it first');return}
+    const b=new Blob([batchText],{type:'text/plain'}),u=URL.createObjectURL(b);
+    const a=document.createElement('a');a.href=u;a.download='shoot-sheet.txt';a.click();
+    setTimeout(()=>URL.revokeObjectURL(u),1000);toast('Downloaded')};
+
+  $$('#s-money input').forEach(el=>el.addEventListener('input',calcMoney));
+
+  $('#addPost').onclick=()=>{$('#postForm').style.display='';
+    $('#postForm').scrollIntoView({behavior:'smooth',block:'center'})};
+  $('#cancelPost').onclick=()=>$('#postForm').style.display='none';
+  $('#savePost').onclick=()=>{
+    const prod=$('#l_prod').value.trim();
+    if(!prod){toast('Which product?');return}
+    S.posts.push({id:uid(),date:$('#l_date').value,prod,fmt:$('#l_fmt').value,hook:$('#l_hook').value,
+      views:$('#l_views').value,clicks:$('#l_clicks').value,sales:$('#l_sales').value,rev:$('#l_rev').value});
+    save();$('#postForm').style.display='none';
+    ['l_prod','l_views','l_clicks','l_sales','l_rev'].forEach(i=>$('#'+i).value='');
+    renderLog();toast('Logged')};
+
+  $('#expData').onclick=()=>{
+    const b=new Blob([JSON.stringify(S,null,2)],{type:'application/json'}),u=URL.createObjectURL(b);
+    const a=document.createElement('a');a.href=u;a.download='engine-backup.json';a.click();
+    setTimeout(()=>URL.revokeObjectURL(u),1000);toast('Exported')};
+  $('#impData').onclick=()=>$('#impFile').click();
+  $('#impFile').onchange=e=>{
+    const f=e.target.files[0];if(!f)return;
+    const r=new FileReader();
+    r.onload=()=>{try{S=Object.assign({},DEF,JSON.parse(r.result));save();
+      writeDraft(S.draft||{});renderFmts();renderProds();renderLog();renderHooks();calcMoney();
+      toast('Imported')}catch(err){toast('Bad file')}};
+    r.readAsText(f);e.target.value=''};
+  $('#wipeData').onclick=()=>{
+    if(!confirm('Delete every product, post and draft? This cannot be undone.'))return;
+    S=structuredClone(DEF);save();writeDraft({});renderProds();renderLog();renderHooks();
+    calcMoney();toast('Wiped')};
+
+  calcMoney();
+}
+init();
+</script>

@@ -909,3 +909,43 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   Verified E2E via scratchpad/deskcoach-light.mjs + coach-light2.mjs (temp
   coach minted → dashboard shot → deleted). Masters: admin-base.html,
   coach-base.html.
+
+## The Engine — affiliate content machine (2026-08-15)
+
+- **NEW standalone tool, separate business.** Aiman sent a 41s IG reel by
+  **@HEMZZ.6** ("HOW TO SMELL GOOD ALL DAY" → silicone body scrubber) and asked
+  to turn it into an automated affiliate business. Built **engine.html** (single
+  file, no backend, localStorage only, key `engine_v1`). NOT linked from
+  index.html and NOT on main — feature branch only, so it does not auto-deploy.
+  Merge to main to publish it at /engine.html.
+- **What it is:** the reel was reverse-engineered into an 8-beat structure
+  (promise+enemy → swap → 3 reasons → callout → real job → mechanism → repeat;
+  the sell lives only in the bio, never in the audio). That structure is the
+  tool's core IP. 8 tabs: **The Play** (teardown + the honest constraints + a
+  90-day route), **Script** (6 formats × product inputs → timestamped script
+  with on-screen text, shot notes, caption with #ad disclosure, hashtags per
+  niche), **Hooks** (6 categories × ~6 templates, auto-filled with the product),
+  **Products** (pipeline w/ per-sale commission vs own-product margin),
+  **Batch** (pick products → full N-post shoot sheet, copy or .txt download —
+  the actual automation payoff), **Money** (views→CTR→CVR→$ model comparing
+  affiliate vs owning the product), **Log** (per-post results → which format and
+  hook type carry the account), **Rules** (compliance). Export/import JSON.
+- **The strategic call (researched, not guessed):** TikTok Shop is **not
+  available in Australia** and TikTok has confirmed no local rollout — so the
+  tag-the-product-in-video loop he imagined doesn't exist here. AU route is
+  bio-link affiliate (Amazon Associates AU, Commission Factory), ~5% on an ~$80
+  beauty basket ≈ **$4/sale** → $1M of commission = 250k sales. So affiliate is
+  positioned as the *instrument*, not the business: run it 90 days to find which
+  product genuinely converts, then white-label the winner (silicone scrubber
+  lands ~$1–3/unit, retails ~$25–30) — same video, ~5× the money, and you own
+  the customer. The Money tab makes that gap visible live.
+- **Hard rules baked into the tool** (he must not break these): never re-upload
+  @HEMZZ.6's video — copy the structure, film his own; ACCC/Amazon affiliate
+  disclosure required; no health claims (TGA); no automated posting/DMs — which
+  also honours the standing NEVER-automate-Instagram rule. The automation here
+  is in the *writing and batching*, never the posting.
+- Verified E2E 55/55 (scratchpad/engine-e2e.mjs — boot, script gen across
+  formats, hooks, products maths, 60-post shoot sheet, money model exact-value
+  checks, log breakdowns, reload persistence, mobile 390px no-overflow, zero JS
+  errors). Business-plan artifact:
+  https://claude.ai/code/artifact/e6c021bb-543a-45a0-a334-2df797e68dbd
