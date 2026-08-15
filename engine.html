@@ -214,9 +214,9 @@ td.num,th.num{text-align:right;font-family:var(--mono)}
         <label class="f"><span>The outcome they want</span><input id="p_out" placeholder="smell good all day"></label>
         <label class="f"><span>The enemy (what they use / do now)</span><input id="p_en" placeholder="your loofah"></label>
         <div class="grid g3" style="gap:8px">
-          <label class="f"><span>Reason 1</span><input id="p_r1" placeholder="smaller"></label>
+          <label class="f"><span>Reason 1 — "they…"</span><input id="p_r1" placeholder="are smaller"></label>
           <label class="f"><span>Reason 2</span><input id="p_r2" placeholder="doesn't hold bacteria"></label>
-          <label class="f"><span>Reason 3</span><input id="p_r3" placeholder="lasts years"></label>
+          <label class="f"><span>Reason 3 — "they…"</span><input id="p_r3" placeholder="last for years"></label>
         </div>
         <label class="f"><span>The mechanism — <i>why</i> it works (your best line)</span>
           <textarea id="p_mech" placeholder="whatever you put on after actually sticks to skin, instead of sitting on a layer of dead skin"></textarea></label>
@@ -270,8 +270,13 @@ td.num,th.num{text-align:right;font-family:var(--mono)}
 <section id="s-prod">
   <div class="card">
     <div class="ch"><h3>Product pipeline</h3><span class="sub">what you're covering and what each one pays</span>
-      <button class="btn sm" id="addProd" style="margin-left:auto">＋ Add product</button></div>
+      <div class="row" style="margin-left:auto">
+        <button class="btn gh sm" id="loadStarter">Load 12 starter products</button>
+        <button class="btn sm" id="addProd">＋ Add product</button></div></div>
     <div class="tscroll"><table id="prodTable"></table></div>
+    <p class="xs dim" style="margin:12px 0 0">The <b>angle</b> column is what the shoot sheet writes from.
+      A product without one still generates a script, but a generic one — fill the angle in and every
+      post about it comes out specific.</p>
   </div>
   <div class="card" id="prodForm" style="display:none">
     <div class="ch"><h3 id="pfTitle">Add a product</h3></div>
@@ -288,6 +293,21 @@ td.num,th.num{text-align:right;font-family:var(--mono)}
         <option>Posted</option><option>Winner</option><option>Dead</option></select></label>
       <label class="f"><span>Note</span><input id="f_note"></label>
     </div>
+    <hr>
+    <div class="eyebrow">The angle — this is what every script for this product is built from</div>
+    <div class="grid g2">
+      <label class="f"><span>The outcome they want</span><input id="f_out" placeholder="smell good all day"></label>
+      <label class="f"><span>The enemy (what they do now)</span><input id="f_en" placeholder="your loofah"></label>
+    </div>
+    <div class="grid g3" style="gap:8px">
+      <label class="f"><span>Reason 1 — "they…"</span><input id="f_r1" placeholder="are smaller"></label>
+      <label class="f"><span>Reason 2</span><input id="f_r2" placeholder="don't hold bacteria"></label>
+      <label class="f"><span>Reason 3 — "they…"</span><input id="f_r3" placeholder="last for years"></label>
+    </div>
+    <label class="f"><span>The mechanism — <i>why</i> it works</span>
+      <textarea id="f_mech" placeholder="whatever you put on after actually sticks to skin"></textarea></label>
+    <label class="f"><span>The bad habit you're calling out</span>
+      <input id="f_bad" placeholder="just patting body wash on yourself"></label>
     <div class="row"><button class="btn" id="saveProd">Save</button>
       <button class="btn gh" id="cancelProd">Cancel</button></div>
   </div>
@@ -462,6 +482,64 @@ const NICHES={
   sleep:{name:'Sleep & wellness',tags:['sleep','wellness','recovery','routine','selfcare','fyp']}
 };
 
+/* ---------- starter pack ----------
+   Twelve cheap, universal grooming products with the angle already written —
+   the creative half you can't google. Prices are rough AU estimates to be
+   confirmed on the actual listing; commission seeded at the 5% AU beauty
+   default. Every mechanism here describes what the product DOES — none of them
+   make a health claim, and that is deliberate. */
+const STARTER=[
+ {name:'Silicone body scrubber',price:'18',cogs:'2.50',out:'smell good all day',en:'your loofah',
+  r1:'are smaller',r2:'don\'t hold onto bacteria the way loofahs do',r3:'last for years',
+  mech:'whatever you put on after actually sticks to your skin, instead of sitting on top of a layer of dead skin cells',
+  bad:'just patting body wash on yourself'},
+ {name:'Tongue scraper',price:'12',out:'stop worrying about your breath',en:'brushing your tongue',
+  r1:'take about four seconds',r2:'reach the back where it actually matters',r3:'cost less than a coffee',
+  mech:'most of what people smell is sitting on the back of your tongue, and a toothbrush pushes it around instead of lifting it off',
+  bad:'brushing your teeth and calling it done'},
+ {name:'Exfoliating mitt',price:'10',out:'have skin people want to touch',en:'your bare hands',
+  r1:'cover your whole back',r2:'give you actual friction',r3:'go in the wash',
+  mech:'you physically cannot create enough friction with a palm to lift anything off',
+  bad:'rubbing soap around with your hands'},
+ {name:'Microfibre hair towel',price:'20',out:'stop fighting your hair every morning',en:'a normal bath towel',
+  r1:'dry it in half the time',r2:'don\'t rough the hair up',r3:'stay out of your way while you get ready',
+  mech:'a cotton towel drags on the cuticle while your hair is wet and soft, and that is where most of the frizz comes from',
+  bad:'scrubbing your head with a bath towel'},
+ {name:'Silk pillowcase',price:'30',out:'wake up looking like you slept well',en:'a cotton pillowcase',
+  r1:'let your hair slide instead of grip',r2:'stay cool all night',r3:'last years',
+  mech:'cotton grabs your hair and drags on it for eight hours straight, every single night',
+  bad:'blaming your hair for what your pillow is doing'},
+ {name:'Laundry scent booster',price:'14',out:'smell good all day',en:'relying on cologne alone',
+  r1:'last through the whole day',r2:'go in the wash you already do',r3:'work on everything you own',
+  mech:'people are standing close enough to smell your shirt long before they are close enough to smell your neck',
+  bad:'spraying cologne on a shirt that smells like the machine'},
+ {name:'Boar bristle brush',price:'22',out:'stop having greasy roots and dry ends',en:'a plastic brush',
+  r1:'move the oil instead of leaving it',r2:'don\'t tear at your hair',r3:'last a decade',
+  mech:'it carries the oil from your scalp down the length, instead of leaving it pooled at the roots where you can see it',
+  bad:'washing your hair more to fix greasy roots'},
+ {name:'Nose and ear trimmer',price:'25',out:'stop being the guy nobody tells',en:'ignoring it completely',
+  r1:'take about ten seconds',r2:'don\'t hurt',r3:'cost less than one haircut',
+  mech:'this is the one grooming thing every single person notices and not one of them is ever going to mention it to you',
+  bad:'hoping nobody has noticed'},
+ {name:'Water flosser',price:'60',out:'stop worrying about your breath',en:'skipping floss entirely',
+  r1:'take under a minute',r2:'reach what a brush cannot',r3:'are actually easy to keep doing',
+  mech:'what sits between your teeth is where it starts, and a toothbrush has never once been in there',
+  bad:'telling yourself you will floss tonight'},
+ {name:'Foot file',price:'15',out:'not have to hide your feet',en:'ignoring them until summer',
+  r1:'take two minutes',r2:'work best straight out of the shower',r3:'cost almost nothing',
+  mech:'hard skin builds up over months, so by the time you notice it in December it has had all year to get there',
+  bad:'remembering your feet exist the week before the beach'},
+ {name:'Shoe deodoriser spray',price:'13',out:'take your shoes off anywhere',en:'blaming your socks',
+  r1:'work overnight',r2:'go in your gym bag',r3:'are cheaper than new shoes',
+  mech:'it is the lining of the shoe holding it, not the sock — which is why fresh socks never fixed it',
+  bad:'buying more socks'},
+ {name:'Body oil',price:'24',out:'have skin people want to touch',en:'putting it on dry skin',
+  r1:'go further than you think',r2:'work in seconds',r3:'replace three other things',
+  mech:'oil on damp skin traps the water that is already there — on dry skin it has got nothing to hold and just sits on top',
+  bad:'towelling off completely first'},
+].map(p=>({niche:'grooming',where:'Amazon AU',comm:'5',status:'Researching',
+  note:'price is an estimate — confirm on the listing',...p}));
+
 /* ---------- the teardown ---------- */
 const TEARDOWN=[
   ['0:00–0:04','Promise + enemy','Names the outcome and kills what they currently use, in one breath. On-screen text carries the promise so it lands with sound off.'],
@@ -494,16 +572,16 @@ const RULES=[
 ];
 
 /* ---------- formats ---------- */
-const D=d=>({name:d.name||'this',out:d.out||'get the result',en:d.en||'what you\'re using now',
-  r1:d.r1||'better',r2:d.r2||'cleaner',r3:d.r3||'lasts',mech:d.mech||'it actually does the job properly',
+const D=d=>({name:d.name||'this',nm:lcn(d.name||'this'),out:d.out||'get the result',en:d.en||'what you\'re using now',
+  r1:d.r1||'are better made',r2:d.r2||'do the job properly',r3:d.r3||'last longer',mech:d.mech||'it actually does the job properly',
   bad:d.bad||'skipping the step',price:d.price||'',niche:d.niche||'grooming'});
 
 const FORMATS=[
 {id:'swap',name:'The Swap',desc:'The exact shape of the video you sent. You\'re using the wrong thing — here\'s the right thing, and here\'s why it works. Your highest-conversion format; use it for your best products.',
  beats:d=>[
-  ['0:00–0:04','Promise + enemy',`${cap(d.out)} starts before you think it does — and ${d.en} isn't going to cut it anymore.`,`HOW TO ${d.out.toUpperCase()}`,'Straight to camera, product just out of frame'],
-  ['0:04–0:08','The swap',`So you need to get yourself a ${d.name}.`,'','Bring the product up into frame'],
-  ['0:08–0:15','Three reasons',`These are better because they're ${d.r1}, they ${d.r2}, and they ${d.r3}.`,'','Hold it up, turn it, let them see it'],
+  ['0:00–0:04','Promise + enemy',`If you want to ${d.out}, it starts before you think it does — and ${d.en} isn't going to cut it anymore.`,`HOW TO ${d.out.toUpperCase()}`,'Straight to camera, product just out of frame'],
+  ['0:04–0:08','The swap',`So you need to get yourself ${art(d.nm)} ${d.nm}.`,'','Bring the product up into frame'],
+  ['0:08–0:15','Three reasons',`These are better because they ${d.r1}, they ${d.r2}, and they ${d.r3}.`,'','Hold it up, turn it, let them see it'],
   ['0:15–0:21','The callout',`And I know some of you are still ${d.bad} — that's not going to cut it.`,'','Point at the lens, slight lean in'],
   ['0:21–0:27','The real job',`What you actually need to be doing is the bit everyone skips.`,'','Demo the motion on your arm'],
   ['0:27–0:36','The mechanism',`Because ${d.mech}.`,'','Slow down here — this is the line that lands'],
@@ -515,7 +593,7 @@ const FORMATS=[
   ['0:04–0:11','Mistake one',`One — you're ${d.bad}. That does nothing.`,'ONE','Fingers count down as you go'],
   ['0:11–0:18','Mistake two',`Two — you're relying on ${d.en}, which was never built for this.`,'TWO',''],
   ['0:18–0:28','Mistake three',`Three, and this is the big one — ${d.mech}. That's the whole thing.`,'THREE','Bring the product in on "three"'],
-  ['0:28–0:36','The fix',`Fix is a ${d.name}. ${cap(d.r1)}, ${d.r2}, ${d.r3}.`,'','Product up, turn it once'],
+  ['0:28–0:36','The fix',`Fix is ${art(d.nm)} ${d.nm} — they ${d.r1}, they ${d.r2}, and they ${d.r3}.`,'','Product up, turn it once'],
   ['0:36–0:41','Close',`Sort the third one out and you'll notice within a week.`,'','Hold, no smile'],
  ]},
 {id:'callout',name:'The Callout',desc:'Opens by accusing the viewer. Highest comment rate of any format — people defend themselves in the replies, which is exactly what you want.',
@@ -523,15 +601,15 @@ const FORMATS=[
   ['0:00–0:04','The accusation',`I can tell just by looking at you that you're still ${d.bad}.`,`STOP ${d.bad.toUpperCase()}`,'Dead straight to camera, no smile'],
   ['0:04–0:10','Twist the knife',`And you're wondering why you can't ${d.out}. That's why.`,'',''],
   ['0:10–0:18','The reason',`${cap(d.en)} was never going to do it. ${cap(d.mech)}.`,'','Lean in'],
-  ['0:18–0:28','The answer',`What you want is a ${d.name}. ${cap(d.r1)}, ${d.r2}, and ${d.r3}.`,'','Product up'],
+  ['0:18–0:28','The answer',`What you want is ${art(d.nm)} ${d.nm}. They ${d.r1}, they ${d.r2}, and they ${d.r3}.`,'','Product up'],
   ['0:28–0:36','Proof of use',`I've had mine ages and it's the one thing in there I'd actually replace immediately.`,'','Show wear / show it in use'],
   ['0:36–0:41','Close',`Go and fix it.`,'',''],
  ]},
 {id:'routine',name:'The Routine',desc:'Your full stack, your product as one step. Lower conversion per video but it builds the account — people follow routines, they don\'t follow ads.',
  beats:d=>[
   ['0:00–0:04','The promise',`This is everything I do to ${d.out}, in order.`,`MY ${d.out.toUpperCase()} ROUTINE`,'Products lined up on the bench behind you'],
-  ['0:04–0:10','Step one',`Starts in the shower — and it starts by binning ${d.en}.`,'STEP 1',''],
-  ['0:10–0:20','Step two — the hero',`This is the ${d.name}. ${cap(d.r1)}, ${d.r2}, ${d.r3}. This is the one that actually matters.`,'STEP 2','Longest hold of the video on this one'],
+  ['0:04–0:10','Step one',`Starts in the shower — and it starts by giving up on ${d.en}.`,'STEP 1',''],
+  ['0:10–0:20','Step two — the hero',`This is the ${d.nm}. They ${d.r1}, they ${d.r2}, they ${d.r3}. This is the one that actually matters.`,'STEP 2','Longest hold of the video on this one'],
   ['0:20–0:29','Why it matters',`${cap(d.mech)} — which is why everything after it works better.`,'',''],
   ['0:29–0:36','Step three',`Then everything after — and it all lands, because you did step two.`,'STEP 3','Gesture at the rest of the line-up'],
   ['0:36–0:41','Close',`That's it. That's the whole routine.`,'',''],
@@ -541,28 +619,33 @@ const FORMATS=[
   ['0:00–0:05','The myth',`${cap(d.en)} is not going to make you ${d.out}. It never was.`,`${d.en.toUpperCase()} ISN'T THE ANSWER`,'Straight to camera'],
   ['0:05–0:13','Why they believe it',`Everyone tells you it is, so you keep doing it, and you keep wondering why nothing changes.`,'',''],
   ['0:13–0:24','The truth',`Here's what's actually happening: ${d.mech}.`,'','Slow, this is the payload'],
-  ['0:24–0:33','The fix',`Which is why you want a ${d.name}. ${cap(d.r1)}, ${d.r2}, ${d.r3}.`,'','Product up'],
+  ['0:24–0:33','The fix',`Which is why you want ${art(d.nm)} ${d.nm}. They ${d.r1}, they ${d.r2}, they ${d.r3}.`,'','Product up'],
   ['0:33–0:41','Close',`Try it for a week. You'll know.`,'',''],
  ]},
 {id:'demo',name:'The Demo',desc:'Almost no talking — show the thing doing the thing. Use for products with a visible, satisfying result. Travels furthest on watch time.',
  beats:d=>[
   ['0:00–0:03','Visual hook',`Watch this.`,`${d.name.toUpperCase()}`,'Start mid-action — never start still'],
   ['0:03–0:12','The demo','(no line — let it play)','','The actual result, unbroken, no cuts'],
-  ['0:12–0:20','Name it',`That's a ${d.name}. ${cap(d.r1)} and ${d.r2}.`,'',''],
+  ['0:12–0:20','Name it',`That's ${art(d.nm)} ${d.nm} — they ${d.r1} and they ${d.r2}.`,'',''],
   ['0:20–0:30','The mechanism',`${cap(d.mech)}.`,'','Back to the demo underneath'],
   ['0:30–0:38','The comparison',`Versus ${d.en}, which does about a third of that.`,'','Hold both up if you can'],
   ['0:38–0:41','Close',`${cap(d.out)}. That's it.`,'',''],
  ]},
 ];
 const cap=s=>String(s||'').charAt(0).toUpperCase()+String(s||'').slice(1);
+// lowercase a product name for mid-sentence use, unless it looks like a brand
+const lcn=s=>{const t=String(s||'');return /[A-Z]/.test(t.slice(1))?t:t.charAt(0).toLowerCase()+t.slice(1)};
+// "a" vs "an" — vowel sound, not vowel letter
+const art=s=>{const t=String(s||'').trim().toLowerCase();
+  return /^(uni|use|user|one|euro|ute)/.test(t)?'a':/^[aeiou]/.test(t)?'an':'a'};
 
 /* ---------- hooks ---------- */
 const HOOKS={
-  problem:['{OUT} starts way earlier than you think.','You\'re not going to {out} while you\'re still using {en}.','The reason you don\'t {out} has nothing to do with what you\'re buying.','Nobody\'s told you this, but {en} is working against you.','If you can\'t {out}, this is why.','{cap_en} is the reason, and you\'ve never once suspected it.'],
+  problem:['If you want to {out}, it starts way earlier than you think.','You\'re not going to {out} while you\'re still relying on {en}.','The reason you don\'t {out} has nothing to do with what you\'re buying.','Nobody\'s told you this, but {en} is working against you.','If you can\'t {out}, this is why.','{cap_en} is the reason, and you\'ve never once suspected it.'],
   callout:['I can tell you\'re still {bad}.','Some of you are genuinely still {bad} and it shows.','If you\'re {bad}, this one\'s for you.','Be honest — you\'re {bad}, aren\'t you.','This is going to upset the people who are {bad}.','You\'re doing this wrong and I can prove it in 30 seconds.'],
   authority:['I\'ve tried every {name} there is. Get this one.','Three years of this and I\'d only replace one thing immediately.','Everyone gets this backwards, including me for a long time.','I\'m not going to pretend this is complicated. It\'s one product.','If I had to start over with $20, this is what I\'d buy first.'],
   curiosity:['This is the cheapest thing in my routine and the only one that matters.','$20 and it does more than anything else in that shower.','Nobody talks about this and I don\'t know why.','This looks stupid. It isn\'t.','The thing that changed it for me cost less than lunch.','There\'s one step everyone skips and it\'s the only one that does anything.'],
-  direct:['Bin {en}. Here\'s what to use instead.','Stop {bad}. Do this.','If you do one thing this week, do this.','Throw {en} out. I\'m serious.','Replace {en} today.'],
+  direct:['Forget {en}. Here\'s what to do instead.','Stop {bad}. Do this.','If you do one thing this week, do this.','Give up on {en}. I\'m serious.','{cap_en} isn\'t working. Do this instead.'],
   result:['{cap_out}, every single day, from one $20 thing.','This is how you actually {out}.','How to {out} without buying more product.','You can {out} with one swap.','The whole thing is one product and about 30 seconds a day.'],
 };
 const HOOKCATS={problem:'Problem',callout:'Callout',authority:'Authority',curiosity:'Curiosity',direct:'Direct',result:'Result'};
@@ -571,7 +654,7 @@ let hookCat='problem';
 function fillHook(h,d){
   return h.replace(/\{OUT\}/g,cap(d.out)).replace(/\{out\}/g,d.out)
           .replace(/\{cap_out\}/g,cap(d.out)).replace(/\{cap_en\}/g,cap(d.en))
-          .replace(/\{en\}/g,d.en).replace(/\{bad\}/g,d.bad).replace(/\{name\}/g,d.name);
+          .replace(/\{en\}/g,d.en).replace(/\{bad\}/g,d.bad).replace(/\{name\}/g,d.nm);
 }
 
 /* ---------- captions ---------- */
@@ -620,7 +703,7 @@ function renderPlay(){
    SCRIPT
    ============================================================ */
 const DEMO={name:'silicone body scrubber',out:'smell good all day',en:'your loofah',
-  r1:'smaller',r2:'don\'t hold onto bacteria the way loofahs do',r3:'last for years',
+  r1:'are smaller',r2:'don\'t hold onto bacteria the way loofahs do',r3:'last for years',
   mech:'whatever you put on after actually sticks to your skin, instead of sitting on top of a layer of dead skin cells',
   bad:'just patting body wash on yourself',price:'$18',niche:'grooming'};
 
@@ -705,15 +788,17 @@ function renderProds(){
   const t=$('#prodTable');
   if(!S.products.length){
     t.innerHTML=`<tr><td><div class="empty">Nothing in the pipeline yet.<br>
-      <span class="xs">Add the 10–15 products you're going to buy and film.</span></div></td></tr>`;return}
-  t.innerHTML=`<thead><tr><th>Product</th><th>Niche</th><th>Where</th><th class="num">Price</th>
+      <span class="xs">Hit <b>Load 12 starter products</b> above — cheap grooming items with the
+      angle already written, so you can shoot tonight.</span></div></td></tr>`;return}
+  t.innerHTML=`<thead><tr><th>Product</th><th>Angle</th><th>Where</th><th class="num">Price</th>
     <th class="num">Comm</th><th class="num">Per sale</th><th class="num">If yours</th><th>Status</th><th></th></tr></thead><tbody>`+
     S.products.map(p=>{
       const per=(+p.price||0)*(+p.comm||0)/100;
       const own=(+p.price||0)-(+p.cogs||0);
       const st={Winner:'ac',Dead:'bad',Posted:'ac',Filming:'warn'}[p.status]||'';
+      const angled=!!(p.mech&&p.en&&p.out);
       return `<tr><td><b>${esc(p.name)}</b>${p.note?`<div class="xs dim">${esc(p.note)}</div>`:''}</td>
-        <td class="xs muted">${esc((NICHES[p.niche]||{}).name||p.niche||'')}</td>
+        <td>${angled?'<span class="tag ac">Written</span>':'<span class="tag warn">Missing</span>'}</td>
         <td class="xs muted">${p.link?`<a href="${esc(p.link)}" target="_blank" rel="noopener">${esc(p.where||'link')}</a>`:esc(p.where||'—')}</td>
         <td class="num">${p.price?'$'+(+p.price).toFixed(2):'—'}</td>
         <td class="num">${p.comm?(+p.comm)+'%':'—'}</td>
@@ -721,9 +806,16 @@ function renderProds(){
         <td class="num" style="color:var(--ac)">${own>0&&p.cogs?'$'+own.toFixed(2):'—'}</td>
         <td><span class="tag ${st}">${esc(p.status||'')}</span></td>
         <td style="text-align:right;white-space:nowrap">
+          <button class="btn gh sm" data-scr="${p.id}">Script</button>
           <button class="btn gh sm" data-ed="${p.id}">Edit</button>
           <button class="btn gh sm" data-del="${p.id}">✕</button></td></tr>`}).join('')+'</tbody>';
   $$('[data-ed]',t).forEach(b=>b.onclick=()=>editProd(b.dataset.ed));
+  $$('[data-scr]',t).forEach(b=>b.onclick=()=>{
+    const p=S.products.find(x=>x.id===b.dataset.scr);if(!p)return;
+    const d={name:p.name,out:p.out||'',en:p.en||'',r1:p.r1||'',r2:p.r2||'',r3:p.r3||'',
+      mech:p.mech||'',bad:p.bad||'',price:p.price?'$'+p.price:'',niche:p.niche||'grooming'};
+    writeDraft(d);S.draft=d;save();go('script');genScript(true);renderHooks();
+    toast('Loaded '+p.name)});
   $$('[data-del]',t).forEach(b=>b.onclick=()=>{
     if(!confirm('Remove this product?'))return;
     S.products=S.products.filter(x=>x.id!==b.dataset.del);save();renderProds();calcMoney()});
@@ -734,6 +826,9 @@ function editProd(id){
   $('#f_name').value=p.name||'';$('#f_niche').value=p.niche||'grooming';$('#f_where').value=p.where||'';
   $('#f_price').value=p.price||'';$('#f_comm').value=p.comm||'';$('#f_cogs').value=p.cogs||'';
   $('#f_link').value=p.link||'';$('#f_status').value=p.status||'Researching';$('#f_note').value=p.note||'';
+  $('#f_out').value=p.out||'';$('#f_en').value=p.en||'';$('#f_r1').value=p.r1||'';
+  $('#f_r2').value=p.r2||'';$('#f_r3').value=p.r3||'';$('#f_mech').value=p.mech||'';
+  $('#f_bad').value=p.bad||'';
   $('#prodForm').style.display='';$('#prodForm').scrollIntoView({behavior:'smooth',block:'center'});
 }
 
@@ -771,7 +866,7 @@ function buildBatch(){
     const dt=new Date(start.getTime()+Math.floor(i/ppd)*864e5);
     const slot=i%ppd;
     const d=D({name:p.name,out:p.out||'get the result',en:p.en||'what you use now',
-      r1:p.r1||'better made',r2:p.r2||'do the job properly',r3:p.r3||'last longer',
+      r1:p.r1||'are better made',r2:p.r2||'do the job properly',r3:p.r3||'last longer',
       mech:p.mech||'it actually does what the cheap version pretends to',
       bad:p.bad||'skipping it',niche:p.niche});
     const cat=cats[i%cats.length];
@@ -925,7 +1020,8 @@ function init(){
     el.addEventListener('change',()=>{readDraft();renderHooks()}));
 
   $('#addProd').onclick=()=>{editId=null;$('#pfTitle').textContent='Add a product';
-    ['f_name','f_where','f_price','f_comm','f_cogs','f_link','f_note'].forEach(i=>$('#'+i).value='');
+    ['f_name','f_where','f_price','f_comm','f_cogs','f_link','f_note',
+     'f_out','f_en','f_r1','f_r2','f_r3','f_mech','f_bad'].forEach(i=>$('#'+i).value='');
     $('#f_status').value='Researching';$('#prodForm').style.display='';
     $('#prodForm').scrollIntoView({behavior:'smooth',block:'center'})};
   $('#cancelProd').onclick=()=>{$('#prodForm').style.display='none';editId=null};
@@ -934,10 +1030,20 @@ function init(){
     if(!name){toast('Give it a name');return}
     const rec={name,niche:$('#f_niche').value,where:$('#f_where').value.trim(),
       price:$('#f_price').value,comm:$('#f_comm').value,cogs:$('#f_cogs').value,
-      link:$('#f_link').value.trim(),status:$('#f_status').value,note:$('#f_note').value.trim()};
+      link:$('#f_link').value.trim(),status:$('#f_status').value,note:$('#f_note').value.trim(),
+      out:$('#f_out').value.trim(),en:$('#f_en').value.trim(),r1:$('#f_r1').value.trim(),
+      r2:$('#f_r2').value.trim(),r3:$('#f_r3').value.trim(),mech:$('#f_mech').value.trim(),
+      bad:$('#f_bad').value.trim()};
     if(editId){Object.assign(S.products.find(x=>x.id===editId),rec)}
     else{S.products.push({id:uid(),...rec})}
-    save();editId=null;$('#prodForm').style.display='none';renderProds();toast('Saved')};
+    save();editId=null;$('#prodForm').style.display='none';renderProds();calcMoney();toast('Saved')};
+  $('#loadStarter').onclick=()=>{
+    const have=new Set(S.products.map(p=>p.name.toLowerCase()));
+    const add=STARTER.filter(p=>!have.has(p.name.toLowerCase()));
+    if(!add.length){toast('Already loaded');return}
+    add.forEach(p=>S.products.push({id:uid(),...p}));
+    save();renderProds();calcMoney();
+    toast(add.length+' products loaded — angles already written')};
 
   $('#genBatch').onclick=buildBatch;
   $('#copyBatch').onclick=()=>batchText?copy(batchText,'Shoot sheet copied'):toast('Build it first');

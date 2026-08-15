@@ -944,7 +944,24 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   disclosure required; no health claims (TGA); no automated posting/DMs — which
   also honours the standing NEVER-automate-Instagram rule. The automation here
   is in the *writing and batching*, never the posting.
-- Verified E2E 55/55 (scratchpad/engine-e2e.mjs — boot, script gen across
+- **Starter pack + angle fields (same day, he asked "what do I start with").**
+  Products only captured price/commission, so the batch sheet fell back to
+  generic filler copy. Product form now also carries the ANGLE (outcome/enemy/
+  3 reasons/mechanism/bad-habit) — the fields every script is generated from —
+  and the table shows an Angle: Written/Missing chip. Added `STARTER[12]`
+  (cheap universal grooming items — scrubber, tongue scraper, mitt, microfibre
+  towel, silk pillowcase, laundry booster, boar brush, nose trimmer, water
+  flosser, foot file, shoe spray, body oil) with every angle pre-written and NO
+  health claims; one-tap "Load 12 starter products" (idempotent by name),
+  prices seeded as flagged estimates, comm 5%, cogs only on the scrubber (the
+  one researched). Per-row **Script** button loads a product into the Script tab.
+  Grammar fixes the starter data exposed: `art()` a/an helper, `lcn()` so
+  product names read lowercase mid-sentence, reasons standardised to verb
+  phrases ("they work overnight" not "they're work overnight"), enemy
+  phrasings made habit-safe ("relying on brushing your tongue", not "using"),
+  and the opener rebuilt as "If you want to {out}, it starts…". Swept 828
+  generated lines (12 products × 6 formats × all hooks) clean.
+- Verified E2E 88/88 (scratchpad/engine-e2e.mjs 55 + starter-e2e.mjs 33 — boot, script gen across
   formats, hooks, products maths, 60-post shoot sheet, money model exact-value
   checks, log breakdowns, reload persistence, mobile 390px no-overflow, zero JS
   errors). Business-plan artifact:
