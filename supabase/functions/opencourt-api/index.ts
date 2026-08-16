@@ -1,6 +1,6 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 
-// Hoops Heaven (codename OpenCourt) — Sydney's open run. Sister product of
+// Certified Hooper (codename OpenCourt) — Sydney pickup basketball. Sister product of
 // Lockdown Lab Live, same engine: all DB access is server-side (service
 // role), the browser sends the public anon key as Bearer + apikey.
 // Identity: no passwords — a device registers once with a name + Instagram
@@ -48,7 +48,7 @@ const emailClean = (v: unknown) => {
   return /^[^\s@]+@[^\s@]+\.[a-z]{2,24}$/.test(e) ? e : "";
 };
 const FORMATS = ["5v5", "4v4", "3v3", "2v2", "1v1", "21", "shootaround"];
-const BANNED_MSG = "this account is banned from Hoops Heaven";
+const BANNED_MSG = "this account is banned from Certified Hooper";
 
 // Pull [lat, lon] out of a Google Maps URL or a plain "lat, lon" string.
 // Handles @lat,lon / !3d..!4d.. / ?q=lat,lon / ?ll= / plain paste. Requires
@@ -1008,7 +1008,7 @@ Deno.serve(async (req: Request) => {
         if (b.on !== false) {
           await db(`oc_inbox?player_id=eq.${encodeURIComponent(pid)}`, { method: "DELETE" });
           // Ping the player that they're in (closed-app push).
-          try { await sendHH([pid], { title: "✓ You're verified on Hoops Heaven", body: "Full access unlocked — call runs, add courts & post clips 🏀", tag: "hh-verify", url: "/hoopsheaven.html" }); } catch (_e) { /* best-effort */ }
+          try { await sendHH([pid], { title: "✓ You're Certified", body: "Full access unlocked — call runs, add courts & post clips 🏀", tag: "hh-verify", url: "/hoopsheaven.html" }); } catch (_e) { /* best-effort */ }
         }
         return J({ ok: true });
       }

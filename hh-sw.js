@@ -1,4 +1,4 @@
-/* Hoops Heaven — dedicated push service worker.
+/* Certified Hooper — dedicated push service worker.
    The Lab owns the root /sw.js (scope "/"). This one is registered at a unique
    scope ("/hh-push/") so the two registrations never collide. It controls no
    pages — it exists only to receive closed-app pushes. On a payload-free push
@@ -14,7 +14,7 @@ self.addEventListener('push', e => {
   e.waitUntil((async () => {
     let pid = '';
     try { const c = await caches.open('hh-meta'); const r = await c.match('/hh-pid'); if (r) pid = (await r.text()) || ''; } catch (_) {}
-    let title = '🏀 Hoops Heaven', body = 'Something just happened — tap in.', tag = 'hh', url = '/hoopsheaven.html';
+    let title = '✓ Certified Hooper', body = 'Something just happened — tap in.', tag = 'hh', url = '/hoopsheaven.html';
     if (pid) {
       try {
         const res = await fetch(API, {

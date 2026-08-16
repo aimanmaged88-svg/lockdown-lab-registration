@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Hoops Heaven — court QR posters</title>
+<title>Certified Hooper — court QR posters</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%23D8FF3E'/%3E%3Cpath d='M32 4v56M4 32h56M11 11c12 10 30 10 42 0M11 53c12-10 30-10 42 0' stroke='%230A0C0F' stroke-width='4' fill='none'/%3E%3C/svg%3E">
 <style>
 
@@ -55,7 +55,7 @@ p.sub{color:#96A0A8;font-size:14px;margin:6px 0 16px}
 <body>
 <div class="top">
   <h1>Court QR <span>posters</span></h1>
-  <p class="sub">Pick courts, hit Print. Each poster's QR opens that court's page in Hoops Heaven and checks the player in on the spot. Laminate it, zip-tie it to the fence, done.</p>
+  <p class="sub">Pick courts, hit Print. Each poster's QR opens that court's page in Certified Hooper and checks the player in on the spot. Laminate it, zip-tie it to the fence, done.</p>
   <input class="inp" id="q" placeholder="Search court or suburb…">
 </div>
 <div class="list" id="list"></div>
@@ -110,7 +110,7 @@ function renderPosters(){
   $('#posters').innerHTML=SEL.map(c=>{
     const url=`${APP}?court=${encodeURIComponent(c.key)}&ci=1`;
     return `<div class="poster">
-      <div class="wm"><span class="o">HOOPS</span><span class="f">HEAVEN</span></div>
+      <div class="wm"><span class="o">CERTIFIED</span><span class="f">HOOPER</span></div>
       <div class="court">${esc(c.name)}</div>
       <div class="sub2">${esc(c.suburb||'Sydney')} · Sydney's open run</div>
       <div class="qrcard">${qrSvg(url)}</div>

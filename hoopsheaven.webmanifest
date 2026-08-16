@@ -1,7 +1,7 @@
 {
-  "name": "Hoops Heaven",
-  "short_name": "Hoops Heaven",
-  "description": "Sydney's open pickup basketball network. Find a free court near you, see who's playing right now, join the run.",
+  "name": "Certified Hooper",
+  "short_name": "Certified",
+  "description": "Sydney pickup basketball. Find a free court, see who's playing right now, join the run — and get your ✓.",
   "start_url": "hoopsheaven.html",
   "scope": "hoopsheaven.html",
   "display": "standalone",
