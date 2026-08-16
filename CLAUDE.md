@@ -272,7 +272,22 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   scratchpad/coach-mobile.mjs (temp coach, dark+light, closed/open/after-nav).
   NEWS id:23. Admin desk mobile still uses its own top strip (not asked yet).
 
-## Hoops Heaven — pickup basketball network (2026-07-28, codename OpenCourt)
+## Certified Hooper — pickup basketball network (2026-07-28, codename OpenCourt)
+
+- **RENAMED: Hoops Heaven → CERTIFIED HOOPER (2026-08-16, Aiman's final pick).**
+  Process: 25-name logo pack → his shortlist (Buckets/Next Up/Fives/Certified
+  Hooper/Aura) → in-app header mocks → he picked FIVES → clash-check found
+  fives.life = existing same-category pickup app (dealbreaker), Buckets/Next
+  Up/Aura also crowded → CERTIFIED HOOPER came back clean and he locked it.
+  The ✓ verification IS the brand ("you certified?"). Rebrand shipped (edge
+  v27): app/desk/QR wordmarks, circled-✓ header logo SVG, new app icons
+  (hh-icon-*, Retro-night bg + glowing white ring + teal ✓, same filenames),
+  manifest (name Certified Hooper, short_name Certified), share cards
+  ("✓ MY CERTIFIED HOOPER CARD", drawMark() now draws the ✓ badge), verify
+  push = "✓ You're Certified", banned msg, hh-sw fallback title. FILE NAMES
+  AND URLS UNCHANGED on purpose (hoopsheaven.html etc. — testers' installs +
+  QR links keep working; internals keep codename like oc_/opencourt-api).
+  Domain + @certifiedhooper IG handle = separate later step, his call.
 
 - **NEW standalone product** (Aiman: own brand, "starting fresh", nothing to do
   with the Lab). Named **Hoops Heaven** (Aiman: OpenCourt → Hoops Haven → **Hoops Heaven**,
