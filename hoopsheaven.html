@@ -1489,6 +1489,24 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
   <p class="fine" style="margin-top:10px">Your code lives in Profile → 🔑 Phone-switch code. Lost it? Message the coach on IG and we'll sort you.</p>
 </div></div>
 
+<!-- phone-switch code keeper -->
+<div class="sheet" id="shCode"><div class="scrim" data-close></div><div class="panel">
+  <div class="grab"></div>
+  <div class="xrow"><div><h3>🔑 Your phone-switch code</h3><p class="sub">It's just a number — but it's your way back into your account on any phone.</p></div><button class="x" data-close>✕</button></div>
+  <div id="codeBig" style="text-align:center;font-weight:900;font-size:44px;letter-spacing:10px;padding:16px 0 4px;color:var(--volt);cursor:pointer">•••••</div>
+  <p class="fine" style="text-align:center;margin:0 0 2px" id="codeNum"></p>
+  <p class="fine" style="text-align:center;margin:0 0 14px;opacity:.7">tap the code to copy it</p>
+  <button class="btn btn-v btn-block" id="codeSend">📤 Send it to myself</button>
+  <div style="margin-top:16px">
+    <p class="fine" style="margin:0 0 8px;font-weight:700;color:var(--text)">Park it somewhere it can't get lost:</p>
+    <p class="fine" style="margin:0 0 6px">💬 WhatsApp it to yourself — it lives in your chats forever</p>
+    <p class="fine" style="margin:0 0 6px">📝 Drop it in your notes app — the cloud keeps it, not your phone</p>
+    <p class="fine" style="margin:0 0 6px">📇 Save it in your contacts as "Certified Hooper"</p>
+    <p class="fine" style="margin:0 0 6px">📸 Or just screenshot this page</p>
+  </div>
+  <p class="fine" style="margin-top:14px;opacity:.8">New phone? Open the app → "Already got an account? Log in" → your @, email or player number + this code. Lost it anyway? Message the coach — we'll sort you. 🤝</p>
+</div></div>
+
 <!-- call-a-run sheet -->
 <div class="sheet" id="shCall"><div class="scrim" data-close></div><div class="panel">
   <div class="grab"></div>
@@ -3043,8 +3061,19 @@ function paintNotifRow(){
 $('#pNotif').onclick=()=>{ if(notifOn())disableHHNotifs(); else enableHHNotifs(); };
 $('#pCode').onclick=()=>{
   if(!OCP||!OCP.code){toast('Sign in first to get your code',1);return}
-  try{navigator.clipboard.writeText(OCP.code)}catch(e){}
-  toast('Your phone-switch code: '+OCP.code+' — copied. Save it somewhere safe; it logs you in on a new phone.',0,4600);
+  $('#codeBig').textContent=OCP.code;
+  $('#codeNum').textContent=OCP.num?("you're Player #"+OCP.num+" — that works as your login too"):'';
+  openSheet('shCode');
+};
+$('#codeBig').onclick=()=>{
+  if(!OCP||!OCP.code)return;
+  try{navigator.clipboard.writeText(OCP.code);toast('Code copied 🔑')}catch(e){}
+};
+$('#codeSend').onclick=async()=>{
+  if(!OCP||!OCP.code)return;
+  const t='🔑 My Certified Hooper phone-switch code: '+OCP.code+(OCP.num?(' (Player #'+OCP.num+')'):'')+' — logs me back in if I ever switch phones. '+location.origin+location.pathname;
+  if(navigator.share){ try{await navigator.share({text:t})}catch(e){} }
+  else{ try{await navigator.clipboard.writeText(t);toast('Copied — paste it to yourself on WhatsApp 💬')}catch(e){} }
 };
 // keep the subscription fresh + pid stamped on boot when already enabled
 async function refreshNotifs(){
