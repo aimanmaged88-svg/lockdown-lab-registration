@@ -289,6 +289,16 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   his framing "it's just a number — but it's your way back in". E2E 7/7
   (scratchpad/code-sheet-test.mjs). Shipped to main during the outage — goes
   live when Netlify unblocks; mirror serves it as githack cache refreshes.
+- **Owner auto-verify (edge v28, 2026-08-18).** His screen recording showed the
+  ✓ gate blocking HIM post-wipe ("get verified to call runs"). Immediate fix:
+  SQL-verified+coach-flagged his two fresh accounts (#8422/#4059, both
+  @uncsthoughts). Permanent fix: register now checks `OWNER_IGS =
+  ["uncsthoughts","lockdownlab33"]` → auto verified=true + coach=true, so
+  wipes/self-heals can never lock the owner out again. Deployed via subagent
+  (SHA 9f91fa29… byte-identical, VAPID intact), E2E: owner handle →
+  verified:true, normal handle → false, test rows deleted. OPEN QUESTION for
+  Aiman: Green Square Courts has indoor=true in oc_courts (run sheet says
+  "Indoor — rain can't touch this run") — he plays there; awaiting his call.
 - **Fresh slate #3 + body font → Inter (2026-08-18, Aiman asked).** ALL player
   data wiped again (7 accounts incl. Musa/Hasan/his own + inbox/login_guard;
   13 courts kept) — he's re-testing sign-ups himself in two browsers. NOTE:
