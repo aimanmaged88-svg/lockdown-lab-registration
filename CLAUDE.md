@@ -289,6 +289,14 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   his framing "it's just a number — but it's your way back in". E2E 7/7
   (scratchpad/code-sheet-test.mjs). Shipped to main during the outage — goes
   live when Netlify unblocks; mirror serves it as githack cache refreshes.
+- **Fresh slate #3 + body font → Inter (2026-08-18, Aiman asked).** ALL player
+  data wiped again (7 accounts incl. Musa/Hasan/his own + inbox/login_guard;
+  13 courts kept) — he's re-testing sign-ups himself in two browsers. NOTE:
+  stale devices (his + testers' phones) will silently SELF-HEAL back into
+  fresh accounts on next open (by design). FONT: HHBody @font-face src swapped
+  to self-hosted **assets/fonts/inter-var.woff2** (latin variable 48KB) in
+  app + desk + qr — body text more readable; HHDisplay/HHCond stay Chakra
+  Petch, HHMarker unchanged. Same family names, no other CSS touched.
 - **RENAMED: Hoops Heaven → CERTIFIED HOOPER (2026-08-16, Aiman's final pick).**
   Process: 25-name logo pack → his shortlist (Buckets/Next Up/Fives/Certified
   Hooper/Aura) → in-app header mocks → he picked FIVES → clash-check found
