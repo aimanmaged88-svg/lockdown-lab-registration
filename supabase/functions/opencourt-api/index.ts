@@ -49,6 +49,9 @@ const emailClean = (v: unknown) => {
 };
 const FORMATS = ["5v5", "4v4", "3v3", "2v2", "1v1", "21", "shootaround"];
 const BANNED_MSG = "this account is banned from Certified Hooper";
+// The coach's own IG handles: any sign-up with one of these is instantly
+// verified + coach-flagged (desk pings). Keep lowercase.
+const OWNER_IGS = ["uncsthoughts", "lockdownlab33"];
 
 // Pull [lat, lon] out of a Google Maps URL or a plain "lat, lon" string.
 // Handles @lat,lon / !3d..!4d.. / ?q=lat,lon / ?ll= / plain paste. Requires
@@ -381,12 +384,18 @@ Deno.serve(async (req: Request) => {
         const prev = await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=banned`);
         if (prev?.[0]?.banned) return J({ error: BANNED_MSG, code: "banned" }, 403);
         const cur = await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=verified,verify_code,player_num`);
-        const verified = !!cur?.[0]?.verified;
+        let verified = !!cur?.[0]?.verified;
         const verify_code = cur?.[0]?.verify_code || mkCode();
         await db(`oc_players?on_conflict=id`, {
           method: "POST", headers: { Prefer: "resolution=merge-duplicates" },
           body: JSON.stringify({ id, name, ig, tiktok, email, accepted_at: new Date().toISOString(), verify_code }),
         });
+        // The owner's own handles always come back verified + coach-flagged,
+        // so a fresh-slate wipe never locks the coach out of his own app.
+        if (OWNER_IGS.includes(ig)) {
+          await db(`oc_players?id=eq.${encodeURIComponent(id)}`, { method: "PATCH", body: JSON.stringify({ verified: true, coach: true }) });
+          verified = true;
+        }
         // Every hooper gets a random unique 4-digit player number — their public
         // ID in the app ("Player #4358"), worn on the card like a jersey.
         let player_num = cur?.[0]?.player_num ?? null;
