@@ -274,6 +274,21 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
 
 ## Certified Hooper — pickup basketball network (2026-07-28, codename OpenCourt)
 
+- **NETLIFY OUTAGE (since 2026-08-16 ~04:04 UTC, STILL OPEN as of 08-18).** The
+  whole site (Lab + Hooper, every page) serves 503 `usage_exceeded` — an
+  ACCOUNT-level Netlify block (team "Groundworks Studio" shows Pro, deploy
+  state ready, netlifystatus green ⇒ billing/usage on HIS account; only Aiman
+  can fix at app.netlify.com). Backend (Supabase) unaffected. Working mirror
+  (tested, boots clean): raw.githack.com/aimanmaged88-svg/
+  lockdown-lab-registration/main/hoopsheaven.html (+ -desk.html) — different
+  origin so profiles need code login. Watchdog has been firing hourly. Task #34.
+- **Phone-switch code keeper sheet (2026-08-18, Aiman asked).** Profile → 🔑 no
+  longer just toasts: opens `#shCode` — big tap-to-copy code, "you're Player
+  #NNNN" line, **📤 Send it to myself** (navigator.share, clipboard fallback)
+  and casual save tips (WhatsApp yourself / notes app / contacts / screenshot),
+  his framing "it's just a number — but it's your way back in". E2E 7/7
+  (scratchpad/code-sheet-test.mjs). Shipped to main during the outage — goes
+  live when Netlify unblocks; mirror serves it as githack cache refreshes.
 - **RENAMED: Hoops Heaven → CERTIFIED HOOPER (2026-08-16, Aiman's final pick).**
   Process: 25-name logo pack → his shortlist (Buckets/Next Up/Fives/Certified
   Hooper/Aura) → in-app header mocks → he picked FIVES → clash-check found
