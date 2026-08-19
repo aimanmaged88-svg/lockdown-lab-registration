@@ -195,18 +195,16 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
 .rc-tap{position:fixed;bottom:52px;color:#888;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase}
 .recapthumbs{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
 .recapthumbs img{width:52px;height:52px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
-.hero{margin:2px 0 16px}
-.hero-card{border:var(--bw) solid var(--line);border-radius:var(--r);background:var(--card);box-shadow:4px 4px 0 var(--shadow);overflow:hidden}
-.hero-head{padding:14px 15px 4px}
-.hero-head .hw{font-family:var(--disp);font-size:20px;font-weight:700;letter-spacing:.01em}
-[data-theme="retro"] .hero-head .hw{font-family:var(--street);font-weight:400}
-.hero-head .hs{font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.45}
-.caro{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:12px 15px 4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.caro::-webkit-scrollbar{display:none}
-.caro img{width:82%;flex:0 0 82%;scroll-snap-align:center;border-radius:12px;border:var(--bw) solid var(--line);cursor:pointer;aspect-ratio:1/1;object-fit:contain;background:#0b0b09}
-.caro-dots{display:flex;gap:6px;justify-content:center;padding:8px 0 13px}
-.caro-dots span{width:7px;height:7px;border-radius:50%;background:var(--line2);transition:.2s}
-.caro-dots span.on{background:var(--acc)}
+.intro{position:fixed;inset:0;z-index:60;background:var(--bg);overflow-y:auto;display:none}
+.intro.open{display:block;animation:fade .35s var(--ease)}
+.intro-wrap{max-width:520px;margin:0 auto;padding:22px 16px 46px;text-align:center}
+.intro h2{font-family:var(--disp);font-size:22px;margin:12px 0 16px;letter-spacing:.01em}
+[data-theme="retro"] .intro h2{font-family:var(--street);font-weight:400}
+#inPhotos img{width:100%;display:block;border-radius:14px;border:var(--bw) solid var(--line);box-shadow:4px 4px 0 var(--shadow);margin:0 0 13px}
+.motd{border:var(--bw) solid var(--acc);border-radius:var(--r);background:var(--card);padding:16px 17px;margin:10px 0 18px;text-align:left;box-shadow:4px 4px 0 var(--shadow)}
+.motd .mh{font-family:var(--disp);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--acc);margin-bottom:8px}
+[data-theme="retro"] .motd .mh{font-family:var(--street);letter-spacing:.05em;text-transform:none;font-size:15px}
+.motd p{margin:0;font-size:16px;line-height:1.6;font-weight:600}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important}}
 </style>
 </head>
@@ -230,7 +228,6 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
   </nav>
 
   <section class="pane on" id="pane-sched">
-    <div class="hero" id="hero"></div>
     <div class="courthead"><button id="cSel1" aria-pressed="true">Court 1</button><button id="cSel2" aria-pressed="false">Court 2</button></div>
     <div id="board"><div class="slotrow"><div class="skel"></div><div class="skel"></div></div><div class="slotrow"><div class="skel"></div><div class="skel"></div></div></div>
   </section>
@@ -247,7 +244,7 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
     <button class="bigbtn" id="genBtn">⚡ Generate the night</button>
     <button class="bigbtn ghost" id="resetBtn">🧹 Reset the night</button>
     <div class="lbl" style="margin-top:22px">📰 Last run recap</div>
-    <p class="hintline">Upload the recap cards (in order: news → MVP → story → face → message → ladder). They become the welcome carousel everyone sees first.</p>
+    <p class="hintline">Upload the recap cards (in order: news → MVP → story → face → message → ladder). They become the full-screen recap everyone sees when they open the link.</p>
     <div class="recapthumbs" id="recapThumbs"></div>
     <div class="arow2" style="margin-top:4px">
       <button class="bigbtn ghost" id="recapPick" style="margin:0">Choose photos</button>
@@ -322,6 +319,17 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
   <div class="modes">
     <button class="pill" data-mode="dark">🌙 Dark</button>
     <button class="pill" data-mode="light">☀️ Light</button>
+  </div>
+</div>
+
+<div class="intro" id="intro">
+  <button class="rc-x" id="inX" aria-label="Skip to the app">×</button>
+  <div class="intro-wrap">
+    <img src="/assets/lotg-logo.jpg" alt="Love of the Game" class="logoimg" style="height:64px;margin:0 auto"/>
+    <h2>Here's a recap of last week 📰</h2>
+    <div id="inPhotos"></div>
+    <div class="motd"><div class="mh">💬 Message of the night</div><p id="motdTx"></p></div>
+    <button class="bigbtn" id="inGo">Into the app 🏀</button>
   </div>
 </div>
 
@@ -432,7 +440,7 @@ function renderSchedule(){
   }else{
     box.innerHTML=cg.map(g=>`<div class="slotrow">${gameCard(g)}</div>`).join('');
   }
-  wireGames();renderHero();renderChrome();
+  wireGames();renderChrome();
 }
 function computeTable(teamsList,gamesList){
   const rows=teamsList.map(t=>({t,p:0,w:0,d:0,l:0,pf:0,pa:0}));
@@ -635,15 +643,13 @@ async function generateNight(){
     if(!rows.length)throw new Error('Need at least 2 teams (per court for pools).');
     const latestScored=weekGames().some(g=>g.status==='final');
     const targetWeek=weekGames().length?(latestScored?state.wk+1:state.wk):state.wk;
-    const newNight=!weekGames().length||latestScored;
-    const weekNo=(+(state.settings.weekNo)||0)+(newNight?1:0)||1;
     const payload=rows.map(r=>({court:r.court,slot_index:r.slot_index,game_time:fmtTime(start+r.slot_index*SLOT_MIN),
       team1_id:r.pair[0].id,team2_id:r.pair[1].id,status:'upcoming',week:targetWeek,tournament:state.tn}));
     if(weekGames().length&&!latestScored){
       await rest(`lotg_games?week=eq.${state.wk}`,{method:'DELETE'},true); // redo this week's draw
     }
     await rest('lotg_games',{method:'POST',body:JSON.stringify(payload)},true);
-    await rest('lotg_admin?id=eq.1',{method:'PATCH',body:JSON.stringify({settings:{...state.settings,start:fmtTime(start),weekNo}})},true);
+    await rest('lotg_admin?id=eq.1',{method:'PATCH',body:JSON.stringify({settings:{...state.settings,start:fmtTime(start)}})},true);
     closeSheets();await loadAll();pick('sched');
     toast('Tonight\'s schedule is live 🏀');
   }catch(e){$('#genErr').textContent=e.message;}
@@ -827,7 +833,7 @@ function nextWedStr(){
 let RECAP=[];
 async function loadRecap(){
   try{RECAP=await rest('lotg_recap?select=id,ord,img,created_at&order=ord.asc')||[];}catch(e){RECAP=[];}
-  renderRecapAdmin();renderHero();
+  renderRecapAdmin();renderIntro();
 }
 let rcI=0;
 function rcShow(i){
@@ -836,24 +842,20 @@ function rcShow(i){
   $('#rcDots').innerHTML=RECAP.map((_,j)=>`<span class="${j===i?'on':''}"></span>`).join('');
 }
 $('#rcX').onclick=()=>$('#rcView').classList.remove('open');
+$('#inGo').onclick=closeIntro;
+$('#inX').onclick=closeIntro;
 $('#rcView').onclick=e=>{ if(e.target.id==='rcX')return; if(rcI+1<RECAP.length)rcShow(rcI+1); else $('#rcView').classList.remove('open'); };
-function renderHero(){
-  const el=$('#hero'); if(!el)return;
-  const created=weekGames().map(g=>new Date(g.created_at||0).getTime());
-  const fresh=created.length&&(Date.now()-Math.max(...created))<2*864e5;
-  const base=+(state.settings.weekNo||state.wk)||1;
-  const wkNo=fresh?base:base+1;
-  const sub=fresh?`The Week ${base} board is in — first tip-off ${esc(state.settings.start||'7:15 PM')} 🔥`
-                 :`Tip-off ~${esc(state.settings.start||'7:15 PM')} Wednesday ${nextWedStr()} — see you soon.`;
-  const caro=RECAP.length?`<div class="caro" id="caro">${RECAP.map((r,i)=>`<img src="${r.img}" data-lr="${i}" alt="Last run recap ${i+1}"/>`).join('')}</div><div class="caro-dots" id="caroDots">${RECAP.map((_,i)=>`<span class="${i?'':'on'}"></span>`).join('')}</div>`:'';
-  el.innerHTML=`<div class="hero-card"><div class="hero-head"><div class="hw">Welcome to Week ${wkNo} 🏀</div><div class="hs">${sub}${RECAP.length?' Swipe through what happened last run 👇':''}</div></div>${caro}</div>`;
-  document.querySelectorAll('#hero [data-lr]').forEach(im=>im.onclick=()=>{ $('#rcView').classList.add('open');rcShow(+im.dataset.lr); });
-  const c=$('#caro');
-  if(c)c.addEventListener('scroll',()=>{
-    const i=Math.min(RECAP.length-1,Math.round(c.scrollLeft/(c.scrollWidth/RECAP.length)));
-    document.querySelectorAll('#caroDots span').forEach((d,j)=>d.classList.toggle('on',j===i));
-  },{passive:true});
+const MOTD_DEFAULT="Pass the ball. Get it moving. Get everyone involved — the game looks more beautiful that way. Played right, basketball is artwork. Let's paint every Wednesday night. 🎨🏀";
+function renderIntro(){
+  const el=$('#intro');
+  if(!RECAP.length||state.admin){el.classList.remove('open');return;}
+  let last=0;try{last=+localStorage.getItem('lotg_intro_ts')||0}catch(e){}
+  if(Date.now()-last<3*36e5)return;
+  $('#inPhotos').innerHTML=RECAP.map((r,i)=>`<img src="${r.img}" alt="Last week recap ${i+1}"/>`).join('');
+  $('#motdTx').textContent=state.settings.motd||MOTD_DEFAULT;
+  el.classList.add('open');window.scrollTo(0,0);
 }
+function closeIntro(){try{localStorage.setItem('lotg_intro_ts',String(Date.now()))}catch(e){}$('#intro').classList.remove('open');}
 function renderRecapAdmin(){
   if(!state.admin)return;
   $('#recapThumbs').innerHTML=RECAP.map(r=>`<img src="${r.img}" alt=""/>`).join('')||'<p class="hintline">No recap loaded yet.</p>';
