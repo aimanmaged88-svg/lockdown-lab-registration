@@ -195,13 +195,18 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
 .rc-tap{position:fixed;bottom:52px;color:#888;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase}
 .recapthumbs{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
 .recapthumbs img{width:52px;height:52px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
-.lr-img{width:100%;display:block;border-radius:var(--r);border:var(--bw) solid var(--line);box-shadow:4px 4px 0 var(--shadow);margin-bottom:12px;cursor:pointer}
-.honours{border:var(--bw) solid var(--line);border-radius:var(--r);overflow:hidden;background:var(--card);margin-bottom:16px;box-shadow:4px 4px 0 var(--shadow)}
-.honours .hrow{display:flex;align-items:baseline;gap:10px;padding:10px 13px;border-top:1px solid var(--line)}
-.honours .hrow:first-of-type{border-top:none}
-.honours .hl{flex:0 0 auto;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);font-weight:700;width:92px}
-.honours .hv{font-weight:700;font-size:15px;color:var(--ink)}
-.honours .hv small{display:block;font-weight:600;font-size:12px;color:var(--muted)}
+.hero{margin:2px 0 16px}
+.hero-card{border:var(--bw) solid var(--line);border-radius:var(--r);background:var(--card);box-shadow:4px 4px 0 var(--shadow);overflow:hidden}
+.hero-head{padding:14px 15px 4px}
+.hero-head .hw{font-family:var(--disp);font-size:20px;font-weight:700;letter-spacing:.01em}
+[data-theme="retro"] .hero-head .hw{font-family:var(--street);font-weight:400}
+.hero-head .hs{font-size:12.5px;color:var(--muted);margin-top:4px;line-height:1.45}
+.caro{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:12px 15px 4px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.caro::-webkit-scrollbar{display:none}
+.caro img{width:82%;flex:0 0 82%;scroll-snap-align:center;border-radius:12px;border:var(--bw) solid var(--line);cursor:pointer;aspect-ratio:1/1;object-fit:contain;background:#0b0b09}
+.caro-dots{display:flex;gap:6px;justify-content:center;padding:8px 0 13px}
+.caro-dots span{width:7px;height:7px;border-radius:50%;background:var(--line2);transition:.2s}
+.caro-dots span.on{background:var(--acc)}
 @media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;transition-duration:.001ms!important}}
 </style>
 </head>
@@ -225,13 +230,13 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
   </nav>
 
   <section class="pane on" id="pane-sched">
+    <div class="hero" id="hero"></div>
     <div class="courthead"><button id="cSel1" aria-pressed="true">Court 1</button><button id="cSel2" aria-pressed="false">Court 2</button></div>
     <div id="board"><div class="slotrow"><div class="skel"></div><div class="skel"></div></div><div class="slotrow"><div class="skel"></div><div class="skel"></div></div></div>
   </section>
 
   <section class="pane" id="pane-stand">
     <div id="standings"></div>
-    <div id="lastrun"></div>
   </section>
 
   <section class="pane" id="pane-teams">
@@ -241,12 +246,8 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
     <button class="bigbtn ghost" id="importBtn">📲 Import from WhatsApp</button>
     <button class="bigbtn" id="genBtn">⚡ Generate the night</button>
     <button class="bigbtn ghost" id="resetBtn">🧹 Reset the night</button>
-    <div class="lbl" style="margin-top:22px">🏆 Last week's winners</div>
-    <p class="hintline">Shown at the top of Standings. Use "Name — Team" and the team drops to a second line.</p>
-    <div id="honoursForm"></div>
-    <button class="bigbtn ghost" id="honSave">Save winners</button>
     <div class="lbl" style="margin-top:22px">📰 Last run recap</div>
-    <p class="hintline">Upload the recap cards (in order: news → MVP → story → face → message → ladder). Everyone gets the pop-up next time they open the app.</p>
+    <p class="hintline">Upload the recap cards (in order: news → MVP → story → face → message → ladder). They become the welcome carousel everyone sees first.</p>
     <div class="recapthumbs" id="recapThumbs"></div>
     <div class="arow2" style="margin-top:4px">
       <button class="bigbtn ghost" id="recapPick" style="margin:0">Choose photos</button>
@@ -324,30 +325,12 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
   </div>
 </div>
 
-<!-- last-run recap popup -->
-<div class="recap" id="recap">
-  <div class="rc-card">
-    <img src="/assets/lotg-logo.jpg" alt="" class="logoimg" style="height:56px;margin:0 auto 6px"/>
-    <h3 id="rcTitle">This is what happened last run 👀</h3>
-    <p>Tap through the recap from the last Wednesday night.</p>
-    <button class="bigbtn" id="rcGo" style="margin-top:2px">Click here</button>
-    <button class="bigbtn ghost" id="rcSkip" style="margin-top:8px">Skip</button>
-  </div>
-</div>
 <div class="rc-view" id="rcView">
   <button class="rc-x" id="rcX" aria-label="Close">×</button>
   <img id="rcImg" alt="Last run recap" />
   <div class="rc-dots" id="rcDots"></div>
   <span class="rc-tap">Tap the photo for the next one</span>
 </div>
-<div class="recap" id="rcEnd">
-  <div class="rc-card">
-    <h3>That was last run 🏀</h3>
-    <p id="rcEndMsg"></p>
-    <button class="bigbtn" id="rcOk">Okay, see you Wednesday</button>
-  </div>
-</div>
-
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -449,7 +432,7 @@ function renderSchedule(){
   }else{
     box.innerHTML=cg.map(g=>`<div class="slotrow">${gameCard(g)}</div>`).join('');
   }
-  wireGames();renderChrome();
+  wireGames();renderHero();renderChrome();
 }
 function computeTable(teamsList,gamesList){
   const rows=teamsList.map(t=>({t,p:0,w:0,d:0,l:0,pf:0,pa:0}));
@@ -468,23 +451,16 @@ function tableHTML(title,rows,anyFinal){
     ${rows.map((r,i)=>`<tr class="${i===0&&anyFinal&&r.p>0?'top':''}"><td class="tn">${logoNm(r.t)}</td><td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.diff>0?'+':''}${r.diff}</td><td class="pts">${r.pts}</td></tr>`).join('')}
     </tbody></table></div>`;
 }
-function honoursHTML(){
-  const h=state.settings.honours;
-  if(!h)return'';
-  const row=(l,v)=>v?`<div class="hrow"><span class="hl">${l}</span><span class="hv">${esc(v).replace(/ — /,'<small>')}${/ — /.test(v)?'</small>':''}</span></div>`:'';
-  const rows=row('🏆 Champions',h.champs)+row('👑 MVP',h.mvp)+row('📖 Story',h.story)+row('😤 Face',h.face)+row('💬 Message',h.message);
-  return rows?`<div class="honours"><div class="sthead">Last week's winners</div>${rows}</div>`:'';
-}
 function renderStandings(){
   const wg=weekGames();
   const tm=teamMap();
   const anyFinal=wg.some(g=>g.status==='final');
-  if(!wg.length){$('#standings').innerHTML=honoursHTML()+'<div class="empty">Standings appear once the night is generated.</div>';return;}
+  if(!wg.length){$('#standings').innerHTML='<div class="empty">Standings appear once the night is generated.</div>';return;}
   const playing=[...new Set(wg.flatMap(g=>[g.team1_id,g.team2_id]))].map(id=>tm.get(id)).filter(Boolean);
   if(isCross()){
-    $('#standings').innerHTML=honoursHTML()+tableHTML(`The Ladder`,computeTable(playing,wg),anyFinal);
+    $('#standings').innerHTML=tableHTML(`The Ladder`,computeTable(playing,wg),anyFinal);
   }else{
-    $('#standings').innerHTML=honoursHTML()+[1,2].map(cg=>{
+    $('#standings').innerHTML=[1,2].map(cg=>{
       const rows=computeTable(playing.filter(t=>t.court_group===cg),wg);
       return rows.length?tableHTML(`Court ${cg} ladder`,rows,anyFinal):'';
     }).join('')||'<div class="empty">Standings appear once scores go in.</div>';
@@ -659,13 +635,15 @@ async function generateNight(){
     if(!rows.length)throw new Error('Need at least 2 teams (per court for pools).');
     const latestScored=weekGames().some(g=>g.status==='final');
     const targetWeek=weekGames().length?(latestScored?state.wk+1:state.wk):state.wk;
+    const newNight=!weekGames().length||latestScored;
+    const weekNo=(+(state.settings.weekNo)||0)+(newNight?1:0)||1;
     const payload=rows.map(r=>({court:r.court,slot_index:r.slot_index,game_time:fmtTime(start+r.slot_index*SLOT_MIN),
       team1_id:r.pair[0].id,team2_id:r.pair[1].id,status:'upcoming',week:targetWeek,tournament:state.tn}));
     if(weekGames().length&&!latestScored){
       await rest(`lotg_games?week=eq.${state.wk}`,{method:'DELETE'},true); // redo this week's draw
     }
     await rest('lotg_games',{method:'POST',body:JSON.stringify(payload)},true);
-    await rest('lotg_admin?id=eq.1',{method:'PATCH',body:JSON.stringify({settings:{...state.settings,start:fmtTime(start)}})},true);
+    await rest('lotg_admin?id=eq.1',{method:'PATCH',body:JSON.stringify({settings:{...state.settings,start:fmtTime(start),weekNo}})},true);
     closeSheets();await loadAll();pick('sched');
     toast('Tonight\'s schedule is live 🏀');
   }catch(e){$('#genErr').textContent=e.message;}
@@ -849,10 +827,7 @@ function nextWedStr(){
 let RECAP=[];
 async function loadRecap(){
   try{RECAP=await rest('lotg_recap?select=id,ord,img,created_at&order=ord.asc')||[];}catch(e){RECAP=[];}
-  renderRecapAdmin();renderLastRun();
-  const stamp=RECAP.length?RECAP[0].created_at:'';
-  let seen=''; try{seen=localStorage.getItem('lotg_recap_seen')||''}catch(e){}
-  if(RECAP.length&&stamp!==seen&&!state.admin){ $('#recap').classList.add('open'); }
+  renderRecapAdmin();renderHero();
 }
 let rcI=0;
 function rcShow(i){
@@ -860,31 +835,28 @@ function rcShow(i){
   $('#rcImg').src=RECAP[i].img;
   $('#rcDots').innerHTML=RECAP.map((_,j)=>`<span class="${j===i?'on':''}"></span>`).join('');
 }
-function rcDone(){
-  $('#rcView').classList.remove('open');$('#recap').classList.remove('open');
-  $('#rcEndMsg').textContent=`The next schedule drops right here ~2 hours before tip-off on Wednesday ${nextWedStr()}. Lock it in 🔒🏀`;
-  $('#rcEnd').classList.add('open');
-}
-function rcSeen(){try{localStorage.setItem('lotg_recap_seen',RECAP.length?RECAP[0].created_at:'')}catch(e){}}
-$('#rcGo').onclick=()=>{$('#recap').classList.remove('open');$('#rcView').classList.add('open');rcShow(0);};
-$('#rcSkip').onclick=()=>{$('#recap').classList.remove('open');rcSeen();};
-$('#rcX').onclick=()=>{rcSeen();$('#rcView').classList.remove('open');};
-$('#rcView').onclick=e=>{ if(e.target.id==='rcX')return; if(rcI+1<RECAP.length)rcShow(rcI+1); else {rcSeen();rcDone();} };
-$('#rcOk').onclick=()=>{rcSeen();$('#rcEnd').classList.remove('open');};
-function renderLastRun(){
-  $('#lastrun').innerHTML=RECAP.length?`<div class="lbl" style="margin-top:24px">📰 Last run</div>`+RECAP.map((r,i)=>`<img class="lr-img" src="${r.img}" alt="Last run recap ${i+1}" data-lr="${i}"/>`).join(''):'';
-  document.querySelectorAll('[data-lr]').forEach(el=>el.onclick=()=>{ $('#rcView').classList.add('open');rcShow(+el.dataset.lr); });
-}
-const HON_FIELDS=[['champs','🏆 Champions'],['mvp','👑 MVP'],['story','📖 Story of the week'],['face','😤 Face of the week'],['message','💬 Message of the week']];
-function renderHonoursForm(){
-  if(!state.admin)return;
-  const h=state.settings.honours||{};
-  $('#honoursForm').innerHTML=HON_FIELDS.map(([k,l])=>`<div class="arow2" style="margin:8px 0"><input data-hon="${k}" type="text" placeholder="${l}" value="${esc(h[k]||'')}" maxlength="60"/></div>`).join('');
+$('#rcX').onclick=()=>$('#rcView').classList.remove('open');
+$('#rcView').onclick=e=>{ if(e.target.id==='rcX')return; if(rcI+1<RECAP.length)rcShow(rcI+1); else $('#rcView').classList.remove('open'); };
+function renderHero(){
+  const el=$('#hero'); if(!el)return;
+  const created=weekGames().map(g=>new Date(g.created_at||0).getTime());
+  const fresh=created.length&&(Date.now()-Math.max(...created))<2*864e5;
+  const base=+(state.settings.weekNo||state.wk)||1;
+  const wkNo=fresh?base:base+1;
+  const sub=fresh?`The Week ${base} board is in — first tip-off ${esc(state.settings.start||'7:15 PM')} 🔥`
+                 :`Tip-off ~${esc(state.settings.start||'7:15 PM')} Wednesday ${nextWedStr()} — see you soon.`;
+  const caro=RECAP.length?`<div class="caro" id="caro">${RECAP.map((r,i)=>`<img src="${r.img}" data-lr="${i}" alt="Last run recap ${i+1}"/>`).join('')}</div><div class="caro-dots" id="caroDots">${RECAP.map((_,i)=>`<span class="${i?'':'on'}"></span>`).join('')}</div>`:'';
+  el.innerHTML=`<div class="hero-card"><div class="hero-head"><div class="hw">Welcome to Week ${wkNo} 🏀</div><div class="hs">${sub}${RECAP.length?' Swipe through what happened last run 👇':''}</div></div>${caro}</div>`;
+  document.querySelectorAll('#hero [data-lr]').forEach(im=>im.onclick=()=>{ $('#rcView').classList.add('open');rcShow(+im.dataset.lr); });
+  const c=$('#caro');
+  if(c)c.addEventListener('scroll',()=>{
+    const i=Math.min(RECAP.length-1,Math.round(c.scrollLeft/(c.scrollWidth/RECAP.length)));
+    document.querySelectorAll('#caroDots span').forEach((d,j)=>d.classList.toggle('on',j===i));
+  },{passive:true});
 }
 function renderRecapAdmin(){
   if(!state.admin)return;
   $('#recapThumbs').innerHTML=RECAP.map(r=>`<img src="${r.img}" alt=""/>`).join('')||'<p class="hintline">No recap loaded yet.</p>';
-  renderHonoursForm();
 }
 async function shrink(file,max){
   const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=URL.createObjectURL(file);});
@@ -893,13 +865,6 @@ async function shrink(file,max){
   c.getContext('2d').drawImage(img,0,0,c.width,c.height);
   return c.toDataURL('image/jpeg',.8);
 }
-$('#honSave').onclick=async()=>{
-  const h={};document.querySelectorAll('[data-hon]').forEach(i=>{const v=i.value.trim();if(v)h[i.dataset.hon]=v;});
-  try{
-    await rest('lotg_admin?id=eq.1',{method:'PATCH',body:JSON.stringify({settings:{...state.settings,honours:Object.keys(h).length?h:null}})},true);
-    state.settings.honours=Object.keys(h).length?h:null;renderStandings();toast("Winners saved 🏆");
-  }catch(e){toast(e.message);}
-};
 $('#recapPick').onclick=()=>$('#recapFiles').click();
 $('#recapFiles').addEventListener('change',async()=>{
   const files=[...$('#recapFiles').files];$('#recapFiles').value='';
