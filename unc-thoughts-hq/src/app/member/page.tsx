@@ -2,20 +2,15 @@ import Link from "next/link";
 import { getMember } from "@/lib/member";
 import { prisma } from "@/lib/db";
 import { ContextCard } from "@/components/member/context-card";
-import { MessageCircleQuestion, Trophy, Dumbbell, Apple, Brain, BatteryCharging, Lightbulb, Lock, Flame, BookOpen } from "lucide-react";
+import { MessageCircleQuestion, BookOpen, Lightbulb, Lock } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
-// The member home. Deliberately small: nine things, no feed.
-const TILES = [
-  { href: "/member/game", label: "Game today", note: "Quick game-day prep", icon: Trophy },
-  { href: "/member/training", label: "Training today", note: "Quick training prep", icon: Dumbbell },
-  { href: "/member/eat", label: "What should I eat?", note: "Time-aware, general education", icon: Apple },
-  { href: "/member/mindset", label: "Mindset reset", note: "One cue, one action", icon: Brain },
-  { href: "/member/recovery", label: "Recovery", note: "Post-session basics", icon: BatteryCharging },
-  { href: "/member/thought", label: "Today's thoughts", note: "Morning · afternoon · evening + your library", icon: Lightbulb },
-];
-
+// The member home, stripped back to basics for the Skool era: ask the AI,
+// ask UNC himself, browse the Library, get today's thought, see your answers.
+// Community talk lives in the Skool community, not here. The old tools
+// (game-day, training, eat, recovery, consistency, huddle) keep their routes
+// but are no longer surfaced — one commit brings any of them back.
 export default async function MemberHome() {
   const member = await getMember();
   let due = 0;
@@ -33,12 +28,12 @@ export default async function MemberHome() {
     <div className="space-y-5">
       <div>
         <h1 className="text-2xl">Ask UNC</h1>
-        <p className="text-sm text-grey mt-1">Straight answers for today. Private reflection by default.</p>
+        <p className="text-sm text-grey mt-1">Straight answers. Anonymous by default.</p>
       </div>
 
-      {/* 1. Ask UNC — one question field */}
+      {/* Ask the AI — one question field */}
       <form action="/member/ask" method="get" className="flex gap-2">
-        <input name="q" className="input flex-1" placeholder="Ask UNC anything about today…" aria-label="Ask UNC" />
+        <input name="q" className="input flex-1" placeholder="Ask UNC anything…" aria-label="Ask UNC" />
         <button className="btn btn-primary" type="submit">Ask</button>
       </form>
 
@@ -53,57 +48,27 @@ export default async function MemberHome() {
         </span>
       </Link>
 
-      {/* 2–7 */}
+      {/* The Library + Today's thoughts */}
       <div className="grid grid-cols-2 gap-2.5">
-        {TILES.map(({ href, label, note, icon: Icon }) => (
-          <Link key={href} href={href} className="card p-4 hover:bg-ink-soft transition-colors">
-            <Icon size={18} className="text-paper-dim" />
-            <div className="font-medium text-sm mt-2">{label}</div>
-            <div className="text-[11px] text-grey mt-0.5">{note}</div>
-          </Link>
-        ))}
+        <Link href="/member/library" className="card p-4 hover:bg-ink-soft transition-colors">
+          <BookOpen size={18} className="text-paper-dim" />
+          <div className="font-medium text-sm mt-2">The Library</div>
+          <div className="text-[11px] text-grey mt-0.5">Every question UNC has answered — browse by category</div>
+        </Link>
+        <Link href="/member/thought" className="card p-4 hover:bg-ink-soft transition-colors">
+          <Lightbulb size={18} className="text-paper-dim" />
+          <div className="font-medium text-sm mt-2">Today&apos;s thoughts</div>
+          <div className="text-[11px] text-grey mt-0.5">Morning · afternoon · evening + your saves</div>
+        </Link>
       </div>
 
-      {/* The Library — every approved Q&A, categorised */}
-      <Link href="/member/library" className="card p-4 flex items-center justify-between hover:bg-ink-soft transition-colors">
-        <span className="flex items-center gap-3">
-          <BookOpen size={16} className="text-paper-dim" />
-          <span>
-            <span className="block font-medium text-sm">The Library</span>
-            <span className="block text-[11px] text-grey">Questions already asked + answered by UNC — browse by category</span>
-          </span>
-        </span>
-      </Link>
-
-      {/* The Huddle — verified community talk */}
-      <Link href="/member/huddle" className="card p-4 flex items-center justify-between hover:bg-ink-soft transition-colors">
-        <span className="flex items-center gap-3">
-          <MessageCircleQuestion size={16} className="text-paper-dim" />
-          <span>
-            <span className="block font-medium text-sm">The Huddle</span>
-            <span className="block text-[11px] text-grey">Community talk by topic — every post checked by UNC</span>
-          </span>
-        </span>
-      </Link>
-
-      {/* 8. Consistency Chart */}
-      <Link href="/member/consistency" className="card p-4 flex items-center justify-between hover:bg-ink-soft transition-colors">
-        <span className="flex items-center gap-3">
-          <Flame size={16} className="text-paper-dim" />
-          <span>
-            <span className="block font-medium text-sm">Consistency Chart</span>
-            <span className="block text-[11px] text-grey">Tag your day. Your own data shows what works.</span>
-          </span>
-        </span>
-      </Link>
-
-      {/* 9. My answers */}
+      {/* My answers */}
       <Link href="/member/answers" className="card p-4 flex items-center justify-between hover:bg-ink-soft transition-colors">
         <span className="flex items-center gap-3">
           <Lock size={16} className="text-paper-dim" />
           <span>
             <span className="block font-medium text-sm">My answers</span>
-            <span className="block text-[11px] text-grey">Your private reflection history</span>
+            <span className="block text-[11px] text-grey">Your private history</span>
           </span>
         </span>
         {due > 0 && <span className="chip border-warn/50 text-warn">{due} to check in on</span>}

@@ -3,7 +3,10 @@ import { LibraryClient } from "@/components/member/library-client";
 import Link from "next/link";
 import { BookOpen } from "lucide-react";
 
-export const dynamic = "force-dynamic";
+// Cached at the CDN and rebuilt at most every 10 minutes — replyToQuestion
+// calls revalidatePath("/member/library") so fresh answers still land fast.
+// This page reads no cookies, so it's safe to cache for everyone.
+export const revalidate = 600;
 
 // The Library: every question UNC has approved for everyone — categorised,
 // searchable, always anonymous. The community's questions become the
