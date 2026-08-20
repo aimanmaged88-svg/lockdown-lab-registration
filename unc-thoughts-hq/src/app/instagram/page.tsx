@@ -1,6 +1,5 @@
 import { prisma, getOrgId } from "@/lib/db";
 import { NoteBank } from "@/components/desk/notes-client";
-import { IgTemplateStudio } from "@/components/desk/ig-template-studio";
 import { ThoughtCardStudio } from "@/components/desk/thought-card-studio";
 import { Instagram } from "lucide-react";
 
@@ -52,12 +51,6 @@ export default async function InstagramPage() {
           word, choose a look and a size, download. Nothing to write.
         </p>
         <ThoughtCardStudio lines={lines} />
-      </section>
-
-      <section className="space-y-2">
-        <h2 className="text-lg font-semibold normal-case tracking-normal">Template studio</h2>
-        <p className="text-sm text-grey -mt-1">The house template. The three pillar posts are presets that never change — the middle one is whatever you&apos;re saying this week. Type, preview, download, post.</p>
-        <IgTemplateStudio />
       </section>
 
       <section className="space-y-2 max-w-xl">
