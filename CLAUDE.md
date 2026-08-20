@@ -104,6 +104,17 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   jsonb + admin-update policy. Open write policies
   (qual=true) that the compiled app relied on were **DROPPED at flip time**
   (migration lotg_drop_open_write_policies) — writes now require x-lotg-admin.
+- **Recap intro takeover + media (2026-08-20/21):** opening the link shows a
+  full-screen "Here's a recap of last week" — photos AND video clips (top plays)
+  from `lotg_recap` (kind image|video), then 📣 notice (settings.notice, seeded
+  "Week 4 draw drops Wednesday 26/8 — the FINAL round"), 🎬 full-reel link
+  (settings.reelUrl, renders after the first video), 💬 message of the night
+  (settings.motd) → "Into the app". 3h re-open suppression; admins skip it.
+  Admin Teams tab: 📝 Night notes (notice/reel/motd editable) + uploader takes
+  photos+videos (images→data-URI ≤1200px; videos→signed upload to public bucket
+  **lotg-media** [200MB] via NEW edge fn **lotg-board-media** {init,clear},
+  authed by the board passcode). Aiman self-uploaded Week 3's 6 cards 2026-08-19.
+  Weekly flow: upload recap → edit night notes → reset → generate.
 - Verified E2E vs live DB (bridged Playwright): week detect, 28-card board,
   combined ladder, retro/light, unlock, score→standings, generate→week 3,
   import parse w/ late detect. All test rows removed, one test score reset —

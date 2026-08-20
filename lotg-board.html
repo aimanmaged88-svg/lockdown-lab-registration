@@ -200,7 +200,12 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
 .intro-wrap{max-width:520px;margin:0 auto;padding:22px 16px 46px;text-align:center}
 .intro h2{font-family:var(--disp);font-size:22px;margin:12px 0 16px;letter-spacing:.01em}
 [data-theme="retro"] .intro h2{font-family:var(--street);font-weight:400}
-#inPhotos img{width:100%;display:block;border-radius:14px;border:var(--bw) solid var(--line);box-shadow:4px 4px 0 var(--shadow);margin:0 0 13px}
+#inPhotos img,#inPhotos video{width:100%;display:block;border-radius:14px;border:var(--bw) solid var(--line);box-shadow:4px 4px 0 var(--shadow);margin:0 0 13px}
+#inPhotos video{background:#000;max-height:74vh}
+.reelbtn{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--acc);color:var(--onacc);border:var(--bw) solid var(--acc);border-radius:13px;padding:14px;margin:2px 0 15px;font-family:var(--disp);font-weight:700;font-size:13.5px;letter-spacing:.05em;text-transform:uppercase;text-decoration:none;box-shadow:4px 4px 0 var(--shadow)}
+[data-theme="retro"] .reelbtn{font-weight:400}
+.notice{border:var(--bw) solid var(--acc2);border-radius:var(--r);background:var(--card);padding:14px 16px;margin:4px 0 14px;font-family:var(--disp);font-weight:700;font-size:15.5px;color:var(--acc2);box-shadow:4px 4px 0 var(--shadow)}
+[data-theme="retro"] .notice{font-family:var(--street);font-weight:400}
 .motd{border:var(--bw) solid var(--acc);border-radius:var(--r);background:var(--card);padding:16px 17px;margin:10px 0 18px;text-align:left;box-shadow:4px 4px 0 var(--shadow)}
 .motd .mh{font-family:var(--disp);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--acc);margin-bottom:8px}
 [data-theme="retro"] .motd .mh{font-family:var(--street);letter-spacing:.05em;text-transform:none;font-size:15px}
@@ -243,14 +248,21 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
     <button class="bigbtn ghost" id="importBtn">📲 Import from WhatsApp</button>
     <button class="bigbtn" id="genBtn">⚡ Generate the night</button>
     <button class="bigbtn ghost" id="resetBtn">🧹 Reset the night</button>
+    <div class="lbl" style="margin-top:22px">📝 Night notes</div>
+    <p class="hintline">These show inside the recap. All three editable any time.</p>
+    <div class="arow2" style="margin:8px 0"><input id="nnNotice" type="text" placeholder="Announcement — e.g. Week 4 draw drops Wednesday 26/8" maxlength="90"/></div>
+    <div class="arow2" style="margin:8px 0"><input id="nnReel" type="text" placeholder="Full highlight reel link (https://…)" maxlength="300"/></div>
+    <div class="arow2" style="margin:8px 0"><textarea id="nnMotd" placeholder="Message of the night" maxlength="300" style="flex:1;min-height:84px;background:var(--card);border:var(--bw) solid var(--line);border-radius:12px;padding:12px;color:var(--ink);font-family:inherit;font-size:15px;resize:vertical"></textarea></div>
+    <button class="bigbtn ghost" id="nnSave">Save night notes</button>
     <div class="lbl" style="margin-top:22px">📰 Last run recap</div>
-    <p class="hintline">Upload the recap cards (in order: news → MVP → story → face → message → ladder). They become the full-screen recap everyone sees when they open the link.</p>
+    <p class="hintline">Upload photos AND video clips (top plays) in the order you want them seen — they're the full-screen recap everyone gets when they open the link. Videos up to ~200MB; the long full reel goes in the link above instead.</p>
+    <p class="hintline" id="upStat"></p>
     <div class="recapthumbs" id="recapThumbs"></div>
     <div class="arow2" style="margin-top:4px">
-      <button class="bigbtn ghost" id="recapPick" style="margin:0">Choose photos</button>
+      <button class="bigbtn ghost" id="recapPick" style="margin:0">Choose photos & clips</button>
       <button class="bigbtn ghost" id="recapClear" style="margin:0">Clear</button>
     </div>
-    <input id="recapFiles" type="file" accept="image/*" multiple hidden/>
+    <input id="recapFiles" type="file" accept="image/*,video/*" multiple hidden/>
     <input id="logoFile" type="file" accept="image/*" hidden/>
     <p class="hintline" id="genHint"></p>
   </section>
@@ -832,7 +844,7 @@ function nextWedStr(){
 }
 let RECAP=[];
 async function loadRecap(){
-  try{RECAP=await rest('lotg_recap?select=id,ord,img,created_at&order=ord.asc')||[];}catch(e){RECAP=[];}
+  try{RECAP=await rest('lotg_recap?select=id,ord,img,kind,created_at&order=ord.asc,created_at.asc')||[];}catch(e){RECAP=[];}
   renderRecapAdmin();renderIntro();
 }
 let rcI=0;
@@ -851,14 +863,29 @@ function renderIntro(){
   if(!RECAP.length||state.admin){el.classList.remove('open');return;}
   let last=0;try{last=+localStorage.getItem('lotg_intro_ts')||0}catch(e){}
   if(Date.now()-last<3*36e5)return;
-  $('#inPhotos').innerHTML=RECAP.map((r,i)=>`<img src="${r.img}" alt="Last week recap ${i+1}"/>`).join('');
+  const reel=state.settings.reelUrl&&/^https?:\/\//.test(state.settings.reelUrl)?`<a class="reelbtn" href="${esc(state.settings.reelUrl)}" target="_blank" rel="noopener">🎬 Watch the FULL highlight reel ↗</a>`:'';
+  let reelPlaced=false;
+  let html=RECAP.map((r,i)=>{
+    if(r.kind==='video'){
+      const v=`<video src="${esc(r.img)}" controls playsinline preload="metadata"></video>`;
+      if(!reelPlaced&&reel){reelPlaced=true;return v+reel;}
+      return v;
+    }
+    return `<img src="${r.img}" alt="Last week recap ${i+1}"/>`;
+  }).join('');
+  if(reel&&!reelPlaced)html+=reel;
+  if(state.settings.notice)html+=`<div class="notice">📣 ${esc(state.settings.notice)}</div>`;
+  $('#inPhotos').innerHTML=html;
   $('#motdTx').textContent=state.settings.motd||MOTD_DEFAULT;
   el.classList.add('open');window.scrollTo(0,0);
 }
 function closeIntro(){try{localStorage.setItem('lotg_intro_ts',String(Date.now()))}catch(e){}$('#intro').classList.remove('open');}
 function renderRecapAdmin(){
   if(!state.admin)return;
-  $('#recapThumbs').innerHTML=RECAP.map(r=>`<img src="${r.img}" alt=""/>`).join('')||'<p class="hintline">No recap loaded yet.</p>';
+  $('#recapThumbs').innerHTML=RECAP.map(r=>r.kind==='video'?`<span style="width:52px;height:52px;display:grid;place-items:center;border:1px solid var(--line);border-radius:8px;font-size:20px">🎬</span>`:`<img src="${r.img}" alt=""/>`).join('')||'<p class="hintline">No recap loaded yet.</p>';
+  if($('#nnNotice')&&document.activeElement?.id!=='nnNotice')$('#nnNotice').value=state.settings.notice||'';
+  if($('#nnReel')&&document.activeElement?.id!=='nnReel')$('#nnReel').value=state.settings.reelUrl||'';
+  if($('#nnMotd')&&document.activeElement?.id!=='nnMotd')$('#nnMotd').value=state.settings.motd||MOTD_DEFAULT;
 }
 async function shrink(file,max){
   const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=URL.createObjectURL(file);});
@@ -867,21 +894,73 @@ async function shrink(file,max){
   c.getContext('2d').drawImage(img,0,0,c.width,c.height);
   return c.toDataURL('image/jpeg',.8);
 }
+const MEDIA_FN='https://ymuwuhvqqftgpxwhzoub.supabase.co/functions/v1/lotg-board-media';
+async function mediaApi(body){
+  const r=await fetch(MEDIA_FN,{method:'POST',headers:{Authorization:'Bearer '+KEY,apikey:KEY,'Content-Type':'application/json'},body:JSON.stringify({...body,pass:state.pass})});
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(d.error||'upload service hiccup');
+  return d;
+}
+function xhrPut(url,file,onProg){
+  return new Promise((res,rej)=>{
+    const x=new XMLHttpRequest();x.open('PUT',url);
+    x.setRequestHeader('Content-Type',file.type);
+    x.upload.onprogress=e=>{if(e.lengthComputable)onProg(e.loaded/e.total)};
+    x.onload=()=>(x.status>=200&&x.status<300)?res():rej(new Error('upload failed ('+x.status+')'));
+    x.onerror=()=>rej(new Error('upload failed — check your connection'));
+    x.send(file);
+  });
+}
+const upStat=t=>{const el=$('#upStat');if(el)el.textContent=t;};
 $('#recapPick').onclick=()=>$('#recapFiles').click();
 $('#recapFiles').addEventListener('change',async()=>{
   const files=[...$('#recapFiles').files];$('#recapFiles').value='';
   if(!files.length)return;
-  toast('Loading photos…');
+  const big=files.find(f=>f.size>200*1048576);
+  if(big){toast(`${big.name} is over 200MB — that one goes in the reel link instead`);return;}
+  if(!confirm(`Load ${files.length} file${files.length===1?'':'s'} as the new recap? This replaces the current one.`))return;
   try{
-    const imgs=[];for(const f of files)imgs.push(await shrink(f,1000));
+    upStat('Clearing the old recap…');
     await rest('lotg_recap?id=not.is.null',{method:'DELETE'},true);
-    await rest('lotg_recap',{method:'POST',body:JSON.stringify(imgs.map((img,i)=>({ord:i,img})))},true);
-    await loadRecap();toast(`Recap loaded — ${imgs.length} photos 📰`);
-  }catch(e){toast(e.message);}
+    await mediaApi({action:'clear'});
+    const rows=[];
+    for(let i=0;i<files.length;i++){
+      const f=files[i];
+      if(/^video\//.test(f.type)){
+        upStat(`Uploading clip ${i+1}/${files.length} — 0%`);
+        const init=await mediaApi({action:'init',contentType:f.type});
+        await xhrPut(init.uploadUrl,f,pr=>upStat(`Uploading clip ${i+1}/${files.length} — ${Math.round(pr*100)}%`));
+        rows.push({ord:i,img:init.publicUrl,kind:'video'});
+      }else{
+        upStat(`Adding photo ${i+1}/${files.length}…`);
+        rows.push({ord:i,img:await shrink(f,1200),kind:'image'});
+      }
+    }
+    upStat('Saving…');
+    await rest('lotg_recap',{method:'POST',body:JSON.stringify(rows)},true);
+    await loadRecap();upStat('');
+    toast(`Recap loaded — ${rows.length} item${rows.length===1?'':'s'} 📰`);
+  }catch(e){upStat('');toast(e.message);}
 });
 $('#recapClear').onclick=async()=>{
-  if(!confirm('Clear the recap pop-up?'))return;
-  try{await rest('lotg_recap?id=not.is.null',{method:'DELETE'},true);await loadRecap();toast('Recap cleared');}catch(e){toast(e.message);}
+  if(!confirm('Clear the recap?'))return;
+  try{
+    await rest('lotg_recap?id=not.is.null',{method:'DELETE'},true);
+    await mediaApi({action:'clear'}).catch(()=>{});
+    await loadRecap();toast('Recap cleared');
+  }catch(e){toast(e.message);}
+};
+$('#nnSave').onclick=async()=>{
+  const st={...state.settings};
+  const notice=$('#nnNotice').value.trim(),reel=$('#nnReel').value.trim(),motd=$('#nnMotd').value.trim();
+  notice?st.notice=notice:delete st.notice;
+  if(reel&&!/^https?:\/\//.test(reel)){toast('Reel link needs to start with https://');return;}
+  reel?st.reelUrl=reel:delete st.reelUrl;
+  motd?st.motd=motd:delete st.motd;
+  try{
+    await rest('lotg_admin?id=eq.1',{method:'PATCH',body:JSON.stringify({settings:st})},true);
+    state.settings=st;toast('Night notes saved 📝');
+  }catch(e){toast(e.message);}
 };
 
 /* boot */
