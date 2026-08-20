@@ -4,6 +4,7 @@ import { prisma, getOrgId } from "../db";
 import { audit } from "../audit";
 import { revalidatePath } from "next/cache";
 import { requireMember, getMemberId, isYouthBand } from "../member";
+import { requireDesk } from "../desk-auth";
 import { approvedItems } from "./knowledge";
 import { compose, type UnkAnswer } from "./answer";
 import { parseClockTime, minutesUntil } from "./timeband";
@@ -98,6 +99,63 @@ export async function memberSnapshot(): Promise<{ ageBand: string | null; allerg
     },
   });
   return { ageBand: member.ageBand, allergies: member.allergies, due };
+}
+
+// Change your mind about something you already answered. The answer lives in
+// two places — the public Library row and the brain FAQ the AI quotes — so an
+// edit has to move both, or the app starts saying two different things. Also
+// lets you pull an answer out of the Library (or put it back) after the fact.
+export async function editAnswer(questionId: string, answer: string, inLibrary: boolean) {
+  await requireDesk();
+  const orgId = await getOrgId();
+  const text = answer.trim();
+  if (!text) throw new Error("The answer can't be empty.");
+
+  const q = await prisma.communityQuestion.findFirst({ where: { id: questionId, orgId } });
+  if (!q) throw new Error("Question not found.");
+  if (q.status !== "answered") throw new Error("That one hasn't been answered yet.");
+
+  const pillar = q.pillar && ["Basketball", "Nutrition", "Mindset", "Community"].includes(q.pillar) ? q.pillar : "Mindset";
+  const title = q.text.slice(0, 110);
+  const body = `DO NOW: ${text}\nPRIVATE: What would you add from your own experience?\nWHY: UNC answered this one for the community.`;
+
+  // The brain FAQ is matched on the question text, which is how it was written.
+  const existing = await prisma.knowledgeItem.findFirst({ where: { orgId, kind: "faq", title } });
+
+  if (inLibrary) {
+    if (existing) {
+      await prisma.knowledgeItem.update({
+        where: { id: existing.id },
+        data: { body, pillar, approval: "approved", reviewedAt: new Date() },
+      });
+    } else {
+      await prisma.knowledgeItem.create({
+        data: {
+          orgId, kind: "faq", title, pillar, body,
+          tags: JSON.stringify(["reply", pillar.toLowerCase()]),
+          source: "UNC reply", author: "UNC", approval: "approved", reviewedAt: new Date(),
+          safetyClass: pillar === "Nutrition" ? "nutrition" : "general",
+        },
+      });
+    }
+  } else if (existing) {
+    // Pulled from the Library: archive the brain copy so the AI stops quoting it.
+    await prisma.knowledgeItem.update({ where: { id: existing.id }, data: { approval: "archived" } });
+  }
+
+  await prisma.communityQuestion.update({
+    where: { id: q.id },
+    data: { answerText: text, inLibrary },
+  });
+
+  await audit("question.answer_edited", {
+    entity: "CommunityQuestion", entityId: q.id,
+    detail: { inLibrary, brainItem: existing?.id ?? null },
+  });
+  revalidatePath("/member/library");
+  revalidatePath("/inbox");
+  revalidatePath("/community");
+  return { ok: true as const, inLibrary };
 }
 
 // ── Private reflections ─────────────────────────────────────────

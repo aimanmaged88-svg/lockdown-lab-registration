@@ -1,6 +1,7 @@
 import { prisma, getOrgId } from "@/lib/db";
 import { Badge, pillarTone } from "@/components/ui";
 import { QuickReply } from "@/components/community/quick-reply";
+import { EditAnswer } from "@/components/community/edit-answer";
 import { HuddleModeration } from "@/components/community/huddle-mod";
 import { huddleQueue } from "@/lib/huddle-actions";
 import { QUESTION_TREE } from "@/lib/member-shared";
@@ -92,6 +93,7 @@ export default async function InboxPage() {
               <div className="card p-3 max-w-[92%] ml-auto bg-ink-soft border-paper/20">
                 <p className="text-[11px] text-grey mb-0.5">You</p>
                 <p className="text-sm whitespace-pre-wrap">{q.answerText}</p>
+                <EditAnswer questionId={q.id} answer={q.answerText ?? ""} inLibrary={q.inLibrary} />
               </div>
             </div>
           ))}
