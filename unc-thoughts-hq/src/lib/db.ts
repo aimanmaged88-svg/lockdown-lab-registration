@@ -21,6 +21,12 @@ export async function getOrg() {
   return org;
 }
 
+// The org id is immutable for the life of the deployment, but almost every
+// page asks for it — memoize per serverless instance so it costs one DB
+// round trip per lambda lifetime instead of one per request.
+let orgIdCache: string | null = null;
 export async function getOrgId() {
-  return (await getOrg()).id;
+  if (orgIdCache) return orgIdCache;
+  orgIdCache = (await getOrg()).id;
+  return orgIdCache;
 }
