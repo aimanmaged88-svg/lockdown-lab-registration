@@ -4,12 +4,15 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/cn";
 import { Logo } from "./logo";
 import {
-  CalendarDays, Home, Film, Video, BarChart3, Users, Mic, FlaskConical,
-  BookOpen, ClipboardCheck, Settings, Menu, X, Brain, PenSquare, Inbox,
+  CalendarDays, Home, Users, Settings, Menu, X, Brain, PenSquare, Inbox,
   Lightbulb, Instagram, Wallet,
 } from "lucide-react";
 import { useState } from "react";
 
+// The desk, stripped to what actually gets used day to day. Content,
+// Recording Studio, Analytics, Talks, Growth Lab, Practice Library and
+// Weekly Review still exist at their own URLs — they're just off the menu.
+// Adding a line back here brings any of them home.
 const NAV = [
   { href: "/", label: "Today", icon: Home },
   { href: "/inbox", label: "Inbox", icon: Inbox },
@@ -18,15 +21,8 @@ const NAV = [
   { href: "/sessions", label: "Sessions & $", icon: Wallet },
   { href: "/compose", label: "Compose", icon: PenSquare },
   { href: "/calendar", label: "Calendar", icon: CalendarDays },
-  { href: "/content", label: "Content", icon: Film },
-  { href: "/studio", label: "Recording Studio", icon: Video },
-  { href: "/analytics", label: "Analytics", icon: BarChart3 },
   { href: "/community", label: "Community", icon: Users },
-  { href: "/talks", label: "Talks", icon: Mic },
-  { href: "/growth", label: "Growth Lab", icon: FlaskConical },
   { href: "/brain", label: "UNC's Brain", icon: Brain },
-  { href: "/practice", label: "Practice Library", icon: BookOpen },
-  { href: "/review", label: "Weekly Review", icon: ClipboardCheck },
   { href: "/settings", label: "Settings", icon: Settings },
 ];
 
