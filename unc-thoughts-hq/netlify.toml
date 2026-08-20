@@ -21,3 +21,10 @@
 # Scheduled functions (owner phone notifications) live alongside the Next app.
 [functions]
   directory = "netlify/functions"
+  # Run compute in Sydney, next to the Supabase database (ap-southeast-2).
+  # The default region is US East, which put a Pacific round trip on EVERY
+  # query — the main cause of 3-5s member pages. Region choice is included
+  # in the Pro plan. If this key is ever ignored, the same setting lives at
+  # Project configuration > Build & deploy > Continuous deployment >
+  # Functions region.
+  region = "syd"
