@@ -1,14 +1,15 @@
-import { myQuestions } from "@/lib/unk/question-actions";
 import { QuestionClient } from "@/components/member/question-client";
 import Link from "next/link";
 
-export const dynamic = "force-dynamic";
+// This is where the Instagram link lands people, so it does no database work
+// before painting: the ask form is fully static and the visitor's own
+// question history loads client-side once the form is already up.
+export const dynamic = "force-static";
 
 // Ask UNC himself — not the AI. Categorised so his inbox stays sane, anonymous
 // by default, optional ping when the answer lands.
 export default async function QuestionPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
   const { q } = await searchParams;
-  const mine = await myQuestions();
 
   return (
     <div className="space-y-5">
@@ -27,7 +28,7 @@ export default async function QuestionPage({ searchParams }: { searchParams: Pro
         </span>
       </Link>
 
-      <QuestionClient prefill={q?.slice(0, 500) ?? ""} mine={mine} />
+      <QuestionClient prefill={q?.slice(0, 500) ?? ""} />
 
       <p className="text-[11px] text-grey leading-relaxed">
         By sending a question you agree to the <Link href="/member/terms" className="underline">House Rules &amp; Terms</Link>.

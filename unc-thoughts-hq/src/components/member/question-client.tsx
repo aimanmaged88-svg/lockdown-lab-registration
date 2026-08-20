@@ -1,7 +1,7 @@
 "use client";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { sendQuestionToUnc, type SendQuestionResult } from "@/lib/unk/question-actions";
+import { sendQuestionToUnc, myQuestions, type SendQuestionResult } from "@/lib/unk/question-actions";
 import { QUESTION_TREE, WHO_OPTIONS } from "@/lib/member-shared";
 import { Check, Bell, Send, LifeBuoy } from "lucide-react";
 
@@ -48,8 +48,18 @@ async function getPushSub(): Promise<{ sub: PushSubscriptionJSON | null; note: s
   }
 }
 
-export function QuestionClient({ prefill, mine }: { prefill: string; mine: Mine[] }) {
+export function QuestionClient({ prefill }: { prefill: string }) {
   const router = useRouter();
+  // The ask form is the whole point of this page, so it ships as a static
+  // page and paints instantly. Your own question history is personal, can't
+  // be cached, and is worthless to a first-time visitor — so it loads after
+  // the form is already on screen.
+  const [mine, setMine] = useState<Mine[]>([]);
+  useEffect(() => {
+    let live = true;
+    myQuestions().then((rows) => { if (live) setMine(rows); }).catch(() => {});
+    return () => { live = false; };
+  }, []);
   const [pillar, setPillar] = useState<string | null>(null);
   const [subcat, setSubcat] = useState<string | null>(null);
   const [who, setWho] = useState<string | null>(null);
@@ -89,6 +99,7 @@ export function QuestionClient({ prefill, mine }: { prefill: string; mine: Mine[
         return;
       }
       setSent(true);
+      myQuestions().then(setMine).catch(() => {});
       router.refresh();
     });
   }
