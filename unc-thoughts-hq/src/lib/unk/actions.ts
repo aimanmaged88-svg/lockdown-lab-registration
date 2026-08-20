@@ -3,7 +3,7 @@
 import { prisma, getOrgId } from "../db";
 import { audit } from "../audit";
 import { revalidatePath } from "next/cache";
-import { requireMember, isYouthBand } from "../member";
+import { requireMember, getMemberId, isYouthBand } from "../member";
 import { approvedItems } from "./knowledge";
 import { compose, type UnkAnswer } from "./answer";
 import { parseClockTime, minutesUntil } from "./timeband";
@@ -80,6 +80,24 @@ export async function updateMemberContext(patch: { ageBand?: string | null; alle
     },
   });
   revalidatePath("/member");
+}
+
+// The member home is a static page, so the personal bits — your saved context
+// and the "check in on" count — are read here from the client after paint
+// instead of blocking the page on a database round trip.
+export async function memberSnapshot(): Promise<{ ageBand: string | null; allergies: string | null; due: number }> {
+  const id = await getMemberId();
+  if (!id) return { ageBand: null, allergies: null, due: 0 };
+  const member = await prisma.member.findUnique({ where: { id } });
+  if (!member) return { ageBand: null, allergies: null, due: 0 };
+  const due = await prisma.reflection.count({
+    where: {
+      memberId: member.id,
+      followUp: null,
+      OR: [{ reminderAt: { lte: new Date() } }, { actionChosen: { not: null }, createdAt: { lte: new Date(Date.now() - 864e5) } }],
+    },
+  });
+  return { ageBand: member.ageBand, allergies: member.allergies, due };
 }
 
 // ── Private reflections ─────────────────────────────────────────

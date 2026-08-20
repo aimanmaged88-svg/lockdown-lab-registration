@@ -1,29 +1,17 @@
 import Link from "next/link";
-import { getMember } from "@/lib/member";
-import { prisma } from "@/lib/db";
-import { ContextCard } from "@/components/member/context-card";
-import { MessageCircleQuestion, BookOpen, Lightbulb, Lock } from "lucide-react";
+import { HomePersonal } from "@/components/member/home-personal";
+import { MessageCircleQuestion, BookOpen, Lightbulb } from "lucide-react";
 
-export const dynamic = "force-dynamic";
+// Static: the home does no database work before painting. The personal tail
+// (your context + reflection count) loads client-side via HomePersonal.
+export const dynamic = "force-static";
 
 // The member home, stripped back to basics for the Skool era: ask the AI,
 // ask UNC himself, browse the Library, get today's thought, see your answers.
 // Community talk lives in the Skool community, not here. The old tools
 // (game-day, training, eat, recovery, consistency, huddle) keep their routes
 // but are no longer surfaced — one commit brings any of them back.
-export default async function MemberHome() {
-  const member = await getMember();
-  let due = 0;
-  if (member) {
-    due = await prisma.reflection.count({
-      where: {
-        memberId: member.id,
-        followUp: null,
-        OR: [{ reminderAt: { lte: new Date() } }, { actionChosen: { not: null }, createdAt: { lte: new Date(Date.now() - 864e5) } }],
-      },
-    });
-  }
-
+export default function MemberHome() {
   return (
     <div className="space-y-5">
       <div>
@@ -62,19 +50,7 @@ export default async function MemberHome() {
         </Link>
       </div>
 
-      {/* My answers */}
-      <Link href="/member/answers" className="card p-4 flex items-center justify-between hover:bg-ink-soft transition-colors">
-        <span className="flex items-center gap-3">
-          <Lock size={16} className="text-paper-dim" />
-          <span>
-            <span className="block font-medium text-sm">My answers</span>
-            <span className="block text-[11px] text-grey">Your private history</span>
-          </span>
-        </span>
-        {due > 0 && <span className="chip border-warn/50 text-warn">{due} to check in on</span>}
-      </Link>
-
-      <ContextCard ageBand={member?.ageBand ?? null} allergies={member?.allergies ?? null} />
+      <HomePersonal />
 
       <p className="text-[11px] text-grey flex items-start gap-1.5">
         <MessageCircleQuestion size={13} className="shrink-0 mt-0.5" />
