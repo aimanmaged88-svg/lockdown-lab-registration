@@ -299,6 +299,26 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   verified:true, normal handle → false, test rows deleted. OPEN QUESTION for
   Aiman: Green Square Courts has indoor=true in oc_courts (run sheet says
   "Indoor — rain can't touch this run") — he plays there; awaiting his call.
+- **Mobile number required at signup (edge v29, 2026-08-22, Aiman asked).**
+  Migration `opencourt_player_phone` (oc_players.phone + index). Edge:
+  `phoneClean()` canonicalises AU mobiles (+61/04/spaces → `04xxxxxxxx`,
+  returns "" for empty vs null for junk); **register requires one for NEW rows**
+  (`code:'needphone'`) but PRESERVES the number on file for re-registers /
+  self-heals so no legacy device is locked out (`keepPhone`); `badphone` on
+  junk; **login accepts the mobile as `who`** (phone lookup branch, 4-digit
+  player_num check still wins first); admin_players + admin_player_edit carry
+  it. **PRIVACY (deliberate):** phone is coach-only — NOT returned by me /
+  profile / any roster payload, because device ids ARE visible in rosters, so
+  leaking it there would expose minors' numbers. Explicitly regression-tested.
+  App: required `#pfPhone` field on the sign-up sheet + `auPhone()` mirror of
+  the server rule, stored in `oc_profile` so a phone-switch carries it,
+  self-heal passes it and turns a `needphone` reject into an add-your-number
+  prompt (not an error), login sheet copy now "@, mobile, email or player
+  number". Desk: tap-to-call `tel:` link on roster rows (`fmtPhone()`
+  0412 345 678) + `#pePh` in the player editor. Deployed via subagent (SHA
+  02fbe5cc… byte-identical, VAPID intact). Verified: live backend 11/11
+  (refusals, +61, login-by-mobile, self-heal keeps number, privacy ×2, desk
+  sees it), app 7/7, desk UI 6/6. All test rows + temp coach deleted.
 - **Phone-switch rescue + map follows the theme (2026-08-22).** His #1 worry:
   "what if they switch phones". Journey re-verified live E2E 7/7 (signup →
   login by @handle AND by player number → wrong code refused 401 → profile +
