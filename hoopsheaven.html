@@ -712,6 +712,55 @@ svg.leaflet-image-layer.leaflet-interactive path {
 [data-theme="concrete"] .hero h1{color:#F2F2EE;text-shadow:2px 2px 0 rgba(0,0,0,.35)}
 [data-theme="concrete"] .hero .scripty{background:none;-webkit-text-fill-color:#FFE01A;color:#FFE01A;transform:rotate(-3deg);text-shadow:2px 2px 0 rgba(0,0,0,.5);animation:none}
 [data-theme="concrete"] .ccard .ph{background:linear-gradient(135deg,#242424,#151515)}
+/* CLUB: clean premium daylight (design v2 default) */
+:root[data-theme="club"]{--bg:#F6F5F2;--card:#FFFFFF;--card2:#F0EEE8;--line:rgba(20,20,18,.10);--text:#141412;--muted:#6B6960;--dim:#A6A49B;}
+[data-theme="club"] body{background:#F6F5F2 fixed!important}
+[data-theme="club"] header{background:rgba(246,245,242,.94)!important;border-bottom:1px solid rgba(20,20,18,.08)!important}
+[data-theme="club"] .hero h1{color:#141412}
+[data-theme="club"] .hero .scripty{background:none;-webkit-text-fill-color:#0DBFA0;color:#0DBFA0;animation:none}
+[data-theme="club"] .ccard .ph{background:linear-gradient(135deg,#ECEAE4,#E0DED6)}
+[data-theme="club"] .tabbar{background:rgba(255,255,255,.97);border:1px solid rgba(20,20,18,.07);box-shadow:0 12px 34px rgba(20,20,18,.14)}
+[data-theme="club"] .panel{background:#F6F5F2}
+[data-theme="club"] .search,[data-theme="club"] .empty,[data-theme="club"] .runstrip,[data-theme="club"] .run,[data-theme="club"] .crow{background:#fff;box-shadow:0 1px 2px rgba(20,20,18,.04),0 8px 24px rgba(20,20,18,.05)}
+[data-theme="club"] .skel{background:rgba(20,20,18,.06)}
+[data-theme="club"] .foot{color:#A6A49B}
+/* ===== Tonight home (design v2: feed-first, all themes) ===== */
+.tn-eyebrow{font-family:var(--cond);font-size:12.5px;font-weight:600;letter-spacing:2.6px;text-transform:uppercase;color:var(--dim);margin-top:18px}
+.tn-h1{font-weight:800;font-size:40px;letter-spacing:-.03em;line-height:1;margin:2px 0 4px;color:var(--text)}
+.tn-h1 i{font-style:normal;color:var(--volt)}
+.stories{display:flex;gap:15px;overflow-x:auto;scrollbar-width:none;margin:14px -18px 4px;padding:4px 18px 6px}
+.stories::-webkit-scrollbar{display:none}
+.story{display:flex;flex-direction:column;align-items:center;gap:6px;flex:0 0 auto;position:relative;cursor:pointer;background:none;border:none;color:var(--text);padding:0}
+.sring{display:block;width:60px;height:60px;border-radius:50%;padding:3px;background:var(--line)}
+.story.hot .sring{background:var(--volt)}
+.sin{display:flex;width:54px;height:54px;border-radius:50%;background:var(--card);align-items:center;justify-content:center;font-size:22px;border:3px solid var(--bg);background-size:cover;background-position:center;box-sizing:border-box}
+.sname{font-size:10.5px;font-weight:700;color:var(--muted);max-width:70px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.slive{position:absolute;top:44px;left:50%;transform:translateX(-50%);background:var(--danger);color:#fff;font-size:8.5px;font-weight:900;letter-spacing:.1em;padding:2px 7px;border-radius:7px;border:2px solid var(--bg)}
+.nowhero{background:#141412;color:#fff;border-radius:24px;padding:20px;margin-top:14px;position:relative;overflow:hidden;cursor:pointer}
+.nowhero:after{content:"🏀";position:absolute;right:-16px;bottom:-20px;font-size:104px;opacity:.13;transform:rotate(-12deg)}
+[data-theme="retro"] .nowhero{background:#160D36}
+[data-theme="concrete"] .nowhero{background:#0D0D0D}
+.nh-live{display:inline-flex;align-items:center;gap:7px;font-family:var(--cond);font-size:12.5px;font-weight:600;letter-spacing:2.2px;color:#FF8A8A}
+.nh-live b{width:7px;height:7px;border-radius:50%;background:var(--danger);box-shadow:0 0 12px var(--danger)}
+.nh-when{display:inline-flex;font-family:var(--cond);font-size:12.5px;font-weight:600;letter-spacing:2.2px;color:var(--volt);text-transform:uppercase}
+[data-theme="club"] .nowhero .nh-when{color:#2DE0C0}
+.nh-name{font-family:var(--disp);font-weight:700;font-size:23px;margin-top:7px}
+.nh-meta{font-size:13px;color:rgba(255,255,255,.65);margin-top:5px}
+.nh-row{display:flex;align-items:center;justify-content:space-between;margin-top:16px;min-height:31px}
+.nh-btn{height:42px;padding:0 20px;border-radius:14px;background:var(--volt);color:var(--onaccent);font-weight:800;font-size:14px;display:flex;align-items:center;border:none;cursor:pointer}
+.avs2{display:flex}
+.avs2 .a2{width:31px;height:31px;border-radius:50%;border:2.5px solid #141412;margin-left:-9px;background:#3A3A36;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:800;color:#fff}
+.avs2 .a2:first-child{margin-left:0}
+.runcard{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;margin-bottom:11px;position:relative;cursor:pointer}
+[data-theme="club"] .runcard{border-color:transparent;box-shadow:0 1px 2px rgba(20,20,18,.05),0 10px 30px rgba(20,20,18,.06)}
+.rc-when{font-family:var(--cond);font-size:12px;font-weight:600;letter-spacing:2px;color:var(--volt);text-transform:uppercase}
+.rc-name{font-weight:800;font-size:17px;letter-spacing:-.01em;margin-top:5px;color:var(--text)}
+.rc-meta{font-size:12.5px;color:var(--muted);margin-top:3px}
+.rc-row{display:flex;align-items:center;justify-content:space-between;margin-top:12px}
+.runcard .a2{border-color:var(--card);background:var(--card2);color:var(--text)}
+.rc-go{height:38px;padding:0 17px;border-radius:12px;background:var(--text);color:var(--bg);font-weight:700;font-size:13px;display:flex;align-items:center;border:none;cursor:pointer}
+.rc-spots{position:absolute;top:14px;right:14px;font-size:10.5px;font-weight:800;color:#B07A00;background:rgba(255,176,32,.16);padding:5px 10px;border-radius:99px}
+#fabCall{position:fixed;right:18px;bottom:96px;width:56px;height:56px;border-radius:19px;background:var(--text);color:var(--bg);font-size:26px;font-weight:700;border:none;box-shadow:0 12px 30px rgba(0,0,0,.28);z-index:40;cursor:pointer}
 /* vibe picker cards */
 .vibegrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
 .vibe{position:relative;border:1.5px solid var(--line);border-radius:16px;padding:14px 12px;cursor:pointer;overflow:hidden;text-align:left;background:var(--card2);transition:transform .18s var(--spring),border-color .18s}
@@ -1350,36 +1399,31 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
 
   <!-- ============ HOME ============ -->
   <section id="vHome">
-    <div class="hero">
-      <h1>Sydney's<br>playing.<br><span class="scripty">You in?</span></h1>
-      <p>See who's hooping near you and pull up.</p>
-      <div class="herostat" id="heroStat"></div>
-    </div>
+    <div class="tn-eyebrow" id="tnDay">SYDNEY</div>
+    <h1 class="tn-h1">Tonight<i>.</i></h1>
     <div class="search"><span class="ic">🔍</span><input id="hq" placeholder="Search courts or suburbs" autocomplete="off"></div>
-    <div class="pills-h">
-      <button class="fpill" id="fOutdoor">☀️ Outdoor</button>
-      <button class="fpill ok on">🆓 Free</button>
-      <button class="fpill" id="fNow">🟢 Now</button>
-      <button class="fpill" id="fMore">⋯ Map</button>
-    </div>
     <div class="hres" id="hres"></div>
+    <div class="stories" id="storyRow"></div>
+    <div id="nowHero"></div>
     <div class="sect">
-      <div class="seclbl"><h2>Nearby courts</h2><button id="nearBtn2">📍 Near me</button></div>
-      <div class="cscroll" id="nearby"><div class="skel" style="flex:none;width:172px;height:160px"></div><div class="skel" style="flex:none;width:172px;height:160px"></div></div>
-    </div>
-    <div class="sect">
-      <div class="seclbl"><h2>Runs <em style="color:var(--volt);font-style:normal">tonight</em></h2><button id="seeRuns">SEE ALL</button></div>
-      <div id="popruns"></div>
+      <div class="seclbl"><h2>Coming <em style="color:var(--volt);font-style:normal">up</em></h2><button id="seeRuns">SEE ALL</button></div>
+      <div id="runFeed"><div class="skel"></div></div>
     </div>
     <div class="sect" id="kingsSect" style="display:none">
       <div class="seclbl"><h2>🏆 City <em style="color:var(--volt);font-style:normal">Kings</em></h2><button id="seeKings">SEE ALL</button></div>
       <div id="homeKings"></div>
+    </div>
+    <div class="sect">
+      <div class="seclbl"><h2>Courts near you</h2><button id="nearBtn2">📍 Near me</button></div>
+      <div class="cscroll" id="nearby"><div class="skel" style="flex:none;width:172px;height:160px"></div><div class="skel" style="flex:none;width:172px;height:160px"></div></div>
     </div>
     <div class="foot">
       <b>CERTIFIED HOOPER</b> · built in Sydney · court data © OpenStreetMap contributors<br>
       Runs are player-called, never guaranteed. Pull up, play hard, look after each other.<br>
       <button class="linky" id="rulesLink" style="margin-top:6px">House rules</button>
     </div>
+    <div style="display:none" aria-hidden="true"><span id="heroStat"></span><button id="fOutdoor"></button><button id="fNow"></button><button id="fMore"></button><div id="popruns"></div></div>
+    <button id="fabCall" aria-label="Call a run">＋</button>
   </section>
 
   <!-- ============ MAP ============ -->
@@ -1434,11 +1478,11 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
 
 <!-- ============ tab bar ============ -->
 <nav class="tabbar">
-  <button class="tab on" data-v="Home"><span class="i">🏀</span>Home</button>
-  <button class="tab" data-v="Map"><span class="i">📍</span>Map</button>
-  <button class="tab" data-v="Runs"><span class="i">⚡</span>Runs</button>
+  <button class="tab on" data-v="Home"><span class="i">⚡</span>Tonight</button>
+  <button class="tab" data-v="Map"><span class="i">📍</span>Courts</button>
+  <button class="tab" data-v="Runs"><span class="i">🏀</span>Runs</button>
   <button class="tab" data-v="Saved"><span class="i">🔖</span>Saved</button>
-  <button class="tab" data-v="Profile"><span class="i">👤</span>Profile</button>
+  <button class="tab" data-v="Profile"><span class="i">👤</span>You</button>
 </nav>
 
 <!-- house rules -->
@@ -2092,7 +2136,7 @@ let RUNS=[];
 async function loadBoard(){
   try{
     const d=await api({action:'board'});
-    RUNS=d.runs||[]; renderBoard(); paintPopRuns();
+    RUNS=d.runs||[]; renderBoard(); paintPopRuns(); paintTonight();
   }catch(e){ $('#board').innerHTML=`<div class="empty"><b>Can't reach the court</b>${esc(e.message)} — pull to retry.</div>`; }
 }
 function renderBoard(){
@@ -2152,6 +2196,96 @@ function paintPopRuns(){
   </div>`;
   $('#popstrip').onclick=()=>view('Runs');
 }
+
+/* ---------- Tonight home (design v2 feed) ---------- */
+function tnDayLbl(){
+  const d=new Date(new Date().toLocaleString('en-US',{timeZone:'Australia/Sydney'}));
+  const days=['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
+  const mo=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  return days[d.getDay()]+' · '+d.getDate()+' '+mo[d.getMonth()]+' · SYDNEY';
+}
+function storyName(n){
+  let s=(n||'').split(/ [—–-] /)[0].replace(/ (Park )?Courts?$/i,'').replace(/ Oval$/i,'');
+  const w=s.split(' ');
+  return w.length>2?w.slice(0,2).join(' '):s;
+}
+function avStack(names){
+  const list=(names||[]).slice(0,4);
+  let h=list.map(n=>`<span class="a2">${esc((n[0]||'?').toUpperCase())}</span>`).join('');
+  const more=(names||[]).length-list.length;
+  if(more>0)h+=`<span class="a2">+${more}</span>`;
+  return `<div class="avs2">${h}</div>`;
+}
+function paintTonight(){
+  const dl=$('#tnDay');if(dl)dl.textContent=tnDayLbl();
+  // court stories — live/active courts ringed, LIVE badge when people are there
+  const sr=$('#storyRow');
+  if(sr&&COURTS){
+    const list=[...COURTS].sort((a,b)=>courtScore(b)-courtScore(a)).slice(0,10);
+    sr.innerHTML=list.map(c=>{
+      const live=hereN(c)>0,ring=live||((ACT.runs[c.key]||0)>0);
+      return `<button class="story ${ring?'hot':''}" data-k="${esc(c.key)}">
+        <span class="sring"><span class="sin" style="${c.photo?`background-image:url('${esc(c.photo)}')`:''}">${c.photo?'':(c.indoor?'🏟️':'🏀')}</span></span>
+        ${live?'<span class="slive">LIVE</span>':''}
+        <span class="sname">${esc(storyName(c.name))}</span>
+      </button>`;
+    }).join('');
+    sr.querySelectorAll('.story').forEach(x=>x.onclick=()=>{const c=COURTS.find(y=>y.key===x.dataset.k);if(c)openCourtPage(c)});
+  }
+  // hero: live court beats next run beats call-to-action
+  const nh=$('#nowHero');
+  if(nh){
+    const liveC=COURTS?[...COURTS].filter(c=>hereN(c)>0).sort((a,b)=>hereN(b)-hereN(a))[0]:null;
+    const today=(RUNS||[]).filter(r=>runYmd(r)===ymdSyd(0));
+    const next=today[0]||(RUNS||[])[0]||null;
+    if(liveC){
+      const n=hereN(liveC);
+      nh.innerHTML=`<div class="nowhero">
+        <span class="nh-live"><b></b>HAPPENING NOW</span>
+        <div class="nh-name">${esc(liveC.name)}</div>
+        <div class="nh-meta">${n} tapped in right now${liveC.lit?' · lights':''} · free</div>
+        <div class="nh-row"><span></span><button class="nh-btn">Pull up</button></div>
+      </div>`;
+      nh.firstElementChild.onclick=()=>openCourtPage(liveC);
+    }else if(next){
+      nh.innerHTML=`<div class="nowhero">
+        <span class="nh-when">NEXT RUN · ${esc(dayLabel(runYmd(next)).toUpperCase())} · ${esc(runTime(next))}</span>
+        <div class="nh-name">${esc(next.court_name)}</div>
+        <div class="nh-meta">${esc(next.format)} · ${(next.players||[]).length}/${next.cap} in · by ${esc(next.host_name)}</div>
+        <div class="nh-row">${avStack((next.players||[]).map(p=>p.name))}<button class="nh-btn">Tap in</button></div>
+      </div>`;
+      nh.firstElementChild.onclick=()=>openRun(next.id);
+    }else{
+      nh.innerHTML=`<div class="nowhero">
+        <span class="nh-when">SYDNEY'S QUIET</span>
+        <div class="nh-name">Nothing on yet.</div>
+        <div class="nh-meta">Be the one who calls it — the whole city sees it.</div>
+        <div class="nh-row"><span></span><button class="nh-btn">⚡ Call a run</button></div>
+      </div>`;
+      nh.firstElementChild.onclick=()=>startCall();
+    }
+  }
+  // coming up feed
+  const rf=$('#runFeed');
+  if(rf){
+    const liveC=COURTS?COURTS.some(c=>hereN(c)>0):false;
+    const heroRun=(!liveC&&(RUNS||[]).length)?((RUNS.filter(r=>runYmd(r)===ymdSyd(0))[0]||RUNS[0])):null;
+    const rest=(RUNS||[]).filter(r=>!heroRun||r.id!==heroRun.id).slice(0,6);
+    rf.innerHTML=rest.map(r=>{
+      const n=(r.players||[]).length,left=r.cap-n;
+      return `<div class="runcard" data-run="${esc(r.id)}">
+        ${left>0&&left<=2?`<span class="rc-spots">${left} spot${left===1?'':'s'} left</span>`:''}
+        <div class="rc-when">${esc(dayLabel(runYmd(r)).toUpperCase())} · ${esc(runTime(r))}</div>
+        <div class="rc-name">${esc(r.court_name)}</div>
+        <div class="rc-meta">${esc(r.format)} · by ${esc(r.host_name)}${r.suburb?' · '+esc(r.suburb):''}</div>
+        <div class="rc-row">${avStack((r.players||[]).map(p=>p.name))}<button class="rc-go">${n>=r.cap?'View':'Tap in'}</button></div>
+      </div>`;
+    }).join('')||`<div class="runcard" id="rfEmpty"><div class="rc-when">THE BOARD IS OPEN</div><div class="rc-name">Call the first run</div><div class="rc-meta">Pick a court, set a time — everyone sees it.</div></div>`;
+    rf.querySelectorAll('[data-run]').forEach(x=>x.onclick=()=>openRun(x.dataset.run));
+    const e=$('#rfEmpty');if(e)e.onclick=()=>startCall();
+  }
+}
+$('#fabCall').onclick=()=>startCall();
 
 /* ---------- run sheet ---------- */
 let CUR=null;
@@ -2439,6 +2573,7 @@ function paintNearby(){
   $('#nearby').querySelectorAll('.ccard').forEach(x=>x.onclick=()=>{
     const c=COURTS.find(y=>y.key===x.dataset.k); if(c)openCourtPage(c);
   });
+  paintTonight();
 }
 function paintHomeSearch(){
   const q=$('#hq').value.trim().toLowerCase(),el=$('#hres');
@@ -3120,12 +3255,15 @@ $('#swCustom').oninput=e=>applyAccent(e.target.value);
 
 /* ---------- vibes: user-selectable full themes ---------- */
 const VIBES={
+  club:{label:'Club',desc:'Clean & premium — daylight',accent:'#0DBFA0',on:'#FFFFFF',tag:'CLUB'},
   retro:{label:'Retro',desc:'90s purple + neon',accent:'#2DE0C0',on:'#0B0B20',tag:'RETRO'},
   concrete:{label:'Concrete',desc:'Street grit + spray',accent:'#FFE01A',on:'#161616',tag:'STREET'}
 };
-const curTheme=()=>VIBES[localStorage.getItem('oc_theme')]?localStorage.getItem('oc_theme'):'retro';
+const curTheme=()=>VIBES[localStorage.getItem('oc_theme')]?localStorage.getItem('oc_theme'):'club';
+// one-time migration to design v2: everyone lands on Club once, can switch back in 🎨
+if(!localStorage.getItem('oc_theme_v2')){localStorage.setItem('oc_theme','club');localStorage.removeItem('oc_accent');localStorage.setItem('oc_theme_v2','1');}
 function applyTheme(name,save=true){
-  if(!VIBES[name])name='retro';
+  if(!VIBES[name])name='club';
   const v=VIBES[name];
   document.documentElement.setAttribute('data-theme',name);
   document.documentElement.style.setProperty('--volt',v.accent);
