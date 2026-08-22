@@ -260,6 +260,10 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
     <button class="bigbtn ghost" id="importBtn">📲 Import from WhatsApp</button>
     <button class="bigbtn" id="genBtn">⚡ Generate the night</button>
     <button class="bigbtn ghost" id="resetBtn">🧹 Reset the night</button>
+    <div class="lbl" style="margin-top:22px">🏆 Season ladder (4-week chase)</div>
+    <p class="hintline">The running month totals — shown under the court ladders. Update after each night.</p>
+    <div id="seasonForm"></div>
+    <button class="bigbtn ghost" id="seasonSave">Save season ladder</button>
     <div class="lbl" style="margin-top:22px">📝 Night notes</div>
     <p class="hintline">These show inside the recap. All three editable any time.</p>
     <div class="arow2" style="margin:8px 0"><input id="nnNotice" type="text" placeholder="Announcement — e.g. Week 4 draw drops Wednesday 26/8" maxlength="90"/></div>
@@ -491,19 +495,28 @@ function tableHTML(title,rows,anyFinal){
     ${rows.map((r,i)=>`<tr class="${i===0&&anyFinal&&r.p>0?'top':''}"><td class="tn">${logoNm(r.t)}</td><td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td><td>${r.diff>0?'+':''}${r.diff}</td><td class="pts">${r.pts}</td></tr>`).join('')}
     </tbody></table></div>`;
 }
+function seasonHTML(){
+  const rows=(state.settings.season&&state.settings.season.rows)||[];
+  if(!rows.length)return'';
+  const sorted=[...rows].sort((a,b)=>b.pts-a.pts||String(a.name).localeCompare(String(b.name)));
+  return `<div class="stwrap" style="border-color:var(--acc2)"><div class="sthead" style="background:var(--acc2)">🏆 The Ladder — 4-week chase</div>
+    <table><thead><tr><th style="width:34px">#</th><th class="tn">Team</th><th style="width:64px">PTS</th></tr></thead><tbody>
+    ${sorted.map((r,i)=>`<tr class="${i===0?'top':''}"><td>${i+1}</td><td class="tn">${esc(r.name)}</td><td class="pts">${r.pts}</td></tr>`).join('')}
+    </tbody></table></div><p class="hintline" style="text-align:center;margin-top:-6px">Winning squad after 4 weeks takes the $500 💰</p>`;
+}
 function renderStandings(){
   const wg=weekGames();
   const tm=teamMap();
   const anyFinal=wg.some(g=>g.status==='final');
-  if(!wg.length){$('#standings').innerHTML='<div class="empty">Standings appear once the night is generated.</div>';return;}
+  if(!wg.length){$('#standings').innerHTML='<div class="empty">Standings appear once the night is generated.</div>'+seasonHTML();return;}
   const playing=[...new Set(wg.flatMap(g=>[g.team1_id,g.team2_id]))].map(id=>tm.get(id)).filter(Boolean);
   if(isCross()){
-    $('#standings').innerHTML=tableHTML(`The Ladder`,computeTable(playing,wg),anyFinal);
+    $('#standings').innerHTML=tableHTML(`Tonight`,computeTable(playing,wg),anyFinal)+seasonHTML();
   }else{
-    $('#standings').innerHTML=[1,2].map(cg=>{
+    $('#standings').innerHTML=([1,2].map(cg=>{
       const rows=computeTable(playing.filter(t=>t.court_group===cg),wg);
       return rows.length?tableHTML(`Court ${cg} ladder`,rows,anyFinal):'';
-    }).join('')||'<div class="empty">Standings appear once scores go in.</div>';
+    }).join('')||'<div class="empty">Standings appear once scores go in.</div>')+seasonHTML();
   }
 }
 function renderTeams(){
@@ -904,9 +917,17 @@ function renderIntro(){
   el.classList.add('open');window.scrollTo(0,0);
 }
 function closeIntro(){try{localStorage.setItem('lotg_intro_ts',String(Date.now()))}catch(e){}$('#intro').classList.remove('open');}
+function renderSeasonForm(){
+  if(!state.admin||!$('#seasonForm'))return;
+  const cur=new Map(((state.settings.season&&state.settings.season.rows)||[]).map(r=>[String(r.name).toLowerCase(),r.pts]));
+  $('#seasonForm').innerHTML=state.teams.map(t=>`<div class="arow2" style="margin:7px 0;align-items:center">
+    <span style="flex:1;font-weight:700">${esc(t.name)}</span>
+    <input data-season="${esc(t.name)}" type="text" inputmode="numeric" value="${cur.get(t.name.toLowerCase())??''}" placeholder="pts" style="flex:0 0 84px;text-align:center"/></div>`).join('');
+}
 function renderRecapAdmin(){
   if(!state.admin)return;
   $('#recapThumbs').innerHTML=RECAP.map(r=>r.kind==='video'?`<span style="width:52px;height:52px;display:grid;place-items:center;border:1px solid var(--line);border-radius:8px;font-size:20px">🎬</span>`:`<img src="${r.img}" alt=""/>`).join('')||'<p class="hintline">No recap loaded yet.</p>';
+  renderSeasonForm();
   if($('#nnNotice')&&document.activeElement?.id!=='nnNotice')$('#nnNotice').value=state.settings.notice||'';
   if($('#nnReel')&&document.activeElement?.id!=='nnReel')$('#nnReel').value=state.settings.reelUrl||'';
   if($('#nnMotd')&&document.activeElement?.id!=='nnMotd')$('#nnMotd').value=state.settings.motd||MOTD_DEFAULT;
@@ -973,6 +994,21 @@ $('#recapClear').onclick=async()=>{
     await rest('lotg_recap?id=not.is.null',{method:'DELETE'},true);
     await mediaApi({action:'clear'}).catch(()=>{});
     await loadRecap();toast('Recap cleared');
+  }catch(e){toast(e.message);}
+};
+$('#seasonSave').onclick=async()=>{
+  const rows=[];let bad=false;
+  document.querySelectorAll('[data-season]').forEach(i=>{
+    const v=i.value.trim();if(v==='')return;
+    const n=+v;if(!Number.isInteger(n)||n<0){bad=true;return;}
+    rows.push({name:i.dataset.season,pts:n});
+  });
+  if(bad){toast('Whole numbers only');return;}
+  const st={...state.settings};
+  rows.length?st.season={rows}:delete st.season;
+  try{
+    await rest('lotg_admin?id=eq.1',{method:'PATCH',body:JSON.stringify({settings:st})},true);
+    state.settings=st;renderStandings();toast('Season ladder saved 🏆');
   }catch(e){toast(e.message);}
 };
 $('#nnSave').onclick=async()=>{
