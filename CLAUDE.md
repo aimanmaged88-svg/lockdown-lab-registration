@@ -299,6 +299,20 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   verified:true, normal handle → false, test rows deleted. OPEN QUESTION for
   Aiman: Green Square Courts has indoor=true in oc_courts (run sheet says
   "Indoor — rain can't touch this run") — he plays there; awaiting his call.
+- **Phone-switch rescue + map follows the theme (2026-08-22).** His #1 worry:
+  "what if they switch phones". Journey re-verified live E2E 7/7 (signup →
+  login by @handle AND by player number → wrong code refused 401 → profile +
+  number intact). GAP FOUND + FIXED: the desk only rendered `verify_code` for
+  UNVERIFIED players, so a verified hooper who lost their code couldn't be
+  rescued — now every non-banned row shows the code, **tap-to-copy**
+  (`[data-copy]` handler + toast), plus a roster hint line. Desk UI 5/5
+  (scratchpad/desk-rescue.mjs, switch-e2e.mjs). Also: Leaflet tiles now follow
+  the theme (`tileStyle()` → CARTO light_all in club, dark_all otherwise;
+  `TILEL.setUrl` on theme switch) — the map was still dark inside the new light
+  design. Stayed on Leaflet/OSM deliberately (Google Maps = API key + billing;
+  we already use Google for the Directions button + paste-a-Maps-link).
+  Test rows + temp coach deleted. NOTE: his own account self-healed back as
+  @lockdownlab33 #5308, auto verified+coach via OWNER_IGS.
 - **DESIGN V2 — Tonight-first home + Club theme (2026-08-22, Aiman picked
   mocks 2+3).** Process: 4 design-direction mocks (scratchpad dz1-map/dz2-feed/
   dz3-clean/dz4-media) → he picked 2+3 → merged mock dz5-mix approved by
