@@ -299,6 +299,24 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   verified:true, normal handle → false, test rows deleted. OPEN QUESTION for
   Aiman: Green Square Courts has indoor=true in oc_courts (run sheet says
   "Indoor — rain can't touch this run") — he plays there; awaiting his call.
+- **DESIGN V2 — Tonight-first home + Club theme (2026-08-22, Aiman picked
+  mocks 2+3).** Process: 4 design-direction mocks (scratchpad dz1-map/dz2-feed/
+  dz3-clean/dz4-media) → he picked 2+3 → merged mock dz5-mix approved by
+  choice. Shipped: #vHome rebuilt as a FEED — `#tnDay` eyebrow + "Tonight."
+  h1, `#storyRow` court stories (photo circles, volt ring when active, LIVE
+  badge from ACT.here), `#nowHero` hero card (live court → HAPPENING NOW;
+  else next run; else call-CTA), `#runFeed` coming-up cards (avStack initials,
+  rc-spots "N left", tap-in → openRun), `#fabCall` floating ＋ → startCall().
+  paintTonight() called from loadBoard + paintNearby; legacy home ids kept as
+  hidden stubs (heroStat/fOutdoor/fNow/fMore/popruns) so old handlers stand.
+  NEW DEFAULT THEME **club** (light premium: bg #F6F5F2, white cards, teal
+  #0DBFA0 accent) in VIBES + `:root[data-theme="club"]` var flip + overrides;
+  one-time `oc_theme_v2` migration moves EVERY device to club once (Retro/
+  Concrete remain in 🎨 picker; nowhero stays dark in all themes). Tabs
+  relabeled ⚡Tonight/📍Courts/🏀Runs/🔖Saved/👤You (data-v unchanged). Tested
+  3 home states 10/10 + tab/court/profile club screenshots (scratchpad
+  tonight-test.mjs, club-tabs.mjs). Live on main. Backlog: NBA card could get
+  a dark-card override in club; desk still volt-dark (untouched).
 - **Fresh slate #3 + body font → Inter (2026-08-18, Aiman asked).** ALL player
   data wiped again (7 accounts incl. Musa/Hasan/his own + inbox/login_guard;
   13 courts kept) — he's re-testing sign-ups himself in two browsers. NOTE:
