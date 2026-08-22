@@ -2604,14 +2604,15 @@ function askGeo(cb){
 $('#nearBtn2').onclick=()=>askGeo(()=>{paintNearby();paintHomeSearch();toast('Sorted by distance 📍')});
 
 /* ---------- map ---------- */
-let MAP=null,MAPC=null;
+let MAP=null,MAPC=null,TILEL=null;
+const tileStyle=()=>document.documentElement.getAttribute('data-theme')==='club'?'light_all':'dark_all';
 function initMap(){
   if(MAP){setTimeout(()=>MAP.invalidateSize(),60);return}
   if(typeof L==='undefined'){toast('Map failed to load',1);return}
   loadCourts().then(cs=>{
     const mc=$('#mapCount');if(mc)mc.textContent=cs.length?cs.length+' court'+(cs.length===1?'':'s'):'coming soon';
     MAP=L.map('map',{renderer:L.canvas(),zoomControl:true,attributionControl:true}).setView([-33.87,151.06],11);
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
+    TILEL=L.tileLayer('https://{s}.basemaps.cartocdn.com/'+tileStyle()+'/{z}/{x}/{y}{r}.png',{
       attribution:'© <a href="https://www.openstreetmap.org/copyright">OSM</a> © <a href="https://carto.com/attributions">CARTO</a>',
       subdomains:'abcd',maxZoom:19
     }).addTo(MAP);
@@ -3271,6 +3272,7 @@ function applyTheme(name,save=true){
   if(save){localStorage.setItem('oc_theme',name);localStorage.removeItem('oc_accent');}
   const m=document.querySelector('meta[name=theme-color]');
   if(m)m.setAttribute('content',getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#161616');
+  if(TILEL)TILEL.setUrl('https://{s}.basemaps.cartocdn.com/'+tileStyle()+'/{z}/{x}/{y}{r}.png');
   if($('#vibeGrid'))renderVibe();
   if($('#swGrid'))paintSw(v.accent);
 }
