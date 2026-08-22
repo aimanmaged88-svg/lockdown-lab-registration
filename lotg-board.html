@@ -172,6 +172,17 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
 .modes .pill{flex:1;text-align:center;padding:11px}
 .modes .pill.on{background:var(--acc);border-color:var(--acc);color:var(--onacc)}
 
+.mtcard{border:var(--bw) solid var(--line);border-radius:var(--r);background:var(--card);box-shadow:4px 4px 0 var(--shadow);padding:14px 15px;margin:2px 0 16px}
+.mtcard .mth{font-family:var(--disp);font-weight:700;font-size:15px;margin-bottom:4px}
+[data-theme="retro"] .mtcard .mth{font-family:var(--street);font-weight:400}
+.mtcard .mts{font-size:12.5px;color:var(--muted);line-height:1.45;margin-bottom:11px}
+.teamchips{display:flex;flex-wrap:wrap;gap:8px}
+.tchip{appearance:none;cursor:pointer;display:flex;align-items:center;gap:7px;border:var(--bw) solid var(--line);background:var(--card2);color:var(--ink);border-radius:999px;padding:8px 13px;font-family:inherit;font-weight:700;font-size:13.5px;transition:.15s var(--ease)}
+.tchip:active{transform:scale(.95)}
+.tchip img{width:20px;height:20px;border-radius:6px;object-fit:cover}
+.mton{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.mton .who{font-weight:700;font-size:15px}
+.mton .who small{display:block;font-weight:600;font-size:11.5px;color:var(--muted)}
 .foot{text-align:center;color:var(--dim);font-size:11.5px;margin:28px 0 4px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
 .foot a{color:var(--muted)}
 .toast{position:fixed;left:50%;bottom:24px;z-index:40;transform:translate(-50%,26px);pointer-events:none;background:var(--card);border:var(--bw) solid var(--line2);color:var(--ink);padding:12px 17px;border-radius:13px;font-size:13.5px;font-weight:700;box-shadow:0 16px 40px -12px rgba(0,0,0,.6);opacity:0;transition:.3s var(--spring);max-width:88vw;text-align:center}
@@ -238,6 +249,7 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
   </section>
 
   <section class="pane" id="pane-stand">
+    <div id="myteam"></div>
     <div id="standings"></div>
   </section>
 
@@ -351,6 +363,14 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
   <div class="rc-dots" id="rcDots"></div>
   <span class="rc-tap">Tap the photo for the next one</span>
 </div>
+<div class="sheet" id="shA2HS" role="dialog" aria-modal="true">
+  <div class="grip"></div>
+  <h3>One step first 📲</h3>
+  <p class="note">iPhones only ping apps on the Home Screen. Takes 10 seconds:</p>
+  <p class="note" style="color:var(--ink);font-size:14px;line-height:1.9">1. Tap the <b>Share</b> button (square with ↑)<br/>2. Tap <b>Add to Home Screen</b> → <b>Add</b><br/>3. Open <b>LOTG</b> from your Home Screen and pick your team there 🏀</p>
+  <button class="bigbtn" id="a2hsOk">Got it</button>
+</div>
+
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
@@ -412,7 +432,7 @@ function isCross(){
   const tm=teamMap();
   return weekGames().some(g=>{const a=tm.get(g.team1_id),b=tm.get(g.team2_id);return a&&b&&a.court_group!==b.court_group;});
 }
-function renderAll(){renderSchedule();renderStandings();renderTeams();renderChrome();}
+function renderAll(){renderSchedule();renderStandings();renderTeams();renderMyTeam();renderChrome();}
 function renderChrome(){
   $('#lockBtn').classList.toggle('on',state.admin);
   $('#lockBtn').textContent=state.admin?'🔓':'🔒';
@@ -529,7 +549,10 @@ async function saveScore(id,el){
   const g=state.games.find(x=>x.id===id);const prev={...g};
   Object.assign(g,{score1:a,score2:b,status:'final'});state.editing=null;
   renderSchedule();renderStandings();
-  try{await rest(`lotg_games?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({score1:a,score2:b,status:'final'})},true);toast('Score saved ✓');}
+  try{
+    await rest(`lotg_games?id=eq.${id}`,{method:'PATCH',body:JSON.stringify({score1:a,score2:b,status:'final'})},true);toast('Score saved ✓');
+    if(prev.status!=='final')pushApi({action:'game_final',pass:state.pass,game_id:id}).catch(()=>{});
+  }
   catch(e){Object.assign(g,prev);renderSchedule();renderStandings();toast(e.message);}
 }
 async function resetGame(id){
@@ -664,6 +687,7 @@ async function generateNight(){
     await rest('lotg_admin?id=eq.1',{method:'PATCH',body:JSON.stringify({settings:{...state.settings,start:fmtTime(start)}})},true);
     closeSheets();await loadAll();pick('sched');
     toast('Tonight\'s schedule is live 🏀');
+    pushApi({action:'announce',pass:state.pass,title:'📣 The draw is UP',body:'Tonight\'s games are live — open the app to see when you play.'}).catch(()=>{});
   }catch(e){$('#genErr').textContent=e.message;}
   finally{$('#genGo').disabled=false;$('#genGo').textContent='Build the schedule';}
 }
@@ -940,6 +964,7 @@ $('#recapFiles').addEventListener('change',async()=>{
     await rest('lotg_recap',{method:'POST',body:JSON.stringify(rows)},true);
     await loadRecap();upStat('');
     toast(`Recap loaded — ${rows.length} item${rows.length===1?'':'s'} 📰`);
+    pushApi({action:'announce',pass:state.pass,title:'📰 The recap just dropped',body:'Last night\'s photos and plays are in the app — tap in.'}).catch(()=>{});
   }catch(e){upStat('');toast(e.message);}
 });
 $('#recapClear').onclick=async()=>{
@@ -962,6 +987,47 @@ $('#nnSave').onclick=async()=>{
     state.settings=st;toast('Night notes saved 📝');
   }catch(e){toast(e.message);}
 };
+
+/* ---------- team pings ---------- */
+const PUSH_FN='https://ymuwuhvqqftgpxwhzoub.supabase.co/functions/v1/lotg-board-push';
+const VAPID_PUB='BIyZs-g6WqeAhyk4NQsAZ7rq-AoyWOTptKUZkE5z-hvvn61vVW9F1Ord5VbySnizrNu9OrLD4kOE0SMRzbcZRgI';
+try{state.myteam=JSON.parse(localStorage.getItem('lotg_myteam')||'null')}catch(e){state.myteam=null}
+function b64uToU8(s){const p='='.repeat((4-s.length%4)%4);return Uint8Array.from(atob((s+p).replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0));}
+async function pushApi(body){
+  const r=await fetch(PUSH_FN,{method:'POST',headers:{Authorization:'Bearer '+KEY,apikey:KEY,'Content-Type':'application/json'},body:JSON.stringify(body)});
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok)throw new Error(d.error||'ping service hiccup');
+  return d;
+}
+function renderMyTeam(){
+  const el=$('#myteam');if(!el)return;
+  if(state.myteam){
+    el.innerHTML=`<div class="mtcard"><div class="mton"><div class="who">🔔 ${esc(state.myteam.name)}<small>You'll get pinged: you're-up-next + every final score</small></div><button class="pill" id="mtOff">Off</button></div></div>`;
+    $('#mtOff').onclick=async()=>{try{await pushApi({action:'unsub',device:DV})}catch(e){}state.myteam=null;try{localStorage.removeItem('lotg_myteam')}catch(e){}renderMyTeam();toast('Pings off');};
+  }else if(state.teams.length){
+    el.innerHTML=`<div class="mtcard"><div class="mth">🔔 Pick your team</div><div class="mts">Get buzzed when you're up next — and every final score, all night.</div><div class="teamchips">${state.teams.map(t=>`<button class="tchip" data-mt="${t.id}">${t.logo?`<img src="${esc(t.logo)}" alt=""/>`:''}${esc(t.name)}</button>`).join('')}</div></div>`;
+    el.querySelectorAll('[data-mt]').forEach(b=>b.onclick=()=>{const t=state.teams.find(x=>x.id===b.dataset.mt);if(t)pickTeam(t.id,t.name);});
+  }else el.innerHTML='';
+}
+async function pickTeam(id,name){
+  const ios=/iP(hone|ad|od)/.test(navigator.userAgent);
+  const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+  if(ios&&!standalone){openSheet('shA2HS');return;}
+  if(!('serviceWorker' in navigator)||!('PushManager' in window)||!('Notification' in window)){toast("This browser can't do pings — try Chrome/Safari");return;}
+  try{
+    const perm=await Notification.requestPermission();
+    if(perm!=='granted'){toast('Allow notifications to get pinged 🔔');return;}
+    await navigator.serviceWorker.register('/sw.js');
+    const reg=await navigator.serviceWorker.ready;
+    let sub=await reg.pushManager.getSubscription();
+    if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64uToU8(VAPID_PUB)});
+    await pushApi({action:'sub',device:DV,team_id:id,sub:sub.toJSON()});
+    try{const c=await caches.open('board-meta');await c.put('/device',new Response(DV));}catch(e){}
+    state.myteam={id,name};try{localStorage.setItem('lotg_myteam',JSON.stringify(state.myteam))}catch(e){}
+    renderMyTeam();toast(`🔔 Locked in — pings ON for ${name}`);
+  }catch(e){toast("Couldn't switch pings on — try again");}
+}
+$('#a2hsOk').onclick=()=>closeSheets();
 
 /* boot */
 (function(){
