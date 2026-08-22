@@ -498,11 +498,11 @@ function tableHTML(title,rows,anyFinal){
 function seasonHTML(){
   const rows=(state.settings.season&&state.settings.season.rows)||[];
   if(!rows.length)return'';
-  const sorted=[...rows].sort((a,b)=>b.pts-a.pts||String(a.name).localeCompare(String(b.name)));
+  const sorted=[...rows].sort((a,b)=>b.pts-a.pts);
   return `<div class="stwrap" style="border-color:var(--acc2)"><div class="sthead" style="background:var(--acc2)">🏆 The Ladder — 4-week chase</div>
     <table><thead><tr><th style="width:34px">#</th><th class="tn">Team</th><th style="width:64px">PTS</th></tr></thead><tbody>
     ${sorted.map((r,i)=>`<tr class="${i===0?'top':''}"><td>${i+1}</td><td class="tn">${esc(r.name)}</td><td class="pts">${r.pts}</td></tr>`).join('')}
-    </tbody></table></div><p class="hintline" style="text-align:center;margin-top:-6px">Winning squad after 4 weeks takes the $500 💰</p>`;
+    </tbody></table></div><p class="hintline" style="text-align:center;margin-top:-6px">Winning squad after 4 weeks takes the $500 💰</p>${state.settings.season.note?`<div class="mtcard" style="border-color:var(--acc2)"><div class="mth">📈 The race</div><div class="mts" style="margin:0;color:var(--ink);font-size:14px;line-height:1.6">${esc(state.settings.season.note)}</div></div>`:''}`;
 }
 function renderStandings(){
   const wg=weekGames();
@@ -919,10 +919,12 @@ function renderIntro(){
 function closeIntro(){try{localStorage.setItem('lotg_intro_ts',String(Date.now()))}catch(e){}$('#intro').classList.remove('open');}
 function renderSeasonForm(){
   if(!state.admin||!$('#seasonForm'))return;
-  const cur=new Map(((state.settings.season&&state.settings.season.rows)||[]).map(r=>[String(r.name).toLowerCase(),r.pts]));
-  $('#seasonForm').innerHTML=state.teams.map(t=>`<div class="arow2" style="margin:7px 0;align-items:center">
-    <span style="flex:1;font-weight:700">${esc(t.name)}</span>
-    <input data-season="${esc(t.name)}" type="text" inputmode="numeric" value="${cur.get(t.name.toLowerCase())??''}" placeholder="pts" style="flex:0 0 84px;text-align:center"/></div>`).join('');
+  const saved=(state.settings.season&&state.settings.season.rows)||[];
+  const rows=saved.length?saved:state.teams.map(t=>({name:t.name,pts:''}));
+  $('#seasonForm').innerHTML=rows.map((r,i)=>`<div class="arow2" style="margin:7px 0;align-items:center">
+    <input data-season-n value="${esc(r.name)}" maxlength="28" style="flex:1"/>
+    <input data-season-p type="text" inputmode="numeric" value="${r.pts===''?'':r.pts}" placeholder="pts" style="flex:0 0 84px;text-align:center"/></div>`).join('')
+    +`<div class="arow2" style="margin:10px 0 0"><textarea id="seasonNote" placeholder="The race — who can still make it, what they need…" maxlength="400" style="flex:1;min-height:80px;background:var(--card);border:var(--bw) solid var(--line);border-radius:12px;padding:12px;color:var(--ink);font-family:inherit;font-size:14px;resize:vertical">${esc(state.settings.season?.note||'')}</textarea></div>`;
 }
 function renderRecapAdmin(){
   if(!state.admin)return;
@@ -998,14 +1000,17 @@ $('#recapClear').onclick=async()=>{
 };
 $('#seasonSave').onclick=async()=>{
   const rows=[];let bad=false;
-  document.querySelectorAll('[data-season]').forEach(i=>{
-    const v=i.value.trim();if(v==='')return;
+  const names=[...document.querySelectorAll('[data-season-n]')],pts=[...document.querySelectorAll('[data-season-p]')];
+  names.forEach((ni,ix)=>{
+    const name=ni.value.trim(),v=pts[ix].value.trim();
+    if(!name||v==='')return;
     const n=+v;if(!Number.isInteger(n)||n<0){bad=true;return;}
-    rows.push({name:i.dataset.season,pts:n});
+    rows.push({name,pts:n});
   });
   if(bad){toast('Whole numbers only');return;}
+  const note=($('#seasonNote')?.value||'').trim();
   const st={...state.settings};
-  rows.length?st.season={rows}:delete st.season;
+  rows.length?st.season={rows,...(note?{note}:{})}:delete st.season;
   try{
     await rest('lotg_admin?id=eq.1',{method:'PATCH',body:JSON.stringify({settings:st})},true);
     state.settings=st;renderStandings();toast('Season ladder saved 🏆');
