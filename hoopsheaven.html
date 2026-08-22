@@ -1519,6 +1519,7 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
   <div class="fld" id="igFld"><label>Instagram handle</label><div class="igwrap"><span class="at">@</span><input class="inp" id="pfIg" maxlength="30" autocapitalize="none" placeholder="yourhandle"></div></div>
   <div class="fld" id="ttFld" style="display:none"><label>TikTok handle</label><div class="igwrap"><span class="at">@</span><input class="inp" id="pfTiktok" maxlength="30" autocapitalize="none" placeholder="yourhandle"></div></div>
   <div class="fld" id="emFld" style="display:none"><label>Email (Gmail / Apple ID / any real inbox)</label><input class="inp" id="pfEmail" type="email" autocapitalize="none" placeholder="you@gmail.com"></div>
+  <div class="fld"><label>Mobile number</label><input class="inp" id="pfPhone" type="tel" inputmode="tel" maxlength="17" autocomplete="tel" placeholder="0412 345 678"><p class="fine" style="margin:6px 2px 0">Only the coach sees this — never shown on the courts or your card. It's how you get back in if you switch phones.</p></div>
   <button class="btn btn-v btn-block" id="pfSave">Lock it in</button>
   <button class="linky" id="pfLogin" style="display:none;margin:14px auto 0;text-align:center;width:100%">Already got an account? Switched phones? <b style="color:var(--volt)">Log in</b></button>
 </div></div>
@@ -1526,8 +1527,8 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
 <!-- log back in (new phone / reinstalled) -->
 <div class="sheet" id="shLogin"><div class="scrim" data-close></div><div class="panel">
   <div class="grab"></div>
-  <div class="xrow"><div><h3>Log back in</h3><p class="sub">Your profile follows your account, not your phone. Enter the @ (or email) you signed up with + your 5-digit code.</p></div><button class="x" data-close>✕</button></div>
-  <div class="fld"><label>Your @, email or player number</label><input class="inp" id="lgWho" autocapitalize="none" placeholder="@yourhandle · you@gmail.com · 4358"></div>
+  <div class="xrow"><div><h3>Log back in</h3><p class="sub">Your profile follows your account, not your phone. Enter your @, mobile, email or player number + your 5-digit code.</p></div><button class="x" data-close>✕</button></div>
+  <div class="fld"><label>Your @, mobile, email or player number</label><input class="inp" id="lgWho" autocapitalize="none" placeholder="@yourhandle · 0412 345 678 · 4358"></div>
   <div class="fld"><label>Your 5-digit code</label><input class="inp" id="lgCode" inputmode="numeric" maxlength="6" placeholder="12345"></div>
   <button class="btn btn-v btn-block" id="lgGo">Log me in 🏀</button>
   <p class="fine" style="margin-top:10px">Your code lives in Profile → 🔑 Phone-switch code. Lost it? Message the coach on IG and we'll sort you.</p>
@@ -1548,7 +1549,7 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
     <p class="fine" style="margin:0 0 6px">📇 Save it in your contacts as "Certified Hooper"</p>
     <p class="fine" style="margin:0 0 6px">📸 Or just screenshot this page</p>
   </div>
-  <p class="fine" style="margin-top:14px;opacity:.8">New phone? Open the app → "Already got an account? Log in" → your @, email or player number + this code. Lost it anyway? Message the coach — we'll sort you. 🤝</p>
+  <p class="fine" style="margin-top:14px;opacity:.8">New phone? Open the app → "Already got an account? Log in" → your @, mobile or player number + this code. Lost it anyway? Message the coach — we'll sort you. 🤝</p>
 </div></div>
 
 <!-- call-a-run sheet -->
@@ -1739,6 +1740,14 @@ const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const SYD='Australia/Sydney';
 
+// Aussie mobile → 04xxxxxxxx (mirrors the server). '' when it isn't valid.
+function auPhone(v){
+  let d=String(v||'').trim().replace(/[^\d+]/g,'');
+  if(d.startsWith('+61'))d='0'+d.slice(3);
+  else if(d.startsWith('61')&&d.length===11)d='0'+d.slice(2);
+  d=d.replace(/\D/g,'');
+  return /^04\d{8}$/.test(d)?d:'';
+}
 async function api(body,_retried){
   const r=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+ANON,'apikey':ANON},body:JSON.stringify(body)});
   const d=await r.json().catch(()=>({error:'network error'}));
@@ -1748,13 +1757,16 @@ async function api(body,_retried){
     // once — the player never sees an error for something that isn't their fault.
     if(d.code==='terms'&&body.action!=='register'&&!_retried&&OCP&&OCP.id&&termsOk()){
       try{
-        const rr=await api({action:'register',accept:true,player:{id:OCP.id,name:OCP.name||'Hooper',ig:OCP.ig||'',tiktok:OCP.tiktok||'',email:OCP.email||''}},true);
+        const rr=await api({action:'register',accept:true,player:{id:OCP.id,name:OCP.name||'Hooper',ig:OCP.ig||'',tiktok:OCP.tiktok||'',email:OCP.email||'',phone:OCP.phone||''}},true);
         OCP.vf=!!rr.verified;OCP.code=rr.verify_code||'';
         localStorage.setItem('oc_profile',JSON.stringify(OCP));
         paintMe();
         if(!OCP.vf)api({action:'verify_request',player:{id:OCP.id},text:'auto: account restored — please re-verify me'},true).catch(()=>{});
         return await api(body,true);
-      }catch(e2){}
+      }catch(e2){
+        // account predates mobile numbers — ask for one, don't throw a wobbly
+        if(e2&&e2.code==='needphone'){openEdit&&openEdit();toast('Quick one — add your mobile so we can keep your account',1);return Promise.reject(e2);}
+      }
     }
     if(d.code==='terms'&&body.action!=='register'){localStorage.removeItem('oc_terms');openSheet('shTerms');}
     if(d.code==='verify'){view('Profile');paintVf();toast('Verify your account to unlock that — tap Request verification',1);}
@@ -1978,7 +1990,7 @@ $('#lgGo').onclick=async()=>{
   const b=$('#lgGo');b.disabled=true;b.textContent='Checking…';
   try{
     const d=await api({action:'login',who,code});
-    OCP={id:d.player.id,name:d.player.name,ig:d.player.ig||'',tiktok:d.player.tiktok||'',email:d.player.email||'',vf:!!d.verified,code:d.verify_code||'',num:d.player_num??null};
+    OCP={id:d.player.id,name:d.player.name,ig:d.player.ig||'',tiktok:d.player.tiktok||'',email:d.player.email||'',phone:d.player.phone||'',vf:!!d.verified,code:d.verify_code||'',num:d.player_num??null};
     localStorage.setItem('oc_profile',JSON.stringify(OCP));
     localStorage.setItem('oc_terms',TERMS_V);
     closeSheet('shLogin');$('#shProfile').classList.remove('gate');closeSheet('shProfile');
@@ -2020,7 +2032,7 @@ function setIdMode(m){
 document.querySelectorAll('#idPick button').forEach(b=>b.onclick=()=>setIdMode(b.dataset.id));
 function openMyEdit(){
   if(OCP){
-    $('#pfName').value=OCP.name;$('#pfIg').value=OCP.ig||'';$('#pfTiktok').value=OCP.tiktok||'';$('#pfEmail').value=OCP.email||'';
+    $('#pfName').value=OCP.name;$('#pfIg').value=OCP.ig||'';$('#pfTiktok').value=OCP.tiktok||'';$('#pfEmail').value=OCP.email||'';$('#pfPhone').value=OCP.phone||'';
     setIdMode(OCP.ig?'ig':(OCP.tiktok?'tiktok':(OCP.email?'email':'ig')));
     openEdit();
   }else if(termsOk())openGate();
@@ -2037,16 +2049,18 @@ $('#pfSave').onclick=async()=>{
   const ig=idMode==='ig'?handle($('#pfIg').value):'';
   const tiktok=idMode==='tiktok'?handle($('#pfTiktok').value):'';
   const email=idMode==='email'?$('#pfEmail').value.trim().toLowerCase().slice(0,120):'';
+  const phone=auPhone($('#pfPhone').value);
   if(!name){toast('Put a name on it',1);return}
+  if(!phone){toast('Add your mobile — 04xx xxx xxx',1);$('#pfPhone').focus();return}
   if(idMode==='ig'&&!ig){toast("Drop your @ — that's your jersey",1);return}
   if(idMode==='tiktok'&&!tiktok){toast('Drop your TikTok @',1);return}
   if(idMode==='email'&&!/^[^\s@]+@[^\s@]+\.[a-z]{2,24}$/i.test(email)){toast("That email doesn't look right",1);return}
   const id=(OCP&&OCP.id)||crypto.randomUUID();
   const b=$('#pfSave'); b.disabled=true; b.textContent='Signing in…';
   try{
-    const d=await api({action:'register',accept:true,player:{id,name,ig,tiktok,email}});
+    const d=await api({action:'register',accept:true,player:{id,name,ig,tiktok,email,phone}});
     const fresh=!OCP;
-    OCP={id,name,ig,tiktok,email,vf:!!d.verified,code:d.verify_code||'',num:d.player_num??null};
+    OCP={id,name,ig,tiktok,email,phone,vf:!!d.verified,code:d.verify_code||'',num:d.player_num??null};
     localStorage.setItem('oc_profile',JSON.stringify(OCP));
     paintMe();paintVf();paintProfileTab();paintNotifRow();syncSaves();
     if(fresh)setTimeout(maybeNtfPrompt,3500);

@@ -43,6 +43,17 @@ const num = (v: unknown, lo: number, hi: number, dflt: number) => {
 // strip everything except the charset our ids/keys use, so no ", &, ) can inject.
 const sid = (v: unknown) => String(v ?? "").replace(/[^a-zA-Z0-9._-]/g, "");
 const igClean = (v: unknown) => String(v ?? "").replace(/^@+/, "").toLowerCase().replace(/[^a-z0-9._]/g, "").slice(0, 30);
+// Aussie mobile → canonical 04xxxxxxxx. Accepts +61 4.., 04.., spaces/dashes.
+// Returns "" when nothing was supplied, null when what was supplied is junk.
+const phoneClean = (v: unknown): string | null => {
+  const raw = String(v ?? "").trim();
+  if (!raw) return "";
+  let d = raw.replace(/[^\d+]/g, "");
+  if (d.startsWith("+61")) d = "0" + d.slice(3);
+  else if (d.startsWith("61") && d.length === 11) d = "0" + d.slice(2);
+  d = d.replace(/\D/g, "");
+  return /^04\d{8}$/.test(d) ? d : null;
+};
 const emailClean = (v: unknown) => {
   const e = String(v ?? "").trim().toLowerCase().slice(0, 120);
   return /^[^\s@]+@[^\s@]+\.[a-z]{2,24}$/.test(e) ? e : "";
@@ -376,19 +387,25 @@ Deno.serve(async (req: Request) => {
         const p = (b.player || {}) as Record<string, unknown>;
         const id = str(p.id, 64), name = str(p.name, 40);
         const ig = igClean(p.ig), tiktok = igClean(p.tiktok), email = emailClean(p.email);
+        const phone = phoneClean(p.phone);
         if (!id || !/^[a-zA-Z0-9._-]{8,64}$/.test(id) || !name) return J({ error: "put a name on it" }, 400);
         if (!ig && !tiktok && !email) return J({ error: "sign in with your Instagram or TikTok — or a real email" }, 400);
+        if (phone === null) return J({ error: "that mobile doesn't look right — use 04xx xxx xxx", code: "badphone" }, 400);
         if (b.accept !== true) return J({ error: "you have to accept the house rules to play" }, 400);
         if (await bansHit([id, ig, tiktok, email])) return J({ error: BANNED_MSG, code: "banned" }, 403);
         // A banned device row stays banned even if they re-register.
         const prev = await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=banned`);
         if (prev?.[0]?.banned) return J({ error: BANNED_MSG, code: "banned" }, 403);
-        const cur = await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=verified,verify_code,player_num`);
+        const cur = await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=verified,verify_code,player_num,phone`);
+        // A mobile is a prerequisite for NEW hoopers. Existing rows (re-register,
+        // self-heal) keep the number already on file so nobody gets locked out.
+        const keepPhone = cur?.[0]?.phone || "";
+        if (!phone && !keepPhone) return J({ error: "add your mobile number so the coach can reach you", code: "needphone" }, 400);
         let verified = !!cur?.[0]?.verified;
         const verify_code = cur?.[0]?.verify_code || mkCode();
         await db(`oc_players?on_conflict=id`, {
           method: "POST", headers: { Prefer: "resolution=merge-duplicates" },
-          body: JSON.stringify({ id, name, ig, tiktok, email, accepted_at: new Date().toISOString(), verify_code }),
+          body: JSON.stringify({ id, name, ig, tiktok, email, phone: phone || keepPhone, accepted_at: new Date().toISOString(), verify_code }),
         });
         // The owner's own handles always come back verified + coach-flagged,
         // so a fresh-slate wipe never locks the coach out of his own app.
@@ -424,9 +441,13 @@ Deno.serve(async (req: Request) => {
         }
         await new Promise((r) => setTimeout(r, 650));
         const w = encodeURIComponent(who);
+        const SEL = "id,name,ig,tiktok,email,phone,verified,verify_code,banned,player_num";
+        const asPhone = phoneClean(who);
         const rows = /^\d{4}$/.test(who)
-          ? await db(`oc_players?player_num=eq.${w}&select=id,name,ig,tiktok,email,verified,verify_code,banned,player_num`)
-          : await db(`oc_players?or=(ig.eq.${w},tiktok.eq.${w},email.eq.${w})&select=id,name,ig,tiktok,email,verified,verify_code,banned,player_num`);
+          ? await db(`oc_players?player_num=eq.${w}&select=${SEL}`)
+          : asPhone
+          ? await db(`oc_players?phone=eq.${encodeURIComponent(asPhone)}&select=${SEL}`)
+          : await db(`oc_players?or=(ig.eq.${w},tiktok.eq.${w},email.eq.${w})&select=${SEL}`);
         const hit = (rows || []).find((p: { verify_code?: string }) => p.verify_code === code);
         if (!hit) {
           const fails = (g0?.fails || 0) + 1;
@@ -438,7 +459,7 @@ Deno.serve(async (req: Request) => {
         }
         if (hit.banned || await bansHit([hit.id, hit.ig, hit.tiktok, hit.email])) return J({ error: BANNED_MSG, code: "banned" }, 403);
         if (g0) await db(`oc_login_guard?who=eq.${w}`, { method: "DELETE" });
-        return J({ ok: true, player: { id: hit.id, name: hit.name, ig: hit.ig || "", tiktok: hit.tiktok || "", email: hit.email || "" }, verified: !!hit.verified, verify_code: hit.verify_code, player_num: hit.player_num ?? null });
+        return J({ ok: true, player: { id: hit.id, name: hit.name, ig: hit.ig || "", tiktok: hit.tiktok || "", email: hit.email || "", phone: hit.phone || "" }, verified: !!hit.verified, verify_code: hit.verify_code, player_num: hit.player_num ?? null });
       }
 
       // Resolve a Google Maps link (or plain "lat, lon") to coordinates so the
@@ -976,7 +997,7 @@ Deno.serve(async (req: Request) => {
       // Heaven desk (Lab coach credentials): review + verify + ban + suggestions.
       case "admin_players": {
         if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
-        const rows = await db(`oc_players?select=id,name,ig,tiktok,email,verified,verify_code,banned,checkins_total,created_at,player_num&order=created_at.desc&limit=300`);
+        const rows = await db(`oc_players?select=id,name,ig,tiktok,email,phone,verified,verify_code,banned,checkins_total,created_at,player_num&order=created_at.desc&limit=300`);
         const inbox = await db(`oc_inbox?select=*&order=created_at.asc&limit=100`);
         const court_reqs = await db(`oc_court_reqs?select=*&order=created_at.desc&limit=100`);
         const fb_pending = await db(`oc_pfeedback?approved=is.false&select=id`);
@@ -1050,9 +1071,11 @@ Deno.serve(async (req: Request) => {
         const pid = str(b.pid, 64);
         if (!pid) return J({ error: "bad request" }, 400);
         const name = str(b.name, 40), ig = igClean(b.ig), tiktok = igClean(b.tiktok), email = emailClean(b.email);
+        const phone = phoneClean(b.phone);
+        if (phone === null) return J({ error: "that mobile doesn't look right — use 04xx xxx xxx" }, 400);
         if (!name) return J({ error: "name can't be empty" }, 400);
         if (!ig && !tiktok && !email) return J({ error: "they need at least one of IG / TikTok / email" }, 400);
-        await db(`oc_players?id=eq.${encodeURIComponent(pid)}`, { method: "PATCH", body: JSON.stringify({ name, ig, tiktok, email }) });
+        await db(`oc_players?id=eq.${encodeURIComponent(pid)}`, { method: "PATCH", body: JSON.stringify({ name, ig, tiktok, email, phone }) });
         return J({ ok: true });
       }
 

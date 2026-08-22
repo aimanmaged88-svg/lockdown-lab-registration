@@ -1034,11 +1034,13 @@ const runDay=r=>{
 };
 // Every place a coach checks "are they real?": show tappable IG + TikTok links
 // (whichever they signed up with), or fall back to the email.
+const fmtPhone=v=>{const d=String(v||'').replace(/\D/g,'');return /^04\d{8}$/.test(d)?d.replace(/(\d{4})(\d{3})(\d{3})/,'$1 $2 $3'):v;};
 function socialLinks(p){
   const bits=[];
   if(p.ig)bits.push(`<a href="https://instagram.com/${esc(p.ig)}" target="_blank" rel="noopener">📸 @${esc(p.ig)} ↗</a>`);
   if(p.tiktok)bits.push(`<a href="https://tiktok.com/@${esc(p.tiktok)}" target="_blank" rel="noopener">🎵 @${esc(p.tiktok)} ↗</a>`);
   if(!bits.length&&p.email)bits.push(`<span>${esc(p.email)}</span>`);
+  if(p.phone)bits.push(`<a href="tel:${esc(p.phone)}">📱 ${esc(fmtPhone(p.phone))}</a>`);
   return bits.join(' &nbsp; ')||'<span style="color:var(--dim)">no socials on file</span>';
 }
 function joinAgo(ts){
@@ -1162,7 +1164,7 @@ async function act(body,msg){
 let PS=[],PEID=null;
 function openPedit(p){
   PEID=p.id;
-  $('#peName').value=p.name||'';$('#peIg').value=p.ig||'';$('#peTt').value=p.tiktok||'';$('#peEm').value=p.email||'';
+  $('#peName').value=p.name||'';$('#peIg').value=p.ig||'';$('#peTt').value=p.tiktok||'';$('#peEm').value=p.email||'';$('#pePh').value=p.phone||'';
   $('#peWho').textContent=p.name+(p.ig?' · @'+p.ig:'');
   $('#pedit').style.display='flex';
 }
@@ -1176,6 +1178,7 @@ function closePedit(){$('#pedit').style.display='none';PEID=null;}
     <p class="sub" id="peWho" style="margin-top:2px"></p>
     <input class="inp" id="peName" placeholder="Name" maxlength="40">
     <input class="inp" id="peIg" placeholder="Instagram handle (no @)" autocapitalize="none" maxlength="30">
+    <input class="inp" id="pePh" placeholder="Mobile — 0412 345 678" type="tel" maxlength="17">
     <input class="inp" id="peTt" placeholder="TikTok handle (no @)" autocapitalize="none" maxlength="30">
     <input class="inp" id="peEm" placeholder="Email" autocapitalize="none" maxlength="120">
     <div style="display:flex;gap:8px;margin-top:10px">
@@ -1191,7 +1194,7 @@ function closePedit(){$('#pedit').style.display='none';PEID=null;}
     if(!PEID)return;
     const clean=v=>v.trim().replace(/^@+/,'').toLowerCase().replace(/[^a-z0-9._]/g,'').slice(0,30);
     try{
-      await api({action:'admin_player_edit',pid:PEID,name:$('#peName').value.trim().slice(0,40),ig:clean($('#peIg').value),tiktok:clean($('#peTt').value),email:$('#peEm').value.trim().toLowerCase().slice(0,120)});
+      await api({action:'admin_player_edit',pid:PEID,name:$('#peName').value.trim().slice(0,40),ig:clean($('#peIg').value),tiktok:clean($('#peTt').value),email:$('#peEm').value.trim().toLowerCase().slice(0,120),phone:$('#pePh').value.trim()});
       toast('Saved — their profile\'s updated');closePedit();load();
     }catch(e){toast(e.message,1)}
   };
