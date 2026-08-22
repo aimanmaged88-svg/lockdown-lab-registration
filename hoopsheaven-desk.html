@@ -61,7 +61,8 @@ textarea.inp{resize:vertical;min-height:70px}
 .row .who a{color:var(--muted);font-size:12.5px;text-decoration:none}
 .row .who a:hover{color:var(--volt)}
 .row .who span{color:var(--muted);font-size:12.5px}
-.code{font-family:'HHDisplay',sans-serif;font-weight:400;font-size:19px;letter-spacing:3px;color:var(--volt)}
+.code{font-family:'HHDisplay',sans-serif;font-weight:400;font-size:19px;letter-spacing:3px;color:var(--volt);cursor:pointer;user-select:all}
+.code:hover{opacity:.75}
 .tag{font-size:10px;letter-spacing:1.4px;font-weight:800;border-radius:99px;padding:3px 9px}
 .tag.p{color:var(--warn);border:1px solid color-mix(in srgb, var(--warn) 40%, transparent)}
 .tag.b{color:var(--bad);border:1px solid color-mix(in srgb, var(--bad) 40%, transparent)}
@@ -853,7 +854,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
         <p class="sub">Your community, your call. ✓ the real ones, ✏️ fix their details, ban the trouble — bans block handle, email + device. 🗑 wipes every trace of them.</p>
         <div class="grid2">
           <div><h2>⏳ Waiting on the ✓</h2><div id="pending"></div></div>
-          <div><h2>🏀 The whole roster</h2><div id="all"></div></div>
+          <div><h2>🏀 The whole roster</h2><p class="hint" style="margin:-4px 0 10px">Switched phones and lost their code? Tap the orange code on their row to copy it — they log back in with their @ (or player number) + that code.</p><div id="all"></div></div>
         </div>
       </section>
 
@@ -1054,7 +1055,7 @@ function row(p,pending){
       <b>${esc(p.name)} ${p.player_num?`<span style="color:var(--dim);font-weight:700">#${p.player_num}</span>`:''} ${p.verified?'<span class="vtick">✓</span>':''} ${p.banned?'<span class="tag b">BANNED</span>':pending?'<span class="tag p">PENDING</span>':''}</b>
       ${socialLinks(p)}
     </div>
-    ${!p.verified&&!p.banned?`<span class="code">${esc(p.verify_code||'—')}</span>`:''}
+    ${p.banned?'':`<span class="code" data-copy="${esc(p.verify_code||'')}" title="Their phone-switch code — tap to copy and send it to them">${esc(p.verify_code||'—')}</span>`}
     ${p.banned
       ?`<button class="btn btn-g" data-unban="${esc(p.id)}">Unban</button>`
       :`${p.verified
@@ -1140,6 +1141,12 @@ async function load(){
     document.querySelectorAll('[data-unban]').forEach(b=>b.onclick=()=>act({action:'admin_ban',pid:b.dataset.unban,on:false},'Unbanned — they\'re back'));
     document.querySelectorAll('[data-dismiss]').forEach(b=>b.onclick=()=>act({action:'admin_inbox_done',pid:b.dataset.dismiss},'Request dismissed'));
     document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>{const p=PS.find(x=>x.id===b.dataset.edit);if(p)openPedit(p);});
+    // tap a code to copy it — this is how you rescue someone who's switched
+    // phones and lost their code (they log in with @handle/number + this)
+    document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>{
+      const c=b.dataset.copy; if(!c)return;
+      try{navigator.clipboard.writeText(c);toast('Code '+c+' copied — send it to them');}catch(e){}
+    });
     document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{
       const p=PS.find(x=>x.id===b.dataset.del);const nm=p?p.name:'this player';
       if(!confirm('Delete '+nm+' COMPLETELY? Profile, runs, check-ins, stats — gone forever.\n\n(For troublemakers use Ban instead — delete lets them sign straight back up.)'))return;
