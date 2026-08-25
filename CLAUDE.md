@@ -176,6 +176,15 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   since admins see 5 tabs. **Market tab is ADMIN-ONLY for now** (his call
   same day) — flip `$('#tab-market').style.display=state.admin?…` back to
   `(mkLive().length||state.admin)` to open it to the crew.
+- **Two-step opening takeover (2026-08-25, All-Star night):** intro is now
+  #inStep1 (reel alone: ⭐ kicker + "Watch this first", #inReel embed, #inNext
+  gated by `armNext(10)` — a COUNTDOWN, since IG's iframe exposes no playback
+  events; #inX hidden until it lapses so nobody is trapped) → #inStep2 (the
+  note pops in via popBig/.pop/.pop2). His shoutout + merch pitch + shop
+  button now share ONE `.notecard` ("🛒 How we say thank you"), then recap,
+  then the notice, then Into the app. `introStep(n)` restarts the pop
+  animations by re-adding the classes; closeIntro/introStep clear the timer.
+  Notice reworded to "Teams for the FINAL round get uploaded soon".
 - **All-Star reel replay (2026-08-25):** settings.allstar_embed renders the
   All-Star reel as a playable IG embed inside the ⭐ tab under "🎬 Watch it
   again" (his ask: "drop the All-Star content in there in case anyone wants
