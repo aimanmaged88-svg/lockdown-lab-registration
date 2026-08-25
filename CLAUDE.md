@@ -145,6 +145,14 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   motd card while set) FIRST → embed → recap (heading inline now, first
   video autoplays muted) → notice → Into the app. True IG-embed autoplay
   isn't controllable (their player needs a tap; iframe allows autoplay).
+- **Final-week clear + marketplace mock (2026-08-25, Aiman asked):** all 12
+  scored games DELETED (backup scratchpad/games-backup-final-clear.json) —
+  board empty for the Week 4 final-round draw; season ladder untouched
+  (settings, survives clears); notice set LOUD ("🚨 FINAL WEEK… MAKE SOME
+  NOISE"). Admin Teams pane gained a 🏪 Community Marketplace PREVIEW —
+  static mock only (4 dashed SAMPLE service cards: massage/tradie/barber/
+  training + how-it'll-work note; services only NO merch, his rule).
+  Players never see it. Real build = his go-ahead.
 - **All-Star Weekend section (2026-08-25):** ⭐ All-Star tab (auto-hidden
   until it has content; admins always see it) — table `lotg_allstar`
   (ord/kind image|video|link/url/caption; public read, x-lotg-admin writes).
