@@ -213,6 +213,17 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
 [data-theme="retro"] .intro h2{font-family:var(--street);font-weight:400}
 #inPhotos img,#inPhotos video{width:100%;display:block;border-radius:14px;border:var(--bw) solid var(--line);box-shadow:4px 4px 0 var(--shadow);margin:0 0 13px}
 #inPhotos video{background:#000;max-height:74vh}
+/* marketplace mock (admin preview only) */
+.mkpill{display:inline-block;font-size:10px;letter-spacing:.14em;padding:3px 9px;border-radius:999px;background:var(--acc);color:var(--onacc);vertical-align:2px;margin-left:8px}
+.mkgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin:12px 0}
+.mkcard{position:relative;border:1.5px dashed var(--line2);border-radius:14px;background:var(--card);padding:14px 14px 12px;opacity:.94}
+.mkcard .ico{font-size:26px;line-height:1}
+.mkcard .bnm{font-weight:800;font-size:15px;margin:8px 0 2px;color:var(--ink)}
+.mkcard .bsv{font-size:12.5px;color:var(--muted)}
+.mkcard .bdeal{margin-top:9px;font-size:12px;font-weight:700;color:var(--acc);border:1px solid color-mix(in srgb,var(--acc) 45%,transparent);border-radius:9px;padding:5px 8px;display:inline-block}
+.mkcard .big{margin-top:8px;font-size:12px;color:var(--dim)}
+.mktag{position:absolute;top:10px;right:10px;font-size:9px;letter-spacing:.12em;border:1px solid var(--line2);border-radius:999px;padding:2px 7px;color:var(--dim);background:var(--card2)}
+.mkapply{border:var(--bw) solid var(--line);border-radius:14px;background:var(--card2);padding:13px 14px;font-size:13px;line-height:1.55;color:var(--muted)}
 .igembed{margin:0 0 13px}
 .igembed iframe{width:100%;max-width:540px;height:clamp(430px,70vh,660px);display:block;margin:0 auto;border:var(--bw) solid var(--line);border-radius:14px;background:#fff;box-shadow:4px 4px 0 var(--shadow)}
 .igembed .reelbtn{margin-top:10px}
@@ -309,6 +320,15 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
     </div>
     <input id="recapFiles" type="file" accept="image/*,video/*" multiple hidden/>
     <input id="logoFile" type="file" accept="image/*" hidden/>
+    <div class="lbl" style="margin-top:26px">🏪 Community Marketplace<span class="mkpill">PREVIEW</span></div>
+    <p class="hintline">A mock-up of where community businesses advertise to the crew. <b>Services only for now — no merch.</b> Think massage &amp; recovery, physio, barbers, tradies, training. Nothing here is live yet and players can't see this — it's your preview to shape.</p>
+    <div class="mkgrid">
+      <div class="mkcard"><span class="mktag">SAMPLE</span><div class="ico">💆</div><div class="bnm">Recovery Room Massage</div><div class="bsv">Sports massage · game-night recovery</div><div class="bdeal">LOTG deal · 20% off Thursdays</div><div class="big">📸 @sample-handle</div></div>
+      <div class="mkcard"><span class="mktag">SAMPLE</span><div class="ico">🔧</div><div class="bnm">AK Electrical</div><div class="bsv">Licensed sparky · free quotes for the crew</div><div class="bdeal">Mates rates for LOTG fam</div><div class="big">📸 @sample-handle</div></div>
+      <div class="mkcard"><span class="mktag">SAMPLE</span><div class="ico">💈</div><div class="bnm">Fresh Fades Barber</div><div class="bsv">Cuts &amp; beard work · walk-ins</div><div class="bdeal">Wednesday special for ballers</div><div class="big">📸 @sample-handle</div></div>
+      <div class="mkcard"><span class="mktag">SAMPLE</span><div class="ico">🏀</div><div class="bnm">Next Level Training</div><div class="bsv">1-on-1 skills &amp; conditioning</div><div class="bdeal">First session on the house</div><div class="big">📸 @sample-handle</div></div>
+    </div>
+    <div class="mkapply">📥 <b>How it'll work:</b> a business applies with their name · the service · their Instagram · a deal for the crew. You approve every listing before it shows — community first, services only, no spam. Say the word when you want it built for real.</div>
     <p class="hintline" id="genHint"></p>
   </section>
 
