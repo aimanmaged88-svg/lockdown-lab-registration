@@ -145,6 +145,12 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   motd card while set) FIRST → embed → recap (heading inline now, first
   video autoplays muted) → notice → Into the app. True IG-embed autoplay
   isn't controllable (their player needs a tap; iframe allows autoplay).
+  Merch plug (same day): settings.merchUrl/merchTxt -> gold "🛒 Official
+  LOTG merch" card AFTER the SJ message (order now: reel -> message ->
+  merch -> notice -> Into the app); admin #nnMerch/#nnMerchTxt. Seeded w/
+  SJ's shop https://strongwillsports.com.au/lotg/ (tracking params
+  stripped). Board marketplace stays services-only; this is the official
+  community merch, his ask.
 - **Final-week clear + marketplace mock (2026-08-25, Aiman asked):** all 12
   scored games DELETED (backup scratchpad/games-backup-final-clear.json) —
   board empty for the Week 4 final-round draw; season ladder untouched
