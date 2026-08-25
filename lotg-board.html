@@ -213,6 +213,9 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
 [data-theme="retro"] .intro h2{font-family:var(--street);font-weight:400}
 #inPhotos img,#inPhotos video{width:100%;display:block;border-radius:14px;border:var(--bw) solid var(--line);box-shadow:4px 4px 0 var(--shadow);margin:0 0 13px}
 #inPhotos video{background:#000;max-height:74vh}
+.igembed{margin:0 0 13px}
+.igembed iframe{width:100%;max-width:540px;height:clamp(430px,70vh,660px);display:block;margin:0 auto;border:var(--bw) solid var(--line);border-radius:14px;background:#fff;box-shadow:4px 4px 0 var(--shadow)}
+.igembed .reelbtn{margin-top:10px}
 .igbtn{display:flex;align-items:center;justify-content:space-between;gap:10px;border:var(--bw) solid var(--line);background:var(--card);color:var(--ink);border-radius:14px;padding:15px 16px;margin:0 0 12px;font-weight:700;font-size:14.5px;text-decoration:none;box-shadow:4px 4px 0 var(--shadow);transition:.15s var(--ease)}
 .igbtn:active{transform:scale(.98)}
 .igbtn .go{color:var(--acc);font-family:var(--disp);font-size:12px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
@@ -292,6 +295,7 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
     <p class="hintline">These show inside the recap. All three editable any time.</p>
     <div class="arow2" style="margin:8px 0"><input id="nnNotice" type="text" placeholder="Announcement — e.g. Week 4 draw drops Wednesday 26/8" maxlength="90"/></div>
     <div class="arow2" style="margin:8px 0"><input id="nnReel" type="text" placeholder="Full highlight reel link (https://…)" maxlength="300"/></div>
+    <div class="arow2" style="margin:8px 0"><input id="nnEmbed" type="text" placeholder="Instagram post/reel to FEATURE on opening (paste the link)" maxlength="300"/></div>
     <div class="arow2" style="margin:8px 0"><textarea id="nnMotd" placeholder="Message of the night" maxlength="300" style="flex:1;min-height:84px;background:var(--card);border:var(--bw) solid var(--line);border-radius:12px;padding:12px;color:var(--ink);font-family:inherit;font-size:15px;resize:vertical"></textarea></div>
     <button class="bigbtn ghost" id="nnSave">Save night notes</button>
     <div class="lbl" style="margin-top:22px">📰 Last run recap</div>
@@ -450,7 +454,7 @@ async function loadAll(){
   state.tn=Math.max(1,...state.games.map(g=>g.tournament||1));
   state.settings={start:"7:15 PM",...(adm?.[0]?.settings||{})};
   try{localStorage.setItem('lotg_cache',JSON.stringify({teams:state.teams,games:state.games,wk:state.wk,settings:state.settings}))}catch(e){}
-  renderAll();
+  renderAll();renderIntro();
 }
 
 /* ---------- render ---------- */
@@ -921,14 +925,27 @@ $('#inGo').onclick=closeIntro;
 $('#inX').onclick=closeIntro;
 $('#rcView').onclick=e=>{ if(e.target.id==='rcX')return; if(rcI+1<VIEW.length)rcShow(rcI+1); else $('#rcView').classList.remove('open'); };
 const MOTD_DEFAULT="Pass the ball. Get it moving. Get everyone involved — the game looks more beautiful that way. Played right, basketball is artwork. Let's paint every Wednesday night. 🎨🏀";
+// Official Instagram embed (their /embed/captioned/ iframe — same thing IG's
+// embed.js injects, minus the external script). Link below = the fallback.
+function igEmbed(u){
+  const m=String(u||'').match(/^https:\/\/(www\.)?instagram\.com\/(reel|p|tv)\/[A-Za-z0-9_-]+/);
+  if(!m)return '';
+  const base=m[0].replace('://instagram.com','://www.instagram.com');
+  return `<div class="igembed"><iframe src="${base}/embed/captioned/" title="Instagram" allowfullscreen allow="encrypted-media"></iframe><a class="reelbtn" href="${base}/" target="_blank" rel="noopener">📸 Watch it on Instagram ↗</a></div>`;
+}
+let introSig='';
 function renderIntro(){
   const el=$('#intro');
-  if(!RECAP.length||state.admin){el.classList.remove('open');return;}
+  const emb=igEmbed(state.settings.introEmbed);
+  if((!RECAP.length&&!emb)||state.admin){el.classList.remove('open');introSig='';return;}
   let last=0;try{last=+localStorage.getItem('lotg_intro_ts')||0}catch(e){}
   if(Date.now()-last<3*36e5)return;
+  const sig=JSON.stringify([emb,RECAP.map(r=>r.id),state.settings.reelUrl||'',state.settings.notice||'',state.settings.motd||'']);
+  if(sig===introSig)return;
+  introSig=sig;
   const reel=state.settings.reelUrl&&/^https?:\/\//.test(state.settings.reelUrl)?`<a class="reelbtn" href="${esc(state.settings.reelUrl)}" target="_blank" rel="noopener">🎬 Watch the FULL highlight reel ↗</a>`:'';
   let reelPlaced=false;
-  let html=RECAP.map((r,i)=>{
+  let html=emb+RECAP.map((r,i)=>{
     if(r.kind==='video'){
       const v=`<video src="${esc(r.img)}" controls playsinline preload="metadata"></video>`;
       if(!reelPlaced&&reel){reelPlaced=true;return v+reel;}
@@ -958,6 +975,7 @@ function renderRecapAdmin(){
   renderSeasonForm();
   if($('#nnNotice')&&document.activeElement?.id!=='nnNotice')$('#nnNotice').value=state.settings.notice||'';
   if($('#nnReel')&&document.activeElement?.id!=='nnReel')$('#nnReel').value=state.settings.reelUrl||'';
+  if($('#nnEmbed')&&document.activeElement?.id!=='nnEmbed')$('#nnEmbed').value=state.settings.introEmbed||'';
   if($('#nnMotd')&&document.activeElement?.id!=='nnMotd')$('#nnMotd').value=state.settings.motd||MOTD_DEFAULT;
 }
 async function shrink(file,max){
@@ -1050,6 +1068,9 @@ $('#nnSave').onclick=async()=>{
   notice?st.notice=notice:delete st.notice;
   if(reel&&!/^https?:\/\//.test(reel)){toast('Reel link needs to start with https://');return;}
   reel?st.reelUrl=reel:delete st.reelUrl;
+  const embed=$('#nnEmbed').value.trim();
+  if(embed&&!igEmbed(embed)){toast('Feature link needs to be an Instagram post/reel link');return;}
+  embed?st.introEmbed=embed:delete st.introEmbed;
   motd?st.motd=motd:delete st.motd;
   try{
     await rest('lotg_admin?id=eq.1',{method:'PATCH',body:JSON.stringify({settings:st})},true);
