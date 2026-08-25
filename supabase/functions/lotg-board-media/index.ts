@@ -47,10 +47,12 @@ Deno.serve(async (req: Request) => {
     if (!await passOk(b.pass)) return J({ error: "wrong passcode", code: "auth" }, 401);
 
     // Signed URL for one file — browser PUTs the bytes straight to Storage.
+    // folder: 'board' (weekly recap, default) or 'allstar' (permanent section).
     if (action === "init") {
       const ext = EXT[String(b.contentType ?? "").toLowerCase()];
       if (!ext) return J({ error: "use MP4/MOV/WebM video or JPG/PNG/WebP image" }, 400);
-      const path = `board/${crypto.randomUUID().slice(0, 13)}.${ext}`;
+      const folder = String(b.folder ?? "board") === "allstar" ? "allstar" : "board";
+      const path = `${folder}/${crypto.randomUUID().slice(0, 13)}.${ext}`;
       const r = await sfetch(`/storage/v1/object/upload/sign/${BUCKET}/${path}`, { method: "POST", body: "{}" });
       if (!r.ok) return J({ error: `sign failed (${r.status})` }, 500);
       const { url } = await r.json();
@@ -61,11 +63,12 @@ Deno.serve(async (req: Request) => {
       });
     }
 
-    // Wipe all board media objects (used when a new week's recap replaces the old).
+    // Wipe one folder's media objects (recap replace, or clearing the All-Star set).
     if (action === "clear") {
-      const l = await sfetch(`/storage/v1/object/list/${BUCKET}`, { method: "POST", body: JSON.stringify({ prefix: "board/", limit: 1000 }) });
+      const folder = String(b.folder ?? "board") === "allstar" ? "allstar" : "board";
+      const l = await sfetch(`/storage/v1/object/list/${BUCKET}`, { method: "POST", body: JSON.stringify({ prefix: `${folder}/`, limit: 1000 }) });
       const items = l.ok ? await l.json() : [];
-      const names = (items || []).map((o: Record<string, unknown>) => `board/${o.name}`).filter((n: string) => !n.endsWith("/"));
+      const names = (items || []).map((o: Record<string, unknown>) => `${folder}/${o.name}`).filter((n: string) => !n.endsWith("/"));
       if (names.length) await sfetch(`/storage/v1/object/${BUCKET}`, { method: "DELETE", body: JSON.stringify({ prefixes: names }) });
       return J({ ok: true, removed: names.length });
     }

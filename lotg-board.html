@@ -213,6 +213,13 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
 [data-theme="retro"] .intro h2{font-family:var(--street);font-weight:400}
 #inPhotos img,#inPhotos video{width:100%;display:block;border-radius:14px;border:var(--bw) solid var(--line);box-shadow:4px 4px 0 var(--shadow);margin:0 0 13px}
 #inPhotos video{background:#000;max-height:74vh}
+.igbtn{display:flex;align-items:center;justify-content:space-between;gap:10px;border:var(--bw) solid var(--line);background:var(--card);color:var(--ink);border-radius:14px;padding:15px 16px;margin:0 0 12px;font-weight:700;font-size:14.5px;text-decoration:none;box-shadow:4px 4px 0 var(--shadow);transition:.15s var(--ease)}
+.igbtn:active{transform:scale(.98)}
+.igbtn .go{color:var(--acc);font-family:var(--disp);font-size:12px;letter-spacing:.06em;text-transform:uppercase;white-space:nowrap}
+.asmedia img,.asmedia video{width:100%;display:block;border-radius:14px;border:var(--bw) solid var(--line);box-shadow:4px 4px 0 var(--shadow);margin:0 0 13px}
+.asmedia video{background:#000;max-height:74vh}
+.asrow{display:flex;align-items:center;gap:9px;border:var(--bw) solid var(--line);background:var(--card);border-radius:12px;padding:8px 10px;margin-bottom:7px;font-size:13px}
+.asrow .k{flex:0 0 auto;font-size:16px}.asrow .t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .reelbtn{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--acc);color:var(--onacc);border:var(--bw) solid var(--acc);border-radius:13px;padding:14px;margin:2px 0 15px;font-family:var(--disp);font-weight:700;font-size:13.5px;letter-spacing:.05em;text-transform:uppercase;text-decoration:none;box-shadow:4px 4px 0 var(--shadow)}
 [data-theme="retro"] .reelbtn{font-weight:400}
 .notice{border:var(--bw) solid var(--acc2);border-radius:var(--r);background:var(--card);padding:14px 16px;margin:4px 0 14px;font-family:var(--disp);font-weight:700;font-size:15.5px;color:var(--acc2);box-shadow:4px 4px 0 var(--shadow)}
@@ -240,6 +247,7 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
   <nav class="tabs" role="tablist">
     <button class="tab" role="tab" id="tab-sched" aria-selected="true">Schedule</button>
     <button class="tab" role="tab" id="tab-stand" aria-selected="false">Standings</button>
+    <button class="tab" role="tab" id="tab-astar" aria-selected="false" style="display:none">⭐ All-Star</button>
     <button class="tab" role="tab" id="tab-teams" aria-selected="false" style="display:none">Teams</button>
   </nav>
 
@@ -253,6 +261,10 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
     <div id="standings"></div>
   </section>
 
+  <section class="pane" id="pane-astar">
+    <div id="astarBody"></div>
+  </section>
+
   <section class="pane" id="pane-teams">
     <div class="lbl">Court 1</div><div id="teamsC1"></div>
     <div class="lbl">Court 2</div><div id="teamsC2"></div>
@@ -264,6 +276,18 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
     <p class="hintline">The running month totals — shown under the court ladders. Update after each night.</p>
     <div id="seasonForm"></div>
     <button class="bigbtn ghost" id="seasonSave">Save season ladder</button>
+    <div class="lbl" style="margin-top:22px">🌟 All-Star Weekend</div>
+    <p class="hintline">Its own tab, separate from the weekly recap. Upload the real videos/photos from your phones (up to 200MB each) and paste the Instagram post links.</p>
+    <div class="arow2" style="margin:8px 0"><input id="asIntro" type="text" placeholder="Intro line for the section" maxlength="140"/></div>
+    <div class="arow2" style="margin:8px 0">
+      <button class="bigbtn ghost" id="asPick" style="margin:0">📸 Add photos & clips</button>
+      <button class="bigbtn ghost" id="asClear" style="margin:0">Clear all</button>
+    </div>
+    <input id="asFiles" type="file" accept="image/*,video/*" multiple hidden/>
+    <p class="hintline" id="asStat"></p>
+    <div class="arow2" style="margin:8px 0"><input id="asLink" type="text" placeholder="https://instagram.com/p/…" /><input id="asCap" type="text" placeholder="Label (e.g. Dunk contest 🔥)" maxlength="60" style="flex:0 0 40%"/></div>
+    <button class="bigbtn ghost" id="asAdd">➕ Add the link</button>
+    <div id="asList" style="margin-top:10px"></div>
     <div class="lbl" style="margin-top:22px">📝 Night notes</div>
     <p class="hintline">These show inside the recap. All three editable any time.</p>
     <div class="arow2" style="margin:8px 0"><input id="nnNotice" type="text" placeholder="Announcement — e.g. Week 4 draw drops Wednesday 26/8" maxlength="90"/></div>
@@ -436,11 +460,12 @@ function isCross(){
   const tm=teamMap();
   return weekGames().some(g=>{const a=tm.get(g.team1_id),b=tm.get(g.team2_id);return a&&b&&a.court_group!==b.court_group;});
 }
-function renderAll(){renderSchedule();renderStandings();renderTeams();renderMyTeam();renderChrome();}
+function renderAll(){renderSchedule();renderStandings();renderTeams();renderMyTeam();renderAllstar();renderAllstarAdmin();renderChrome();}
 function renderChrome(){
   $('#lockBtn').classList.toggle('on',state.admin);
   $('#lockBtn').textContent=state.admin?'🔓':'🔒';
   $('#tab-teams').style.display=state.admin?'':'none';
+  $('#tab-astar').style.display=(ALLSTAR.length||state.admin)?'':'none';
   $('#genHint').textContent=state.admin?`${state.teams.length} teams in · first tip-off ${state.settings.start}`:'';
   $('#verline').textContent='Love of the Game · Wednesday nights';
 }
@@ -804,7 +829,7 @@ function setTheme(t,m){
 }
 function setFmt(f){state.fmt=f;document.querySelectorAll('[data-fmt]').forEach(b=>b.classList.toggle('on',b.dataset.fmt===f));}
 function pick(which){
-  ['sched','stand','teams'].forEach(k=>{
+  ['sched','stand','astar','teams'].forEach(k=>{
     $('#tab-'+k).setAttribute('aria-selected',k===which);
     $('#pane-'+k).classList.toggle('on',k===which);
   });
@@ -818,6 +843,7 @@ $('#tab-sched').onclick=()=>pick('sched');
 $('#cSel1').onclick=()=>{state.court=1;try{localStorage.setItem('lotg_court','1')}catch(e){}renderSchedule();};
 $('#cSel2').onclick=()=>{state.court=2;try{localStorage.setItem('lotg_court','2')}catch(e){}renderSchedule();};
 $('#tab-stand').onclick=()=>pick('stand');
+$('#tab-astar').onclick=()=>pick('astar');
 $('#tab-teams').onclick=()=>pick('teams');
 $('#scrim').onclick=closeSheets;
 $('#lockBtn').onclick=()=>{ if(state.admin){ if(confirm('Lock the board?'))lock(); } else {$('#lockErr').textContent='';$('#passIn').value='';openSheet('shLock');setTimeout(()=>$('#passIn').focus(),300);} };
@@ -884,16 +910,16 @@ async function loadRecap(){
   try{RECAP=await rest('lotg_recap?select=id,ord,img,kind,created_at&order=ord.asc,created_at.asc')||[];}catch(e){RECAP=[];}
   renderRecapAdmin();renderIntro();
 }
-let rcI=0;
+let rcI=0,VIEW=[];
 function rcShow(i){
   rcI=i;
-  $('#rcImg').src=RECAP[i].img;
-  $('#rcDots').innerHTML=RECAP.map((_,j)=>`<span class="${j===i?'on':''}"></span>`).join('');
+  $('#rcImg').src=VIEW[i];
+  $('#rcDots').innerHTML=VIEW.map((_,j)=>`<span class="${j===i?'on':''}"></span>`).join('');
 }
 $('#rcX').onclick=()=>$('#rcView').classList.remove('open');
 $('#inGo').onclick=closeIntro;
 $('#inX').onclick=closeIntro;
-$('#rcView').onclick=e=>{ if(e.target.id==='rcX')return; if(rcI+1<RECAP.length)rcShow(rcI+1); else $('#rcView').classList.remove('open'); };
+$('#rcView').onclick=e=>{ if(e.target.id==='rcX')return; if(rcI+1<VIEW.length)rcShow(rcI+1); else $('#rcView').classList.remove('open'); };
 const MOTD_DEFAULT="Pass the ball. Get it moving. Get everyone involved — the game looks more beautiful that way. Played right, basketball is artwork. Let's paint every Wednesday night. 🎨🏀";
 function renderIntro(){
   const el=$('#intro');
@@ -1019,6 +1045,8 @@ $('#seasonSave').onclick=async()=>{
 $('#nnSave').onclick=async()=>{
   const st={...state.settings};
   const notice=$('#nnNotice').value.trim(),reel=$('#nnReel').value.trim(),motd=$('#nnMotd').value.trim();
+  const asIntro=($('#asIntro')?.value||'').trim();
+  asIntro?st.allstar_intro=asIntro:delete st.allstar_intro;
   notice?st.notice=notice:delete st.notice;
   if(reel&&!/^https?:\/\//.test(reel)){toast('Reel link needs to start with https://');return;}
   reel?st.reelUrl=reel:delete st.reelUrl;
@@ -1070,6 +1098,79 @@ async function pickTeam(id,name){
 }
 $('#a2hsOk').onclick=()=>closeSheets();
 
+/* ---------- All-Star Weekend ---------- */
+let ALLSTAR=[];
+async function loadAllstar(){
+  try{ALLSTAR=await rest('lotg_allstar?select=id,ord,kind,url,caption&order=ord.asc,created_at.asc')||[];}catch(e){ALLSTAR=[];}
+  renderAllstar();renderAllstarAdmin();renderChrome();
+}
+function renderAllstar(){
+  const el=$('#astarBody');if(!el)return;
+  if(!ALLSTAR.length){el.innerHTML='<div class="empty">All-Star Weekend content drops here soon 🌟</div>';return;}
+  const imgs=ALLSTAR.filter(x=>x.kind==='image');
+  el.innerHTML=`<div class="lbl" style="margin-top:4px">⭐ All-Star Weekend</div>
+    <p class="hintline" style="font-size:13.5px;color:var(--ink);margin:0 2px 14px">${esc(state.settings.allstar_intro||'')}</p>
+    <div class="asmedia">${ALLSTAR.map(x=>{
+      if(x.kind==='video')return `<video src="${esc(x.url)}" controls playsinline preload="metadata"></video>`;
+      if(x.kind==='link')return `<a class="igbtn" href="${esc(x.url)}" target="_blank" rel="noopener"><span>📸 ${esc(x.caption||'Watch on Instagram')}</span><span class="go">Open ↗</span></a>`;
+      const ix=imgs.indexOf(x);
+      return `<img src="${esc(x.url)}" data-as="${ix}" alt="${esc(x.caption||'All-Star Weekend')}"/>`;
+    }).join('')}</div>`;
+  el.querySelectorAll('[data-as]').forEach(im=>im.onclick=()=>{VIEW=imgs.map(x=>x.url);$('#rcView').classList.add('open');rcShow(+im.dataset.as);});
+}
+function renderAllstarAdmin(){
+  if(!state.admin||!$('#asList'))return;
+  if($('#asIntro')&&document.activeElement?.id!=='asIntro')$('#asIntro').value=state.settings.allstar_intro||'';
+  $('#asList').innerHTML=ALLSTAR.map(x=>`<div class="asrow"><span class="k">${x.kind==='video'?'🎬':x.kind==='link'?'🔗':'🖼️'}</span><span class="t">${esc(x.caption||x.url.slice(0,60))}</span><button class="pill x" data-asdel="${x.id}">✕</button></div>`).join('')||'<p class="hintline">Nothing in the section yet.</p>';
+  $('#asList').querySelectorAll('[data-asdel]').forEach(b=>b.onclick=async()=>{
+    try{await rest(`lotg_allstar?id=eq.${b.dataset.asdel}`,{method:'DELETE'},true);await loadAllstar();toast('Removed');}catch(e){toast(e.message);}
+  });
+}
+const asStat=t=>{const el=$('#asStat');if(el)el.textContent=t;};
+$('#asPick').onclick=()=>$('#asFiles').click();
+$('#asFiles').addEventListener('change',async()=>{
+  const files=[...$('#asFiles').files];$('#asFiles').value='';
+  if(!files.length)return;
+  const big=files.find(f=>f.size>200*1048576);
+  if(big){toast(`${big.name} is over 200MB`);return;}
+  try{
+    let ord=ALLSTAR.length?Math.max(...ALLSTAR.map(x=>x.ord))+1:0;
+    const rows=[];
+    for(let i=0;i<files.length;i++){
+      const f=files[i];
+      if(/^video\//.test(f.type)){
+        asStat(`Uploading clip ${i+1}/${files.length} — 0%`);
+        const init=await mediaApi({action:'init',contentType:f.type,folder:'allstar'});
+        await xhrPut(init.uploadUrl,f,pr=>asStat(`Uploading clip ${i+1}/${files.length} — ${Math.round(pr*100)}%`));
+        rows.push({ord:ord++,kind:'video',url:init.publicUrl});
+      }else{
+        asStat(`Adding photo ${i+1}/${files.length}…`);
+        rows.push({ord:ord++,kind:'image',url:await shrink(f,1200)});
+      }
+    }
+    await rest('lotg_allstar',{method:'POST',body:JSON.stringify(rows)},true);
+    asStat('');await loadAllstar();toast(`Added ${rows.length} to All-Star ⭐`);
+  }catch(e){asStat('');toast(e.message);}
+});
+$('#asAdd').onclick=async()=>{
+  const url=$('#asLink').value.trim(),cap=$('#asCap').value.trim();
+  if(!/^https?:\/\/(www\.)?instagram\.com\//.test(url)){toast('Paste a full Instagram post link');return;}
+  try{
+    const ord=ALLSTAR.length?Math.max(...ALLSTAR.map(x=>x.ord))+1:0;
+    await rest('lotg_allstar',{method:'POST',body:JSON.stringify({ord,kind:'link',url,caption:cap})},true);
+    $('#asLink').value='';$('#asCap').value='';
+    await loadAllstar();toast('Link added 🔗');
+  }catch(e){toast(e.message);}
+};
+$('#asClear').onclick=async()=>{
+  if(!confirm('Clear the whole All-Star section?'))return;
+  try{
+    await rest('lotg_allstar?id=not.is.null',{method:'DELETE'},true);
+    await mediaApi({action:'clear',folder:'allstar'}).catch(()=>{});
+    await loadAllstar();toast('All-Star cleared');
+  }catch(e){toast(e.message);}
+};
+
 /* boot */
 (function(){
   let th='modern',mo='dark';
@@ -1078,6 +1179,7 @@ $('#a2hsOk').onclick=()=>closeSheets();
   cachePaint();
   loadAll().catch(()=>toast('Connection hiccup — retrying…'));
   loadRecap();
+  loadAllstar();
   setInterval(()=>{if(!document.hidden&&!document.querySelector('.sheet.open')&&!state.editing)loadAll().catch(()=>{});},10000);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadAll().catch(()=>{});});
 })();
