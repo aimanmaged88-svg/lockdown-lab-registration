@@ -133,6 +133,13 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   Seeded from his Week 3 IG graphic (Sonics 20 / Unique 18 / G-Unit 18 /
   Surpass 17 / LOTG 17 / JJC 9 / Kopino 9 / Herbalife 9), stable sort keeps
   his entered order on ties.
+- **Featured IG post on opening (2026-08-25):** settings.introEmbed (IG
+  post/reel URL) renders as an official Instagram /embed/captioned/ iframe
+  at the top of the intro takeover (+"Watch it on Instagram ↗" fallback);
+  intro now opens on embed OR recap, renders from loadAll too (fixes a
+  fresh-device settings race) with an introSig guard so the 10s poll never
+  restarts media. Admin: Night-notes field #nnEmbed (instagram.com only).
+  Seeded with his reel Dca9PwYz1kI (Aiman pasted the official embed code).
 - **All-Star Weekend section (2026-08-25):** ⭐ All-Star tab (auto-hidden
   until it has content; admins always see it) — table `lotg_allstar`
   (ord/kind image|video|link/url/caption; public read, x-lotg-admin writes).
