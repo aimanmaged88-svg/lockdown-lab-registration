@@ -213,6 +213,12 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
 [data-theme="retro"] .intro h2{font-family:var(--street);font-weight:400}
 #inPhotos img,#inPhotos video{width:100%;display:block;border-radius:14px;border:var(--bw) solid var(--line);box-shadow:4px 4px 0 var(--shadow);margin:0 0 13px}
 #inPhotos video{background:#000;max-height:74vh}
+/* merch promo card (opening screen) */
+.merchcard{border:var(--bw) solid var(--acc2);border-radius:var(--r);background:linear-gradient(160deg,color-mix(in srgb,var(--acc) 13%,var(--card)),var(--card) 62%);padding:16px 17px;margin:2px 0 18px;text-align:left;box-shadow:4px 4px 0 var(--shadow)}
+.merchcard .mh{font-family:var(--disp);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--acc2);margin-bottom:8px}
+[data-theme="retro"] .merchcard .mh{font-family:var(--street);letter-spacing:.05em;text-transform:none;font-size:15px}
+.merchcard p{margin:0;font-size:15.5px;line-height:1.55;font-weight:600}
+.merchcard .reelbtn{margin:13px 0 0}
 /* marketplace mock (admin preview only) */
 .mkpill{display:inline-block;font-size:10px;letter-spacing:.14em;padding:3px 9px;border-radius:999px;background:var(--acc);color:var(--onacc);vertical-align:2px;margin-left:8px}
 .mkgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin:12px 0}
@@ -308,6 +314,8 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
     <div class="arow2" style="margin:8px 0"><input id="nnNotice" type="text" placeholder="Announcement — e.g. Week 4 draw drops Wednesday 26/8" maxlength="90"/></div>
     <div class="arow2" style="margin:8px 0"><input id="nnReel" type="text" placeholder="Full highlight reel link (https://…)" maxlength="300"/></div>
     <div class="arow2" style="margin:8px 0"><input id="nnEmbed" type="text" placeholder="Instagram post/reel to FEATURE on opening (paste the link)" maxlength="300"/></div>
+    <div class="arow2" style="margin:8px 0"><input id="nnMerch" type="text" placeholder="Merch shop link (https://…, blank = off)" maxlength="300"/></div>
+    <div class="arow2" style="margin:8px 0"><input id="nnMerchTxt" type="text" placeholder="Merch pitch line — e.g. Support SJ, grab the merch" maxlength="160"/></div>
     <div class="arow2" style="margin:8px 0"><textarea id="nnMotd" placeholder="Message of the night" maxlength="300" style="flex:1;min-height:84px;background:var(--card);border:var(--bw) solid var(--line);border-radius:12px;padding:12px;color:var(--ink);font-family:inherit;font-size:15px;resize:vertical"></textarea></div>
     <button class="bigbtn ghost" id="nnSave">Save night notes</button>
     <div class="lbl" style="margin-top:22px">📰 Last run recap</div>
@@ -961,14 +969,17 @@ function renderIntro(){
   if((!RECAP.length&&!emb&&!msg)||state.admin){el.classList.remove('open');introSig='';return;}
   let last=0;try{last=+localStorage.getItem('lotg_intro_ts')||0}catch(e){}
   if(Date.now()-last<3*36e5)return;
-  const sig=JSON.stringify([msg,emb,RECAP.map(r=>r.id),state.settings.reelUrl||'',state.settings.notice||'',state.settings.motd||'']);
+  const mUrl=state.settings.merchUrl||'',mTxt=state.settings.merchTxt||'';
+  const sig=JSON.stringify([msg,emb,mUrl,mTxt,RECAP.map(r=>r.id),state.settings.reelUrl||'',state.settings.notice||'',state.settings.motd||'']);
   if(sig===introSig)return;
   introSig=sig;
   const reel=state.settings.reelUrl&&/^https?:\/\//.test(state.settings.reelUrl)?`<a class="reelbtn" href="${esc(state.settings.reelUrl)}" target="_blank" rel="noopener">🎬 Watch the FULL highlight reel ↗</a>`:'';
   let reelPlaced=false,vidN=0;
-  // The order he set: the message first, then the Insta reel, then into the app.
-  let html=msg?`<div class="motd" style="margin-top:14px"><p style="white-space:pre-line">${esc(msg)}</p></div>`:'';
-  html+=emb;
+  // His order (2026-08-25): the All-Star reel FIRST, then the message to SJ,
+  // then the support-SJ merch plug, then into the app.
+  let html=emb;
+  if(msg)html+=`<div class="motd" style="margin-top:14px"><p style="white-space:pre-line">${esc(msg)}</p></div>`;
+  if(mUrl&&/^https?:\/\//.test(mUrl))html+=`<div class="merchcard"><div class="mh">🛒 Official LOTG merch</div><p style="white-space:pre-line">${esc(mTxt||'Support SJ — grab the merch. Let\'s make this grow 📈')}</p><a class="reelbtn" href="${esc(mUrl)}" target="_blank" rel="noopener">Grab the merch ↗</a></div>`;
   if(RECAP.length)html+=`<h2>Here's a recap of last week 📰</h2>`;
   html+=RECAP.map((r,i)=>{
     if(r.kind==='video'){
@@ -1004,6 +1015,8 @@ function renderRecapAdmin(){
   if($('#nnNotice')&&document.activeElement?.id!=='nnNotice')$('#nnNotice').value=state.settings.notice||'';
   if($('#nnReel')&&document.activeElement?.id!=='nnReel')$('#nnReel').value=state.settings.reelUrl||'';
   if($('#nnEmbed')&&document.activeElement?.id!=='nnEmbed')$('#nnEmbed').value=state.settings.introEmbed||'';
+  if($('#nnMerch')&&document.activeElement?.id!=='nnMerch')$('#nnMerch').value=state.settings.merchUrl||'';
+  if($('#nnMerchTxt')&&document.activeElement?.id!=='nnMerchTxt')$('#nnMerchTxt').value=state.settings.merchTxt||'';
   if($('#nnMotd')&&document.activeElement?.id!=='nnMotd')$('#nnMotd').value=state.settings.motd||MOTD_DEFAULT;
 }
 async function shrink(file,max){
@@ -1101,6 +1114,10 @@ $('#nnSave').onclick=async()=>{
   const embed=$('#nnEmbed').value.trim();
   if(embed&&!igEmbed(embed)){toast('Feature link needs to be an Instagram post/reel link');return;}
   embed?st.introEmbed=embed:delete st.introEmbed;
+  const merch=($('#nnMerch')?.value||'').trim(),merchTxt=($('#nnMerchTxt')?.value||'').trim();
+  if(merch&&!/^https?:\/\//.test(merch)){toast('Merch link needs to start with https://');return;}
+  merch?st.merchUrl=merch:delete st.merchUrl;
+  merchTxt?st.merchTxt=merchTxt:delete st.merchTxt;
   motd?st.motd=motd:delete st.motd;
   try{
     await rest('lotg_admin?id=eq.1',{method:'PATCH',body:JSON.stringify({settings:st})},true);
