@@ -323,6 +323,7 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
     <button class="bigbtn ghost" id="seasonSave">Save season ladder</button>
     <div class="lbl" style="margin-top:22px">🌟 All-Star Weekend</div>
     <p class="hintline">Its own tab, separate from the weekly recap. Upload the real videos/photos from your phones (up to 200MB each) and paste the Instagram post links.</p>
+    <div class="arow2" style="margin:8px 0"><input id="asEmbed" type="text" placeholder="Instagram reel to PLAY in this section (paste the link)" maxlength="300"/></div>
     <div class="arow2" style="margin:8px 0"><textarea id="asIntro" placeholder="Intro / dedication for the section" maxlength="400" style="flex:1;min-height:104px;background:var(--card);border:var(--bw) solid var(--line);border-radius:12px;padding:12px;color:var(--ink);font-family:inherit;font-size:15px;resize:vertical"></textarea></div>
     <div class="arow2" style="margin:8px 0">
       <button class="bigbtn ghost" id="asPick" style="margin:0">📸 Add photos & clips</button>
@@ -514,8 +515,8 @@ function renderChrome(){
   $('#lockBtn').classList.toggle('on',state.admin);
   $('#lockBtn').textContent=state.admin?'🔓':'🔒';
   $('#tab-teams').style.display=state.admin?'':'none';
-  $('#tab-astar').style.display=(ALLSTAR.length||state.admin)?'':'none';
-  $('#tab-market').style.display=(mkLive().length||state.admin)?'':'none';
+  $('#tab-astar').style.display=(ALLSTAR.length||state.settings.allstar_embed||state.admin)?'':'none';
+  $('#tab-market').style.display=state.admin?'':'none';  /* admin-only for now — his call to open it up */
   $('#genHint').textContent=state.admin?`${state.teams.length} teams in · first tip-off ${state.settings.start}`:'';
   $('#verline').textContent='Love of the Game · Wednesday nights';
 }
@@ -978,7 +979,7 @@ function igEmbed(u){
   const m=String(u||'').match(/^https:\/\/(www\.)?instagram\.com\/(reel|p|tv)\/[A-Za-z0-9_-]+/);
   if(!m)return '';
   const base=m[0].replace('://instagram.com','://www.instagram.com');
-  return `<div class="igembed"><iframe src="${base}/embed/captioned/" title="Instagram" allowfullscreen allow="autoplay; encrypted-media"></iframe><a class="reelbtn" href="${base}/" target="_blank" rel="noopener">📸 Watch it on Instagram ↗</a></div>`;
+  return `<div class="igembed"><iframe src="${base}/embed/captioned/" title="Instagram" loading="lazy" allowfullscreen allow="autoplay; encrypted-media"></iframe><a class="reelbtn" href="${base}/" target="_blank" rel="noopener">📸 Watch it on Instagram ↗</a></div>`;
 }
 let introSig='';
 function renderIntro(){
@@ -1127,6 +1128,9 @@ $('#nnSave').onclick=async()=>{
   imsg?st.introMsg=imsg:delete st.introMsg;
   const asIntro=($('#asIntro')?.value||'').trim();
   asIntro?st.allstar_intro=asIntro:delete st.allstar_intro;
+  const asEmb=($('#asEmbed')?.value||'').trim();
+  if(asEmb&&!igEmbed(asEmb)){toast('All-Star reel needs to be an Instagram post/reel link');return;}
+  asEmb?st.allstar_embed=asEmb:delete st.allstar_embed;
   notice?st.notice=notice:delete st.notice;
   if(reel&&!/^https?:\/\//.test(reel)){toast('Reel link needs to start with https://');return;}
   reel?st.reelUrl=reel:delete st.reelUrl;
@@ -1140,7 +1144,7 @@ $('#nnSave').onclick=async()=>{
   motd?st.motd=motd:delete st.motd;
   try{
     await rest('lotg_admin?id=eq.1',{method:'PATCH',body:JSON.stringify({settings:st})},true);
-    state.settings=st;toast('Night notes saved 📝');
+    state.settings=st;renderAllstar();renderChrome();toast('Night notes saved 📝');
   }catch(e){toast(e.message);}
 };
 
@@ -1193,10 +1197,12 @@ async function loadAllstar(){
 }
 function renderAllstar(){
   const el=$('#astarBody');if(!el)return;
-  if(!ALLSTAR.length){el.innerHTML='<div class="empty">All-Star Weekend content drops here soon 🌟</div>';return;}
+  const emb=igEmbed(state.settings.allstar_embed);
+  if(!ALLSTAR.length&&!emb){el.innerHTML='<div class="empty">All-Star Weekend content drops here soon 🌟</div>';return;}
   const imgs=ALLSTAR.filter(x=>x.kind==='image');
   el.innerHTML=`<div class="lbl" style="margin-top:4px">⭐ All-Star Weekend</div>
     <p class="hintline" style="font-size:14px;line-height:1.55;color:var(--ink);margin:0 2px 16px;white-space:pre-line">${esc(state.settings.allstar_intro||'')}</p>
+    ${emb?`<div class="lbl" style="margin:0 0 8px">🎬 Watch it again</div>`+emb:''}
     <div class="asmedia">${ALLSTAR.map(x=>{
       if(x.kind==='video')return `<video src="${esc(x.url)}" controls playsinline preload="metadata"></video>`;
       if(x.kind==='link')return `<a class="igbtn" href="${esc(x.url)}" target="_blank" rel="noopener"><span>📸 ${esc(x.caption||'Watch on Instagram')}</span><span class="go">Open ↗</span></a>`;
@@ -1208,6 +1214,7 @@ function renderAllstar(){
 function renderAllstarAdmin(){
   if(!state.admin||!$('#asList'))return;
   if($('#asIntro')&&document.activeElement?.id!=='asIntro')$('#asIntro').value=state.settings.allstar_intro||'';
+  if($('#asEmbed')&&document.activeElement?.id!=='asEmbed')$('#asEmbed').value=state.settings.allstar_embed||'';
   $('#asList').innerHTML=ALLSTAR.map(x=>`<div class="asrow"><span class="k">${x.kind==='video'?'🎬':x.kind==='link'?'🔗':'🖼️'}</span><span class="t">${esc(x.caption||x.url.slice(0,60))}</span><button class="pill x" data-asdel="${x.id}">✕</button></div>`).join('')||'<p class="hintline">Nothing in the section yet.</p>';
   $('#asList').querySelectorAll('[data-asdel]').forEach(b=>b.onclick=async()=>{
     try{await rest(`lotg_allstar?id=eq.${b.dataset.asdel}`,{method:'DELETE'},true);await loadAllstar();toast('Removed');}catch(e){toast(e.message);}
@@ -1266,7 +1273,7 @@ const MARKET_SAMPLES=`<div class="mkgrid">
   <div class="mkcard"><span class="mktag">SAMPLE</span><div class="ico">💈</div><div class="bnm">Fresh Fades Barber</div><div class="bsv">Cuts &amp; beard work · walk-ins</div><div class="bdeal">Wednesday special for ballers</div><div class="big">📸 @sample-handle</div></div>
   <div class="mkcard"><span class="mktag">SAMPLE</span><div class="ico">🏀</div><div class="bnm">Next Level Training</div><div class="bsv">1-on-1 skills &amp; conditioning</div><div class="bdeal">First session on the house</div><div class="big">📸 @sample-handle</div></div>
 </div>
-<div class="mkapply">👀 <b>Preview only — players can't see this yet.</b> These four are samples to show the shape. Add a real business below and the tab goes live for everyone (the samples disappear the moment there's a real one).</div>`;
+<div class="mkapply">👀 <b>Preview only — the Market tab is yours alone right now.</b> These four are samples showing the shape. Add real businesses below and they'll replace the samples here; the crew sees nothing until you say open it up.</div>`;
 let MARKET=[];
 const mkLive=()=>MARKET.filter(m=>!m.hidden);
 async function loadMarket(){
@@ -1291,7 +1298,7 @@ function renderMarket(){
   const live=mkLive();
   const head=`<div class="lbl" style="margin-top:4px">🏪 Community Marketplace</div>
     <p class="hintline" style="font-size:13.5px;line-height:1.55;color:var(--ink);margin:0 2px 14px;white-space:pre-line">${esc(state.settings.market_intro||MARKET_INTRO_DEFAULT)}</p>`;
-  if(live.length){el.innerHTML=head+`<div class="mkgrid">${live.map(mkCard).join('')}</div>`;return;}
+  if(live.length){el.innerHTML=head+`<div class="mkgrid">${live.map(mkCard).join('')}</div>`+(state.admin?'<div class="mkapply">🔒 <b>Admin-only for now.</b> These listings are live in here but the crew can\'t see the Market tab yet — say the word and I\'ll open it to everyone.</div>':'');return;}
   el.innerHTML=head+(state.admin?MARKET_SAMPLES:'<div class="empty">Community businesses drop here soon 🏪</div>');
 }
 function renderMarketAdmin(){
