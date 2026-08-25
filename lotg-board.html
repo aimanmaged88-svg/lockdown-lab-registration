@@ -214,6 +214,20 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
 [data-theme="retro"] .intro h2{font-family:var(--street);font-weight:400}
 #inPhotos img,#inPhotos video{width:100%;display:block;border-radius:14px;border:var(--bw) solid var(--line);box-shadow:4px 4px 0 var(--shadow);margin:0 0 13px}
 #inPhotos video{background:#000;max-height:74vh}
+/* opening takeover — step 1 (the reel) + step 2 (the note) */
+.inkick{font-family:var(--disp);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--acc2);margin:12px 0 2px}
+[data-theme="retro"] .inkick{font-family:var(--street);letter-spacing:.06em;text-transform:none;font-size:15px}
+.bigbtn.waiting{opacity:.5;cursor:default}
+.notecard{border:var(--bw) solid var(--acc);border-radius:var(--r);background:linear-gradient(165deg,color-mix(in srgb,var(--acc) 12%,var(--card)),var(--card) 58%);padding:19px 18px 17px;margin:10px 0 16px;text-align:left;box-shadow:5px 5px 0 var(--shadow)}
+.notecard p{margin:0;font-size:16px;line-height:1.6;font-weight:600}
+.notecard .nsplit{height:1px;background:var(--line2);margin:16px 0}
+.notecard .mh{font-family:var(--disp);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--acc2);margin-bottom:7px}
+[data-theme="retro"] .notecard .mh{font-family:var(--street);letter-spacing:.05em;text-transform:none;font-size:16px}
+.notecard .mtxt{font-size:14.5px;line-height:1.55}
+.notecard .reelbtn{margin:14px 0 0}
+@keyframes popBig{from{opacity:0;transform:scale(.84) translateY(26px)}62%{opacity:1;transform:scale(1.025) translateY(0)}to{opacity:1;transform:none}}
+.pop{animation:popBig .66s var(--spring) both}
+.pop2{animation:popBig .6s .18s var(--spring) both}
 /* merch promo card (opening screen) */
 .merchcard{border:var(--bw) solid var(--acc2);border-radius:var(--r);background:linear-gradient(160deg,color-mix(in srgb,var(--acc) 13%,var(--card)),var(--card) 62%);padding:16px 17px;margin:2px 0 18px;text-align:left;box-shadow:4px 4px 0 var(--shadow)}
 .merchcard .mh{font-family:var(--disp);font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--acc2);margin-bottom:8px}
@@ -429,9 +443,17 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
   <button class="rc-x" id="inX" aria-label="Skip to the app">×</button>
   <div class="intro-wrap">
     <img src="/assets/lotg-logo.jpg" alt="Love of the Game" class="logoimg" style="height:64px;margin:0 auto"/>
-    <div id="inPhotos"></div>
-    <div class="motd" id="motdCard"><div class="mh">💬 Message of the night</div><p id="motdTx"></p></div>
-    <button class="bigbtn" id="inGo">Into the app 🏀</button>
+    <div id="inStep1" style="display:none">
+      <div class="inkick">⭐ All-Star Weekend</div>
+      <h2 style="margin-top:4px">Watch this first 🎬</h2>
+      <div id="inReel"></div>
+      <button class="bigbtn waiting" id="inNext" disabled>Watch it…</button>
+    </div>
+    <div id="inStep2" style="display:none">
+      <div id="inPhotos"></div>
+      <div class="motd" id="motdCard"><div class="mh">💬 Message of the night</div><p id="motdTx"></p></div>
+      <button class="bigbtn" id="inGo">Into the app 🏀</button>
+    </div>
   </div>
 </div>
 
@@ -970,6 +992,7 @@ function rcShow(i){
 }
 $('#rcX').onclick=()=>$('#rcView').classList.remove('open');
 $('#inGo').onclick=closeIntro;
+$('#inNext').onclick=()=>introStep(2);
 $('#inX').onclick=closeIntro;
 $('#rcView').onclick=e=>{ if(e.target.id==='rcX')return; if(rcI+1<VIEW.length)rcShow(rcI+1); else $('#rcView').classList.remove('open'); };
 const MOTD_DEFAULT="Pass the ball. Get it moving. Get everyone involved — the game looks more beautiful that way. Played right, basketball is artwork. Let's paint every Wednesday night. 🎨🏀";
@@ -995,11 +1018,17 @@ function renderIntro(){
   introSig=sig;
   const reel=state.settings.reelUrl&&/^https?:\/\//.test(state.settings.reelUrl)?`<a class="reelbtn" href="${esc(state.settings.reelUrl)}" target="_blank" rel="noopener">🎬 Watch the FULL highlight reel ↗</a>`:'';
   let reelPlaced=false,vidN=0;
-  // His order (2026-08-25): the All-Star reel FIRST, then the message to SJ,
-  // then the support-SJ merch plug, then into the app.
-  let html=emb;
-  if(msg)html+=`<div class="motd" style="margin-top:14px"><p style="white-space:pre-line">${esc(msg)}</p></div>`;
-  if(mUrl&&/^https?:\/\//.test(mUrl))html+=`<div class="merchcard"><div class="mh">🛒 Official LOTG merch</div><p style="white-space:pre-line">${esc(mTxt||'Support SJ — grab the merch. Let\'s make this grow 📈')}</p><a class="reelbtn" href="${esc(mUrl)}" target="_blank" rel="noopener">Grab the merch ↗</a></div>`;
+  // Step 2 = the note. His shoutout and the way we thank SJ live in ONE card
+  // (his ask), then the recap, then what's coming next.
+  let html='';
+  if(msg||(mUrl&&/^https?:\/\//.test(mUrl))){
+    html+=`<div class="notecard pop">`+
+      (msg?`<p style="white-space:pre-line">${esc(msg)}</p>`:'')+
+      (mUrl&&/^https?:\/\//.test(mUrl)
+        ? (msg?`<div class="nsplit"></div>`:'')+`<div class="mh">🛒 How we say thank you</div><p class="mtxt">${esc(mTxt||'Grab the merch — every piece backs the man who put it on.')}</p><a class="reelbtn" href="${esc(mUrl)}" target="_blank" rel="noopener">Grab the merch ↗</a>`
+        : '')+
+      `</div>`;
+  }
   if(RECAP.length)html+=`<h2>Here's a recap of last week 📰</h2>`;
   html+=RECAP.map((r,i)=>{
     if(r.kind==='video'){
@@ -1011,13 +1040,45 @@ function renderIntro(){
     return `<img src="${r.img}" alt="Last week recap ${i+1}"/>`;
   }).join('');
   if(reel&&!reelPlaced)html+=reel;
-  if(state.settings.notice)html+=`<div class="notice">📣 ${esc(state.settings.notice)}</div>`;
+  if(state.settings.notice)html+=`<div class="notice pop2">📣 ${esc(state.settings.notice)}</div>`;
   $('#inPhotos').innerHTML=html;
   $('#motdCard').style.display=msg?'none':'';
   $('#motdTx').textContent=state.settings.motd||MOTD_DEFAULT;
-  el.classList.add('open');window.scrollTo(0,0);
+  $('#inReel').innerHTML=emb;
+  el.classList.add('open');
+  if(emb){introStep(1);armNext(10);}else{introStep(2);}
+  window.scrollTo(0,0);
 }
-function closeIntro(){try{localStorage.setItem('lotg_intro_ts',String(Date.now()))}catch(e){}$('#intro').classList.remove('open');}
+/* The reel plays first and the way through opens once it's had a run.
+   Instagram's player tells us nothing about playback, so this is a timer,
+   not true detection — the ✕ escape hatch comes back when it lapses. */
+let inTick=null;
+function armNext(sec){
+  const b=$('#inNext');if(!b)return;
+  let left=sec;
+  clearInterval(inTick);
+  b.disabled=true;b.classList.add('waiting');b.textContent=`Watch it… ${left}s`;
+  $('#inX').style.display='none';
+  inTick=setInterval(()=>{
+    if(--left<=0){
+      clearInterval(inTick);inTick=null;
+      b.disabled=false;b.classList.remove('waiting');b.textContent='Now read this 👇';
+      $('#inX').style.display='';
+    }else b.textContent=`Watch it… ${left}s`;
+  },1000);
+}
+function introStep(n){
+  const s1=$('#inStep1'),s2=$('#inStep2');if(!s1||!s2)return;
+  s1.style.display=n===1?'':'none';
+  s2.style.display=n===2?'':'none';
+  if(n===2){
+    clearInterval(inTick);inTick=null;$('#inX').style.display='';
+    s2.querySelectorAll('.pop,.pop2').forEach(el=>{const c=el.className;el.className=c.replace(/\bpop2?\b/g,'').trim();void el.offsetWidth;el.className=c;});
+  }
+  const w=document.querySelector('.intro-wrap');if(w)w.scrollTop=0;
+  window.scrollTo(0,0);
+}
+function closeIntro(){clearInterval(inTick);inTick=null;try{localStorage.setItem('lotg_intro_ts',String(Date.now()))}catch(e){}$('#intro').classList.remove('open');}
 function renderSeasonForm(){
   if(!state.admin||!$('#seasonForm'))return;
   const saved=(state.settings.season&&state.settings.season.rows)||[];
