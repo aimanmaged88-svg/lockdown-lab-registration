@@ -358,6 +358,8 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
     <div class="arow2" style="margin:8px 0"><input id="nnMerchTxt" type="text" placeholder="Merch pitch line — e.g. Support SJ, grab the merch" maxlength="160"/></div>
     <div class="arow2" style="margin:8px 0"><textarea id="nnMotd" placeholder="Message of the night" maxlength="300" style="flex:1;min-height:84px;background:var(--card);border:var(--bw) solid var(--line);border-radius:12px;padding:12px;color:var(--ink);font-family:inherit;font-size:15px;resize:vertical"></textarea></div>
     <button class="bigbtn ghost" id="nnSave">Save night notes</button>
+    <button class="bigbtn ghost" id="introPrev">👁 Preview the opening</button>
+    <p class="hintline">See exactly what the crew sees when they open the link — the opening is skipped for you normally (admins go straight in) and only shows once every 3 hours per phone.</p>
     <div class="lbl" style="margin-top:22px">📰 Last run recap</div>
     <p class="hintline">Upload photos AND video clips (top plays) in the order you want them seen — they're the full-screen recap everyone gets when they open the link. Videos up to ~200MB; the long full reel goes in the link above instead.</p>
     <p class="hintline" id="upStat"></p>
@@ -1004,9 +1006,10 @@ function igEmbed(u){
   const base=m[0].replace('://instagram.com','://www.instagram.com');
   return `<div class="igembed"><iframe src="${base}/embed/captioned/" title="Instagram" loading="lazy" allowfullscreen allow="autoplay; encrypted-media"></iframe><a class="reelbtn" href="${base}/" target="_blank" rel="noopener">📸 Watch it on Instagram ↗</a></div>`;
 }
-let introSig='';
+let introSig='',introPrev=false;
 function renderIntro(){
   const el=$('#intro');
+  if(introPrev)return;
   const emb=igEmbed(state.settings.introEmbed);
   const msg=(state.settings.introMsg||'').trim();
   if((!RECAP.length&&!emb&&!msg)||state.admin){el.classList.remove('open');introSig='';return;}
@@ -1078,7 +1081,21 @@ function introStep(n){
   const w=document.querySelector('.intro-wrap');if(w)w.scrollTop=0;
   window.scrollTo(0,0);
 }
-function closeIntro(){clearInterval(inTick);inTick=null;try{localStorage.setItem('lotg_intro_ts',String(Date.now()))}catch(e){}$('#intro').classList.remove('open');}
+function closeIntro(){
+  clearInterval(inTick);inTick=null;
+  if(!introPrev){try{localStorage.setItem('lotg_intro_ts',String(Date.now()))}catch(e){}}
+  introPrev=false;$('#intro').classList.remove('open');
+}
+$('#introPrev').onclick=()=>{
+  introPrev=false;introSig='';
+  const wasAdmin=state.admin;state.admin=false;
+  let ts=null;try{ts=localStorage.getItem('lotg_intro_ts');localStorage.removeItem('lotg_intro_ts')}catch(e){}
+  renderIntro();
+  state.admin=wasAdmin;
+  try{if(ts)localStorage.setItem('lotg_intro_ts',ts)}catch(e){}
+  if($('#intro').classList.contains('open')){introPrev=true;closeSheets();}
+  else toast('Nothing to open with yet — add a reel, a message or a recap');
+};
 function renderSeasonForm(){
   if(!state.admin||!$('#seasonForm'))return;
   const saved=(state.settings.season&&state.settings.season.rows)||[];
