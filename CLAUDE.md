@@ -173,7 +173,15 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   Services only, NO merch (his rule) — stated in the admin copy. The old
   Teams-pane mock was REMOVED (one-line pointer to the tab left in its place).
   Tab strip is now horizontally scrollable (flex:1 0 auto + hidden scrollbar)
-  since admins see 5 tabs.
+  since admins see 5 tabs. **Market tab is ADMIN-ONLY for now** (his call
+  same day) — flip `$('#tab-market').style.display=state.admin?…` back to
+  `(mkLive().length||state.admin)` to open it to the crew.
+- **All-Star reel replay (2026-08-25):** settings.allstar_embed renders the
+  All-Star reel as a playable IG embed inside the ⭐ tab under "🎬 Watch it
+  again" (his ask: "drop the All-Star content in there in case anyone wants
+  to see it again"), so it survives the one-shot opening takeover. Tab now
+  shows for players on embed OR rows; admin field #asEmbed sits above the
+  intro/dedication box and saves with night notes. Embeds lazy-load.
 - **All-Star Weekend section (2026-08-25):** ⭐ All-Star tab (auto-hidden
   until it has content; admins always see it) — table `lotg_allstar`
   (ord/kind image|video|link/url/caption; public read, x-lotg-admin writes).
