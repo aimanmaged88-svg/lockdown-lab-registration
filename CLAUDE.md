@@ -159,6 +159,21 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   static mock only (4 dashed SAMPLE service cards: massage/tradie/barber/
   training + how-it'll-work note; services only NO merch, his rule).
   Players never see it. Real build = his go-ahead.
+- **Marketplace tab — REAL, not a mock (2026-08-25, "put it in its own tab…
+  start creating it like an app"):** 🏪 Market tab (auto-hidden until it has a
+  live listing; admins always see it) — table `lotg_market` (ord/name/service/
+  deal/icon/ig/phone/link/hidden; public read, x-lotg-admin writes, migration
+  `lotg_market`). Player cards show icon/name/service, a gold deal chip and
+  contact buttons (📸 IG → instagram.com/handle, ☎️ tel:, 🔗 Book/visit).
+  Admin block INSIDE the Market pane: add-a-business form (7 fields, https
+  validation on the link), per-row ✕ delete, and settings.market_intro editor
+  (#mkIntro/#mkIntroSave). The 4 dashed SAMPLE cards now render ONLY for
+  admins when there are zero real listings ("preview only — players can't see
+  this"); the first real listing replaces them and opens the tab to everyone.
+  Services only, NO merch (his rule) — stated in the admin copy. The old
+  Teams-pane mock was REMOVED (one-line pointer to the tab left in its place).
+  Tab strip is now horizontally scrollable (flex:1 0 auto + hidden scrollbar)
+  since admins see 5 tabs.
 - **All-Star Weekend section (2026-08-25):** ⭐ All-Star tab (auto-hidden
   until it has content; admins always see it) — table `lotg_allstar`
   (ord/kind image|video|link/url/caption; public read, x-lotg-admin writes).

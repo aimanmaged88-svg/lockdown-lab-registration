@@ -59,9 +59,10 @@ header{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
 .icobtn.on{background:var(--acc);border-color:var(--acc);color:var(--onacc)}
 
 /* tabs */
-.tabs{position:sticky;top:0;z-index:6;display:flex;gap:6px;padding:10px 0 12px;background:linear-gradient(var(--bg) 62%,transparent)}
-.tab{flex:1;appearance:none;border:var(--bw) solid var(--line);background:var(--card);color:var(--muted);font-family:var(--disp);
-  font-weight:700;font-size:12.5px;letter-spacing:.1em;text-transform:uppercase;padding:12px 6px;border-radius:12px;cursor:pointer;transition:.18s var(--ease);box-shadow:3px 3px 0 var(--shadow)}
+.tabs{position:sticky;top:0;z-index:6;display:flex;gap:6px;padding:10px 0 12px;background:linear-gradient(var(--bg) 62%,transparent);overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1 0 auto;white-space:nowrap;appearance:none;border:var(--bw) solid var(--line);background:var(--card);color:var(--muted);font-family:var(--disp);
+  font-weight:700;font-size:12px;letter-spacing:.08em;text-transform:uppercase;padding:12px 11px;border-radius:12px;cursor:pointer;transition:.18s var(--ease);box-shadow:3px 3px 0 var(--shadow)}
 [data-theme="retro"] .tab{font-weight:400}
 .tab[aria-selected="true"]{background:var(--acc);border-color:var(--acc);color:var(--onacc)}
 .tab:active{transform:scale(.97)}
@@ -219,7 +220,7 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
 [data-theme="retro"] .merchcard .mh{font-family:var(--street);letter-spacing:.05em;text-transform:none;font-size:15px}
 .merchcard p{margin:0;font-size:15.5px;line-height:1.55;font-weight:600}
 .merchcard .reelbtn{margin:13px 0 0}
-/* marketplace mock (admin preview only) */
+/* community marketplace */
 .mkpill{display:inline-block;font-size:10px;letter-spacing:.14em;padding:3px 9px;border-radius:999px;background:var(--acc);color:var(--onacc);vertical-align:2px;margin-left:8px}
 .mkgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px;margin:12px 0}
 .mkcard{position:relative;border:1.5px dashed var(--line2);border-radius:14px;background:var(--card);padding:14px 14px 12px;opacity:.94}
@@ -228,6 +229,11 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
 .mkcard .bsv{font-size:12.5px;color:var(--muted)}
 .mkcard .bdeal{margin-top:9px;font-size:12px;font-weight:700;color:var(--acc);border:1px solid color-mix(in srgb,var(--acc) 45%,transparent);border-radius:9px;padding:5px 8px;display:inline-block}
 .mkcard .big{margin-top:8px;font-size:12px;color:var(--dim)}
+.mkcard.real{border-style:solid;border-color:var(--line);opacity:1;box-shadow:4px 4px 0 var(--shadow)}
+.mkrow{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}
+.mkbtn{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;text-decoration:none;border:1px solid var(--line2);border-radius:10px;padding:7px 11px;color:var(--ink);background:var(--card2);transition:.15s var(--ease)}
+.mkbtn.go{background:var(--acc);border-color:var(--acc);color:var(--onacc)}
+.mkbtn:active{transform:scale(.97)}
 .mktag{position:absolute;top:10px;right:10px;font-size:9px;letter-spacing:.12em;border:1px solid var(--line2);border-radius:999px;padding:2px 7px;color:var(--dim);background:var(--card2)}
 .mkapply{border:var(--bw) solid var(--line);border-radius:14px;background:var(--card2);padding:13px 14px;font-size:13px;line-height:1.55;color:var(--muted)}
 .igembed{margin:0 0 13px}
@@ -268,6 +274,7 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
     <button class="tab" role="tab" id="tab-sched" aria-selected="true">Schedule</button>
     <button class="tab" role="tab" id="tab-stand" aria-selected="false">Standings</button>
     <button class="tab" role="tab" id="tab-astar" aria-selected="false" style="display:none">⭐ All-Star</button>
+    <button class="tab" role="tab" id="tab-market" aria-selected="false" style="display:none">🏪 Market</button>
     <button class="tab" role="tab" id="tab-teams" aria-selected="false" style="display:none">Teams</button>
   </nav>
 
@@ -283,6 +290,24 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
 
   <section class="pane" id="pane-astar">
     <div id="astarBody"></div>
+  </section>
+
+  <section class="pane" id="pane-market">
+    <div id="marketBody"></div>
+    <div id="marketAdmin" style="display:none">
+      <div class="lbl" style="margin-top:24px">➕ Add a business</div>
+      <p class="hintline"><b>Services only — no merch.</b> Massage &amp; recovery, physio, barbers, tradies, training, photography. You add them, you remove them; nothing shows without you.</p>
+      <div class="arow2" style="margin:8px 0"><input id="mkIcon" type="text" placeholder="💆" maxlength="4" style="flex:0 0 62px;text-align:center"/><input id="mkName" type="text" placeholder="Business name" maxlength="40"/></div>
+      <div class="arow2" style="margin:8px 0"><input id="mkService" type="text" placeholder="What they do — e.g. Sports massage &amp; recovery" maxlength="70"/></div>
+      <div class="arow2" style="margin:8px 0"><input id="mkDeal" type="text" placeholder="Deal for the crew (optional) — e.g. 20% off for LOTG" maxlength="60"/></div>
+      <div class="arow2" style="margin:8px 0"><input id="mkIg" type="text" placeholder="Instagram handle" maxlength="40"/><input id="mkPhone" type="text" placeholder="Phone (optional)" maxlength="24" style="flex:0 0 42%"/></div>
+      <div class="arow2" style="margin:8px 0"><input id="mkLink" type="text" placeholder="Booking / website link (optional, https://…)" maxlength="300"/></div>
+      <button class="bigbtn ghost" id="mkAdd">➕ Add the business</button>
+      <div id="mkList" style="margin-top:12px"></div>
+      <div class="lbl" style="margin-top:22px">📝 Marketplace intro</div>
+      <div class="arow2" style="margin:8px 0"><textarea id="mkIntro" placeholder="The line players read at the top of the marketplace" maxlength="300" style="flex:1;min-height:84px;background:var(--card);border:var(--bw) solid var(--line);border-radius:12px;padding:12px;color:var(--ink);font-family:inherit;font-size:15px;resize:vertical"></textarea></div>
+      <button class="bigbtn ghost" id="mkIntroSave">Save intro</button>
+    </div>
   </section>
 
   <section class="pane" id="pane-teams">
@@ -328,15 +353,7 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
     </div>
     <input id="recapFiles" type="file" accept="image/*,video/*" multiple hidden/>
     <input id="logoFile" type="file" accept="image/*" hidden/>
-    <div class="lbl" style="margin-top:26px">🏪 Community Marketplace<span class="mkpill">PREVIEW</span></div>
-    <p class="hintline">A mock-up of where community businesses advertise to the crew. <b>Services only for now — no merch.</b> Think massage &amp; recovery, physio, barbers, tradies, training. Nothing here is live yet and players can't see this — it's your preview to shape.</p>
-    <div class="mkgrid">
-      <div class="mkcard"><span class="mktag">SAMPLE</span><div class="ico">💆</div><div class="bnm">Recovery Room Massage</div><div class="bsv">Sports massage · game-night recovery</div><div class="bdeal">LOTG deal · 20% off Thursdays</div><div class="big">📸 @sample-handle</div></div>
-      <div class="mkcard"><span class="mktag">SAMPLE</span><div class="ico">🔧</div><div class="bnm">AK Electrical</div><div class="bsv">Licensed sparky · free quotes for the crew</div><div class="bdeal">Mates rates for LOTG fam</div><div class="big">📸 @sample-handle</div></div>
-      <div class="mkcard"><span class="mktag">SAMPLE</span><div class="ico">💈</div><div class="bnm">Fresh Fades Barber</div><div class="bsv">Cuts &amp; beard work · walk-ins</div><div class="bdeal">Wednesday special for ballers</div><div class="big">📸 @sample-handle</div></div>
-      <div class="mkcard"><span class="mktag">SAMPLE</span><div class="ico">🏀</div><div class="bnm">Next Level Training</div><div class="bsv">1-on-1 skills &amp; conditioning</div><div class="bdeal">First session on the house</div><div class="big">📸 @sample-handle</div></div>
-    </div>
-    <div class="mkapply">📥 <b>How it'll work:</b> a business applies with their name · the service · their Instagram · a deal for the crew. You approve every listing before it shows — community first, services only, no spam. Say the word when you want it built for real.</div>
+    <p class="hintline" style="margin-top:24px">🏪 The <b>Community Marketplace</b> now has its own tab — add businesses there.</p>
     <p class="hintline" id="genHint"></p>
   </section>
 
@@ -492,12 +509,13 @@ function isCross(){
   const tm=teamMap();
   return weekGames().some(g=>{const a=tm.get(g.team1_id),b=tm.get(g.team2_id);return a&&b&&a.court_group!==b.court_group;});
 }
-function renderAll(){renderSchedule();renderStandings();renderTeams();renderMyTeam();renderAllstar();renderAllstarAdmin();renderChrome();}
+function renderAll(){renderSchedule();renderStandings();renderTeams();renderMyTeam();renderAllstar();renderAllstarAdmin();renderMarket();renderMarketAdmin();renderChrome();}
 function renderChrome(){
   $('#lockBtn').classList.toggle('on',state.admin);
   $('#lockBtn').textContent=state.admin?'🔓':'🔒';
   $('#tab-teams').style.display=state.admin?'':'none';
   $('#tab-astar').style.display=(ALLSTAR.length||state.admin)?'':'none';
+  $('#tab-market').style.display=(mkLive().length||state.admin)?'':'none';
   $('#genHint').textContent=state.admin?`${state.teams.length} teams in · first tip-off ${state.settings.start}`:'';
   $('#verline').textContent='Love of the Game · Wednesday nights';
 }
@@ -861,7 +879,7 @@ function setTheme(t,m){
 }
 function setFmt(f){state.fmt=f;document.querySelectorAll('[data-fmt]').forEach(b=>b.classList.toggle('on',b.dataset.fmt===f));}
 function pick(which){
-  ['sched','stand','astar','teams'].forEach(k=>{
+  ['sched','stand','astar','market','teams'].forEach(k=>{
     $('#tab-'+k).setAttribute('aria-selected',k===which);
     $('#pane-'+k).classList.toggle('on',k===which);
   });
@@ -876,6 +894,7 @@ $('#cSel1').onclick=()=>{state.court=1;try{localStorage.setItem('lotg_court','1'
 $('#cSel2').onclick=()=>{state.court=2;try{localStorage.setItem('lotg_court','2')}catch(e){}renderSchedule();};
 $('#tab-stand').onclick=()=>pick('stand');
 $('#tab-astar').onclick=()=>pick('astar');
+$('#tab-market').onclick=()=>pick('market');
 $('#tab-teams').onclick=()=>pick('teams');
 $('#scrim').onclick=closeSheets;
 $('#lockBtn').onclick=()=>{ if(state.admin){ if(confirm('Lock the board?'))lock(); } else {$('#lockErr').textContent='';$('#passIn').value='';openSheet('shLock');setTimeout(()=>$('#passIn').focus(),300);} };
@@ -1239,6 +1258,75 @@ $('#asClear').onclick=async()=>{
   }catch(e){toast(e.message);}
 };
 
+/* ---------- community marketplace ---------- */
+const MARKET_INTRO_DEFAULT="Businesses from inside the community. Services only — no merch. Every one of these is someone who shows up on Wednesdays, so look after them and they'll look after you.";
+const MARKET_SAMPLES=`<div class="mkgrid">
+  <div class="mkcard"><span class="mktag">SAMPLE</span><div class="ico">💆</div><div class="bnm">Recovery Room Massage</div><div class="bsv">Sports massage · game-night recovery</div><div class="bdeal">LOTG deal · 20% off Thursdays</div><div class="big">📸 @sample-handle</div></div>
+  <div class="mkcard"><span class="mktag">SAMPLE</span><div class="ico">🔧</div><div class="bnm">AK Electrical</div><div class="bsv">Licensed sparky · free quotes for the crew</div><div class="bdeal">Mates rates for LOTG fam</div><div class="big">📸 @sample-handle</div></div>
+  <div class="mkcard"><span class="mktag">SAMPLE</span><div class="ico">💈</div><div class="bnm">Fresh Fades Barber</div><div class="bsv">Cuts &amp; beard work · walk-ins</div><div class="bdeal">Wednesday special for ballers</div><div class="big">📸 @sample-handle</div></div>
+  <div class="mkcard"><span class="mktag">SAMPLE</span><div class="ico">🏀</div><div class="bnm">Next Level Training</div><div class="bsv">1-on-1 skills &amp; conditioning</div><div class="bdeal">First session on the house</div><div class="big">📸 @sample-handle</div></div>
+</div>
+<div class="mkapply">👀 <b>Preview only — players can't see this yet.</b> These four are samples to show the shape. Add a real business below and the tab goes live for everyone (the samples disappear the moment there's a real one).</div>`;
+let MARKET=[];
+const mkLive=()=>MARKET.filter(m=>!m.hidden);
+async function loadMarket(){
+  try{MARKET=await rest('lotg_market?select=id,ord,name,service,deal,icon,ig,phone,link,hidden&order=ord.asc,created_at.asc')||[];}catch(e){MARKET=[];}
+  renderMarket();renderMarketAdmin();renderChrome();
+}
+function mkCard(m){
+  const ig=(m.ig||'').replace(/^@/,'').trim();
+  const tel=(m.phone||'').replace(/[^0-9+]/g,'');
+  const btns=[
+    ig?`<a class="mkbtn" href="https://instagram.com/${encodeURIComponent(ig)}" target="_blank" rel="noopener">📸 @${esc(ig)}</a>`:'',
+    tel?`<a class="mkbtn" href="tel:${esc(tel)}">☎️ Call</a>`:'',
+    m.link&&/^https?:\/\//.test(m.link)?`<a class="mkbtn go" href="${esc(m.link)}" target="_blank" rel="noopener">Book / visit ↗</a>`:'',
+  ].filter(Boolean).join('');
+  return `<div class="mkcard real"><div class="ico">${esc(m.icon||'🏪')}</div><div class="bnm">${esc(m.name)}</div>`+
+    (m.service?`<div class="bsv">${esc(m.service)}</div>`:'')+
+    (m.deal?`<div class="bdeal">${esc(m.deal)}</div>`:'')+
+    (btns?`<div class="mkrow">${btns}</div>`:'')+`</div>`;
+}
+function renderMarket(){
+  const el=$('#marketBody');if(!el)return;
+  const live=mkLive();
+  const head=`<div class="lbl" style="margin-top:4px">🏪 Community Marketplace</div>
+    <p class="hintline" style="font-size:13.5px;line-height:1.55;color:var(--ink);margin:0 2px 14px;white-space:pre-line">${esc(state.settings.market_intro||MARKET_INTRO_DEFAULT)}</p>`;
+  if(live.length){el.innerHTML=head+`<div class="mkgrid">${live.map(mkCard).join('')}</div>`;return;}
+  el.innerHTML=head+(state.admin?MARKET_SAMPLES:'<div class="empty">Community businesses drop here soon 🏪</div>');
+}
+function renderMarketAdmin(){
+  const box=$('#marketAdmin');if(!box)return;
+  box.style.display=state.admin?'':'none';
+  if(!state.admin)return;
+  if($('#mkIntro')&&document.activeElement?.id!=='mkIntro')$('#mkIntro').value=state.settings.market_intro||'';
+  $('#mkList').innerHTML=MARKET.map(m=>`<div class="asrow"><span class="k">${esc(m.icon||'🏪')}</span><span class="t">${esc(m.name)}${m.service?' · '+esc(m.service):''}</span><button class="pill x" data-mkdel="${m.id}">✕</button></div>`).join('')||'<p class="hintline">No businesses listed yet — the cards above are just the preview.</p>';
+  $('#mkList').querySelectorAll('[data-mkdel]').forEach(b=>b.onclick=async()=>{
+    if(!confirm('Remove this business from the marketplace?'))return;
+    try{await rest(`lotg_market?id=eq.${b.dataset.mkdel}`,{method:'DELETE'},true);await loadMarket();toast('Removed');}catch(e){toast(e.message);}
+  });
+}
+$('#mkAdd').onclick=async()=>{
+  const name=$('#mkName').value.trim();
+  if(!name){toast('Business name first');return;}
+  const link=$('#mkLink').value.trim();
+  if(link&&!/^https?:\/\//.test(link)){toast('Link needs to start with https://');return;}
+  const row={ord:MARKET.length?Math.max(...MARKET.map(m=>m.ord))+1:0,name,
+    service:$('#mkService').value.trim(),deal:$('#mkDeal').value.trim(),
+    icon:$('#mkIcon').value.trim()||'🏪',ig:$('#mkIg').value.trim().replace(/^@/,''),
+    phone:$('#mkPhone').value.trim(),link};
+  try{
+    await rest('lotg_market',{method:'POST',body:JSON.stringify(row)},true);
+    ['mkIcon','mkName','mkService','mkDeal','mkIg','mkPhone','mkLink'].forEach(id=>$('#'+id).value='');
+    await loadMarket();toast('Business added 🏪');
+  }catch(e){toast(e.message);}
+};
+$('#mkIntroSave').onclick=async()=>{
+  const st={...state.settings},v=$('#mkIntro').value.trim();
+  v?st.market_intro=v:delete st.market_intro;
+  try{await rest('lotg_admin?id=eq.1',{method:'PATCH',body:JSON.stringify({settings:st})},true);state.settings=st;renderMarket();toast('Marketplace intro saved');}
+  catch(e){toast(e.message);}
+};
+
 /* boot */
 (function(){
   let th='modern',mo='dark';
@@ -1248,6 +1336,7 @@ $('#asClear').onclick=async()=>{
   loadAll().catch(()=>toast('Connection hiccup — retrying…'));
   loadRecap();
   loadAllstar();
+  loadMarket();
   setInterval(()=>{if(!document.hidden&&!document.querySelector('.sheet.open')&&!state.editing)loadAll().catch(()=>{});},10000);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)loadAll().catch(()=>{});});
 })();
