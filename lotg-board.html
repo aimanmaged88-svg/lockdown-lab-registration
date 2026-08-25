@@ -293,6 +293,7 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
     <div id="asList" style="margin-top:10px"></div>
     <div class="lbl" style="margin-top:22px">📝 Night notes</div>
     <p class="hintline">These show inside the recap. All three editable any time.</p>
+    <div class="arow2" style="margin:8px 0"><textarea id="nnMsg" placeholder="Opening message — shows FIRST on the opening screen (blank = off)" maxlength="400" style="flex:1;min-height:104px;background:var(--card);border:var(--bw) solid var(--line);border-radius:12px;padding:12px;color:var(--ink);font-family:inherit;font-size:15px;resize:vertical"></textarea></div>
     <div class="arow2" style="margin:8px 0"><input id="nnNotice" type="text" placeholder="Announcement — e.g. Week 4 draw drops Wednesday 26/8" maxlength="90"/></div>
     <div class="arow2" style="margin:8px 0"><input id="nnReel" type="text" placeholder="Full highlight reel link (https://…)" maxlength="300"/></div>
     <div class="arow2" style="margin:8px 0"><input id="nnEmbed" type="text" placeholder="Instagram post/reel to FEATURE on opening (paste the link)" maxlength="300"/></div>
@@ -382,9 +383,8 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
   <button class="rc-x" id="inX" aria-label="Skip to the app">×</button>
   <div class="intro-wrap">
     <img src="/assets/lotg-logo.jpg" alt="Love of the Game" class="logoimg" style="height:64px;margin:0 auto"/>
-    <h2>Here's a recap of last week 📰</h2>
     <div id="inPhotos"></div>
-    <div class="motd"><div class="mh">💬 Message of the night</div><p id="motdTx"></p></div>
+    <div class="motd" id="motdCard"><div class="mh">💬 Message of the night</div><p id="motdTx"></p></div>
     <button class="bigbtn" id="inGo">Into the app 🏀</button>
   </div>
 </div>
@@ -931,23 +931,29 @@ function igEmbed(u){
   const m=String(u||'').match(/^https:\/\/(www\.)?instagram\.com\/(reel|p|tv)\/[A-Za-z0-9_-]+/);
   if(!m)return '';
   const base=m[0].replace('://instagram.com','://www.instagram.com');
-  return `<div class="igembed"><iframe src="${base}/embed/captioned/" title="Instagram" allowfullscreen allow="encrypted-media"></iframe><a class="reelbtn" href="${base}/" target="_blank" rel="noopener">📸 Watch it on Instagram ↗</a></div>`;
+  return `<div class="igembed"><iframe src="${base}/embed/captioned/" title="Instagram" allowfullscreen allow="autoplay; encrypted-media"></iframe><a class="reelbtn" href="${base}/" target="_blank" rel="noopener">📸 Watch it on Instagram ↗</a></div>`;
 }
 let introSig='';
 function renderIntro(){
   const el=$('#intro');
   const emb=igEmbed(state.settings.introEmbed);
-  if((!RECAP.length&&!emb)||state.admin){el.classList.remove('open');introSig='';return;}
+  const msg=(state.settings.introMsg||'').trim();
+  if((!RECAP.length&&!emb&&!msg)||state.admin){el.classList.remove('open');introSig='';return;}
   let last=0;try{last=+localStorage.getItem('lotg_intro_ts')||0}catch(e){}
   if(Date.now()-last<3*36e5)return;
-  const sig=JSON.stringify([emb,RECAP.map(r=>r.id),state.settings.reelUrl||'',state.settings.notice||'',state.settings.motd||'']);
+  const sig=JSON.stringify([msg,emb,RECAP.map(r=>r.id),state.settings.reelUrl||'',state.settings.notice||'',state.settings.motd||'']);
   if(sig===introSig)return;
   introSig=sig;
   const reel=state.settings.reelUrl&&/^https?:\/\//.test(state.settings.reelUrl)?`<a class="reelbtn" href="${esc(state.settings.reelUrl)}" target="_blank" rel="noopener">🎬 Watch the FULL highlight reel ↗</a>`:'';
-  let reelPlaced=false;
-  let html=emb+RECAP.map((r,i)=>{
+  let reelPlaced=false,vidN=0;
+  // The order he set: the message first, then the Insta reel, then into the app.
+  let html=msg?`<div class="motd" style="margin-top:14px"><p style="white-space:pre-line">${esc(msg)}</p></div>`:'';
+  html+=emb;
+  if(RECAP.length)html+=`<h2>Here's a recap of last week 📰</h2>`;
+  html+=RECAP.map((r,i)=>{
     if(r.kind==='video'){
-      const v=`<video src="${esc(r.img)}" controls playsinline preload="metadata"></video>`;
+      const auto=++vidN===1?' autoplay muted loop':'';
+      const v=`<video src="${esc(r.img)}" controls playsinline preload="metadata"${auto}></video>`;
       if(!reelPlaced&&reel){reelPlaced=true;return v+reel;}
       return v;
     }
@@ -956,6 +962,7 @@ function renderIntro(){
   if(reel&&!reelPlaced)html+=reel;
   if(state.settings.notice)html+=`<div class="notice">📣 ${esc(state.settings.notice)}</div>`;
   $('#inPhotos').innerHTML=html;
+  $('#motdCard').style.display=msg?'none':'';
   $('#motdTx').textContent=state.settings.motd||MOTD_DEFAULT;
   el.classList.add('open');window.scrollTo(0,0);
 }
@@ -973,6 +980,7 @@ function renderRecapAdmin(){
   if(!state.admin)return;
   $('#recapThumbs').innerHTML=RECAP.map(r=>r.kind==='video'?`<span style="width:52px;height:52px;display:grid;place-items:center;border:1px solid var(--line);border-radius:8px;font-size:20px">🎬</span>`:`<img src="${r.img}" alt=""/>`).join('')||'<p class="hintline">No recap loaded yet.</p>';
   renderSeasonForm();
+  if($('#nnMsg')&&document.activeElement?.id!=='nnMsg')$('#nnMsg').value=state.settings.introMsg||'';
   if($('#nnNotice')&&document.activeElement?.id!=='nnNotice')$('#nnNotice').value=state.settings.notice||'';
   if($('#nnReel')&&document.activeElement?.id!=='nnReel')$('#nnReel').value=state.settings.reelUrl||'';
   if($('#nnEmbed')&&document.activeElement?.id!=='nnEmbed')$('#nnEmbed').value=state.settings.introEmbed||'';
@@ -1063,6 +1071,8 @@ $('#seasonSave').onclick=async()=>{
 $('#nnSave').onclick=async()=>{
   const st={...state.settings};
   const notice=$('#nnNotice').value.trim(),reel=$('#nnReel').value.trim(),motd=$('#nnMotd').value.trim();
+  const imsg=($('#nnMsg')?.value||'').trim();
+  imsg?st.introMsg=imsg:delete st.introMsg;
   const asIntro=($('#asIntro')?.value||'').trim();
   asIntro?st.allstar_intro=asIntro:delete st.allstar_intro;
   notice?st.notice=notice:delete st.notice;
