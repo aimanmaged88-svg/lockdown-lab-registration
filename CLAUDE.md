@@ -140,6 +140,11 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   fresh-device settings race) with an introSig guard so the 10s poll never
   restarts media. Admin: Night-notes field #nnEmbed (instagram.com only).
   Seeded with his reel Dca9PwYz1kI (Aiman pasted the official embed code).
+  Opening ORDER (his ask, same day): settings.introMsg (multi-line message
+  card, admin #nnMsg textarea, seeded w/ the SJ All-Star shoutout; hides the
+  motd card while set) FIRST → embed → recap (heading inline now, first
+  video autoplays muted) → notice → Into the app. True IG-embed autoplay
+  isn't controllable (their player needs a tap; iframe allows autoplay).
 - **All-Star Weekend section (2026-08-25):** ⭐ All-Star tab (auto-hidden
   until it has content; admins always see it) — table `lotg_allstar`
   (ord/kind image|video|link/url/caption; public read, x-lotg-admin writes).
