@@ -281,7 +281,7 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
     <button class="bigbtn ghost" id="seasonSave">Save season ladder</button>
     <div class="lbl" style="margin-top:22px">🌟 All-Star Weekend</div>
     <p class="hintline">Its own tab, separate from the weekly recap. Upload the real videos/photos from your phones (up to 200MB each) and paste the Instagram post links.</p>
-    <div class="arow2" style="margin:8px 0"><input id="asIntro" type="text" placeholder="Intro line for the section" maxlength="140"/></div>
+    <div class="arow2" style="margin:8px 0"><textarea id="asIntro" placeholder="Intro / dedication for the section" maxlength="400" style="flex:1;min-height:104px;background:var(--card);border:var(--bw) solid var(--line);border-radius:12px;padding:12px;color:var(--ink);font-family:inherit;font-size:15px;resize:vertical"></textarea></div>
     <div class="arow2" style="margin:8px 0">
       <button class="bigbtn ghost" id="asPick" style="margin:0">📸 Add photos & clips</button>
       <button class="bigbtn ghost" id="asClear" style="margin:0">Clear all</button>
@@ -1130,7 +1130,7 @@ function renderAllstar(){
   if(!ALLSTAR.length){el.innerHTML='<div class="empty">All-Star Weekend content drops here soon 🌟</div>';return;}
   const imgs=ALLSTAR.filter(x=>x.kind==='image');
   el.innerHTML=`<div class="lbl" style="margin-top:4px">⭐ All-Star Weekend</div>
-    <p class="hintline" style="font-size:13.5px;color:var(--ink);margin:0 2px 14px">${esc(state.settings.allstar_intro||'')}</p>
+    <p class="hintline" style="font-size:14px;line-height:1.55;color:var(--ink);margin:0 2px 16px;white-space:pre-line">${esc(state.settings.allstar_intro||'')}</p>
     <div class="asmedia">${ALLSTAR.map(x=>{
       if(x.kind==='video')return `<video src="${esc(x.url)}" controls playsinline preload="metadata"></video>`;
       if(x.kind==='link')return `<a class="igbtn" href="${esc(x.url)}" target="_blank" rel="noopener"><span>📸 ${esc(x.caption||'Watch on Instagram')}</span><span class="go">Open ↗</span></a>`;
