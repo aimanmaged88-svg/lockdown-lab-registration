@@ -119,6 +119,31 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   combined ladder, retro/light, unlock, score→standings, generate→week 3,
   import parse w/ late detect. All test rows removed, one test score reset —
   DB restored byte-identical (40 games, all upcoming, max week 2).
+- **Team pings (2026-08-22):** pick-your-team on the board → closed-app web
+  push via NEW edge fn **lotg-board-push** (sub/unsub/pull public;
+  game_final/announce passcode-gated; Lab's VAPID keypair reused; tables
+  lotg_push/lotg_notif, migration lotg_pings). SW = lotg-board-sw.js (deployed
+  as /sw.js, payload-free tickle → pull → loud notify). Score save fires
+  FINAL-to-all + "You're up next" to the next game's two teams on that court;
+  generate/recap-upload fire announcements. iOS needs A2HS (guided sheet).
+  Real-device delivery still unconfirmed by Aiman ("test ping me" offered).
+- **Season ladder (2026-08-24):** standings tab also shows the gold "🏆 The
+  Ladder — 4-week chase" (freeform name+pts rows in settings.season, editable
+  in admin Teams tab, + settings.seasonNote race commentary + "$500" footer).
+  Seeded from his Week 3 IG graphic (Sonics 20 / Unique 18 / G-Unit 18 /
+  Surpass 17 / LOTG 17 / JJC 9 / Kopino 9 / Herbalife 9), stable sort keeps
+  his entered order on ties.
+- **All-Star Weekend section (2026-08-25):** ⭐ All-Star tab (auto-hidden
+  until it has content; admins always see it) — table `lotg_allstar`
+  (ord/kind image|video|link/url/caption; public read, x-lotg-admin writes).
+  Photos data-URI ≤1200px; clips via lotg-board-media **v2 `folder` param
+  ('board'|'allstar')** → lotg-media/allstar/* so recap clears never touch it;
+  Instagram post links render as tappable "📸 label · Open ↗" cards (URL must
+  match instagram.com). Admin manager in Teams tab (#asIntro saved with night
+  notes → settings.allstar_intro, #asPick upload, #asLink/#asCap/#asAdd,
+  per-row ✕, Clear all = rows + storage folder). Images open the shared
+  fullscreen viewer (VIEW[]). Aiman will paste copied IG links from
+  @loveofthegameaus (NEVER scrape IG); load them as kind:'link' rows.
 
 ## Badge economy + Money desk (2026-07-19)
 
