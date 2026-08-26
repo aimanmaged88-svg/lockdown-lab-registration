@@ -117,7 +117,8 @@ td.tn .tlogo{vertical-align:-4px;margin-right:7px}
 table{border-collapse:collapse;width:100%}
 th,td{padding:8px 6px;text-align:center;font-size:13.5px;border-top:1px solid var(--line)}
 th{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);border-top:none;padding-top:10px}
-td.tn,th.tn{text-align:left;padding-left:13px;font-weight:700;max-width:0;width:38%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+td.tn,th.tn{text-align:left;padding-left:13px;font-weight:700;width:56%;overflow-wrap:anywhere;line-height:1.3}
+th.tn{white-space:nowrap}
 td.pts{font-family:var(--disp);font-weight:700;color:var(--acc)}
 tr.top td.tn::before{content:"👑 ";font-size:11px}
 
@@ -611,7 +612,8 @@ function renderStandings(){
   const wg=weekGames();
   const tm=teamMap();
   const anyFinal=wg.some(g=>g.status==='final');
-  if(!wg.length){$('#standings').innerHTML='<div class="empty">Standings appear once the night is generated.</div>'+seasonHTML();return;}
+  const soon='<p class="hintline" style="text-align:center;margin:2px 0 6px">Tonight\'s Court 1 &amp; Court 2 ladders appear as soon as the games go up 🏀</p>';
+  if(!wg.length){$('#standings').innerHTML=seasonHTML()+soon;return;}
   const playing=[...new Set(wg.flatMap(g=>[g.team1_id,g.team2_id]))].map(id=>tm.get(id)).filter(Boolean);
   if(isCross()){
     $('#standings').innerHTML=tableHTML(`Tonight`,computeTable(playing,wg),anyFinal)+seasonHTML();
@@ -619,7 +621,7 @@ function renderStandings(){
     $('#standings').innerHTML=([1,2].map(cg=>{
       const rows=computeTable(playing.filter(t=>t.court_group===cg),wg);
       return rows.length?tableHTML(`Court ${cg} ladder`,rows,anyFinal):'';
-    }).join('')||'<div class="empty">Standings appear once scores go in.</div>')+seasonHTML();
+    }).join('')||'')+seasonHTML()+(wg.some(g=>g.status!=='final')&&!anyFinal?soon.replace('appear as soon as the games go up 🏀','fill in as soon as the first scores land 🏀'):'');
   }
 }
 function renderTeams(){
