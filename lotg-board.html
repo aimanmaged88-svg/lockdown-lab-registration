@@ -535,12 +535,15 @@ function isCross(){
   return weekGames().some(g=>{const a=tm.get(g.team1_id),b=tm.get(g.team2_id);return a&&b&&a.court_group!==b.court_group;});
 }
 function renderAll(){renderSchedule();renderStandings();renderTeams();renderMyTeam();renderAllstar();renderAllstarAdmin();renderMarket();renderMarketAdmin();renderChrome();}
+/* Extra sections, parked at his word (2026-08-26) — the code, tables and
+   content all stay put; flip either to true to bring the tab back. */
+const SECTIONS={allstar:false,market:false};
 function renderChrome(){
   $('#lockBtn').classList.toggle('on',state.admin);
   $('#lockBtn').textContent=state.admin?'🔓':'🔒';
   $('#tab-teams').style.display=state.admin?'':'none';
-  $('#tab-astar').style.display=(ALLSTAR.length||state.settings.allstar_embed||state.admin)?'':'none';
-  $('#tab-market').style.display=state.admin?'':'none';  /* admin-only for now — his call to open it up */
+  $('#tab-astar').style.display=(SECTIONS.allstar&&(ALLSTAR.length||state.settings.allstar_embed||state.admin))?'':'none';
+  $('#tab-market').style.display=(SECTIONS.market&&state.admin)?'':'none';
   $('#genHint').textContent=state.admin?`${state.teams.length} teams in · first tip-off ${state.settings.start}`:'';
   $('#verline').textContent='Love of the Game · Wednesday nights';
 }
@@ -570,7 +573,7 @@ function renderSchedule(){
   $('#cSel2').setAttribute('aria-pressed',state.court===2);
   const cg=wg.filter(g=>g.court===state.court).sort((a,b)=>a.slot_index-b.slot_index);
   if(!wg.length){
-    box.innerHTML=`<div class="empty">${state.admin?'No games yet.<br>Add the teams, then hit <b>Generate the night</b>.':'Nothing here yet — the schedule drops ~2 hours before tip-off.<br><b>Check back Wednesday 🏀</b>'}</div>`;
+    box.innerHTML=`<div class="empty">${state.admin?'No games yet.<br>Add the teams, then hit <b>Generate the night</b>.':'Teams go up about 2 hours before tip-off.<br><b>Keep this link handy 🏀</b>'}</div>`;
   }else if(!cg.length){
     box.innerHTML=`<div class="empty">${state.admin?`No games on Court ${state.court} tonight.`:`Court ${state.court} is pending — <b>check back Wednesday 🏀</b>`}</div>`;
   }else{
@@ -904,6 +907,7 @@ function setTheme(t,m){
 }
 function setFmt(f){state.fmt=f;document.querySelectorAll('[data-fmt]').forEach(b=>b.classList.toggle('on',b.dataset.fmt===f));}
 function pick(which){
+  if((which==='astar'&&!SECTIONS.allstar)||(which==='market'&&!SECTIONS.market))which='sched';
   ['sched','stand','astar','market','teams'].forEach(k=>{
     $('#tab-'+k).setAttribute('aria-selected',k===which);
     $('#pane-'+k).classList.toggle('on',k===which);
