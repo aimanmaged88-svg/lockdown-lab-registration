@@ -1002,6 +1002,47 @@ Deno.serve(async (req: Request) => {
 
       // Suggest a court → Heaven desk. Players never add courts themselves; the
       // coach reviews suggestions and adds the official ones. Rate-limited.
+      // "Something's off here" — a hooper corrects a court's details or adds a
+      // photo. Same desk inbox as new-court suggestions, flagged kind='fix'.
+      case "court_fix": {
+        const g = await guard(((b.player || {}) as Record<string, unknown>).id as string);
+        if (g.err) return g.err;
+        const player = g.p!;
+        const court_key = str(b.court_key, 64);
+        const court_name = str(b.court_name, 80);
+        const note = str(b.note, 400);
+        if (!court_key) return J({ error: "which court?" }, 400);
+        let photo_url = "";
+        if (typeof b.photo === "string" && b.photo.startsWith("data:image")) {
+          photo_url = await uploadImg(b.photo, `suggest/${sid(player.id)}-${Date.now()}`).catch(() => "");
+        }
+        if (!note && !photo_url) return J({ error: "tell us what's off, or add a photo" }, 400);
+        const dayAgo = new Date(Date.now() - 864e5).toISOString();
+        const mine = await db(`oc_court_reqs?player_id=eq.${encodeURIComponent(player.id)}&created_at=gte.${dayAgo}&select=id`);
+        if ((mine?.length || 0) >= 8) return J({ error: "easy — plenty from you today already, we'll get to them" }, 429);
+        await db(`oc_court_reqs`, {
+          method: "POST",
+          body: JSON.stringify({
+            player_id: player.id, name: player.name, ig: player.ig,
+            kind: "fix", court_key, court_name, note, photo_url,
+            where_txt: "", created_at: new Date().toISOString(),
+          }),
+        });
+        // let the coach know the map needs a touch-up
+        try {
+          const coaches = await db(`oc_players?coach=is.true&select=id`) || [];
+          const ids = coaches.map((c: { id: string }) => c.id);
+          if (ids.length) {
+            await sendHH(ids, {
+              title: photo_url && !note ? "📸 New court photo" : "📝 Court needs a fix",
+              body: `${player.name} · ${court_name || "a court"}${note ? ": " + note.slice(0, 70) : ""}`,
+              url: "/hoopsheaven-desk.html",
+            });
+          }
+        } catch (_e) { /* best effort */ }
+        return J({ ok: true });
+      }
+
       case "court_suggest": {
         const g = await guard(((b.player || {}) as Record<string, unknown>).id as string);
         if (g.err) return g.err;
@@ -1023,7 +1064,7 @@ Deno.serve(async (req: Request) => {
         }
         await db(`oc_court_reqs`, {
           method: "POST",
-          body: JSON.stringify({ player_id: player.id, name: player.name, ig: player.ig, court_name, where_txt: where, note: str(b.note, 300), photo_url, lat: inSyd ? c![0] : null, lon: inSyd ? c![1] : null, created_at: new Date().toISOString() }),
+          body: JSON.stringify({ player_id: player.id, name: player.name, ig: player.ig, kind: "new", court_name, where_txt: where, note: str(b.note, 300), photo_url, lat: inSyd ? c![0] : null, lon: inSyd ? c![1] : null, created_at: new Date().toISOString() }),
         });
         return J({ ok: true });
       }

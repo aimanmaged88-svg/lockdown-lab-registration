@@ -43,6 +43,11 @@ h1 span{color:var(--volt)}
 h2{font-family:'HHCond',sans-serif;font-size:15px;letter-spacing:2.4px;text-transform:uppercase;color:var(--dim);font-weight:600;margin:22px 0 10px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
 #inviteCard{margin-bottom:16px}
+.sgtag{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;border-radius:99px;padding:2.5px 8px;margin-right:6px;vertical-align:1px}
+.sgtag.new{background:rgba(45,224,192,.16);color:var(--volt)}
+.sgtag.fix{background:rgba(255,176,32,.16);color:#E8B44C}
+.sgtag.photo{background:rgba(122,92,255,.18);color:#B7A6FF}
+.row.isfix{border-left:3px solid #E8B44C}
 .gaterow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .gaterow b{font-size:15px}
 .gaterow .btn{margin-left:auto}
@@ -1669,19 +1674,39 @@ function renderSuggestions(reqs){
   if(!box)return;
   box.style.display=SUGG.length?'':'none';
   if(n){n.textContent=SUGG.length;n.style.display=SUGG.length?'':'none';}
-  list.innerHTML=SUGG.length?SUGG.map(s=>`
-    <div class="row"><div class="who" style="display:flex;gap:10px;align-items:flex-start">
+  list.innerHTML=SUGG.length?SUGG.map(s=>{
+    const isFix=s.kind==='fix';
+    const tag=isFix
+      ? (s.photo_url&&!s.note
+          ? '<span class="sgtag photo">📸 New photo</span>'
+          : '<span class="sgtag fix">📝 Fix this court</span>')
+      : '<span class="sgtag new">➕ New court</span>';
+    return `<div class="row ${isFix?'isfix':''}"><div class="who" style="display:flex;gap:10px;align-items:flex-start">
       ${s.photo_url?`<a href="${esc(s.photo_url)}" target="_blank" rel="noopener" style="flex:0 0 auto"><img src="${esc(s.photo_url)}" alt="" style="width:56px;height:56px;object-fit:cover;border-radius:9px;border:1px solid var(--line)"></a>`:''}
       <div style="min-width:0">
-        <b>${esc(s.court_name||'Court')}</b>
+        <b>${tag} ${esc(s.court_name||'Court')}</b>
         <span>${esc(s.where_txt||'')}${s.note?' — “'+esc(s.note)+'”':''}</span>
-        <span style="opacity:.7">by ${esc(s.name||'someone')}${s.ig?' · <a href="https://instagram.com/'+esc(s.ig)+'" target="_blank" rel="noopener">@'+esc(s.ig)+'</a>':''}</span>
+        <span style="opacity:.7">by ${esc(s.name||'someone')}${s.ig?' · <a href="https://instagram.com/'+esc(s.ig)+'" target="_blank" rel="noopener">@'+esc(s.ig)+'</a>':''} · ${ago(s.created_at)}</span>
         ${(s.lat!=null&&s.lon!=null)?'<span style="display:inline-block;margin-top:5px;font-size:11px;font-weight:700;color:var(--volt);background:rgba(216,255,62,.12);border-radius:20px;padding:2px 9px">📍 Pinned from their link</span>':''}
       </div>
     </div>
-    <button class="btn btn-v" data-sadd="${esc(s.id)}">➕ Add it</button>
-    <button class="btn btn-g" data-sdone="${esc(s.id)}">Dismiss</button></div>`).join('')
+    ${isFix
+      ? `<button class="btn btn-v" data-sfix="${esc(s.id)}">✏️ Open the court</button>`
+      : `<button class="btn btn-v" data-sadd="${esc(s.id)}">➕ Add it</button>`}
+    <button class="btn btn-g" data-sdone="${esc(s.id)}">Dismiss</button></div>`;
+  }).join('')
     :'<div class="empty">No suggestions right now.</div>';
+  list.querySelectorAll('[data-sfix]').forEach(b=>b.onclick=()=>{
+    const s=SUGG.find(x=>x.id===b.dataset.sfix);if(!s)return;
+    const c=(OFFICIAL||[]).find(x=>x.key===s.court_key);
+    if(!c){toast('That court is no longer on the map',1);return}
+    const nv=document.querySelector('.nv[data-sec="courts"]');if(nv)nv.click();
+    editCourt(c);                       // resets CPHOTO/CFROMSUGG…
+    CFROMSUGG=s.id;                     // …so claim them after
+    if(s.photo_url){CPHOTO=s.photo_url;toast('Their photo is attached — hit Save to use it');}
+    else toast('Fix what they flagged, then Save');
+    if(s.note){const n=$('#cTips');if(n&&!n.value)n.placeholder='Reported: '+s.note;}
+  });
   list.querySelectorAll('[data-sadd]').forEach(b=>b.onclick=()=>{
     const s=SUGG.find(x=>x.id===b.dataset.sadd);if(!s)return;
     newCourt();

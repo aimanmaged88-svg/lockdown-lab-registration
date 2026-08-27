@@ -760,6 +760,14 @@ svg.leaflet-image-layer.leaflet-interactive path {
 .runcard .a2{border-color:var(--card);background:var(--card2);color:var(--text)}
 .rc-go{height:38px;padding:0 17px;border-radius:12px;background:var(--text);color:var(--bg);font-weight:700;font-size:13px;display:flex;align-items:center;border:none;cursor:pointer}
 .rc-spots{position:absolute;top:14px;right:14px;font-size:10.5px;font-weight:800;color:#B07A00;background:rgba(255,176,32,.16);padding:5px 10px;border-radius:99px}
+.commit{background:color-mix(in srgb, var(--volt) 9%, transparent);border:1px solid color-mix(in srgb, var(--volt) 32%, transparent);border-radius:15px;padding:13px 15px;margin:16px 0 4px}
+.commit b{display:block;font-size:13.5px;margin-bottom:5px}
+.commit p{font-size:12.5px;color:var(--muted);line-height:1.5;margin:0}
+.commit p b{display:inline;color:var(--text);font-size:12.5px}
+.fixcard{background:var(--card);border:1px dashed var(--line);border-radius:16px;padding:14px 15px;margin:14px 0 4px}
+.fixcard .fx1{margin-bottom:11px}
+.fixcard .fx1 b{display:block;font-size:14.5px;margin-bottom:3px}
+.fixcard .fx1 span{font-size:12.5px;color:var(--muted);line-height:1.45}
 #fabCall{position:fixed;right:18px;bottom:96px;width:56px;height:56px;border-radius:19px;background:var(--text);color:var(--bg);font-size:26px;font-weight:700;border:none;box-shadow:0 12px 30px rgba(0,0,0,.28);z-index:40;cursor:pointer}
 /* vibe picker cards */
 .vibegrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
@@ -969,6 +977,13 @@ header{
 #shProfile{z-index:70}
 #shLogin{z-index:72} /* must sit ABOVE the sign-up gate — "Log in" opens from it */
 #shTerms{z-index:72}
+/* these open FROM another sheet (court page / profile), so they sit above it */
+#shHooper{z-index:73}   /* opened from a run/court sheet */
+#shFix{z-index:74}
+#shBug{z-index:74}
+#shRate{z-index:74}
+#shInvite{z-index:74}
+#shCode{z-index:74}
 .sheet.open{display:block}
 .sheet .scrim{position:absolute;inset:0;background:rgba(0,0,0,.62);backdrop-filter:blur(8px) saturate(1.05);-webkit-backdrop-filter:blur(8px) saturate(1.05);animation:fad .32s var(--ease)}
 @keyframes fad{from{opacity:0;backdrop-filter:blur(0)}}
@@ -1510,6 +1525,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   <div class="rule"><span class="ic">🙌</span><span><b>Good vibes only — non-negotiable.</b> This is a hype house. Everyone's welcome, every level, every body. Encourage, don't gatekeep. If someone's new or still finding their game, you build them up. That's the culture here.</span></div>
   <div class="rule"><span class="ic">⭐</span><span><b>Ratings are to hype, never to hurt.</b> Player ratings exist to celebrate hoopers — not to tear anyone down. Low scores never show as a number, and the coach reads every rating and comment before it appears. Rate the run, respect the person.</span></div>
   <div class="rule"><span class="ic">🧊</span><span><b>Zero tolerance on bad behaviour.</b> Disrespect, threats, abuse, discrimination, tearing people down — in the app or at a run — and you're gone. Banned indefinitely. One strike is enough.</span></div>
+  <div class="rule"><span class="ic">🤝</span><span><b>We build this together.</b> Call your runs, check in when you're there, fix a court when something's off. Accurate info is what makes the runs good — bad info wastes everyone's trip.</span></div>
   <div class="rule"><span class="ic">🪪</span><span><b>Real accounts only.</b> Sign in with your Instagram — or a real email (Gmail, Apple ID, whatever) if you don't have IG. Burner and fake accounts get removed on sight.</span></div>
   <div class="rule"><span class="ic">🔨</span><span><b>Bans stick.</b> Break the rules and your handle, your email and your device are all blocked. A new account won't save you.</span></div>
   <div class="rule"><span class="ic">🧹</span><span>We can remove any run, clip or account at any time to protect the community.</span></div>
@@ -1535,6 +1551,10 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   <div class="fld" id="ttFld" style="display:none"><label>TikTok handle</label><div class="igwrap"><span class="at">@</span><input class="inp" id="pfTiktok" maxlength="30" autocapitalize="none" placeholder="yourhandle"></div></div>
   <div class="fld" id="emFld" style="display:none"><label>Email (Gmail / Apple ID / any real inbox)</label><input class="inp" id="pfEmail" type="email" autocapitalize="none" placeholder="you@gmail.com"></div>
   <div class="fld"><label>Mobile number</label><input class="inp" id="pfPhone" type="tel" inputmode="tel" maxlength="17" autocomplete="tel" placeholder="0412 345 678"><p class="fine" style="margin:6px 2px 0">Only the coach sees this — never shown on the courts or your card. It's how you get back in if you switch phones.</p></div>
+  <div class="commit">
+    <b>🤝 This only works if we build it together</b>
+    <p>Every run you call, every check-in, every photo and correction makes the next hooper's info right. Accurate courts and honest run times mean <b>everyone gets better runs</b> — that's the whole deal. Put real info in, get real runs out.</p>
+  </div>
   <button class="btn btn-v btn-block" id="pfSave">Lock it in</button>
   <button class="linky" id="pfLogin" style="display:none;margin:14px auto 0;text-align:center;width:100%">Already got an account? Switched phones? <b style="color:var(--volt)">Log in</b></button>
 </div></div>
@@ -1547,6 +1567,18 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   <div class="fld"><label>Your 5-digit code</label><input class="inp" id="lgCode" inputmode="numeric" maxlength="6" placeholder="12345"></div>
   <button class="btn btn-v btn-block" id="lgGo">Log me in 🏀</button>
   <p class="fine" style="margin-top:10px">Your code lives in Profile → 🔑 Phone-switch code. Lost it? Message the coach on IG and we'll sort you.</p>
+</div></div>
+
+<!-- court fix / photo: the community keeps the map honest -->
+<div class="sheet" id="shFix"><div class="scrim" data-close></div><div class="panel">
+  <div class="grab"></div>
+  <div class="xrow"><div><h3 id="fixTitle">Something's off?</h3><p class="sub" id="fixSub">Tell the coach what's wrong and he'll fix the court page for everyone.</p></div><button class="x" data-close>✕</button></div>
+  <p class="fine" id="fixCourt" style="margin:-4px 0 12px;font-weight:700;color:var(--text)"></p>
+  <div class="fld"><label id="fixLbl">What's not right?</label><textarea class="inp" id="fixTxt" rows="3" maxlength="400" placeholder="e.g. the left ring is bent, lights don't come on anymore, there's a fee now"></textarea></div>
+  <div class="sgphoto" id="fixPhotoBox">📷 Add a photo of the court</div>
+  <input type="file" id="fixPhoto" accept="image/*" style="display:none">
+  <button class="btn btn-v btn-block" id="fixGo" style="margin-top:12px">Send it to the coach</button>
+  <p class="fine" style="margin-top:10px">Good photos help people find the court and know what they're walking into. The coach checks everything before it goes live.</p>
 </div></div>
 
 <!-- something broke: tester feedback straight to the desk -->
@@ -1664,6 +1696,13 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       <div class="step"><button type="button" id="exMinus" aria-label="one fewer">−</button><b id="ctExtraN">0</b><button type="button" id="exPlus" aria-label="one more">+</button></div>
     </div>
     <p style="font-size:11.5px;color:var(--dim);margin-top:7px">Not a booking system — just who's here right now. Times aren't guaranteed. Check in when you're at the court, or scan its QR. Everyone auto-checks out after 2 hours, so this stays live.</p>
+  </div>
+  <div class="fixcard" id="ctFixCard">
+    <div class="fx1"><b>Keep this court right 🤝</b><span>Rings bent? Lights out? Gate locked? A photo or a line from you keeps everyone's info accurate.</span></div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" id="ctFixBtn" style="flex:1">📝 Something's off</button>
+      <button class="btn btn-ghost" id="ctPhotoBtn" style="flex:1">📸 Add a photo</button>
+    </div>
   </div>
   <div class="subsect"><h4>Runs at this court</h4><div id="ctRuns"></div>
     <button class="btn btn-v btn-block" id="ctCall" style="margin-top:8px">⚡ Call a run here</button></div>
@@ -3156,6 +3195,61 @@ async function autoCheckout(){
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){autoCheckout();autoCheckin();}});
 
 /* ---------- suggest a court ---------- */
+/* ---------- court fixes + photos (community keeps the map honest) ---------- */
+let fixPhotoData='',FIXMODE='fix';
+function resetFix(){
+  fixPhotoData='';$('#fixTxt').value='';
+  const bx=$('#fixPhotoBox');bx.classList.remove('has');bx.style.backgroundImage='';bx.textContent='📷 Add a photo of the court';
+  $('#fixPhoto').value='';
+}
+function openFix(mode){
+  if(!CC)return;
+  ensureProfile(()=>{
+    FIXMODE=mode;resetFix();
+    $('#fixCourt').textContent='🏀 '+CC.name+(CC.suburb?' · '+CC.suburb:'');
+    if(mode==='photo'){
+      $('#fixTitle').textContent='Add a photo 📸';
+      $('#fixSub').textContent='A real shot of this court helps everyone know what they\'re pulling up to.';
+      $('#fixLbl').textContent='Anything worth saying about it? (optional)';
+      $('#fixTxt').placeholder='e.g. taken this morning — new nets went up';
+    }else{
+      $('#fixTitle').textContent='Something\'s off?';
+      $('#fixSub').textContent='Tell the coach what\'s wrong and he\'ll fix the court page for everyone.';
+      $('#fixLbl').textContent='What\'s not right?';
+      $('#fixTxt').placeholder='e.g. the left ring is bent, lights don\'t come on anymore, there\'s a fee now';
+    }
+    openSheet('shFix');
+    setTimeout(()=>{if(mode!=='photo')$('#fixTxt').focus()},320);
+  });
+}
+$('#ctFixBtn').onclick=()=>openFix('fix');
+$('#ctPhotoBtn').onclick=()=>openFix('photo');
+$('#fixPhotoBox').onclick=()=>$('#fixPhoto').click();
+$('#fixPhoto').onchange=e=>{
+  const f=e.target.files[0];if(!f)return;
+  const img=new Image();
+  img.onload=()=>{
+    const scale=Math.min(1,1280/Math.max(img.width,img.height));
+    const cv=document.createElement('canvas');
+    cv.width=Math.round(img.width*scale);cv.height=Math.round(img.height*scale);
+    cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+    fixPhotoData=cv.toDataURL('image/jpeg',.8);
+    const bx=$('#fixPhotoBox');bx.classList.add('has');bx.style.backgroundImage=`url("${fixPhotoData}")`;bx.textContent='';
+  };
+  img.src=URL.createObjectURL(f);
+};
+$('#fixGo').onclick=()=>ensureProfile(async()=>{
+  const note=$('#fixTxt').value.trim();
+  if(!note&&!fixPhotoData){toast(FIXMODE==='photo'?'Pick a photo first':'Tell us what\'s off',1);return}
+  const b=$('#fixGo');b.disabled=true;b.textContent='Sending…';
+  try{
+    await api({action:'court_fix',player:OCP,court_key:CC.key,court_name:CC.name,note,photo:fixPhotoData||undefined});
+    closeSheet('shFix');resetFix();
+    toast('Sent 🙏 the coach will check it — you just made this court better');
+  }catch(e){toast(e.message,1)}
+  b.disabled=false;b.textContent='Send it to the coach';
+});
+
 let sgPhotoData='';
 function resetSuggest(){sgPhotoData='';const bx=$('#sgPhotoBox');bx.classList.remove('has');bx.style.backgroundImage='';bx.textContent='📷 Add a photo';$('#sgPhoto').value='';}
 function openSuggest(){ensureProfile(()=>openSheet('shSuggest'));}
