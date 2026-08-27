@@ -760,6 +760,26 @@ svg.leaflet-image-layer.leaflet-interactive path {
 .runcard .a2{border-color:var(--card);background:var(--card2);color:var(--text)}
 .rc-go{height:38px;padding:0 17px;border-radius:12px;background:var(--text);color:var(--bg);font-weight:700;font-size:13px;display:flex;align-items:center;border:none;cursor:pointer}
 .rc-spots{position:absolute;top:14px;right:14px;font-size:10.5px;font-weight:800;color:#B07A00;background:rgba(255,176,32,.16);padding:5px 10px;border-radius:99px}
+.kinds{display:flex;flex-wrap:wrap;gap:7px}
+.kinds button{background:var(--card2);border:1px solid var(--line);color:var(--muted);border-radius:99px;padding:8px 13px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer}
+.kinds button.on{background:var(--volt);color:var(--onaccent);border-color:transparent}
+.iss{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--danger);border-radius:14px;padding:12px 13px;margin-bottom:9px}
+.iss.onit{border-left-color:#E8B44C}
+.iss.fixed{border-left-color:var(--ok);opacity:.85}
+.iss .ih{display:flex;align-items:flex-start;gap:10px}
+.iss .ith{width:46px;height:46px;border-radius:10px;flex:none;background:var(--card2) center/cover no-repeat;display:grid;place-items:center;font-size:19px}
+.iss .im{flex:1;min-width:0}
+.iss .im b{display:block;font-size:14px}
+.iss .im span{font-size:12px;color:var(--muted);display:block;margin-top:2px}
+.iss .ist{font-size:10px;font-weight:800;letter-spacing:.07em;text-transform:uppercase;border-radius:99px;padding:3px 8px;flex:none}
+.iss .ist.open{background:color-mix(in srgb,var(--danger) 16%,transparent);color:var(--danger)}
+.iss .ist.onit{background:rgba(232,180,76,.18);color:#E8B44C}
+.iss .ist.fixed{background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)}
+.iss .ib{display:flex;gap:7px;margin-top:10px}
+.iss .ib button{flex:1;border:none;border-radius:10px;padding:9px 8px;font-size:12.5px;font-weight:800;font-family:inherit;cursor:pointer;background:var(--card2);color:var(--text);border:1px solid var(--line)}
+.iss .ib button.go{background:var(--volt);color:var(--onaccent);border-color:transparent}
+.iss .ib button.ok{background:var(--ok);color:#04231d;border-color:transparent}
+.iss .ib button.on{background:color-mix(in srgb,var(--volt) 18%,transparent);color:var(--volt);border-color:color-mix(in srgb,var(--volt) 40%,transparent)}
 .commit{background:color-mix(in srgb, var(--volt) 9%, transparent);border:1px solid color-mix(in srgb, var(--volt) 32%, transparent);border-radius:15px;padding:13px 15px;margin:16px 0 4px}
 .commit b{display:block;font-size:13.5px;margin-bottom:5px}
 .commit p{font-size:12.5px;color:var(--muted);line-height:1.5;margin:0}
@@ -1569,6 +1589,31 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   <p class="fine" style="margin-top:10px">Your code lives in Profile → 🔑 Phone-switch code. Lost it? Message the coach on IG and we'll sort you.</p>
 </div></div>
 
+<!-- community repair board: report it, claim it, prove it's fixed -->
+<div class="sheet" id="shIssue"><div class="scrim" data-close></div><div class="panel">
+  <div class="grab"></div>
+  <div class="xrow"><div><h3>🔧 What's broken?</h3><p class="sub">The whole court sees this. Someone with a spare rim might just sort it.</p></div><button class="x" data-close>✕</button></div>
+  <p class="fine" id="issCourt" style="margin:-4px 0 12px;font-weight:700;color:var(--text)"></p>
+  <div class="fld"><label>What's the problem?</label>
+    <div class="kinds" id="issKinds"></div>
+  </div>
+  <div class="fld"><label>Tell us more</label><textarea class="inp" id="issTxt" rows="2" maxlength="300" placeholder="e.g. north rim is bent right down, unplayable"></textarea></div>
+  <div class="sgphoto" id="issPhotoBox">📷 Show us (optional)</div>
+  <input type="file" id="issPhoto" accept="image/*" style="display:none">
+  <button class="btn btn-v btn-block" id="issGo" style="margin-top:12px">Put it on the board</button>
+</div></div>
+
+<!-- proof it's fixed -->
+<div class="sheet" id="shFixed"><div class="scrim" data-close></div><div class="panel">
+  <div class="grab"></div>
+  <div class="xrow"><div><h3>✅ You fixed it?</h3><p class="sub">Big up. Snap a photo so everyone knows the court's good again.</p></div><button class="x" data-close>✕</button></div>
+  <p class="fine" id="fxdWhat" style="margin:-4px 0 12px;font-weight:700;color:var(--text)"></p>
+  <div class="sgphoto" id="fxdPhotoBox">📷 Photo of the fix</div>
+  <input type="file" id="fxdPhoto" accept="image/*" style="display:none">
+  <button class="btn btn-ok btn-block" id="fxdGo" style="margin-top:12px">Mark it fixed 🔨</button>
+  <p class="fine" style="margin-top:10px">A photo isn't required, but it's what makes people believe it — and it's how you build a rep at your court.</p>
+</div></div>
+
 <!-- court fix / photo: the community keeps the map honest -->
 <div class="sheet" id="shFix"><div class="scrim" data-close></div><div class="panel">
   <div class="grab"></div>
@@ -1696,6 +1741,10 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       <div class="step"><button type="button" id="exMinus" aria-label="one fewer">−</button><b id="ctExtraN">0</b><button type="button" id="exPlus" aria-label="one more">+</button></div>
     </div>
     <p style="font-size:11.5px;color:var(--dim);margin-top:7px">Not a booking system — just who's here right now. Times aren't guaranteed. Check in when you're at the court, or scan its QR. Everyone auto-checks out after 2 hours, so this stays live.</p>
+  </div>
+  <div class="subsect" id="ctIssuesWrap"><h4>🔧 Court status <span class="chip f" id="ctIssN"></span></h4>
+    <div id="ctIssues"></div>
+    <button class="btn btn-ghost btn-block" id="ctIssBtn" style="margin-top:8px">🔧 Report a problem</button>
   </div>
   <div class="fixcard" id="ctFixCard">
     <div class="fx1"><b>Keep this court right 🤝</b><span>Rings bent? Lights out? Gate locked? A photo or a line from you keeps everyone's info accurate.</span></div>
@@ -2970,6 +3019,7 @@ function openCourtPage(c){
   bk.onclick=()=>{toggleSaved(c.key);bk.classList.toggle('on',isSaved(c.key));};
   $('#ctRuns').innerHTML='<div class="skel" style="height:56px"></div>';
   $('#ctPlays').innerHTML='<div class="skel" style="height:48px"></div>';
+  ISSUES=[];$('#ctIssues').innerHTML='<div class="skel" style="height:40px"></div>';$('#ctIssN').textContent='';
   $('#ctKotc').innerHTML='';
   $('#ctWx').innerHTML='';
   $('#ctHere').innerHTML='<div class="skel" style="height:40px"></div>';
@@ -3007,6 +3057,7 @@ function openCourtPage(c){
     });
     paintHere(d.here||[],d.hereExtra||0);
     paintPlays(d.plays);
+    paintIssues(d.issues||[]);
     paintReviews(d);
     const kings=(d.kotc||[]).filter(k=>k.runs>0);
     if(kings.length){
@@ -3195,6 +3246,120 @@ async function autoCheckout(){
 document.addEventListener('visibilitychange',()=>{if(!document.hidden){autoCheckout();autoCheckin();}});
 
 /* ---------- suggest a court ---------- */
+/* ---------- community repair board ---------- */
+const IKINDS=[['rim','🏀 Rim / backboard'],['net','🕸️ Net'],['lights','💡 Lights'],['surface','🧱 Surface'],['gate','🔒 Gate / access'],['rubbish','🗑️ Rubbish'],['other','⚠️ Something else']];
+const IICO={rim:'🏀',net:'🕸️',lights:'💡',surface:'🧱',gate:'🔒',rubbish:'🗑️',other:'⚠️'};
+let ISSUES=[],ISSKIND='rim',issPhotoData='',fxdPhotoData='',FXDID=null;
+function paintIssues(list){
+  if(list)ISSUES=list;
+  const open=ISSUES.filter(i=>i.status!=='fixed');
+  const n=$('#ctIssN');
+  if(n){n.textContent=open.length?open.length+' open':'all good ✓';n.style.display='';}
+  const box=$('#ctIssues');if(!box)return;
+  if(!ISSUES.length){
+    box.innerHTML='<div class="empty" style="padding:14px">Nothing reported here — the court\'s in good shape. Spot something broken? Put it on the board.</div>';
+    return;
+  }
+  box.innerHTML=ISSUES.map(i=>{
+    const mine=OCP&&i.player_id===OCP.id;
+    const iAmFixer=OCP&&i.fixer_id===OCP.id;
+    const st=i.status==='fixed'?'fixed':(i.status==='onit'?'onit':'open');
+    const stl=st==='fixed'?'Fixed':(st==='onit'?(iAmFixer?"You're on it":esc(i.fixer_name||'Someone')+' is on it'):'Broken');
+    const photo=i.status==='fixed'&&i.fixed_photo?i.fixed_photo:i.photo_url;
+    return `<div class="iss ${st}">
+      <div class="ih">
+        <div class="ith" style="${photo?`background-image:url('${esc(photo)}')`:''}">${photo?'':(IICO[i.kind]||'⚠️')}</div>
+        <div class="im">
+          <b>${esc((IKINDS.find(k=>k[0]===i.kind)||['','Problem'])[1].replace(/^\S+\s/,''))}${i.text?' — '+esc(i.text):''}</b>
+          <span>${esc(i.name||'Someone')}${i.ig?' @'+esc(i.ig):''} · ${esc(sinceTxt(i.created_at))}${i.bumps>0?' · '+i.bumps+' more said the same':''}</span>
+          ${i.status==='fixed'?`<span style="color:var(--ok);font-weight:700">🔨 Fixed by ${esc(i.fixed_name||'someone')}${i.fixed_at?' · '+esc(sinceTxt(i.fixed_at)):''}</span>`:''}
+        </div>
+        <span class="ist ${st}">${stl}</span>
+      </div>
+      ${i.status==='fixed'?'':`<div class="ib">
+        <button class="${i.bumped?'on':''}" data-ibump="${esc(i.id)}">${i.bumped?'✓ Same here':'👍 Same here'}</button>
+        <button class="${iAmFixer?'on':'go'}" data-iclaim="${esc(i.id)}">${iAmFixer?"✓ You're on it":"🙋 I'll fix it"}</button>
+        <button class="ok" data-ifixed="${esc(i.id)}">✅ It's fixed</button>
+      </div>`}
+    </div>`;
+  }).join('');
+  box.querySelectorAll('[data-ibump]').forEach(b=>b.onclick=()=>ensureProfile(async()=>{
+    try{const d=await api({action:'issue_bump',player:OCP,id:b.dataset.ibump});paintIssues(d.issues);}catch(e){toast(e.message,1)}
+  }));
+  box.querySelectorAll('[data-iclaim]').forEach(b=>b.onclick=()=>ensureProfile(async()=>{
+    try{const d=await api({action:'issue_claim',player:OCP,id:b.dataset.iclaim});paintIssues(d.issues);
+      toast(d.claimed?'You\'re on it 🔧 the court can see':'Taken off your name');}catch(e){toast(e.message,1)}
+  }));
+  box.querySelectorAll('[data-ifixed]').forEach(b=>b.onclick=()=>ensureProfile(()=>{
+    FXDID=b.dataset.ifixed;
+    const i=ISSUES.find(x=>x.id===FXDID);
+    fxdPhotoData='';
+    const bx=$('#fxdPhotoBox');bx.classList.remove('has');bx.style.backgroundImage='';bx.textContent='📷 Photo of the fix';
+    $('#fxdWhat').textContent=i?((IICO[i.kind]||'⚠️')+' '+(i.text||(IKINDS.find(k=>k[0]===i.kind)||['','Problem'])[1])):'';
+    openSheet('shFixed');
+  }));
+}
+function sinceTxt(ts){
+  if(!ts)return '';
+  const m=Math.floor((Date.now()-new Date(ts).getTime())/60000);
+  if(m<1)return 'just now';
+  if(m<60)return m+'m ago';
+  const h=Math.floor(m/60);if(h<24)return h+'h ago';
+  const d=Math.floor(h/24);return d===1?'yesterday':d+'d ago';
+}
+function photoPicker(inputId,boxId,setter,label){
+  $('#'+boxId).onclick=()=>$('#'+inputId).click();
+  $('#'+inputId).onchange=e=>{
+    const f=e.target.files[0];if(!f)return;
+    const img=new Image();
+    img.onload=()=>{
+      const scale=Math.min(1,1280/Math.max(img.width,img.height));
+      const cv=document.createElement('canvas');
+      cv.width=Math.round(img.width*scale);cv.height=Math.round(img.height*scale);
+      cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+      const data=cv.toDataURL('image/jpeg',.8);
+      setter(data);
+      const bx=$('#'+boxId);bx.classList.add('has');bx.style.backgroundImage=`url("${data}")`;bx.textContent='';
+    };
+    img.src=URL.createObjectURL(f);
+  };
+}
+photoPicker('issPhoto','issPhotoBox',d=>issPhotoData=d);
+photoPicker('fxdPhoto','fxdPhotoBox',d=>fxdPhotoData=d);
+function paintIssKinds(){
+  $('#issKinds').innerHTML=IKINDS.map(k=>`<button type="button" class="${k[0]===ISSKIND?'on':''}" data-k="${k[0]}">${k[1]}</button>`).join('');
+  $('#issKinds').querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{ISSKIND=b.dataset.k;paintIssKinds();});
+}
+$('#ctIssBtn').onclick=()=>{
+  if(!CC)return;
+  ensureProfile(()=>{
+    ISSKIND='rim';issPhotoData='';$('#issTxt').value='';
+    const bx=$('#issPhotoBox');bx.classList.remove('has');bx.style.backgroundImage='';bx.textContent='📷 Show us (optional)';
+    $('#issCourt').textContent='🏀 '+CC.name+(CC.suburb?' · '+CC.suburb:'');
+    paintIssKinds();openSheet('shIssue');
+  });
+};
+$('#issGo').onclick=()=>ensureProfile(async()=>{
+  const b=$('#issGo');b.disabled=true;b.textContent='Posting…';
+  try{
+    const d=await api({action:'issue_report',player:OCP,court_key:CC.key,court_name:CC.name,kind:ISSKIND,text:$('#issTxt').value.trim(),photo:issPhotoData||undefined});
+    paintIssues(d.issues);closeSheet('shIssue');
+    toast('On the board 🔧 the court can see it now');
+  }catch(e){toast(e.message,1)}
+  b.disabled=false;b.textContent='Put it on the board';
+});
+$('#fxdGo').onclick=()=>ensureProfile(async()=>{
+  if(!FXDID)return;
+  const b=$('#fxdGo');b.disabled=true;b.textContent='Saving…';
+  try{
+    const d=await api({action:'issue_fixed',player:OCP,id:FXDID,photo:fxdPhotoData||undefined});
+    paintIssues(d.issues);closeSheet('shFixed');
+    toast('🔨 Marked fixed — respect. The whole court can see.');
+    confettiBurst&&confettiBurst('#2ECC71');
+  }catch(e){toast(e.message,1)}
+  b.disabled=false;b.textContent='Mark it fixed 🔨';
+});
+
 /* ---------- court fixes + photos (community keeps the map honest) ---------- */
 let fixPhotoData='',FIXMODE='fix';
 function resetFix(){
@@ -3224,20 +3389,7 @@ function openFix(mode){
 }
 $('#ctFixBtn').onclick=()=>openFix('fix');
 $('#ctPhotoBtn').onclick=()=>openFix('photo');
-$('#fixPhotoBox').onclick=()=>$('#fixPhoto').click();
-$('#fixPhoto').onchange=e=>{
-  const f=e.target.files[0];if(!f)return;
-  const img=new Image();
-  img.onload=()=>{
-    const scale=Math.min(1,1280/Math.max(img.width,img.height));
-    const cv=document.createElement('canvas');
-    cv.width=Math.round(img.width*scale);cv.height=Math.round(img.height*scale);
-    cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
-    fixPhotoData=cv.toDataURL('image/jpeg',.8);
-    const bx=$('#fixPhotoBox');bx.classList.add('has');bx.style.backgroundImage=`url("${fixPhotoData}")`;bx.textContent='';
-  };
-  img.src=URL.createObjectURL(f);
-};
+photoPicker('fixPhoto','fixPhotoBox',d=>fixPhotoData=d);
 $('#fixGo').onclick=()=>ensureProfile(async()=>{
   const note=$('#fixTxt').value.trim();
   if(!note&&!fixPhotoData){toast(FIXMODE==='photo'?'Pick a photo first':'Tell us what\'s off',1);return}
@@ -3255,20 +3407,7 @@ function resetSuggest(){sgPhotoData='';const bx=$('#sgPhotoBox');bx.classList.re
 function openSuggest(){ensureProfile(()=>openSheet('shSuggest'));}
 $('#suggestBtn2').onclick=openSuggest;
 document.addEventListener('click',e=>{const s=e.target.closest('[data-suggest]');if(s){e.preventDefault();openSuggest();}});
-$('#sgPhotoBox').onclick=()=>$('#sgPhoto').click();
-$('#sgPhoto').onchange=e=>{
-  const f=e.target.files[0];if(!f)return;
-  const img=new Image();
-  img.onload=()=>{
-    const scale=Math.min(1,1280/Math.max(img.width,img.height));
-    const cv=document.createElement('canvas');
-    cv.width=Math.round(img.width*scale);cv.height=Math.round(img.height*scale);
-    cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
-    sgPhotoData=cv.toDataURL('image/jpeg',.8);
-    const bx=$('#sgPhotoBox');bx.classList.add('has');bx.style.backgroundImage=`url("${sgPhotoData}")`;bx.textContent='';
-  };
-  img.src=URL.createObjectURL(f);
-};
+photoPicker('sgPhoto','sgPhotoBox',d=>sgPhotoData=d);
 $('#sgGo').onclick=()=>ensureProfile(async()=>{
   const court_name=$('#sgName').value.trim();
   if(!court_name){toast('What\'s the court called?',1);return}

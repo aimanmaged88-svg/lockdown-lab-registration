@@ -55,6 +55,35 @@ const phoneClean = (v: unknown): string | null => {
   return /^04\d{8}$/.test(d) ? d : null;
 };
 // app settings (key/value) — invite_only gates closed testing
+// The repair board for one court: what's broken, who's on it, what got fixed.
+// Fixed items hang around for 5 days so the court sees the good news.
+async function issuesFor(court_key: string, viewer?: string) {
+  const cutoff = new Date(Date.now() - 5 * 864e5).toISOString();
+  const rows = await db(
+    `oc_court_issues?court_key=eq.${encodeURIComponent(sid(court_key))}&hidden=is.false&or=(status.neq.fixed,fixed_at.gte.${cutoff})&select=*&order=created_at.desc&limit=40`,
+  ) || [];
+  if (!rows.length) return [];
+  const ids = rows.map((r: { id: string }) => `"${sid(r.id)}"`).join(",");
+  const bumps = await db(`oc_issue_bumps?issue_id=in.(${ids})&select=issue_id,player_id`) || [];
+  const count: Record<string, number> = {};
+  const mine: Record<string, boolean> = {};
+  for (const b of bumps) {
+    count[b.issue_id] = (count[b.issue_id] || 0) + 1;
+    if (viewer && b.player_id === viewer) mine[b.issue_id] = true;
+  }
+  const rank = (s: string) => (s === "onit" ? 0 : s === "open" ? 1 : 2);
+  return rows
+    .map((r: Record<string, unknown>) => ({
+      id: r.id, kind: r.kind, text: r.text, photo_url: r.photo_url,
+      player_id: r.player_id, name: r.name, ig: r.ig, status: r.status,
+      fixer_id: r.fixer_id, fixer_name: r.fixer_name,
+      fixed_name: r.fixed_name, fixed_photo: r.fixed_photo, fixed_at: r.fixed_at,
+      created_at: r.created_at,
+      bumps: count[r.id as string] || 0,
+      bumped: !!mine[r.id as string],
+    }))
+    .sort((a, z) => rank(a.status as string) - rank(z.status as string));
+}
 async function settingOn(key: string): Promise<boolean> {
   try {
     const r = await db(`oc_settings?key=eq.${encodeURIComponent(key)}&select=value`);
@@ -820,7 +849,8 @@ Deno.serve(async (req: Request) => {
         const reviews = (rrows || []).map(r => ({ ...(asAdmin ? { pid: r.player_id } : {}), stars: r.stars, text: r.text, at: r.created_at, name: rnames[r.player_id as string]?.name || "Hooper", ig: rnames[r.player_id as string]?.ig || "", v: rvs.has(r.player_id as string), mine: r.player_id === me }));
         const rsum = reviews.length ? { avg: Math.round(reviews.reduce((a, r) => a + (r.stars as number), 0) / reviews.length * 10) / 10, n: reviews.length } : null;
         const h = await hereFor(key);
-        return J({ runs: await withPlayers(runs), plays, week, kotc, here: h.list, hereTotal: h.total, hereExtra: h.extra, info, reviews, rsum });
+        const issues = await issuesFor(key, me);
+        return J({ runs: await withPlayers(runs), plays, week, kotc, here: h.list, hereTotal: h.total, hereExtra: h.extra, info, reviews, rsum, issues });
       }
 
 
@@ -1002,6 +1032,119 @@ Deno.serve(async (req: Request) => {
 
       // Suggest a court → Heaven desk. Players never add courts themselves; the
       // coach reviews suggestions and adds the official ones. Rate-limited.
+      // ---- community repair board: report it, claim it, prove it's fixed ----
+      // Loads with the court page, so it's public: the whole court sees what's
+      // broken and who's on it.
+      case "issue_report": {
+        const g = await guard(((b.player || {}) as Record<string, unknown>).id as string);
+        if (g.err) return g.err;
+        const player = g.p!;
+        const court_key = str(b.court_key, 64);
+        if (!court_key) return J({ error: "which court?" }, 400);
+        const KINDS = ["rim", "net", "lights", "surface", "gate", "rubbish", "other"];
+        const kind = KINDS.includes(str(b.kind, 12)) ? str(b.kind, 12) : "other";
+        const dayAgo = new Date(Date.now() - 864e5).toISOString();
+        const mine = await db(`oc_court_issues?player_id=eq.${encodeURIComponent(player.id)}&created_at=gte.${dayAgo}&select=id`);
+        if ((mine?.length || 0) >= 10) return J({ error: "that's a lot of reports today — give it a rest" }, 429);
+        let photo_url = "";
+        if (typeof b.photo === "string" && b.photo.startsWith("data:image")) {
+          photo_url = await uploadImg(b.photo, `issues/${sid(player.id)}-${Date.now()}`).catch(() => "");
+        }
+        await db(`oc_court_issues`, {
+          method: "POST",
+          body: JSON.stringify({
+            court_key, court_name: str(b.court_name, 80), kind, text: str(b.text, 300), photo_url,
+            player_id: player.id, name: player.name, ig: player.ig,
+            status: "open", created_at: new Date().toISOString(),
+          }),
+        });
+        return J({ ok: true, issues: await issuesFor(court_key, player.id) });
+      }
+
+      // "same here" — confirms it's still broken (one per player, toggles off)
+      case "issue_bump": {
+        const g = await guard(((b.player || {}) as Record<string, unknown>).id as string);
+        if (g.err) return g.err;
+        const player = g.p!;
+        const id = str(b.id, 64);
+        const rows = await db(`oc_court_issues?id=eq.${encodeURIComponent(id)}&select=court_key`);
+        if (!rows?.[0]) return J({ error: "that report is gone" }, 404);
+        const had = await db(`oc_issue_bumps?issue_id=eq.${encodeURIComponent(id)}&player_id=eq.${encodeURIComponent(player.id)}&select=player_id`);
+        if (had?.length) {
+          await db(`oc_issue_bumps?issue_id=eq.${encodeURIComponent(id)}&player_id=eq.${encodeURIComponent(player.id)}`, { method: "DELETE" });
+        } else {
+          await db(`oc_issue_bumps`, { method: "POST", body: JSON.stringify({ issue_id: id, player_id: player.id, created_at: new Date().toISOString() }) });
+        }
+        return J({ ok: true, issues: await issuesFor(rows[0].court_key, player.id) });
+      }
+
+      // "I'll fix it" — puts your name on it so nobody doubles up. Tapping
+      // again takes your name back off.
+      case "issue_claim": {
+        const g = await guard(((b.player || {}) as Record<string, unknown>).id as string);
+        if (g.err) return g.err;
+        const player = g.p!;
+        const id = str(b.id, 64);
+        const rows = await db(`oc_court_issues?id=eq.${encodeURIComponent(id)}&select=court_key,status,fixer_id`);
+        const row = rows?.[0];
+        if (!row) return J({ error: "that report is gone" }, 404);
+        if (row.status === "fixed") return J({ error: "that one's already fixed 🔨" }, 400);
+        const mineAlready = row.fixer_id === player.id;
+        await db(`oc_court_issues?id=eq.${encodeURIComponent(id)}`, {
+          method: "PATCH",
+          body: JSON.stringify(mineAlready
+            ? { status: "open", fixer_id: null, fixer_name: null, fixer_ig: null, claimed_at: null }
+            : { status: "onit", fixer_id: player.id, fixer_name: player.name, fixer_ig: player.ig, claimed_at: new Date().toISOString() }),
+        });
+        return J({ ok: true, claimed: !mineAlready, issues: await issuesFor(row.court_key, player.id) });
+      }
+
+      // "it's fixed" — with a photo, that's the proof the court is good again
+      case "issue_fixed": {
+        const g = await guard(((b.player || {}) as Record<string, unknown>).id as string);
+        if (g.err) return g.err;
+        const player = g.p!;
+        const id = str(b.id, 64);
+        const rows = await db(`oc_court_issues?id=eq.${encodeURIComponent(id)}&select=court_key,court_name,status,player_id`);
+        const row = rows?.[0];
+        if (!row) return J({ error: "that report is gone" }, 404);
+        if (row.status === "fixed") return J({ error: "already marked fixed" }, 400);
+        let fixed_photo = "";
+        if (typeof b.photo === "string" && b.photo.startsWith("data:image")) {
+          fixed_photo = await uploadImg(b.photo, `issues/fixed-${sid(player.id)}-${Date.now()}`).catch(() => "");
+        }
+        await db(`oc_court_issues?id=eq.${encodeURIComponent(id)}`, {
+          method: "PATCH",
+          body: JSON.stringify({ status: "fixed", fixed_by: player.id, fixed_name: player.name, fixed_ig: player.ig, fixed_photo, fixed_at: new Date().toISOString() }),
+        });
+        // tell whoever reported it that their court got sorted
+        try {
+          if (row.player_id && row.player_id !== player.id) {
+            await sendHH([row.player_id as string], {
+              title: "🔨 Fixed at " + (row.court_name || "your court"),
+              body: `${player.name} sorted the thing you reported`,
+              url: "/hoopsheaven.html?court=" + encodeURIComponent(row.court_key as string),
+            });
+          }
+        } catch (_e) { /* best effort */ }
+        return J({ ok: true, issues: await issuesFor(row.court_key, player.id) });
+      }
+
+      // coach moderation
+      case "admin_issue_del": {
+        if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
+        const id = str(b.id, 64);
+        if (!id) return J({ error: "bad request" }, 400);
+        await db(`oc_issue_bumps?issue_id=eq.${encodeURIComponent(id)}`, { method: "DELETE" });
+        await db(`oc_court_issues?id=eq.${encodeURIComponent(id)}`, { method: "DELETE" });
+        return J({ ok: true });
+      }
+      case "admin_issues": {
+        if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
+        const rows = await db(`oc_court_issues?select=*&order=created_at.desc&limit=200`) || [];
+        return J({ issues: rows });
+      }
+
       // "Something's off here" — a hooper corrects a court's details or adds a
       // photo. Same desk inbox as new-court suggestions, flagged kind='fix'.
       case "court_fix": {
