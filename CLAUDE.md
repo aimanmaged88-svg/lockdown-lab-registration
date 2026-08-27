@@ -299,6 +299,30 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   verified:true, normal handle → false, test rows deleted. OPEN QUESTION for
   Aiman: Green Square Courts has indoor=true in oc_courts (run sheet says
   "Indoor — rain can't touch this run") — he plays there; awaiting his call.
+- **CLOSED TESTING: invite codes + feedback loop (edge v30, 2026-08-26, Aiman
+  asked).** He wants it used for real, in-house, gated by codes he hands out.
+  Migration `opencourt_invites_bugs`: `oc_invites` (code pk, note, used_by/
+  used_name/used_at, revoked), `oc_bugs` (player_id/name/ig/text/page/ua/done),
+  `oc_settings` (key/value; `invite_only`='1'). Edge: `settingOn()`,
+  `mkInvite()` (6 chars, ambiguous ILO01 removed), register gate — a NEW row
+  needs a valid unused code (`needinvite`/`badinvite`/`usedinvite`), claimed
+  atomically via `used_by=is.null` PATCH + read-back; **OWNER_IGS and existing
+  device rows are never gated** (self-heal safe, and the app re-sends the code
+  from `oc_invite` localStorage). New actions: `invite_status` (pre-check),
+  `bug_report` (UNGUARDED by design — a broken app must still be able to
+  report; pushes every coach=true player), admin `admin_invite_mint` (≤25),
+  `_list`, `_del`, `_gate` (open/close the door), `admin_bugs`, `_bug_done`,
+  `_bug_del`. App: `#pfInvite` field on the gate, prefilled from
+  `?invite=CODE` (also accepts `?code=`), `checkGate()` on boot hides it if the
+  gate is open, invite errors render inline on `#invHint`; Profile →
+  `#pBug` → `#shBug` "Something broke" sheet. Desk: 🎟️ **Invites** section
+  (gate toggle card, mint N codes with a note, code chips with Copy-link,
+  full list showing who used what, delete) + 🐞 **Reports** section, both with
+  live sidebar badges via `pollSideBadges()` on the 30s poll (toast + desktop
+  notification on a new report). `ago()` helper added (joinAgo is day-only).
+  ALL players wiped again at his ask. Verified: live backend 18/18 (gate on/off,
+  code single-use, sharing refused, self-heal, owner bypass, bug round-trip),
+  UI 17/17. Test rows + temp coach deleted; gate left ON.
 - **Mobile number required at signup (edge v29, 2026-08-22, Aiman asked).**
   Migration `opencourt_player_phone` (oc_players.phone + index). Edge:
   `phoneClean()` canonicalises AU mobiles (+61/04/spaces → `04xxxxxxxx`,
