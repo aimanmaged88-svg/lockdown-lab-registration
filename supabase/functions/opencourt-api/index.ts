@@ -537,7 +537,7 @@ Deno.serve(async (req: Request) => {
           method: "POST",
           body: JSON.stringify({
             player_id: str(p.id, 64), name: str(p.name, 40), ig: igClean(p.ig),
-            text, page: str(b.page, 40), ua: str(b.ua, 200),
+            text, kind: str(b.kind, 12) || "bug", page: str(b.page, 40), ua: str(b.ua, 200),
             created_at: new Date().toISOString(),
           }),
         });
@@ -547,8 +547,9 @@ Deno.serve(async (req: Request) => {
           const ids = coaches.map((c: { id: string }) => c.id);
           if (ids.length) {
             await sendHH(ids, {
-              title: "🐞 Something broke",
+              title: ({ slow: "🐌 Feels slow", idea: "💡 Tester idea", vibe: "💬 Tester feedback" } as Record<string, string>)[str(b.kind, 12)] || "🐞 Something broke",
               body: `${str(p.name, 40) || "A tester"}: ${text.slice(0, 80)}`,
+            // (kind shown on the desk; the ping stays short)
               url: "/hoopsheaven-desk.html",
             });
           }

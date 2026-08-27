@@ -760,6 +760,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
 .runcard .a2{border-color:var(--card);background:var(--card2);color:var(--text)}
 .rc-go{height:38px;padding:0 17px;border-radius:12px;background:var(--text);color:var(--bg);font-weight:700;font-size:13px;display:flex;align-items:center;border:none;cursor:pointer}
 .rc-spots{position:absolute;top:14px;right:14px;font-size:10.5px;font-weight:800;color:#B07A00;background:rgba(255,176,32,.16);padding:5px 10px;border-radius:99px}
+.iconbtn.fbdot{position:relative}
+.iconbtn.fbdot:after{content:"";position:absolute;top:6px;right:6px;width:7px;height:7px;border-radius:50%;background:var(--volt);box-shadow:0 0 0 2px var(--bg)}
 .betapill{display:inline-block;font-family:var(--cond);font-size:12px;font-weight:600;letter-spacing:2.4px;text-transform:uppercase;color:var(--volt);background:color-mix(in srgb,var(--volt) 14%,transparent);border:1px solid color-mix(in srgb,var(--volt) 36%,transparent);border-radius:99px;padding:5px 13px;margin-bottom:14px}
 .betatag{font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:1.6px;color:var(--volt);border:1px solid color-mix(in srgb,var(--volt) 45%,transparent);border-radius:99px;padding:1px 6px;margin-left:7px;vertical-align:3px}
 .kinds{display:flex;flex-wrap:wrap;gap:7px}
@@ -1437,6 +1439,7 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
       <div class="lw">Certified<br>Hooper<span class="betatag">BETA</span></div>
     </div>
     <div class="hdr-r">
+      <button class="iconbtn fbdot" id="fbBtn" title="Send feedback">💬</button>
       <button class="iconbtn" id="themeBtn" title="Colours">🎨</button>
       <div class="me" id="meChip"><div class="av" id="meAv">?</div><b id="meName">Who are you?</b></div>
     </div>
@@ -1516,7 +1519,7 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
       <div id="vfCard" style="display:none;margin-top:12px"></div>
       <div class="prow" id="pNotif" style="margin-top:12px"><span class="ic">🔔</span><span class="lbl">Turn on notifications</span><span class="ar">›</span></div>
       <div class="prow" id="pCode"><span class="ic">🔑</span><span>Phone-switch code</span><span class="ar" id="pCodeVal" style="letter-spacing:2px;font-weight:800">•••••</span></div>
-      <div class="prow" id="pBug"><span class="ic">🐞</span><span>Something broke — tell the coach</span><span class="ar">›</span></div>
+      <div class="prow" id="pBug"><span class="ic">💬</span><span>Send feedback — broke, slow, ideas</span><span class="ar">›</span></div>
       <div class="prow" id="pInvite"><span class="ic">📲</span><span>Invite a hooper</span><span class="ar">›</span></div>
       <div class="prow" id="pShare"><span class="ic">📤</span><span>Share my card</span><span class="ar">›</span></div>
       <div class="prow" id="pEdit"><span class="ic">✏️</span><span>Edit name / socials</span><span class="ar">›</span></div>
@@ -1632,10 +1635,10 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <!-- something broke: tester feedback straight to the desk -->
 <div class="sheet" id="shBug"><div class="scrim" data-close></div><div class="panel">
   <div class="grab"></div>
-  <div class="xrow"><div><h3>🐞 Something broke?</h3><p class="sub">Tell the coach exactly what happened — it lands on his desk straight away.</p></div><button class="x" data-close>✕</button></div>
-  <div class="fld"><label>What went wrong?</label><textarea class="inp" id="bugTxt" rows="4" maxlength="600" placeholder="e.g. I tapped 'Tap in' on the Green Square run and nothing happened"></textarea></div>
+  <div class="xrow"><div><h3>💬 Send feedback</h3><p class="sub">You're a beta tester — this is the bit that actually builds the app. Straight to the coach.</p></div><button class="x" data-close>✕</button></div>
+  <div class="fld"><label>Broke? Slow? Idea? Just say it</label><textarea class="inp" id="bugTxt" rows="4" maxlength="600" placeholder="e.g. the map was slow on 4G · nothing happened when I tapped Tap in · the boys liked it but didn't get the ✓"></textarea></div>
   <button class="btn btn-v btn-block" id="bugGo">Send it to the coach</button>
-  <p class="fine" style="margin-top:10px">Anything counts — a button that does nothing, a word that looks wrong, something that felt confusing. This is what testing is for. 🙏</p>
+  <p class="fine" style="margin-top:10px">Anything counts — a button that does nothing, a screen that felt slow, a word that reads wrong, or just what you reckon. No such thing as too small. 🙏</p>
 </div></div>
 
 <!-- invite: QR + link -->
@@ -3550,7 +3553,9 @@ function openInvite(){
   openSheet('shInvite');
 }
 $('#pInvite').onclick=openInvite;
-$('#pBug').onclick=()=>{$('#bugTxt').value='';openSheet('shBug');setTimeout(()=>$('#bugTxt').focus(),320)};
+function openFeedback(){$('#bugTxt').value='';openSheet('shBug');setTimeout(()=>$('#bugTxt').focus(),320)}
+$('#pBug').onclick=openFeedback;
+$('#fbBtn').onclick=openFeedback;
 $('#bugGo').onclick=async()=>{
   const t=$('#bugTxt').value.trim();
   if(!t){toast('Tell us what happened first',1);return}
