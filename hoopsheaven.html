@@ -760,6 +760,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
 .runcard .a2{border-color:var(--card);background:var(--card2);color:var(--text)}
 .rc-go{height:38px;padding:0 17px;border-radius:12px;background:var(--text);color:var(--bg);font-weight:700;font-size:13px;display:flex;align-items:center;border:none;cursor:pointer}
 .rc-spots{position:absolute;top:14px;right:14px;font-size:10.5px;font-weight:800;color:#B07A00;background:rgba(255,176,32,.16);padding:5px 10px;border-radius:99px}
+.betapill{display:inline-block;font-family:var(--cond);font-size:12px;font-weight:600;letter-spacing:2.4px;text-transform:uppercase;color:var(--volt);background:color-mix(in srgb,var(--volt) 14%,transparent);border:1px solid color-mix(in srgb,var(--volt) 36%,transparent);border-radius:99px;padding:5px 13px;margin-bottom:14px}
+.betatag{font-family:var(--cond);font-size:10px;font-weight:700;letter-spacing:1.6px;color:var(--volt);border:1px solid color-mix(in srgb,var(--volt) 45%,transparent);border-radius:99px;padding:1px 6px;margin-left:7px;vertical-align:3px}
 .kinds{display:flex;flex-wrap:wrap;gap:7px}
 .kinds button{background:var(--card2);border:1px solid var(--line);color:var(--muted);border-radius:99px;padding:8px 13px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer}
 .kinds button.on{background:var(--volt);color:var(--onaccent);border-color:transparent}
@@ -1406,6 +1408,7 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
 <div id="flashTut">
   <button class="skip" id="tutSkip">Skip</button>
   <div class="tslide on" data-t="0">
+    <div class="betapill">BETA · INVITE ONLY</div>
     <div class="big">🏀</div>
     <h2>Every court.<br><em>Mapped.</em></h2>
     <p>13 vetted Sydney courts — lights, hoops, water, the lot. Pick one, get directions, pull up. More dropping every week.</p>
@@ -1416,9 +1419,9 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
     <p>Live check-ins show who's at the court right now. Call a run, share the link, squad up. No more hooping alone.</p>
   </div>
   <div class="tslide" data-t="2">
-    <div class="big">✓</div>
-    <h2>Real ones<br><em>only.</em></h2>
-    <p>Sign up with your <b style="color:var(--text)">Instagram</b> or a real <b style="color:var(--text)">email</b> — that's your jersey on every run. It keeps the community real hoopers, no randoms.</p>
+    <div class="big">🤝</div>
+    <h2>You're not a user.<br><em>You're a builder.</em></h2>
+    <p>This is a <b style="color:var(--text)">beta</b>, and it's built by the community. Every run you call, every court you fix, every thing you report makes it better. <b style="color:var(--text)">It only takes off if we put into it</b> — that goes for every run we run.</p>
   </div>
   <div class="tfoot">
     <div class="tdots" id="tutDots"><span class="on"></span><span></span><span></span></div>
@@ -1431,7 +1434,7 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
   <header>
     <div class="logo" id="logoBtn">
       <svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="25" fill="none" stroke="var(--volt)" stroke-width="5"/><path d="M20 33 L29 42 L45 23" fill="none" stroke="var(--volt)" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      <div class="lw">Certified<br>Hooper</div>
+      <div class="lw">Certified<br>Hooper<span class="betatag">BETA</span></div>
     </div>
     <div class="hdr-r">
       <button class="iconbtn" id="themeBtn" title="Colours">🎨</button>
@@ -1545,7 +1548,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   <div class="rule"><span class="ic">🙌</span><span><b>Good vibes only — non-negotiable.</b> This is a hype house. Everyone's welcome, every level, every body. Encourage, don't gatekeep. If someone's new or still finding their game, you build them up. That's the culture here.</span></div>
   <div class="rule"><span class="ic">⭐</span><span><b>Ratings are to hype, never to hurt.</b> Player ratings exist to celebrate hoopers — not to tear anyone down. Low scores never show as a number, and the coach reads every rating and comment before it appears. Rate the run, respect the person.</span></div>
   <div class="rule"><span class="ic">🧊</span><span><b>Zero tolerance on bad behaviour.</b> Disrespect, threats, abuse, discrimination, tearing people down — in the app or at a run — and you're gone. Banned indefinitely. One strike is enough.</span></div>
-  <div class="rule"><span class="ic">🤝</span><span><b>We build this together.</b> Call your runs, check in when you're there, fix a court when something's off. Accurate info is what makes the runs good — bad info wastes everyone's trip.</span></div>
+  <div class="rule"><span class="ic">🚧</span><span><b>This is a beta, built by the community.</b> Call your runs, check in when you're there, fix a court when something's off, tell us when it breaks. It only gets better if we put into it — bad info wastes everyone's trip.</span></div>
   <div class="rule"><span class="ic">🪪</span><span><b>Real accounts only.</b> Sign in with your Instagram — or a real email (Gmail, Apple ID, whatever) if you don't have IG. Burner and fake accounts get removed on sight.</span></div>
   <div class="rule"><span class="ic">🔨</span><span><b>Bans stick.</b> Break the rules and your handle, your email and your device are all blocked. A new account won't save you.</span></div>
   <div class="rule"><span class="ic">🧹</span><span>We can remove any run, clip or account at any time to protect the community.</span></div>
@@ -1558,7 +1561,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   <div class="grab"></div>
   <div class="gatewm">CERTIFIED <span>HOOPER</span></div>
   <div class="xrow"><div><h3 id="pfTitle">Who's pulling up?</h3><p class="sub" id="pfSub">Your <b style="color:var(--volt)">@</b> is your jersey — it shows on every run so people can find you. Real accounts only (house rules).</p></div><button class="x" data-close>✕</button></div>
-  <div class="fld" id="invFld"><label>Invite code</label><input class="inp" id="pfInvite" maxlength="8" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="ABC123" style="text-transform:uppercase;letter-spacing:3px;font-weight:800"><p class="fine" id="invHint" style="margin:6px 2px 0">Closed testing — the coach sends you this. Tap his link and it fills itself in.</p></div>
+  <div class="fld" id="invFld"><label>Invite code</label><input class="inp" id="pfInvite" maxlength="8" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="ABC123" style="text-transform:uppercase;letter-spacing:3px;font-weight:800"><p class="fine" id="invHint" style="margin:6px 2px 0">Beta testers only right now — the coach sends you this. Tap his link and it fills itself in.</p></div>
   <div class="fld"><label>Your name</label><input class="inp" id="pfName" maxlength="40" placeholder="e.g. Jordan"></div>
   <div class="fld"><label>How people find you — &amp; how we check you're real</label>
     <div class="idpick" id="idPick">
@@ -1572,8 +1575,8 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   <div class="fld" id="emFld" style="display:none"><label>Email (Gmail / Apple ID / any real inbox)</label><input class="inp" id="pfEmail" type="email" autocapitalize="none" placeholder="you@gmail.com"></div>
   <div class="fld"><label>Mobile number</label><input class="inp" id="pfPhone" type="tel" inputmode="tel" maxlength="17" autocomplete="tel" placeholder="0412 345 678"><p class="fine" style="margin:6px 2px 0">Only the coach sees this — never shown on the courts or your card. It's how you get back in if you switch phones.</p></div>
   <div class="commit">
-    <b>🤝 This only works if we build it together</b>
-    <p>Every run you call, every check-in, every photo and correction makes the next hooper's info right. Accurate courts and honest run times mean <b>everyone gets better runs</b> — that's the whole deal. Put real info in, get real runs out.</p>
+    <b>🚧 This is a beta — and you're building it</b>
+    <p>Nothing here works unless the community puts into it. Call your runs, check in when you're there, flag a broken rim, tell us when something breaks. <b>Good info in, good runs out</b> — that's the whole deal, and it's how every run we run stays worth pulling up to.</p>
   </div>
   <button class="btn btn-v btn-block" id="pfSave">Lock it in</button>
   <button class="linky" id="pfLogin" style="display:none;margin:14px auto 0;text-align:center;width:100%">Already got an account? Switched phones? <b style="color:var(--volt)">Log in</b></button>
@@ -2149,7 +2152,7 @@ function openGate(){
   paintInviteField();
   $('#pfLogin').style.display='';
   $('#pfTitle').textContent='Create your account';
-  $('#pfSub').innerHTML='Certified Hooper runs on real people — you need an account before you play. Your <b style="color:var(--volt)">@</b> is your jersey; no Instagram, use a real email. One account, this stays your device\'s key to every court in Sydney.';
+  $('#pfSub').innerHTML='<b style="color:var(--volt)">You\'re in the beta.</b> This is built by the hoopers using it — you\'re here to play, break it, and tell us what\'s wrong. Your <b style="color:var(--volt)">@</b> is your jersey; no Instagram, use a real email.';
   $('#pfSave').textContent='Create my account 🏀';
   openSheet('shProfile');
   setTimeout(()=>$('#pfName').focus(),300);
