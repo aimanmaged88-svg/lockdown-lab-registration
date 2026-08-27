@@ -54,6 +54,23 @@ const phoneClean = (v: unknown): string | null => {
   d = d.replace(/\D/g, "");
   return /^04\d{8}$/.test(d) ? d : null;
 };
+// app settings (key/value) — invite_only gates closed testing
+async function settingOn(key: string): Promise<boolean> {
+  try {
+    const r = await db(`oc_settings?key=eq.${encodeURIComponent(key)}&select=value`);
+    return r?.[0]?.value === "1";
+  } catch (_e) { return false; }
+}
+const inviteClean = (v: unknown) => String(v ?? "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12);
+const AMBIG = "ILO01";
+function mkInvite(): string {
+  const abc = "ABCDEFGHJKMNPQRSTUVWXYZ23456789".split("").filter((c) => !AMBIG.includes(c));
+  let out = "";
+  const buf = new Uint32Array(6);
+  crypto.getRandomValues(buf);
+  for (let i = 0; i < 6; i++) out += abc[buf[i] % abc.length];
+  return out;
+}
 const emailClean = (v: unknown) => {
   const e = String(v ?? "").trim().toLowerCase().slice(0, 120);
   return /^[^\s@]+@[^\s@]+\.[a-z]{2,24}$/.test(e) ? e : "";
@@ -397,6 +414,24 @@ Deno.serve(async (req: Request) => {
         const prev = await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=banned`);
         if (prev?.[0]?.banned) return J({ error: BANNED_MSG, code: "banned" }, 403);
         const cur = await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=verified,verify_code,player_num,phone`);
+        // CLOSED TESTING: a new hooper needs an invite code from the coach.
+        // The owner's own handles always walk straight in. A device that already
+        // has a row (re-register / self-heal) is never re-gated.
+        if (!cur?.[0] && !OWNER_IGS.includes(ig) && await settingOn("invite_only")) {
+          const code = inviteClean(p.invite ?? b.invite);
+          if (!code) return J({ error: "Certified Hooper is invite-only right now — ask the coach for your code", code: "needinvite" }, 403);
+          const inv = await db(`oc_invites?code=eq.${encodeURIComponent(code)}&select=code,used_by,revoked`);
+          const row = inv?.[0];
+          if (!row || row.revoked) return J({ error: "that code isn't valid — check it with the coach", code: "badinvite" }, 403);
+          if (row.used_by && row.used_by !== id) return J({ error: "that code has already been used", code: "usedinvite" }, 403);
+          // claim it for this device (guarded so two people can't share one code)
+          await db(`oc_invites?code=eq.${encodeURIComponent(code)}&used_by=is.null`, {
+            method: "PATCH",
+            body: JSON.stringify({ used_by: id, used_name: name, used_at: new Date().toISOString() }),
+          });
+          const chk = await db(`oc_invites?code=eq.${encodeURIComponent(code)}&select=used_by`);
+          if (chk?.[0]?.used_by !== id) return J({ error: "that code has already been used", code: "usedinvite" }, 403);
+        }
         // A mobile is a prerequisite for NEW hoopers. Existing rows (re-register,
         // self-heal) keep the number already on file so nobody gets locked out.
         const keepPhone = cur?.[0]?.phone || "";
@@ -460,6 +495,111 @@ Deno.serve(async (req: Request) => {
         if (hit.banned || await bansHit([hit.id, hit.ig, hit.tiktok, hit.email])) return J({ error: BANNED_MSG, code: "banned" }, 403);
         if (g0) await db(`oc_login_guard?who=eq.${w}`, { method: "DELETE" });
         return J({ ok: true, player: { id: hit.id, name: hit.name, ig: hit.ig || "", tiktok: hit.tiktok || "", email: hit.email || "", phone: hit.phone || "" }, verified: !!hit.verified, verify_code: hit.verify_code, player_num: hit.player_num ?? null });
+      }
+
+      // "Something broke" — a tester taps the bug button, it lands on the desk.
+      // Deliberately NOT guarded: if the app is broken for them we still want
+      // the report, even from a half-registered device.
+      case "bug_report": {
+        const p = (b.player || {}) as Record<string, unknown>;
+        const text = str(b.text, 600);
+        if (!text) return J({ error: "tell us what happened first" }, 400);
+        await db(`oc_bugs`, {
+          method: "POST",
+          body: JSON.stringify({
+            player_id: str(p.id, 64), name: str(p.name, 40), ig: igClean(p.ig),
+            text, page: str(b.page, 40), ua: str(b.ua, 200),
+            created_at: new Date().toISOString(),
+          }),
+        });
+        // buzz the coach's phone like a verify request does
+        try {
+          const coaches = await db(`oc_players?coach=is.true&select=id`) || [];
+          const ids = coaches.map((c: { id: string }) => c.id);
+          if (ids.length) {
+            await sendHH(ids, {
+              title: "🐞 Something broke",
+              body: `${str(p.name, 40) || "A tester"}: ${text.slice(0, 80)}`,
+              url: "/hoopsheaven-desk.html",
+            });
+          }
+        } catch (_e) { /* best effort */ }
+        return J({ ok: true });
+      }
+
+      // Is the door open, and does this code work? (checked before sign-up so
+      // a tester sees a clear answer instead of a failed registration)
+      case "invite_status": {
+        const on = await settingOn("invite_only");
+        if (!on) return J({ invite_only: false, ok: true });
+        const code = inviteClean(b.code);
+        if (!code) return J({ invite_only: true, ok: false });
+        const inv = await db(`oc_invites?code=eq.${encodeURIComponent(code)}&select=code,used_by,revoked`);
+        const row = inv?.[0];
+        const device = str(b.player_id, 64);
+        const ok = !!row && !row.revoked && (!row.used_by || row.used_by === device);
+        return J({ invite_only: true, ok, used: !!(row && row.used_by && row.used_by !== device) });
+      }
+
+      // ---- coach desk: invite codes ----
+      case "admin_invite_mint": {
+        if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
+        const n = Math.max(1, Math.min(25, Number(b.n) || 1));
+        const note = str(b.note, 60);
+        const made: string[] = [];
+        for (let i = 0; i < n; i++) {
+          for (let t = 0; t < 6; t++) {
+            const code = mkInvite();
+            try {
+              const r = await db(`oc_invites`, { method: "POST", headers: { Prefer: "return=representation" }, body: JSON.stringify({ code, note, created_at: new Date().toISOString() }) });
+              if (r?.[0]?.code) { made.push(r[0].code); break; }
+            } catch (_e) { /* collision — roll again */ }
+          }
+        }
+        return J({ ok: true, codes: made });
+      }
+      case "admin_invite_list": {
+        if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
+        const rows = await db(`oc_invites?select=*&order=created_at.desc&limit=300`) || [];
+        const on = await settingOn("invite_only");
+        return J({ invites: rows, invite_only: on });
+      }
+      case "admin_invite_del": {
+        if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
+        const code = inviteClean(b.code);
+        if (!code) return J({ error: "bad request" }, 400);
+        await db(`oc_invites?code=eq.${encodeURIComponent(code)}`, { method: "DELETE" });
+        return J({ ok: true });
+      }
+      case "admin_invite_gate": {
+        if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
+        const on = b.on === true ? "1" : "0";
+        await db(`oc_settings?on_conflict=key`, {
+          method: "POST", headers: { Prefer: "resolution=merge-duplicates" },
+          body: JSON.stringify({ key: "invite_only", value: on, updated_at: new Date().toISOString() }),
+        });
+        return J({ ok: true, invite_only: on === "1" });
+      }
+
+      // ---- coach desk: bug reports ----
+      case "admin_bugs": {
+        if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
+        const rows = await db(`oc_bugs?select=*&order=created_at.desc&limit=200`) || [];
+        return J({ bugs: rows });
+      }
+      case "admin_bug_done": {
+        if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
+        const id = str(b.id, 64);
+        if (!id) return J({ error: "bad request" }, 400);
+        await db(`oc_bugs?id=eq.${encodeURIComponent(id)}`, { method: "PATCH", body: JSON.stringify({ done: b.on !== false }) });
+        return J({ ok: true });
+      }
+      case "admin_bug_del": {
+        if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
+        const id = str(b.id, 64);
+        if (!id) return J({ error: "bad request" }, 400);
+        await db(`oc_bugs?id=eq.${encodeURIComponent(id)}`, { method: "DELETE" });
+        return J({ ok: true });
       }
 
       // Resolve a Google Maps link (or plain "lat, lon") to coordinates so the

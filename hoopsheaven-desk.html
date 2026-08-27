@@ -43,6 +43,34 @@ h1 span{color:var(--volt)}
 h2{font-family:'HHCond',sans-serif;font-size:15px;letter-spacing:2.4px;text-transform:uppercase;color:var(--dim);font-weight:600;margin:22px 0 10px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
 #inviteCard{margin-bottom:16px}
+.gaterow{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.gaterow b{font-size:15px}
+.gaterow .btn{margin-left:auto}
+.mintrow{display:flex;gap:9px;margin-top:10px;flex-wrap:wrap}
+.mintrow .inp{flex:1;min-width:150px}
+.mintrow #mintN{flex:0 0 110px;min-width:110px}
+#mintOut{display:flex;flex-wrap:wrap;gap:9px;margin-top:13px}
+.codechip{background:var(--card2);border:1px solid var(--volt);border-radius:12px;padding:10px 13px;display:flex;flex-direction:column;gap:6px;min-width:150px}
+.codechip b{font-family:'HHDisplay',sans-serif;font-size:21px;letter-spacing:3px;color:var(--volt)}
+.codechip .cbtns{display:flex;gap:6px}
+.codechip button{flex:1;font-size:11.5px;padding:6px 8px;border-radius:8px;border:none;cursor:pointer;background:var(--volt);color:var(--onaccent,#111);font-weight:800}
+.codechip button.g{background:rgba(255,255,255,.08);color:var(--text)}
+.invrow{display:flex;align-items:center;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:9px;flex-wrap:wrap}
+.invrow .cd{font-family:'HHDisplay',sans-serif;font-size:19px;letter-spacing:3px;color:var(--volt);cursor:pointer;min-width:100px}
+.invrow.used .cd{color:var(--dim);text-decoration:line-through}
+.invrow .who{flex:1;min-width:130px;font-size:13px}
+.invrow .who b{display:block;font-size:14px}
+.invrow .who span{color:var(--muted)}
+.invrow .tagx{font-size:10.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;padding:4px 9px;border-radius:99px}
+.invrow .tagx.open{background:rgba(45,224,192,.16);color:var(--volt)}
+.invrow .tagx.used{background:rgba(255,255,255,.07);color:var(--dim)}
+.bugrow{background:var(--card);border:1px solid var(--line);border-left:3px solid #FF5A5A;border-radius:14px;padding:13px 15px;margin-bottom:10px}
+.bugrow.done{border-left-color:var(--dim);opacity:.6}
+.bugrow .bt{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;margin-bottom:6px}
+.bugrow .bt b{font-size:14px}
+.bugrow .bt span{font-size:11.5px;color:var(--muted)}
+.bugrow p{font-size:14px;line-height:1.5;margin:0 0 10px;white-space:pre-wrap}
+.bugrow .bbtns{display:flex;gap:8px}
 .ivwrap{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
 #dqr{background:#fff;padding:10px;border-radius:14px;width:150px;height:150px;flex:0 0 auto;display:grid;place-items:center}
 .ivtxt{flex:1;min-width:220px}
@@ -817,6 +845,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
       <button class="nv on" data-sec="overview">🏠 Overview <span class="b" id="bReq"></span></button>
       <button class="nv" data-sec="players">👥 Players</button>
       <button class="nv" data-sec="courts">🏀 Courts <span class="b" id="bCourts"></span></button>
+      <button class="nv" data-sec="invites">🎟️ Invites <span class="b" id="bInvites"></span></button>
+      <button class="nv" data-sec="bugs">🐞 Reports <span class="b" id="bBugs"></span></button>
       <button class="nv" data-sec="feedback">⭐ Feedback <span class="b" id="bFeedback"></span></button>
     </nav>
     <div class="sb-foot">
@@ -981,6 +1011,38 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
         </div>
         <div id="fbList"><div class="empty">Loading…</div></div>
       </section>
+
+      <section id="sec-invites" style="display:none">
+        <h1>Invites</h1>
+        <p class="sub">Closed testing. Generate a code, send the link, they're in. One code = one person.</p>
+        <div class="card" style="margin-bottom:16px">
+          <div class="gaterow">
+            <div>
+              <b id="gateState">Checking…</b>
+              <p class="hint" style="margin:3px 0 0" id="gateHint"></p>
+            </div>
+            <button class="btn btn-g" id="gateBtn">…</button>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:16px">
+          <h2 style="margin:0 0 4px">Make codes</h2>
+          <p class="hint">Each one works once. Add a name so you remember who it went to.</p>
+          <div class="mintrow">
+            <input class="inp" id="mintNote" placeholder="Who's it for? (e.g. Musa)" maxlength="60">
+            <select class="inp" id="mintN"><option value="1">1 code</option><option value="3">3 codes</option><option value="5">5 codes</option><option value="10">10 codes</option></select>
+            <button class="btn btn-v" id="mintGo">Generate</button>
+          </div>
+          <div id="mintOut"></div>
+        </div>
+        <h2 style="margin:0 0 8px">Codes you've made</h2>
+        <div id="invList"><div class="empty">Loading…</div></div>
+      </section>
+
+      <section id="sec-bugs" style="display:none">
+        <h1>Reports</h1>
+        <p class="sub">Testers tapping "something broke" in the app land here. Your phone buzzes when one comes in.</p>
+        <div id="bugList"><div class="empty">Loading…</div></div>
+      </section>
     </div>
   </main>
 </div>
@@ -1024,6 +1086,8 @@ document.querySelectorAll('.nv').forEach(n=>n.onclick=()=>{
   $('#sec-'+n.dataset.sec).style.display='';
   if(n.dataset.sec==='courts')initCourts();
   if(n.dataset.sec==='feedback')loadFeedback();
+  if(n.dataset.sec==='invites')loadInvites();
+  if(n.dataset.sec==='bugs')loadBugs();
 });
 
 function show(){
@@ -1067,6 +1131,116 @@ document.addEventListener('click',e=>{
   const b=e.target.closest('#dqrCopy');if(!b)return;
   try{navigator.clipboard.writeText(INVITE_URL);toast('Invite link copied 🔗');}catch(err){}
 });
+/* ---------- invites (closed testing) ---------- */
+const APP_URL=location.origin+location.pathname.replace(/-desk\.html$/,'.html');
+// finer-grained than joinAgo — reports and signups want minutes, not days
+function ago(ts){
+  if(!ts)return '';
+  const m=Math.floor((Date.now()-new Date(ts).getTime())/60000);
+  if(m<1)return 'just now';
+  if(m<60)return m+'m ago';
+  const h=Math.floor(m/60); if(h<24)return h+'h ago';
+  const d=Math.floor(h/24); if(d===1)return 'yesterday';
+  if(d<7)return d+'d ago';
+  if(d<30)return Math.floor(d/7)+'w ago';
+  return Math.floor(d/30)+'mo ago';
+}
+const inviteLink=c=>APP_URL+'?invite='+c;
+let INV=[],GATE=true;
+function codeChip(c){
+  return `<div class="codechip"><b>${esc(c)}</b>
+    <div class="cbtns"><button data-ilink="${esc(c)}">Copy link</button><button class="g" data-icode="${esc(c)}">Code</button></div></div>`;
+}
+function paintGate(){
+  $('#gateState').textContent=GATE?'🔒 Invite-only — ON':'🌏 Open to everyone';
+  $('#gateHint').textContent=GATE?'Only people with a code can create an account. Keep this on while testing.':'Anyone with the link can sign up. Turn it back on to lock the door.';
+  $('#gateBtn').textContent=GATE?'Open it up':'Lock it down';
+}
+async function loadInvites(){
+  try{
+    const d=await api({action:'admin_invite_list'});
+    INV=d.invites||[];GATE=!!d.invite_only;
+    paintGate();renderInvites();
+    const openN=INV.filter(i=>!i.used_by&&!i.revoked).length;
+    const b=$('#bInvites');b.textContent=openN;b.style.display=openN?'':'none';
+  }catch(e){$('#invList').innerHTML='<div class="empty">'+esc(e.message)+'</div>'}
+}
+function renderInvites(){
+  if(!INV.length){$('#invList').innerHTML='<div class="empty">No codes yet — generate one above and send it to your first tester.</div>';return}
+  $('#invList').innerHTML=INV.map(i=>{
+    const used=!!i.used_by;
+    return `<div class="invrow ${used?'used':''}">
+      <div class="cd" data-icode="${esc(i.code)}" title="Tap to copy">${esc(i.code)}</div>
+      <div class="who">${used?`<b>${esc(i.used_name||'Someone')}</b><span>signed up ${ago(i.used_at)}</span>`:`<b>${esc(i.note||'Unassigned')}</b><span>made ${ago(i.created_at)}</span>`}</div>
+      <span class="tagx ${used?'used':'open'}">${used?'used':'open'}</span>
+      ${used?'':`<button class="btn btn-g" data-ilink="${esc(i.code)}">Copy link</button>`}
+      <button class="btn btn-r" data-idel="${esc(i.code)}">✕</button>
+    </div>`;
+  }).join('');
+  wireInviteBtns($('#invList'));
+}
+function wireInviteBtns(root){
+  root.querySelectorAll('[data-ilink]').forEach(b=>b.onclick=()=>{
+    try{navigator.clipboard.writeText(inviteLink(b.dataset.ilink));toast('Invite link copied — send it to them');}catch(e){}
+  });
+  root.querySelectorAll('[data-icode]').forEach(b=>b.onclick=()=>{
+    try{navigator.clipboard.writeText(b.dataset.icode);toast('Code '+b.dataset.icode+' copied');}catch(e){}
+  });
+  root.querySelectorAll('[data-idel]').forEach(b=>b.onclick=async()=>{
+    if(!confirm('Delete code '+b.dataset.idel+'? If someone already used it their account stays.'))return;
+    try{await api({action:'admin_invite_del',code:b.dataset.idel});toast('Code deleted');loadInvites();}catch(e){toast(e.message,1)}
+  });
+}
+$('#mintGo').onclick=async()=>{
+  const b=$('#mintGo');b.disabled=true;b.textContent='Making…';
+  try{
+    const d=await api({action:'admin_invite_mint',n:+$('#mintN').value,note:$('#mintNote').value.trim()});
+    const codes=d.codes||[];
+    $('#mintOut').innerHTML=codes.map(codeChip).join('');
+    wireInviteBtns($('#mintOut'));
+    $('#mintNote').value='';
+    toast(codes.length+' code'+(codes.length===1?'':'s')+' ready — copy the link and send it');
+    loadInvites();
+  }catch(e){toast(e.message,1)}
+  b.disabled=false;b.textContent='Generate';
+};
+$('#gateBtn').onclick=async()=>{
+  const next=!GATE;
+  if(!next&&!confirm('Open the app to ANYONE with the link? Codes stop being required.'))return;
+  try{const d=await api({action:'admin_invite_gate',on:next});GATE=!!d.invite_only;paintGate();
+    toast(GATE?'Locked — codes required 🔒':'Open — anyone can sign up');}catch(e){toast(e.message,1)}
+};
+
+/* ---------- bug reports ---------- */
+let BUGS=[];
+async function loadBugs(){
+  try{
+    const d=await api({action:'admin_bugs'});
+    BUGS=d.bugs||[];renderBugs();
+    const openN=BUGS.filter(x=>!x.done).length;
+    const b=$('#bBugs');b.textContent=openN;b.style.display=openN?'':'none';
+  }catch(e){$('#bugList').innerHTML='<div class="empty">'+esc(e.message)+'</div>'}
+}
+function renderBugs(){
+  if(!BUGS.length){$('#bugList').innerHTML='<div class="empty">Nothing broken yet 🤞 When a tester taps "something broke" in the app, it shows up here.</div>';return}
+  $('#bugList').innerHTML=BUGS.map(x=>`
+    <div class="bugrow ${x.done?'done':''}">
+      <div class="bt"><b>${esc(x.name||'Someone')}</b>${x.ig?`<a href="https://instagram.com/${esc(x.ig)}" target="_blank" rel="noopener">@${esc(x.ig)}</a>`:''}<span>${ago(x.created_at)}${x.page?' · on '+esc(x.page):''}</span></div>
+      <p>${esc(x.text)}</p>
+      <div class="bbtns">
+        <button class="btn btn-g" data-bugdone="${esc(x.id)}" data-on="${x.done?'0':'1'}">${x.done?'Reopen':'Mark sorted'}</button>
+        <button class="btn btn-r" data-bugdel="${esc(x.id)}">Delete</button>
+      </div>
+    </div>`).join('');
+  document.querySelectorAll('[data-bugdone]').forEach(b=>b.onclick=async()=>{
+    try{await api({action:'admin_bug_done',id:b.dataset.bugdone,on:b.dataset.on==='1'});loadBugs();}catch(e){toast(e.message,1)}
+  });
+  document.querySelectorAll('[data-bugdel]').forEach(b=>b.onclick=async()=>{
+    if(!confirm('Delete this report?'))return;
+    try{await api({action:'admin_bug_del',id:b.dataset.bugdel});loadBugs();}catch(e){toast(e.message,1)}
+  });
+}
+
 function socialLinks(p){
   const bits=[];
   if(p.ig)bits.push(`<a href="https://instagram.com/${esc(p.ig)}" target="_blank" rel="noopener">📸 @${esc(p.ig)} ↗</a>`);
@@ -1102,6 +1276,7 @@ function row(p,pending){
 }
 async function load(){
   paintDeskQR();
+  if(prevBugs===null)pollSideBadges();
   try{
     const [d,bd]=await Promise.all([api({action:'admin_players'}),api({action:'board'})]);
     const ps=d.players||[],inbox=d.inbox||[],runs=bd.runs||[];
@@ -1564,7 +1739,29 @@ async function fbAct(action,body,msg){
 document.querySelectorAll('[data-fbtab]').forEach(b=>b.onclick=()=>{FBTAB=b.dataset.fbtab;renderFeedback();});
 
 show();
-setInterval(()=>{if(CREDS&&!document.hidden)load()},30000);
+let prevBugs=null;
+async function pollSideBadges(){
+  if(!CREDS)return;
+  try{
+    const d=await api({action:'admin_bugs'});
+    const open=(d.bugs||[]).filter(x=>!x.done);
+    const b=$('#bBugs'); if(b){b.textContent=open.length;b.style.display=open.length?'':'none';}
+    if(prevBugs!==null&&open.length>prevBugs){
+      toast('🐞 New report from a tester');
+      try{if(document.hidden&&'Notification'in window&&Notification.permission==='granted')
+        new Notification('🐞 Something broke',{body:(open[0]&&open[0].text||'').slice(0,90)});}catch(e){}
+      if($('#sec-bugs').style.display!=='none')renderBugsFrom(d.bugs||[]);
+    }
+    prevBugs=open.length;
+  }catch(e){}
+  try{
+    const d2=await api({action:'admin_invite_list'});
+    const openN=(d2.invites||[]).filter(i=>!i.used_by&&!i.revoked).length;
+    const b2=$('#bInvites'); if(b2){b2.textContent=openN;b2.style.display=openN?'':'none';}
+  }catch(e){}
+}
+function renderBugsFrom(list){BUGS=list;renderBugs();}
+setInterval(()=>{if(CREDS&&!document.hidden){load();pollSideBadges();}},30000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&CREDS)load()});
 </script>
 </body>

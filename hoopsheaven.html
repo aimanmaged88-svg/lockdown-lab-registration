@@ -1478,6 +1478,7 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
       <div id="vfCard" style="display:none;margin-top:12px"></div>
       <div class="prow" id="pNotif" style="margin-top:12px"><span class="ic">🔔</span><span class="lbl">Turn on notifications</span><span class="ar">›</span></div>
       <div class="prow" id="pCode"><span class="ic">🔑</span><span>Phone-switch code</span><span class="ar" id="pCodeVal" style="letter-spacing:2px;font-weight:800">•••••</span></div>
+      <div class="prow" id="pBug"><span class="ic">🐞</span><span>Something broke — tell the coach</span><span class="ar">›</span></div>
       <div class="prow" id="pInvite"><span class="ic">📲</span><span>Invite a hooper</span><span class="ar">›</span></div>
       <div class="prow" id="pShare"><span class="ic">📤</span><span>Share my card</span><span class="ar">›</span></div>
       <div class="prow" id="pEdit"><span class="ic">✏️</span><span>Edit name / socials</span><span class="ar">›</span></div>
@@ -1521,6 +1522,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   <div class="grab"></div>
   <div class="gatewm">CERTIFIED <span>HOOPER</span></div>
   <div class="xrow"><div><h3 id="pfTitle">Who's pulling up?</h3><p class="sub" id="pfSub">Your <b style="color:var(--volt)">@</b> is your jersey — it shows on every run so people can find you. Real accounts only (house rules).</p></div><button class="x" data-close>✕</button></div>
+  <div class="fld" id="invFld"><label>Invite code</label><input class="inp" id="pfInvite" maxlength="8" autocapitalize="characters" autocomplete="off" spellcheck="false" placeholder="ABC123" style="text-transform:uppercase;letter-spacing:3px;font-weight:800"><p class="fine" id="invHint" style="margin:6px 2px 0">Closed testing — the coach sends you this. Tap his link and it fills itself in.</p></div>
   <div class="fld"><label>Your name</label><input class="inp" id="pfName" maxlength="40" placeholder="e.g. Jordan"></div>
   <div class="fld"><label>How people find you — &amp; how we check you're real</label>
     <div class="idpick" id="idPick">
@@ -1545,6 +1547,15 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   <div class="fld"><label>Your 5-digit code</label><input class="inp" id="lgCode" inputmode="numeric" maxlength="6" placeholder="12345"></div>
   <button class="btn btn-v btn-block" id="lgGo">Log me in 🏀</button>
   <p class="fine" style="margin-top:10px">Your code lives in Profile → 🔑 Phone-switch code. Lost it? Message the coach on IG and we'll sort you.</p>
+</div></div>
+
+<!-- something broke: tester feedback straight to the desk -->
+<div class="sheet" id="shBug"><div class="scrim" data-close></div><div class="panel">
+  <div class="grab"></div>
+  <div class="xrow"><div><h3>🐞 Something broke?</h3><p class="sub">Tell the coach exactly what happened — it lands on his desk straight away.</p></div><button class="x" data-close>✕</button></div>
+  <div class="fld"><label>What went wrong?</label><textarea class="inp" id="bugTxt" rows="4" maxlength="600" placeholder="e.g. I tapped 'Tap in' on the Green Square run and nothing happened"></textarea></div>
+  <button class="btn btn-v btn-block" id="bugGo">Send it to the coach</button>
+  <p class="fine" style="margin-top:10px">Anything counts — a button that does nothing, a word that looks wrong, something that felt confusing. This is what testing is for. 🙏</p>
 </div></div>
 
 <!-- invite: QR + link -->
@@ -1780,7 +1791,7 @@ async function api(body,_retried){
     // once — the player never sees an error for something that isn't their fault.
     if(d.code==='terms'&&body.action!=='register'&&!_retried&&OCP&&OCP.id&&termsOk()){
       try{
-        const rr=await api({action:'register',accept:true,player:{id:OCP.id,name:OCP.name||'Hooper',ig:OCP.ig||'',tiktok:OCP.tiktok||'',email:OCP.email||'',phone:OCP.phone||''}},true);
+        const rr=await api({action:'register',accept:true,player:{id:OCP.id,name:OCP.name||'Hooper',ig:OCP.ig||'',tiktok:OCP.tiktok||'',email:OCP.email||'',phone:OCP.phone||'',invite:OCP.invite||savedInvite()}},true);
         OCP.vf=!!rr.verified;OCP.code=rr.verify_code||'';
         localStorage.setItem('oc_profile',JSON.stringify(OCP));
         paintMe();
@@ -2023,8 +2034,31 @@ $('#lgGo').onclick=async()=>{
   b.disabled=false;b.textContent='Log me in 🏀';
 };
 
+// closed testing: the coach's link carries the code (?invite=ABC123)
+let INVITE_ONLY=true;
+function inviteFromUrl(){
+  try{const q=new URLSearchParams(location.search);return (q.get('invite')||q.get('code')||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8);}catch(e){return ''}
+}
+function savedInvite(){try{return localStorage.getItem('oc_invite')||''}catch(e){return ''}}
+function rememberInvite(c){try{if(c)localStorage.setItem('oc_invite',c)}catch(e){}}
+function paintInviteField(){
+  const f=$('#invFld');if(!f)return;
+  const fromLink=inviteFromUrl();
+  const code=fromLink||savedInvite();
+  if(code){$('#pfInvite').value=code;rememberInvite(code);}
+  f.style.display=INVITE_ONLY?'':'none';
+  if(fromLink)$('#invHint').innerHTML='✓ Code loaded from the coach\'s link — you\'re good to go.';
+}
+async function checkGate(){
+  try{
+    const d=await api({action:'invite_status',code:$('#pfInvite')?$('#pfInvite').value:'',player_id:(OCP&&OCP.id)||''});
+    INVITE_ONLY=!!d.invite_only;
+  }catch(e){}
+  paintInviteField();
+}
 function openGate(){
   $('#shProfile').classList.add('gate');
+  paintInviteField();
   $('#pfLogin').style.display='';
   $('#pfTitle').textContent='Create your account';
   $('#pfSub').innerHTML='Certified Hooper runs on real people — you need an account before you play. Your <b style="color:var(--volt)">@</b> is your jersey; no Instagram, use a real email. One account, this stays your device\'s key to every court in Sydney.';
@@ -2034,6 +2068,7 @@ function openGate(){
 }
 function openEdit(){
   $('#shProfile').classList.remove('gate');
+  {const f=$('#invFld');if(f)f.style.display='none';}
   $('#pfLogin').style.display='none';
   $('#pfTitle').textContent='Who\'s pulling up?';
   $('#pfSub').innerHTML='Your <b style="color:var(--volt)">@</b> is your jersey — it shows on every run so people can find you. Real accounts only (house rules).';
@@ -2073,6 +2108,8 @@ $('#pfSave').onclick=async()=>{
   const tiktok=idMode==='tiktok'?handle($('#pfTiktok').value):'';
   const email=idMode==='email'?$('#pfEmail').value.trim().toLowerCase().slice(0,120):'';
   const phone=auPhone($('#pfPhone').value);
+  const invite=($('#pfInvite')?$('#pfInvite').value:'').toUpperCase().replace(/[^A-Z0-9]/g,'');
+  if(INVITE_ONLY&&!OCP&&!invite){toast('Enter the invite code the coach sent you',1);$('#pfInvite').focus();return}
   if(!name){toast('Put a name on it',1);return}
   if(!phone){toast('Add your mobile — 04xx xxx xxx',1);$('#pfPhone').focus();return}
   if(idMode==='ig'&&!ig){toast("Drop your @ — that's your jersey",1);return}
@@ -2081,9 +2118,10 @@ $('#pfSave').onclick=async()=>{
   const id=(OCP&&OCP.id)||crypto.randomUUID();
   const b=$('#pfSave'); b.disabled=true; b.textContent='Signing in…';
   try{
-    const d=await api({action:'register',accept:true,player:{id,name,ig,tiktok,email,phone}});
+    const d=await api({action:'register',accept:true,invite,player:{id,name,ig,tiktok,email,phone,invite}});
     const fresh=!OCP;
-    OCP={id,name,ig,tiktok,email,phone,vf:!!d.verified,code:d.verify_code||'',num:d.player_num??null};
+    if(invite)rememberInvite(invite);
+    OCP={id,name,ig,tiktok,email,phone,invite,vf:!!d.verified,code:d.verify_code||'',num:d.player_num??null};
     localStorage.setItem('oc_profile',JSON.stringify(OCP));
     paintMe();paintVf();paintProfileTab();paintNotifRow();syncSaves();
     if(fresh)setTimeout(maybeNtfPrompt,3500);
@@ -2094,7 +2132,14 @@ $('#pfSave').onclick=async()=>{
     closeSheet('shProfile');
     toast(fresh?('Welcome to Certified Hooper — you\'re Player #'+(OCP.num??'?')+'. Now get your ✓ 🏀'):'Saved 🏀');
     if(afterProfile){const f=afterProfile;afterProfile=null;f();}
-  }catch(e){toast(e.message,1)}
+  }catch(e){
+    if(e.code==='needinvite'||e.code==='badinvite'||e.code==='usedinvite'){
+      INVITE_ONLY=true;paintInviteField();
+      $('#invHint').innerHTML='<b style="color:var(--danger)">'+esc(e.message)+'</b>';
+      $('#pfInvite').focus();
+    }
+    toast(e.message,1);
+  }
   b.disabled=false; b.textContent='Lock it in';
 };
 
@@ -3269,6 +3314,18 @@ function openInvite(){
   openSheet('shInvite');
 }
 $('#pInvite').onclick=openInvite;
+$('#pBug').onclick=()=>{$('#bugTxt').value='';openSheet('shBug');setTimeout(()=>$('#bugTxt').focus(),320)};
+$('#bugGo').onclick=async()=>{
+  const t=$('#bugTxt').value.trim();
+  if(!t){toast('Tell us what happened first',1);return}
+  const b=$('#bugGo');b.disabled=true;b.textContent='Sending…';
+  try{
+    await api({action:'bug_report',player:OCP||{},text:t,page:(document.querySelector('.tab.on')||{}).textContent||'',ua:navigator.userAgent.slice(0,200)});
+    closeSheet('shBug');
+    toast('Sent 🙏 the coach has it — thank you');
+  }catch(e){toast(e.message,1)}
+  b.disabled=false;b.textContent='Send it to the coach';
+};
 $('#ivLink').onclick=()=>{try{navigator.clipboard.writeText(INVITE_URL);toast('Link copied 🔗')}catch(e){}};
 $('#ivShare').onclick=async()=>{
   const t='🏀 Get on Certified Hooper — every court in Sydney, see who\'s hooping, join the run. '+INVITE_URL;
@@ -3384,6 +3441,8 @@ document.querySelectorAll('#flashTut .tslide').forEach(s=>s.onclick=()=>{if(TUTN
 
 /* ---------- boot ---------- */
 paintMe();
+{const c=inviteFromUrl();if(c)rememberInvite(c);}
+checkGate();
 if(!termsOk()){ if(!OCP)showTut(); else openSheet('shTerms'); }
 else if(!OCP)openGate();
 refreshMe(false);
