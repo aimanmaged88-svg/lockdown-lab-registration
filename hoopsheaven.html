@@ -16,7 +16,6 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://lockdown-lab-registration.netlify.app/hoopsheaven.html">
 <meta name="description" content="Sydney's playing. You in? Find free courts near you, see who's on right now, and join the run — Certified Hooper.">
-<link rel="preload" as="image" href="assets/unc-logo.webp" type="image/webp" fetchpriority="high">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%23FF6A2B'/%3E%3Cpath d='M32 4v56M4 32h56M11 11c12 10 30 10 42 0M11 53c12-10 30-10 42 0' stroke='%230A0C0F' stroke-width='4' fill='none'/%3E%3C/svg%3E">
 <style>/* leaflet 1.9.4 (BSD-2) inlined */
 /* required styles */
@@ -1305,20 +1304,21 @@ header{
 .foot{margin-top:44px;text-align:center;color:var(--dim);font-size:11.5px;line-height:1.7;padding-bottom:10px}
 .foot b{color:var(--muted)}
 
-/* ===== UNC intro splash — proudly brought to you by UNC (real logo) ===== */
+/* ===== intro splash — Certified Hooper's own mark ===== */
 #uncIntro{position:fixed;inset:0;z-index:220;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#000}
 #uncIntro.gone{animation:uncOut .8s var(--ease-out) forwards;pointer-events:none}
 @keyframes uncOut{to{opacity:0;transform:scale(1.04);filter:blur(6px);visibility:hidden}}
 .unc-stage{position:relative;display:flex;flex-direction:column;align-items:center;gap:24px;padding:20px}
-.unc-eyebrow{font-family:var(--disp);font-weight:700;letter-spacing:.44em;font-size:11px;text-transform:uppercase;
-  color:rgba(255,255,255,.5);padding-left:.44em;opacity:0;animation:uncEye .9s var(--ease-out) .15s both}
+.unc-eyebrow{font-family:var(--disp);font-weight:700;letter-spacing:.28em;font-size:11px;text-transform:uppercase;
+  color:#2DE0C0;padding-left:.28em;opacity:0;animation:uncEye .9s var(--ease-out) .95s both}
 @keyframes uncEye{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
 .unc-mark{position:relative;display:grid;place-items:center;animation:uncFloat 6s ease-in-out 1.2s infinite alternate}
 @keyframes uncFloat{from{transform:translateY(0)}to{transform:translateY(-7px)}}
 .unc-halo{position:absolute;z-index:2;width:110%;aspect-ratio:1/1;border-radius:50%;top:-4%;
   background:radial-gradient(circle at 50% 38%,rgba(255,255,255,.14),transparent 58%);opacity:0;animation:uncGlow 2.4s ease-in-out .5s both;mix-blend-mode:screen;pointer-events:none}
 @keyframes uncGlow{0%{opacity:0;transform:scale(.6)}50%{opacity:.9}100%{opacity:.55;transform:scale(1)}}
-.unc-logo{display:block;width:min(74vw,340px);height:auto;opacity:0;transform:scale(1.06) translateY(10px);
+.unc-word{font-family:var(--disp);font-weight:700;font-style:italic;font-size:clamp(30px,9vw,44px);line-height:.98;color:#fff;text-transform:uppercase;text-align:center;letter-spacing:.01em;opacity:0;animation:uncLogo 1.05s var(--ease-out) .5s both}
+.unc-logo{display:block;width:min(42vw,190px);height:auto;opacity:0;transform:scale(1.06) translateY(10px);
   animation:uncLogo 1.15s var(--ease-out) .25s both}
 @keyframes uncLogo{to{opacity:1;transform:none}}
 #uncIntro .skip{position:absolute;bottom:34px;left:0;right:0;text-align:center;font-size:11px;letter-spacing:.2em;
@@ -1385,14 +1385,15 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
 <!-- ===== UNC intro splash ===== -->
 <div id="uncIntro">
   <div class="unc-stage">
-    <div class="unc-eyebrow">Proudly brought to you by</div>
     <div class="unc-mark">
       <div class="unc-halo"></div>
-      <picture>
-        <source srcset="assets/unc-logo.webp" type="image/webp">
-        <img class="unc-logo" src="assets/unc-logo.png" alt="UNC Thoughts — Basketball. Nutrition. Mindset." width="720" height="829" decoding="async" fetchpriority="high">
-      </picture>
+      <svg class="unc-logo" viewBox="0 0 64 64" width="200" height="200" aria-label="Certified Hooper">
+        <circle cx="32" cy="32" r="25" fill="none" stroke="#2DE0C0" stroke-width="5"/>
+        <path d="M20 33 L29 42 L45 23" fill="none" stroke="#2DE0C0" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
     </div>
+    <div class="unc-word">Certified<br>Hooper</div>
+    <div class="unc-eyebrow">Sydney's playing — you in?</div>
   </div>
   <div class="skip">tap to enter</div>
 </div>
