@@ -10,12 +10,12 @@
 <meta name="apple-mobile-web-app-title" content="Certified Hooper">
 <link rel="manifest" href="hoopsheaven.webmanifest">
 <link rel="apple-touch-icon" href="assets/hh-icon-180.png">
-<title>Certified Hooper — Sydney pickup basketball</title>
-<meta property="og:title" content="Certified Hooper — Sydney pickup basketball">
+<title>Certified Hooper — Australia's pickup basketball network</title>
+<meta property="og:title" content="Certified Hooper — Australia's pickup basketball network">
 <meta property="og:description" content="Good courts. Real hoopers. Your game. Find a free court near you, see who's playing right now, join the run.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://lockdown-lab-registration.netlify.app/hoopsheaven.html">
-<meta name="description" content="Sydney's playing. You in? Find free courts near you, see who's on right now, and join the run — Certified Hooper.">
+<meta name="description" content="Australia's playing. You in? Find free courts near you, see who's on right now, and join the run — Certified Hooper.">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='28' fill='%23FF6A2B'/%3E%3Cpath d='M32 4v56M4 32h56M11 11c12 10 30 10 42 0M11 53c12-10 30-10 42 0' stroke='%230A0C0F' stroke-width='4' fill='none'/%3E%3C/svg%3E">
 <style>/* leaflet 1.9.4 (BSD-2) inlined */
 /* required styles */
@@ -1393,7 +1393,7 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
       </svg>
     </div>
     <div class="unc-word">Certified<br>Hooper</div>
-    <div class="unc-eyebrow">Sydney's playing — you in?</div>
+    <div class="unc-eyebrow">Australia's playing — you in?</div>
   </div>
   <div class="skip">tap to enter</div>
 </div>
@@ -1414,7 +1414,7 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
     <div class="betapill">BETA · INVITE ONLY</div>
     <div class="big">🏀</div>
     <h2>Every court.<br><em>Mapped.</em></h2>
-    <p>13 vetted Sydney courts — lights, hoops, water, the lot. Pick one, get directions, pull up. More dropping every week.</p>
+    <p>Sydney's courts are live — lights, hoops, water, the lot. Pick one, get directions, pull up. New courts weekly, new cities as we grow.</p>
   </div>
   <div class="tslide" data-t="1">
     <div class="big">⚡</div>
@@ -1467,7 +1467,7 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
       <div class="cscroll" id="nearby"><div class="skel" style="flex:none;width:172px;height:160px"></div><div class="skel" style="flex:none;width:172px;height:160px"></div></div>
     </div>
     <div class="foot">
-      <b>CERTIFIED HOOPER</b> · built in Sydney · court data © OpenStreetMap contributors<br>
+      <b>CERTIFIED HOOPER</b> · built in built in Sydney · court data © OpenStreetMap contributors<br>
       Runs are player-called, never guaranteed. Pull up, play hard, look after each other.<br>
       <button class="linky" id="rulesLink" style="margin-top:6px">House rules</button>
     </div>
@@ -1832,7 +1832,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 <!-- city-wide King of the Court leaderboard -->
 <div class="sheet" id="shKings"><div class="scrim" data-close></div><div class="panel">
   <div class="grab"></div>
-  <div class="xrow"><div><h3>🏆 City Kings</h3><p class="sub">Sydney's most-active hoopers — ranked by check-ins. Show up to climb.</p></div><button class="x" data-close>✕</button></div>
+  <div class="xrow"><div><h3>🏆 City Kings</h3><p class="sub">Australia's most-active hoopers — ranked by check-ins. Show up to climb.</p></div><button class="x" data-close>✕</button></div>
   <div id="kingsList"><div class="skel" style="height:64px;margin-bottom:8px"></div><div class="skel" style="height:64px;margin-bottom:8px"></div><div class="skel" style="height:64px"></div></div>
 </div></div>
 
@@ -2319,7 +2319,7 @@ async function loadBoard(){
 function renderBoard(){
   const el=$('#board');
   if(!RUNS.length){
-    el.innerHTML=`<div class="empty"><b>Nothing on the board</b>Sydney's quiet. Be the one who calls it.<br><br><button class="btn btn-v" onclick="startCall()">⚡ Call the first run</button></div>`;
+    el.innerHTML=`<div class="empty"><b>Nothing on the board</b>The board's quiet. Be the one who calls it.<br><br><button class="btn btn-v" onclick="startCall()">⚡ Call the first run</button></div>`;
     return;
   }
   let html='',lastDay='';
@@ -2434,7 +2434,7 @@ function paintTonight(){
       nh.firstElementChild.onclick=()=>openRun(next.id);
     }else{
       nh.innerHTML=`<div class="nowhero">
-        <span class="nh-when">SYDNEY'S QUIET</span>
+        <span class="nh-when">THE BOARD'S QUIET</span>
         <div class="nh-name">Nothing on yet.</div>
         <div class="nh-meta">Be the one who calls it — the whole city sees it.</div>
         <div class="nh-row"><span></span><button class="nh-btn">⚡ Call a run</button></div>
@@ -2624,7 +2624,7 @@ async function runShareCanvas(r){
   c.fillStyle=onAccentHex();c.font='800 44px HHDisplay, system-ui';c.textAlign='center';
   c.fillText('⚡ TAP IN ON CERTIFIED HOOPER',W/2,1240);c.textAlign='left';
   c.fillStyle='rgba(255,255,255,.5)';c.font='600 26px HHBody, system-ui';
-  c.fillText("Sydney's open run · link in the message",64,1320);
+  c.fillText("an open run · link in the message",64,1320);
   return cv;
 }
 async function cardShareCanvas(d){
@@ -2745,7 +2745,7 @@ function paintNearby(){
       <div class="ph ${c.photo?'has':''}" style="${c.photo?`background-image:url('${esc(c.photo)}')`:''}">${hereN(c)?`<span class="hb">${hereN(c)} here</span>`:''}</div>
       <div class="bd"><b>${esc(c.name)}</b><span>${starBit(c)}${c.km!=null?(c.km<1?Math.round(c.km*1000)+'m':c.km.toFixed(1)+'km')+' · ':''}<span class="fr">Free</span>${c.suburb?' · '+esc(c.suburb):''}</span></div>
     </div>`).join('')||(COURTS.length===0
-      ? '<div class="empty" style="flex:1"><b>Courts dropping soon</b>We\'re hand-picking Sydney\'s best — real courts only. Know one?<br><br><button class="btn btn-v" data-suggest>➕ Suggest a court</button></div>'
+      ? '<div class="empty" style="flex:1"><b>Courts dropping soon</b>We\'re hand-picking Australia\'s best — real courts only. Know one?<br><br><button class="btn btn-v" data-suggest>➕ Suggest a court</button></div>'
       : '<div class="empty" style="flex:1">Nothing matches those filters right now.</div>');
   $('#nearby').querySelectorAll('.ccard').forEach(x=>x.onclick=()=>{
     const c=COURTS.find(y=>y.key===x.dataset.k); if(c)openCourtPage(c);
@@ -3570,7 +3570,7 @@ $('#bugGo').onclick=async()=>{
 };
 $('#ivLink').onclick=()=>{try{navigator.clipboard.writeText(INVITE_URL);toast('Link copied 🔗')}catch(e){}};
 $('#ivShare').onclick=async()=>{
-  const t='🏀 Get on Certified Hooper — every court in Sydney, see who\'s hooping, join the run. '+INVITE_URL;
+  const t='🏀 Get on Certified Hooper — every court on the app, see who\'s hooping, join the run. '+INVITE_URL;
   if(navigator.share){try{await navigator.share({text:t})}catch(e){}}
   else{try{await navigator.clipboard.writeText(t);toast('Copied — paste it to them')}catch(e){}}
 };

@@ -90,6 +90,10 @@ async function settingOn(key: string): Promise<boolean> {
     return r?.[0]?.value === "1";
   } catch (_e) { return false; }
 }
+// Australia-wide court bounds (mainland + Tas). Cities open one at a time,
+// but the map is national — a court anywhere in the country can be added.
+const inAus = (lat: number, lon: number) =>
+  lat >= -44.0 && lat <= -9.5 && lon >= 112.0 && lon <= 154.5;
 const inviteClean = (v: unknown) => String(v ?? "").toUpperCase().replace(/[^A-Z0-9]/g, "").slice(0, 12);
 const AMBIG = "ILO01";
 function mkInvite(): string {
@@ -637,7 +641,7 @@ Deno.serve(async (req: Request) => {
       case "resolve_maps": {
         const c = await resolveMapsUrl(str(b.url, 400));
         if (!c) return J({ error: "couldn't read that link — paste the Google Maps share link, or \"lat, lon\"" }, 400);
-        if (c[0] < -35.5 || c[0] > -32.5 || c[1] < 149.5 || c[1] > 152.5) return J({ error: "that pin isn't in Sydney" }, 400);
+        if (!inAus(c[0], c[1])) return J({ error: "that pin isn't in Australia" }, 400);
         return J({ lat: c[0], lon: c[1] });
       }
 
@@ -1200,7 +1204,7 @@ Deno.serve(async (req: Request) => {
         // If they pasted a Maps link (or lat,lon) in the location, resolve it now
         // so the coach gets a court that's already pinned when they approve it.
         const c = where ? await resolveMapsUrl(where) : null;
-        const inSyd = c && c[0] >= -35.5 && c[0] <= -32.5 && c[1] >= 149.5 && c[1] <= 152.5;
+        const inSyd = c && inAus(c[0], c[1]);
         // Optional court photo → storage (moderated: only shows in the desk).
         let photo_url = "";
         if (typeof b.photo === "string" && b.photo.startsWith("data:image")) {
@@ -1248,7 +1252,7 @@ Deno.serve(async (req: Request) => {
         const name = str(b.name, 80), suburb = str(b.suburb, 60);
         const lat = +(b.lat as number), lon = +(b.lon as number);
         if (!name) return J({ error: "name the court" }, 400);
-        if (!Number.isFinite(lat) || !Number.isFinite(lon) || lat < -35.5 || lat > -32.5 || lon < 149.5 || lon > 152.5) return J({ error: "that pin isn't in Sydney — paste \"lat, lon\" from Google Maps" }, 400);
+        if (!Number.isFinite(lat) || !Number.isFinite(lon) || !inAus(lat, lon)) return J({ error: "that pin isn't in Australia — paste \"lat, lon\" from Google Maps" }, 400);
         const key = `oc_c_${crypto.randomUUID().slice(0, 8)}`;
         const photo = ownPhoto(b.photo_url);
         await db(`oc_courts`, { method: "POST", body: JSON.stringify({ key, name, suburb, lat, lon, indoor: b.indoor === true, lit: b.lit === true, custom: true, official: true, info: infoOf(b), radius_m: num(b.radius_m, 80, 2000, 300), hidden: b.hidden === true, ...(photo ? { photo_url: photo } : {}), updated_at: new Date().toISOString() }) });
@@ -1262,7 +1266,7 @@ Deno.serve(async (req: Request) => {
         const patch: Record<string, unknown> = { name: str(b.name, 80), suburb: str(b.suburb, 60), indoor: b.indoor === true, lit: b.lit === true, hidden: b.hidden === true, official: b.official !== false, info: infoOf(b), radius_m: num(b.radius_m, 80, 2000, 300), updated_at: new Date().toISOString() };
         const lat = +(b.lat as number), lon = +(b.lon as number);
         if (Number.isFinite(lat) && Number.isFinite(lon)) {
-          if (lat < -35.5 || lat > -32.5 || lon < 149.5 || lon > 152.5) return J({ error: "that pin isn't in Sydney" }, 400);
+          if (!inAus(lat, lon)) return J({ error: "that pin isn't in Australia" }, 400);
           patch.lat = lat; patch.lon = lon;
         }
         const ep = ownPhoto(b.photo_url); if (ep) patch.photo_url = ep;
