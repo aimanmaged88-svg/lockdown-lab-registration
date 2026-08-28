@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Certified Hooper — Australia's pickup basketball network</title>
+<meta name="description" content="Every court mapped. See who's on right now. Call a run and the city taps in. Sydney live in beta — every other city loading. First 10,000 followers free for life.">
+<meta name="theme-color" content="#07100D">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Certified Hooper — Australia's pickup basketball network">
+<meta property="og:description" content="Every court mapped. See who's on. Call a run. Sydney live in beta — your city's loading. First 10,000 followers free for life.">
+<meta property="og:image" content="assets/ig-kit/post-01-launch.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="assets/hh-icon-192.png">
+<link rel="apple-touch-icon" href="assets/hh-icon-180.png">
+<style>
+@font-face{font-family:'CHDisp';src:url('assets/fonts/chakrapetch-700.woff2') format('woff2');font-weight:700;font-display:swap}
+@font-face{font-family:'CHDisp';src:url('assets/fonts/chakrapetch-600.woff2') format('woff2');font-weight:600;font-display:swap}
+@font-face{font-family:'CHBody';src:url('assets/fonts/inter-var.woff2') format('woff2');font-weight:400 900;font-display:swap}
+
+:root{
+  --bg:#07100D; --bg2:#0B1714; --ink:#fff; --dim:rgba(255,255,255,.62); --faint:rgba(255,255,255,.38);
+  --teal:#2DE0C0; --teal2:#12A98D; --line:rgba(255,255,255,.10);
+  --card:rgba(255,255,255,.045);
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:'CHBody',-apple-system,'Segoe UI',sans-serif;
+  line-height:1.55;overflow-x:hidden;padding-bottom:88px}
+.d{font-family:'CHDisp',sans-serif;font-weight:700;font-style:italic;text-transform:uppercase;line-height:.94;letter-spacing:.004em}
+.lbl{font-family:'CHDisp',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.16em}
+.wrap{max-width:560px;margin:0 auto;padding:0 22px}
+section{position:relative}
+
+/* ---------- ambient court ---------- */
+.bgfx{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.bgfx .glow{position:absolute;left:50%;top:-8%;width:150vw;max-width:900px;aspect-ratio:1;transform:translateX(-50%);
+  background:radial-gradient(circle,rgba(45,224,192,.16),transparent 62%);animation:breathe 9s var(--ease) infinite}
+.bgfx .dots{position:absolute;inset:0;background-image:radial-gradient(rgba(255,255,255,.05) 1.5px,transparent 1.5px);background-size:28px 28px}
+.bgfx .court{position:absolute;left:50%;top:38%;width:min(780px,150vw);aspect-ratio:16/9;
+  border:2px solid rgba(45,224,192,.13);border-radius:12px;
+  transform:translate(-50%,-50%) perspective(1100px) rotateX(58deg)}
+.bgfx .court::after{content:"";position:absolute;left:50%;top:50%;width:34%;aspect-ratio:1;border:2px solid rgba(45,224,192,.13);
+  border-radius:50%;transform:translate(-50%,-50%)}
+@keyframes breathe{0%,100%{opacity:.75;transform:translateX(-50%) scale(1)}50%{opacity:1;transform:translateX(-50%) scale(1.09)}}
+
+/* ---------- hero ---------- */
+.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:center;align-items:center;
+  text-align:center;padding:92px 22px 40px;position:relative;z-index:1}
+.tick{width:104px;height:104px;filter:drop-shadow(0 0 26px rgba(45,224,192,.42))}
+.tick circle{stroke-dasharray:158;stroke-dashoffset:158;animation:draw 1.1s var(--ease) .15s forwards}
+.tick path{stroke-dasharray:46;stroke-dashoffset:46;animation:draw .55s var(--ease) .85s forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.chip{display:inline-flex;align-items:center;gap:9px;font-size:12px;font-weight:800;letter-spacing:.15em;
+  text-transform:uppercase;color:var(--teal);border:1px solid rgba(45,224,192,.34);
+  background:rgba(45,224,192,.08);border-radius:99px;padding:8px 16px;margin-top:26px}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--teal);animation:blip 1.7s infinite}
+@keyframes blip{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(45,224,192,.55)}70%{opacity:.75;box-shadow:0 0 0 8px rgba(45,224,192,0)}}
+h1{font-family:'CHDisp',sans-serif;font-weight:700;font-style:italic;text-transform:uppercase;
+  font-size:clamp(46px,15vw,88px);line-height:.9;margin:22px 0 0}
+h1 em{font-style:italic;color:var(--teal);display:block}
+.sub{color:var(--dim);font-size:clamp(16px,4.4vw,19px);margin-top:20px;max-width:400px;text-wrap:balance}
+.scroller{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--faint);animation:bob 2.4s var(--ease) infinite}
+@keyframes bob{0%,100%{transform:translate(-50%,0);opacity:.5}50%{transform:translate(-50%,7px);opacity:1}}
+
+/* ---------- buttons ---------- */
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;
+  font-family:'CHDisp',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.05em;
+  font-size:17px;padding:17px 22px;border-radius:15px;border:none;cursor:pointer;text-decoration:none;
+  transition:transform .18s var(--ease),box-shadow .18s var(--ease)}
+.btn:active{transform:scale(.975)}
+.btn-p{background:var(--teal);color:#04231D;box-shadow:0 10px 34px rgba(45,224,192,.28)}
+.btn-g{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.btns{display:flex;flex-direction:column;gap:11px;margin-top:30px;width:100%;max-width:360px}
+
+/* ---------- reveal ---------- */
+.rv{opacity:0;transform:translateY(26px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
+.rv.in{opacity:1;transform:none}
+
+/* ---------- offer ---------- */
+.offer{padding:86px 0 76px;position:relative;z-index:1}
+.offer .card{background:linear-gradient(165deg,rgba(45,224,192,.16),rgba(45,224,192,.03));
+  border:1px solid rgba(45,224,192,.28);border-radius:26px;padding:34px 26px;text-align:center;overflow:hidden;position:relative}
+.offer .card::before{content:"";position:absolute;top:-60%;left:-30%;width:70%;height:220%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.09),transparent);transform:rotate(18deg);
+  animation:sheen 5.5s var(--ease) infinite}
+@keyframes sheen{0%{left:-60%}55%,100%{left:130%}}
+.offer h2{font-family:'CHDisp',sans-serif;font-weight:700;font-style:italic;text-transform:uppercase;
+  font-size:clamp(34px,10vw,52px);line-height:.94}
+.offer h2 span{color:var(--teal)}
+.offer p{color:var(--dim);font-size:15.5px;margin-top:16px}
+.steps{display:flex;flex-direction:column;gap:12px;margin-top:26px;text-align:left}
+.stp{display:flex;gap:14px;align-items:flex-start;background:rgba(0,0,0,.28);border-radius:15px;padding:14px 16px}
+.stp>b{font-family:'CHDisp',sans-serif;font-size:22px;color:var(--teal);line-height:1;min-width:26px}
+.stp div{font-size:14.5px;line-height:1.5}
+.stp small{display:block;color:var(--faint);font-size:12.5px;margin-top:3px}
+.receipt{margin-top:22px;font-size:12.5px;color:var(--faint);font-style:italic}
+
+/* ---------- section heads ---------- */
+.eyebrow{font-family:'CHDisp',sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.18em;
+  font-size:12px;color:var(--teal);margin-bottom:12px}
+h2.sh{font-family:'CHDisp',sans-serif;font-weight:700;font-style:italic;text-transform:uppercase;
+  font-size:clamp(30px,8.5vw,44px);line-height:.95}
+
+/* ---------- features ---------- */
+.feats{padding:60px 0;position:relative;z-index:1}
+.grid{display:flex;flex-direction:column;gap:12px;margin-top:26px}
+.f{background:var(--card);border:1px solid var(--line);border-radius:19px;padding:20px 20px}
+.f .ic{font-size:26px;line-height:1}
+.f b{display:block;font-family:'CHDisp',sans-serif;font-weight:700;text-transform:uppercase;
+  font-size:19px;margin:10px 0 6px;letter-spacing:.01em}
+.f p{color:var(--dim);font-size:14.5px}
+
+/* ---------- stats ---------- */
+.stats{display:flex;gap:10px;margin-top:26px}
+.st{flex:1;background:var(--card);border:1px solid var(--line);border-radius:17px;padding:17px 12px;text-align:center}
+.st b{display:block;font-family:'CHDisp',sans-serif;font-size:30px;color:var(--teal);line-height:1;font-variant-numeric:tabular-nums}
+.st span{display:block;font-size:11px;letter-spacing:.11em;text-transform:uppercase;color:var(--faint);margin-top:7px;font-weight:700}
+
+/* ---------- cities ---------- */
+.cities{padding:60px 0;position:relative;z-index:1}
+.city{display:flex;align-items:center;justify-content:space-between;gap:14px;
+  border-bottom:1px solid var(--line);padding:16px 2px}
+.city:last-of-type{border-bottom:none}
+.city b{font-family:'CHDisp',sans-serif;font-weight:700;text-transform:uppercase;font-size:21px;letter-spacing:.03em}
+.tag{font-family:'CHDisp',sans-serif;font-weight:700;font-size:11.5px;letter-spacing:.15em;text-transform:uppercase;
+  padding:6px 12px;border-radius:99px;white-space:nowrap}
+.tag.live{background:var(--teal);color:#04231D}
+.tag.load{color:var(--teal);border:1px solid rgba(45,224,192,.4)}
+.tag.wait{color:var(--faint);border:1px solid var(--line)}
+.city.off b{color:var(--faint)}
+.bar{height:3px;border-radius:99px;background:rgba(255,255,255,.08);margin-top:26px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--teal);border-radius:99px;transition:width 1.4s var(--ease)}
+
+/* ---------- standard ---------- */
+.std{padding:64px 0;position:relative;z-index:1;text-align:center}
+.std .big{font-size:74px;line-height:1;filter:drop-shadow(0 0 24px rgba(45,224,192,.35))}
+.std p{color:var(--dim);font-size:16px;margin-top:18px;max-width:400px;margin-left:auto;margin-right:auto}
+
+/* ---------- final ---------- */
+.final{padding:70px 0 40px;text-align:center;position:relative;z-index:1}
+.final h2{font-family:'CHDisp',sans-serif;font-weight:700;font-style:italic;text-transform:uppercase;
+  font-size:clamp(38px,11vw,60px);line-height:.92}
+.final h2 em{font-style:italic;color:var(--teal);display:block}
+.final .btns{margin-left:auto;margin-right:auto}
+.handle{display:block;margin-top:26px;color:var(--teal);font-weight:700;font-size:16px;text-decoration:none;letter-spacing:.02em}
+footer{text-align:center;color:var(--faint);font-size:12px;padding:34px 22px 20px;line-height:1.7;position:relative;z-index:1}
+footer b{color:var(--dim);letter-spacing:.1em;font-family:'CHDisp',sans-serif;font-weight:700;text-transform:uppercase}
+
+/* ---------- sticky cta ---------- */
+.sticky{position:fixed;left:0;right:0;bottom:0;z-index:20;padding:12px 18px calc(12px + env(safe-area-inset-bottom));
+  background:linear-gradient(to top,rgba(7,16,13,.98) 62%,transparent);
+  transform:translateY(130%);transition:transform .45s var(--ease)}
+.sticky.on{transform:none}
+.sticky .in{max-width:520px;margin:0 auto;display:flex;gap:9px}
+.sticky .btn{font-size:15px;padding:15px 16px}
+.sticky .btn-g{flex:0 0 56px;padding:15px 0}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+  .rv{opacity:1;transform:none}
+  .tick circle,.tick path{stroke-dashoffset:0}
+}
+</style>
+</head>
+<body>
+
+<div class="bgfx"><div class="glow"></div><div class="dots"></div><div class="court"></div></div>
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <svg class="tick" viewBox="0 0 64 64" aria-hidden="true">
+    <circle cx="32" cy="32" r="25" fill="none" stroke="#2DE0C0" stroke-width="4.5"/>
+    <path d="M20 33 L29 42 L45 23" fill="none" stroke="#2DE0C0" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <div class="chip"><span class="pulse"></span>Beta · Sydney live</div>
+  <h1>Australia's<br>playing.<em>You in?</em></h1>
+  <p class="sub">Every court mapped. See who's on right now. Call a run and the city taps in.</p>
+  <div class="btns">
+    <a class="btn btn-p" href="https://instagram.com/certified.hooper.aus" target="_blank" rel="noopener" data-go="hero">Follow on Instagram</a>
+    <a class="btn btn-g" href="#offer">Why you want to follow now</a>
+  </div>
+  <div class="scroller">Scroll</div>
+</section>
+
+<!-- ================= THE OFFER ================= -->
+<section class="offer" id="offer">
+  <div class="wrap">
+    <div class="card rv">
+      <div class="eyebrow">The founding 10,000</div>
+      <h2>First 10,000<br>followers.<br><span>Free for life.</span></h2>
+      <p>We're building Australia's pickup basketball network. The first 10,000 people who follow the page get it free forever — whatever it grows into. No catch. You were here early, that's it.</p>
+      <div class="steps">
+        <div class="stp"><b>1</b><div>Follow the page<small>@certified.hooper.aus — that's the whole entry</small></div></div>
+        <div class="stp"><b>2</b><div>Screenshot it<small>Make sure it shows you&#39;re Following <strong>and</strong> the follower count</small></div></div>
+        <div class="stp"><b>3</b><div>Keep the screenshot<small>When we hit 10k we'll post exactly where to send it — then you get your Founding Hooper ✓</small></div></div>
+      </div>
+      <p class="receipt">That follower number is your receipt. The lower it is, the earlier you were.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= WHAT IT IS ================= -->
+<section class="feats">
+  <div class="wrap">
+    <div class="rv">
+      <div class="eyebrow">What you're getting</div>
+      <h2 class="sh">Not a group chat.<br>A network.</h2>
+    </div>
+    <div class="grid">
+      <div class="f rv"><div class="ic">🗺️</div><b>Every court, scouted</b><p>Rings, lights, water, toilets, parking, the busiest times, what to bring. You know exactly what you're pulling up to — before you leave the house.</p></div>
+      <div class="f rv"><div class="ic">⚡</div><b>See who's on, right now</b><p>Live, GPS-checked check-ins. Not guesses. Not "should be busy around 6". Real people, real headcounts, this minute.</p></div>
+      <div class="f rv"><div class="ic">🏀</div><b>Call a run in 20 seconds</b><p>Court, time, format. It hits the board and the whole city can tap in. Chat's built in, so the run talks before the run.</p></div>
+      <div class="f rv"><div class="ic">👑</div><b>Every court has a king</b><p>Show up, check in, take the throne. Court kings, a city leaderboard, and a card that tracks every run you've ever pulled up to.</p></div>
+      <div class="f rv"><div class="ic">🔧</div><b>We fix our own courts</b><p>Bent rim? Put it on the board. Someone with a spare says "I'll fix it" — and posts the photo when it's done. We're not waiting on the council.</p></div>
+    </div>
+    <div class="stats rv">
+      <div class="st"><b data-count="13">0</b><span>Courts live</span></div>
+      <div class="st"><b data-count="1">0</b><span>City on</span></div>
+      <div class="st"><b>∞</b><span>Loading</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= CITIES ================= -->
+<section class="cities">
+  <div class="wrap">
+    <div class="rv">
+      <div class="eyebrow">The rollout</div>
+      <h2 class="sh">Sydney's on.<br>Your city's loading.</h2>
+      <p class="sub" style="margin-left:0;max-width:none">Every city unlocks the same way: enough hoopers on the ground, enough courts scouted properly, then we flip it on. No half-done cities.</p>
+    </div>
+    <div class="rv" style="margin-top:26px">
+      <div class="city"><b>Sydney</b><span class="tag live">Live</span></div>
+      <div class="city"><b>Melbourne</b><span class="tag load">Loading</span></div>
+      <div class="city off"><b>Brisbane</b><span class="tag wait">Queued</span></div>
+      <div class="city off"><b>Perth</b><span class="tag wait">Queued</span></div>
+      <div class="city off"><b>Adelaide</b><span class="tag wait">Queued</span></div>
+      <div class="city off"><b>Gold Coast</b><span class="tag wait">Queued</span></div>
+    </div>
+    <div class="bar rv"><i data-bar="17"></i></div>
+    <div class="btns rv" style="max-width:none">
+      <a class="btn btn-g" href="https://ig.me/m/certified.hooper.aus" target="_blank" rel="noopener" data-go="city">DM us your city →</a>
+    </div>
+  </div>
+</section>
+
+<!-- ================= THE STANDARD ================= -->
+<section class="std">
+  <div class="wrap rv">
+    <div class="big">✓</div>
+    <div class="eyebrow" style="margin-top:20px">The standard</div>
+    <h2 class="sh">Real ones only.</h2>
+    <p>Every hooper gets checked by a coach before they can call runs. We look at your page. We make sure you're real. Then you're certified. No burner accounts, no randoms, nobody wasting your Saturday.</p>
+  </div>
+</section>
+
+<!-- ================= FINAL ================= -->
+<section class="final">
+  <div class="wrap rv">
+    <h2>Get in before<em>the 10,000.</em></h2>
+    <p class="sub" style="margin-left:auto;margin-right:auto">The app's in closed beta — invite only. Follow to lock your spot, then DM for a code.</p>
+    <div class="btns">
+      <a class="btn btn-p" href="https://instagram.com/certified.hooper.aus" target="_blank" rel="noopener" data-go="final">Follow — lock it in</a>
+      <a class="btn btn-g" href="https://ig.me/m/certified.hooper.aus" target="_blank" rel="noopener" data-go="dm">DM for a beta code</a>
+      <button class="btn btn-g" id="share">Send this to a hooper</button>
+    </div>
+    <a class="handle" href="https://instagram.com/certified.hooper.aus" target="_blank" rel="noopener">@certified.hooper.aus</a>
+  </div>
+</section>
+
+<footer>
+  <b>Certified Hooper</b><br>
+  Australia's pickup basketball network<br>
+  Sydney live in beta · every other city loading<br>
+  Runs are player-called, never guaranteed. Pull up, play hard, look after each other.
+</footer>
+
+<div class="sticky" id="sticky">
+  <div class="in">
+    <a class="btn btn-p" href="https://instagram.com/certified.hooper.aus" target="_blank" rel="noopener" data-go="sticky">Follow — free for life</a>
+    <button class="btn btn-g" id="share2" aria-label="Share">↗</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  var RM = matchMedia('(prefers-reduced-motion:reduce)').matches;
+
+  /* scroll reveals */
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting) return;
+      e.target.classList.add('in');
+      io.unobserve(e.target);
+      var c = e.target.querySelector('[data-count]') || (e.target.matches('.stats') ? null : null);
+      if(e.target.classList.contains('stats')) countUp(e.target);
+      var b = e.target.querySelector('[data-bar]');
+      if(b) setTimeout(function(){ b.style.width = b.dataset.bar + '%'; }, 220);
+    });
+  }, {threshold:.18, rootMargin:'0px 0px -8% 0px'});
+  document.querySelectorAll('.rv').forEach(function(el){ io.observe(el); });
+
+  function countUp(scope){
+    scope.querySelectorAll('[data-count]').forEach(function(el){
+      var to = +el.dataset.count;
+      if(RM){ el.textContent = to; return; }
+      var t0 = performance.now(), dur = 900;
+      (function step(now){
+        var p = Math.min(1,(now-t0)/dur);
+        el.textContent = Math.round(to * (1 - Math.pow(1-p,3)));
+        if(p < 1) requestAnimationFrame(step);
+      })(t0);
+    });
+  }
+
+  /* sticky CTA appears once the hero is gone */
+  var hero = document.querySelector('.hero'), sticky = document.getElementById('sticky');
+  new IntersectionObserver(function(es){
+    sticky.classList.toggle('on', !es[0].isIntersecting);
+  }, {threshold:0}).observe(hero);
+
+  /* share */
+  function share(){
+    var data = {
+      title: 'Certified Hooper',
+      text: "Australia's pickup basketball network. First 10,000 followers get it free for life — Sydney's live now.",
+      url: location.href.split('#')[0]
+    };
+    if(navigator.share){ navigator.share(data).catch(function(){}); return; }
+    navigator.clipboard && navigator.clipboard.writeText(data.url).then(function(){
+      var b = document.getElementById('share');
+      if(b){ var w = b.textContent; b.textContent = 'Link copied ✓'; setTimeout(function(){ b.textContent = w; }, 1600); }
+    }).catch(function(){});
+  }
+  var s1 = document.getElementById('share'), s2 = document.getElementById('share2');
+  if(s1) s1.onclick = share;
+  if(s2) s2.onclick = share;
+})();
+</script>
+</body>
+</html>
