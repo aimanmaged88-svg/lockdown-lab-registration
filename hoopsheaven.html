@@ -1414,7 +1414,7 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
     <div class="betapill">BETA · INVITE ONLY</div>
     <div class="big">🏀</div>
     <h2>Every court.<br><em>Mapped.</em></h2>
-    <p>Sydney's courts are live — lights, hoops, water, the lot. Pick one, get directions, pull up. New courts weekly, new cities as we grow.</p>
+    <p>Every court in Australia, mapped properly — lights, hoops, water, the lot. <b>Sydney's live now</b> in beta; every other city is loading. Pick one, get directions, pull up.</p>
   </div>
   <div class="tslide" data-t="1">
     <div class="big">⚡</div>
@@ -1467,7 +1467,7 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
       <div class="cscroll" id="nearby"><div class="skel" style="flex:none;width:172px;height:160px"></div><div class="skel" style="flex:none;width:172px;height:160px"></div></div>
     </div>
     <div class="foot">
-      <b>CERTIFIED HOOPER</b> · built in built in Sydney · court data © OpenStreetMap contributors<br>
+      <b>CERTIFIED HOOPER</b> · Australia's pickup basketball network<br>Sydney live in beta · every other city loading · built in Sydney<br>court data © OpenStreetMap contributors<br>
       Runs are player-called, never guaranteed. Pull up, play hard, look after each other.<br>
       <button class="linky" id="rulesLink" style="margin-top:6px">House rules</button>
     </div>
@@ -2379,7 +2379,7 @@ function tnDayLbl(){
   const d=new Date(new Date().toLocaleString('en-US',{timeZone:'Australia/Sydney'}));
   const days=['SUNDAY','MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY'];
   const mo=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
-  return days[d.getDay()]+' · '+d.getDate()+' '+mo[d.getMonth()]+' · SYDNEY';
+  return days[d.getDay()]+' · '+d.getDate()+' '+mo[d.getMonth()]+' · SYDNEY LIVE';
 }
 function storyName(n){
   let s=(n||'').split(/ [—–-] /)[0].replace(/ (Park )?Courts?$/i,'').replace(/ Oval$/i,'');
@@ -2731,7 +2731,7 @@ function paintHeroStat(){
                         :`<span class="hs">🏗️ Courts dropping soon</span>`;
   if(here>0)html+=`<span class="hs"><span class="live"></span><b>${here}</b> playing now</span>`;
   else if(runs>0)html+=`<span class="hs"><span class="live"></span><b>${runs}</b> run${runs===1?'':'s'} on</span>`;
-  else if(COURTS.length)html+=`<span class="hs">📍 Sydney</span>`;
+  else if(COURTS.length)html+=`<span class="hs">📍 Sydney · live</span>`;
   el.innerHTML=html; el.classList.add('on');
 }
 function paintNearby(){
