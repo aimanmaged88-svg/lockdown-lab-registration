@@ -1304,25 +1304,42 @@ header{
 .foot{margin-top:44px;text-align:center;color:var(--dim);font-size:11.5px;line-height:1.7;padding-bottom:10px}
 .foot b{color:var(--muted)}
 
-/* ===== intro splash — Certified Hooper's own mark ===== */
-#uncIntro{position:fixed;inset:0;z-index:220;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#000}
+/* ===== intro splash — the house card, then Certified Hooper's own mark ===== */
+#uncIntro{position:fixed;inset:0;z-index:220;overflow:hidden;background:#000}
+#uncIntro .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+/* phase 1 — presented by Love of the Game */
+.lotg{display:flex;flex-direction:column;align-items:center;gap:20px;padding:20px;
+  animation:lotgOut .55s var(--ease-out) 1.25s both}
+@keyframes lotgOut{to{opacity:0;transform:scale(.965)}}
+.lotg-eb{font-family:var(--disp);font-weight:700;letter-spacing:.34em;font-size:10.5px;text-transform:uppercase;
+  color:rgba(255,255,255,.42);padding-left:.34em;opacity:0;animation:uncEye .7s var(--ease-out) .12s both}
+.lotg-lock{display:flex;align-items:center;gap:21px;opacity:0;animation:uncLogo .8s var(--ease-out) .3s both}
+.lotg-mark{width:min(25vw,104px);height:auto;flex:none}
+.lotg-mark .seam{stroke:#fff}
+.lotg-mark .heart{stroke:#FF6A2B;stroke-dasharray:150;stroke-dashoffset:150;
+  animation:lotgHeart .85s cubic-bezier(.3,1,.4,1) .55s both}
+@keyframes lotgHeart{to{stroke-dashoffset:0}}
+.lotg-word{font-family:var(--disp);font-weight:700;font-style:italic;text-transform:uppercase;
+  font-size:clamp(25px,7.6vw,36px);line-height:.85;letter-spacing:.005em;color:#fff}
+/* phase 2 — the product */
+.ph2{opacity:0;animation:uncLogo .7s var(--ease-out) 1.65s both}
 #uncIntro.gone{animation:uncOut .8s var(--ease-out) forwards;pointer-events:none}
 @keyframes uncOut{to{opacity:0;transform:scale(1.04);filter:blur(6px);visibility:hidden}}
 .unc-stage{position:relative;display:flex;flex-direction:column;align-items:center;gap:24px;padding:20px}
 .unc-eyebrow{font-family:var(--disp);font-weight:700;letter-spacing:.28em;font-size:11px;text-transform:uppercase;
-  color:#2DE0C0;padding-left:.28em;opacity:0;animation:uncEye .9s var(--ease-out) .95s both}
+  color:#2DE0C0;padding-left:.28em;opacity:0;animation:uncEye .9s var(--ease-out) 2.35s both}
 @keyframes uncEye{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
-.unc-mark{position:relative;display:grid;place-items:center;animation:uncFloat 6s ease-in-out 1.2s infinite alternate}
+.unc-mark{position:relative;display:grid;place-items:center;animation:uncFloat 6s ease-in-out 2.6s infinite alternate}
 @keyframes uncFloat{from{transform:translateY(0)}to{transform:translateY(-7px)}}
 .unc-halo{position:absolute;z-index:2;width:110%;aspect-ratio:1/1;border-radius:50%;top:-4%;
   background:radial-gradient(circle at 50% 38%,rgba(255,255,255,.14),transparent 58%);opacity:0;animation:uncGlow 2.4s ease-in-out .5s both;mix-blend-mode:screen;pointer-events:none}
 @keyframes uncGlow{0%{opacity:0;transform:scale(.6)}50%{opacity:.9}100%{opacity:.55;transform:scale(1)}}
-.unc-word{font-family:var(--disp);font-weight:700;font-style:italic;font-size:clamp(30px,9vw,44px);line-height:.98;color:#fff;text-transform:uppercase;text-align:center;letter-spacing:.01em;opacity:0;animation:uncLogo 1.05s var(--ease-out) .5s both}
+.unc-word{font-family:var(--disp);font-weight:700;font-style:italic;font-size:clamp(30px,9vw,44px);line-height:.98;color:#fff;text-transform:uppercase;text-align:center;letter-spacing:.01em;opacity:0;animation:uncLogo 1.05s var(--ease-out) 1.95s both}
 .unc-logo{display:block;width:min(42vw,190px);height:auto;opacity:0;transform:scale(1.06) translateY(10px);
-  animation:uncLogo 1.15s var(--ease-out) .25s both}
+  animation:uncLogo 1.15s var(--ease-out) 1.7s both}
 @keyframes uncLogo{to{opacity:1;transform:none}}
-#uncIntro .skip{position:absolute;bottom:34px;left:0;right:0;text-align:center;font-size:11px;letter-spacing:.2em;
-  text-transform:uppercase;color:rgba(255,255,255,.28);opacity:0;animation:uncEye .8s ease 1.8s both}
+#uncIntro .skip{position:absolute;bottom:34px;left:0;right:0;z-index:3;text-align:center;font-size:11px;letter-spacing:.2em;
+  text-transform:uppercase;color:rgba(255,255,255,.28);opacity:0;animation:uncEye .8s ease 2.9s both}
 /* jersey number — every hooper's public ID, worn like a real card number */
 .nbacard .jersey{position:absolute;right:16px;bottom:8px;font-family:var(--disp);font-weight:700;font-size:46px;line-height:1;color:var(--tc);opacity:.18;letter-spacing:.02em;pointer-events:none}
 .pnumchip{display:inline-block;margin-left:7px;font-family:var(--cond);font-weight:800;font-size:11.5px;letter-spacing:.08em;color:var(--muted);background:color-mix(in srgb,var(--tc) 14%,transparent);border:1px solid color-mix(in srgb,var(--tc) 30%,transparent);border-radius:99px;padding:2px 9px;vertical-align:middle}
@@ -1382,9 +1399,22 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
 </head>
 <body>
 
-<!-- ===== UNC intro splash ===== -->
+<!-- ===== intro splash: the house card, then the product ===== -->
 <div id="uncIntro">
-  <div class="unc-stage">
+  <div class="ph ph1"><div class="lotg">
+    <div class="lotg-eb">Presented by</div>
+    <div class="lotg-lock">
+      <svg class="lotg-mark" viewBox="0 0 100 100" aria-hidden="true">
+        <circle class="seam" cx="50" cy="50" r="43" fill="none" stroke-width="4.5"/>
+        <path class="seam" d="M16 24 C29 40 29 60 16 76" fill="none" stroke-width="4"/>
+        <path class="seam" d="M84 24 C71 40 71 60 84 76" fill="none" stroke-width="4"/>
+        <path class="heart" d="M50 74 C31 60 25 48 32 40 C38 33 47 36 50 43 C53 36 62 33 68 40 C75 48 69 60 50 74 Z"
+              fill="none" stroke-width="5" stroke-linejoin="round"/>
+      </svg>
+      <div class="lotg-word">Love<br>of the<br>Game</div>
+    </div>
+  </div></div>
+  <div class="ph ph2"><div class="unc-stage">
     <div class="unc-mark">
       <div class="unc-halo"></div>
       <svg class="unc-logo" viewBox="0 0 64 64" width="200" height="200" aria-label="Certified Hooper">
@@ -1394,7 +1424,7 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
     </div>
     <div class="unc-word">Certified<br>Hooper</div>
     <div class="unc-eyebrow">Australia's playing — you in?</div>
-  </div>
+  </div></div>
   <div class="skip">tap to enter</div>
 </div>
 <script>
@@ -1402,7 +1432,7 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
   var el=document.getElementById('uncIntro'); if(!el)return;
   var rm=matchMedia('(prefers-reduced-motion:reduce)').matches, done=false;
   function go(){ if(done)return; done=true; document.body.classList.add('appin'); el.classList.add('gone'); setTimeout(function(){ el.parentNode&&el.parentNode.removeChild(el); },820); }
-  var t=setTimeout(go, rm?600:2200);
+  var t=setTimeout(go, rm?700:3400);
   el.addEventListener('click',function(){ clearTimeout(t); go(); });
 })();
 </script>
