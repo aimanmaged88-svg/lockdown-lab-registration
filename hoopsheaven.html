@@ -707,7 +707,10 @@ svg.leaflet-image-layer.leaflet-interactive path {
 /* ===== VIBES: user-selectable full themes (default Love of the Game) ===== */
 /* Love of the Game — the house theme: their black, cream and brass */
 :root[data-theme="lotg"]{--bg:#0D1113;--card:#161B1E;--card2:#1D2327;--line:rgba(240,236,226,.12);
-  --text:#E6E2D6;--muted:#949A97;--dim:#5F6664;}
+  --text:#E6E2D6;--muted:#949A97;--dim:#5F6664;
+  /* black and white all the way through — "good" reads as white, not green.
+     Danger stays red because a warning has to break the palette to work. */
+  --ok:#FFFFFD;--fire:#E6E2D6;}
 [data-theme="lotg"] body{background:#0D1113 fixed!important}
 [data-theme="lotg"] header{background:rgba(13,17,19,.9)!important;border-bottom:1px solid rgba(244,239,226,.10)!important}
 [data-theme="lotg"] .hero h1{color:#F6F3EA}
