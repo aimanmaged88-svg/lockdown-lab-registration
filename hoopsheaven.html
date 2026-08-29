@@ -1516,7 +1516,7 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
       <div id="runFeed"><div class="skel"></div></div>
     </div>
     <div class="sect" id="kingsSect" style="display:none">
-      <div class="seclbl"><h2>🏆 City <em style="color:var(--volt);font-style:normal">Kings</em></h2><button id="seeKings">SEE ALL</button></div>
+      <div class="seclbl"><h2>✓ Certified <em style="color:var(--volt);font-style:normal">Hoopers</em></h2><button id="seeKings">SEE ALL</button></div>
       <div id="homeKings"></div>
     </div>
     <div class="sect">
@@ -1834,10 +1834,10 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
       <button class="btn btn-v btn-block" id="rateGo" style="margin-top:9px">Post my rating</button>
     </div>
   </div>
-  <div class="subsect"><h4>👑 King of the Court</h4>
+  <div class="subsect"><h4>✓ Certified here</h4>
     <div class="kotc">
-      <div class="crown">👑</div><b id="ctKingHead">The throne is open</b>
-      <p id="ctKingSub">Every run you tap into at this court counts. Show up, get crowned.</p>
+      <div class="crown">✓</div><b id="ctKingHead">Nobody's a regular yet</b>
+      <p id="ctKingSub">Every run you tap into at this court counts. Turn up and you're on it.</p>
       <div class="klead" id="ctKotc"></div>
     </div>
   </div>
@@ -1888,10 +1888,10 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   <p class="fine">The coach reviews every suggestion. Real courts only — no random pins.</p>
 </div></div>
 
-<!-- city-wide King of the Court leaderboard -->
+<!-- city-wide certified-hooper board -->
 <div class="sheet" id="shKings"><div class="scrim" data-close></div><div class="panel">
   <div class="grab"></div>
-  <div class="xrow"><div><h3>🏆 City Kings</h3><p class="sub">Australia's most-active hoopers — ranked by check-ins. Show up to climb.</p></div><button class="x" data-close>✕</button></div>
+  <div class="xrow"><div><h3>✓ Certified Hoopers</h3><p class="sub">The ✓ across the city — every hooper who turns up, ranked by check-ins.</p></div><button class="x" data-close>✕</button></div>
   <div id="kingsList"><div class="skel" style="height:64px;margin-bottom:8px"></div><div class="skel" style="height:64px;margin-bottom:8px"></div><div class="skel" style="height:64px"></div></div>
 </div></div>
 
@@ -2013,7 +2013,7 @@ function hooperCardHTML(d,own){
   else rt=`<div class="big" data-count="${r.value}" data-dec>0.0</div><div class="out">/10 · ${r.count} rating${r.count===1?'':'s'}</div>`;
   const next=t.next;
   const pct=next?Math.max(5,Math.min(100,Math.round((d.checkins-t.min)/((next.at-t.min)||1)*100))):100;
-  const bar=`<div class="tierbar"><div class="lab"><span>${esc(t.name)}</span><span>${next?Math.max(0,next.at-d.checkins)+' check-in'+((next.at-d.checkins)===1?'':'s')+' → '+esc(next.name):'👑 top tier'}</span></div><div class="track"><div class="fill" data-fill="${pct}"></div></div></div>`;
+  const bar=`<div class="tierbar"><div class="lab"><span>${esc(t.name)}</span><span>${next?Math.max(0,next.at-d.checkins)+' check-in'+((next.at-d.checkins)===1?'':'s')+' → '+esc(next.name):'✓ top tier'}</span></div><div class="track"><div class="fill" data-fill="${pct}"></div></div></div>`;
   const box=`<div class="boxscore">
     <div class="b"><div class="v" data-count="${d.checkins}">0</div><div class="l">Check-ins</div></div>
     <div class="b"><div class="v" data-count="${d.runs}">0</div><div class="l">Runs</div></div>
@@ -2081,7 +2081,7 @@ async function openHooper(id){
 }
 /* rate a hooper 1-10 */
 let RATEE=null,RSTARS=0;
-const RWORDS={1:'Everyone starts somewhere 🌱',2:'On the come-up',3:'Building the game',4:'Getting there',5:'Solid role player',6:'Reliable bucket',7:'Real problem 🔥',8:'Cold — All-Star stuff',9:'Elite. Certified hooper',10:'👑 Untouchable'};
+const RWORDS={1:'Everyone starts somewhere 🌱',2:'On the come-up',3:'Building the game',4:'Getting there',5:'Solid role player',6:'Reliable bucket',7:'Real problem 🔥',8:'Cold — All-Star stuff',9:'Elite. Certified hooper',10:'✓ Untouchable'};
 function paintRate10(){
   $('#rt10').innerHTML=[1,2,3,4,5,6,7,8,9,10].map(s=>`<button class="${s<=RSTARS?'on':''}" data-s="${s}">⭐</button>`).join('');
   $('#rt10').querySelectorAll('button').forEach(b=>b.onclick=()=>{RSTARS=+b.dataset.s;paintRate10();$('#rtWord').textContent=RWORDS[RSTARS]||'';});
@@ -3131,14 +3131,14 @@ function openCourtPage(c){
     paintReviews(d);
     const kings=(d.kotc||[]).filter(k=>k.runs>0);
     if(kings.length){
-      $('#ctKingHead').textContent=`👑 ${kings[0].name} runs this court`;
-      $('#ctKingSub').textContent='Most tap-ins here over the last 90 days. Show up more to take the crown.';
+      $('#ctKingHead').textContent=`✓ ${kings[0].name} is a regular here`;
+      $('#ctKingSub').textContent='Most tap-ins at this court over the last 90 days. Turn up more to move up.';
     }else{
-      $('#ctKingHead').textContent='The throne is open';
-      $('#ctKingSub').textContent='Every run you tap into here counts. Show up, get crowned.';
+      $('#ctKingHead').textContent="Nobody's a regular yet";
+      $('#ctKingSub').textContent='Every run you tap into here counts. Turn up and you\'re on it.';
     }
     $('#ctKotc').innerHTML=kings.slice(0,5).map((k,i)=>`
-      <div class="kr"><b>${['👑','🥈','🥉','④','⑤'][i]||''} ${esc(k.name)}${k.ig?` <a style="color:var(--muted);text-decoration:none" href="https://instagram.com/${esc(k.ig)}" target="_blank" rel="noopener">@${esc(k.ig)}</a>`:''}</b><span>${k.runs} run${k.runs===1?'':'s'}</span></div>`).join('');
+      <div class="kr"><b>${['🥇','🥈','🥉','④','⑤'][i]||''} ${esc(k.name)}${k.ig?` <a style="color:var(--muted);text-decoration:none" href="https://instagram.com/${esc(k.ig)}" target="_blank" rel="noopener">@${esc(k.ig)}</a>`:''}</b><span>${k.runs} run${k.runs===1?'':'s'}</span></div>`).join('');
   }).catch(e=>toast(e.message,1));
 }
 function paintPlays(plays){
@@ -3491,7 +3491,7 @@ $('#sgGo').onclick=()=>ensureProfile(async()=>{
   b.disabled=false;b.textContent='Send it to the desk';
 });
 
-/* ---------- City Kings (King of the Court leaderboard) ---------- */
+/* ---------- Certified Hoopers (the city-wide board) ---------- */
 let KINGS=null;
 function kingRowHTML(k){
   const t=k.tier||{name:'Rookie',color:'#8A9099'};
@@ -3508,8 +3508,8 @@ function kingRowHTML(k){
 function renderKingsHome(){
   const el=$('#homeKings'); if(!el)return;
   const sect=$('#kingsSect');
-  // Launch-clean: hide the whole City Kings block until someone's actually on the board,
-  // so a fresh app never shows an empty leaderboard. It appears the moment there's a king.
+  // Launch-clean: hide the whole Certified Hoopers block until someone's on it,
+  // so a fresh app never shows an empty board. It appears on the first check-in.
   if(!KINGS||!KINGS.length){if(sect)sect.style.display='none';el.innerHTML='';return;}
   if(sect)sect.style.display='';
   el.innerHTML=KINGS.slice(0,3).map(kingRowHTML).join('');wireHoopers(el);
@@ -3521,7 +3521,7 @@ async function loadKings(force){
 }
 function openKings(){
   openSheet('shKings');const box=$('#kingsList');
-  const paint=()=>{box.innerHTML=(KINGS&&KINGS.length)?KINGS.map(kingRowHTML).join(''):'<div class="empty" style="padding:20px">No kings yet. Be first — check in at a court and climb the board 👑</div>';wireHoopers(box);};
+  const paint=()=>{box.innerHTML=(KINGS&&KINGS.length)?KINGS.map(kingRowHTML).join(''):'<div class="empty" style="padding:20px">Nobody\'s on the board yet. Be first — check in at a court and your ✓ shows up here.</div>';wireHoopers(box);};
   if(KINGS)paint();
   else api({action:'leaderboard'}).then(d=>{KINGS=d.kings||[];paint();renderKingsHome();}).catch(()=>{box.innerHTML='<div class="empty" style="padding:20px">Could not load — try again.</div>';});
 }
