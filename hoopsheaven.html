@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0A0C0F">
+<meta name="theme-color" content="#0D1113">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
@@ -698,7 +698,23 @@ svg.leaflet-image-layer.leaflet-interactive path {
   /* motion — Apple-ish: fast, decisive, slight overshoot */
   --ease:cubic-bezier(.22,.61,.24,1); --spring:cubic-bezier(.34,1.4,.5,1); --ease-out:cubic-bezier(.16,1,.3,1);
 }
-/* ===== VIBES: user-selectable full themes (default retro, switch to concrete) ===== */
+:root:not([data-theme="club"]) .leaflet-control-zoom a{background:#161B1E;color:#F4EFE2;border-bottom-color:rgba(255,255,255,.12)}
+:root:not([data-theme="club"]) .leaflet-control-zoom a:hover{background:#1D2327}
+:root:not([data-theme="club"]) .leaflet-bar{border:1px solid rgba(255,255,255,.14)}
+:root:not([data-theme="club"]) .leaflet-control-attribution{background:rgba(13,17,19,.72)!important;color:#7C8380!important}
+:root:not([data-theme="club"]) .leaflet-control-attribution a{color:#9AA09E!important}
+
+/* ===== VIBES: user-selectable full themes (default Love of the Game) ===== */
+/* Love of the Game — the house theme: their black, cream and brass */
+:root[data-theme="lotg"]{--bg:#0D1113;--card:#161B1E;--card2:#1D2327;--line:rgba(240,236,226,.12);
+  --text:#E6E2D6;--muted:#949A97;--dim:#5F6664;}
+[data-theme="lotg"] body{background:#0D1113 fixed!important}
+[data-theme="lotg"] header{background:rgba(13,17,19,.9)!important;border-bottom:1px solid rgba(244,239,226,.10)!important}
+[data-theme="lotg"] .hero h1{color:#F6F3EA}
+[data-theme="lotg"] .hero .scripty{background:none;-webkit-text-fill-color:#FFFFFD;color:#FFFFFD;animation:none}
+[data-theme="lotg"] .ccard .ph{background:linear-gradient(135deg,#1D2327,#0F1416)}
+[data-theme="lotg"] .nowhero{background:#10161A}
+[data-theme="lotg"] .tabbar{background:rgba(16,21,24,.97);border:1px solid rgba(244,239,226,.09)}
 :root[data-theme="retro"]{--bg:#1A1140;--card:#281B54;--card2:#322268;--line:rgba(255,255,255,.13);--text:#FDF3FF;--muted:#B7A6D9;--dim:#7C6DA0;}
 [data-theme="retro"] body{background:linear-gradient(160deg,#241650 0%,#150B33 62%) fixed!important}
 [data-theme="retro"] header{background:rgba(21,11,51,.86)!important;border-bottom:1px solid rgba(255,255,255,.10)!important}
@@ -798,6 +814,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 .vibe:active{transform:scale(.97)}
 .vibe.on{border-color:var(--volt)}
 .vibe .vw{height:52px;border-radius:11px;margin-bottom:9px;display:flex;align-items:center;justify-content:center;font-family:'HHMarker',cursive;font-size:20px}
+.vibe.lotg .vw{background:#0D1113;color:#FFFFFD;border:1px solid rgba(255,255,255,.4);font-family:var(--disp);font-weight:700;letter-spacing:.16em;font-size:15px}
 .vibe.retro .vw{background:linear-gradient(160deg,#241650,#150B33);color:#FF7AC6}
 .vibe.concrete .vw{background:repeating-linear-gradient(90deg,#1c1c1c 0 10px,#191919 10px 11px),#161616;color:#FFE01A;transform:rotate(-1deg)}
 .vibe b{display:block;font-family:var(--cond);font-size:14px;letter-spacing:1.4px;text-transform:uppercase;font-weight:800;color:var(--text)}
@@ -953,6 +970,9 @@ header{
 .leaflet-container{background:#0E1116;font-family:inherit}
 .mappin{background:var(--volt);color:var(--onaccent);font-weight:900;font-size:12px;border-radius:50%;width:28px;height:28px;display:grid;place-items:center;border:2px solid #0A0C0F;box-shadow:0 2px 8px rgba(0,0,0,.5)}
 .mappin.hot{background:var(--ok);color:#0A0C0F}
+[data-theme="lotg"] .mappin{background:#FFFFFD;color:#0D1113;border-color:#0D1113}
+[data-theme="lotg"] .mappin.hot{background:#FFFFFD;color:#0D1113;
+  box-shadow:0 0 0 3px rgba(255,255,255,.30),0 2px 10px rgba(0,0,0,.6)}
 #mapCard{display:none;position:relative;margin-top:-74px;z-index:5;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:13px 15px}
 #mapCard .row1{display:flex;align-items:center;gap:12px}
 #mapCard .th{width:54px;height:54px;border-radius:12px;background:var(--card2) center/cover no-repeat;flex:none;display:grid;place-items:center;font-size:20px}
@@ -1199,6 +1219,14 @@ header{
    box-shadow:0 18px 44px -20px color-mix(in srgb,var(--tc) 70%,transparent), 0 2px 0 rgba(255,255,255,.05) inset;
    overflow:hidden;animation:cardIn .6s var(--ease-out) both}
 @keyframes cardIn{from{opacity:0;transform:translatey(16px) scale(.96)}}
+[data-theme="lotg"] .nbacard{background:linear-gradient(150deg,#FFFFFD 0%,#8E938F 24%,#0C0F11 56%,#1A1F22 100%);
+  box-shadow:0 18px 44px -22px rgba(0,0,0,.9),0 2px 0 rgba(255,255,255,.06) inset}
+[data-theme="lotg"] .nbacard .inner{background:radial-gradient(120% 90% at 50% -10%,#1A2024 0%,#0C0F11 52%,#090B0D 100%)}
+[data-theme="lotg"] .nbacard .jersey{color:#FFFFFD;opacity:.10}
+[data-theme="lotg"] .nbacard .rt .big.soft,[data-theme="lotg"] .nbacard .rt .new{color:#E6E2D6}
+[data-theme="lotg"] .nbacard .pfp{background:linear-gradient(150deg,#FFFFFD,#C9C6BC);box-shadow:0 6px 18px -8px rgba(255,255,255,.5)}
+[data-theme="lotg"] .tierbar .track i,[data-theme="lotg"] .tierbar .track>*{background:#FFFFFD!important}
+[data-theme="lotg"] #vfCard>div:first-child{color:#FFFFFD!important}
 .nbacard .inner{position:relative;border-radius:20px;background:
    radial-gradient(120% 90% at 50% -10%, color-mix(in srgb,var(--tc) 26%,#0d1014) 0%, #0b0d11 52%, #090b0e 100%);
    padding:20px 18px 18px;overflow:hidden}
@@ -1302,13 +1330,16 @@ header{
 #toast.err{background:var(--danger);color:#fff}
 
 .foot{margin-top:44px;text-align:center;color:var(--dim);font-size:11.5px;line-height:1.7;padding-bottom:10px}
+.byhouse{display:flex;flex-direction:column;align-items:center;gap:9px;margin-bottom:20px;color:var(--muted)}
+.byhouse span{font-family:var(--disp);font-weight:700;letter-spacing:.3em;font-size:9.5px;text-transform:uppercase;padding-left:.3em;color:var(--dim)}
+.byhouse svg{width:132px;height:auto;opacity:.82}
 .foot b{color:var(--muted)}
 
 /* ===== intro splash — the house card, then Certified Hooper's own mark ===== */
 #uncIntro{position:fixed;inset:0;z-index:220;overflow:hidden;background:#000}
 #uncIntro .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
 /* phase 1 — presented by Love of the Game */
-.lotg{display:flex;flex-direction:column;align-items:center;gap:20px;padding:20px;
+#uncIntro .lotg{display:flex;flex-direction:column;align-items:center;gap:20px;padding:20px;
   animation:lotgOut .55s var(--ease-out) 1.25s both}
 @keyframes lotgOut{to{opacity:0;transform:scale(.965)}}
 .lotg-eb{font-family:var(--disp);font-weight:700;letter-spacing:.34em;font-size:10.5px;text-transform:uppercase;
@@ -1490,6 +1521,8 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
       <div class="cscroll" id="nearby"><div class="skel" style="flex:none;width:172px;height:160px"></div><div class="skel" style="flex:none;width:172px;height:160px"></div></div>
     </div>
     <div class="foot">
+      <div class="byhouse"><span>Presented by</span>
+        <svg viewBox="2 126 155 60" aria-hidden="true" role="img" aria-label="Love of the Game"><path fill="currentColor" fill-rule="evenodd" d="M24.58 127L27.67 126.92L31.17 128.08L33.75 130.33L35.08 132.5L35.08 137.5L33.92 140.33L31.17 142.92L28 144.08L24.17 144.08L20.67 142.75L18.58 140.83L17.25 138.67L16.92 134.17L18.08 131L20.67 128.25L22.83 127.25L24.58 127ZM79.58 127L82.83 126.92L86.33 128.08L88.75 130.17L90.25 133.33L90.58 136L89.25 140.17L87.17 142.42L84 143.92L79.33 144.08L75.83 142.75L73.42 140.33L72.25 137.67L72.25 133.33L73.75 130.33L76.17 128.08L79.58 127ZM6.75 127.17L9.33 127.08L10.25 127.67L10.58 138.5L11.83 139.42L16.67 139.58L17.08 140.17L17.08 142.17L16.33 143.75L6.67 143.92L5.58 143.17L5.42 128.33L6.17 127.25L6.75 127.17ZM35.58 127.17L38.5 127.08L39.92 127.83L42.25 135L43.33 136.75L44.08 136.33L46.42 128.67L47.5 127.25L51.33 127.08L52.67 127.58L53.83 127.08L64.33 127.08L65.17 127.42L65.75 128.5L65.75 130.17L65.17 131.08L64.33 131.42L59 131.42L58.42 132L58.42 132.83L59.17 133.25L64.83 133.42L65.58 134.83L65.25 137L64.17 137.58L59 137.58L58.42 138L58.25 138.83L58.67 139.42L59.83 139.75L65.17 139.92L65.75 140.83L65.42 143.33L64.5 143.92L54 143.92L53.25 143.33L53.08 130L52.5 128.75L51.08 131.5L46.75 143.33L45.67 143.92L40.67 143.75L39.58 142.33L36.92 134.83L35.25 131.67L34.58 127.83L35.58 127.17ZM92.75 127.17L102.83 127.08L104.25 128.17L104.25 130.33L103.5 131.25L97.67 131.42L96.92 132L96.92 132.67L97.67 133.25L102.83 133.25L103.67 133.58L104.08 134.33L104.08 136.5L102.67 137.58L97.67 137.58L97 137.92L96.58 138.67L96.58 142.67L95.5 143.92L92.67 143.92L91.42 142.67L91.08 136.67L91.42 128.5L91.75 127.67L92.75 127.17ZM111.58 127.17L123.33 127.08L125.17 128.42L126.83 127.08L129.33 127.08L130.58 128L130.75 132L132 133.08L136 132.92L136.75 132L136.92 127.83L138 127.08L141.17 127.25L141.92 128.5L141.92 142.67L141.58 143.5L140.83 143.92L137.5 143.75L136.75 142.5L136.58 138.17L134.67 137.42L131.67 137.58L130.92 138.17L130.75 142.17L130.17 143.58L129.5 143.92L126.33 143.75L125.58 142.67L125.58 132.17L124.83 130.58L123.5 131.58L120.83 131.75L120.08 132.67L119.92 143.17L118.67 143.92L115.5 143.58L114.92 142L114.92 132.5L114.17 131.75L111.67 131.58L110.58 130.83L110.42 128.33L111.58 127.17ZM144.92 127.17L155.33 127.08L156.42 127.83L156.58 130.17L155.83 131.25L150 131.42L149.25 132.17L149.25 132.67L150.17 133.25L155.5 133.25L156.08 133.83L156.25 136.67L155.67 137.42L150 137.58L149.25 138.17L149.25 139L149.83 139.58L156 139.92L156.58 140.83L156.58 142.67L155.83 143.75L144.83 143.92L144.08 143.33L143.92 128.17L144.92 127.17ZM25.33 131.42L23.5 132.25L22.58 133.33L22.08 136.33L23.67 138.92L25.17 139.58L27 139.58L28.5 138.92L29.42 137.83L30.08 135.83L29.92 134.33L28.33 132.08L26.83 131.42L25.33 131.42ZM80.67 131.42L78.42 132.5L77.42 134.17L77.25 136.17L78.83 138.92L81.5 139.75L83.67 138.92L84.42 138.17L85.08 136.83L85.25 135L84.75 133.33L83.83 132.25L82 131.42L80.67 131.42ZM21.75 148.33L27 148.58L31.83 150.08L35.67 152.42L38.08 154.83L38.58 156.33L37.83 157.08L30.5 160.58L29.67 160.58L27 158.42L24.5 157.58L20.83 157.75L18 158.92L15.25 161.67L14.25 164L13.92 167.67L14.92 171L17 173.25L19.5 174.42L22.83 174.75L26.5 173.92L28.42 172.83L28.58 172L28.17 171.58L22.67 171.75L21.75 170.67L21.75 164.33L22.5 163.25L38.83 162.58L39.75 163.67L39.75 175.33L36.17 178.75L30.33 182.08L22.83 183.92L15.5 183.75L12 182.75L8.67 180.92L6.08 178.5L4.58 176.33L3.25 173L2.58 169.17L3.08 162.5L5.25 157.17L7.42 154.33L9.83 152.25L15.67 149.25L21.75 148.33ZM52.75 149L65.67 148.92L66.92 150L76.25 171.83L79.25 178L79.83 178.25L80.25 177.5L80.25 150L80.67 149.25L81.33 148.92L95 148.92L95.67 149.25L97.92 153.83L101.25 162.67L101.83 163.58L102.67 163.75L108.08 150.5L109.17 149.08L123.17 148.92L124.25 150L124.25 181L123.33 181.92L121.33 181.92L114.17 181.25L113.42 180.83L113.08 179.83L113.08 163.67L112.67 162.92L111.25 164.83L105.08 179.83L104 180.58L101.5 180.58L100 180.08L99.25 179.17L93.25 164.33L92.75 163.33L91.83 162.75L91.42 164L91.42 179.33L90.67 180.08L81.33 180.08L80.33 179.75L68.5 180.08L67.58 179.5L66.17 176.58L65.5 176.25L60.83 176.25L52.83 176.75L51.75 177.67L50.75 180.33L50 180.92L39.67 181.58L39.08 180.33L40.58 176L51.42 150.5L52.75 149ZM129.58 149L155.33 148.92L156.42 149.67L156.58 157.17L156.17 157.92L153.83 158.25L140.83 157.75L139.75 159L139.92 161L141 161.92L154.17 162.42L155.33 162.58L155.92 163.17L156.08 171L155.5 171.75L140.67 170.75L139.75 172L139.92 174.33L141 175.08L155.83 176.75L156.58 177.83L156.58 183.83L155.5 185.42L154.17 185.75L145.83 184.25L131 182.75L129.83 182.58L128.92 181.83L128.58 150L129.58 149ZM59 158.92L55.42 167.5L56.33 168.42L62.33 168.25L62.92 167.83L62.92 166.67L60.08 159.5L59 158.92Z"/></svg></div>
       <b>CERTIFIED HOOPER</b> · Australia's pickup basketball network<br>Sydney live in beta · every other city loading · built in Sydney<br>court data © OpenStreetMap contributors<br>
       Runs are player-called, never guaranteed. Pull up, play hard, look after each other.<br>
       <button class="linky" id="rulesLink" style="margin-top:6px">House rules</button>
@@ -2805,17 +2838,21 @@ $('#nearBtn2').onclick=()=>askGeo(()=>{paintNearby();paintHomeSearch();toast('So
 
 /* ---------- map ---------- */
 let MAP=null,MAPC=null,TILEL=null;
-const tileStyle=()=>document.documentElement.getAttribute('data-theme')==='club'?'light_all':'dark_all';
+const TILE_URL='https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+const lightTheme=()=>document.documentElement.getAttribute('data-theme')==='club';
+function paintTiles(){ const c=document.querySelector('#map .leaflet-tile-pane');
+  if(c) c.style.filter = lightTheme() ? 'none' : 'invert(1) hue-rotate(180deg) brightness(.86) contrast(.92) saturate(.8)'; }
 function initMap(){
   if(MAP){setTimeout(()=>MAP.invalidateSize(),60);return}
   if(typeof L==='undefined'){toast('Map failed to load',1);return}
   loadCourts().then(cs=>{
     const mc=$('#mapCount');if(mc)mc.textContent=cs.length?cs.length+' court'+(cs.length===1?'':'s'):'coming soon';
     MAP=L.map('map',{renderer:L.canvas(),zoomControl:true,attributionControl:true}).setView([-33.87,151.06],11);
-    TILEL=L.tileLayer('https://{s}.basemaps.cartocdn.com/'+tileStyle()+'/{z}/{x}/{y}{r}.png',{
-      attribution:'© <a href="https://www.openstreetmap.org/copyright">OSM</a> © <a href="https://carto.com/attributions">CARTO</a>',
-      subdomains:'abcd',maxZoom:19
+    TILEL=L.tileLayer(TILE_URL,{
+      attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      maxZoom:19
     }).addTo(MAP);
+    paintTiles();
     for(const c of cs){
       const n=hereN(c)+((ACT.runs[c.key]||0)>0?1:0);
       let m;
@@ -3658,15 +3695,17 @@ $('#swCustom').oninput=e=>applyAccent(e.target.value);
 
 /* ---------- vibes: user-selectable full themes ---------- */
 const VIBES={
+  lotg:{label:'Love of the Game',desc:'The house colours — black & white',accent:'#FFFFFD',on:'#0D1113',tag:'LOTG'},
   club:{label:'Club',desc:'Clean & premium — daylight',accent:'#0DBFA0',on:'#FFFFFF',tag:'CLUB'},
   retro:{label:'Retro',desc:'90s purple + neon',accent:'#2DE0C0',on:'#0B0B20',tag:'RETRO'},
   concrete:{label:'Concrete',desc:'Street grit + spray',accent:'#FFE01A',on:'#161616',tag:'STREET'}
 };
-const curTheme=()=>VIBES[localStorage.getItem('oc_theme')]?localStorage.getItem('oc_theme'):'club';
-// one-time migration to design v2: everyone lands on Club once, can switch back in 🎨
-if(!localStorage.getItem('oc_theme_v2')){localStorage.setItem('oc_theme','club');localStorage.removeItem('oc_accent');localStorage.setItem('oc_theme_v2','1');}
+const curTheme=()=>VIBES[localStorage.getItem('oc_theme')]?localStorage.getItem('oc_theme'):'lotg';
+// one-time migration to the house colours: everyone lands on Love of the Game
+// once, and can still switch to any other vibe in 🎨
+if(!localStorage.getItem('oc_theme_v3')){localStorage.setItem('oc_theme','lotg');localStorage.removeItem('oc_accent');localStorage.setItem('oc_theme_v3','1');}
 function applyTheme(name,save=true){
-  if(!VIBES[name])name='club';
+  if(!VIBES[name])name='lotg';
   const v=VIBES[name];
   document.documentElement.setAttribute('data-theme',name);
   document.documentElement.style.setProperty('--volt',v.accent);
@@ -3674,7 +3713,7 @@ function applyTheme(name,save=true){
   if(save){localStorage.setItem('oc_theme',name);localStorage.removeItem('oc_accent');}
   const m=document.querySelector('meta[name=theme-color]');
   if(m)m.setAttribute('content',getComputedStyle(document.documentElement).getPropertyValue('--bg').trim()||'#161616');
-  if(TILEL)TILEL.setUrl('https://{s}.basemaps.cartocdn.com/'+tileStyle()+'/{z}/{x}/{y}{r}.png');
+  paintTiles();
   if($('#vibeGrid'))renderVibe();
   if($('#swGrid'))paintSw(v.accent);
 }
