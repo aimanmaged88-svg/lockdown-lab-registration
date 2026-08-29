@@ -831,5 +831,48 @@ model StudioSession {
   notes        String?
   createdAt    DateTime  @default(now())
 
+  // The member-facing half: when it is listed, players can see it on
+  // /member/live and put their hand up for a seat.
+  listed   Boolean @default(false)
+  timeText String? // "Thursday 7:00pm" — written how he says it, not parsed
+  blurb    String? // what they'll actually walk away with
+  ageBand  String? // "All ages" | "13-15" | "16-18" ...
+  joinUrl  String? // Zoom link, only ever shown to a seat that is paid
+
+  seats SeatBooking[]
+
   @@index([orgId, status])
+  @@index([orgId, listed])
+}
+
+// A hand up for a seat. Held the moment they ask, paid once he sees the money
+// land. Nothing here touches a card — the payment happens the way he chooses
+// (PayID, transfer, a payment link) and he ticks it off.
+model SeatBooking {
+  id        String        @id @default(cuid())
+  orgId     String
+  sessionId String
+  session   StudioSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  memberId  String?
+  name      String
+  contact   String // phone, email or IG handle — whatever they gave
+  note      String?
+  status    String        @default("held") // held | paid | cancelled
+  createdAt DateTime      @default(now())
+  paidAt    DateTime?
+
+  @@index([orgId, status])
+  @@index([sessionId, status])
+}
+
+// Small org-level key/value store. Right now it holds the "how to pay me" line
+// that shows on a confirmed seat, so it can be changed without a deploy.
+model Setting {
+  id        String   @id @default(cuid())
+  orgId     String
+  key       String
+  value     String
+  updatedAt DateTime @default(now()) @updatedAt
+
+  @@unique([orgId, key])
 }

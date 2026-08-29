@@ -3,17 +3,24 @@ import { useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { Card, Section, Badge, Empty } from "@/components/ui";
 import { sessionAdd, sessionSetSeats, sessionSetStatus, sessionDelete } from "@/lib/studio-actions";
-import { Calculator, Plus, Minus, Check, Trash2, Undo2 } from "lucide-react";
+import { Calculator, Plus, Minus, Check, Trash2, Undo2, ChevronDown } from "lucide-react";
+import { PayLineCard, SeatPanel, type Seat, type Listing } from "./live-desk";
 
-type S = { id: string; title: string; topic: string | null; date: string | null; pricePerSeat: number; capacity: number; seatsSold: number; status: string };
+type S = {
+  id: string; title: string; topic: string | null; date: string | null;
+  pricePerSeat: number; capacity: number; seatsSold: number; status: string;
+  listed: boolean; timeText: string | null; blurb: string | null; ageBand: string | null; joinUrl: string | null;
+  seats: Seat[];
+};
 const money = (n: number) => "$" + Math.round(n).toLocaleString("en-AU");
 const TOPICS = ["Mindset", "Defence", "Nutrition", "Basketball IQ", "Other"];
 
-export function SessionsClient({ sessions }: { sessions: S[] }) {
+export function SessionsClient({ sessions, payLine }: { sessions: S[]; payLine: string }) {
   return (
     <div className="space-y-8">
-      <MoneyCalc />
       <Tracker sessions={sessions} />
+      <PayLineCard value={payLine} />
+      <MoneyCalc />
     </div>
   );
 }
@@ -156,12 +163,21 @@ function Tracker({ sessions }: { sessions: S[] }) {
 function Row({ s, act, pending }: { s: S; act: (fn: () => Promise<void>) => void; pending: boolean }) {
   const rev = s.seatsSold * s.pricePerSeat;
   const full = s.seatsSold >= s.capacity;
+  const [openSeats, setOpenSeats] = useState(false);
+  const waiting = s.seats.filter((b) => b.status === "held").length;
+  const listing: Listing = {
+    id: s.id, listed: s.listed, timeText: s.timeText, blurb: s.blurb,
+    ageBand: s.ageBand, joinUrl: s.joinUrl,
+  };
   return (
-    <Card className="flex flex-wrap items-center gap-3">
+    <Card>
+     <div className="flex flex-wrap items-center gap-3">
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-2 flex-wrap">
           <span className="font-medium text-sm truncate">{s.title}</span>
           {s.topic && <Badge>{s.topic}</Badge>}
+          {s.listed && <Badge tone="good">live</Badge>}
+          {waiting > 0 && <Badge tone="warn">{waiting} waiting on money</Badge>}
           {s.status === "done" && <Badge tone="accent">done</Badge>}
         </div>
         <div className="text-[11px] text-grey mt-0.5">
@@ -200,6 +216,16 @@ function Row({ s, act, pending }: { s: S; act: (fn: () => Promise<void>) => void
         )}
         <button aria-label="delete" className="btn btn-ghost px-2" disabled={pending} onClick={() => act(() => sessionDelete(s.id))}><Trash2 size={14} /></button>
       </div>
+     </div>
+
+      <button
+        className="btn btn-ghost text-xs mt-2" aria-expanded={openSeats}
+        onClick={() => setOpenSeats((v) => !v)}
+      >
+        <ChevronDown size={13} className={openSeats ? "rotate-180 transition-transform" : "transition-transform"} />
+        {openSeats ? "Hide seats & listing" : `Seats & listing${s.seats.length ? ` (${s.seats.length})` : ""}`}
+      </button>
+      {openSeats && <SeatPanel listing={listing} seats={s.seats} />}
     </Card>
   );
 }

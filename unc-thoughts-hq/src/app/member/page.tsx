@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { HomePersonal } from "@/components/member/home-personal";
-import { MessageCircleQuestion, BookOpen, Lightbulb } from "lucide-react";
+import { MessageCircleQuestion, BookOpen, Lightbulb, Radio } from "lucide-react";
 
 // Static: the home does no database work before painting. The personal tail
 // (your context + reflection count) loads client-side via HomePersonal.
@@ -34,6 +34,18 @@ export default function MemberHome() {
             <span className="block text-[11px] text-grey">Real question → real answer from the man. Anonymous if you want.</span>
           </span>
         </span>
+      </Link>
+
+      {/* UNC LIVE — the paid sessions */}
+      <Link href="/member/live" className="card p-4 flex items-center justify-between hover:bg-ink-soft transition-colors">
+        <span className="flex items-center gap-3">
+          <Radio size={18} className="text-paper-dim" />
+          <span>
+            <span className="block font-medium text-sm">UNC LIVE</span>
+            <span className="block text-[11px] text-grey">Small online sessions with UNC — mindset, defence, nutrition, basketball IQ</span>
+          </span>
+        </span>
+        <span className="chip">Book a seat</span>
       </Link>
 
       {/* The Library + Today's thoughts */}
