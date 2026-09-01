@@ -746,7 +746,7 @@ svg.leaflet-image-layer.leaflet-interactive path {
 .tn-eyebrow{font-family:var(--cond);font-size:12.5px;font-weight:600;letter-spacing:2.6px;text-transform:uppercase;color:var(--dim);margin-top:18px}
 .tn-h1{font-weight:800;font-size:40px;letter-spacing:-.03em;line-height:1;margin:2px 0 4px;color:var(--text)}
 .tn-h1 i{font-style:normal;color:var(--volt)}
-.stories{display:flex;gap:15px;overflow-x:auto;scrollbar-width:none;margin:14px -18px 4px;padding:4px 18px 6px}
+.stories{display:flex;gap:15px;overflow-x:auto;scrollbar-width:none;margin:14px -16px 4px;padding:4px 16px 6px}
 .stories::-webkit-scrollbar{display:none}
 .story{display:flex;flex-direction:column;align-items:center;gap:6px;flex:0 0 auto;position:relative;cursor:pointer;background:none;border:none;color:var(--text);padding:0}
 .sring{display:block;width:60px;height:60px;border-radius:50%;padding:3px;background:var(--line)}
@@ -855,17 +855,30 @@ header{
   background:rgba(10,12,15,.85); border-bottom:1px solid var(--line); margin:0 -16px; padding-left:18px; padding-right:18px;
   padding-top:max(12px,env(safe-area-inset-top));
 }
-.logo{display:flex;align-items:center;gap:9px;cursor:pointer;user-select:none}
+.logo{display:flex;align-items:center;gap:9px;cursor:pointer;user-select:none;flex:0 0 auto}
 .logo svg{width:34px;height:34px;flex:none}
-.logo .lw{font-family:var(--disp);font-weight:400;font-size:17px;line-height:.98;text-transform:uppercase;letter-spacing:1px}
-.hdr-r{display:flex;gap:8px;align-items:center;min-width:0}
+.logo .lw{font-family:var(--disp);font-weight:400;font-size:17px;line-height:.98;text-transform:uppercase;letter-spacing:1px;white-space:nowrap}
+.hdr-r{display:flex;gap:8px;align-items:center;min-width:0;flex:0 1 auto;justify-content:flex-end}
 .iconbtn{flex:none;background:var(--card);border:1px solid var(--line);border-radius:50%;width:36px;height:36px;font-size:16px;cursor:pointer;display:grid;place-items:center}
+/* the handle chip is the only flexible thing in the header — it shrinks (ellipsis) before anything can push off-screen */
 .me{
   display:flex; align-items:center; gap:8px; background:var(--card); border:1px solid var(--line);
   border-radius:99px; padding:6px 12px 6px 7px; cursor:pointer; font-size:13px; color:var(--muted); max-width:42vw;
+  min-width:0; flex:0 1 auto;
 }
 .me .av{width:26px;height:26px;border-radius:50%;background:var(--volt);color:var(--onaccent);font-weight:800;font-size:12px;display:grid;place-items:center;flex:none}
-.me b{color:var(--text);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.me b{color:var(--text);font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+/* verified ✓ rides on the avatar itself, so the chip still says "certified" when the handle is hidden */
+.me .av{position:relative}
+.me.vf .av::after{content:"✓";position:absolute;right:-3px;bottom:-3px;width:14px;height:14px;border-radius:50%;background:var(--text);color:var(--bg);font-size:9px;font-weight:900;display:grid;place-items:center;border:2px solid var(--bg)}
+/* phones: the wordmark + 2 icon buttons leave no honest room for a handle — the chip becomes an avatar-only circle
+   (same 36px as the icon buttons). The handle lives on the You tab. Desktop/tablet keeps the full chip. */
+@media(max-width:600px){
+  .me{padding:0;gap:0;max-width:none;border:none;background:none}
+  .me b{display:none}
+  .me .av{width:36px;height:36px;font-size:15px}
+  .me.vf .av::after{right:-2px;bottom:-2px;width:16px;height:16px;font-size:10px;background:var(--bg);color:var(--volt);border:2px solid var(--volt)}
+}
 
 /* ---------- hero ---------- */
 .hero{padding:24px 2px 4px;position:relative}
@@ -1009,7 +1022,7 @@ header{
 
 /* ---------- tab bar ---------- */
 .tabbar{
-  position:fixed;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom));z-index:40;
+  position:fixed;left:0;right:0;margin-inline:auto;bottom:calc(10px + env(safe-area-inset-bottom));z-index:40;
   display:flex;gap:2px;background:rgba(14,17,22,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
   border:1px solid var(--line);border-radius:20px;padding:7px;width:min(94vw,420px);
 }
@@ -1997,8 +2010,8 @@ let OCP=null;
 try{OCP=JSON.parse(localStorage.getItem('oc_profile')||'null')}catch(e){}
 let afterProfile=null,idMode='ig';
 function paintMe(){
-  if(OCP){$('#meAv').textContent=(OCP.name[0]||'?').toUpperCase();$('#meName').textContent=(OCP.ig?('@'+OCP.ig):OCP.name)+(OCP.vf?' ✓':'');}
-  else{$('#meAv').textContent='?';$('#meName').textContent='Who are you?';}
+  if(OCP){$('#meAv').textContent=(OCP.name[0]||'?').toUpperCase();$('#meName').textContent=(OCP.ig?('@'+OCP.ig):OCP.name)+(OCP.vf?' ✓':'');$('#meChip').classList.toggle('vf',!!OCP.vf);}
+  else{$('#meAv').textContent='?';$('#meName').textContent='Who are you?';$('#meChip').classList.remove('vf');}
 }
 /* ===== NBA player cards ===== */
 const RM=()=>matchMedia('(prefers-reduced-motion:reduce)').matches;
