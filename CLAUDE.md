@@ -1033,3 +1033,30 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   Verified E2E via scratchpad/deskcoach-light.mjs + coach-light2.mjs (temp
   coach minted → dashboard shot → deleted). Masters: admin-base.html,
   coach-base.html.
+
+## Hair & Beauty Kingdom — storefront concept (2026-09-01, Aiman asked)
+
+- **Context:** Aiman is taking over running hairandbeautykingdom.com.au for its
+  owner (wholesale hair/barber/beauty supplies, Yagoona + Blacktown, 1300 061
+  808). Live site = Shopify (`hair-and-beauty-kingdom.myshopify.com`, PageFly
+  pages, BSS B2B Lock app — its free trial has EXPIRED and shows a red admin
+  notice; "Login for trade prices" locks depend on it). Public feeds used for
+  real data: `/products.json`, `/collections/<handle>/products.json`.
+- **Shipped: `hairbeautykingdom/index.html`** (self-contained concept, ~110KB
+  + 47 product photos in `img/p/` pulled from their Shopify CDN at 720px,
+  their real logo `img/logo.png`, Inter var font copied to `fonts/`). Hash
+  router: home / `#/c/<cat>` (brand + price filters, sort) / `#/p/<i>` /
+  brands / deals / checkout / done / account. Working client-side cart
+  (localStorage `hbk_cart`, free-delivery bar at $150, bulky/skid freight
+  rules), live search (`/` shortcut, ↑↓ Enter), trade login modal → Gold tier
+  = 10% off everything (`hbk_trade`), trade dashboard (reorder, orders),
+  checkout (deliver / collect Yagoona / collect Blacktown, GST line, demo
+  "Place order"), mobile bottom tab bar + hamburger drawer. Demo hooks for
+  screenshots: `?trade=1`, `?cart=1`, `?reset=1`.
+- Design: white/pink (#D4127A from their logo) trade-first look, product
+  photos on soft grey tiles via mix-blend multiply. Scratchpad masters:
+  hbk-template.html + build.py (injects curated.json) + shoot.mjs (Playwright
+  desktop 1440 + mobile 390, functional checks) + board.html (concept board).
+  Screenshots committed under `hairbeautykingdom/concept/`.
+- NOT wired to Shopify — next step if he wants it live is a Shopify theme
+  port (or headless via Storefront API) using this as the design spec.

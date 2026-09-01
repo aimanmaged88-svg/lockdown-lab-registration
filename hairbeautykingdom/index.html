@@ -1,0 +1,968 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Hair & Beauty Kingdom — Wholesale hair, barber & beauty supplies, Sydney</title>
+<meta name="description" content="Australia's trade counter for barbers, salons and beauty pros. 12,000+ items, 20+ pro brands, two Sydney warehouses (Yagoona & Blacktown), free delivery over $150." />
+<meta name="theme-color" content="#D4127A" />
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml" />
+<style>
+/* ============================================================
+   HAIR & BEAUTY KINGDOM — storefront concept (v1)
+   Real catalogue data (names, prices, photos) pulled from the
+   live Shopify store. Fully client-side: cart, search, trade
+   login, category pages, product pages, checkout — all work
+   in-browser so the concept can be clicked through end to end.
+   ============================================================ */
+@font-face{font-family:'HBK';src:url(fonts/inter-var.woff2) format('woff2');font-weight:100 900;font-display:swap}
+:root{
+  --pink:#D4127A; --pink-deep:#A80D5F; --pink-soft:#FCE7F1; --pink-ink:#3A0A22;
+  --ink:#0E0D10; --ink-2:#2A2830; --mute:#6D6A75; --faint:#A9A6B2;
+  --paper:#FFFFFF; --mist:#F5F4F6; --mist-2:#ECEBEF; --line:#E4E2E8; --line-2:#D5D2DB;
+  --good:#0F8A5F; --gold:#C89B3C;
+  --r:14px; --r-lg:22px; --r-xl:30px;
+  --maxw:1240px;
+  --font:'HBK',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;
+  --serif:'Iowan Old Style','Palatino Linotype',Palatino,Georgia,'Times New Roman',serif;
+  --ease:cubic-bezier(.2,.7,.2,1); --spring:cubic-bezier(.34,1.4,.4,1);
+  --shadow:0 1px 2px rgba(14,13,16,.06),0 8px 24px -12px rgba(14,13,16,.18);
+  --shadow-lg:0 2px 4px rgba(14,13,16,.05),0 30px 60px -24px rgba(14,13,16,.3);
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font);font-size:15px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0}
+input,select,textarea{font:inherit;color:inherit}
+h1,h2,h3,h4{margin:0;letter-spacing:-.02em;line-height:1.08}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+.hidden{display:none!important}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.em{font-family:var(--serif);font-style:italic;font-weight:400;letter-spacing:0}
+.pink{color:var(--pink)}
+
+/* ---------- announcement + header ---------- */
+.ann{background:var(--ink);color:#fff;font-size:12.5px;font-weight:500;letter-spacing:.02em;text-align:center;padding:9px 16px}
+.ann b{color:#FF7DBE;font-weight:700}
+.ann span+span::before{content:"·";margin:0 12px;color:rgba(255,255,255,.35)}
+@media(max-width:700px){.ann span:nth-child(n+2){display:none}}
+header.hd{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.86);backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid var(--line)}
+.hd-top{display:flex;align-items:center;gap:18px;height:72px}
+.logo{display:flex;align-items:center;gap:12px;flex:0 0 auto}
+.logo .mk{width:44px;height:44px;border-radius:13px;background:var(--pink) url(img/logo.png) center/cover no-repeat;box-shadow:0 6px 16px -6px rgba(212,18,122,.6)}
+.logo .wm{display:flex;flex-direction:column;line-height:1}
+.logo .wm b{font-size:15px;font-weight:800;letter-spacing:-.02em}
+.logo .wm small{font-size:10.5px;font-weight:600;letter-spacing:.14em;color:var(--pink);margin-top:3px}
+.search{flex:1;position:relative;max-width:560px}
+.search input{width:100%;height:46px;border-radius:999px;border:1px solid var(--line-2);background:var(--mist);padding:0 48px 0 46px;font-size:14.5px;outline:none;transition:.2s var(--ease)}
+.search input:focus{background:#fff;border-color:var(--pink);box-shadow:0 0 0 4px rgba(212,18,122,.12)}
+.search .ic{position:absolute;left:17px;top:14px;width:18px;height:18px;color:var(--mute);pointer-events:none}
+.search .kbd{position:absolute;right:12px;top:12px;font-size:11px;font-weight:600;color:var(--faint);border:1px solid var(--line-2);border-radius:6px;padding:2px 6px;background:#fff}
+.sres{position:absolute;top:54px;left:0;right:0;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-lg);padding:8px;display:none;max-height:70vh;overflow:auto;z-index:50}
+.sres.on{display:block}
+.sres .lbl{font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--faint);padding:8px 12px 4px}
+.srow{display:flex;align-items:center;gap:12px;padding:8px 10px;border-radius:12px;width:100%;text-align:left}
+.srow:hover,.srow.sel{background:var(--mist)}
+.srow img{width:44px;height:44px;border-radius:10px;object-fit:contain;background:var(--mist);mix-blend-mode:multiply}
+.srow .t{flex:1;min-width:0}
+.srow .t b{display:block;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.srow .t span{font-size:12px;color:var(--mute)}
+.srow .p{font-weight:700;font-size:14px}
+.hd-acts{display:flex;align-items:center;gap:8px;margin-left:auto}
+.ibtn{position:relative;display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 14px;border-radius:999px;font-weight:600;font-size:14px;transition:.18s var(--ease)}
+.ibtn:hover{background:var(--mist)}
+.ibtn svg{width:20px;height:20px}
+.ibtn.pk{background:var(--ink);color:#fff}
+.ibtn.pk:hover{background:var(--ink-2)}
+.ibtn .cnt{position:absolute;top:4px;right:6px;min-width:19px;height:19px;border-radius:10px;background:var(--pink);color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;padding:0 5px;transform:scale(0);transition:.25s var(--spring)}
+.ibtn .cnt.on{transform:scale(1)}
+.ibtn .cnt.pop{animation:pop .4s var(--spring)}
+@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.35)}100%{transform:scale(1)}}
+.hd-nav{display:flex;align-items:center;gap:4px;height:48px;border-top:1px solid var(--line);margin:0 -24px;padding:0 24px;overflow-x:auto;scrollbar-width:none}
+.hd-nav::-webkit-scrollbar{display:none}
+.hd-nav a{font-size:14px;font-weight:600;padding:8px 14px;border-radius:999px;white-space:nowrap;color:var(--ink-2);transition:.15s}
+.hd-nav a:hover{background:var(--mist);color:var(--ink)}
+.hd-nav a.on{background:var(--pink-soft);color:var(--pink)}
+.hd-nav a.deal{color:var(--pink)}
+.hd-nav .sp{flex:1}
+.hd-nav .tel{font-size:13px;color:var(--mute);font-weight:500}
+.hd-nav .tel b{color:var(--ink)}
+.burger{display:none}
+@media(max-width:900px){
+  .hd-top{height:auto;min-height:64px;gap:10px;flex-wrap:wrap;padding:10px 0 12px}
+  .logo .wm{display:none}
+  .hd-acts{margin-left:auto}
+  .search{max-width:none;flex-basis:100%;order:9}
+  .search input{height:44px}
+  .search .kbd{display:none}
+  .sres{top:52px}
+  .ibtn .lb{display:none}
+  .ibtn{padding:0 11px}
+  .hd-nav{display:none}
+  .burger{display:inline-flex}
+}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;height:50px;padding:0 24px;border-radius:999px;font-weight:700;font-size:15px;letter-spacing:-.005em;transition:.2s var(--ease);white-space:nowrap}
+.btn:active{transform:scale(.97)}
+.btn.p{background:var(--pink);color:#fff;box-shadow:0 10px 24px -10px rgba(212,18,122,.7)}
+.btn.p:hover{background:var(--pink-deep)}
+.btn.k{background:var(--ink);color:#fff}
+.btn.k:hover{background:var(--ink-2)}
+.btn.g{background:var(--mist);color:var(--ink)}
+.btn.g:hover{background:var(--mist-2)}
+.btn.o{border:1.5px solid var(--line-2);background:#fff}
+.btn.o:hover{border-color:var(--ink)}
+.btn.w{background:#fff;color:var(--ink)}
+.btn.sm{height:40px;padding:0 16px;font-size:13.5px}
+.btn.full{width:100%}
+.btn svg{width:18px;height:18px}
+.btn[disabled]{opacity:.5;pointer-events:none}
+
+/* ---------- hero ---------- */
+.hero{padding:44px 0 26px}
+.hero-g{display:grid;grid-template-columns:1.05fr .95fr;gap:36px;align-items:center}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--pink);background:var(--pink-soft);padding:7px 12px 7px 9px;border-radius:999px}
+.eyebrow i{width:7px;height:7px;border-radius:50%;background:var(--pink);box-shadow:0 0 0 3px rgba(212,18,122,.2)}
+.hero h1{font-size:clamp(40px,5.6vw,72px);font-weight:800;letter-spacing:-.04em;margin:18px 0 16px;line-height:.98}
+.hero h1 .em{font-weight:400;color:var(--pink);letter-spacing:-.01em}
+.hero p{font-size:17px;color:var(--mute);max-width:520px;margin:0 0 26px;line-height:1.55}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+.hero-stats{display:flex;gap:28px;margin-top:34px;padding-top:22px;border-top:1px solid var(--line)}
+.hero-stats div b{display:block;font-size:24px;font-weight:800;letter-spacing:-.03em}
+.hero-stats div span{font-size:12.5px;color:var(--mute);font-weight:500}
+.collage{position:relative;height:520px}
+.tile{position:absolute;background:var(--mist);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--shadow);transition:.5s var(--ease);animation:rise .9s var(--ease) both}
+.tile img{width:100%;height:100%;object-fit:contain;mix-blend-mode:multiply;padding:10%}
+.tile .cap{position:absolute;left:14px;bottom:12px;background:#fff;border-radius:999px;padding:6px 11px;font-size:12px;font-weight:700;box-shadow:var(--shadow)}
+.tile .cap s{color:var(--faint);font-weight:500;margin-left:5px}
+.tile:hover{transform:translateY(-6px) rotate(0)!important}
+.t1{left:0;top:30px;width:52%;height:62%;animation-delay:.05s}
+.t2{right:0;top:0;width:42%;height:38%;animation-delay:.15s;background:var(--pink-soft)}
+.t3{right:0;bottom:30px;width:42%;height:52%;animation-delay:.25s}
+.t4{left:8%;bottom:0;width:36%;height:28%;animation-delay:.35s;background:#EEF4F1}
+.badge-f{position:absolute;left:40%;top:-14px;z-index:2;background:var(--ink);color:#fff;border-radius:16px;padding:12px 16px;font-size:12.5px;font-weight:600;line-height:1.3;box-shadow:var(--shadow-lg);animation:rise 1s .5s var(--ease) both}
+.badge-f b{display:block;font-size:15px;color:#FF7DBE}
+@keyframes rise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
+@media(max-width:900px){
+  .hero{padding:22px 0 10px}
+  .hero-g{grid-template-columns:1fr;gap:22px}
+  .hero h1{font-size:clamp(36px,11vw,46px);margin:14px 0 12px}
+  .hero p{font-size:15px;margin-bottom:18px}
+  .hero-cta .btn{height:46px;padding:0 20px;font-size:14px}
+  .eyebrow{font-size:10.5px;padding:6px 10px 6px 8px}
+  .collage{height:340px}
+  .hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:14px 18px;margin-top:22px;padding-top:16px}
+  .hero-stats div b{font-size:20px}
+  .badge-f{left:34%;top:-10px;padding:10px 13px;font-size:12px}
+}
+
+/* ---------- trust strip ---------- */
+.trust{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:20px 0 0}
+.trust>div{display:flex;align-items:center;gap:12px;background:var(--mist);border-radius:16px;padding:14px 16px;font-size:13.5px;font-weight:600;line-height:1.3}
+.trust>div>div{min-width:0}
+.trust>div span{color:var(--mute);font-weight:500;display:block;font-size:12px;margin-top:3px}
+.trust svg{width:22px;height:22px;color:var(--pink);flex:0 0 auto}
+@media(max-width:900px){.trust{grid-template-columns:repeat(2,1fr)}}
+
+/* ---------- sections ---------- */
+section.sec{padding:56px 0 8px}
+.sec-h{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:22px}
+.sec-h h2{font-size:clamp(26px,3vw,36px);font-weight:800;letter-spacing:-.035em}
+.sec-h p{margin:6px 0 0;color:var(--mute);font-size:15px}
+.sec-h a.more{font-weight:700;font-size:14px;color:var(--pink);white-space:nowrap;display:inline-flex;align-items:center;gap:6px}
+.sec-h a.more:hover{gap:10px}
+.sec-h a.more svg,.deal .go svg,.cat .ct i svg{width:16px;height:16px}
+
+/* categories */
+.cats{display:grid;grid-template-columns:1.4fr 1fr 1fr;grid-template-rows:230px 230px;gap:14px}
+.cat{position:relative;border-radius:var(--r-lg);overflow:hidden;background:var(--mist);display:flex;align-items:flex-end;padding:22px;transition:.35s var(--ease);isolation:isolate}
+.cat:first-child{grid-row:span 2}
+.cat img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;padding:12% 8% 22%;mix-blend-mode:multiply;transition:.6s var(--ease);z-index:-1}
+.cat:first-child img{padding:6% 12% 20%}
+.cat:hover img{transform:scale(1.06)}
+.cat:hover{box-shadow:var(--shadow-lg)}
+.cat .ct{background:#fff;border-radius:16px;padding:12px 14px;box-shadow:var(--shadow);width:100%;display:flex;align-items:center;justify-content:space-between}
+.cat .ct b{font-size:17px;font-weight:800;letter-spacing:-.02em;display:block}
+.cat .ct span{font-size:12.5px;color:var(--mute);font-weight:500}
+.cat .ct i{width:34px;height:34px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-style:normal;flex:0 0 auto}
+.cat.c-barber{background:#F1EEF3}.cat.c-hair{background:#FCE7F1}.cat.c-beauty{background:#F3EFE6}.cat.c-essentials{background:#EAF2EE}.cat.c-furniture{background:#EDEDF2}
+@media(max-width:900px){.cats{grid-template-columns:1fr 1fr;grid-template-rows:200px 180px 180px}.cat:first-child{grid-column:span 2;grid-row:span 1}}
+
+/* product grid */
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+.pill{height:38px;padding:0 15px;border-radius:999px;background:var(--mist);font-weight:600;font-size:13.5px;color:var(--ink-2);transition:.15s}
+.pill:hover{background:var(--mist-2)}
+.pill.on{background:var(--ink);color:#fff}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+@media(max-width:1000px){.grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:700px){.grid{grid-template-columns:repeat(2,1fr);gap:10px}}
+.card{position:relative;background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:10px;display:flex;flex-direction:column;transition:.3s var(--ease);animation:rise .6s var(--ease) both}
+.card:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg);border-color:transparent}
+.card .ph{position:relative;background:var(--mist);border-radius:16px;aspect-ratio:1;display:grid;place-items:center;overflow:hidden;cursor:pointer}
+.card .ph img{width:82%;height:82%;object-fit:contain;mix-blend-mode:multiply;transition:.5s var(--ease)}
+.card:hover .ph img{transform:scale(1.06)}
+.card .tag{position:absolute;left:10px;top:10px;background:var(--pink);color:#fff;font-size:11px;font-weight:800;letter-spacing:.04em;border-radius:8px;padding:4px 8px}
+.card .tag.k{background:var(--ink)}
+.card .tag.g{background:var(--gold)}
+.card .sv{position:absolute;right:10px;top:10px;width:34px;height:34px;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:var(--shadow);transition:.2s var(--spring)}
+.card .sv:hover{transform:scale(1.1)}
+.card .sv svg{width:16px;height:16px}
+.card .sv.on{color:var(--pink)}
+.card .sv.on svg{fill:currentColor}
+.card .bd{padding:12px 6px 6px;flex:1;display:flex;flex-direction:column}
+.card .br{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--pink)}
+.card .nm{font-size:14.5px;font-weight:600;line-height:1.3;margin:4px 0 10px;cursor:pointer;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.card .pr{margin-top:auto;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.card .pr b{font-size:18px;font-weight:800;letter-spacing:-.02em}
+.card .pr s{color:var(--faint);font-size:13px}
+.card .pr .sav{font-size:11.5px;font-weight:700;color:var(--good);background:#E6F4EE;border-radius:6px;padding:2px 6px}
+.card .pr .tr{font-size:10.5px;font-weight:800;color:var(--pink);background:var(--pink-soft);border-radius:6px;padding:2px 6px;letter-spacing:.06em}
+.card .add{margin-top:10px;height:42px;border-radius:12px;background:var(--mist);font-weight:700;font-size:13.5px;display:flex;align-items:center;justify-content:center;gap:8px;transition:.2s var(--ease)}
+.card .add:hover{background:var(--ink);color:#fff}
+.card .add.done{background:var(--good);color:#fff}
+.card .add svg{width:16px;height:16px}
+@media(max-width:700px){.card .add{height:38px;font-size:13px}.card .pr b{font-size:16px}}
+
+/* trade banner */
+.trade{margin-top:56px;border-radius:var(--r-xl);background:var(--ink);color:#fff;padding:44px;display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:center;position:relative;overflow:hidden}
+.trade::before{content:"";position:absolute;right:-120px;top:-160px;width:520px;height:520px;border-radius:50%;background:radial-gradient(circle,rgba(212,18,122,.55),transparent 62%);pointer-events:none}
+.trade h2{font-size:clamp(28px,3.4vw,44px);font-weight:800;letter-spacing:-.035em;line-height:1.02}
+.trade h2 .em{color:#FF7DBE;font-weight:400}
+.trade p{color:rgba(255,255,255,.7);font-size:16px;max-width:520px;margin:14px 0 22px}
+.trade ul{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:1fr 1fr;gap:10px 18px}
+.trade li{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:rgba(255,255,255,.85);font-weight:500}
+.trade li i{width:20px;height:20px;border-radius:50%;background:var(--pink);flex:0 0 auto;display:grid;place-items:center;font-style:normal;font-size:12px;font-weight:800}
+.trade .form{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:22px;padding:22px;backdrop-filter:blur(8px)}
+.trade .form h3{font-size:18px;font-weight:700;margin-bottom:4px}
+.trade .form p{font-size:13px;margin:0 0 14px;color:rgba(255,255,255,.55)}
+.trade .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}
+.trade input,.trade select{width:100%;height:46px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.08);color:#fff;padding:0 14px;outline:none}
+.trade input::placeholder{color:rgba(255,255,255,.4)}
+.trade input:focus{border-color:var(--pink);background:rgba(255,255,255,.12)}
+.trade select option{color:#000}
+@media(max-width:900px){.trade{grid-template-columns:1fr;padding:28px 22px}.trade ul{grid-template-columns:1fr}}
+
+/* brands */
+.brands{margin-top:56px}
+.marq{overflow:hidden;mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);-webkit-mask-image:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
+.marq .tr{display:flex;gap:14px;width:max-content;animation:marq 48s linear infinite}
+.marq:hover .tr{animation-play-state:paused}
+@keyframes marq{to{transform:translateX(-50%)}}
+.bl{height:64px;padding:0 26px;border-radius:16px;background:var(--mist);display:flex;align-items:center;font-weight:800;font-size:17px;letter-spacing:-.02em;color:var(--ink-2);white-space:nowrap;transition:.2s}
+.bl:hover{background:var(--ink);color:#fff}
+.bl.serif{font-family:var(--serif);font-weight:400;font-size:20px}
+.bl.cond{letter-spacing:.14em;text-transform:uppercase;font-size:14px}
+
+/* deals strip */
+.deals{margin-top:56px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.deal{border-radius:var(--r-lg);padding:24px;min-height:200px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;transition:.3s var(--ease)}
+.deal:hover{transform:translateY(-4px);box-shadow:var(--shadow-lg)}
+.deal b{font-size:22px;font-weight:800;letter-spacing:-.03em;line-height:1.05;display:block;max-width:70%}
+.deal span{font-size:13.5px;font-weight:500;opacity:.75;display:block;margin-top:8px;max-width:70%}
+.deal .go{margin-top:16px;font-weight:700;font-size:13.5px;display:inline-flex;align-items:center;gap:6px}
+.deal img{position:absolute;right:-6%;bottom:-8%;width:52%;height:auto;mix-blend-mode:multiply;transition:.5s var(--ease)}
+.deal:hover img{transform:rotate(-4deg) scale(1.06)}
+.d1{background:linear-gradient(135deg,#FCE7F1,#F9D2E4)}.d2{background:linear-gradient(135deg,#F1EEF3,#E3DFEA)}.d3{background:var(--ink);color:#fff}.d3 img{mix-blend-mode:normal;border-radius:14px;width:44%;right:4%;bottom:10%}
+@media(max-width:900px){.deals{grid-template-columns:1fr}}
+
+/* stores */
+.stores{margin-top:56px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.store{border:1px solid var(--line);border-radius:var(--r-lg);padding:22px;display:grid;grid-template-columns:1fr auto;gap:12px;transition:.25s}
+.store:hover{box-shadow:var(--shadow-lg);border-color:transparent}
+.store .lo{font-size:11.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--pink)}
+.store h3{font-size:22px;font-weight:800;letter-spacing:-.03em;margin:4px 0 8px}
+.store p{margin:0 0 4px;color:var(--mute);font-size:14px}
+.store .ok{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--good);margin-top:10px}
+.store .ok i{width:8px;height:8px;border-radius:50%;background:var(--good);box-shadow:0 0 0 3px #E6F4EE}
+.store .map{width:132px;height:132px;border-radius:16px;background:
+  radial-gradient(circle at 60% 40%,rgba(212,18,122,.25),transparent 30%),
+  repeating-linear-gradient(0deg,transparent 0 22px,rgba(14,13,16,.06) 22px 23px),
+  repeating-linear-gradient(90deg,transparent 0 22px,rgba(14,13,16,.06) 22px 23px),var(--mist);position:relative}
+.store .map::after{content:"";position:absolute;left:50%;top:40%;width:14px;height:14px;border-radius:50% 50% 50% 0;background:var(--pink);transform:translate(-50%,-50%) rotate(-45deg);box-shadow:0 4px 10px rgba(212,18,122,.5)}
+.store .acts{grid-column:span 2;display:flex;gap:8px;flex-wrap:wrap}
+@media(max-width:900px){.stores{grid-template-columns:1fr}}
+
+/* reviews */
+.revs{margin-top:56px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.rev{background:var(--mist);border-radius:var(--r-lg);padding:26px;position:relative}
+.rev .q{font-family:var(--serif);font-style:italic;font-size:21px;line-height:1.35;letter-spacing:-.01em}
+.rev .who{margin-top:16px;font-size:13.5px;font-weight:700;display:flex;align-items:center;gap:10px}
+.rev .who i{width:32px;height:32px;border-radius:50%;background:var(--pink);color:#fff;display:grid;place-items:center;font-style:normal;font-size:12px;font-weight:800}
+.rev .who span{color:var(--mute);font-weight:500}
+.stars{color:var(--gold);letter-spacing:2px;font-size:14px;margin-bottom:12px}
+@media(max-width:900px){.revs{grid-template-columns:1fr}}
+
+/* footer */
+footer{margin-top:80px;background:var(--ink);color:#fff;padding:56px 0 30px}
+.ft{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:28px}
+.ft h4{font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:14px}
+.ft a{display:block;font-size:14px;color:rgba(255,255,255,.8);padding:5px 0}
+.ft a:hover{color:#fff}
+.ft p{color:rgba(255,255,255,.6);font-size:14px;line-height:1.55;max-width:340px}
+.ft .logo .wm b,.ft .logo .wm small{color:#fff}
+.ft .logo .wm small{color:#FF7DBE}
+.ft-b{margin-top:40px;padding-top:20px;border-top:1px solid rgba(255,255,255,.1);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;font-size:12.5px;color:rgba(255,255,255,.45)}
+.ft-b span b{color:#FF7DBE}
+@media(max-width:900px){.ft{grid-template-columns:1fr 1fr}}
+
+/* ---------- category page ---------- */
+.crumbs{font-size:13px;color:var(--mute);padding:18px 0 0;display:flex;gap:8px;align-items:center}
+.crumbs a:hover{color:var(--ink)}
+.chead{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:end;padding:16px 0 22px}
+.chead h1{font-size:clamp(34px,4.4vw,56px);font-weight:800;letter-spacing:-.04em}
+.chead p{color:var(--mute);margin:8px 0 0;max-width:600px;font-size:16px}
+.chead .n{font-size:13px;color:var(--mute);font-weight:500}
+.clay{display:grid;grid-template-columns:240px 1fr;gap:26px;align-items:start}
+.filt{position:sticky;top:140px;display:flex;flex-direction:column;gap:22px}
+.filt h4{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mute);margin-bottom:10px}
+.chk{display:flex;align-items:center;gap:10px;font-size:14px;padding:6px 0;cursor:pointer;font-weight:500}
+.chk input{appearance:none;width:18px;height:18px;border-radius:6px;border:1.5px solid var(--line-2);display:grid;place-items:center;margin:0;transition:.15s}
+.chk input:checked{background:var(--pink);border-color:var(--pink)}
+.chk input:checked::after{content:"";width:5px;height:9px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.chk span{flex:1}.chk small{color:var(--faint)}
+.tools{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px}
+.tools select{height:40px;border-radius:10px;border:1px solid var(--line-2);background:#fff;padding:0 12px;font-weight:600;font-size:13.5px}
+.mfilt{display:none}
+@media(max-width:900px){.clay{grid-template-columns:1fr}.filt{display:none}.mfilt{display:inline-flex}.chead{grid-template-columns:1fr}}
+
+/* ---------- product page ---------- */
+.pp{display:grid;grid-template-columns:1.05fr .95fr;gap:40px;padding:22px 0 0;align-items:start}
+.gal .main{background:var(--mist);border-radius:var(--r-xl);aspect-ratio:1;display:grid;place-items:center;overflow:hidden;position:relative}
+.gal .main img{width:78%;height:78%;object-fit:contain;mix-blend-mode:multiply;animation:rise .5s var(--ease)}
+.gal .thumbs{display:flex;gap:10px;margin-top:12px}
+.gal .thumbs button{width:76px;height:76px;border-radius:14px;background:var(--mist);border:2px solid transparent;overflow:hidden;display:grid;place-items:center}
+.gal .thumbs button.on{border-color:var(--ink)}
+.gal .thumbs img{width:80%;height:80%;object-fit:contain;mix-blend-mode:multiply}
+.pinfo .br{font-size:12px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--pink)}
+.pinfo h1{font-size:clamp(26px,3vw,38px);font-weight:800;letter-spacing:-.035em;margin:8px 0 10px}
+.pinfo .meta{display:flex;gap:12px;align-items:center;font-size:13px;color:var(--mute);flex-wrap:wrap}
+.pinfo .meta .ok{color:var(--good);font-weight:700;display:inline-flex;align-items:center;gap:6px}
+.pinfo .meta .ok i{width:7px;height:7px;border-radius:50%;background:var(--good)}
+.pbox{margin-top:22px;border:1px solid var(--line);border-radius:var(--r-lg);padding:22px}
+.pbox .pr{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.pbox .pr b{font-size:36px;font-weight:800;letter-spacing:-.04em}
+.pbox .pr s{font-size:17px;color:var(--faint)}
+.pbox .pr .sav{font-size:13px;font-weight:700;color:var(--good);background:#E6F4EE;border-radius:8px;padding:4px 8px}
+.pbox .pr .tr{font-size:12px;font-weight:800;color:var(--pink);background:var(--pink-soft);border-radius:8px;padding:4px 8px;letter-spacing:.06em}
+.pbox .gst{font-size:12.5px;color:var(--mute);margin-top:2px}
+.pbox .tl svg{width:16px;height:16px}
+.pbox .tl{margin-top:10px;font-size:13.5px;color:var(--pink);font-weight:600;display:inline-flex;align-items:center;gap:6px}
+.qty{display:inline-flex;align-items:center;border:1.5px solid var(--line-2);border-radius:999px;height:50px}
+.qty button{width:46px;height:100%;font-size:20px;font-weight:600;color:var(--mute)}
+.qty button:hover{color:var(--ink)}
+.qty span{min-width:34px;text-align:center;font-weight:800;font-size:16px}
+.pbox .acts{display:flex;gap:10px;margin-top:18px;align-items:center}
+.pbox .acts .btn{flex:1}
+.pbox .ship{margin-top:18px;display:grid;gap:8px;font-size:13.5px}
+.pbox .ship div{display:flex;gap:10px;align-items:flex-start;color:var(--ink-2)}
+.pbox .ship svg{width:18px;height:18px;color:var(--pink);flex:0 0 auto;margin-top:1px}
+.pbox .ship b{font-weight:700}
+.ptabs{margin-top:22px;display:flex;gap:4px;border-bottom:1px solid var(--line)}
+.ptabs button{padding:12px 14px;font-weight:700;font-size:14px;color:var(--mute);border-bottom:2px solid transparent;margin-bottom:-1px}
+.ptabs button.on{color:var(--ink);border-color:var(--ink)}
+.ptab{padding:18px 4px;font-size:14.5px;color:var(--ink-2);line-height:1.6}
+.ptab table{width:100%;border-collapse:collapse;font-size:14px}
+.ptab td{padding:9px 0;border-bottom:1px solid var(--line)}
+.ptab td:first-child{color:var(--mute);width:38%}
+.bulk{margin-top:14px;background:var(--pink-soft);border-radius:14px;padding:12px 14px;font-size:13.5px;display:flex;gap:10px;align-items:center}
+.bulk b{color:var(--pink)}
+@media(max-width:900px){.pp{grid-template-columns:1fr;gap:22px}}
+
+/* ---------- cart drawer ---------- */
+.scrim{position:fixed;inset:0;background:rgba(14,13,16,.45);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);opacity:0;pointer-events:none;transition:.3s;z-index:60}
+.scrim.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:min(460px,100vw);background:#fff;z-index:70;transform:translateX(104%);transition:.42s var(--ease);display:flex;flex-direction:column;box-shadow:-20px 0 60px -30px rgba(0,0,0,.4)}
+.drawer.on{transform:none}
+.drawer .dh{display:flex;align-items:center;justify-content:space-between;padding:20px 22px;border-bottom:1px solid var(--line)}
+.drawer .dh h3{font-size:20px;font-weight:800;letter-spacing:-.03em}
+.drawer .dh span{font-size:13px;color:var(--mute);margin-left:8px;font-weight:500}
+.x{width:40px;height:40px;border-radius:50%;background:var(--mist);display:grid;place-items:center;font-size:18px}
+.x:hover{background:var(--mist-2)}
+.dbody{flex:1;overflow:auto;padding:14px 22px}
+.free{background:var(--mist);border-radius:14px;padding:12px 14px;font-size:13px;font-weight:600;margin-bottom:14px}
+.free .bar{height:6px;border-radius:3px;background:var(--line);margin-top:8px;overflow:hidden}
+.free .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--pink),#FF7DBE);border-radius:3px;transition:.5s var(--ease)}
+.free.ok{background:#E6F4EE;color:var(--good)}
+.ci{display:grid;grid-template-columns:76px 1fr auto;gap:14px;padding:12px 0;border-bottom:1px solid var(--line);align-items:center;animation:rise .35s var(--ease)}
+.ci .ph{width:76px;height:76px;border-radius:14px;background:var(--mist);display:grid;place-items:center;overflow:hidden}
+.ci .ph img{width:80%;height:80%;object-fit:contain;mix-blend-mode:multiply}
+.ci .t b{display:block;font-size:14px;font-weight:600;line-height:1.3}
+.ci .t span{font-size:12px;color:var(--mute)}
+.ci .qty{height:36px;margin-top:8px}
+.ci .qty button{width:32px;font-size:16px}
+.ci .qty span{min-width:26px;font-size:14px}
+.ci .r{text-align:right}
+.ci .r b{display:block;font-size:15px;font-weight:800}
+.ci .r button{font-size:12px;color:var(--mute);margin-top:6px;text-decoration:underline}
+.empty{text-align:center;padding:50px 20px;color:var(--mute)}
+.empty b{display:block;font-size:20px;color:var(--ink);margin-bottom:6px;letter-spacing:-.02em}
+.dfoot{padding:16px 22px 22px;border-top:1px solid var(--line);background:#fff}
+.tot{display:flex;justify-content:space-between;font-size:14px;padding:4px 0;color:var(--mute)}
+.tot.big{font-size:18px;font-weight:800;color:var(--ink);padding-top:10px;margin-top:6px;border-top:1px solid var(--line)}
+.tot .g{color:var(--good);font-weight:700}
+
+/* ---------- modal ---------- */
+.modal{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:20px;opacity:0;pointer-events:none;transition:.25s}
+.modal.on{opacity:1;pointer-events:auto}
+.modal .bx{background:#fff;border-radius:26px;width:min(440px,100%);padding:28px;box-shadow:var(--shadow-lg);transform:translateY(16px) scale(.98);transition:.35s var(--spring)}
+.modal.on .bx{transform:none}
+.modal h3{font-size:24px;font-weight:800;letter-spacing:-.03em}
+.modal p{color:var(--mute);font-size:14px;margin:6px 0 18px}
+.fld{margin-bottom:12px}
+.fld label{display:block;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--mute);margin-bottom:6px}
+.fld input,.fld select,.fld textarea{width:100%;height:48px;border-radius:12px;border:1.5px solid var(--line-2);padding:0 14px;outline:none;transition:.15s;background:#fff}
+.fld textarea{height:auto;padding:12px 14px}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--pink);box-shadow:0 0 0 4px rgba(212,18,122,.12)}
+.fld .hint{font-size:12px;color:var(--faint);margin-top:6px}
+.modal .lk{font-size:13px;color:var(--mute);text-align:center;margin-top:14px}
+.modal .lk a{color:var(--pink);font-weight:700}
+
+/* ---------- checkout ---------- */
+.co{display:grid;grid-template-columns:1.1fr .9fr;gap:30px;padding:26px 0;align-items:start}
+.co h1{font-size:34px;font-weight:800;letter-spacing:-.04em;margin-bottom:6px}
+.steps{display:flex;gap:6px;margin:14px 0 22px;font-size:13px;font-weight:600;color:var(--mute)}
+.steps span{display:flex;align-items:center;gap:8px}
+.steps span i{width:24px;height:24px;border-radius:50%;background:var(--mist);display:grid;place-items:center;font-style:normal;font-size:12px;font-weight:800}
+.steps span.on{color:var(--ink)}.steps span.on i{background:var(--pink);color:#fff}
+.steps span+span::before{content:"";width:22px;height:1px;background:var(--line-2);margin:0 4px}
+.cobox{border:1px solid var(--line);border-radius:var(--r-lg);padding:22px;margin-bottom:14px}
+.cobox h3{font-size:17px;font-weight:800;letter-spacing:-.02em;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:4px 10px}
+.cobox h3 small{font-size:12px;color:var(--mute);font-weight:500}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.opt{display:flex;gap:12px;align-items:center;border:1.5px solid var(--line-2);border-radius:14px;padding:14px;cursor:pointer;margin-bottom:8px;transition:.15s}
+.opt:hover{border-color:var(--ink)}
+.opt.on{border-color:var(--pink);background:var(--pink-soft)}
+.opt i{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--line-2);display:grid;place-items:center;flex:0 0 auto}
+.opt.on i{border-color:var(--pink)}
+.opt.on i::after{content:"";width:10px;height:10px;border-radius:50%;background:var(--pink)}
+.opt b{display:block;font-size:14.5px}
+.opt span{font-size:12.5px;color:var(--mute)}
+.opt .pr{margin-left:auto;font-weight:800;font-size:14px;white-space:nowrap}
+.opt .pr.g{color:var(--good)}
+.sum{position:sticky;top:96px;background:var(--mist);border-radius:var(--r-lg);padding:22px}
+.sum h3{font-size:17px;font-weight:800;margin-bottom:12px;letter-spacing:-.02em}
+.sum .ci{grid-template-columns:56px 1fr auto;border-color:var(--line-2)}
+.sum .ci .ph{width:56px;height:56px;background:#fff}
+.pay{display:flex;gap:8px;margin-top:12px}
+.pay span{flex:1;height:38px;border-radius:10px;background:#fff;border:1px solid var(--line-2);display:grid;place-items:center;font-size:11.5px;font-weight:800;letter-spacing:.04em;color:var(--ink-2)}
+.done{text-align:center;padding:70px 0 40px;max-width:560px;margin:0 auto}
+.done .tick{width:88px;height:88px;border-radius:50%;background:var(--good);color:#fff;display:grid;place-items:center;margin:0 auto 22px;font-size:40px;animation:pop .6s var(--spring)}
+.done h1{font-size:38px;font-weight:800;letter-spacing:-.04em}
+.done p{color:var(--mute);font-size:16px}
+.done .ord{display:inline-block;background:var(--mist);border-radius:12px;padding:10px 16px;font-weight:800;letter-spacing:.06em;margin:12px 0 22px}
+@media(max-width:900px){.co{grid-template-columns:1fr}.sum{position:static}}
+
+/* ---------- brands page ---------- */
+.bgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding-bottom:20px}
+.bgrid a{height:92px;border-radius:18px;background:var(--mist);display:grid;place-items:center;font-weight:800;font-size:18px;letter-spacing:-.02em;transition:.2s}
+.bgrid a:hover{background:var(--ink);color:#fff;transform:translateY(-3px)}
+.bgrid a.serif{font-family:var(--serif);font-weight:400;font-size:22px}
+.bgrid a.cond{letter-spacing:.14em;text-transform:uppercase;font-size:14px}
+@media(max-width:900px){.bgrid{grid-template-columns:repeat(2,1fr)}}
+
+/* ---------- account ---------- */
+.acct{display:grid;grid-template-columns:260px 1fr;gap:26px;padding:26px 0;align-items:start}
+.acct .side{background:var(--mist);border-radius:var(--r-lg);padding:18px}
+.acct .side .av{width:56px;height:56px;border-radius:16px;background:var(--pink);color:#fff;display:grid;place-items:center;font-weight:800;font-size:20px;margin-bottom:12px}
+.acct .side b{display:block;font-size:17px;letter-spacing:-.02em}
+.acct .side span{font-size:13px;color:var(--mute)}
+.acct .side .tier{display:inline-flex;align-items:center;gap:6px;background:var(--ink);color:#fff;border-radius:999px;padding:5px 10px;font-size:12px;font-weight:700;margin-top:10px}
+.acct .side .tier i{width:8px;height:8px;border-radius:50%;background:var(--gold)}
+.acct nav{margin-top:18px;display:flex;flex-direction:column;gap:2px}
+.acct nav a{padding:9px 10px;border-radius:10px;font-weight:600;font-size:14px}
+.acct nav a.on{background:#fff;box-shadow:var(--shadow)}
+.stat4{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+.stat4 div{background:var(--mist);border-radius:18px;padding:18px}
+.stat4 div b{display:block;font-size:26px;font-weight:800;letter-spacing:-.03em}
+.stat4 div span{font-size:12.5px;color:var(--mute);font-weight:500}
+.orow{display:grid;grid-template-columns:1fr auto auto;gap:14px;padding:12px 0;border-bottom:1px solid var(--line);font-size:14px;align-items:center}
+.orow b{display:block}
+.orow span{font-size:12.5px;color:var(--mute)}
+.orow .st{font-size:12px;font-weight:700;border-radius:8px;padding:4px 8px;background:#E6F4EE;color:var(--good)}
+.orow .st.w{background:#FFF4E0;color:#A86A00}
+.quick{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.quick button{display:flex;gap:12px;align-items:center;border:1px solid var(--line);border-radius:14px;padding:12px;text-align:left;transition:.15s}
+.quick button:hover{border-color:var(--ink)}
+.quick img{width:44px;height:44px;border-radius:10px;background:var(--mist);object-fit:contain;mix-blend-mode:multiply}
+.quick b{font-size:13.5px;display:block}
+.quick span{font-size:12px;color:var(--mute)}
+@media(max-width:900px){.acct{grid-template-columns:1fr}.stat4{grid-template-columns:1fr 1fr}}
+
+/* ---------- mobile nav drawer ---------- */
+.mnav{position:fixed;top:0;left:0;bottom:0;width:min(340px,88vw);background:#fff;z-index:70;transform:translateX(-104%);transition:.4s var(--ease);padding:22px;display:flex;flex-direction:column;gap:6px}
+.mnav.on{transform:none}
+.mnav a{font-size:20px;font-weight:800;letter-spacing:-.02em;padding:12px 8px;border-radius:12px}
+.mnav a:hover{background:var(--mist)}
+.mnav .sm{font-size:14px;font-weight:600;color:var(--mute);padding:8px}
+.mnav .ft{margin-top:auto;display:block;font-size:13px;color:var(--mute)}
+
+/* ---------- toast ---------- */
+.toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);background:var(--ink);color:#fff;border-radius:999px;padding:12px 18px;font-size:14px;font-weight:600;z-index:90;opacity:0;transition:.3s var(--spring);display:flex;align-items:center;gap:10px;box-shadow:var(--shadow-lg);white-space:nowrap}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+.toast i{width:22px;height:22px;border-radius:50%;background:var(--good);display:grid;place-items:center;font-style:normal;font-size:13px}
+
+/* bottom mobile bar */
+.mbar{display:none}
+@media(max-width:900px){
+  .mbar{display:grid;grid-template-columns:repeat(4,1fr);position:fixed;left:12px;right:12px;bottom:12px;height:64px;background:rgba(14,13,16,.94);backdrop-filter:blur(14px);border-radius:22px;z-index:45;box-shadow:var(--shadow-lg);padding:6px}
+  .mbar a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:rgba(255,255,255,.6);font-size:10.5px;font-weight:700;border-radius:16px;position:relative}
+  .mbar a.on{color:#fff;background:rgba(255,255,255,.1)}
+  .mbar svg{width:22px;height:22px}
+  .mbar .cnt{position:absolute;top:6px;right:16px;min-width:17px;height:17px;border-radius:9px;background:var(--pink);font-size:10px;display:flex;align-items:center;justify-content:center;padding:0 4px;color:#fff}
+  body{padding-bottom:90px}
+  footer{padding-bottom:60px}
+}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="ann"><span><b>FREE DELIVERY</b> on orders over $150 · AU & NZ</span><span>Click & Collect at Yagoona and Blacktown</span><span>Trade accounts unlock tier pricing</span></div>
+
+<header class="hd">
+  <div class="wrap">
+    <div class="hd-top">
+      <button class="ibtn burger" id="burger" aria-label="Menu"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
+      <a class="logo" href="#/" aria-label="Hair & Beauty Kingdom home"><span class="mk"></span><span class="wm"><b>Hair & Beauty Kingdom</b><small>TRADE SUPPLIES · SYDNEY</small></span></a>
+      <div class="search">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+        <input id="q" type="search" placeholder="Search products, brands, SKUs…" autocomplete="off" />
+        <span class="kbd">/</span>
+        <div class="sres" id="sres"></div>
+      </div>
+      <div class="hd-acts">
+        <button class="ibtn" id="tradeBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg><span class="lb" id="tradeLbl">Trade login</span></button>
+        <button class="ibtn pk" id="cartBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h14l-1.5 9h-11z"/><path d="M6 7 5 4H2"/><circle cx="9" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/></svg><span class="lb">Cart</span><span class="cnt" id="cartCnt">0</span></button>
+      </div>
+    </div>
+    <nav class="hd-nav" id="topnav">
+      <a href="#/c/barber" data-nav="barber">Barber</a>
+      <a href="#/c/hair" data-nav="hair">Hair</a>
+      <a href="#/c/beauty" data-nav="beauty">Beauty</a>
+      <a href="#/c/essentials" data-nav="essentials">Salon Essentials</a>
+      <a href="#/c/furniture" data-nav="furniture">Furniture</a>
+      <a href="#/brands" data-nav="brands">Brands</a>
+      <a href="#/deals" data-nav="deals" class="deal">Deals & Cartons</a>
+      <span class="sp"></span>
+      <span class="tel">Trade desk <b>1300 061 808</b></span>
+    </nav>
+  </div>
+</header>
+
+<main id="app"></main>
+
+<footer>
+  <div class="wrap">
+    <div class="ft">
+      <div>
+        <a class="logo" href="#/"><span class="mk"></span><span class="wm"><b>Hair & Beauty Kingdom</b><small>SINCE 2014</small></span></a>
+        <p style="margin-top:16px">Australia's trade counter for barbers, salons and beauty professionals. 12,000+ coded items on the shelves, two Sydney warehouses, delivery across AU & NZ.</p>
+      </div>
+      <div><h4>Shop</h4><a href="#/c/barber">Barber</a><a href="#/c/hair">Hair</a><a href="#/c/beauty">Beauty</a><a href="#/c/essentials">Salon essentials</a><a href="#/c/furniture">Salon furniture</a><a href="#/brands">All brands</a></div>
+      <div><h4>Trade</h4><a href="#/account">Open a trade account</a><a href="#/deals">Carton & bulk deals</a><a href="#/">Student kits</a><a href="#/">Delivery & returns</a><a href="#/">Click & collect</a></div>
+      <div><h4>Visit</h4><a href="https://maps.google.com/?q=Unit+5/165+Rookwood+Rd+Yagoona+NSW+2199" target="_blank" rel="noopener">Yagoona — 5/165 Rookwood Rd</a><a href="https://maps.google.com/?q=7/45+Fourth+Ave+Blacktown+NSW+2148" target="_blank" rel="noopener">Blacktown — 7/45 Fourth Ave</a><a href="tel:1300061808">1300 061 808</a><a href="mailto:sales@hairandbeautykingdom.com.au">sales@hairandbeautykingdom.com.au</a></div>
+    </div>
+    <div class="ft-b"><span>© 2026 Hair & Beauty Kingdom Pty Ltd · ABN on request</span><span>Storefront concept <b>v1</b> — real catalogue, demo checkout</span></div>
+  </div>
+</footer>
+
+<nav class="mbar" id="mbar">
+  <a href="#/" data-m="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11 12 4l9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Home</a>
+  <a href="#/c/barber" data-m="shop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/></svg>Shop</a>
+  <a href="#/account" data-m="acct"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-7 8-7s8 3 8 7"/></svg>Trade</a>
+  <a href="#cart" data-m="cart" id="mcart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h14l-1.5 9h-11z"/><path d="M6 7 5 4H2"/><circle cx="9" cy="20" r="1.4"/><circle cx="17" cy="20" r="1.4"/></svg>Cart<span class="cnt hidden" id="mcnt">0</span></a>
+</nav>
+
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-label="Cart">
+  <div class="dh"><h3>Your cart<span id="dCount"></span></h3><button class="x" id="dClose" aria-label="Close">✕</button></div>
+  <div class="dbody" id="dBody"></div>
+  <div class="dfoot" id="dFoot"></div>
+</aside>
+<nav class="mnav" id="mnav">
+  <a href="#/">Home</a><a href="#/c/barber">Barber</a><a href="#/c/hair">Hair</a><a href="#/c/beauty">Beauty</a><a href="#/c/essentials">Salon Essentials</a><a href="#/c/furniture">Furniture</a><a href="#/brands">Brands</a><a href="#/deals" style="color:var(--pink)">Deals & Cartons</a>
+  <a class="sm" href="#/account">Trade account</a>
+  <span class="ft">Trade desk <b>1300 061 808</b><br>Yagoona · Blacktown</span>
+</nav>
+
+<div class="modal" id="tradeModal">
+  <div class="bx">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start"><div><h3>Trade login</h3><p>Unlock your tier pricing, saved carts and reorders.</p></div><button class="x" data-close>✕</button></div>
+    <form id="tradeForm">
+      <div class="fld"><label>Salon / shop</label><input id="tfSalon" placeholder="e.g. Fade Society Bankstown" required /></div>
+      <div class="fld"><label>Your name</label><input id="tfName" placeholder="First name" required /></div>
+      <div class="fld"><label>Trade PIN</label><input id="tfPin" placeholder="••••" type="password" inputmode="numeric" required /><div class="hint">Concept demo — any PIN signs you in as a Gold tier account.</div></div>
+      <button class="btn p full" type="submit">Sign in</button>
+    </form>
+    <div class="lk">New to the Kingdom? <a href="#/account" data-close>Apply for a trade account →</a></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i>✓</i><span id="toastT">Added to cart</span></div>
+
+<script>
+/* ============================ DATA ============================ */
+const PRODUCTS = [{"cat":"barber","short":"Wahl Magic Clip Cordless","title":"Wahl Magic Cordless Clipper Burgundy","vendor":"Wahl","type":"Clipper","price":240.0,"was":264.0,"img":"img/p/00.jpg","imgs":["img/p/00.jpg"],"tags":[],"desc":"Wahl 5-Star Series Magic Cordless Clipper Product Description The Wahl 5-Star Series Magic Cordless Clipper is a professional-grade clipper designed to deliver exceptional precision, blending, and fading performance.","bulky":false,"skid":false},{"cat":"barber","short":"Caliber .50 Cal BMG Cordless Clipper","title":"Caliber .50 Cal BMG Cordless Clipper","vendor":"Caliber","type":"Clipper","price":290.0,"was":377.0,"img":"img/p/01.jpg","imgs":["img/p/01.jpg"],"tags":[],"desc":"Caliber .50 Cal BMG Cordless Clipper Experience unmatched cutting-edge technology and versatility with the Caliber .50 Cal BMG Cordless Clipper .","bulky":false,"skid":false},{"cat":"barber","short":"TUFT Vista S Triple Foil Shaver","title":"Tuft Vista S Professional Triple Foil Shaver with UV, Charging Dock and Extra Foil with Cutter","vendor":"Tuft","type":"Foil Shaver","price":350.0,"was":399.0,"img":"img/p/02.jpg","imgs":["img/p/02.jpg"],"tags":["TYPE_New Arrivals"],"desc":"TUFT Vista S Professional Triple Foil Shaver with UV, Charging Dock and Extra Foil with Cutter Product Description The TUFT Vista S Professional Triple Foil Shaver is engineered for barbers and professional hairstylists who demand exceptional shaving performance, superior hygiene, and long-lasting reliability.","bulky":false,"skid":false},{"cat":"barber","short":"Astra Double Edge Blades 20pk","title":"Astra Double Edge Blades 20 Pack Carton","vendor":"Astra","type":"Razor Blades","price":20.0,"was":29.95,"img":"img/p/03.jpg","imgs":["img/p/03.jpg"],"tags":[],"desc":"Astra Double Edge Blades 20 Pack Carton – Precision & Comfort in Every Shave The Astra Superior Platinum Double Edge Blades deliver a premium shaving experience, combining sharpness, durability, and comfort.","bulky":false,"skid":false},{"cat":"barber","short":"Barber Marmara Pomade 100ml","title":"Barber Marmara Hair Wax Pomade 100ml","vendor":"Barber Marmara","type":"Hair Wax","price":24.95,"was":32.44,"img":"img/p/04.jpg","imgs":["img/p/04.jpg"],"tags":[],"desc":"Barber Marmara Hair Wax Pomade 100ml Barber Marmara Hair Wax Pomade is the perfect solution for achieving a sleek, glossy finish with a strong hold. This versatile pomade combines the best of both worlds—delivering the texture and flexibility of a wax with the shine and smoothness of a pomade.","bulky":false,"skid":false},{"cat":"barber","short":"Immortal NYC Chaos Sea Salt Pomade","title":"Immortal NYC Chaos Sea Salt Pomade Hair Wax 100ml","vendor":"Immortal","type":"Hair Wax","price":29.95,"was":32.95,"img":"img/p/05.jpg","imgs":["img/p/05.jpg"],"tags":[],"desc":"Immortal NYC Chaos Sea Salt Pomade Hair Wax 100ml Achieve effortless, textured styles with Immortal NYC Chaos Sea Salt Pomade Hair Wax . This innovative styling wax combines the texture-enhancing effects of sea salt with the hold of a pomade, giving your hair a natural, beachy look with a matte finish.","bulky":false,"skid":false},{"cat":"barber","short":"Immortal NYC Cologne 01 Reserve 500ml","title":"Immortal NYC Eau De Cologne Original 01 Reserve 500ml","vendor":"Immortal","type":"Cologne","price":24.95,"was":32.44,"img":"img/p/06.jpg","imgs":["img/p/06.jpg"],"tags":[],"desc":"Immortal NYC Eau De Cologne Original 01 Reserve 500ml Product Description The Immortal NYC Eau De Cologne Original 01 Reserve 500ml is a sophisticated men’s fragrance designed to deliver a bold, layered scent with fresh, floral, woody and ambery characteristics.","bulky":false,"skid":false},{"cat":"barber","short":"Clippercide Spray 425g","title":"Clippercide Spray 425g","vendor":"Barbicide","type":"Disinfectant","price":33.0,"was":39.95,"img":"img/p/07.jpg","imgs":["img/p/07.jpg"],"tags":[],"desc":"Clippercide Spray 425g Why use multiple products when one easy-to-use, economical solution can meet all your needs? Clippercide Spray 425g is a proven 5-in-1 formula that disinfects, lubricates, cleans, cools, and prevents rust in just 10 minutes or less—perfect for metal hair clippers and implements.","bulky":false,"skid":false},{"cat":"barber","short":"Andis Cool Care Plus 439g","title":"Andis Cool Care 439g","vendor":"Andis","type":"Disinfectant","price":37.0,"was":38.4,"img":"img/p/08.jpg","imgs":["img/p/08.jpg"],"tags":[],"desc":"Andis Cool Care 5-in-1 Spray: Prolong the Life of Your Clippers Andis Cool Care Spray is the ultimate 5-in-1 solution for maintaining your clippers. This versatile spray acts as a coolant, lubricant, cleaner, disinfectant , and rust preventive , ensuring your tools perform at their peak.","bulky":false,"skid":false},{"cat":"barber","short":"Wahl Blade Oil 60ml","title":"Wahl Blade Oil 60ml","vendor":"Wahl","type":"Clipper/Trimmer Accessories","price":12.0,"was":15.95,"img":"img/p/09.jpg","imgs":["img/p/09.jpg"],"tags":[],"desc":"Wahl Blade Oil 60ml Wahl Blade Oil (60ml) is specially formulated to lubricate, protect, and maintain the clipper blades of your grooming tools. Regular use ensures optimal performance by reducing friction, preventing rust, and maintaining the correct blade speed.","bulky":false,"skid":false},{"cat":"barber","short":"Immortal NYC Matte Look Wax 150ml","title":"Immortal NYC Matte Look Hair Wax 150ml","vendor":"Immortal","type":"Hair Wax","price":24.95,"was":32.95,"img":"img/p/10.jpg","imgs":["img/p/10.jpg"],"tags":[],"desc":"Immortal NYC Matte Look Hair Wax 150ml Product Description Take control of your style with Immortal NYC Matte Look Hair Wax 150ml , a professional styling wax designed to create textured, modern hairstyles with a natural matte finish.","bulky":false,"skid":false},{"cat":"hair","short":"K18 Molecular Repair Mask 150ml","title":"K18 Molecular Repair Hair Mask 150ml","vendor":"K18","type":"Hair Treatment","price":179.0,"was":229.0,"img":"img/p/11.jpg","imgs":["img/p/11.jpg"],"tags":[],"desc":"A leave-in treatment mask for all hair types that clinically reverses damage in 4 minutes. The patented peptide technology works to repair damage from bleach, color, chemical services & heat restoring strength, softness, smoothness, and bounce to hair.","bulky":false,"skid":false},{"cat":"hair","short":"Olaplex No.3 Hair Perfector 100ml","title":"Olaplex Hair Perfector No.3 Home Treatment 100ml","vendor":"Olaplex","type":"Hair Treatment","price":57.0,"was":75.0,"img":"img/p/12.jpg","imgs":["img/p/12.jpg"],"tags":[],"desc":"A professional, weekly hair treatment that repairs broken hair bonds. Restore your hair to its glory days with Olaplex Hair Perfector No.3 At Home Treatment, a key step this cult-favourite bond-rebuilding treatment.","bulky":false,"skid":false},{"cat":"hair","short":"Shiseido H1+2 Straightening Kit","title":"Shiseido H1 + 2 Straightening Kit","vendor":"Shiseido","type":"Permanent Straightening Systems - Relaxers","price":75.0,"was":129.0,"img":"img/p/13.jpg","imgs":["img/p/13.jpg"],"tags":[],"desc":"PROFESSIONAL USE ONLY Please note the manufacturer has changed the packaging for Neutralizing Cream #2. It is still the same great product. Shiseido H1 + H2 Straightening Kit Achieve sleek, smooth, and straight hair effortlessly with the Shiseido H1 + H2 Straightening Kit .","bulky":false,"skid":false},{"cat":"hair","short":"L'Oréal Absolut Repair Shampoo 1.5L","title":"L'oreal Absolut Repair Shampoo 1.5L","vendor":"Loreal","type":"Shampoo/Conditioner","price":58.95,"was":68.95,"img":"img/p/14.jpg","imgs":["img/p/14.jpg"],"tags":[],"desc":"Infused with GOLD QUINOA + PROTEIN, the professional formula of the Instant Resurfacing Conditioner is the perfect treatment to immediately restructure damaged hair. Its creamy formula nourishes the fibre while leaving it with a lightweight touch.","bulky":false,"skid":false},{"cat":"hair","short":"Redken All Soft Shampoo 1L","title":"Redken All Soft Shampoo 1L","vendor":"Redken","type":"Shampoo/Conditioner","price":54.95,"was":64.95,"img":"img/p/15.jpg","imgs":["img/p/15.jpg"],"tags":[],"desc":"Redken All Soft Shampoo 1L Product Description Transform dry, brittle hair into silky smooth perfection with Redken All Soft Shampoo 1L . Formulated with Redken’s Moisture Complex and enriched with Argan Oil , this professional shampoo delivers deep hydration and softness from root to tip.","bulky":false,"skid":false},{"cat":"hair","short":"Bondi Boost HG Growth Shampoo 1L","title":"Bondi Boost HG Hair Growth Shampoo 1L","vendor":"Bondi Boost","type":"Hair Care","price":59.95,"was":79.95,"img":"img/p/16.jpg","imgs":["img/p/16.jpg"],"tags":[],"desc":"Praised as the holy grail of hair care, this shampoo is specifically developed for thinning, aging and dull hair types. A world away from supermarket shampoo, it contains a proprietary phytoactive boosting blend of Aloe Vera, Peppermint, Rosemary and Saw Palmetto - key ingredients that fight back against thinning hair.","bulky":false,"skid":false},{"cat":"hair","short":"TUFT Granite 1\" Straightener 250°C","title":"TUFT Granite 1inch Hair Straightener 250C Black - Floractive Approved","vendor":"Tuft","type":"Hair Straightener","price":290.0,"was":399.0,"img":"img/p/17.jpg","imgs":["img/p/17.jpg"],"tags":[],"desc":"TUFT Granite 1-Inch Hair Straightener 250°C – Black Product Description The TUFT Granite 1-Inch Hair Straightener 250°C – Black is a professional-grade styling tool designed to deliver exceptional straightening, smoothing, and hair treatment results.","bulky":false,"skid":false},{"cat":"hair","short":"Fonex Silver Shampoo 500ml","title":"Fonex Silver Shampoo 500ml – Anti-Yellow Shampoo for Blonde & Grey Hair","vendor":"Fonex","type":"Shampoo/Conditioner","price":25.0,"was":32.5,"img":"img/p/18.jpg","imgs":["img/p/18.jpg"],"tags":["TYPE_New Arrivals"],"desc":"Fonex Silver Shampoo 500ml – Anti-Yellow Shampoo for Blonde & Grey Hair Product Description The Fonex Silver Shampoo 500ml – Anti-Yellow Shampoo for Blonde & Grey Hair is a professional toning shampoo designed to help neutralise unwanted yellow and brassy tones in blonde, bleached, highlighted, silver and grey hair.","bulky":false,"skid":false},{"cat":"hair","short":"Natural Look Static Free 1L Duo","title":"Natural Look Static Free Anti Frizz Shampoo and Conditioner 1L Duo Bundle","vendor":"Natural Look","type":"Bundles","price":55.95,"was":89.95,"img":"img/p/19.jpg","imgs":["img/p/19.jpg"],"tags":[],"desc":"Natural Look Static Free Anti-Frizz Shampoo & Conditioner 1L Duo Bundle Smooth and Control Unwanted Frizz & Static for All Hair Types Frizz-Free Hair, Anytime, Anywhere The Natural Look Static Free Anti-Frizz Shampoo & Conditioner 1L Duo Bundle is the ultimate frizz-control solution.","bulky":false,"skid":false},{"cat":"hair","short":"Goldwell Lagoom Jam 150ml","title":"Goldwell StyleSign Ultra Volume Lagoom Jam 150ml","vendor":"Goldwell","type":"Hair Gel","price":19.99,"was":29.95,"img":"img/p/20.jpg","imgs":["img/p/20.jpg"],"tags":[],"desc":"Goldwell StyleSign Ultra Volume Lagoom Jam 150ml - Achieve bold, voluminous styles effortlessly with Goldwell StyleSign Ultra Volume Lagoom Jam . This long-lasting gel is your go-to solution for creating instant volume and body, especially in fine hair.","bulky":false,"skid":false},{"cat":"beauty","short":"Refectocil Tint No.1 Pure Black","title":"Refectocil Eyelash Brow Tint Colour No. 1 Pure Black 15ml","vendor":"Refectocil","type":"Eyebrow","price":17.95,"was":19.95,"img":"img/p/21.jpg","imgs":["img/p/21.jpg"],"tags":[],"desc":"RefectoCil Eyelash & Brow Tint Colour No. 1 Pure Black 15ml Achieve bold, classic black lashes and brows with RefectoCil No. 1 Pure Black. This timeless shade tints each hair a deep, pure black, creating the illusion of longer, fuller lashes and brows.","bulky":false,"skid":false},{"cat":"beauty","short":"Elleebana Lash Lift Starter Kit","title":"Elleebana Lash Lift One Shot Starter Kit","vendor":"Elleebana","type":"Eyelash Products","price":150.0,"was":180.0,"img":"img/p/22.jpg","imgs":["img/p/22.jpg"],"tags":[],"desc":"Elevate your lash game with Elleebana One Shot Lash Lift Kit. In just 20 minutes, offer your clients luscious, lifted lashes that can last up to 12 weeks. This chemical process safely breaks down hair bonds, giving the appearance of longer, thicker and darker lashes.","bulky":false,"skid":false},{"cat":"beauty","short":"MineTan Spray Tan Tent","title":"MineTan Spray Tan Tent","vendor":"Mine Tan","type":"Tanning","price":79.0,"was":120.0,"img":"img/p/23.jpg","imgs":["img/p/23.jpg"],"tags":[],"desc":"Compact, light and easy to put up and down. Providing a professional spray tanning experience has never been easier with our Tanning Cubicle.","bulky":false,"skid":false},{"cat":"beauty","short":"Real Techniques Best of Blends Set","title":"Real Techniques Best of Blends Brush Set","vendor":"Real Techniques","type":"Make Up Brushes","price":39.95,"was":0,"img":"img/p/24.jpg","imgs":["img/p/24.jpg"],"tags":[],"desc":"Real Techniques Best of Blends Brush Set Product Description The Real Techniques Best of Blends Brush Set is a versatile makeup brush collection designed to help create smooth, seamless and beautifully blended makeup looks across the face.","bulky":false,"skid":false},{"cat":"beauty","short":"Refectocil Browista Tool Kit","title":"Refectocil Browista Tool Kit","vendor":"Refectocil","type":"Eyebrow","price":36.95,"was":39.95,"img":"img/p/25.jpg","imgs":["img/p/25.jpg"],"tags":[],"desc":"RefectoCil Browista Tool Kit Elevate your tinting game with the RefectoCil Browista Tool Kit, the ultimate set for lash and brow artists. Designed to meet the needs of professionals, this kit provides all the tools necessary for precise, flawless application.","bulky":false,"skid":false},{"cat":"beauty","short":"Karma Facial Steamer + LED Lamp","title":"Karma Facial Steamer with Ozone - White and LED Magnifying Lamp 01050410","vendor":"Karma","type":"Facial Steamers","price":399.0,"was":499.0,"img":"img/p/26.jpg","imgs":["img/p/26.jpg"],"tags":[],"desc":"Karma Compact Facial Steamer with Ozone – Professional Skincare Solution The Karma Compact Facial Steamer with Ozone is the perfect addition to any esthetician's toolkit, providing high-quality facial treatments with the convenience of a compact design.","bulky":true,"skid":false},{"cat":"beauty","short":"Karma 18\" LED Ring Light","title":"Karma LED Ring Light 18 inch with Wall/Celling Mount Black","vendor":"Karma","type":"Ring Lights - Moon Lights","price":249.95,"was":398.0,"img":"img/p/27.jpg","imgs":["img/p/27.jpg"],"tags":["TYPE_New Arrivals"],"desc":"Karma LED Ring Light 18 Inch with Wall/Ceiling Mount – Black Product Description Create professional-quality lighting for hairdressing, barbering, beauty treatments, makeup application, photography, and content creation with the Karma LED Ring Light 18 Inch with Wall/Ceiling Mount – Black .","bulky":true,"skid":false},{"cat":"beauty","short":"Natural Look Dermofoliant 500ml","title":"Natural Look Immaculate Dermofoliant Micro Exfoliation 500ml","vendor":"Natural Look","type":"Spa Product","price":29.95,"was":35.9,"img":"img/p/28.jpg","imgs":["img/p/28.jpg"],"tags":[],"desc":"Especially formulated for sensitive skin to stimulate the building of new epidermal cells and remove dead cell build up leaving you with an even and glowing skin tone. Regular use will help reduce uneven skin pigmentation. Geranium boosts circulation and invigorates the skin while having a general cleansing action.","bulky":false,"skid":false},{"cat":"essentials","short":"RNS Disposable Hair Towels 100pk","title":"RNS Premium Professional Disposable Hair Towel 40x75cm 100pk","vendor":"RNS","type":"Towels","price":40.0,"was":52.0,"img":"img/p/29.jpg","imgs":["img/p/29.jpg"],"tags":[],"desc":"Your client will feel luxurious comfort and cleanliness after any hot towel shave, hair or beauty service! Individually packed RNS Premium Professional Disposable Hair Towels are perfect for that single-use experience. These top-notch towels are the ideal solution for barbershops, beauty salons and hair salons.","bulky":false,"skid":false},{"cat":"essentials","short":"BOB Salon Grade Disinfectant 5L","title":"BOB Salon Grade Disinfectant 5L – Professional Salon & Barber Disinfectant","vendor":"Bob","type":"Disinfectant","price":33.0,"was":43.0,"img":"img/p/30.jpg","imgs":["img/p/30.jpg"],"tags":[],"desc":"Bob 5L Hospital-Grade Disinfectant – Powerful Germ-Killing Solution for Professional Use Now available at Hair & Beauty Kingdom, Bob 5L Hospital-Grade Disinfectant , made in Australia , is a high-performance sanitizing solution designed to meet strict hospital-grade standards.","bulky":true,"skid":false},{"cat":"essentials","short":"Salon Smart Microfibre Towels 10pk","title":"Salon Smart Microfibre So Soft Salon Towels 40cm x 73cm 10pc Black","vendor":"Salon Smart","type":"Towels","price":50.0,"was":60.0,"img":"img/p/31.jpg","imgs":["img/p/31.jpg"],"tags":[],"desc":"Salon Smart Microfibre So Soft Salon Towels 40cm x 73cm 10 Pack – Black Product Description The Salon Smart Microfibre So Soft Salon Towels 40cm x 73cm 10 Pack – Black are premium-quality salon towels designed to deliver exceptional softness, absorbency, and durability for professional salon, barber…","bulky":false,"skid":false},{"cat":"essentials","short":"Deyaz Replicape Salon Cape","title":"Deyaz Replicape Premium Fashion Salon Cape Black & Gold","vendor":"Repli Cape","type":"Capes","price":35.0,"was":45.5,"img":"img/p/32.jpg","imgs":["img/p/32.jpg"],"tags":[],"desc":"Made from premium Micro Fabric Material. This salon cape has a heavy duty button clasp and hook with elastic neck to cater for all neck sizes. The outer seams are double stitched to ensure longevity after many washes. Colour: Black & Gold Size: 150 x 160cm","bulky":false,"skid":false},{"cat":"essentials","short":"BOB Neck Strips 5 Rolls","title":"Bob Neck Strips Roll White 5pk","vendor":"Bob","type":"Neck Rolls","price":12.0,"was":15.6,"img":"img/p/33.jpg","imgs":["img/p/33.jpg"],"tags":[],"desc":"BOB Neck Strips Roll White 5pk – Hygienic, Comfortable & Professional Maintain the highest hygiene standards in your salon or barbershop with BOB Premium Neck Strips .","bulky":false,"skid":false},{"cat":"essentials","short":"Berberin Disposable Towels 100pk","title":"Berberin Disposable Towel 100pk","vendor":"Berberin","type":"Towels","price":30.0,"was":36.0,"img":"img/p/34.jpg","imgs":["img/p/34.jpg"],"tags":[],"desc":"Keep your client comfortable and feeling clean after a hair cut, hair wash, facial or beard shave. Each towel is individually packed. Single use for each client Towel size: 80cm x 40cm","bulky":false,"skid":false},{"cat":"essentials","short":"Dateline Appointment Book","title":"Dateline Professional 50 Page Appointment Book 2 Column","vendor":"Dateline","type":"Appointment Books - Record Cards","price":15.0,"was":18.0,"img":"img/p/35.jpg","imgs":["img/p/35.jpg"],"tags":[],"desc":"Keep track of appointments with the Dateline Professional 2 Column Appointment Book. An essential appointment book for maximising available time and enabling the smooth running of any hairdressing salon or beauty business. Features: 2 columns 50 double-sided pages 15 minute scheduling 8 am 9 pm appointment times","bulky":false,"skid":false},{"cat":"essentials","short":"BOB Sharps Container","title":"Bob Sharps Container Black","vendor":"Bob","type":"Sharps Containers","price":12.0,"was":15.6,"img":"img/p/36.jpg","imgs":["img/p/36.jpg"],"tags":[],"desc":"Bob Sharps Container Black Ensure a safe and hygienic environment with the Bob Sharps Container Black , designed for the safe disposal of used blades and sharps. This durable container helps prevent accidents and contamination by providing a secure space for disposal.","bulky":false,"skid":false},{"cat":"furniture","short":"Karma Paddington Barber Chair","title":"Karma Paddington Barber Chair Black with Turquoise Blue Stitching 04100101BP","vendor":"Karma","type":"Barber Chair","price":1295.0,"was":1695.0,"img":"img/p/37.jpg","imgs":["img/p/37.jpg"],"tags":["TYPE_New Arrivals"],"desc":"Karma Paddington Barber Chair Black with Turquoise Blue Stitching Product Description The Karma Paddington Barber Chair Black with Turquoise Blue Stitching is a heavy-duty professional barber chair designed for busy barbershops and grooming studios where durability, stability, and client comfort are essential.","bulky":true,"skid":true},{"cat":"furniture","short":"Karma Mackay Barber Chair Black & Gold","title":"Karma Mackay Professional Barber Chair Black & Gold 04140103– Hydraulic Chair","vendor":"Karma","type":"Barber Chair","price":1295.0,"was":1495.0,"img":"img/p/38.jpg","imgs":["img/p/38.jpg"],"tags":[],"desc":"Karma Mackay Professional Barber Chair Black & Gold 04140103 – Hydraulic Chair Product Description The Karma Mackay Professional Barber Chair Black & Gold 04140103 – Hydraulic Chair is a premium professional barber chair designed to combine classic styling, reliable hydraulic performance and everyda…","bulky":true,"skid":true},{"cat":"furniture","short":"Karma Yass Salon Chair","title":"Karma Yass Salon Chair Black Top and Black Base and Pump 022601","vendor":"Karma","type":"Salon Chairs","price":495.0,"was":595.0,"img":"img/p/39.jpg","imgs":["img/p/39.jpg"],"tags":["TYPE_New Arrivals"],"desc":"Karma Yass Salon Chair Black Top with Black Base & Black Pump 022601 Product Description The Karma Yass Salon Chair Black Top with Black Base & Black Pump 022601 combines contemporary styling, exceptional comfort, and professional functionality to create a stylish centrepiece for any modern salon.","bulky":true,"skid":false},{"cat":"furniture","short":"Karma Ballarat Electric Shampoo Unit","title":"Karma Ballarat Complete Shampoo Unit Electric Black with Black Deep Basin and Air Massage 03190101","vendor":"Karma","type":"Shampoo Units","price":2495.0,"was":2995.0,"img":"img/p/40.jpg","imgs":["img/p/40.jpg"],"tags":["TYPE_New Arrivals"],"desc":"Karma Ballarat Complete Shampoo Unit Electric Black with Black Deep Basin and Air Massage 03190101 Product Description The Karma Ballarat Complete Shampoo Unit Electric Black with Black Deep Basin and Air Massage 03190101 is a premium salon backwash system designed to deliver exceptional comfort, lu…","bulky":true,"skid":true},{"cat":"furniture","short":"Karma Wellington Hydraulic Beauty Bed","title":"Karma Wellington Beauty or Tattoo Hydraulic Bed 360 Degree Swivel 09090410 - White","vendor":"Karma","type":"Beauty Beds","price":795.0,"was":1095.0,"img":"img/p/41.jpg","imgs":["img/p/41.jpg"],"tags":[],"desc":"Karma Wellington Beauty or Tattoo Hydraulic Bed – 360° Swivel Upgrade your salon or studio with the Karma Wellington Hydraulic Bed , a versatile and stylish choice for beauty professionals and tattoo artists.","bulky":true,"skid":true},{"cat":"furniture","short":"Karma UV Hot Towel Warmer 32L","title":"Karma UV Salon Twin/Double Hot Towel Warmer Black 32L 01010132","vendor":"Karma","type":"Towel Warmers - UV Sterilizers","price":295.0,"was":383.5,"img":"img/p/42.jpg","imgs":["img/p/42.jpg"],"tags":[],"desc":"This 2 in 1 towel cleaner can be used on home, spa, beauty salon, hair salon and most places. It mainly uses the UV rays to keep towels germ-free and also the cabinet has temperature consistence function that can keep the towels warmer all the time. It is suitable for both traditional and disposable towels cleaning.","bulky":true,"skid":false},{"cat":"furniture","short":"Karma Wilton 3-Tier Trolley","title":"Karma Wilton 3 Tier Beauty & Medical Trolley Small 080904ST","vendor":"Karma","type":"Salon Trolleys","price":239.0,"was":289.0,"img":"img/p/43.jpg","imgs":["img/p/43.jpg"],"tags":["TYPE_New Arrivals"],"desc":"Karma Wilton 3 Tier Beauty & Medical Trolley Small 080904ST Product Description Keep your treatment room organised and your essential equipment within easy reach with the Karma Wilton 3 Tier Beauty & Medical Trolley Small 080904ST .","bulky":true,"skid":false},{"cat":"furniture","short":"Karma UV Sterilizer Cabinet","title":"Karma UV Sterilizer Cabinet Black 01021000","vendor":"Karma","type":"Towel Warmers - UV Sterilizers","price":199.0,"was":219.7,"img":"img/p/44.jpg","imgs":["img/p/44.jpg"],"tags":[],"desc":"TheÂ Karma UV Steriliser is a state of the art sterilising machine that uses high powered UV lights to kill and remove all bacteria from your tools such as blades, scissors, machines etc it also comes equipped with a LED touch screen designed with an easy open and close door with handle.","bulky":true,"skid":false},{"cat":"furniture","short":"Karma Anti-Fatigue Mat","title":"Karma Thick Barber & Salon Anti Fatigue Mat Oval 00060101 - Rectangle for Square Base Chairs","vendor":"Karma","type":"Anti Fatigue Mat","price":125.0,"was":139.0,"img":"img/p/45.jpg","imgs":["img/p/45.jpg"],"tags":[],"desc":"Mat only, chair not included This high quality thick Karma branded Rectangular Anti-fatigue mat is suitable for all square base Hair Dressing and Barber Salon Chairs. It Prevents aches and pains and promotes good posture. Suitable for chairs with square base.","bulky":true,"skid":false},{"cat":"furniture","short":"Karma Tumut Reclining Chair","title":"Karma Tumut Reclining Salon/ Barber/ Beauty Chair 02230101 - Black","vendor":"Karma","type":"Salon Chairs","price":499.0,"was":599.0,"img":"img/p/46.jpg","imgs":["img/p/46.jpg"],"tags":[],"desc":"Karma Tumut Reclining Salon, Barber & Beauty Chair 02230101 – Black Product Description Elevate your salon, barbershop, or beauty studio with the Karma Tumut Reclining Salon, Barber & Beauty Chair 02230101 – Black .","bulky":true,"skid":true}];
+const CATS = {
+  barber:{name:'Barber',h:'Barber supplies',blurb:'Clippers, trimmers, shavers, blades, pomades, colognes and everything behind the chair. Wahl, Andis, BabylissPRO, Caliber, TUFT and the street brands your clients ask for.',hero:1,cls:'c-barber'},
+  hair:{name:'Hair',h:'Professional hair care',blurb:'Salon-size shampoo, treatments, colour, straightening systems and tools. K18, Olaplex, L\'Oréal Professionnel, Redken, Shiseido, Goldwell and more — at trade.',hero:11,cls:'c-hair'},
+  beauty:{name:'Beauty',h:'Beauty & skin',blurb:'Lash and brow, tanning, waxing, skincare and the equipment for the treatment room. Refectocil, Elleebana, MineTan, Real Techniques, Natural Look.',hero:22,cls:'c-beauty'},
+  essentials:{name:'Salon Essentials',h:'Salon essentials',blurb:'The stuff you run out of: towels, capes, neck strips, disinfectant, sharps, appointment books. Restock in cartons and never run dry mid-shift.',hero:29,cls:'c-essentials'},
+  furniture:{name:'Furniture',h:'Salon & barber furniture',blurb:'Karma chairs, shampoo units, beauty beds, trolleys, towel warmers and sterilisers. Fit out a whole shop, delivered on a skid to your door.',hero:37,cls:'c-furniture'},
+};
+const BRANDS=[['Wahl','cond'],['Andis','cond'],['BabylissPRO',''],['Immortal NYC','serif'],['Barber Marmara','serif'],['BOB Haircare',''],['Karma','cond'],['TUFT','cond'],['Caliber',''],['Shiseido Professional','serif'],['Olaplex',''],['K18','cond'],['L\'Oréal Professionnel','serif'],['Redken',''],['Goldwell',''],['Refectocil','serif'],['Elleebana',''],['American Crew','cond'],['Fonex',''],['Bondi Boost',''],['Natural Look','serif'],['Barbicide','cond'],['MineTan',''],['Real Techniques','']];
+const TRADE_OFF=0.10;
+const money=n=>'$'+n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+const $=(s,r=document)=>r.querySelector(s);const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ============================ STATE ============================ */
+const ls=(k,v)=>{try{if(v===undefined){const x=localStorage.getItem(k);return x?JSON.parse(x):null}localStorage.setItem(k,JSON.stringify(v))}catch(e){return null}};
+let CART=ls('hbk_cart')||{};let TRADE=ls('hbk_trade')||null;let SAVED=ls('hbk_saved')||[];
+const saveCart=()=>{ls('hbk_cart',CART);paintCartUI()};
+const priceOf=p=>TRADE?Math.round(p.price*(1-TRADE_OFF)*100)/100:p.price;
+const retailOf=p=>p.was>p.price?p.was:(TRADE?p.price:0);
+const cartLines=()=>Object.entries(CART).map(([id,q])=>({p:PRODUCTS[+id],q})).filter(l=>l.p);
+const cartCount=()=>cartLines().reduce((a,l)=>a+l.q,0);
+const cartSub=()=>cartLines().reduce((a,l)=>a+priceOf(l.p)*l.q,0);
+const bulkyIn=()=>cartLines().some(l=>l.p.bulky);
+const shipCost=(mode)=>mode==='collect'?0:(bulkyIn()?(cartLines().some(l=>l.p.skid)?149:39):(cartSub()>=150?0:12.95));
+
+/* ============================ ROUTER ============================ */
+const app=$('#app');
+function route(){
+  const h=location.hash||'#/';
+  if(h==='#cart'){openCart();history.replaceState(null,'',location.pathname+(prevHash||'#/'));return}
+  prevHash=h;
+  window.scrollTo({top:0});
+  let m;
+  if(h==='#/')home();
+  else if((m=h.match(/^#\/c\/(\w+)/)))catPage(m[1]);
+  else if((m=h.match(/^#\/p\/(\d+)/)))productPage(+m[1]);
+  else if(h==='#/brands')brandsPage();
+  else if(h==='#/deals')dealsPage();
+  else if(h==='#/checkout')checkoutPage();
+  else if(h==='#/done')donePage();
+  else if(h==='#/account')accountPage();
+  else home();
+  $$('#topnav a').forEach(a=>a.classList.toggle('on',h.startsWith('#/c/'+a.dataset.nav)||h==='#/'+a.dataset.nav));
+  $$('#mbar a').forEach(a=>a.classList.toggle('on',(a.dataset.m==='home'&&h==='#/')||(a.dataset.m==='shop'&&(h.startsWith('#/c/')||h.startsWith('#/p/')))||(a.dataset.m==='acct'&&h==='#/account')));
+  wire();
+}
+let prevHash='#/';
+window.addEventListener('hashchange',route);
+
+/* ============================ RENDER PARTS ============================ */
+const ICONS={
+  truck:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h11v9H3zM14 10h4l3 3v3h-7z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg>',
+  pin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6.2 7-12a7 7 0 0 0-14 0c0 5.8 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>',
+  box:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8 12 3l9 5-9 5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg>',
+  shield:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6z"/><path d="m9 12 2 2 4-4"/></svg>',
+  heart:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  tick:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m5 12 4.5 4.5L19 7"/></svg>',
+  arrow:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>',
+};
+function tagFor(p,i){
+  if(p.tags.some(t=>/New Arrivals/i.test(t)))return '<span class="tag">NEW</span>';
+  if(p.was>p.price&&(p.was-p.price)/p.was>=0.3)return '<span class="tag">'+Math.round((p.was-p.price)/p.was*100)+'% OFF</span>';
+  if([0,11,12,4].includes(i))return '<span class="tag k">BEST SELLER</span>';
+  if(p.bulky)return '<span class="tag g">BULKY</span>';
+  return '';
+}
+function priceHTML(p,big){
+  const pr=priceOf(p),rt=retailOf(p);
+  let h='<b>'+money(pr)+'</b>';
+  if(rt>pr)h+='<s>'+money(rt)+'</s>';
+  if(TRADE)h+='<span class="tr">TRADE</span>';
+  else if(rt>pr)h+='<span class="sav">Save '+Math.round((rt-pr)/rt*100)+'%</span>';
+  return h;
+}
+function card(p,i,delay=0){
+  return `<article class="card" data-id="${i}" style="animation-delay:${delay}ms">
+    <div class="ph" data-go="${i}">${tagFor(p,i)}<img src="${p.img}" alt="${esc(p.short)}" loading="lazy"/>
+      <button class="sv ${SAVED.includes(i)?'on':''}" data-save="${i}" aria-label="Save">${ICONS.heart}</button></div>
+    <div class="bd"><div class="br">${esc(p.vendor)}</div><div class="nm" data-go="${i}">${esc(p.short)}</div>
+      <div class="pr">${priceHTML(p)}</div>
+      <button class="add" data-add="${i}">${ICONS.plus}Add to cart</button></div></article>`;
+}
+function grid(list){return '<div class="grid">'+list.map((p,k)=>card(p,PRODUCTS.indexOf(p),k*40)).join('')+'</div>'}
+const idx=list=>list.map(i=>PRODUCTS[i]);
+
+/* ============================ PAGES ============================ */
+function home(){
+  const feat=idx([0,11,4,37,12,2,22,29]);
+  app.innerHTML=`
+  <section class="hero"><div class="wrap"><div class="hero-g">
+    <div>
+      <span class="eyebrow"><i></i>Yagoona · Blacktown · AU & NZ</span>
+      <h1>Everything behind<br>the chair, <span class="em">at trade.</span></h1>
+      <p>Sydney's wholesale counter for barbers, salons and beauty pros since 2014. 12,000+ coded items, 20+ professional brands, and a team that actually knows the difference between a Magic Clip and a Cordless Senior.</p>
+      <div class="hero-cta"><a class="btn p" href="#/c/barber">Shop barber ${ICONS.arrow}</a><a class="btn g" href="#/account">Open a trade account</a></div>
+      <div class="hero-stats"><div><b>12,000+</b><span>items on the shelf</span></div><div><b>20+</b><span>pro brands stocked</span></div><div><b>2</b><span>Sydney warehouses</span></div><div><b>$150</b><span>free delivery threshold</span></div></div>
+    </div>
+    <div class="collage">
+      <div class="badge-f"><b>Trade tiers live</b>Log in for your pricing</div>
+      <a class="tile t1" href="#/p/37"><img src="${PRODUCTS[37].img}" alt=""/><span class="cap">Karma Paddington <s>$1,695</s> $1,295</span></a>
+      <a class="tile t2" href="#/p/0"><img src="${PRODUCTS[0].img}" alt=""/><span class="cap">Wahl Magic Clip $240</span></a>
+      <a class="tile t3" href="#/p/11"><img src="${PRODUCTS[11].img}" alt=""/><span class="cap">K18 Mask <s>$229</s> $179</span></a>
+      <a class="tile t4" href="#/p/4"><img src="${PRODUCTS[4].img}" alt=""/><span class="cap">Marmara Pomade $24.95</span></a>
+    </div>
+  </div>
+  <div class="trust">
+    <div>${ICONS.truck}<div>Free delivery over $150<span>AU & NZ · excludes furniture & NT</span></div></div>
+    <div>${ICONS.pin}<div>Click & collect, same day<span>Yagoona or Blacktown</span></div></div>
+    <div>${ICONS.box}<div>Carton & bulk pricing<span>Restock the whole shop in one order</span></div></div>
+    <div>${ICONS.shield}<div>Genuine pro stock<span>Authorised distributor for every brand</span></div></div>
+  </div></div></section>
+
+  <section class="sec"><div class="wrap">
+    <div class="sec-h"><div><h2>Shop by trade</h2><p>Five departments, one delivery.</p></div><a class="more" href="#/c/barber">All products ${ICONS.arrow}</a></div>
+    <div class="cats">${Object.entries(CATS).map(([k,c])=>`<a class="cat ${c.cls}" href="#/c/${k}"><img src="${PRODUCTS[c.hero].img}" alt=""/><div class="ct"><div><b>${c.name}</b><span>${PRODUCTS.filter(p=>p.cat===k).length} featured · ${({barber:'3,398',hair:'4,100+',beauty:'1,200+',essentials:'900+',furniture:'260+'})[k]} in range</span></div><i>${ICONS.arrow}</i></div></a>`).join('')}</div>
+  </div></section>
+
+  <section class="sec"><div class="wrap">
+    <div class="sec-h"><div><h2>This week's movers</h2><p>What the shops are actually ordering.</p></div><a class="more" href="#/deals">See all deals ${ICONS.arrow}</a></div>
+    <div class="pills" id="homePills"><button class="pill on" data-f="all">All</button><button class="pill" data-f="barber">Barber</button><button class="pill" data-f="hair">Hair</button><button class="pill" data-f="beauty">Beauty</button><button class="pill" data-f="furniture">Furniture</button></div>
+    <div id="homeGrid">${grid(feat)}</div>
+  </div></section>
+
+  <div class="wrap"><div class="trade" id="tradeSect">
+    <div><h2>Trade accounts.<br><span class="em">Priced like a partner.</span></h2>
+      <p>Tier pricing on every item, saved carts for reorders, 30-day terms for approved shops, and a rep who picks up the phone. Free to apply — approved within one business day.</p>
+      <ul><li><i>✓</i>Gold, Platinum & Distributor tiers</li><li><i>✓</i>One-tap reorder from history</li><li><i>✓</i>Carton pricing unlocked</li><li><i>✓</i>Early access to new drops</li><li><i>✓</i>Student kits for academies</li><li><i>✓</i>Dedicated account manager</li></ul></div>
+    <form class="form" id="applyForm"><h3>Apply in 60 seconds</h3><p>We'll verify your ABN and call you back.</p>
+      <div class="row"><input placeholder="Salon / barbershop name" required/><input placeholder="ABN" required/></div>
+      <div class="row"><input placeholder="Your name" required/><input placeholder="Mobile" required/></div>
+      <div class="row" style="grid-template-columns:1fr"><select><option>Barbershop</option><option>Hair salon</option><option>Beauty / lash / brow</option><option>Academy / student</option><option>Distributor</option></select></div>
+      <button class="btn p full" type="submit">Apply for trade pricing</button></form>
+  </div></div>
+
+  <div class="wrap brands"><div class="sec-h"><div><h2>Brands we distribute</h2><p>Authorised stockist. No grey imports, no parallel stock.</p></div><a class="more" href="#/brands">All brands ${ICONS.arrow}</a></div>
+    <div class="marq"><div class="tr">${[...BRANDS,...BRANDS].map(([b,c])=>`<a class="bl ${c}" href="#/brands">${b}</a>`).join('')}</div></div></div>
+
+  <div class="wrap"><div class="sec-h" style="margin-top:56px"><div><h2>Deals & cartons</h2><p>Buy the box, keep the margin.</p></div></div>
+    <div class="deals" style="margin-top:0">
+      <a class="deal d1" href="#/deals"><div><b>Up to 56% off selected brands</b><span>Immortal NYC, Fonex, Karma & more, this month only.</span></div><span class="go">Shop the sale ${ICONS.arrow}</span><img src="${PRODUCTS[5].img}" alt=""/></a>
+      <a class="deal d2" href="#/deals"><div><b>Cartons of 24 from $199</b><span>Waxes, beard oils, shampoo — carton pricing for shops that move volume.</span></div><span class="go">Carton deals ${ICONS.arrow}</span><img src="${PRODUCTS[10].img}" alt=""/></a>
+      <a class="deal d3" href="#/c/furniture"><div><b>Fit-out finance on furniture</b><span>Chairs, basins and beds from $495. Skid delivery Sydney-wide.</span></div><span class="go">Plan a fit-out ${ICONS.arrow}</span><img src="${PRODUCTS[39].img}" alt=""/></a>
+    </div></div>
+
+  <div class="wrap"><div class="sec-h" style="margin-top:56px"><div><h2>Two counters, one Kingdom</h2><p>Order online, pick up on the way to the shop.</p></div></div>
+    <div class="stores" style="margin-top:0">
+      <div class="store"><div><div class="lo">Head office & warehouse</div><h3>Yagoona</h3><p>Unit 5, 165 Rookwood Road<br>Yagoona NSW 2199</p><p>Trade desk 1300 061 808</p><div class="ok"><i></i>Click & collect ready in ~1 hr</div></div><div class="map"></div><div class="acts"><a class="btn o sm" href="https://maps.google.com/?q=Unit+5/165+Rookwood+Rd+Yagoona+NSW+2199" target="_blank" rel="noopener">Directions</a><a class="btn g sm" href="tel:1300061808">Call the desk</a></div></div>
+      <div class="store"><div><div class="lo">Western Sydney</div><h3>Blacktown</h3><p>Unit 7, 45 Fourth Avenue<br>Blacktown NSW 2148</p><p>Trade desk 1300 061 808</p><div class="ok"><i></i>Click & collect ready in ~1 hr</div></div><div class="map"></div><div class="acts"><a class="btn o sm" href="https://maps.google.com/?q=7/45+Fourth+Ave+Blacktown+NSW+2148" target="_blank" rel="noopener">Directions</a><a class="btn g sm" href="tel:1300061808">Call the desk</a></div></div>
+    </div></div>
+
+  <div class="wrap"><div class="revs">
+    <div class="rev"><div class="stars">★★★★★</div><div class="q">“Great service, great products with great prices! Will definitely come again.”</div><div class="who"><i>LN</i>Leesa Nassar <span>· Google review</span></div></div>
+    <div class="rev"><div class="stars">★★★★★</div><div class="q">“Thank you for great service, got exactly what I wanted and good advice and great prices… my new go-to hair store.”</div><div class="who"><i>DG</i>Dina Ghamrawi <span>· Google review</span></div></div>
+  </div></div>`;
+  $('#homePills').addEventListener('click',e=>{const b=e.target.closest('.pill');if(!b)return;$$('#homePills .pill').forEach(x=>x.classList.toggle('on',x===b));const f=b.dataset.f;const list=f==='all'?feat:PRODUCTS.filter(p=>p.cat===f).slice(0,8);$('#homeGrid').innerHTML=grid(list);wire()});
+  $('#applyForm').addEventListener('submit',e=>{e.preventDefault();toast('Application received — we\'ll call you within 1 business day');e.target.reset()});
+}
+
+function catPage(k){
+  const c=CATS[k];if(!c)return home();
+  let list=PRODUCTS.filter(p=>p.cat===k);
+  const vendors=[...new Set(list.map(p=>p.vendor))];
+  const state={v:new Set(),sort:'feat',max:null};
+  app.innerHTML=`<div class="wrap">
+    <div class="crumbs"><a href="#/">Home</a><span>›</span><span>${c.name}</span></div>
+    <div class="chead"><div><h1>${c.h}</h1><p>${c.blurb}</p></div><span class="n" id="cn"></span></div>
+    <div class="clay">
+      <aside class="filt">
+        <div><h4>Brand</h4>${vendors.map(v=>`<label class="chk"><input type="checkbox" data-v="${esc(v)}"/><span>${esc(v)}</span><small>${list.filter(p=>p.vendor===v).length}</small></label>`).join('')}</div>
+        <div><h4>Price</h4>${[[50,'Under $50'],[150,'Under $150'],[500,'Under $500'],[null,'Any']].map(([m,l])=>`<label class="chk"><input type="radio" name="pm" data-max="${m}" ${m===null?'checked':''}/><span>${l}</span></label>`).join('')}</div>
+        <div><h4>Availability</h4><label class="chk"><input type="checkbox" checked/><span>In stock</span></label><label class="chk"><input type="checkbox"/><span>Carton deal</span></label><label class="chk"><input type="checkbox"/><span>Bulky / skid</span></label></div>
+      </aside>
+      <div>
+        <div class="tools"><button class="btn o sm mfilt">Filters</button><span class="n" id="cn2" style="font-size:13px;color:var(--mute)"></span><select id="sort"><option value="feat">Featured</option><option value="lo">Price: low to high</option><option value="hi">Price: high to low</option><option value="sav">Biggest saving</option></select></div>
+        <div id="cgrid"></div>
+      </div>
+    </div></div>`;
+  const paint=()=>{
+    let l=list.filter(p=>(!state.v.size||state.v.has(p.vendor))&&(state.max===null||priceOf(p)<state.max));
+    if(state.sort==='lo')l=[...l].sort((a,b)=>priceOf(a)-priceOf(b));
+    if(state.sort==='hi')l=[...l].sort((a,b)=>priceOf(b)-priceOf(a));
+    if(state.sort==='sav')l=[...l].sort((a,b)=>(b.was-b.price)/(b.was||1)-(a.was-a.price)/(a.was||1));
+    $('#cgrid').innerHTML=l.length?grid(l):'<div class="empty"><b>Nothing matches</b>Try clearing a filter.</div>';
+    $('#cn').textContent=l.length+' of '+list.length+' featured';$('#cn2').textContent=l.length+' products';wire();
+  };
+  $$('.filt [data-v]').forEach(i=>i.addEventListener('change',()=>{i.checked?state.v.add(i.dataset.v):state.v.delete(i.dataset.v);paint()}));
+  $$('.filt [name=pm]').forEach(i=>i.addEventListener('change',()=>{state.max=i.dataset.max==='null'?null:+i.dataset.max;paint()}));
+  $('#sort').addEventListener('change',e=>{state.sort=e.target.value;paint()});
+  paint();
+}
+
+function productPage(i){
+  const p=PRODUCTS[i];if(!p)return home();
+  const c=CATS[p.cat];const rel=PRODUCTS.filter(x=>x.cat===p.cat&&x!==p).slice(0,4);
+  const pr=priceOf(p),rt=retailOf(p);
+  app.innerHTML=`<div class="wrap">
+    <div class="crumbs"><a href="#/">Home</a><span>›</span><a href="#/c/${p.cat}">${c.name}</a><span>›</span><span>${esc(p.vendor)}</span></div>
+    <div class="pp">
+      <div class="gal"><div class="main"><img id="gmain" src="${p.img}" alt="${esc(p.title)}"/></div>
+        ${p.imgs.length>1?'<div class="thumbs">'+p.imgs.map((s,k)=>`<button class="${k?'':'on'}" data-th="${s}"><img src="${s}" alt=""/></button>`).join('')+'</div>':''}</div>
+      <div class="pinfo">
+        <div class="br">${esc(p.vendor)}</div><h1>${esc(p.title)}</h1>
+        <div class="meta"><span class="ok"><i></i>In stock · Yagoona & Blacktown</span><span>SKU HBK-${String(1000+i*37).slice(-4)}</span><span>${esc(p.type)}</span></div>
+        <div class="pbox">
+          <div class="pr">${priceHTML(p,1)}</div>
+          <div class="gst">Inc. GST · ${TRADE?'Gold trade price applied':'Retail price shown'}</div>
+          ${TRADE?'':'<button class="tl" id="tlink">'+ICONS.arrow+' Log in to see your trade price</button>'}
+          ${p.bulky?`<div class="bulk">📦 <span><b>Bulky item.</b> ${p.skid?'Ships on a skid — Sydney metro from $149, or free collect from Yagoona.':'Parcel freight from $39, or free click & collect.'}</span></div>`:`<div class="bulk">🧴 <span><b>Carton deal:</b> order 12+ and save a further 8% automatically.</span></div>`}
+          <div class="acts"><div class="qty"><button data-q="-1">−</button><span id="qv">1</span><button data-q="1">+</button></div><button class="btn p" id="padd">${ICONS.plus}Add to cart</button></div>
+          <div class="ship"><div>${ICONS.truck}<span><b>${p.bulky?'Freight quoted at checkout':'Free delivery'}</b> ${p.bulky?'— we\'ll book the skid for you':'when your order clears $150'}</span></div><div>${ICONS.pin}<span><b>Click & collect</b> ready in about an hour at either warehouse</span></div><div>${ICONS.shield}<span><b>Genuine ${esc(p.vendor)}</b> — authorised distributor, full warranty</span></div></div>
+        </div>
+        <div class="ptabs"><button class="on" data-t="d">Details</button><button data-t="s">Specs</button><button data-t="r">Delivery & returns</button></div>
+        <div class="ptab" id="ptab"></div>
+      </div>
+    </div>
+    <div class="sec-h" style="margin-top:56px"><div><h2>Goes with it</h2><p>More from ${c.name}.</p></div><a class="more" href="#/c/${p.cat}">All ${c.name} ${ICONS.arrow}</a></div>
+    ${grid(rel)}</div>`;
+  const tabs={d:'<p>'+esc(p.desc||('Professional-grade '+p.type.toLowerCase()+' from '+p.vendor+'. Sourced direct from the distributor, backed by full warranty, and stocked at both Kingdom warehouses.'))+'</p>',
+    s:`<table><tr><td>Brand</td><td>${esc(p.vendor)}</td></tr><tr><td>Category</td><td>${esc(p.type)}</td></tr><tr><td>Department</td><td>${c.name}</td></tr><tr><td>Shipping class</td><td>${p.skid?'Skid freight':p.bulky?'Bulky parcel':'Standard parcel'}</td></tr><tr><td>Warranty</td><td>Manufacturer's, via HBK</td></tr></table>`,
+    r:'<p><b>Delivery.</b> Free AU & NZ delivery on parcel orders over $150 (excludes furniture, bulky items and NT). Bulky and skid freight is quoted live at checkout. Sydney metro orders placed before 1pm ship same day.</p><p><b>Click & collect.</b> Yagoona or Blacktown, usually ready within the hour — we text you when it\'s packed.</p><p><b>Returns.</b> 30 days on unopened stock. Electricals carry the manufacturer\'s warranty; bring it to either counter and we handle the claim.</p>'};
+  const setTab=t=>{$('#ptab').innerHTML=tabs[t];$$('.ptabs button').forEach(b=>b.classList.toggle('on',b.dataset.t===t))};setTab('d');
+  $$('.ptabs button').forEach(b=>b.addEventListener('click',()=>setTab(b.dataset.t)));
+  let q=1;$$('[data-q]').forEach(b=>b.addEventListener('click',()=>{q=Math.max(1,q+ +b.dataset.q);$('#qv').textContent=q}));
+  $('#padd').addEventListener('click',()=>{addToCart(i,q);openCart()});
+  $$('[data-th]').forEach(b=>b.addEventListener('click',()=>{$('#gmain').src=b.dataset.th;$$('[data-th]').forEach(x=>x.classList.toggle('on',x===b))}));
+  const tl=$('#tlink');if(tl)tl.addEventListener('click',openTrade);
+}
+
+function brandsPage(){
+  app.innerHTML=`<div class="wrap"><div class="crumbs"><a href="#/">Home</a><span>›</span><span>Brands</span></div>
+    <div class="chead"><div><h1>Brands we distribute</h1><p>Authorised stockist for every name below. Genuine stock, manufacturer's warranty, no grey imports.</p></div><span class="n">${BRANDS.length}+ brands</span></div>
+    <div class="bgrid">${BRANDS.map(([b,c])=>`<a class="${c}" href="#/c/${PRODUCTS.find(p=>b.toLowerCase().startsWith(p.vendor.toLowerCase().split(' ')[0]))?.cat||'barber'}">${b}</a>`).join('')}</div>
+    <div class="sec-h" style="margin-top:40px"><div><h2>Brand favourites</h2><p>The SKUs each brand is known for.</p></div></div>${grid(idx([0,1,4,5,11,12,13,21]))}</div>`;
+}
+function dealsPage(){
+  const list=[...PRODUCTS].filter(p=>p.was>p.price).sort((a,b)=>(b.was-b.price)/b.was-(a.was-a.price)/a.was);
+  app.innerHTML=`<div class="wrap"><div class="crumbs"><a href="#/">Home</a><span>›</span><span>Deals</span></div>
+    <div class="chead"><div><h1>Deals & <span class="em pink">cartons.</span></h1><p>Biggest savings first. Carton pricing kicks in automatically at 12+ units of any non-bulky line.</p></div><span class="n">${list.length} on sale</span></div>
+    <div class="deals" style="margin:0 0 26px">
+      <div class="deal d1"><div><b>Up to 56% off selected brands</b><span>Ends Sunday midnight.</span></div><span class="go">Auto-applied</span><img src="${PRODUCTS[5].img}" alt=""/></div>
+      <div class="deal d2"><div><b>12+ units = carton price</b><span>A further 8% off, stacked on sale prices.</span></div><span class="go">No code needed</span><img src="${PRODUCTS[18].img}" alt=""/></div>
+      <div class="deal d3"><div><b>Trade tier on top</b><span>Gold accounts save another 10% on everything.</span></div><span class="go">Log in ${ICONS.arrow}</span><img src="${PRODUCTS[41].img}" alt=""/></div>
+    </div>${grid(list)}</div>`;
+}
+function accountPage(){
+  if(!TRADE){app.innerHTML=`<div class="wrap"><div class="co" style="grid-template-columns:1fr;max-width:560px;margin:0 auto"><div><h1>Trade account</h1><p style="color:var(--mute);margin:0 0 18px">Log in to see tier pricing, reorder from history and manage your shop's team. New here? Apply below — approved within a business day.</p>
+    <div class="cobox"><h3>Already a Kingdom account</h3><button class="btn k full" id="acLogin">Log in</button></div>
+    <div class="cobox"><h3>Apply for trade pricing <small>Free · 60 seconds</small></h3><form id="acApply"><div class="r2"><div class="fld"><label>Shop name</label><input required placeholder="Fade Society"/></div><div class="fld"><label>ABN</label><input required placeholder="11 digits"/></div></div><div class="r2"><div class="fld"><label>Your name</label><input required/></div><div class="fld"><label>Mobile</label><input required/></div></div><div class="fld"><label>Business type</label><select><option>Barbershop</option><option>Hair salon</option><option>Beauty / lash / brow</option><option>Academy</option><option>Distributor</option></select></div><button class="btn p full" type="submit">Apply now</button></form></div></div></div></div>`;
+    $('#acLogin').addEventListener('click',openTrade);$('#acApply').addEventListener('submit',e=>{e.preventDefault();toast('Application received — we\'ll call you back');e.target.reset()});return}
+  const init=TRADE.name.slice(0,1).toUpperCase();
+  app.innerHTML=`<div class="wrap"><div class="acct">
+    <aside class="side"><div class="av">${init}</div><b>${esc(TRADE.salon)}</b><span>${esc(TRADE.name)} · Gold tier</span><br><span class="tier"><i></i>10% off everything</span>
+      <nav><a class="on" href="#/account">Overview</a><a href="#/account">Orders & invoices</a><a href="#/account">Saved carts</a><a href="#/account">Team logins</a><a href="#/account">Statements</a><a href="#/account" id="acOut" style="color:var(--pink)">Log out</a></nav></aside>
+    <div>
+      <h1 style="font-size:32px;font-weight:800;letter-spacing:-.04em;margin-bottom:16px">Morning, ${esc(TRADE.name)}.</h1>
+      <div class="stat4"><div><b>$4,318</b><span>Spent this quarter</span></div><div><b>$479</b><span>Saved with Gold tier</span></div><div><b>$682</b><span>to Platinum (12.5%)</span></div></div>
+      <div class="cobox"><h3>One-tap reorder <small>Based on your last 90 days</small></h3><div class="quick">${idx([9,3,33,7]).map(p=>`<button data-add="${PRODUCTS.indexOf(p)}"><img src="${p.img}" alt=""/><div><b>${esc(p.short)}</b><span>Last ordered 12 days ago · ${money(priceOf(p))}</span></div></button>`).join('')}</div></div>
+      <div class="cobox"><h3>Recent orders</h3>
+        <div class="orow"><div><b>#HBK-48213</b><span>Tue 26 Aug · 14 items · Click & collect Yagoona</span></div><b>$612.40</b><span class="st">Collected</span></div>
+        <div class="orow"><div><b>#HBK-48096</b><span>Mon 18 Aug · 6 items · Delivered</span></div><b>$286.90</b><span class="st">Delivered</span></div>
+        <div class="orow"><div><b>#HBK-47901</b><span>Thu 7 Aug · Karma Paddington chair · Skid</span></div><b>$1,444.00</b><span class="st w">Invoice due</span></div>
+      </div>
+    </div></div></div>`;
+  $('#acOut').addEventListener('click',e=>{e.preventDefault();TRADE=null;ls('hbk_trade',null);localStorage.removeItem('hbk_trade');paintTrade();toast('Logged out');route()});
+}
+
+function checkoutPage(){
+  const lines=cartLines();if(!lines.length){app.innerHTML='<div class="wrap"><div class="empty" style="padding:90px 0"><b>Your cart is empty</b>Add something first.<br><br><a class="btn k" href="#/c/barber">Shop barber</a></div></div>';return}
+  let mode='deliver';
+  app.innerHTML=`<div class="wrap"><div class="co">
+    <div><h1>Checkout</h1><div class="steps"><span class="on"><i>1</i>Details</span><span class="on"><i>2</i>Delivery</span><span><i>3</i>Payment</span></div>
+      <div class="cobox"><h3>Your details ${TRADE?'<small>Gold trade · '+esc(TRADE.salon)+'</small>':'<small><a href="#" id="coLogin" style="color:var(--pink);font-weight:700">Trade account? Log in</a></small>'}</h3>
+        <div class="r2"><div class="fld"><label>First name</label><input value="${TRADE?esc(TRADE.name):''}" placeholder="Aiman"/></div><div class="fld"><label>Last name</label><input/></div></div>
+        <div class="r2"><div class="fld"><label>Mobile</label><input placeholder="04xx xxx xxx"/></div><div class="fld"><label>Email</label><input placeholder="you@shop.com.au"/></div></div>
+        <div class="fld"><label>Shop / business (optional)</label><input value="${TRADE?esc(TRADE.salon):''}"/></div></div>
+      <div class="cobox"><h3>How do you want it?</h3>
+        <div class="opt on" data-mode="deliver"><i></i><div><b>Deliver it</b><span>Sydney metro next day · AU & NZ 2–6 days</span></div><span class="pr ${shipCost('deliver')?'':'g'}" id="oDel">${shipCost('deliver')?money(shipCost('deliver')):'FREE'}</span></div>
+        <div class="opt" data-mode="collect"><i></i><div><b>Click & collect — Yagoona</b><span>Unit 5/165 Rookwood Rd · ready in ~1 hr</span></div><span class="pr g">FREE</span></div>
+        <div class="opt" data-mode="collect2"><i></i><div><b>Click & collect — Blacktown</b><span>Unit 7/45 Fourth Ave · ready in ~1 hr</span></div><span class="pr g">FREE</span></div>
+        <div id="addr"><div class="fld"><label>Street address</label><input placeholder="Shop 3, 12 Example St"/></div><div class="r2"><div class="fld"><label>Suburb</label><input/></div><div class="fld"><label>Postcode</label><input inputmode="numeric"/></div></div></div></div>
+      <div class="cobox"><h3>Payment</h3><div class="pay"><span>VISA</span><span>MC</span><span>AMEX</span><span>PayPal</span><span>Afterpay</span>${TRADE?'<span style="color:var(--pink)">30-DAY ACCT</span>':''}</div>
+        <div class="fld" style="margin-top:12px"><label>Card number</label><input placeholder="4242 4242 4242 4242" inputmode="numeric"/></div><div class="r2"><div class="fld"><label>Expiry</label><input placeholder="MM / YY"/></div><div class="fld"><label>CVC</label><input placeholder="123"/></div></div></div>
+    </div>
+    <aside class="sum"><h3>Order summary</h3>${lines.map(l=>`<div class="ci"><div class="ph"><img src="${l.p.img}" alt=""/></div><div class="t"><b>${esc(l.p.short)}</b><span>Qty ${l.q} · ${esc(l.p.vendor)}</span></div><div class="r"><b>${money(priceOf(l.p)*l.q)}</b></div></div>`).join('')}
+      <div style="margin-top:12px" id="sumTot"></div><button class="btn p full" id="place" style="margin-top:16px">Place order · <span id="placeAmt"></span></button><p style="font-size:12px;color:var(--faint);text-align:center;margin:10px 0 0">Concept demo — no payment is taken.</p></aside>
+  </div></div>`;
+  const paintTot=()=>{const s=cartSub(),sh=shipCost(mode.startsWith('collect')?'collect':'deliver'),gst=(s+sh)/11;$('#sumTot').innerHTML=`<div class="tot"><span>Subtotal</span><span>${money(s)}</span></div>${TRADE?`<div class="tot"><span>Gold tier saving</span><span class="g">−${money(lines.reduce((a,l)=>a+(l.p.price-priceOf(l.p))*l.q,0))}</span></div>`:''}<div class="tot"><span>${mode.startsWith('collect')?'Collect':'Delivery'}</span><span class="${sh?'':'g'}">${sh?money(sh):'FREE'}</span></div><div class="tot"><span>Incl. GST</span><span>${money(gst)}</span></div><div class="tot big"><span>Total</span><span>${money(s+sh)}</span></div>`;$('#placeAmt').textContent=money(s+sh);$('#addr').classList.toggle('hidden',mode.startsWith('collect'))};
+  $$('.opt').forEach(o=>o.addEventListener('click',()=>{$$('.opt').forEach(x=>x.classList.toggle('on',x===o));mode=o.dataset.mode;paintTot()}));
+  paintTot();
+  const cl=$('#coLogin');if(cl)cl.addEventListener('click',e=>{e.preventDefault();openTrade()});
+  $('#place').addEventListener('click',()=>{const b=$('#place');b.disabled=true;b.textContent='Placing order…';setTimeout(()=>{ls('hbk_last',{n:'HBK-'+(48214+Math.floor(Math.random()*40)),t:cartSub()+shipCost(mode.startsWith('collect')?'collect':'deliver'),mode,items:cartCount()});CART={};saveCart();location.hash='#/done'},900)});
+}
+function donePage(){
+  const o=ls('hbk_last')||{n:'HBK-48219',t:0,mode:'deliver',items:0};
+  app.innerHTML=`<div class="wrap"><div class="done"><div class="tick">✓</div><h1>Order placed.</h1><p>${o.mode.startsWith('collect')?'We\'ll text you the moment it\'s packed — usually within the hour.':'Packed today, on the truck tomorrow. Tracking lands in your inbox tonight.'}</p><div class="ord">${o.n} · ${o.items} items · ${money(o.t)}</div><br><a class="btn k" href="#/">Back to the shop</a> <a class="btn g" href="#/account">View orders</a></div></div>`;
+}
+
+/* ============================ CART ============================ */
+function addToCart(i,q=1){CART[i]=(CART[i]||0)+q;saveCart();const c=$('#cartCnt');c.classList.remove('pop');void c.offsetWidth;c.classList.add('pop');toast(PRODUCTS[i].short+' added')}
+function setQty(i,q){if(q<=0)delete CART[i];else CART[i]=q;saveCart();paintDrawer()}
+function paintCartUI(){const n=cartCount();$('#cartCnt').textContent=n;$('#cartCnt').classList.toggle('on',n>0);const m=$('#mcnt');m.textContent=n;m.classList.toggle('hidden',!n);$$('[data-add]').forEach(b=>{if(b.classList.contains('add'))b.innerHTML=CART[b.dataset.add]?ICONS.tick+'In cart · '+CART[b.dataset.add]:ICONS.plus+'Add to cart'})}
+function paintDrawer(){
+  const lines=cartLines();$('#dCount').textContent=lines.length?cartCount()+' items':'';
+  if(!lines.length){$('#dBody').innerHTML='<div class="empty"><b>Nothing in here yet</b>Your cart is waiting for a restock.</div>';$('#dFoot').innerHTML='<a class="btn k full" href="#/c/barber" id="dShop">Start with Barber</a>';$('#dShop').addEventListener('click',closeAll);return}
+  const s=cartSub();const left=Math.max(0,150-s);const pct=Math.min(100,s/150*100);
+  $('#dBody').innerHTML=`<div class="free ${left?'':'ok'}">${left?'Add <b>'+money(left)+'</b> more for free delivery':'✓ You\'ve unlocked free delivery'}<div class="bar"><i style="width:${pct}%"></i></div></div>`+
+    lines.map(l=>{const i=PRODUCTS.indexOf(l.p);return `<div class="ci"><div class="ph"><img src="${l.p.img}" alt=""/></div><div class="t"><b>${esc(l.p.short)}</b><span>${esc(l.p.vendor)} · ${money(priceOf(l.p))} ea</span><div class="qty"><button data-dq="${i}|${l.q-1}">−</button><span>${l.q}</span><button data-dq="${i}|${l.q+1}">+</button></div></div><div class="r"><b>${money(priceOf(l.p)*l.q)}</b><button data-dq="${i}|0">Remove</button></div></div>`}).join('');
+  const sh=shipCost('deliver');
+  $('#dFoot').innerHTML=`<div class="tot"><span>Subtotal</span><span>${money(s)}</span></div><div class="tot"><span>Delivery estimate</span><span class="${sh?'':'g'}">${sh?money(sh):'FREE'}</span></div>${TRADE?'<div class="tot"><span>Gold tier saving</span><span class="g">−'+money(lines.reduce((a,l)=>a+(l.p.price-priceOf(l.p))*l.q,0))+'</span></div>':''}<div class="tot big"><span>Total</span><span>${money(s+sh)}</span></div><a class="btn p full" href="#/checkout" id="dCo" style="margin-top:12px">Checkout ${ICONS.arrow}</a><div style="text-align:center;font-size:12px;color:var(--faint);margin-top:10px">Click & collect free · 30-day terms on trade accounts</div>`;
+  $$('[data-dq]').forEach(b=>b.addEventListener('click',()=>{const [i,q]=b.dataset.dq.split('|');setQty(i,+q)}));
+  $('#dCo').addEventListener('click',closeAll);
+}
+function openCart(){paintDrawer();$('#drawer').classList.add('on');$('#scrim').classList.add('on')}
+function closeAll(){$('#drawer').classList.remove('on');$('#mnav').classList.remove('on');$('#scrim').classList.remove('on');$('#tradeModal').classList.remove('on')}
+$('#cartBtn').addEventListener('click',openCart);$('#dClose').addEventListener('click',closeAll);$('#scrim').addEventListener('click',closeAll);
+$('#mcart').addEventListener('click',e=>{e.preventDefault();openCart()});
+$('#burger').addEventListener('click',()=>{$('#mnav').classList.add('on');$('#scrim').classList.add('on')});
+$('#mnav').addEventListener('click',e=>{if(e.target.closest('a'))closeAll()});
+
+/* ============================ TRADE ============================ */
+function openTrade(){$('#tradeModal').classList.add('on');$('#scrim').classList.add('on');setTimeout(()=>$('#tfSalon').focus(),80)}
+function paintTrade(){$('#tradeLbl').textContent=TRADE?TRADE.name+' · Gold':'Trade login';$('#tradeBtn').classList.toggle('pk',!!TRADE);$('#cartBtn').classList.toggle('pk',!TRADE)}
+$('#tradeBtn').addEventListener('click',()=>{TRADE?location.hash='#/account':openTrade()});
+$$('#tradeModal [data-close]').forEach(b=>b.addEventListener('click',closeAll));
+$('#tradeForm').addEventListener('submit',e=>{e.preventDefault();TRADE={salon:$('#tfSalon').value.trim(),name:$('#tfName').value.trim()};ls('hbk_trade',TRADE);paintTrade();closeAll();toast('Welcome back, '+TRADE.name+' — Gold pricing on');route()});
+
+/* ============================ SEARCH ============================ */
+const q=$('#q'),sres=$('#sres');let sel=-1;
+function doSearch(){const v=q.value.trim().toLowerCase();if(v.length<2){sres.classList.remove('on');return}
+  const hits=PRODUCTS.map((p,i)=>({p,i,s:(p.short+' '+p.vendor+' '+p.type+' '+p.title).toLowerCase()})).filter(x=>v.split(/\s+/).every(w=>x.s.includes(w))).slice(0,7);
+  const brand=BRANDS.filter(([b])=>b.toLowerCase().includes(v)).slice(0,3);
+  sres.innerHTML=(brand.length?'<div class="lbl">BRANDS</div>'+brand.map(([b])=>`<a class="srow" href="#/brands"><div class="t"><b>${b}</b><span>Authorised stockist</span></div></a>`).join(''):'')+
+    (hits.length?'<div class="lbl">PRODUCTS</div>'+hits.map(x=>`<a class="srow" href="#/p/${x.i}"><img src="${x.p.img}" alt=""/><div class="t"><b>${esc(x.p.short)}</b><span>${esc(x.p.vendor)} · ${esc(x.p.type)}</span></div><span class="p">${money(priceOf(x.p))}</span></a>`).join(''):'<div class="lbl">No matches in the featured set — call 1300 061 808, we probably have it.</div>');
+  sres.classList.add('on');sel=-1}
+q.addEventListener('input',doSearch);q.addEventListener('focus',doSearch);
+document.addEventListener('click',e=>{if(!e.target.closest('.search'))sres.classList.remove('on')});
+document.addEventListener('keydown',e=>{if(e.key==='/'&&document.activeElement!==q&&!/input|textarea/i.test(document.activeElement.tagName)){e.preventDefault();q.focus()}if(e.key==='Escape'){sres.classList.remove('on');closeAll()}
+  if(sres.classList.contains('on')&&['ArrowDown','ArrowUp','Enter'].includes(e.key)){const rows=$$('.srow',sres);if(!rows.length)return;e.preventDefault();if(e.key==='Enter'){(rows[sel]||rows[0]).click();sres.classList.remove('on');return}sel=e.key==='ArrowDown'?Math.min(rows.length-1,sel+1):Math.max(0,sel-1);rows.forEach((r,k)=>r.classList.toggle('sel',k===sel))}});
+sres.addEventListener('click',()=>{sres.classList.remove('on');q.value=''});
+
+/* ============================ WIRING ============================ */
+let toastT;function toast(t){$('#toastT').textContent=t;const el=$('#toast');el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),2200)}
+function wire(){
+  $$('[data-add]').forEach(b=>{if(b._w)return;b._w=1;b.addEventListener('click',e=>{e.preventDefault();addToCart(+b.dataset.add);if(b.classList.contains('add')){b.classList.add('done');b.innerHTML=ICONS.tick+'Added';setTimeout(()=>{b.classList.remove('done');paintCartUI()},900)}})});
+  $$('[data-go]').forEach(b=>{if(b._w)return;b._w=1;b.addEventListener('click',()=>location.hash='#/p/'+b.dataset.go)});
+  $$('[data-save]').forEach(b=>{if(b._w)return;b._w=1;b.addEventListener('click',e=>{e.stopPropagation();const i=+b.dataset.save;SAVED.includes(i)?SAVED=SAVED.filter(x=>x!==i):SAVED.push(i);ls('hbk_saved',SAVED);b.classList.toggle('on');toast(b.classList.contains('on')?'Saved for later':'Removed from saved')})});
+  paintCartUI();
+}
+/* demo hooks for screenshots: ?trade=1 pre-logs a trade account, ?cart=1 seeds a cart */
+(()=>{const u=new URLSearchParams(location.search);
+  if(u.get('trade')){TRADE={salon:'Fade Society Bankstown',name:'Aiman'};ls('hbk_trade',TRADE)}
+  if(u.get('cart')){CART={0:1,4:3,9:2,33:1,7:1};ls('hbk_cart',CART)}
+  if(u.get('reset')){CART={};TRADE=null;localStorage.clear()}
+})();
+paintTrade();route();
+</script>
+</body>
+</html>
