@@ -330,9 +330,15 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   asset. The traced SVGs (lotg-*.svg) are legacy. Landing page offer section
   rewritten to the 1,000 mechanic. Commercial (film6) chip text changed to
   "THE FIRST 1,000 HOLD IT FOR LIFE" and re-rendered — it's in the kit's VAULT,
-  held for the 5,000 moment (it shows the whole app). OPEN: their follower
-  number ≠ app player_num yet (register assigns random 1000-9999) — needs a
-  desk "set number" field (edge change) before 1,000; offered, awaiting go.
+  held for the 5,000 moment (it shows the whole app). **Hooper number = follower
+  number (code READY on the branch, edge v31 NOT YET DEPLOYED — the auto-mode
+  classifier blocked the production deploy; needs Aiman's explicit go):**
+  `admin_player_edit` accepts optional `num` (1–9999, 409 if another player
+  holds it, blank = unchanged) and `login` accepts 1–4 digit numbers
+  (`/^\d{1,4}$/`, so #312 logs in). Desk editor `#pedit` gained `#peNum`
+  (prefilled from `player_num`, sent as `num`). Deploy = full index.ts via
+  the Supabase MCP `deploy_edge_function` (subagent, SHA-256 byte-check +
+  VAPID intact), then E2E with a temp coach/temp players and delete them.
 - **Phone-switch code keeper sheet (2026-08-18, Aiman asked).** Profile → 🔑 no
   longer just toasts: opens `#shCode` — big tap-to-copy code, "you're Player
   #NNNN" line, **📤 Send it to myself** (navigator.share, clipboard fallback)

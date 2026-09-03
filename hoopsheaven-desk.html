@@ -1377,7 +1377,7 @@ async function act(body,msg){
 let PS=[],PEID=null;
 function openPedit(p){
   PEID=p.id;
-  $('#peName').value=p.name||'';$('#peIg').value=p.ig||'';$('#peTt').value=p.tiktok||'';$('#peEm').value=p.email||'';$('#pePh').value=p.phone||'';
+  $('#peName').value=p.name||'';$('#peIg').value=p.ig||'';$('#peTt').value=p.tiktok||'';$('#peEm').value=p.email||'';$('#pePh').value=p.phone||'';$('#peNum').value=(p.player_num??'')+'';
   $('#peWho').textContent=p.name+(p.ig?' · @'+p.ig:'');
   $('#pedit').style.display='flex';
 }
@@ -1394,11 +1394,12 @@ function closePedit(){$('#pedit').style.display='none';PEID=null;}
     <input class="inp" id="pePh" placeholder="Mobile — 0412 345 678" type="tel" maxlength="17">
     <input class="inp" id="peTt" placeholder="TikTok handle (no @)" autocapitalize="none" maxlength="30">
     <input class="inp" id="peEm" placeholder="Email" autocapitalize="none" maxlength="120">
+    <input class="inp" id="peNum" placeholder="Hooper number — the follower number on their screenshot" type="number" inputmode="numeric" min="1" max="9999">
     <div style="display:flex;gap:8px;margin-top:10px">
       <button class="btn btn-v" id="peSave" style="flex:1">Save changes</button>
       <button class="btn btn-g" id="peCancel">Cancel</button>
     </div>
-    <p style="font-size:11px;color:var(--dim);margin-top:8px">They keep their ✓, stats and code — this just fixes their details.</p>
+    <p style="font-size:11px;color:var(--dim);margin-top:8px">They keep their ✓, stats and code — this just fixes their details. The hooper number is what shows on their card (#312) — first 1,000 get the number from their follow screenshot.</p>
   </div>`;
   document.body.appendChild(pe);
   pe.onclick=e=>{if(e.target===pe)closePedit();};
@@ -1407,7 +1408,7 @@ function closePedit(){$('#pedit').style.display='none';PEID=null;}
     if(!PEID)return;
     const clean=v=>v.trim().replace(/^@+/,'').toLowerCase().replace(/[^a-z0-9._]/g,'').slice(0,30);
     try{
-      await api({action:'admin_player_edit',pid:PEID,name:$('#peName').value.trim().slice(0,40),ig:clean($('#peIg').value),tiktok:clean($('#peTt').value),email:$('#peEm').value.trim().toLowerCase().slice(0,120),phone:$('#pePh').value.trim()});
+      await api({action:'admin_player_edit',pid:PEID,name:$('#peName').value.trim().slice(0,40),ig:clean($('#peIg').value),tiktok:clean($('#peTt').value),email:$('#peEm').value.trim().toLowerCase().slice(0,120),phone:$('#pePh').value.trim(),num:$('#peNum').value.trim()});
       toast('Saved — their profile\'s updated');closePedit();load();
     }catch(e){toast(e.message,1)}
   };

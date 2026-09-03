@@ -511,7 +511,7 @@ Deno.serve(async (req: Request) => {
         const w = encodeURIComponent(who);
         const SEL = "id,name,ig,tiktok,email,phone,verified,verify_code,banned,player_num";
         const asPhone = phoneClean(who);
-        const rows = /^\d{4}$/.test(who)
+        const rows = /^\d{1,4}$/.test(who) // hooper numbers can be 1–4 digits now (#312)
           ? await db(`oc_players?player_num=eq.${w}&select=${SEL}`)
           : asPhone
           ? await db(`oc_players?phone=eq.${encodeURIComponent(asPhone)}&select=${SEL}`)
@@ -1404,8 +1404,18 @@ Deno.serve(async (req: Request) => {
         if (phone === null) return J({ error: "that mobile doesn't look right — use 04xx xxx xxx" }, 400);
         if (!name) return J({ error: "name can't be empty" }, 400);
         if (!ig && !tiktok && !email) return J({ error: "they need at least one of IG / TikTok / email" }, 400);
-        await db(`oc_players?id=eq.${encodeURIComponent(pid)}`, { method: "PATCH", body: JSON.stringify({ name, ig, tiktok, email, phone }) });
-        return J({ ok: true });
+        // Hooper number: the coach stamps the follower number from their screenshot (first 1,000 = free for life).
+        // Blank = leave as is. Must be 1–9999 and not already someone else's.
+        let num: number | undefined = undefined;
+        if (b.num !== undefined && b.num !== null && String(b.num).trim() !== "") {
+          const n = Number(String(b.num).trim());
+          if (!Number.isInteger(n) || n < 1 || n > 9999) return J({ error: "hooper number must be 1–9999" }, 400);
+          const taken = await db(`oc_players?player_num=eq.${n}&id=neq.${encodeURIComponent(pid)}&select=id,name`);
+          if (taken?.length) return J({ error: `#${n} already belongs to ${taken[0].name} — pick another` }, 409);
+          num = n;
+        }
+        await db(`oc_players?id=eq.${encodeURIComponent(pid)}`, { method: "PATCH", body: JSON.stringify({ name, ig, tiktok, email, phone, ...(num !== undefined ? { player_num: num } : {}) }) });
+        return J({ ok: true, player_num: num });
       }
 
       // Full delete: the player + every trace of them (runs they host included).
