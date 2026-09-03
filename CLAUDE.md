@@ -331,8 +331,9 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   rewritten to the 1,000 mechanic. Commercial (film6) chip text changed to
   "THE FIRST 1,000 HOLD IT FOR LIFE" and re-rendered — it's in the kit's VAULT,
   held for the 5,000 moment (it shows the whole app). **Hooper number = follower
-  number (code READY on the branch, edge v31 NOT YET DEPLOYED — the auto-mode
-  classifier blocked the production deploy; needs Aiman's explicit go):**
+  number — SHIPPED, edge v31 (= Supabase fn version 34), Aiman said "deploy
+  it" 2026-09-03; deployed via subagent, SHA-256 byte-identical, VAPID intact,
+  E2E 10/10 with temp coach + 2 temp players, all deleted):**
   `admin_player_edit` accepts optional `num` (1–9999, 409 if another player
   holds it, blank = unchanged) and `login` accepts 1–4 digit numbers
   (`/^\d{1,4}$/`, so #312 logs in). Desk editor `#pedit` gained `#peNum`
