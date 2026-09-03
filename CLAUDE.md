@@ -307,6 +307,32 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   refreshes the app screenshots (`social/t-*.jpg`). **NO launch date on
   anything** (Aiman: "don't put 1 September on anything"). Rebrand is
   UNMERGED — Netlify still serves the orange build until he says "merge it".
+- **THE FIRST 1,000 — cryptic launch (2026-09-03, Aiman's brief).** The whole IG
+  launch is now built on the first **1,000 followers** of @certified.hooper.aus
+  (NOT 10,000): follow → screenshot the follow showing the follower count → that
+  number is theirs, **free for life**, and it becomes their **hooper number** at
+  sign-up. At 1,000 → "drop two" (cryptic hint that the doors opened for the
+  first thousand, never say "app"); at **5,000 the app goes public** but is only
+  ever teased ("the fence comes down"). Public copy rule: say "hoops finder",
+  "first 1,000", "your number"; never "app/download/launch/date". Deliverables:
+  **3 posts** — carousel v3 (scratchpad carousel3.html → assets/carousel/
+  slide-1..9.png, cryptic 9 slides), reel 1 "The first 1,000" (reel1.html,
+  21s 60fps → assets/video/reel-first-1000-*), reel 2 "Sydney's playing"
+  (reel2.html 19s → reel-sydneys-playing-*), + **story** "pulse" (story1.html
+  12s → story-pulse-*). Shared canvas lib scratchpad/cry.js (slam/hb/pulseRings/
+  igProfile/mapTicks/tickDraw…); renderer cryrender.mjs <html> <fps> <outdir>,
+  mixer crymix.py <name> <fps> <dur> <sfx-json>. Kit page = launch.html from
+  **gen_launch2.py <SHA>** (3 posts + story + drops/milestones + bio + 3 DM
+  scripts + install clips + vault). **LOTG logo = his ORIGINAL pixels now:** the
+  396×232 upload was recovered from the transcript JSONL (`queued_command`
+  attachment, base64) → alpha-keyed + 4× lanczos → assets/lotg-original.png;
+  used by the app splash (`.lotg-img`), app + landing footers, every campaign
+  asset. The traced SVGs (lotg-*.svg) are legacy. Landing page offer section
+  rewritten to the 1,000 mechanic. Commercial (film6) chip text changed to
+  "THE FIRST 1,000 HOLD IT FOR LIFE" and re-rendered — it's in the kit's VAULT,
+  held for the 5,000 moment (it shows the whole app). OPEN: their follower
+  number ≠ app player_num yet (register assigns random 1000-9999) — needs a
+  desk "set number" field (edge change) before 1,000; offered, awaiting go.
 - **Phone-switch code keeper sheet (2026-08-18, Aiman asked).** Profile → 🔑 no
   longer just toasts: opens `#shCode` — big tap-to-copy code, "you're Player
   #NNNN" line, **📤 Send it to myself** (navigator.share, clipboard fallback)
