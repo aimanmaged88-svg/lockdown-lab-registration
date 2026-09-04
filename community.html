@@ -202,15 +202,37 @@ footer a{color:var(--muted)}
   <p class="note">Courts the community found and Aiman added.</p>
   <div class="card" id="addedList"><div class="empty" style="border:0;padding:8px">Nothing yet — the first one's yours.</div></div>
 
-  <h2 id="fb"><small>Anything else</small>Tell Aiman</h2>
-  <p class="note">Ideas, problems, a court that's wrong, a run you want called. It lands straight with him.</p>
+  <h2 id="fb"><small>Step 3</small>Shape the app</h2>
+  <p class="note">This is being built for you, so tell us how you want it to run. What should be in it? What's missing? Every idea lands straight with Aiman.</p>
   <div class="card">
-    <textarea id="fbText" placeholder="Say it how you'd say it." maxlength="600"></textarea>
+    <label class="l">What's this about?</label>
+    <div class="seg" id="fbKind">
+      <button type="button" data-k="idea" class="on">💡 Feature idea</button>
+      <button type="button" data-k="how">⚙️ How it works</button>
+      <button type="button" data-k="bug">🐞 Something's wrong</button>
+    </div>
+
+    <label class="l" id="fbExL">Want any of these? Tap the ones you'd use</label>
+    <div class="chips" id="fbIdeas">
+      <button type="button" class="chip" data-i="Gamification — levels, XP, streaks">🎮 Gamification</button>
+      <button type="button" class="chip" data-i="My own player profile">👤 My own profile</button>
+      <button type="button" class="chip" data-i="Leaderboards / rankings">🏆 Leaderboards</button>
+      <button type="button" class="chip" data-i="Badges & rewards for turning up">🎖️ Badges & rewards</button>
+      <button type="button" class="chip" data-i="Find players near me">📍 Players near me</button>
+      <button type="button" class="chip" data-i="Squads / teams">👥 Squads & teams</button>
+      <button type="button" class="chip" data-i="Track my stats">📊 Stats tracking</button>
+      <button type="button" class="chip" data-i="Prizes / comps">💰 Prizes & comps</button>
+      <button type="button" class="chip" data-i="Better notifications">🔔 Notifications</button>
+      <button type="button" class="chip" data-i="Chat with the run">💬 Run chat</button>
+    </div>
+
+    <label class="l" for="fbText">Tell Aiman in your own words</label>
+    <textarea id="fbText" placeholder="Say it how you'd say it. What would make you open this every day?" maxlength="600"></textarea>
     <div class="row2" style="margin-top:10px">
       <input class="inp" id="fbName" placeholder="Your name" maxlength="40">
       <input class="inp" id="fbIg" placeholder="@handle (optional)" maxlength="31" autocapitalize="none">
     </div>
-    <button class="btn g" id="fbSend" type="button">Send</button>
+    <button class="btn" id="fbSend" type="button">Send it to Aiman</button>
     <div class="err" id="fbErr"></div>
   </div>
 
@@ -291,9 +313,23 @@ function paintList(){
 }
 loadList();
 
-/* ---------- feedback ---------- */
-$('#fbSend').onclick=async()=>{ const t=$('#fbText').value.trim(); const err=$('#fbErr'); err.style.display='none'; if(!t){err.textContent='Say something first.';err.style.display='block';return;}
-  const b=$('#fbSend'); b.disabled=true; try{ await api('bug_report',{kind:'vibe',page:'community',text:t,ua:navigator.userAgent.slice(0,200),player:{id:DEV,name:$('#fbName').value.trim(),ig:$('#fbIg').value.trim()}}); $('#fbText').value=''; toast('Sent to Aiman 🤝'); }catch(e){ err.textContent=e.message; err.style.display='block'; } b.disabled=false; };
+/* ---------- shape the app ---------- */
+let FBKIND='idea';
+$$('#fbKind button').forEach(b=>b.onclick=()=>{ $$('#fbKind button').forEach(x=>x.classList.remove('on')); b.classList.add('on'); FBKIND=b.dataset.k;
+  $('#fbExL').style.display=FBKIND==='bug'?'none':'block'; $('#fbIdeas').style.display=FBKIND==='bug'?'none':'flex';
+  $('#fbText').placeholder=FBKIND==='bug'?"What broke? What were you doing when it happened?":FBKIND==='how'?"How should it work? What's clunky, what would you change?":"Say it how you'd say it. What would make you open this every day?"; });
+$$('#fbIdeas .chip').forEach(c=>c.onclick=()=>c.classList.toggle('on'));
+$('#fbSend').onclick=async()=>{
+  const picks=$$('#fbIdeas .chip.on').map(c=>c.dataset.i);
+  const t=$('#fbText').value.trim(); const err=$('#fbErr'); err.style.display='none';
+  if(!t && !picks.length){ err.textContent='Tap an idea or tell us in your own words.'; err.style.display='block'; return; }
+  const text=(picks.length?'Wants: '+picks.join(', ')+(t?'\n\n':''):'')+t;
+  const b=$('#fbSend'); b.disabled=true; b.textContent='Sending…';
+  try{ await api('bug_report',{kind:FBKIND,page:'community',text,ua:navigator.userAgent.slice(0,200),player:{id:DEV,name:$('#fbName').value.trim(),ig:$('#fbIg').value.trim()}});
+    $('#fbText').value=''; $$('#fbIdeas .chip.on').forEach(c=>c.classList.remove('on')); toast('Sent to Aiman 🤝 — keep them coming'); }
+  catch(e){ err.textContent=e.message; err.style.display='block'; }
+  b.disabled=false; b.textContent='Send it to Aiman';
+};
 
 /* ---------- the hidden door → review desk ---------- */
 let PIN=sessionStorage.getItem('cc_pin')||''; let ADM=null; let TAB='pending';
@@ -313,7 +349,8 @@ function paintDesk(){
   $('#tabs').innerHTML=tabs.map(([k,l,n])=>`<button class="tab ${TAB===k?'on':''}" data-t="${k}">${l}${n!=null?' · '+n:''}</button>`).join('');
   $$('#tabs .tab').forEach(b=>b.onclick=()=>{TAB=b.dataset.t;paintDesk();});
   let html='';
-  if(TAB==='feedback'){ html = FB.length ? FB.map(f=>`<div class="fb ${f.done?'done':''}"><div class="t">${esc(f.text)}</div><div class="m">${esc(f.name||'anon')}${f.ig?' · @'+esc(f.ig):''} · ${ago(f.created_at)}</div><div class="acts"><button data-a="fbdone" data-id="${f.id}" data-on="${f.done?'0':'1'}">${f.done?'Reopen':'Done ✓'}</button><button class="d" data-a="fbdel" data-id="${f.id}">Delete</button></div></div>`).join('') : '<div class="empty" style="margin-top:14px">No feedback yet.</div>'; }
+  if(TAB==='feedback'){ const KIND={idea:['💡 Feature idea','#F6F3EA'],how:['⚙️ How it works','#F6F3EA'],bug:['🐞 Something broke','#FF7A7A'],vibe:['💬 Feedback','#949A97'],slug:['💬 Feedback','#949A97']};
+    html = FB.length ? FB.map(f=>{ const k=KIND[f.kind]||KIND.vibe; return `<div class="fb ${f.done?'done':''}"><div style="margin-bottom:6px"><span class="st" style="color:${k[1]};border-color:${k[1]}66">${k[0]}</span></div><div class="t">${esc(f.text)}</div><div class="m">${esc(f.name||'anon')}${f.ig?' · <a href="https://instagram.com/'+esc(f.ig)+'" target="_blank" rel="noopener" style="color:#949A97">@'+esc(f.ig)+'</a>':''} · ${ago(f.created_at)}</div><div class="acts"><button data-a="fbdone" data-id="${f.id}" data-on="${f.done?'0':'1'}">${f.done?'Reopen':'Done ✓'}</button><button class="d" data-a="fbdel" data-id="${f.id}">Delete</button></div></div>`; }).join('') : '<div class="empty" style="margin-top:14px">No responses yet. Ideas people send land here.</div>'; }
   else if(TAB==='settings'){ html=`<div class="card" style="margin-top:14px"><label class="l">Change the coach PIN</label><div class="pinrow"><input class="inp" id="npin" inputmode="numeric" maxlength="8" placeholder="new PIN (4–8 digits)"><button class="btn" style="margin:0;width:auto;padding:10px 14px;font-size:14px" id="npinGo" type="button">Save</button></div><p class="note" style="margin-top:10px">The hidden button is the bottom-right corner of this page. The PIN never leaves your head.</p></div>`; }
   else { const rows=C.filter(c=>c.status===TAB); html = rows.length ? rows.map(r=>{ const f=r.features||{}; const pics=r.photos||[]; return `<div class="rc" data-id="${r.id}">
       ${pics.length?`<div class="pics">${pics.map(p=>`<a href="${esc(p)}" target="_blank" rel="noopener"><img src="${esc(p)}" alt="" loading="lazy"></a>`).join('')}</div>`:''}
