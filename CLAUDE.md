@@ -361,7 +361,15 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   Pending / On the vote / On the map / Dismissed / Feedback / PIN). PIN he chose
   = 1975 (only he + this note know it; change via the PIN tab). Landing card
   links "Send us a court →"; kit bio link now = community.html. Playwright
-  smoke scratchpad/demo/cctest.mjs (stubbed API). **DEPLOYED via subagent —
+  smoke scratchpad/demo/cctest.mjs + cctest2.mjs (stubbed). **Shape-the-app
+  (2026-09-04, Aiman: "app suggestions not just courts"):** Step 3 on
+  community.html — kind seg (idea/how/bug) + example idea chips (gamification/
+  own profile/leaderboards/badges/players-near-me/squads/stats/prizes/notifs/
+  run chat) that prefix "Wants: …" into the message + free text + name/ig →
+  `bug_report` kind=idea|how|bug page community (NO edge change; reuses the
+  action + cc_admin feedback query). Desk Feedback tab labels each by kind
+  (💡/⚙️/🐞) + tappable @ig. Hidden corner desk = his SINGLE inbox for courts
+  AND ideas. **DEPLOYED via subagent —
   edge v32 = Supabase fn version 35, SHA-256 byte-identical, VAPID 5-line
   identical; live E2E 22/22** (submit+photo→heaven/community, honeypot, missing
   name 400, vote up/down/re-vote, pending→voting→add→real oc_court credited
