@@ -374,7 +374,10 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   removed the public submitter byline from vote cards ("Added 2h ago") and the
   on-map list, name field reframed "stays private", and edge cc_add court
   `notes` changed from "Found by <name>…" to just "Courts by the community"
-  (edge redeploy). Submitter name/ig still stored + shown in the PIN desk only. **DEPLOYED via subagent —
+  (edge v33 = Supabase fn v36, deployed via subagent 2026-09-04: SHA-256
+  byte-identical, VAPID 5-line intact, live E2E confirmed the note is
+  "Courts by the community" with no name; test rows deleted). Submitter
+  name/ig still stored + shown in the PIN desk only. **DEPLOYED via subagent —
   edge v32 = Supabase fn version 35, SHA-256 byte-identical, VAPID 5-line
   identical; live E2E 22/22** (submit+photo→heaven/community, honeypot, missing
   name 400, vote up/down/re-vote, pending→voting→add→real oc_court credited
