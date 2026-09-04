@@ -377,7 +377,23 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   (edge v33 = Supabase fn v36, deployed via subagent 2026-09-04: SHA-256
   byte-identical, VAPID 5-line intact, live E2E confirmed the note is
   "Courts by the community" with no name; test rows deleted). Submitter
-  name/ig still stored + shown in the PIN desk only. **DEPLOYED via subagent —
+  name/ig still stored + shown in the PIN desk only.
+- **LAUNCH ELEVATION + inbox link + kit → Netlify (2026-09-04, Aiman: "make it
+  a Netlify link... big company... make it special... it's go").** community.html
+  hero elevated to a launch: green pulsing "THE APP IS BUILT · LAUNCHING WITH
+  THE COMMUNITY" status pill, "the app is ready… we'll drop hints, tips and
+  progress as we go" lead, a "Not a side project — months in the making, a team
+  pulled it together… presented by Love of the Game" `.build` block with 3
+  pillars (map/✓/network). No fake numbers. **Inbox link:** `?hq` (or `#inbox`)
+  on community.html auto-opens the PIN review desk (`openAdm()`), so Aiman has a
+  bookmarkable inbox at `<netlify>/community.html?hq` (still PIN-gated). **Kit
+  now Netlify-hosted:** gen_launch2.py JD=RW=GH=`https://lockdown-lab-
+  registration.netlify.app` (no SHA pin) → bio link + all page/media links are
+  the clean permanent domain, page+media same-origin (share buttons, no CORS),
+  bio never needs re-pinning. Kit gained a "Your inbox" section. app QA clean
+  (no h-overflow, only expected h-scroller/leaflet items). **MERGED to main
+  (fast-forward — branch was a clean superset of main, all extras present) →
+  Netlify auto-deploy; the b&w rebrand + community + first-1000 all LIVE.** **DEPLOYED via subagent —
   edge v32 = Supabase fn version 35, SHA-256 byte-identical, VAPID 5-line
   identical; live E2E 22/22** (submit+photo→heaven/community, honeypot, missing
   name 400, vote up/down/re-vote, pending→voting→add→real oc_court credited

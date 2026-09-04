@@ -117,14 +117,37 @@ footer a{color:var(--muted)}
 .fb.done{opacity:.5}
 .fb .t{font-size:15px;color:var(--ink)} .fb .m{font-size:12.5px;color:var(--dim);margin-top:4px}
 @media(min-width:700px){.vc .pics img{height:240px}}
+.status{display:inline-flex;align-items:center;gap:9px;margin:18px auto 4px;border:1px solid rgba(127,224,176,.35);background:rgba(127,224,176,.06);border-radius:99px;padding:8px 15px;font-family:CPB,sans-serif;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ok)}
+.status .d{width:8px;height:8px;border-radius:50%;background:var(--ok);animation:sp 2s infinite}
+@keyframes sp{0%{box-shadow:0 0 0 0 rgba(127,224,176,.5)}70%{box-shadow:0 0 0 12px rgba(127,224,176,0)}100%{box-shadow:0 0 0 0 rgba(127,224,176,0)}}
+.build{margin:36px 0 6px;border:1px solid var(--line);border-radius:18px;padding:22px 20px;background:linear-gradient(180deg,rgba(240,236,226,.045),transparent)}
+.build h3{font-family:CP,sans-serif;font-style:italic;text-transform:uppercase;font-size:23px;color:var(--ink);margin-bottom:8px}
+.build p{color:var(--muted);font-size:15px}
+.pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}
+.pillar{border:1px solid var(--line);border-radius:12px;padding:14px 10px;text-align:center}
+.pillar .ic{font-size:24px;line-height:1}
+.pillar b{display:block;font-family:CPB,sans-serif;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink);margin-top:8px}
+.pillar span{font-size:11.5px;color:var(--dim)}
+@media(max-width:460px){.pillars{grid-template-columns:1fr}}
 </style></head><body>
 
 <div class="w">
   <div class="top">
     <div class="brand"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="25" fill="none" stroke="currentColor" stroke-width="5"/><path d="M20 33 L29 42 L45 23" fill="none" stroke="currentColor" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Certified Hooper</div>
+    <div class="status"><span class="d"></span>The app is built · launching with the community</div>
     <h1>Courts by the <em>community.</em></h1>
-    <p class="lead">13 courts to start. You find the rest. Send us a court, vote on the ones people send, and we build the map together.</p>
+    <p class="lead">The app is ready. Certified Hooper is Sydney's pickup-basketball network — the map, the runs, the profiles, the ✓. Now we open it up to you. You find the courts. You shape what comes next. And we'll drop hints, tips and progress as we go.</p>
     <div class="hook">Follow <a href="https://instagram.com/certified.hooper.aus" target="_blank" rel="noopener">@certified.hooper.aus</a> — the <b>first 1,000</b> hold it for life. Screenshot your number.</div>
+  </div>
+
+  <div class="build">
+    <h3>Not a side project.</h3>
+    <p>Months in the making, and a team pulled it together — every court scouted by hand, every hooper certified by a real person, the whole network built to last. This isn't a demo. You're getting in at the start of something real, presented by Love of the Game.</p>
+    <div class="pillars">
+      <div class="pillar"><div class="ic">🗺️</div><b>The map</b><span>Every real court</span></div>
+      <div class="pillar"><div class="ic">✓</div><b>The ✓</b><span>Real ones only</span></div>
+      <div class="pillar"><div class="ic">🏀</div><b>The network</b><span>Sydney, then more</span></div>
+    </div>
   </div>
 
   <h2 id="add"><small>Step 1</small>Send a court</h2>
@@ -333,7 +356,10 @@ $('#fbSend').onclick=async()=>{
 
 /* ---------- the hidden door → review desk ---------- */
 let PIN=sessionStorage.getItem('cc_pin')||''; let ADM=null; let TAB='pending';
-$('#adm').onclick=()=>{ if(PIN){ openDesk(); return; } $('#pinOv').classList.add('on'); setTimeout(()=>$('#pin').focus(),50); };
+function openAdm(){ if(PIN){ openDesk(); return; } $('#pinOv').classList.add('on'); setTimeout(()=>$('#pin').focus(),50); }
+$('#adm').onclick=openAdm;
+// direct inbox link: community.html?hq  (or #inbox) opens the review desk straight away
+if(new URLSearchParams(location.search).has('hq') || location.hash==='#inbox'){ setTimeout(openAdm,250); }
 $('#pinX').onclick=()=>$('#pinOv').classList.remove('on');
 $('#pin').onkeydown=e=>{ if(e.key==='Enter') $('#pinGo').click(); };
 $('#pinGo').onclick=async()=>{ const p=$('#pin').value.trim(); const err=$('#pinErr'); err.style.display='none'; if(!p)return; $('#pinGo').disabled=true;
