@@ -1,0 +1,343 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Courts by the Community — Certified Hooper</title>
+<meta name="description" content="13 courts to start. You find the rest. Send a court, vote on the ones people send, build Sydney's map together.">
+<meta name="theme-color" content="#000000">
+<meta property="og:title" content="Courts by the Community — Certified Hooper"><meta property="og:description" content="13 to start. You find the rest. Send a court, vote, build the map.">
+<link rel="icon" href="assets/hh-icon-192.png"><link rel="apple-touch-icon" href="assets/hh-icon-180.png">
+<link rel="preload" href="assets/lotg-original.png" as="image">
+<style>
+@font-face{font-family:CP;src:url('assets/fonts/chakrapetch-700.woff2') format('woff2');font-weight:700;font-display:swap}
+@font-face{font-family:CPB;src:url('assets/fonts/chakrapetch-600.woff2') format('woff2');font-weight:600;font-display:swap}
+@font-face{font-family:BD;src:url('assets/fonts/inter-var.woff2') format('woff2');font-weight:100 900;font-display:swap}
+:root{--bg:#000;--card:#0E1113;--card2:#161B1E;--line:rgba(240,236,226,.12);--ink:#F6F3EA;--text:#E6E2D6;--muted:#949A97;--dim:#5F6664;--white:#FFFFFD;--ok:#7FE0B0;--bad:#FF7A7A}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:BD,-apple-system,'Segoe UI',sans-serif;font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden;padding-bottom:80px}
+.w{max-width:620px;margin:0 auto;padding:0 18px}
+.top{text-align:center;padding:30px 0 6px}
+.top .brand{display:inline-flex;align-items:center;gap:9px;font-family:CP,sans-serif;font-size:13px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.top .brand svg{width:22px;height:22px}
+h1{font-family:CP,sans-serif;font-weight:700;font-style:italic;text-transform:uppercase;font-size:clamp(34px,9.2vw,54px);line-height:.94;margin:16px 0 10px;color:var(--ink);text-wrap:balance}
+h1 em{font-style:italic;color:var(--white)}
+.lead{color:var(--muted);font-size:16px;max-width:52ch;margin:0 auto}
+.hook{margin:18px auto 0;display:inline-block;border:1px solid var(--line);border-radius:12px;padding:12px 16px;font-size:14px;color:var(--text)}
+.hook b{color:var(--white)} .hook a{color:var(--white)}
+h2{font-family:CP,sans-serif;font-weight:700;font-style:italic;text-transform:uppercase;font-size:24px;margin:46px 0 4px;color:var(--ink)}
+h2 small{display:block;font-style:normal;font-size:11px;letter-spacing:.3em;color:var(--dim);margin-bottom:6px}
+.note{font-size:13.5px;color:var(--muted);margin-bottom:12px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+label.l{display:block;font-family:CPB,sans-serif;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--dim);margin:16px 0 6px}
+label.l:first-child{margin-top:0}
+.inp,textarea,select{width:100%;background:#000;border:1px solid var(--line);border-radius:12px;color:var(--ink);font:inherit;font-size:16px;padding:13px 14px;outline:none}
+.inp:focus,textarea:focus{border-color:rgba(240,236,226,.4)}
+textarea{min-height:96px;resize:vertical}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:end}
+.row2 label.l{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:#000;color:var(--text);border-radius:99px;padding:9px 14px;font-size:14px;font-weight:600;cursor:pointer;user-select:none;transition:background .15s,color .15s,border-color .15s}
+.chip.on{background:var(--white);color:#000;border-color:var(--white)}
+.seg{display:flex;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.seg button{flex:1;background:#000;border:0;color:var(--text);font:inherit;font-weight:600;padding:12px;cursor:pointer}
+.seg button.on{background:var(--white);color:#000}
+.photos{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.ph{position:relative;aspect-ratio:1;border:1px dashed var(--line);border-radius:12px;display:grid;place-items:center;color:var(--dim);font-size:12px;text-align:center;padding:8px;overflow:hidden;cursor:pointer;background:#000}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.ph .x{position:absolute;top:6px;right:6px;width:26px;height:26px;border-radius:50%;background:rgba(0,0,0,.7);color:#fff;border:0;font-size:14px;display:none;place-items:center;cursor:pointer}
+.ph.has .x{display:grid}
+.btn{display:block;width:100%;text-align:center;text-decoration:none;font-family:CP,sans-serif;font-weight:700;font-style:italic;text-transform:uppercase;font-size:16px;background:var(--white);color:#000;border:0;border-radius:12px;padding:15px;margin-top:16px;cursor:pointer}
+.btn.g{background:transparent;color:var(--text);border:1px solid rgba(240,236,226,.28)}
+.btn[disabled]{opacity:.55}
+.err{color:var(--bad);font-size:14px;margin-top:10px;display:none}
+.ok{display:none;text-align:center;padding:26px 14px}
+.ok .big{font-family:CP,sans-serif;font-style:italic;text-transform:uppercase;font-size:30px;color:var(--white)}
+.ok p{color:var(--muted);margin-top:8px}
+/* vote cards */
+.vc{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden;margin-bottom:14px}
+.vc .pics{display:flex;gap:2px;background:#000}
+.vc .pics img{flex:1;min-width:0;height:200px;object-fit:cover}
+.vc .pics.one img{height:260px}
+.vc .body{padding:14px 16px}
+.vc .nm{font-family:CP,sans-serif;font-style:italic;text-transform:uppercase;font-size:22px;color:var(--ink);line-height:1.05}
+.vc .sb{color:var(--muted);font-size:14px;margin-top:2px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.tag{font-family:CPB,sans-serif;font-size:11px;letter-spacing:.12em;text-transform:uppercase;border:1px solid var(--line);border-radius:6px;padding:4px 8px;color:var(--muted)}
+.tag.y{color:var(--ink);border-color:rgba(240,236,226,.3)}
+.by{font-size:13px;color:var(--dim);margin-top:10px} .by a{color:var(--muted)}
+.tips{font-size:14px;color:var(--text);margin-top:10px;border-left:2px solid var(--line);padding-left:10px}
+.vote{display:flex;gap:8px;margin-top:14px}
+.vote button{flex:1;background:#000;border:1px solid var(--line);border-radius:12px;color:var(--text);font:inherit;font-weight:700;padding:13px 8px;cursor:pointer}
+.vote button b{display:block;font-family:CP,sans-serif;font-size:20px;line-height:1}
+.vote button.up.on{background:var(--white);color:#000;border-color:var(--white)}
+.vote button.dn.on{background:#2A1416;color:var(--bad);border-color:var(--bad)}
+.maps{display:inline-block;margin-top:10px;font-size:14px;color:var(--white);text-decoration:underline;text-underline-offset:3px}
+.empty{border:1px dashed var(--line);border-radius:14px;padding:22px;text-align:center;color:var(--muted);font-size:14.5px}
+.added{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line)}
+.added:first-child{border-top:0}
+.added .t{width:30px;height:30px;flex:none}
+.added b{display:block;font-family:CP,sans-serif;font-style:italic;text-transform:uppercase;color:var(--ink)}
+.added span{font-size:13px;color:var(--muted)}
+footer{text-align:center;color:var(--dim);font-size:12.5px;padding:50px 18px 0;line-height:1.8}
+footer img{width:170px;height:auto;display:block;margin:0 auto 14px;opacity:.9}
+footer a{color:var(--muted)}
+.toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);background:var(--white);color:#000;font-weight:700;padding:12px 18px;border-radius:12px;opacity:0;transition:.25s;z-index:80;max-width:90vw;text-align:center}
+.toast.on{opacity:1;transform:translateX(-50%)}
+/* the hidden door (bottom-right corner) */
+#adm{position:fixed;right:0;bottom:0;width:58px;height:58px;opacity:0;border:0;background:transparent;z-index:60;cursor:default}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.86);backdrop-filter:blur(8px);z-index:90;display:none;align-items:center;justify-content:center;padding:18px}
+.ov.on{display:flex}
+.pinbox{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px;width:100%;max-width:360px;text-align:center}
+.pinbox h3{font-family:CP,sans-serif;font-style:italic;text-transform:uppercase;font-size:22px;color:var(--ink)}
+.pinbox .inp{text-align:center;font-family:CP,sans-serif;font-size:30px;letter-spacing:.4em;margin-top:14px}
+/* review panel */
+#panel{position:fixed;inset:0;background:#000;z-index:95;display:none;overflow:auto;-webkit-overflow-scrolling:touch}
+#panel.on{display:block}
+.ph-top{position:sticky;top:0;background:rgba(0,0,0,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);padding:14px 18px;z-index:2}
+.ph-top h3{font-family:CP,sans-serif;font-style:italic;text-transform:uppercase;font-size:20px;color:var(--ink);display:flex;justify-content:space-between;align-items:center}
+.ph-top h3 button{background:transparent;border:1px solid var(--line);color:var(--text);border-radius:8px;padding:6px 10px;font:inherit;font-size:13px;cursor:pointer}
+.tabs{display:flex;gap:6px;overflow-x:auto;margin-top:10px;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:none;border:1px solid var(--line);border-radius:99px;background:#000;color:var(--muted);padding:7px 12px;font:inherit;font-size:13px;font-weight:600;cursor:pointer}
+.tab.on{background:var(--white);color:#000;border-color:var(--white)}
+.rc{background:var(--card);border:1px solid var(--line);border-radius:14px;margin:12px 0;overflow:hidden}
+.rc .pics{display:flex;gap:2px;background:#000}
+.rc .pics a{flex:1;min-width:0} .rc .pics img{width:100%;height:150px;object-fit:cover;display:block}
+.rc .b{padding:12px 14px}
+.rc .nm{font-family:CP,sans-serif;font-style:italic;text-transform:uppercase;font-size:20px;color:var(--ink)}
+.rc .kv{font-size:13.5px;color:var(--muted);margin-top:6px;line-height:1.6}
+.rc .kv b{color:var(--text);font-weight:600}
+.acts{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.acts button{background:#000;border:1px solid var(--line);color:var(--text);border-radius:10px;padding:10px 12px;font:inherit;font-size:13.5px;font-weight:700;cursor:pointer}
+.acts button.p{background:var(--white);color:#000;border-color:var(--white)}
+.acts button.d{color:var(--bad);border-color:rgba(255,122,122,.35)}
+.st{display:inline-block;font-family:CPB,sans-serif;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;border:1px solid var(--line);border-radius:6px;padding:3px 7px;color:var(--muted);margin-left:8px;vertical-align:middle}
+.st.voting{color:var(--white);border-color:rgba(255,255,253,.5)} .st.added{color:var(--ok);border-color:rgba(127,224,176,.5)} .st.dismissed{color:var(--dim)}
+.pinrow{display:flex;gap:8px;margin-top:8px} .pinrow .inp{flex:1;padding:10px 12px;font-size:14px}
+.fb{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:10px 0}
+.fb.done{opacity:.5}
+.fb .t{font-size:15px;color:var(--ink)} .fb .m{font-size:12.5px;color:var(--dim);margin-top:4px}
+@media(min-width:700px){.vc .pics img{height:240px}}
+</style></head><body>
+
+<div class="w">
+  <div class="top">
+    <div class="brand"><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="25" fill="none" stroke="currentColor" stroke-width="5"/><path d="M20 33 L29 42 L45 23" fill="none" stroke="currentColor" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Certified Hooper</div>
+    <h1>Courts by the <em>community.</em></h1>
+    <p class="lead">13 courts to start. You find the rest. Send us a court, vote on the ones people send, and we build the map together.</p>
+    <div class="hook">Follow <a href="https://instagram.com/certified.hooper.aus" target="_blank" rel="noopener">@certified.hooper.aus</a> — the <b>first 1,000</b> hold it for life. Screenshot your number.</div>
+  </div>
+
+  <h2 id="add"><small>Step 1</small>Send a court</h2>
+  <p class="note">Anywhere you hoop that isn't on the map yet. Tick what's there, drop a photo, put your name on it. Aiman checks every one.</p>
+  <form class="card" id="f" autocomplete="off" novalidate>
+    <label class="l" for="cName">Court name</label>
+    <input class="inp" id="cName" placeholder="e.g. Tempe Reserve courts" maxlength="80" required>
+    <div class="row2">
+      <div><label class="l" for="cSub">Suburb</label><input class="inp" id="cSub" placeholder="Tempe" maxlength="60"></div>
+      <div><label class="l" for="cWhere">Street</label><input class="inp" id="cWhere" placeholder="Holbeach Ave" maxlength="200"></div>
+    </div>
+    <label class="l" for="cMaps">Google Maps link (the best way to pin it)</label>
+    <input class="inp" id="cMaps" placeholder="Paste the share link from Google Maps" maxlength="300" inputmode="url">
+
+    <label class="l">Outdoor or indoor</label>
+    <div class="seg" id="segIn"><button type="button" data-v="0" class="on">Outdoor</button><button type="button" data-v="1">Indoor</button></div>
+    <label class="l">Full court or half</label>
+    <div class="seg" id="segFull"><button type="button" data-v="1" class="on">Full court</button><button type="button" data-v="0">Half court</button></div>
+
+    <label class="l">What's there? Tick everything that's true</label>
+    <div class="chips" id="feat">
+      <button type="button" class="chip" data-k="lit">💡 Lights</button>
+      <button type="button" class="chip" data-k="toilets">🚻 Toilets</button>
+      <button type="button" class="chip" data-k="shade">⛱️ Shade</button>
+      <button type="button" class="chip" data-k="seating">🪑 Seating</button>
+      <button type="button" class="chip" data-k="played">🏀 I've played here</button>
+    </div>
+
+    <div class="row2">
+      <div><label class="l" for="cHoops">How many hoops</label>
+        <select class="inp" id="cHoops"><option value="0">Not sure</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>8</option><option value="10">10+</option></select></div>
+      <div><label class="l" for="cRim">Rims</label>
+        <select class="inp" id="cRim"><option value="">Not sure</option><option>Chain nets</option><option>Nylon nets</option><option>No nets</option><option>Double rims</option></select></div>
+    </div>
+    <div class="row2">
+      <div><label class="l" for="cSurf">Surface</label>
+        <select class="inp" id="cSurf"><option value="">Not sure</option><option>Concrete</option><option>Asphalt</option><option>Rubber / sport tiles</option><option>Timber (indoor)</option><option>Other</option></select></div>
+      <div><label class="l" for="cWater">Water</label>
+        <select class="inp" id="cWater"><option value="">Not sure</option><option value="bubbler">Bubbler</option><option value="tap">Tap</option><option value="none">None — bring your own</option></select></div>
+    </div>
+    <div class="row2">
+      <div><label class="l" for="cPark">Parking</label><input class="inp" id="cPark" placeholder="Street, car park, none…" maxlength="60"></div>
+      <div><label class="l" for="cCost">Free or paid?</label><input class="inp" id="cCost" placeholder="Free" maxlength="40"></div>
+    </div>
+    <label class="l" for="cBest">Best times to play</label>
+    <input class="inp" id="cBest" placeholder="Weeknights after 6, Sunday mornings…" maxlength="80">
+    <label class="l" for="cBring">What to bring</label>
+    <input class="inp" id="cBring" placeholder="Own ball, water, cash for the car park…" maxlength="200">
+    <label class="l" for="cTips">Tips for hoopers</label>
+    <textarea id="cTips" placeholder="Who runs there, when it's busy, anything a first-timer should know." maxlength="600"></textarea>
+
+    <label class="l">Photos — the court, the hoops, you playing on it (up to 3)</label>
+    <input type="file" id="cFiles" accept="image/*" multiple hidden>
+    <div class="photos" id="photos">
+      <div class="ph" data-i="0">📷<br>Add photo<button type="button" class="x" aria-label="remove">✕</button></div>
+      <div class="ph" data-i="1">📷<br>Add photo<button type="button" class="x" aria-label="remove">✕</button></div>
+      <div class="ph" data-i="2">📷<br>Add photo<button type="button" class="x" aria-label="remove">✕</button></div>
+    </div>
+
+    <div class="row2">
+      <div><label class="l" for="cMe">Your name</label><input class="inp" id="cMe" placeholder="So we can credit you" maxlength="40" required></div>
+      <div><label class="l" for="cIg">Instagram (optional)</label><input class="inp" id="cIg" placeholder="@handle" maxlength="31" autocapitalize="none"></div>
+    </div>
+    <div style="position:absolute;left:-9999px;top:-9999px" aria-hidden="true"><input tabindex="-1" id="website" name="website" autocomplete="off"></div>
+    <button class="btn" id="send" type="submit">Send it to Aiman</button>
+    <div class="err" id="fErr"></div>
+    <div class="ok" id="fOk"><div class="big">Sent. 🤝</div><p>Aiman checks it, then it goes to the vote below. Your name rides on it when it hits the map.</p><button class="btn g" type="button" id="again">Send another one</button></div>
+  </form>
+
+  <h2 id="vote"><small>Step 2</small>Is this a legit court?</h2>
+  <p class="note">Courts people have sent in. Been there? Vote. Enough ✓ and Aiman adds it to the map.</p>
+  <div id="voteList"><div class="empty">Loading…</div></div>
+
+  <h2 id="onmap"><small>Built by you</small>On the map</h2>
+  <p class="note">Courts the community found and Aiman added.</p>
+  <div class="card" id="addedList"><div class="empty" style="border:0;padding:8px">Nothing yet — the first one's yours.</div></div>
+
+  <h2 id="fb"><small>Anything else</small>Tell Aiman</h2>
+  <p class="note">Ideas, problems, a court that's wrong, a run you want called. It lands straight with him.</p>
+  <div class="card">
+    <textarea id="fbText" placeholder="Say it how you'd say it." maxlength="600"></textarea>
+    <div class="row2" style="margin-top:10px">
+      <input class="inp" id="fbName" placeholder="Your name" maxlength="40">
+      <input class="inp" id="fbIg" placeholder="@handle (optional)" maxlength="31" autocapitalize="none">
+    </div>
+    <button class="btn g" id="fbSend" type="button">Send</button>
+    <div class="err" id="fbErr"></div>
+  </div>
+
+  <footer>
+    <img src="assets/lotg-original.png" alt="Love of the Game">
+    Certified Hooper · presented by Love of the Game<br>
+    <a href="https://instagram.com/certified.hooper.aus" target="_blank" rel="noopener">@certified.hooper.aus</a> · <a href="certifiedhooper.html">what is this?</a><br>
+    Real courts only. Real names only. Be good to each other.
+  </footer>
+</div>
+
+<button id="adm" aria-hidden="true" tabindex="-1"></button>
+<div class="ov" id="pinOv"><div class="pinbox"><h3>Coach PIN</h3><input class="inp" id="pin" inputmode="numeric" pattern="[0-9]*" maxlength="8" placeholder="••••"><button class="btn" id="pinGo" type="button">Open</button><button class="btn g" id="pinX" type="button">Cancel</button><div class="err" id="pinErr"></div></div></div>
+<div id="panel"><div class="ph-top"><div class="w" style="padding:0"><h3><span>Review desk</span><button id="pClose" type="button">Close</button></h3><div class="tabs" id="tabs"></div></div></div><div class="w" id="pBody"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const API='https://ymuwuhvqqftgpxwhzoub.supabase.co/functions/v1/opencourt-api';
+const ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltdXd1aHZxcWZ0Z3B4d2h6b3ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NjUyMzgsImV4cCI6MjA5OTI0MTIzOH0.sOkWQpulWj_ZSqMNSV7YP55T70UFSm2mP5e5xapQyQo';
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+async function api(action,body={}){
+  const r=await fetch(API,{method:'POST',headers:{'content-type':'application/json',authorization:'Bearer '+ANON,apikey:ANON},body:JSON.stringify({action,...body})});
+  let d={}; try{d=await r.json();}catch(e){}
+  if(!r.ok||d.error){const e=new Error(d.error||('error '+r.status)); e.code=d.code; e.status=r.status; throw e;}
+  return d;
+}
+let DEV=localStorage.getItem('cc_dev'); if(!DEV){DEV=(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random().toString(36).slice(2)).replace(/-/g,'').slice(0,32); localStorage.setItem('cc_dev',DEV);}
+let tT; function toast(m,bad){const t=$('#toast'); t.textContent=m; t.style.background=bad?'#FF7A7A':''; t.classList.add('on'); clearTimeout(tT); tT=setTimeout(()=>t.classList.remove('on'),2600);}
+const ago=iso=>{const s=(Date.now()-new Date(iso))/1000; if(s<3600)return Math.max(1,Math.round(s/60))+'m ago'; if(s<86400)return Math.round(s/3600)+'h ago'; return Math.round(s/86400)+'d ago';};
+const mapsFor=r=>r.maps_url||(r.lat!=null&&r.lon!=null?`https://www.google.com/maps/search/?api=1&query=${r.lat},${r.lon}`:`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent((r.name||'')+' basketball court '+(r.suburb||''))}`);
+function tagsOf(f){ f=f||{}; const t=[]; t.push(f.indoor?'Indoor':'Outdoor'); if(f.full!==undefined)t.push(f.full?'Full court':'Half court'); if(f.hoops)t.push(f.hoops+' hoops'); if(f.lit)t.push('Lights'); if(f.surface)t.push(f.surface); if(f.rim)t.push(f.rim); if(f.water)t.push(f.water==='none'?'No water':f.water==='bubbler'?'Bubbler':'Tap'); if(f.toilets)t.push('Toilets'); if(f.shade)t.push('Shade'); if(f.seating)t.push('Seating'); if(f.parking)t.push('Parking: '+f.parking); if(f.cost)t.push(f.cost); if(f.played)t.push('Played here ✓'); return t; }
+
+/* ---------- form ---------- */
+const F={indoor:false,full:true,lit:false,toilets:false,shade:false,seating:false,played:false};
+$$('#segIn button').forEach(b=>b.onclick=()=>{$$('#segIn button').forEach(x=>x.classList.remove('on'));b.classList.add('on');F.indoor=b.dataset.v==='1';});
+$$('#segFull button').forEach(b=>b.onclick=()=>{$$('#segFull button').forEach(x=>x.classList.remove('on'));b.classList.add('on');F.full=b.dataset.v==='1';});
+$$('#feat .chip').forEach(c=>c.onclick=()=>{c.classList.toggle('on');F[c.dataset.k]=c.classList.contains('on');});
+const PHOTOS=[null,null,null];
+function shrink(file){ return new Promise((res,rej)=>{ const img=new Image(); const u=URL.createObjectURL(file); img.onload=()=>{ const M=1280; let w=img.width,h=img.height; const k=Math.min(1,M/Math.max(w,h)); w=Math.round(w*k); h=Math.round(h*k); const c=document.createElement('canvas'); c.width=w;c.height=h; c.getContext('2d').drawImage(img,0,0,w,h); URL.revokeObjectURL(u); res(c.toDataURL('image/jpeg',.82)); }; img.onerror=()=>rej(new Error('bad image')); img.src=u; }); }
+function paintPhotos(){ $$('#photos .ph').forEach((el,i)=>{ el.classList.toggle('has',!!PHOTOS[i]); const im=el.querySelector('img'); if(PHOTOS[i]){ if(im) im.src=PHOTOS[i]; else { const n=document.createElement('img'); n.src=PHOTOS[i]; el.prepend(n);} } else if(im) im.remove(); }); }
+$$('#photos .ph').forEach(el=>{ el.onclick=e=>{ if(e.target.classList.contains('x')){ PHOTOS[+el.dataset.i]=null; paintPhotos(); return; } $('#cFiles').click(); }; });
+$('#cFiles').onchange=async e=>{ const files=[...e.target.files].slice(0,3); for(const f of files){ const slot=PHOTOS.findIndex(p=>!p); if(slot<0)break; try{ PHOTOS[slot]=await shrink(f); }catch(_){ toast("That image didn't load",1);} } paintPhotos(); e.target.value=''; };
+$('#f').onsubmit=async e=>{
+  e.preventDefault(); const err=$('#fErr'); err.style.display='none';
+  const name=$('#cName').value.trim(), sub=$('#cSub').value.trim(), where=$('#cWhere').value.trim(), maps=$('#cMaps').value.trim(), me=$('#cMe').value.trim();
+  const fail=m=>{err.textContent=m;err.style.display='block';window.scrollTo({top:err.getBoundingClientRect().top+scrollY-200,behavior:'smooth'});};
+  if(!name) return fail('Name the court.'); if(!sub&&!where&&!maps) return fail('Tell us where it is — a suburb, an address or a Google Maps link.'); if(!me) return fail('Put your name on it.');
+  const btn=$('#send'); btn.disabled=true; btn.textContent='Sending…';
+  try{
+    await api('cc_submit',{device:DEV,name,suburb:sub,where,maps,sub_name:me,sub_ig:$('#cIg').value.trim(),website:$('#website').value,
+      features:{...F,hoops:+$('#cHoops').value,rim:$('#cRim').value,surface:$('#cSurf').value,water:$('#cWater').value,parking:$('#cPark').value.trim(),cost:$('#cCost').value.trim(),best:$('#cBest').value.trim(),bring:$('#cBring').value.trim(),tips:$('#cTips').value.trim()},
+      photos:PHOTOS.filter(Boolean)});
+    $('#f').querySelectorAll(':scope > *:not(#fOk)').forEach(el=>el.style.display='none'); $('#fOk').style.display='block'; $('#fOk').scrollIntoView({behavior:'smooth',block:'center'});
+  }catch(e){ fail(e.message); }
+  btn.disabled=false; btn.textContent='Send it to Aiman';
+};
+$('#again').onclick=()=>location.reload();
+
+/* ---------- votes ---------- */
+let LIST=null;
+async function loadList(){ try{ LIST=await api('cc_list',{device:DEV}); }catch(e){ $('#voteList').innerHTML='<div class="empty">Couldn\'t load right now — pull to refresh.</div>'; return; } paintList(); }
+function paintList(){
+  const v=LIST.voting||[], a=LIST.added||[], mine=LIST.mine||{};
+  $('#voteList').innerHTML = v.length ? v.map(r=>{ const f=r.features||{}; const pics=(r.photos||[]).slice(0,3); return `<div class="vc" data-id="${r.id}">
+    ${pics.length?`<div class="pics ${pics.length===1?'one':''}">${pics.map(p=>`<img src="${esc(p)}" alt="" loading="lazy">`).join('')}</div>`:''}
+    <div class="body"><div class="nm">${esc(r.name)}</div><div class="sb">${esc(r.suburb||r.where_txt||'')}${r.suburb&&r.where_txt?' · '+esc(r.where_txt):''}</div>
+    <div class="tags">${tagsOf(f).map(t=>`<span class="tag ${/Lights|Played|hoops/.test(t)?'y':''}">${esc(t)}</span>`).join('')}</div>
+    ${f.tips?`<div class="tips">${esc(f.tips)}</div>`:''}
+    <a class="maps" href="${esc(mapsFor(r))}" target="_blank" rel="noopener">Open in Google Maps ↗</a>
+    <div class="by">Found by ${esc(r.sub_name)}${r.sub_ig?` · <a href="https://instagram.com/${esc(r.sub_ig)}" target="_blank" rel="noopener">@${esc(r.sub_ig)}</a>`:''} · ${ago(r.created_at)}</div>
+    <div class="vote"><button class="up ${mine[r.id]===true?'on':''}" data-up="1"><b>${r.votes.up}</b>✓ Legit court</button><button class="dn ${mine[r.id]===false?'on':''}" data-up="0"><b>${r.votes.down}</b>✗ Not a court</button></div></div></div>`; }).join('')
+    : '<div class="empty">Nothing up for a vote yet — send the first court above.</div>';
+  $('#addedList').innerHTML = a.length ? a.map(r=>`<div class="added"><svg class="t" viewBox="0 0 64 64"><circle cx="32" cy="32" r="25" fill="none" stroke="#F6F3EA" stroke-width="5"/><path d="M20 33 L29 42 L45 23" fill="none" stroke="#F6F3EA" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/></svg><div><b>${esc(r.name)}</b><span>${esc(r.suburb)} · found by ${esc(r.sub_name)}${r.sub_ig?' @'+esc(r.sub_ig):''}</span></div></div>`).join('')
+    : '<div class="empty" style="border:0;padding:8px">Nothing yet — the first one\'s yours.</div>';
+  $$('#voteList .vote button').forEach(b=>b.onclick=async()=>{ const id=b.closest('.vc').dataset.id; const up=b.dataset.up==='1';
+    try{ const d=await api('cc_vote',{device:DEV,id,up}); LIST.mine[id]=up; const row=LIST.voting.find(x=>x.id===id); if(row) row.votes=d.votes; paintList(); toast(up?'Counted — legit ✓':'Counted'); }catch(e){ toast(e.message,1);} });
+}
+loadList();
+
+/* ---------- feedback ---------- */
+$('#fbSend').onclick=async()=>{ const t=$('#fbText').value.trim(); const err=$('#fbErr'); err.style.display='none'; if(!t){err.textContent='Say something first.';err.style.display='block';return;}
+  const b=$('#fbSend'); b.disabled=true; try{ await api('bug_report',{kind:'vibe',page:'community',text:t,ua:navigator.userAgent.slice(0,200),player:{id:DEV,name:$('#fbName').value.trim(),ig:$('#fbIg').value.trim()}}); $('#fbText').value=''; toast('Sent to Aiman 🤝'); }catch(e){ err.textContent=e.message; err.style.display='block'; } b.disabled=false; };
+
+/* ---------- the hidden door → review desk ---------- */
+let PIN=sessionStorage.getItem('cc_pin')||''; let ADM=null; let TAB='pending';
+$('#adm').onclick=()=>{ if(PIN){ openDesk(); return; } $('#pinOv').classList.add('on'); setTimeout(()=>$('#pin').focus(),50); };
+$('#pinX').onclick=()=>$('#pinOv').classList.remove('on');
+$('#pin').onkeydown=e=>{ if(e.key==='Enter') $('#pinGo').click(); };
+$('#pinGo').onclick=async()=>{ const p=$('#pin').value.trim(); const err=$('#pinErr'); err.style.display='none'; if(!p)return; $('#pinGo').disabled=true;
+  try{ ADM=await api('cc_admin',{pin:p}); PIN=p; sessionStorage.setItem('cc_pin',p); $('#pinOv').classList.remove('on'); $('#pin').value=''; openDesk(true); }
+  catch(e){ err.textContent=e.message; err.style.display='block'; } $('#pinGo').disabled=false; };
+async function openDesk(loaded){ if(!loaded){ try{ ADM=await api('cc_admin',{pin:PIN}); }catch(e){ PIN=''; sessionStorage.removeItem('cc_pin'); $('#pinOv').classList.add('on'); return; } } $('#panel').classList.add('on'); document.body.style.overflow='hidden'; paintDesk(); }
+$('#pClose').onclick=()=>{ $('#panel').classList.remove('on'); document.body.style.overflow=''; loadList(); };
+async function act(action,body,okMsg){ try{ const d=await api(action,{pin:PIN,...body}); toast(okMsg||'Done'); ADM=await api('cc_admin',{pin:PIN}); paintDesk(); return d; }catch(e){ toast(e.message,1); throw e; } }
+function paintDesk(){
+  const C=ADM.courts||[], FB=ADM.feedback||[];
+  const cnt=s=>C.filter(c=>c.status===s).length;
+  const tabs=[['pending','Pending',cnt('pending')],['voting','On the vote',cnt('voting')],['added','On the map',cnt('added')],['dismissed','Dismissed',cnt('dismissed')],['feedback','Feedback',FB.filter(f=>!f.done).length],['settings','PIN',null]];
+  $('#tabs').innerHTML=tabs.map(([k,l,n])=>`<button class="tab ${TAB===k?'on':''}" data-t="${k}">${l}${n!=null?' · '+n:''}</button>`).join('');
+  $$('#tabs .tab').forEach(b=>b.onclick=()=>{TAB=b.dataset.t;paintDesk();});
+  let html='';
+  if(TAB==='feedback'){ html = FB.length ? FB.map(f=>`<div class="fb ${f.done?'done':''}"><div class="t">${esc(f.text)}</div><div class="m">${esc(f.name||'anon')}${f.ig?' · @'+esc(f.ig):''} · ${ago(f.created_at)}</div><div class="acts"><button data-a="fbdone" data-id="${f.id}" data-on="${f.done?'0':'1'}">${f.done?'Reopen':'Done ✓'}</button><button class="d" data-a="fbdel" data-id="${f.id}">Delete</button></div></div>`).join('') : '<div class="empty" style="margin-top:14px">No feedback yet.</div>'; }
+  else if(TAB==='settings'){ html=`<div class="card" style="margin-top:14px"><label class="l">Change the coach PIN</label><div class="pinrow"><input class="inp" id="npin" inputmode="numeric" maxlength="8" placeholder="new PIN (4–8 digits)"><button class="btn" style="margin:0;width:auto;padding:10px 14px;font-size:14px" id="npinGo" type="button">Save</button></div><p class="note" style="margin-top:10px">The hidden button is the bottom-right corner of this page. The PIN never leaves your head.</p></div>`; }
+  else { const rows=C.filter(c=>c.status===TAB); html = rows.length ? rows.map(r=>{ const f=r.features||{}; const pics=r.photos||[]; return `<div class="rc" data-id="${r.id}">
+      ${pics.length?`<div class="pics">${pics.map(p=>`<a href="${esc(p)}" target="_blank" rel="noopener"><img src="${esc(p)}" alt="" loading="lazy"></a>`).join('')}</div>`:''}
+      <div class="b"><div class="nm">${esc(r.name)}<span class="st ${r.status}">${r.status}</span></div>
+      <div class="kv"><b>${esc(r.suburb||'—')}</b>${r.where_txt?' · '+esc(r.where_txt):''}<br>
+      ${r.lat!=null?`Pinned ${(+r.lat).toFixed(4)}, ${(+r.lon).toFixed(4)}`:'<b style="color:#FF7A7A">No pin yet</b>'} · <a class="maps" style="margin:0" href="${esc(mapsFor(r))}" target="_blank" rel="noopener">${r.maps_url?'Their Maps link ↗':'Search Google Maps ↗'}</a><br>
+      ${tagsOf(f).join(' · ')}${f.best?'<br>Best: '+esc(f.best):''}${f.bring?'<br>Bring: '+esc(f.bring):''}${f.tips?'<br>Tips: '+esc(f.tips):''}<br>
+      By <b>${esc(r.sub_name)}</b>${r.sub_ig?` · <a href="https://instagram.com/${esc(r.sub_ig)}" target="_blank" rel="noopener" style="color:#949A97">@${esc(r.sub_ig)}</a>`:''} · ${ago(r.created_at)} · votes <b>${r.votes.up} ✓ / ${r.votes.down} ✗</b>${r.added_key?' · key '+esc(r.added_key):''}${r.coach_note?'<br>Note: '+esc(r.coach_note):''}</div>
+      ${r.lat==null&&r.status!=='added'?`<div class="pinrow"><input class="inp" placeholder="Paste a Google Maps link to pin it" data-maps></div>`:''}
+      <div class="acts">
+        ${r.status==='pending'?`<button class="p" data-a="voting">Put it to the vote</button><button data-a="add">Add to the map</button><button data-a="dismissed">Dismiss</button>`:''}
+        ${r.status==='voting'?`<button class="p" data-a="add">Add to the map</button><button data-a="pending">Back to pending</button><button data-a="dismissed">Dismiss</button>`:''}
+        ${r.status==='dismissed'?`<button data-a="pending">Back to pending</button>`:''}
+        <button class="d" data-a="del">Delete</button>
+      </div></div></div>`; }).join('') : '<div class="empty" style="margin-top:14px">Nothing here.</div>'; }
+  $('#pBody').innerHTML=html;
+  $$('#pBody [data-a]').forEach(b=>b.onclick=async()=>{ const a=b.dataset.a; const card=b.closest('.rc'); const id=card?card.dataset.id:b.dataset.id;
+    if(a==='fbdone') return act('cc_bug_done',{id,on:b.dataset.on==='1'});
+    if(a==='fbdel'){ if(!confirm('Delete this feedback?'))return; return act('cc_bug_done',{id,del:true},'Deleted'); }
+    if(a==='del'){ if(!confirm('Delete this court submission for good?'))return; return act('cc_del',{id},'Deleted'); }
+    if(a==='add'){ const mi=card.querySelector('[data-maps]'); const maps=mi?mi.value.trim():''; try{ await act('cc_add',{id,maps},'On the map ✓ — it\'s live in the app'); }catch(e){ if(e.code==='nopin'&&mi){ mi.focus(); } } return; }
+    return act('cc_status',{id,status:a}, a==='voting'?'Up for the vote':a==='dismissed'?'Dismissed':'Back to pending');
+  });
+  const np=$('#npinGo'); if(np) np.onclick=async()=>{ const v=$('#npin').value.trim(); if(!/^\d{4,8}$/.test(v)) return toast('4–8 digits',1); try{ await api('cc_pin_set',{pin:PIN,new_pin:v}); PIN=v; sessionStorage.setItem('cc_pin',v); toast('PIN changed'); $('#npin').value=''; }catch(e){ toast(e.message,1);} };
+}
+</script>
+</body></html>

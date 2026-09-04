@@ -230,6 +230,34 @@ async function coachAuth(user: unknown, pin: unknown) {
 }
 const mkCode = () => String(Math.floor(10000 + Math.random() * 90000));
 
+// community.html review panel: its OWN PIN (sha256 in oc_settings.cc_pin), never the
+// desk/coach logins — a leaked PIN can't reach the desk. 8 misses → locked an hour.
+async function ccAuth(pin: unknown): Promise<{ ok: boolean; err: string; code: number }> {
+  const p = str(pin, 8);
+  if (!/^\d{4,8}$/.test(p)) return { ok: false, err: "enter the PIN", code: 400 };
+  const g0 = (await db(`oc_login_guard?who=eq.cc_admin`))?.[0];
+  if (g0?.locked_until && new Date(g0.locked_until) > new Date()) return { ok: false, err: "too many tries — locked for an hour", code: 429 };
+  await new Promise((r) => setTimeout(r, 400));
+  const want = (await db(`oc_settings?key=eq.cc_pin&select=value`))?.[0]?.value || "";
+  const h = await sha256(`cc:${p}:certifiedhooper`);
+  if (!want || h !== want) {
+    const fails = (g0?.fails || 0) + 1;
+    await db(`oc_login_guard?on_conflict=who`, { method: "POST", headers: { Prefer: "resolution=merge-duplicates" },
+      body: JSON.stringify({ who: "cc_admin", fails, locked_until: fails >= 8 ? new Date(Date.now() + 3600e3).toISOString() : null }) });
+    return { ok: false, err: "wrong PIN", code: 401 };
+  }
+  if (g0) await db(`oc_login_guard?who=eq.cc_admin`, { method: "DELETE" });
+  return { ok: true, err: "", code: 200 };
+}
+type Tally = Record<string, { up: number; down: number }>;
+async function ccTally(ids: string[], device = ""): Promise<{ tally: Tally; mine: Record<string, boolean> }> {
+  const tally: Tally = {}; const mine: Record<string, boolean> = {};
+  if (!ids.length) return { tally, mine };
+  const vs = await db(`oc_cc_votes?cc_id=in.(${ids.map(sid).join(",")})&select=cc_id,device,up`) || [];
+  for (const v of vs) { const t = tally[v.cc_id] ||= { up: 0, down: 0 }; if (v.up) t.up++; else t.down++; if (device && v.device === device) mine[v.cc_id] = !!v.up; }
+  return { tally, mine };
+}
+
 // Which of these player ids are account-verified?
 async function verifiedSet(ids: string[]) {
   const uniq = [...new Set(ids.filter(Boolean))];
@@ -533,6 +561,129 @@ Deno.serve(async (req: Request) => {
       // "Something broke" — a tester taps the bug button, it lands on the desk.
       // Deliberately NOT guarded: if the app is broken for them we still want
       // the report, even from a half-registered device.
+      // ===== Courts by the community (community.html = the bio link) =====
+      // No account needed. Honeypot + 3 courts/device/day. Photos land in the
+      // public bucket under community/. The coach gets a push like a bug report.
+      case "cc_submit": {
+        if (str(b.website, 10)) return J({ ok: true }); // honeypot — bots fill it, humans can't see it
+        const device = sid(b.device).slice(0, 64);
+        if (device.length < 8) return J({ error: "bad request" }, 400);
+        const name = str(b.name, 80), suburb = str(b.suburb, 60), where = str(b.where, 200), maps = str(b.maps, 300);
+        const sub_name = str(b.sub_name, 40), sub_ig = igClean(b.sub_ig);
+        if (!name) return J({ error: "name the court" }, 400);
+        if (!suburb && !where && !maps) return J({ error: "tell us where it is — suburb, address or a Google Maps link" }, 400);
+        if (!sub_name) return J({ error: "put your name on it" }, 400);
+        const since = new Date(Date.now() - 86400e3).toISOString();
+        const recent = await db(`oc_cc?device=eq.${encodeURIComponent(device)}&created_at=gte.${encodeURIComponent(since)}&select=id`) || [];
+        if (recent.length >= 3) return J({ error: "three courts a day is the cap — send the next one tomorrow" }, 429);
+        const f = (b.features || {}) as Record<string, unknown>;
+        const water = ["bubbler", "tap", "none"].includes(String(f.water ?? "")) ? String(f.water) : "";
+        const features = {
+          indoor: f.indoor === true, lit: f.lit === true, full: f.full === true, hoops: num(f.hoops, 0, 20, 0),
+          rim: str(f.rim, 30), surface: str(f.surface, 30), water, toilets: f.toilets === true, parking: str(f.parking, 60),
+          shade: f.shade === true, seating: f.seating === true, cost: str(f.cost, 40), best: str(f.best, 80),
+          bring: str(f.bring, 200), tips: str(f.tips, 600), played: f.played === true,
+        };
+        let lat: number | null = null, lon: number | null = null;
+        try {
+          const c = maps ? await resolveMapsUrl(maps) : parseCoords(where);
+          if (c && inAus(c[0], c[1])) { lat = c[0]; lon = c[1]; }
+        } catch (_e) { /* the pin is optional at this stage */ }
+        const id = crypto.randomUUID();
+        const photos: string[] = [];
+        const raw = Array.isArray(b.photos) ? (b.photos as unknown[]).slice(0, 3) : [];
+        for (let i = 0; i < raw.length; i++) {
+          try { photos.push(await uploadImg(String(raw[i]), `community/${id}-${i}-${Date.now()}`)); }
+          catch (e) { return J({ error: "a photo didn't upload — try a smaller one (" + (e as Error).message + ")" }, 400); }
+        }
+        await db(`oc_cc`, { method: "POST", body: JSON.stringify({ id, name, suburb, where_txt: where, maps_url: maps, lat, lon, features, photos, sub_name, sub_ig, device, status: "pending" }) });
+        try {
+          const coaches = await db(`oc_players?coach=is.true&select=id`) || [];
+          const ids = coaches.map((c: { id: string }) => c.id);
+          if (ids.length) await sendHH(ids, { title: "🏀 New court from the community", body: `${name}${suburb ? " — " + suburb : ""} · by ${sub_name}`, url: "/community.html" });
+        } catch (_e) { /* best effort */ }
+        return J({ ok: true, id });
+      }
+      case "cc_list": {
+        const device = sid(b.device).slice(0, 64);
+        const rows = await db(`oc_cc?status=in.(voting,added)&select=id,created_at,name,suburb,where_txt,maps_url,lat,lon,features,photos,sub_name,sub_ig,status,added_key,decided_at&order=created_at.desc&limit=80`) || [];
+        const { tally, mine } = await ccTally(rows.map((r: { id: string }) => r.id), device);
+        const pub = rows.map((r: Record<string, unknown>) => ({ ...r, votes: tally[r.id as string] || { up: 0, down: 0 } }));
+        return J({ voting: pub.filter((r: { status: string }) => r.status === "voting"), added: pub.filter((r: { status: string }) => r.status === "added").slice(0, 40), mine });
+      }
+      case "cc_vote": {
+        const device = sid(b.device).slice(0, 64); const id = sid(b.id).slice(0, 36);
+        if (device.length < 8 || id.length < 32) return J({ error: "bad request" }, 400);
+        const row = (await db(`oc_cc?id=eq.${id}&select=id,status`))?.[0];
+        if (!row || row.status !== "voting") return J({ error: "this one isn't up for a vote" }, 400);
+        const since = new Date(Date.now() - 86400e3).toISOString();
+        const n = await db(`oc_cc_votes?device=eq.${encodeURIComponent(device)}&created_at=gte.${encodeURIComponent(since)}&select=cc_id`) || [];
+        if (n.length >= 60) return J({ error: "easy — that's enough votes for today" }, 429);
+        await db(`oc_cc_votes?on_conflict=cc_id,device`, { method: "POST", headers: { Prefer: "resolution=merge-duplicates" },
+          body: JSON.stringify({ cc_id: id, device, up: b.up !== false, created_at: new Date().toISOString() }) });
+        const { tally } = await ccTally([id]);
+        return J({ ok: true, votes: tally[id] || { up: 0, down: 0 }, mine: b.up !== false });
+      }
+      case "cc_admin": {
+        const a = await ccAuth(b.pin); if (!a.ok) return J({ error: a.err }, a.code);
+        const rows = await db(`oc_cc?select=*&order=created_at.desc&limit=300`) || [];
+        const { tally } = await ccTally(rows.map((r: { id: string }) => r.id));
+        const feedback = await db(`oc_bugs?page=eq.community&select=*&order=created_at.desc&limit=150`) || [];
+        return J({ ok: true, courts: rows.map((r: Record<string, unknown>) => ({ ...r, votes: tally[r.id as string] || { up: 0, down: 0 } })), feedback });
+      }
+      case "cc_status": {
+        const a = await ccAuth(b.pin); if (!a.ok) return J({ error: a.err }, a.code);
+        const id = sid(b.id).slice(0, 36); const status = str(b.status, 12);
+        if (id.length < 32 || !["pending", "voting", "dismissed"].includes(status)) return J({ error: "bad request" }, 400);
+        await db(`oc_cc?id=eq.${id}`, { method: "PATCH", body: JSON.stringify({ status, coach_note: str(b.note, 300), decided_at: status === "dismissed" ? new Date().toISOString() : null }) });
+        return J({ ok: true });
+      }
+      // Add it to the map: becomes a real official court (same shape as the desk's
+      // admin_court_add) with the submitter credited in the notes.
+      case "cc_add": {
+        const a = await ccAuth(b.pin); if (!a.ok) return J({ error: a.err }, a.code);
+        const id = sid(b.id).slice(0, 36); if (id.length < 32) return J({ error: "bad request" }, 400);
+        const r = (await db(`oc_cc?id=eq.${id}&select=*`))?.[0]; if (!r) return J({ error: "gone" }, 404);
+        if (r.status === "added") return J({ error: "already on the map", key: r.added_key }, 409);
+        let lat = +(b.lat as number), lon = +(b.lon as number);
+        if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+          const m = str(b.maps, 300);
+          const c = m ? await resolveMapsUrl(m) : (r.lat != null && r.lon != null ? [r.lat, r.lon] as [number, number] : null);
+          if (!c) return J({ error: "no pin yet — paste a Google Maps link for it", code: "nopin" }, 400);
+          lat = c[0]; lon = c[1];
+        }
+        if (!inAus(lat, lon)) return J({ error: "that pin isn't in Australia" }, 400);
+        const f = (r.features || {}) as Record<string, unknown>;
+        const name = str(b.name, 80) || r.name, suburb = str(b.suburb, 60) || r.suburb;
+        const key = `oc_c_${crypto.randomUUID().slice(0, 8)}`;
+        const info = infoOf({ info: { surface: f.surface, hoops: f.hoops, rim: f.rim, cost: f.cost || "Free", best: f.best, water: f.water, toilets: f.toilets, parking: f.parking, shade: f.shade, seating: f.seating,
+          bring: String(f.bring || "").split(",").map((x) => x.trim()).filter(Boolean), tips: f.tips } });
+        const photo = ownPhoto((r.photos || [])[0]);
+        await db(`oc_courts`, { method: "POST", body: JSON.stringify({ key, name, suburb, lat, lon, indoor: f.indoor === true, lit: f.lit === true, custom: true, official: true, info, radius_m: 300, hidden: false, updated_at: new Date().toISOString(),
+          ...(photo ? { photo_url: photo } : {}), notes: `Found by ${r.sub_name}${r.sub_ig ? " (@" + r.sub_ig + ")" : ""} — courts by the community` }) });
+        await db(`oc_cc?id=eq.${id}`, { method: "PATCH", body: JSON.stringify({ status: "added", added_key: key, lat, lon, decided_at: new Date().toISOString(), coach_note: str(b.note, 300) || r.coach_note }) });
+        return J({ ok: true, key });
+      }
+      case "cc_del": {
+        const a = await ccAuth(b.pin); if (!a.ok) return J({ error: a.err }, a.code);
+        const id = sid(b.id).slice(0, 36); if (id.length < 32) return J({ error: "bad request" }, 400);
+        await db(`oc_cc?id=eq.${id}`, { method: "DELETE" });
+        return J({ ok: true });
+      }
+      case "cc_bug_done": {
+        const a = await ccAuth(b.pin); if (!a.ok) return J({ error: a.err }, a.code);
+        const id = str(b.id, 64); if (!id) return J({ error: "bad request" }, 400);
+        if (b.del === true) await db(`oc_bugs?id=eq.${encodeURIComponent(id)}`, { method: "DELETE" });
+        else await db(`oc_bugs?id=eq.${encodeURIComponent(id)}`, { method: "PATCH", body: JSON.stringify({ done: b.on !== false }) });
+        return J({ ok: true });
+      }
+      case "cc_pin_set": {
+        const a = await ccAuth(b.pin); if (!a.ok) return J({ error: a.err }, a.code);
+        const np = str(b.new_pin, 8); if (!/^\d{4,8}$/.test(np)) return J({ error: "new PIN must be 4–8 digits" }, 400);
+        await db(`oc_settings?on_conflict=key`, { method: "POST", headers: { Prefer: "resolution=merge-duplicates" }, body: JSON.stringify({ key: "cc_pin", value: await sha256(`cc:${np}:certifiedhooper`) }) });
+        return J({ ok: true });
+      }
+
       case "bug_report": {
         const p = (b.player || {}) as Record<string, unknown>;
         const text = str(b.text, 600);

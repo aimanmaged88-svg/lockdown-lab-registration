@@ -340,6 +340,28 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   (prefilled from `player_num`, sent as `num`). Deploy = full index.ts via
   the Supabase MCP `deploy_edge_function` (subagent, SHA-256 byte-check +
   VAPID intact), then E2E with a temp coach/temp players and delete them.
+- **COURTS BY THE COMMUNITY — community.html, the bio link (edge v32, 2026-09-04,
+  Aiman asked).** Public page, no account: **send a court** (name/suburb/street/
+  Maps link, outdoor-indoor, full-half, lights/toilets/shade/seating/played-here
+  chips, hoops/rims/surface/water selects, parking/cost/best/bring/tips, up to 3
+  photos client-downscaled → `heaven/community/*`), **vote** "is this a legit
+  court?" (✓/✗, one per device, change allowed), **on the map** list, and a
+  **tell Aiman** box (→ `bug_report` kind vibe page community). Migration
+  `opencourt_community_courts`: `oc_cc` (status pending|voting|added|dismissed,
+  features jsonb, photos jsonb, sub_name/sub_ig, device, added_key) +
+  `oc_cc_votes` (pk cc_id+device). Edge: `ccAuth(pin)` — its OWN PIN (sha256
+  `cc:<pin>:certifiedhooper` in `oc_settings.cc_pin`, 8 misses → 1h lock via
+  oc_login_guard who=cc_admin; never the desk/coach logins) and actions
+  `cc_submit` (honeypot `website`, 3/device/day, resolves Maps link → lat/lon,
+  pushes coach=true players), `cc_list`, `cc_vote` (60/device/day), admin
+  `cc_admin`/`cc_status`/`cc_add` (→ real oc_courts row, same shape as
+  admin_court_add, credited "Found by …" in notes; `nopin` if no coords — paste
+  a Maps link)/`cc_del`/`cc_bug_done`/`cc_pin_set`. **Hidden door:** invisible
+  58px button bottom-right (`#adm`) → PIN sheet → `#panel` review desk (tabs
+  Pending / On the vote / On the map / Dismissed / Feedback / PIN). PIN he chose
+  = 1975 (only he + this note know it; change via the PIN tab). Landing card
+  links "Send us a court →"; kit bio link now = community.html. Playwright
+  smoke scratchpad/demo/cctest.mjs (stubbed API).
 - **Phone-switch code keeper sheet (2026-08-18, Aiman asked).** Profile → 🔑 no
   longer just toasts: opens `#shCode` — big tap-to-copy code, "you're Player
   #NNNN" line, **📤 Send it to myself** (navigator.share, clipboard fallback)
