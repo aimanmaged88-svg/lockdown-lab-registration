@@ -660,7 +660,7 @@ Deno.serve(async (req: Request) => {
           bring: String(f.bring || "").split(",").map((x) => x.trim()).filter(Boolean), tips: f.tips } });
         const photo = ownPhoto((r.photos || [])[0]);
         await db(`oc_courts`, { method: "POST", body: JSON.stringify({ key, name, suburb, lat, lon, indoor: f.indoor === true, lit: f.lit === true, custom: true, official: true, info, radius_m: 300, hidden: false, updated_at: new Date().toISOString(),
-          ...(photo ? { photo_url: photo } : {}), notes: `Found by ${r.sub_name}${r.sub_ig ? " (@" + r.sub_ig + ")" : ""} — courts by the community` }) });
+          ...(photo ? { photo_url: photo } : {}), notes: `Courts by the community` }) });
         await db(`oc_cc?id=eq.${id}`, { method: "PATCH", body: JSON.stringify({ status: "added", added_key: key, lat, lon, decided_at: new Date().toISOString(), coach_note: str(b.note, 300) || r.coach_note }) });
         return J({ ok: true, key });
       }

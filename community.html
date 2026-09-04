@@ -128,7 +128,7 @@ footer a{color:var(--muted)}
   </div>
 
   <h2 id="add"><small>Step 1</small>Send a court</h2>
-  <p class="note">Anywhere you hoop that isn't on the map yet. Tick what's there, drop a photo, put your name on it. Aiman checks every one.</p>
+  <p class="note">Anywhere you hoop that isn't on the map yet. Tick what's there, drop a photo, add your name so we can reach you. Every one gets checked.</p>
   <form class="card" id="f" autocomplete="off" novalidate>
     <label class="l" for="cName">Court name</label>
     <input class="inp" id="cName" placeholder="e.g. Tempe Reserve courts" maxlength="80" required>
@@ -185,25 +185,25 @@ footer a{color:var(--muted)}
     </div>
 
     <div class="row2">
-      <div><label class="l" for="cMe">Your name</label><input class="inp" id="cMe" placeholder="So we can credit you" maxlength="40" required></div>
+      <div><label class="l" for="cMe">Your name</label><input class="inp" id="cMe" placeholder="Stays private — so we can reach you" maxlength="40" required></div>
       <div><label class="l" for="cIg">Instagram (optional)</label><input class="inp" id="cIg" placeholder="@handle" maxlength="31" autocapitalize="none"></div>
     </div>
     <div style="position:absolute;left:-9999px;top:-9999px" aria-hidden="true"><input tabindex="-1" id="website" name="website" autocomplete="off"></div>
-    <button class="btn" id="send" type="submit">Send it to Aiman</button>
+    <button class="btn" id="send" type="submit">Send it in</button>
     <div class="err" id="fErr"></div>
-    <div class="ok" id="fOk"><div class="big">Sent. 🤝</div><p>Aiman checks it, then it goes to the vote below. Your name rides on it when it hits the map.</p><button class="btn g" type="button" id="again">Send another one</button></div>
+    <div class="ok" id="fOk"><div class="big">Sent. 🤝</div><p>We check it, then it goes to the vote below. If it makes the map, everyone gets to hoop there.</p><button class="btn g" type="button" id="again">Send another one</button></div>
   </form>
 
   <h2 id="vote"><small>Step 2</small>Is this a legit court?</h2>
-  <p class="note">Courts people have sent in. Been there? Vote. Enough ✓ and Aiman adds it to the map.</p>
+  <p class="note">Courts people have sent in. Been there? Vote. Enough ✓ and it goes on the map.</p>
   <div id="voteList"><div class="empty">Loading…</div></div>
 
   <h2 id="onmap"><small>Built by you</small>On the map</h2>
-  <p class="note">Courts the community found and Aiman added.</p>
+  <p class="note">Courts the community found that made the map.</p>
   <div class="card" id="addedList"><div class="empty" style="border:0;padding:8px">Nothing yet — the first one's yours.</div></div>
 
   <h2 id="fb"><small>Step 3</small>Shape the app</h2>
-  <p class="note">This is being built for you, so tell us how you want it to run. What should be in it? What's missing? Every idea lands straight with Aiman.</p>
+  <p class="note">This is being built for you, so tell us how you want it to run. What should be in it? What's missing? Every idea lands straight with the team.</p>
   <div class="card">
     <label class="l">What's this about?</label>
     <div class="seg" id="fbKind">
@@ -226,13 +226,13 @@ footer a{color:var(--muted)}
       <button type="button" class="chip" data-i="Chat with the run">💬 Run chat</button>
     </div>
 
-    <label class="l" for="fbText">Tell Aiman in your own words</label>
+    <label class="l" for="fbText">Tell us in your own words</label>
     <textarea id="fbText" placeholder="Say it how you'd say it. What would make you open this every day?" maxlength="600"></textarea>
     <div class="row2" style="margin-top:10px">
       <input class="inp" id="fbName" placeholder="Your name" maxlength="40">
       <input class="inp" id="fbIg" placeholder="@handle (optional)" maxlength="31" autocapitalize="none">
     </div>
-    <button class="btn" id="fbSend" type="button">Send it to Aiman</button>
+    <button class="btn" id="fbSend" type="button">Send it in</button>
     <div class="err" id="fbErr"></div>
   </div>
 
@@ -288,7 +288,7 @@ $('#f').onsubmit=async e=>{
       photos:PHOTOS.filter(Boolean)});
     $('#f').querySelectorAll(':scope > *:not(#fOk)').forEach(el=>el.style.display='none'); $('#fOk').style.display='block'; $('#fOk').scrollIntoView({behavior:'smooth',block:'center'});
   }catch(e){ fail(e.message); }
-  btn.disabled=false; btn.textContent='Send it to Aiman';
+  btn.disabled=false; btn.textContent='Send it in';
 };
 $('#again').onclick=()=>location.reload();
 
@@ -303,10 +303,10 @@ function paintList(){
     <div class="tags">${tagsOf(f).map(t=>`<span class="tag ${/Lights|Played|hoops/.test(t)?'y':''}">${esc(t)}</span>`).join('')}</div>
     ${f.tips?`<div class="tips">${esc(f.tips)}</div>`:''}
     <a class="maps" href="${esc(mapsFor(r))}" target="_blank" rel="noopener">Open in Google Maps ↗</a>
-    <div class="by">Found by ${esc(r.sub_name)}${r.sub_ig?` · <a href="https://instagram.com/${esc(r.sub_ig)}" target="_blank" rel="noopener">@${esc(r.sub_ig)}</a>`:''} · ${ago(r.created_at)}</div>
+    <div class="by">Added ${ago(r.created_at)}</div>
     <div class="vote"><button class="up ${mine[r.id]===true?'on':''}" data-up="1"><b>${r.votes.up}</b>✓ Legit court</button><button class="dn ${mine[r.id]===false?'on':''}" data-up="0"><b>${r.votes.down}</b>✗ Not a court</button></div></div></div>`; }).join('')
     : '<div class="empty">Nothing up for a vote yet — send the first court above.</div>';
-  $('#addedList').innerHTML = a.length ? a.map(r=>`<div class="added"><svg class="t" viewBox="0 0 64 64"><circle cx="32" cy="32" r="25" fill="none" stroke="#F6F3EA" stroke-width="5"/><path d="M20 33 L29 42 L45 23" fill="none" stroke="#F6F3EA" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/></svg><div><b>${esc(r.name)}</b><span>${esc(r.suburb)} · found by ${esc(r.sub_name)}${r.sub_ig?' @'+esc(r.sub_ig):''}</span></div></div>`).join('')
+  $('#addedList').innerHTML = a.length ? a.map(r=>`<div class="added"><svg class="t" viewBox="0 0 64 64"><circle cx="32" cy="32" r="25" fill="none" stroke="#F6F3EA" stroke-width="5"/><path d="M20 33 L29 42 L45 23" fill="none" stroke="#F6F3EA" stroke-width="6.5" stroke-linecap="round" stroke-linejoin="round"/></svg><div><b>${esc(r.name)}</b><span>${esc(r.suburb)}</span></div></div>`).join('')
     : '<div class="empty" style="border:0;padding:8px">Nothing yet — the first one\'s yours.</div>';
   $$('#voteList .vote button').forEach(b=>b.onclick=async()=>{ const id=b.closest('.vc').dataset.id; const up=b.dataset.up==='1';
     try{ const d=await api('cc_vote',{device:DEV,id,up}); LIST.mine[id]=up; const row=LIST.voting.find(x=>x.id===id); if(row) row.votes=d.votes; paintList(); toast(up?'Counted — legit ✓':'Counted'); }catch(e){ toast(e.message,1);} });
@@ -326,9 +326,9 @@ $('#fbSend').onclick=async()=>{
   const text=(picks.length?'Wants: '+picks.join(', ')+(t?'\n\n':''):'')+t;
   const b=$('#fbSend'); b.disabled=true; b.textContent='Sending…';
   try{ await api('bug_report',{kind:FBKIND,page:'community',text,ua:navigator.userAgent.slice(0,200),player:{id:DEV,name:$('#fbName').value.trim(),ig:$('#fbIg').value.trim()}});
-    $('#fbText').value=''; $$('#fbIdeas .chip.on').forEach(c=>c.classList.remove('on')); toast('Sent to Aiman 🤝 — keep them coming'); }
+    $('#fbText').value=''; $$('#fbIdeas .chip.on').forEach(c=>c.classList.remove('on')); toast('Sent 🤝 — keep them coming'); }
   catch(e){ err.textContent=e.message; err.style.display='block'; }
-  b.disabled=false; b.textContent='Send it to Aiman';
+  b.disabled=false; b.textContent='Send it in';
 };
 
 /* ---------- the hidden door → review desk ---------- */
