@@ -8,6 +8,7 @@
   from = "/"
   to = "/hoopsheaven.html"
   status = 302
+  force = true
 
 # --- Athlete OS -----------------------------------------------------------
 # Clean short entry: /os → the Athlete OS landing (real folder, no loop).
