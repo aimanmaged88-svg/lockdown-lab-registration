@@ -401,6 +401,37 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   trip, PIN 1975 wrong/right + rotation, cc_del; all test rows deleted). One
   1×1 test JPEG left in storage (Supabase objects can't be SQL-deleted;
   harmless). Frontend UNMERGED like the rest — live via raw.githack.
+- **DOMAIN RENAMED + signup gate OPENED (2026-09-04, Aiman: "why am I getting
+  errors when I log into stuff… make the link just Certified Hooper, no
+  lockdown lab").** Two things. (1) **Login errors diagnosed:** `oc_settings.
+  invite_only` was still `'1'` (closed-testing leftover) with **0 invite codes**
+  AND **0 player rows** (last wipe) — so every non-owner signup hit
+  `needinvite`/`badinvite` and any cross-phone login to a wiped account hit
+  "no match". Fix: `update oc_settings set value='0' where key='invite_only'`
+  → **public signups OPEN** (the first-1,000 model is IG-follow-based, no
+  codes). Live E2E: non-owner signup ok (num 5966), cross-phone login ok,
+  owner @uncsthoughts auto-verifies (OWNER_IGS) — all test rows deleted, DB
+  clean (0 players, 13 courts). His own app account was wiped → he just signs
+  up fresh (owner IG = instant ✓). (2) **Netlify site renamed
+  `lockdown-lab-registration` → `certifiedhooper`** (site id 7f6a47a4-…, via
+  Netlify MCP update-project-name). **The live URL is now
+  `https://certifiedhooper.netlify.app`** — bio link
+  `certifiedhooper.netlify.app/community.html`, app `/hoopsheaven.html`, desk
+  `/hoopsheaven-desk.html`, inbox `/community.html?hq`. Updated every
+  Certified-Hooper user-facing ref to the new domain: hoopsheaven.html og:url +
+  `VERIFY_IG` (`lockdownlablive`→`certified.hooper.aus`), hoopsheaven-qr.html
+  APP, launch.html (regen: `gen_launch2.py` NET→new domain), and the legacy kit
+  sub-pages posts/carousel/pack.html (SHA-pinned jsdelivr/raw/githack repo-name
+  URLs → clean Netlify domain). netlify.toml: bare `/` now `force`-302s to
+  `/hoopsheaven.html` (index.html shadows a non-forced root redirect — the
+  gotcha). community.html was already clean. **The OLD domain
+  `lockdown-lab-registration.netlify.app` is now DEAD** — Lab files (app.html/
+  admin.html/access.html/hub.html) still hardcode it; left untouched on purpose
+  (Aiman wants zero lockdown-lab tie-in; app.html share links use
+  location.origin at runtime so they self-fix, the few hardcoded Lab invite/nav
+  links are dead until/if he asks). Committed 160cc19 + a68fbac, pushed branch
+  + main (ff), Netlify auto-deployed, verified live: root 302→app, og:url +
+  VERIFY_IG served, community/launch 200.
 - **Phone-switch code keeper sheet (2026-08-18, Aiman asked).** Profile → 🔑 no
   longer just toasts: opens `#shCode` — big tap-to-copy code, "you're Player
   #NNNN" line, **📤 Send it to myself** (navigator.share, clipboard fallback)
