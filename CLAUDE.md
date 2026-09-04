@@ -361,7 +361,14 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   Pending / On the vote / On the map / Dismissed / Feedback / PIN). PIN he chose
   = 1975 (only he + this note know it; change via the PIN tab). Landing card
   links "Send us a court →"; kit bio link now = community.html. Playwright
-  smoke scratchpad/demo/cctest.mjs (stubbed API).
+  smoke scratchpad/demo/cctest.mjs (stubbed API). **DEPLOYED via subagent —
+  edge v32 = Supabase fn version 35, SHA-256 byte-identical, VAPID 5-line
+  identical; live E2E 22/22** (submit+photo→heaven/community, honeypot, missing
+  name 400, vote up/down/re-vote, pending→voting→add→real oc_court credited
+  "Found by …", nopin 400 then Maps-link resolve, 409 re-add, feedback round-
+  trip, PIN 1975 wrong/right + rotation, cc_del; all test rows deleted). One
+  1×1 test JPEG left in storage (Supabase objects can't be SQL-deleted;
+  harmless). Frontend UNMERGED like the rest — live via raw.githack.
 - **Phone-switch code keeper sheet (2026-08-18, Aiman asked).** Profile → 🔑 no
   longer just toasts: opens `#shCode` — big tap-to-copy code, "you're Player
   #NNNN" line, **📤 Send it to myself** (navigator.share, clipboard fallback)
