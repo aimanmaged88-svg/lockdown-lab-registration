@@ -432,6 +432,35 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   links are dead until/if he asks). Committed 160cc19 + a68fbac, pushed branch
   + main (ff), Netlify auto-deployed, verified live: root 302→app, og:url +
   VERIFY_IG served, community/launch 200.
+- **PREMIUM PASS on the whole IG launch kit (2026-09-04, Aiman: "go hard…
+  premium premium premium… before 12am").** Ran an art-director panel workflow
+  (5 lenses + synthesis) → one elevation spec, then rebuilt all 4 cryptic
+  assets (reel1/reel2/story1/carousel3) on a shared `cry.js` premium stack.
+  **New cry.js helpers (the lift):** `frameBase`(hard reset composite/filter/
+  alpha/shadow → graded warm-charcoal `groundGrad` #15130E→#000 + vertical
+  crush → faint ghost-court motif `courtLines` ≤.032) and `frameTop`(seeded
+  mulberry-style **film grain** soft-light+overlay ≤.06 → warm `vignette`
+  edge rgba(10,7,3) → persistent cryptic **`hud`** = ●SIGNAL + SYDNEY·NSW +
+  FOLLOWERS 312 + −33.8688°,151.2093° coords + corner brackets, IG-safe
+  insets bottom y=H-320); plus `spotlight` (warm elliptical key-bar, comp
+  lighter), `bloom`, glow on `T`/`slam` (Chakra display only), `beatSweep`,
+  `redact` (hatched fence bar), pulseRings glow. **counter()** upgraded to an
+  odometer (real integer, comma clicks in at 1000) + motion-blur ghosts +
+  damped-spring LOCK + white impact flash. **slam()** got settle-crush
+  undershoot + drop. **MAP BEAT REDESIGNED (was broken):** old `mapTicks`
+  projected the 13 courts into a squished bottom-right blob w/ overlapping
+  labels; new `mapLayout` = aspect-correct projection (lon×cos(lat)) +
+  deterministic force-relaxation (min-sep 148) + recenter-to-safe-box +
+  nearest-neighbour constellation links + 6 hero suburb labels (used in
+  reel1 s5 + carousel s6). Determinism strictly preserved (no Math.random/
+  Date at frame time). reel1 now 32s (slower to read, Aiman asked), reel2
+  19s, story 12s; all 60fps, SFX-mixed (assets/sfx). Fixes: body bg #111→#000
+  (the muddy-grey export bug), reel2 long caption clip → `capPlate`
+  fit-to-width, carousel HUD/footer collision → brackets-only + clean footer,
+  carousel s9 permanent redacted "NEXT: ▨▨▨" chip. Masters: scratchpad
+  reel1/reel2/story1/carousel3.html + cry.js; render `cryrender.mjs`+`crymix.py`
+  via `buildvid.sh`, carousel `carcap3.mjs`. Kit filenames unchanged so
+  launch.html auto-serves the new versions.
 - **Phone-switch code keeper sheet (2026-08-18, Aiman asked).** Profile → 🔑 no
   longer just toasts: opens `#shCode` — big tap-to-copy code, "you're Player
   #NNNN" line, **📤 Send it to myself** (navigator.share, clipboard fallback)
