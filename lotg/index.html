@@ -1,0 +1,795 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Love of the Game</title>
+<meta name="description" content="Love of the Game — a community hub for sport, stories, men's mental health, a schools program and events across NSW.">
+<meta name="theme-color" content="#09090B">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Archivo:ital,wght@1,900&family=Hanken+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="canonical" href="https://loveofthegame.netlify.app/">
+<link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Love of the Game">
+<meta property="og:title" content="Love of the Game"><meta property="og:description" content="A community hub for sport, stories, men&#39;s mental health, a schools program and events across NSW.">
+<meta property="og:url" content="https://loveofthegame.netlify.app/"><meta property="og:image" content="https://loveofthegame.netlify.app/assets/og.jpg">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Love of the Game">
+<meta name="twitter:description" content="A community hub for sport, stories, men&#39;s mental health, a schools program and events across NSW."><meta name="twitter:image" content="https://loveofthegame.netlify.app/assets/og.jpg">
+<style>
+  :root{
+    --ink:#09090B; --ink-2:#0D0D10; --court:#121215; --court-2:#17171B;
+    --chalk:#F2EFE6; --chalk-2:#D9D4C7; --ash:#9A958A; --ash-dim:#66635C;
+    --gold:#E2B44E; --gold-2:#F0CF83;
+    --line:rgba(242,239,230,.10); --line-2:rgba(242,239,230,.05); --hi:rgba(242,239,230,.06);
+    --maxw:1200px; --wide:1380px;
+    --ease:cubic-bezier(.2,.7,.2,1); --out:cubic-bezier(.16,1,.3,1);
+    --disp:'Archivo','Helvetica Neue',Arial,sans-serif;
+    --body:'Hanken Grotesk',system-ui,-apple-system,sans-serif;
+  }
+  *{box-sizing:border-box}
+  a,button{-webkit-tap-highlight-color:transparent}
+  html{scroll-behavior:smooth;scroll-padding-top:76px}
+  html,body{margin:0}
+  body{background:var(--ink);color:var(--chalk);font-family:var(--body);-webkit-font-smoothing:antialiased;
+    text-rendering:optimizeLegibility;overflow-x:hidden;position:relative}
+  ::selection{background:var(--gold);color:#17130A}
+
+  /* ambient */
+  .vignette{position:absolute;inset:0;z-index:2;pointer-events:none;
+    background:radial-gradient(120% 90% at 50% 20%, transparent 42%, rgba(4,4,6,.6) 100%)}
+  .grain{position:absolute;inset:0;z-index:3;pointer-events:none;opacity:.045;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")}
+
+  /* sticky glass bar */
+  .topbar{position:fixed;top:0;left:0;right:0;z-index:60;display:flex;align-items:center;justify-content:space-between;
+    gap:16px;padding:max(12px,env(safe-area-inset-top)) clamp(16px,2.6vw,28px) 12px;background:rgba(9,9,11,.62);backdrop-filter:blur(16px) saturate(1.2);
+    -webkit-backdrop-filter:blur(16px) saturate(1.2);border-bottom:1px solid var(--line-2);
+    transform:translateY(-100%);transition:transform .55s var(--out)}
+  .topbar.show{transform:none}
+  .topbar .brand img{height:24px}
+  .topbar .brand b{font-size:12px}
+  .topbar nav a.pill{color:#17130A;background:var(--gold);padding:9px 14px;border-radius:2px;font-weight:800}
+  .topbar nav a.pill:hover{background:var(--gold-2);color:#17130A}
+
+  /* hero */
+  .hero{position:relative;overflow:hidden;isolation:isolate}
+  .hero-bg{position:absolute;inset:-8%;z-index:0;pointer-events:none}
+  .hero-bg img{width:100%;height:100%;object-fit:cover;display:block;opacity:0;
+    filter:grayscale(1) blur(6px) brightness(.62) contrast(1.15);transform:scale(1.06);will-change:transform;
+    animation:bgfade 2.4s var(--ease) .2s forwards, drift 40s ease-in-out 2s infinite alternate}
+  .hero-bg::after{content:"";position:absolute;inset:0;
+    background:linear-gradient(180deg,rgba(9,9,11,.35) 0%,rgba(9,9,11,.55) 55%,var(--ink) 100%)}
+  #court{position:absolute;inset:0;width:100%;height:100%;z-index:1;opacity:0;animation:bgin 1.8s var(--ease) .3s forwards}
+  .wm{position:absolute;top:50%;right:-14%;transform:translateY(-50%);height:82vh;width:auto;z-index:1;opacity:0;
+    pointer-events:none;filter:saturate(0) brightness(1.6);animation:wmin 2s var(--ease) .4s forwards}
+  .shell{position:relative;z-index:5;display:grid;grid-template-rows:auto 1fr auto;min-height:100vh;min-height:100svh;padding:clamp(16px,2.6vw,28px)}
+
+  header{display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .brand{display:flex;align-items:center;gap:11px;text-decoration:none;color:var(--chalk)}
+  .brand img{height:30px;width:auto}
+  .brand b{font-family:var(--disp);font-weight:800;font-size:12.5px;letter-spacing:.18em;text-transform:uppercase;white-space:nowrap}
+  nav{display:flex;align-items:center;gap:clamp(14px,2vw,26px)}
+  nav a{color:var(--ash);text-decoration:none;font-family:var(--disp);font-size:11.5px;font-weight:600;letter-spacing:.14em;
+    text-transform:uppercase;transition:color .2s}
+  nav a:hover{color:var(--chalk)}
+  nav a.ig{color:var(--chalk)}
+  nav a.ig:hover{color:var(--gold)}
+
+  main{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:clamp(12px,1.7vw,20px);
+    position:relative;padding:clamp(12px,2.4vh,32px) 8px}
+  .glow{position:absolute;top:-6%;left:50%;width:min(1100px,120vw);height:min(760px,90vw);transform:translate(-50%,-30%);
+    z-index:-1;pointer-events:none;opacity:0;
+    background:radial-gradient(ellipse at 50% 0%, rgba(242,239,230,.13), rgba(226,180,78,.05) 40%, transparent 68%);
+    filter:blur(10px);animation:glowin 2.6s var(--ease) .5s forwards}
+  .eyebrow{display:inline-flex;align-items:center;justify-content:center;gap:12px;max-width:100%;flex-wrap:wrap;
+    font-family:var(--disp);font-weight:700;font-size:11px;letter-spacing:.32em;text-transform:uppercase;color:var(--ash);padding-left:.32em}
+  .eyebrow i{display:block;width:22px;height:1px;background:var(--gold)}
+  .crest{width:clamp(220px,34vw,400px);height:auto;display:block;filter:drop-shadow(0 24px 60px rgba(0,0,0,.6));will-change:transform}
+  .say{font-family:var(--disp);font-weight:900;font-size:clamp(30px,5vw,60px);line-height:.98;letter-spacing:-.035em;
+    text-wrap:balance;margin:6px auto 0;width:100%;max-width:17ch}
+  .say u{text-decoration:none;color:var(--gold)}
+  .lede{font-size:clamp(16px,1.9vw,19px);line-height:1.58;color:var(--chalk-2);width:100%;max-width:56ch;margin:0 auto;
+    font-weight:300;overflow-wrap:break-word}
+  .lede b{color:var(--chalk);font-weight:600}
+
+  .cta{display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:10px;width:100%}
+  .btn{display:inline-flex;align-items:center;gap:10px;font-family:var(--disp);font-weight:700;font-size:12.5px;letter-spacing:.12em;
+    text-transform:uppercase;text-decoration:none;cursor:pointer;padding:16px 24px;border-radius:2px;border:1px solid transparent;
+    transition:transform .25s var(--out),background .25s,color .25s,border-color .25s,box-shadow .25s}
+  .btn svg{width:15px;height:15px;display:block}
+  .btn-gold{background:var(--gold);color:#17130A;box-shadow:0 14px 34px -12px rgba(226,180,78,.45)}
+  .btn-gold:hover{transform:translateY(-2px);background:var(--gold-2);box-shadow:0 18px 40px -12px rgba(226,180,78,.6)}
+  .btn-gold:not(:has(svg))::after{content:"→";font-weight:800;transition:transform .25s var(--out)}
+  .btn-gold:not(:has(svg)):hover::after{transform:translateX(3px)}
+  .btn-ghost{color:var(--chalk);border-color:var(--line);background:rgba(242,239,230,.02)}
+  .btn-ghost:hover{transform:translateY(-2px);border-color:rgba(242,239,230,.5);background:rgba(242,239,230,.05)}
+  a:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+
+  footer{display:flex;flex-direction:column;align-items:center;gap:18px;padding-bottom:clamp(30px,5vh,52px)}
+  .strip{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:clamp(12px,3vw,30px);
+    border-top:1px solid var(--line-2);padding-top:18px;width:100%;max-width:var(--maxw)}
+  .strip span{font-family:var(--disp);font-weight:600;font-size:clamp(10px,1.3vw,11.5px);letter-spacing:.24em;text-transform:uppercase;
+    color:var(--ash);white-space:nowrap}
+  .strip span.k{color:var(--chalk-2)}
+  .strip i.dot{width:4px;height:4px;border-radius:50%;background:var(--gold);flex:0 0 auto}
+  .cue{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);z-index:6;display:flex;flex-direction:column;align-items:center;
+    gap:6px;text-decoration:none;font-family:var(--disp);font-weight:600;font-size:9.5px;letter-spacing:.34em;text-transform:uppercase;color:var(--ash-dim)}
+  .cue:hover{color:var(--gold)}
+  .cue svg{width:14px;height:14px;animation:nudge 2s ease-in-out infinite}
+
+  /* sections */
+  .sec{position:relative;z-index:5}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding-inline:clamp(20px,5vw,64px)}
+  .wrap.wide{max-width:var(--wide);padding-inline:clamp(14px,3vw,40px)}
+  .about,.program,.media,.events{padding-block:clamp(96px,14vh,176px);border-top:1px solid var(--line-2);scroll-margin-top:60px}
+
+  .kick{display:inline-flex;align-items:center;gap:12px;font-family:var(--disp);font-weight:700;font-size:11px;letter-spacing:.3em;
+    text-transform:uppercase;color:var(--ash)}
+  .kick::before{content:"";width:22px;height:1px;background:var(--gold)}
+  .about h2,.media-head h2,.ev-head h2{font-family:var(--disp);font-weight:900;font-size:clamp(34px,5.2vw,62px);line-height:.96;
+    letter-spacing:-.035em;text-wrap:balance;margin:22px 0 0;max-width:16ch}
+  .about h2 u,.media-head h2 u,.ev-head h2 u,.forwho h3 u,.prog-head h2 u,.close h2 u{text-decoration:none;color:var(--gold)}
+  .about h2{max-width:20ch}
+  .intro{font-size:clamp(17px,1.9vw,21px);line-height:1.6;color:var(--chalk-2);max-width:58ch;margin:24px 0 0;font-weight:300}
+  .intro b{color:var(--chalk);font-weight:600}
+
+  /* pillars */
+  .pillars{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:clamp(40px,5.5vw,64px)}
+  .pill{position:relative;background:linear-gradient(180deg,var(--court-2),var(--court));border:1px solid var(--line);border-radius:4px;
+    padding:clamp(24px,2.8vw,34px);overflow:hidden;box-shadow:inset 0 1px 0 var(--hi),0 30px 60px -40px rgba(0,0,0,.9);
+    transition:transform .35s var(--out),border-color .3s}
+  .pill::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,var(--gold),transparent);
+    transform:scaleX(0);transform-origin:left;transition:transform .5s var(--out)}
+  .pill:hover{transform:translateY(-4px);border-color:rgba(242,239,230,.18)}
+  .pill:hover::after{transform:scaleX(1)}
+  .pill .ico{width:30px;height:30px;color:var(--gold);margin-bottom:18px}
+  .pill .ico svg{width:100%;height:100%;display:block}
+  .pill h3{font-family:var(--disp);font-weight:800;font-size:clamp(19px,2.1vw,23px);letter-spacing:-.015em;margin:0 0 8px;color:var(--chalk)}
+  .pill p{margin:0;font-size:15px;line-height:1.6;color:var(--ash)}
+  .pill .tag{position:absolute;top:24px;right:24px;font-family:var(--disp);font-weight:600;font-size:10px;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--ash-dim)}
+  .pill .more{display:inline-flex;align-items:center;gap:6px;margin-top:14px;font-family:var(--disp);font-weight:700;font-size:11px;
+    letter-spacing:.16em;text-transform:uppercase;color:var(--gold);text-decoration:none}
+  .pill .more:hover{color:var(--gold-2)}
+
+  .motto{margin-top:clamp(56px,8vw,96px);padding:clamp(40px,5.5vw,64px) 0;border-top:1px solid var(--line-2);border-bottom:1px solid var(--line-2);text-align:center}
+  .motto p{margin:0 auto;font-family:var(--body);font-weight:300;font-size:clamp(24px,3.4vw,42px);line-height:1.2;letter-spacing:-.01em;
+    text-wrap:balance;color:var(--chalk);max-width:22ch}
+  .motto p u{text-decoration:none;color:var(--gold);font-weight:500}
+  .motto small{display:block;margin-top:18px;font-family:var(--disp);font-weight:700;font-size:10.5px;letter-spacing:.34em;text-transform:uppercase;color:var(--ash-dim)}
+
+  /* program */
+  .program{overflow:hidden;background:radial-gradient(60% 50% at 0% 0%, rgba(226,180,78,.06), transparent 60%),linear-gradient(180deg,var(--ink-2),var(--ink) 45%)}
+  .program .ghost{position:absolute;top:clamp(18px,3vw,40px);right:-1vw;z-index:0;font-family:var(--disp);font-weight:900;font-style:italic;
+    font-size:clamp(88px,17vw,230px);line-height:.82;letter-spacing:-.03em;text-transform:uppercase;color:transparent;
+    -webkit-text-stroke:1px rgba(242,239,230,.07);pointer-events:none;user-select:none;white-space:nowrap;will-change:transform}
+  .program .wrap{position:relative;z-index:1}
+  .prog-head{max-width:66ch}
+  .prog-head h2{font-family:var(--disp);font-weight:900;font-style:italic;font-size:clamp(46px,9vw,112px);line-height:.88;letter-spacing:-.03em;
+    text-transform:uppercase;margin:22px 0 0}
+  .prog-head .sub{font-family:var(--disp);font-weight:600;font-size:clamp(10.5px,1.3vw,12.5px);letter-spacing:.24em;text-transform:uppercase;color:var(--ash);margin:18px 0 0}
+  .specs{display:flex;flex-wrap:wrap;gap:8px;list-style:none;padding:0;margin:26px 0 0}
+  .specs li{font-family:var(--disp);font-weight:600;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--chalk-2);
+    border:1px solid var(--line);padding:9px 13px 8px;border-radius:2px;background:rgba(242,239,230,.02)}
+  .specs li b{color:var(--gold);font-weight:900;margin-right:6px}
+  .track{margin-top:clamp(52px,7vw,88px)}
+  .timeline{position:relative}
+  .rail{position:absolute;left:0;right:0;top:0;height:1px;background:var(--line)}
+  .rail .fill{position:absolute;left:0;top:0;width:100%;height:100%;display:block;background:linear-gradient(90deg,var(--gold),var(--gold-2));
+    transform-origin:left center;transform:scaleX(0);transition:transform 1.6s var(--out) .1s}
+  .track.on .rail .fill{transform:scaleX(1)}
+  .phases{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(16px,2.6vw,32px)}
+  .phase{position:relative;padding:clamp(30px,3.4vw,44px) clamp(4px,1vw,10px) 0}
+  .phase::before{content:"";position:absolute;left:clamp(4px,1vw,10px);top:-6px;width:12px;height:12px;border-radius:50%;background:var(--ink);
+    border:2px solid var(--ash-dim);transition:background .45s var(--ease),border-color .45s,box-shadow .45s}
+  .track.on .phase::before{background:var(--gold);border-color:var(--gold);box-shadow:0 0 0 6px rgba(226,180,78,.16)}
+  .track.on .phase:nth-child(1)::before{transition-delay:.3s}.track.on .phase:nth-child(2)::before{transition-delay:.8s}.track.on .phase:nth-child(3)::before{transition-delay:1.3s}
+  .phase .num{display:block;font-family:var(--disp);font-weight:900;font-style:italic;font-size:clamp(50px,6.4vw,80px);line-height:.9;letter-spacing:-.03em;
+    color:rgba(226,180,78,.08);-webkit-text-stroke:1.5px var(--gold);transition:color .3s}
+  .phase:hover .num{color:rgba(226,180,78,.24)}
+  .phase .wk{display:inline-block;margin-top:16px;font-family:var(--disp);font-weight:600;font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;
+    color:var(--chalk-2);border:1px solid var(--line);padding:6px 10px 5px;border-radius:2px}
+  .phase h3{font-family:var(--disp);font-weight:800;font-size:clamp(20px,2.2vw,25px);line-height:1.1;letter-spacing:-.02em;margin:16px 0 8px;text-wrap:balance}
+  .phase p{margin:0;font-size:15.5px;line-height:1.6;color:var(--ash);max-width:34ch}
+  .ruler{display:grid;grid-template-columns:repeat(9,1fr);margin-top:clamp(32px,4vw,52px);border-top:1px solid var(--line-2)}
+  .ruler i{display:block;position:relative;height:34px;font-style:normal;font-family:var(--disp);font-weight:600;font-size:10.5px;letter-spacing:.12em;
+    color:var(--ash-dim);padding-top:12px;text-align:center;font-variant-numeric:tabular-nums}
+  .ruler i::before{content:"";position:absolute;top:-1px;left:50%;width:1px;height:6px;background:var(--ash-dim)}
+  .ruler i.q{color:var(--gold)}.ruler i.q::before{background:var(--gold);height:11px}
+  .ruler-lbl{display:flex;justify-content:space-between;margin-top:2px;font-family:var(--disp);font-weight:600;font-size:10px;letter-spacing:.28em;text-transform:uppercase;color:var(--ash-dim)}
+  .forwho{margin-top:clamp(56px,8vw,96px);display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(20px,4vw,48px);align-items:center;position:relative;overflow:hidden;
+    border:1px solid var(--line);border-radius:4px;padding:clamp(28px,4.4vw,56px);
+    background:linear-gradient(135deg,rgba(226,180,78,.08),transparent 55%),linear-gradient(180deg,var(--court-2),var(--court));
+    box-shadow:inset 0 1px 0 var(--hi),0 40px 80px -50px rgba(0,0,0,.9)}
+  .forwho::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(70% 90% at 100% 100%, rgba(226,180,78,.08), transparent 60%)}
+  .forwho>*{position:relative;z-index:1}
+  .forwho h3{font-family:var(--disp);font-weight:900;font-size:clamp(26px,3.8vw,44px);line-height:.98;letter-spacing:-.03em;margin:0;text-wrap:balance}
+  .forwho p{margin:16px 0 0;color:var(--chalk-2);font-size:16.5px;line-height:1.6;max-width:46ch;font-weight:300}
+  .forwho .cta{justify-content:flex-start;margin-top:0}
+  .forwho .mail{display:block;margin-top:16px;font-family:var(--disp);font-weight:600;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ash-dim)}
+  .forwho .mail a{color:var(--chalk);text-decoration:none;border-bottom:1px solid var(--line)}
+  .forwho .mail a:hover{color:var(--gold);border-color:var(--gold)}
+
+  /* media wall */
+  .media{background:linear-gradient(180deg,var(--ink) 0%,var(--ink-2) 55%,var(--ink) 100%)}
+  .media-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:18px 40px;max-width:var(--maxw);margin:0 auto;
+    padding-inline:clamp(6px,2vw,24px)}
+  .media-head .intro{margin-top:18px;max-width:46ch}
+  .media-head .side{display:flex;flex-direction:column;align-items:flex-start;gap:14px;padding-bottom:6px}
+  .count{display:inline-flex;align-items:center;gap:10px;font-family:var(--disp);font-weight:600;font-size:11px;letter-spacing:.24em;text-transform:uppercase;color:var(--ash)}
+  .count i{width:7px;height:7px;border-radius:50%;background:var(--gold);animation:ping 2.6s ease-out infinite}
+  .wall{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:clamp(36px,5vw,60px)}
+  .tile{position:relative;display:block;aspect-ratio:3/4;overflow:hidden;border-radius:3px;background:var(--court);text-decoration:none;color:var(--chalk);
+    box-shadow:0 30px 60px -40px rgba(0,0,0,.9)}
+  .tile.feat{grid-column:span 2;grid-row:span 2}
+  .tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(.92) contrast(1.08) brightness(.92);
+    transform:scale(1.001);transition:transform .9s var(--out),filter .6s var(--ease)}
+  .tile::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,4,6,.02) 40%,rgba(4,4,6,.86) 100%);transition:opacity .4s}
+  .tile:hover img{transform:scale(1.05);filter:grayscale(0) contrast(1.04) brightness(1)}
+  .tile .play{position:absolute;top:8px;right:8px;z-index:2;width:48px;height:48px;border-radius:50%;background:rgba(9,9,11,.78);
+    border:1px solid rgba(242,239,230,.18);display:grid;place-items:center;backdrop-filter:blur(6px)}
+  .tile.feat .play{width:56px;height:56px}
+  .tile .play svg{width:12px;height:12px;margin-left:2px;fill:var(--chalk)}
+  .tile .cap{position:absolute;left:12px;right:12px;bottom:12px;z-index:2;display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+  .tile .tag{font-family:var(--disp);font-weight:700;font-size:9.5px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);text-shadow:0 1px 8px rgba(0,0,0,.8)}
+  .tile .box{display:block;max-width:100%;color:var(--chalk);font-family:var(--disp);font-weight:700;font-size:13px;line-height:1.3;letter-spacing:-.01em;
+    text-shadow:0 2px 14px rgba(0,0,0,.85);transition:transform .35s var(--out)}
+  .tile:hover .box{transform:translateY(-2px)}
+  .tile.feat .box{display:inline-block;background:var(--chalk);color:#111;font-style:italic;font-weight:900;font-size:clamp(14px,1.5vw,18px);
+    text-transform:uppercase;letter-spacing:.01em;padding:9px 13px 8px;border-left:3px solid var(--gold);text-shadow:none}
+  .tile.feat .tag{font-size:11px}
+  .wall-foot{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px;margin-top:26px;max-width:var(--maxw);margin-inline:auto;padding-inline:clamp(6px,2vw,24px)}
+  .wall-foot p{margin:0;font-size:13.5px;color:var(--ash-dim);max-width:60ch}
+
+  /* events */
+  .events{background:radial-gradient(60% 50% at 100% 0%, rgba(226,180,78,.05), transparent 60%),var(--ink)}
+  .ev-head{max-width:var(--maxw);margin:0 auto;padding-inline:clamp(6px,2vw,24px)}
+  .ev-head .intro{margin-top:18px}
+  .fx{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:clamp(36px,5vw,60px)}
+  .card{position:relative;overflow:hidden;border-radius:4px;background:var(--court);min-height:320px;display:flex;align-items:flex-end;text-decoration:none;
+    color:var(--chalk);box-shadow:0 30px 60px -40px rgba(0,0,0,.9)}
+  .card.big{grid-column:span 3;min-height:min(560px,62vw)}
+  .card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(.88) contrast(1.06) brightness(.9);
+    transition:transform .9s var(--out),filter .6s var(--ease)}
+  .card.big img{filter:grayscale(.85) contrast(1.1) brightness(1.05)}
+  .card::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(4,4,6,.1) 0%,rgba(4,4,6,.5) 45%,rgba(4,4,6,.94) 100%)}
+  .card.big::after{background:linear-gradient(90deg,rgba(4,4,6,.94) 0%,rgba(4,4,6,.62) 45%,rgba(4,4,6,.1) 100%),linear-gradient(180deg,transparent 40%,rgba(4,4,6,.55) 100%)}
+  .card:hover img{transform:scale(1.04);filter:grayscale(0) contrast(1.04) brightness(1)}
+  .card .in{position:relative;z-index:2;padding:clamp(20px,2.6vw,30px);width:100%}
+  .card.big .in{padding:clamp(26px,4.4vw,56px);max-width:700px}
+  .card .tag{display:inline-block;font-family:var(--disp);font-weight:600;font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--chalk-2);
+    border:1px solid rgba(242,239,230,.28);padding:6px 10px 5px;border-radius:2px;backdrop-filter:blur(6px)}
+  .card h3{font-family:var(--disp);font-weight:900;font-size:clamp(21px,2.4vw,28px);line-height:1.02;letter-spacing:-.025em;margin:14px 0 8px;text-wrap:balance}
+  .card.big h3{font-size:clamp(24px,3vw,36px)}
+  .card p{margin:0;font-size:14.5px;line-height:1.6;color:var(--ash);max-width:40ch}
+  .card.big p{font-size:clamp(15px,1.6vw,17.5px);max-width:46ch;color:var(--chalk-2);font-weight:300}
+  .card .meta{display:flex;align-items:center;gap:8px;margin-top:16px;font-family:var(--disp);font-weight:600;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--chalk)}
+  .card .meta i{width:4px;height:4px;border-radius:50%;background:var(--gold);flex:0 0 auto}
+  .stake{display:block;font-family:var(--disp);font-weight:900;font-style:italic;font-size:clamp(60px,9.4vw,130px);line-height:.85;letter-spacing:-.045em;color:var(--gold);
+    margin:14px 0 4px;text-shadow:0 14px 50px rgba(226,180,78,.28)}
+  .stake small{display:block;font-size:clamp(11px,1.2vw,13px);letter-spacing:.32em;color:var(--chalk);margin-top:14px;font-weight:700;font-style:normal;text-shadow:none}
+  .involve{margin-top:12px;display:grid;grid-template-columns:1fr auto;gap:16px 28px;align-items:center;border:1px solid var(--line);border-radius:4px;
+    padding:clamp(20px,2.8vw,32px);background:linear-gradient(180deg,var(--court-2),var(--court));box-shadow:inset 0 1px 0 var(--hi)}
+  .involve h4{font-family:var(--disp);font-weight:800;font-size:clamp(18px,2vw,23px);letter-spacing:-.02em;margin:0 0 6px}
+  .involve p{margin:0;color:var(--ash);font-size:14.5px;line-height:1.6;max-width:60ch}
+  .involve .cta{margin:0;justify-content:flex-end;width:auto}
+
+  /* closing statement */
+  .close{padding:clamp(110px,16vh,200px) 0 clamp(90px,12vh,150px);text-align:center;border-top:1px solid var(--line-2);
+    background:radial-gradient(60% 60% at 50% 0%, rgba(242,239,230,.05), transparent 60%),var(--ink)}
+  .close img{height:54px;width:auto;display:block;margin:0 auto 26px;opacity:.9}
+  .close h2{font-family:var(--disp);font-weight:900;font-size:clamp(46px,9.5vw,132px);line-height:.9;letter-spacing:-.045em;margin:0;text-wrap:balance}
+  .close p{margin:26px auto 0;font-size:clamp(16px,1.8vw,19px);line-height:1.6;color:var(--ash);max-width:44ch;font-weight:300}
+  .close .cta{margin-top:30px}
+
+  /* footer */
+  .foot{border-top:1px solid var(--line-2);padding-block:clamp(56px,8vh,96px) 28px;background:linear-gradient(180deg,var(--ink) 0%,#050507 100%)}
+  .foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1.1fr;gap:clamp(24px,4vw,64px)}
+  .foot .brandblock img{height:56px;width:auto;display:block}
+  .foot .brandblock b{display:block;margin-top:16px;font-family:var(--disp);font-weight:800;font-size:14px;letter-spacing:.18em;text-transform:uppercase}
+  .foot .brandblock span{display:block;margin-top:8px;font-family:var(--disp);font-weight:600;font-size:10.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold)}
+  .foot .brandblock p{margin:16px 0 0;color:var(--ash);font-size:14px;line-height:1.65;max-width:32ch}
+  .foot h5{font-family:var(--disp);font-weight:600;font-size:10.5px;letter-spacing:.28em;text-transform:uppercase;color:var(--ash-dim);margin:0 0 16px}
+  .foot ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:11px}
+  .foot ul a{color:var(--chalk-2);text-decoration:none;font-size:14.5px;font-weight:500;transition:color .2s;overflow-wrap:anywhere}
+  .foot ul a:hover{color:var(--gold)}
+  .foot ul small{display:block;color:var(--ash-dim);font-size:12px;margin-top:2px}
+  .foot-bar{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px 24px;margin-top:clamp(40px,5vw,64px);padding-top:20px;border-top:1px solid var(--line-2);
+    font-family:var(--disp);font-weight:600;font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--ash-dim)}
+  .foot-bar b{color:var(--ash)}
+
+  /* motion */
+  .rise{animation:rise .9s var(--out) both}
+  .d1{animation-delay:.15s}.d2{animation-delay:.28s}.d3{animation-delay:.4s}.d4{animation-delay:.52s}.d5{animation-delay:.64s}.d6{animation-delay:.76s}
+  .js .rv{opacity:0;transform:translateY(26px);filter:blur(6px)}
+  .js .rv.in{opacity:1;transform:none;filter:none;transition:opacity 1s var(--out),transform 1s var(--out),filter .8s var(--out)}
+  .js .rv.in.dl1{transition-delay:.08s}.js .rv.in.dl2{transition-delay:.16s}.js .rv.in.dl3{transition-delay:.24s}
+  @keyframes rise{from{transform:translateY(16px)}to{transform:translateY(0)}}
+  @keyframes bgin{to{opacity:.7}}
+  @keyframes bgfade{to{opacity:.6}}
+  @keyframes drift{from{transform:scale(1.06) translate3d(0,0,0)}to{transform:scale(1.14) translate3d(-1.5%,1%,0)}}
+  @keyframes wmin{to{opacity:.045}}
+  @keyframes glowin{to{opacity:1}}
+  @keyframes nudge{0%,100%{transform:translateY(0);opacity:.7}50%{transform:translateY(4px);opacity:1}}
+  @keyframes ping{0%{box-shadow:0 0 0 0 rgba(226,180,78,.55)}100%{box-shadow:0 0 0 12px rgba(226,180,78,0)}}
+
+  @media (max-width:1100px){ .wall{grid-template-columns:repeat(3,1fr)} }
+  @media (min-width:1600px){ .crest{width:460px} .say{font-size:64px} .lede{font-size:20px} }
+  @media (max-height:560px) and (orientation:landscape){
+    .crest{width:min(28vh,200px)} .say{font-size:clamp(22px,5vh,32px)} .lede{font-size:15px;max-width:60ch}
+    main{gap:10px;padding:8px} .shell{padding:12px 20px} footer{padding-bottom:18px} .cue{display:none}
+  }
+  @media (max-width:820px){
+    nav .txt{display:none}
+    .phases{grid-template-columns:1fr;gap:28px;padding-left:28px}
+    .rail{left:5px;right:auto;top:0;bottom:0;width:1px;height:auto}
+    .rail .fill{transform-origin:center top;transform:scaleY(0);background:linear-gradient(180deg,var(--gold),var(--gold-2))}
+    .track.on .rail .fill{transform:scaleY(1)}
+    .phase{padding:0 0 0 10px}.phase::before{left:-29px;top:8px}
+    .forwho{grid-template-columns:1fr}.forwho .cta{justify-content:center}
+    .wall{grid-template-columns:repeat(2,1fr);gap:6px}
+    .tile.feat{grid-column:span 2;grid-row:span 1;aspect-ratio:4/3}
+    .tile.feat img{object-position:50% 12%}
+    .fx{grid-template-columns:1fr}.card{min-height:250px}.card.big{grid-column:span 1;min-height:440px}
+    .card.big::after{background:linear-gradient(180deg,rgba(4,4,6,.28) 0%,rgba(4,4,6,.6) 42%,rgba(4,4,6,.95) 100%)}
+    .card.big .in{max-width:none}
+    .involve{grid-template-columns:1fr}.involve .cta{justify-content:flex-start}
+    .foot-grid{grid-template-columns:1fr 1fr}.foot .brandblock{grid-column:span 2}
+    .media-head .side{align-items:stretch;width:100%}
+  }
+  @media (max-width:720px){ .pillars{grid-template-columns:1fr} }
+  @media (max-width:560px){
+    .intro,.lede,.card.big p,.forwho p,.close p,.pill p,.tcard p,.card p,.phase p{font-weight:400}
+    .hero-bg img{filter:grayscale(1) brightness(.62) contrast(1.15)}
+    .wrap{padding-inline:18px} .wrap.wide{padding-inline:12px}
+    .about h2,.media-head h2,.ev-head h2,.talk h2{font-size:clamp(30px,9vw,38px)}
+    .prog-head h2{font-size:clamp(44px,13vw,60px)}
+    .close h2{font-size:clamp(42px,13vw,58px)}
+    .stake{font-size:clamp(56px,18vw,80px)}
+    nav .txt{display:none}
+    .brand b{font-size:11px;letter-spacing:.14em}
+    .crest{width:min(74vw,310px)}
+    .say{font-size:clamp(30px,8.4vw,40px)}
+    .cta .btn{flex:1 1 auto;justify-content:center}
+    footer{padding-bottom:58px}
+    .topbar nav a.pill{padding:8px 12px}
+  }
+  @media (max-width:480px){ .foot-grid{grid-template-columns:1fr}.foot .brandblock{grid-column:span 1} }
+  @media (prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto}
+    *{animation-duration:.001s!important;animation-delay:0s!important}
+    .glow{opacity:1;animation:none}#court{opacity:.7;animation:none}.wm{opacity:.045;animation:none}
+    .hero-bg img{opacity:.6;animation:none;transform:none}
+    .cue svg,.count i{animation:none}
+    .rail .fill{transform:none!important;transition:none}
+    .phase::before{transition:none;background:var(--gold);border-color:var(--gold)}
+    .js .rv{opacity:1;transform:none;filter:none}
+    .topbar{transition:none}
+  }
+  /* real talk — men's mental health */
+  .talk{padding-block:clamp(96px,14vh,176px);border-top:1px solid var(--line-2);scroll-margin-top:60px;
+    background:radial-gradient(70% 60% at 50% 100%, rgba(226,180,78,.05), transparent 60%),var(--ink)}
+  .talk-head{max-width:66ch}
+  .talk h2{font-family:var(--disp);font-weight:900;font-size:clamp(34px,5.2vw,62px);line-height:.96;letter-spacing:-.035em;text-wrap:balance;margin:22px 0 0;max-width:16ch}
+  .talk h2 u{text-decoration:none;color:var(--gold)}
+  .talk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:clamp(40px,5.5vw,64px)}
+  .tcard{background:linear-gradient(180deg,var(--court-2),var(--court));border:1px solid var(--line);border-radius:4px;padding:clamp(24px,2.8vw,34px);box-shadow:inset 0 1px 0 var(--hi)}
+  .tcard i.n{display:block;width:22px;height:1px;background:var(--gold);margin-bottom:18px}
+  .tcard h3{font-family:var(--disp);font-weight:800;font-size:clamp(19px,2.1vw,23px);letter-spacing:-.015em;margin:0 0 8px}
+  .tcard p{margin:0;font-size:15px;line-height:1.6;color:var(--ash)}
+  .support{margin-top:clamp(28px,4vw,44px);display:grid;grid-template-columns:1fr auto;gap:16px 28px;align-items:center;border:1px solid var(--line);
+    border-radius:4px;padding:clamp(20px,2.8vw,32px);background:rgba(242,239,230,.02)}
+  .support p{margin:0;font-size:14.5px;line-height:1.65;color:var(--chalk-2)}
+  .support p b{color:var(--chalk);font-weight:600}
+  .support .cta{margin:0;justify-content:flex-end;width:auto}
+  @media (max-width:820px){.talk-grid{grid-template-columns:1fr}.support{grid-template-columns:1fr}.support .cta{justify-content:flex-start}}
+</style>
+</head>
+<body>
+<div class="topbar" id="topbar">
+  <a class="brand" href="#top"><img src="assets/mark.webp" alt=""><b>Love of the Game</b></a>
+  <nav>
+        <a class="txt" href="#about">What we do</a>
+        <a class="txt" href="#media">Stories</a>
+        <a class="txt" href="#talk">Real talk</a>
+        <a class="txt" href="#program">Program</a>
+        <a class="txt" href="#events">Events</a>
+        <a class="pill" href="https://www.instagram.com/loveofthegameaus" target="_blank" rel="noopener">Instagram</a>
+  </nav>
+</div>
+<section class="hero" id="top">
+  <div class="hero-bg" aria-hidden="true"><img src="assets/hero-bg.webp" alt=""></div>
+  <canvas id="court" aria-hidden="true"></canvas>
+  <img class="wm" src="assets/mark.webp" alt="" aria-hidden="true">
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="shell">
+    <header class="rise">
+      <a class="brand" href="#top"><img src="assets/mark.webp" alt=""><b>Love of the Game</b></a>
+      <nav>
+        <a class="txt" href="#about">What we do</a>
+        <a class="txt" href="#media">Stories</a>
+        <a class="txt" href="#talk">Real talk</a>
+        <a class="txt" href="#program">Program</a>
+        <a class="txt" href="#events">Events</a>
+        <a class="ig" href="https://www.instagram.com/loveofthegameaus" target="_blank" rel="noopener">Instagram</a>
+      </nav>
+    </header>
+    <main>
+      <div class="glow" aria-hidden="true"></div>
+      <div class="eyebrow rise d1"><i></i>Sydney · NSW — Est. 2024<i></i></div>
+      <div class="rise d2"><img class="crest" id="crest" src="assets/crest.webp" alt="Love of the Game — Your Journey, Your Story. Established 2024."></div>
+      <h1 class="say rise d3">Everyone has a <u>story</u> worth telling.</h1>
+      <p class="lede rise d4">A community built around sport, real stories and looking out for each other — highlights and
+        interviews, honest talk about <b>men's mental health</b>, a <b>schools program</b> and events, from right across NSW.</p>
+      <div class="cta rise d5">
+        <a class="btn btn-gold" href="https://www.instagram.com/loveofthegameaus" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1.2" fill="currentColor" stroke="none"/></svg>
+          Follow the journey
+        </a>
+        <a class="btn btn-ghost" href="mailto:info@loveofthegame.com.au">Get in touch</a>
+      </div>
+    </main>
+    <footer class="rise d6">
+      <div class="strip">
+        <span class="k">Sport&nbsp;&amp;&nbsp;Stories</span><i class="dot"></i>
+        <span class="k">Real&nbsp;Talk</span><i class="dot"></i>
+        <span class="k">Schools</span><i class="dot"></i>
+        <span class="k">Events</span><i class="dot"></i>
+        <span>10K+&nbsp;Community</span>
+      </div>
+    </footer>
+  </div>
+  <a class="cue" href="#about" aria-label="Scroll to what we do"><span>Scroll</span>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></a>
+</section>
+<section class="sec about" id="about">
+  <div class="wrap">
+    <span class="kick rv">Who we are</span>
+    <h2 class="rv dl1">Making a difference — on and off the <u>court</u>.</h2>
+    <p class="intro rv dl2">Love of the Game started in the gym and grew into a community. We shine a light on sport and the
+      people in it — basketball first, but the NBL, the NRL and stories from right across NSW too. We talk honestly about
+      <b>men's mental health</b>, run a school-based mentoring program, put on the events that bring people together, and
+      back anyone trying to make a difference. <b>Your journey, your story.</b></p>
+    <div class="pillars rv dl2">
+      <article class="pill">
+        <span class="tag">From around NSW</span>
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 9h20M7 4v5M17 4v5M7 20v-5M17 20v-5"/><path d="M11 12.2v3.6l3-1.8z" fill="currentColor" stroke="none"/></svg></div>
+        <h3>Sport &amp; stories</h3>
+        <p>Basketball first — plus the NBL, the NRL and the stories from around NSW the mainstream misses.</p>
+        <a class="more" href="#media">See the stories →</a>
+      </article>
+      <article class="pill">
+        <span class="tag">Men's mental health</span>
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21C7 17.5 3.5 14.5 3.5 10.5A4.2 4.2 0 0 1 12 8a4.2 4.2 0 0 1 8.5 2.5C20.5 14.5 17 17.5 12 21z"/></svg></div>
+        <h3>Real talk</h3>
+        <p>Honest conversations about men's mental health — because the game is about the people who play it.</p>
+        <a class="more" href="#talk">Start here →</a>
+      </article>
+      <article class="pill">
+        <span class="tag">Schools</span>
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 8l10-4 10 4-10 4z"/><path d="M6 10v5c0 1.4 2.7 2.6 6 2.6s6-1.2 6-2.6v-5"/><path d="M22 8v5"/></svg></div>
+        <h3>The Next Play</h3>
+        <p>A school-based mentoring program built on the NSW PDHPE syllabus — meeting young people where they are.</p>
+        <a class="more" href="#program">See the program →</a>
+      </article>
+      <article class="pill">
+        <span class="tag">In the gym</span>
+        <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h12v4a6 6 0 0 1-12 0z"/><path d="M6 6H3v1a4 4 0 0 0 3 3.8M18 6h3v1a4 4 0 0 1-3 3.8"/><path d="M9 20h6M12 14v6"/></svg></div>
+        <h3>Community &amp; events</h3>
+        <p>Wednesday nights, tournaments, call-outs and the moments that bring people together.</p>
+        <a class="more" href="#events">See what's on →</a>
+      </article>
+    </div>
+    <div class="motto rv">
+      <p>Never above you. Never below you. Always <u>beside</u> you.</p>
+      <small>The Love of the Game promise</small>
+    </div>
+  </div>
+</section>
+<section class="sec media" id="media">
+  <div class="wrap wide">
+    <div class="media-head rv">
+      <div>
+        <span class="kick">Stories</span>
+        <h2>From the court — <u>and beyond</u>.</h2>
+        <p class="intro">Highlights, interviews, stat lines and real talk — basketball, the NBL, the NRL and the stories
+          from around NSW that don't make the mainstream.</p>
+      </div>
+      <div class="side">
+        <span class="count"><i></i>4,500+ stories · @loveofthegameaus</span>
+        <a class="btn btn-ghost" href="https://www.instagram.com/loveofthegameaus" target="_blank" rel="noopener">See it all on Instagram</a>
+      </div>
+    </div>
+    <div class="wall rv dl1">
+      <a class="tile feat" href="https://www.instagram.com/loveofthegameaus" target="_blank" rel="noopener">
+        <img src="assets/feat.webp" alt="Above the rim — Love of the Game on Instagram" loading="lazy" decoding="async">
+        <span class="play"><svg viewBox="0 0 24 24"><path d="M6 3l14 9-14 9z"/></svg></span>
+        <span class="cap"><span class="tag">Highlight</span><span class="box">Above the rim</span></span>
+      </a>
+      <a class="tile" href="https://www.instagram.com/loveofthegameaus" target="_blank" rel="noopener">
+        <img src="assets/tile-f11_r1_c2.webp" alt="On the mic — Love of the Game on Instagram" loading="lazy" decoding="async">
+        <span class="play"><svg viewBox="0 0 24 24"><path d="M6 3l14 9-14 9z"/></svg></span>
+        <span class="cap"><span class="tag">Interview</span><span class="box">On the mic</span></span>
+      </a>
+      <a class="tile" href="https://www.instagram.com/loveofthegameaus" target="_blank" rel="noopener">
+        <img src="assets/tile-f15_r2_c2.webp" alt="Wests Tigers — real thoughts on Benji and the squad — Love of the Game on Instagram" loading="lazy" decoding="async">
+        <span class="play"><svg viewBox="0 0 24 24"><path d="M6 3l14 9-14 9z"/></svg></span>
+        <span class="cap"><span class="tag">NRL</span><span class="box">Wests Tigers — real thoughts on Benji and the squad</span></span>
+      </a>
+      <a class="tile" href="https://www.instagram.com/loveofthegameaus" target="_blank" rel="noopener">
+        <img src="assets/tile-f13_r2_c2.webp" alt="Top 3 players to savour — OG edition — Love of the Game on Instagram" loading="lazy" decoding="async">
+        <span class="play"><svg viewBox="0 0 24 24"><path d="M4 8h12v12H4zM8 4h12v12h-2V6H8z"/></svg></span>
+        <span class="cap"><span class="tag">NBL</span><span class="box">Top 3 players to savour — OG edition</span></span>
+      </a>
+      <a class="tile" href="https://www.instagram.com/loveofthegameaus" target="_blank" rel="noopener">
+        <img src="assets/tile-f13_r2_c3.webp" alt="“You inspired me to start.” — Love of the Game on Instagram" loading="lazy" decoding="async">
+        <span class="play"><svg viewBox="0 0 24 24"><path d="M4 8h12v12H4zM8 4h12v12h-2V6H8z"/></svg></span>
+        <span class="cap"><span class="tag">Community</span><span class="box">“You inspired me to start.”</span></span>
+      </a>
+      <a class="tile" href="https://www.instagram.com/loveofthegameaus" target="_blank" rel="noopener">
+        <img src="assets/tile-f15_r1_c1.webp" alt="Isaiah Toledo — LOTG MVP — Love of the Game on Instagram" loading="lazy" decoding="async">
+        <span class="play"><svg viewBox="0 0 24 24"><path d="M6 3l14 9-14 9z"/></svg></span>
+        <span class="cap"><span class="tag">Highlights</span><span class="box">Isaiah Toledo — LOTG MVP</span></span>
+      </a>
+      <a class="tile" href="https://www.instagram.com/loveofthegameaus" target="_blank" rel="noopener">
+        <img src="assets/tile-f15_r2_c3.webp" alt="A Father's Day message — Love of the Game on Instagram" loading="lazy" decoding="async">
+        <span class="play"><svg viewBox="0 0 24 24"><path d="M6 3l14 9-14 9z"/></svg></span>
+        <span class="cap"><span class="tag">Real talk</span><span class="box">A Father's Day message</span></span>
+      </a>
+      <a class="tile" href="https://www.instagram.com/loveofthegameaus" target="_blank" rel="noopener">
+        <img src="assets/tile-f19_r2_c1.webp" alt="Your journey, your story — Love of the Game on Instagram" loading="lazy" decoding="async">
+        <span class="play"><svg viewBox="0 0 24 24"><path d="M4 8h12v12H4zM8 4h12v12h-2V6H8z"/></svg></span>
+        <span class="cap"><span class="tag">Community</span><span class="box">Your journey, your story</span></span>
+      </a>
+      <a class="tile" href="https://www.instagram.com/loveofthegameaus" target="_blank" rel="noopener">
+        <img src="assets/tile-f19_r3_c2.webp" alt="$5,000 — YSA v Team Sphera — Love of the Game on Instagram" loading="lazy" decoding="async">
+        <span class="play"><svg viewBox="0 0 24 24"><path d="M6 3l14 9-14 9z"/></svg></span>
+        <span class="cap"><span class="tag">Event</span><span class="box">$5,000 — YSA v Team Sphera</span></span>
+      </a>
+    </div>
+    <div class="wall-foot rv">
+      <p>Every tile opens Love of the Game on Instagram — that's where the stories land first.</p>
+      <a class="btn btn-gold" href="https://www.instagram.com/loveofthegameaus" target="_blank" rel="noopener">Watch the latest</a>
+    </div>
+  </div>
+</section>
+<section class="sec talk" id="talk">
+  <div class="wrap">
+    <div class="talk-head">
+      <span class="kick rv">Men's mental health</span>
+      <h2 class="rv dl1">Your story matters. <u>So do you.</u></h2>
+      <p class="intro rv dl2">Love of the Game uses its platform to talk honestly about men's mental health — the pressure,
+        the losses, the days that don't make the highlight reel. Real conversations, no judgement, and a community that checks in.</p>
+    </div>
+    <div class="talk-grid rv dl2">
+      <div class="tcard"><i class="n"></i><h3>Real conversations</h3><p>Interviews and messages that go deeper than the game — from the people living it.</p></div>
+      <div class="tcard"><i class="n"></i><h3>A community that checks in</h3><p>Never above you, never below you, always beside you. Look out for your mates — and let them look out for you.</p></div>
+      <div class="tcard"><i class="n"></i><h3>Your story</h3><p>Share it. Speaking up might be the reason someone else does too.</p></div>
+    </div>
+    <div class="support rv">
+      <p><b>Need support right now?</b> Lifeline <b>13 11 14</b> · Beyond Blue <b>1300 22 4636</b> · In an emergency, call <b>000</b>.</p>
+      <div class="cta">
+        <a class="btn btn-gold" href="https://www.instagram.com/loveofthegameaus" target="_blank" rel="noopener">Share your story</a>
+        <a class="btn btn-ghost" href="mailto:info@loveofthegame.com.au?subject=My%20story">Reach out</a>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="sec program" id="program">
+  <div class="ghost" aria-hidden="true">Next Play</div>
+  <div class="wrap">
+    <div class="prog-head rv">
+      <span class="kick">Schools program</span>
+      <h2>The Next <u>Play</u></h2>
+      <p class="sub">Educator-developed · Built on the NSW PDHPE syllabus</p>
+      <p class="intro">A nine-week, school-based mentoring and behaviour-support program that takes
+        <b>Your Journey, Your Story</b> off the court and into the classroom — built for the
+        young people who need it most.</p>
+      <ul class="specs">
+        <li><b>9</b>Weeks</li>
+        <li><b>3</b>Phases</li>
+        <li>NSW PDHPE syllabus</li>
+        <li>School-based</li>
+        <li>Mentoring + behaviour support</li>
+      </ul>
+    </div>
+
+    <div class="track rv dl1" id="track">
+      <div class="timeline">
+        <div class="rail" aria-hidden="true"><i class="fill"></i></div>
+        <ol class="phases">
+          <li class="phase">
+            <span class="num" aria-hidden="true">01</span>
+            <span class="wk">Weeks 1 – 3</span>
+            <h3>Understanding your journey</h3>
+            <p>Your goals, your ambitions, your plans — and who you are.</p>
+          </li>
+          <li class="phase">
+            <span class="num" aria-hidden="true">02</span>
+            <span class="wk">Weeks 4 – 6</span>
+            <h3>Creating your story</h3>
+            <p>Finding what needs to get done — and building the skills to do it.</p>
+          </li>
+          <li class="phase">
+            <span class="num" aria-hidden="true">03</span>
+            <span class="wk">Weeks 7 – 9</span>
+            <h3>Make it great</h3>
+            <p>Knowing that your next steps are truly yours.</p>
+          </li>
+        </ol>
+      </div>
+      <div class="ruler" aria-hidden="true">
+        <i class="q">1</i><i>2</i><i>3</i><i class="q">4</i><i>5</i><i>6</i><i class="q">7</i><i>8</i><i>9</i>
+      </div>
+      <div class="ruler-lbl" aria-hidden="true"><span>Week one</span><span>Week nine</span></div>
+    </div>
+
+    <div class="forwho rv">
+      <div>
+        <h3>For the young people who need it <u>the most</u>.</h3>
+        <p>The Next Play runs inside the school and is delivered beside the student — never above
+          them, never below them. If your school could use it, let's talk.</p>
+        <span class="mail">Email <a href="mailto:info@loveofthegame.com.au">info@loveofthegame.com.au</a></span>
+      </div>
+      <div class="cta">
+        <a class="btn btn-gold" href="mailto:info@loveofthegame.com.au?subject=The%20Next%20Play%20Program%20for%20our%20school">Bring it to your school</a>
+        <a class="btn btn-ghost" href="https://www.instagram.com/loveofthegameaus" target="_blank" rel="noopener">Message on Instagram</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function(){
+    var t=document.getElementById('track'); if(!t)return;
+    if(!('IntersectionObserver' in window)){t.classList.add('on');return;}
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){t.classList.add('on');io.disconnect();} });
+    },{threshold:.25});
+    io.observe(t);
+  })();
+</script>
+
+<section class="sec events" id="events">
+  <div class="wrap wide">
+    <div class="ev-head rv">
+      <span class="kick">Community &amp; events</span>
+      <h2>Where the community <u>shows up</u>.</h2>
+      <p class="intro">From the Wednesday night run to winner-takes-all showdowns — the events that bring people together,
+        on the court and off it.</p>
+    </div>
+    <div class="fx rv dl1">
+      <a class="card big" href="https://www.instagram.com/loveofthegameaus" target="_blank" rel="noopener">
+        <img src="assets/ev-f15_r3_c1.webp" alt="" style="object-position:72% 40%" loading="lazy" decoding="async">
+        <div class="in">
+          <span class="tag">Headline events</span>
+          <span class="stake">$5,000<small>On the line · Winner takes all</small></span>
+          <h3>Winner-takes-all showdowns</h3>
+          <p>Like YSA v Team Sphera — five grand on the line, streamed live on Instagram and YouTube and called like a broadcast.</p>
+          <span class="meta"><i></i>Live on Instagram &amp; YouTube</span>
+        </div>
+      </a>
+      <a class="card" href="https://www.instagram.com/loveofthegameaus" target="_blank" rel="noopener">
+        <img src="assets/ev-f11_r2_c3.webp" alt="" style="object-position:50% 30%" loading="lazy" decoding="async">
+        <div class="in">
+          <span class="tag">WNB</span>
+          <h3>Wednesday nights</h3>
+          <p>The LOTG run — and the community call-outs that come with it.</p>
+          <span class="meta"><i></i>The run · Call-outs</span>
+        </div>
+      </a>
+      <a class="card" href="https://www.instagram.com/loveofthegameaus" target="_blank" rel="noopener">
+        <img src="assets/ev-f17_r1_c1.webp" alt="" style="object-position:50% 35%" loading="lazy" decoding="async">
+        <div class="in">
+          <span class="tag">Seasonal</span>
+          <h3>Tournaments</h3>
+          <p>LOTG tournaments with an MVP crowned and a full highlight package for everyone who shows out.</p>
+          <span class="meta"><i></i>MVP honours · Full highlights</span>
+        </div>
+      </a>
+      <a class="card" href="https://www.instagram.com/loveofthegameaus" target="_blank" rel="noopener">
+        <img src="assets/ev-f15_r3_c3.webp" alt="" style="object-position:55% 45%" loading="lazy" decoding="async">
+        <div class="in">
+          <span class="tag">League</span>
+          <h3>UBL coverage</h3>
+          <p>Round by round — match of the round, stat lines and the grand finals.</p>
+          <span class="meta"><i></i>Match of the round · GFs</span>
+        </div>
+      </a>
+    </div>
+    <div class="involve rv">
+      <div>
+        <h4>Want in?</h4>
+        <p>Enter a team, call someone out for a Wednesday night, or put your brand on an event. One message is all it takes.</p>
+      </div>
+      <div class="cta">
+        <a class="btn btn-gold" href="https://www.instagram.com/loveofthegameaus" target="_blank" rel="noopener">Message on Instagram</a>
+        <a class="btn btn-ghost" href="mailto:info@loveofthegame.com.au?subject=Event%20enquiry%20%E2%80%94%20Love%20of%20the%20Game">Sponsor an event</a>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="sec close">
+  <div class="wrap rv">
+    <img src="assets/mark.webp" alt="">
+    <h2>Your journey.<br><u>Your story.</u></h2>
+    <p>Love of the Game is built by the people in it. Follow along, share your story, bring The Next Play to your school,
+      or get your team on the court.</p>
+    <div class="cta">
+      <a class="btn btn-gold" href="https://www.instagram.com/loveofthegameaus" target="_blank" rel="noopener">Follow the journey</a>
+      <a class="btn btn-ghost" href="mailto:info@loveofthegame.com.au">Get in touch</a>
+    </div>
+  </div>
+</section>
+<div class="sec foot" id="contact" role="contentinfo">
+  <div class="wrap">
+    <div class="foot-grid rv">
+      <div class="brandblock">
+        <img src="assets/mark.webp" alt="">
+        <b>Love of the Game</b>
+        <span>Your journey, your story</span>
+        <p>A community built around sport, stories and looking out for each other — making a difference on and off the court, across NSW.</p>
+      </div>
+      <div><h5>Explore</h5><ul>
+        <li><a href="#about">What we do</a></li><li><a href="#media">Stories</a></li><li><a href="#talk">Real talk</a></li>
+        <li><a href="#program">The Next Play</a></li><li><a href="#events">Community &amp; events</a></li></ul></div>
+      <div><h5>Connect</h5><ul>
+        <li><a href="https://www.instagram.com/loveofthegameaus" target="_blank" rel="noopener">Instagram<small>@loveofthegameaus</small></a></li>
+        <li><a href="https://www.threads.net/@loveofthegameaus" target="_blank" rel="noopener">Threads<small>@loveofthegameaus</small></a></li>
+        <li><a href="https://linktr.ee/loveofthegameaus" target="_blank" rel="noopener">Linktree<small>All the links</small></a></li></ul></div>
+      <div><h5>Get in touch</h5><ul>
+        <li><a href="mailto:info@loveofthegame.com.au">info@loveofthegame.com.au<small>Schools · events · media</small></a></li>
+        <li><a href="mailto:info@loveofthegame.com.au?subject=The%20Next%20Play%20Program%20for%20our%20school">Book The Next Play<small>For schools</small></a></li></ul></div>
+    </div>
+    <div class="foot-bar">
+      <span>© 2026 <b>Love of the Game</b> · Sydney, NSW · Est. 2024</span>
+      <span>Making a difference for the community</span>
+    </div>
+  </div>
+</div>
+<script>
+  document.documentElement.classList.add('js');
+  (function(){
+    var c=document.getElementById('court'); if(!c)return; var x=c.getContext('2d');
+    function draw(){
+      var w=c.clientWidth||innerWidth, h=c.clientHeight||innerHeight, dpr=Math.min(window.devicePixelRatio||1,2);
+      c.width=w*dpr; c.height=h*dpr; x.setTransform(dpr,0,0,dpr,0,0); x.clearRect(0,0,w,h);
+      x.strokeStyle='rgba(242,239,230,0.09)'; x.lineWidth=Math.max(1,Math.min(w,h)*0.0018);
+      var cx=w/2, baseY=h*1.04, R=Math.min(w*0.44,h*0.66);
+      x.beginPath(); x.arc(cx,baseY,R,Math.PI,2*Math.PI); x.stroke();
+      var kW=R*0.42, kH=R*0.64; x.strokeRect(cx-kW/2, baseY-kH, kW, kH);
+      x.beginPath(); x.arc(cx, baseY-kH, kW*0.58, 0, 2*Math.PI); x.stroke();
+      var bb=kW*0.92; x.beginPath(); x.moveTo(cx-bb/2, baseY-R*0.055); x.lineTo(cx+bb/2, baseY-R*0.055); x.stroke();
+      x.beginPath(); x.arc(cx, baseY-R*0.10, R*0.045, 0, 2*Math.PI); x.stroke();
+      x.beginPath(); x.arc(cx, baseY-R, R*0.30, 0, Math.PI); x.stroke();
+    }
+    draw(); var t; addEventListener('resize',function(){clearTimeout(t);t=setTimeout(draw,120)});
+  })();
+  (function(){ /* glass bar after the hero */
+    var tb=document.getElementById('topbar'); if(!tb)return; var last=null;
+    function f(){ var s=scrollY>460; if(s!==last){ tb.classList.toggle('show',s); last=s; } }
+    addEventListener('scroll',f,{passive:true}); f();
+  })();
+  (function(){ /* reveals: above-the-fold content is never hidden; below it rises in as you arrive */
+    var els=[].slice.call(document.querySelectorAll('.rv'));
+    var rm=matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(rm||!('IntersectionObserver' in window)){ els.forEach(function(e){e.classList.add('in')}); return; }
+    var vh=innerHeight; els.forEach(function(e){ if(e.getBoundingClientRect().top<vh*0.92) e.classList.add('in'); });
+    var io=new IntersectionObserver(function(en){ en.forEach(function(x){ if(x.isIntersecting){ x.target.classList.add('in'); io.unobserve(x.target);} }); },{rootMargin:'0px 0px -6% 0px',threshold:.06});
+    els.forEach(function(e){ if(!e.classList.contains('in')) io.observe(e); });
+  })();
+  (function(){ /* gentle parallax: crest + ghost text */
+    if(matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    var c=document.getElementById('crest'), g=document.querySelector('.program .ghost'), t=null;
+    function f(){ var y=scrollY; if(c) c.style.transform='translateY('+Math.min(y,1400)*0.14+'px)';
+      if(g){ var r=g.getBoundingClientRect(); if(r.top<innerHeight&&r.bottom>0) g.style.transform='translateX('+((r.top-innerHeight)*-0.06)+'px)'; } t=null; }
+    addEventListener('scroll',function(){ if(!t) t=requestAnimationFrame(f); },{passive:true}); f();
+  })();
+</script>
+
+</body>
+</html>

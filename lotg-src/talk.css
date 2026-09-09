@@ -1,0 +1,17 @@
+  /* real talk — men's mental health */
+  .talk{padding-block:clamp(96px,14vh,176px);border-top:1px solid var(--line-2);scroll-margin-top:60px;
+    background:radial-gradient(70% 60% at 50% 100%, rgba(226,180,78,.05), transparent 60%),var(--ink)}
+  .talk-head{max-width:66ch}
+  .talk h2{font-family:var(--disp);font-weight:900;font-size:clamp(34px,5.2vw,62px);line-height:.96;letter-spacing:-.035em;text-wrap:balance;margin:22px 0 0;max-width:16ch}
+  .talk h2 u{text-decoration:none;color:var(--gold)}
+  .talk-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:clamp(40px,5.5vw,64px)}
+  .tcard{background:linear-gradient(180deg,var(--court-2),var(--court));border:1px solid var(--line);border-radius:4px;padding:clamp(24px,2.8vw,34px);box-shadow:inset 0 1px 0 var(--hi)}
+  .tcard i.n{display:block;width:22px;height:1px;background:var(--gold);margin-bottom:18px}
+  .tcard h3{font-family:var(--disp);font-weight:800;font-size:clamp(19px,2.1vw,23px);letter-spacing:-.015em;margin:0 0 8px}
+  .tcard p{margin:0;font-size:15px;line-height:1.6;color:var(--ash)}
+  .support{margin-top:clamp(28px,4vw,44px);display:grid;grid-template-columns:1fr auto;gap:16px 28px;align-items:center;border:1px solid var(--line);
+    border-radius:4px;padding:clamp(20px,2.8vw,32px);background:rgba(242,239,230,.02)}
+  .support p{margin:0;font-size:14.5px;line-height:1.65;color:var(--chalk-2)}
+  .support p b{color:var(--chalk);font-weight:600}
+  .support .cta{margin:0;justify-content:flex-end;width:auto}
+  @media (max-width:820px){.talk-grid{grid-template-columns:1fr}.support{grid-template-columns:1fr}.support .cta{justify-content:flex-start}}
