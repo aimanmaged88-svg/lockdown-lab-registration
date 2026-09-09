@@ -1212,3 +1212,40 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   Verified E2E via scratchpad/deskcoach-light.mjs + coach-light2.mjs (temp
   coach minted → dashboard shot → deleted). Masters: admin-base.html,
   coach-base.html.
+
+## Love of the Game — Saleh's community hub site (2026-09-09)
+
+- **What:** standalone landing page for Aiman's friend Saleh's *Love of the Game*
+  (@loveofthegameaus — Sydney/NSW sport media, stories, men's mental health, the
+  Next Play schools program, community events). Reframed on Saleh's ask from "a
+  basketball page" to **a hub of everything he does**. Premium monochrome + gold
+  (black `#09090B`, cream `#F2EFE6`, gold `#E2B44E`), Archivo + Hanken Grotesk.
+- **Live:** https://loveofthegameaus.netlify.app — its OWN Netlify project
+  `loveofthegameaus` (site id `a8ab32cf-59e6-4a86-8966-ddb614a114bc`, team
+  Groundworks Studio `aimanmaged88`), NOT linked to git, NOT the Certified
+  Hooper site. Custom domain **loveofthegame.com.au** (Saleh owns it; DNS at
+  GoDaddy, email = Microsoft 365 — NEVER change nameservers): add the domain in
+  Netlify → Domain management, then in GoDaddy set `A @ 75.2.60.5` and
+  `CNAME www → loveofthegameaus.netlify.app`; leave MX/TXT untouched.
+- **Source of truth:** `lotg-src/` (`build.py` + `premium.css`, `talk.css`,
+  `contact.css`, `prog.html`, `scripts.html`, `tiles/` = his IG post tiles cut
+  from a screen recording, `tile_feat.jpg`, `lotg-mark-crop.png`).
+  `MODE=deploy SITE_URL=https://loveofthegameaus.netlify.app python3 lotg-src/build.py`
+  → `lotg/` (index.html + WebP assets, og.jpg, favicon, thanks.html, _headers,
+  robots). `MODE=artifact LOTG_OUT=<dir>` builds the single-file inlined
+  preview (claude.ai artifact c58d6f25-82fa-45a8-85f6-af77659605b4).
+- **Deploy:** the Netlify MCP `deploy-site` op returns a one-shot command
+  (`npx -y @netlify/mcp@latest --site-id … --proxy-path …`); run it INSIDE
+  `lotg/` so only the site folder uploads (`lotg/netlify.toml` publishes `.`).
+  Do NOT run it from the repo root without swapping the root netlify.toml —
+  it would publish the whole repo with Certified Hooper's redirects.
+- **Contact & bookings** = Netlify Forms (`name="contact"`, honeypot, subject
+  quick-select, in-place AJAX submit, `thanks.html` fallback). Forms are enabled
+  on the site; email notifications to info@loveofthegame.com.au must be set in
+  Netlify → Forms → Notifications (no MCP op). Submissions readable via the MCP
+  `manage-form-submissions`.
+- **Content rules:** everything on the page is from his real posts/bio — no
+  invented facts. Real talk section carries Lifeline 13 11 14 / Beyond Blue
+  1300 22 4636 / 000. Awaiting Saleh: exact wording sign-off, originals of his
+  photos (tiles are soft screen-recording cuts), anything he does that isn't
+  on Instagram, WNB = Wednesday nights confirmation, sponsor CTA keep/cut.
