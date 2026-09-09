@@ -1,0 +1,51 @@
+  /* contact & bookings */
+  .contact{padding-block:clamp(96px,14vh,176px);border-top:1px solid var(--line-2);scroll-margin-top:60px;
+    background:radial-gradient(60% 50% at 0% 100%, rgba(226,180,78,.05), transparent 60%),var(--ink-2)}
+  .contact h2{font-family:var(--disp);font-weight:900;font-size:clamp(34px,5.2vw,62px);line-height:.96;letter-spacing:-.035em;text-wrap:balance;margin:22px 0 0;max-width:16ch}
+  .contact h2 u{text-decoration:none;color:var(--gold)}
+  .cgrid{display:grid;grid-template-columns:1.15fr .85fr;gap:clamp(20px,4vw,56px);margin-top:clamp(36px,5vw,60px);align-items:start}
+  .cform{position:relative;background:linear-gradient(180deg,var(--court-2),var(--court));border:1px solid var(--line);border-radius:4px;
+    padding:clamp(22px,3vw,36px);box-shadow:inset 0 1px 0 var(--hi),0 40px 80px -50px rgba(0,0,0,.9)}
+  .cform .row{display:grid;grid-template-columns:1fr 1fr;gap:0 14px}
+  .f{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
+  .f label{font-family:var(--disp);font-weight:700;font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--ash)}
+  .f label i{color:var(--gold);font-style:normal}
+  .f input,.f select,.f textarea{width:100%;background:rgba(242,239,230,.03);border:1px solid var(--line);border-radius:3px;color:var(--chalk);
+    font-family:var(--body);font-size:16px;padding:13px 14px;outline:none;transition:border-color .2s,background .2s;-webkit-appearance:none;appearance:none}
+  .f select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%239A958A' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 14px center;padding-right:40px}
+  .f select option{background:#141418;color:#F2EFE6}
+  .f textarea{min-height:130px;resize:vertical}
+  .f input:focus,.f select:focus,.f textarea:focus{border-color:var(--gold);background:rgba(242,239,230,.05)}
+  .f input::placeholder,.f textarea::placeholder{color:var(--ash-dim)}
+  .hp{position:absolute;left:-9999px;opacity:0;height:0;overflow:hidden}
+  .cform .btn{width:100%;justify-content:center;margin-top:4px}
+  .cform .btn[disabled]{opacity:.7;cursor:default;transform:none}
+  .cnote{margin:12px 0 0;font-size:12.5px;line-height:1.5;color:var(--ash-dim)}
+  .cnote a{color:var(--ash);text-decoration:none;border-bottom:1px solid var(--line)}
+  .cnote.prev{color:var(--gold-2)}
+  .cerr{display:none;margin-top:12px;font-size:13.5px;line-height:1.5;color:#E9A6A6}
+  .cerr a{color:var(--chalk);text-decoration:none;border-bottom:1px solid var(--line)}
+  .cform.err .cerr{display:block}
+  .cdone{display:none;text-align:center;padding:clamp(28px,4vw,48px) 10px}
+  .cdone .tick{width:56px;height:56px;border-radius:50%;border:1px solid var(--gold);display:grid;place-items:center;margin:0 auto 18px;color:var(--gold)}
+  .cdone .tick svg{width:24px;height:24px}
+  .cdone h3{font-family:var(--disp);font-weight:900;font-size:clamp(22px,2.8vw,32px);letter-spacing:-.02em;margin:0 0 8px}
+  .cdone p{margin:0 auto;color:var(--ash);font-size:15.5px;line-height:1.6;max-width:40ch}
+  .cdone a{color:var(--chalk);text-decoration:none;border-bottom:1px solid var(--line)}
+  .cform.sent form{display:none}.cform.sent .cdone{display:block}
+  .cside h3{font-family:var(--disp);font-weight:800;font-size:clamp(18px,2vw,22px);letter-spacing:-.015em;margin:0 0 14px}
+  .quick{display:flex;flex-direction:column;gap:8px}
+  .quick button{text-align:left;background:rgba(242,239,230,.02);border:1px solid var(--line);border-radius:3px;color:var(--chalk);font-family:var(--body);
+    padding:13px 14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:12px;transition:border-color .2s,background .2s}
+  .quick button b{font-weight:600;font-size:14.5px}.quick button small{display:block;color:var(--ash-dim);font-size:12.5px;margin-top:2px}
+  .quick button span{color:var(--gold);font-family:var(--disp);font-weight:800;flex:0 0 auto}
+  .quick button:hover,.quick button.on{border-color:rgba(226,180,78,.6);background:rgba(226,180,78,.06)}
+  .quick button:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+  .direct{margin-top:26px;display:flex;flex-direction:column;gap:10px}
+  .direct a,.direct span{display:flex;gap:12px;align-items:baseline;color:var(--chalk-2);text-decoration:none;font-size:14.5px;overflow-wrap:anywhere}
+  .direct a:hover{color:var(--gold)}
+  .direct i{font-family:var(--disp);font-style:normal;font-weight:700;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--ash-dim);min-width:78px;flex:0 0 auto}
+  .resp{margin-top:22px;padding:12px 16px;border-left:2px solid var(--gold);color:var(--ash);font-size:13.5px;line-height:1.55}
+  @media (max-width:900px){.cgrid{grid-template-columns:1fr}.cside{order:-1}}
+  @media (max-width:560px){.cform .row{grid-template-columns:1fr}}

@@ -37,3 +37,19 @@
     addEventListener('scroll',function(){ if(!t) t=requestAnimationFrame(f); },{passive:true}); f();
   })();
 </script>
+<script>
+  (function(){ /* contact & bookings: quick-select + in-place submit (Netlify Forms) */
+    var f=document.getElementById('contactForm'), box=document.getElementById('cform'); if(!f) return;
+    var live=f.getAttribute('data-live')!=='0', sel=document.getElementById('c-about');
+    function pick(v,btn){ if(sel&&v) sel.value=v; document.querySelectorAll('#quick button').forEach(function(x){ x.classList.toggle('on', x===btn || (btn&&btn.tagName!=='BUTTON'&&x.getAttribute('data-about')===v)); }); }
+    document.querySelectorAll('[data-about]').forEach(function(b){ b.addEventListener('click',function(){ pick(b.getAttribute('data-about'),b); if(b.tagName==='BUTTON'){ var n=document.getElementById('c-name'); if(n) n.focus({preventScroll:false}); } }); });
+    f.addEventListener('submit',function(e){
+      e.preventDefault(); if(!f.checkValidity()){ f.reportValidity(); return; }
+      var btn=document.getElementById('cSend'); btn.disabled=true; btn.textContent='Sending…'; box.classList.remove('err');
+      if(!live){ setTimeout(function(){ box.classList.add('sent'); },500); return; }
+      fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(new FormData(f)).toString()})
+        .then(function(r){ if(!r.ok) throw new Error(r.status); box.classList.add('sent'); })
+        .catch(function(){ box.classList.add('err'); btn.disabled=false; btn.textContent='Send it'; });
+    });
+  })();
+</script>
