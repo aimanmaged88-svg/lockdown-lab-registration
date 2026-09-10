@@ -1244,6 +1244,24 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   on the site; email notifications to info@loveofthegame.com.au must be set in
   Netlify → Forms → Notifications (no MCP op). Submissions readable via the MCP
   `manage-form-submissions`.
+- **Community layer (2026-09-10, Aiman asked):** `lotg-src/community.css` +
+  the welcome/letterbox JS in `scripts.html`. (1) **Welcome moment** —
+  `.welcome` overlay ~1.1s after entry ("This isn't just a website. You've
+  entered a community through your phone… welcome to the community"),
+  staggered lines, scroll-locked (`html.lock`), dismiss → `localStorage
+  lotg_welcomed=1` so it shows ONCE per device; `?welcome=1` forces it.
+  (2) **Old-school suggestion box** — floating letterbox `#lbox` (bottom-right;
+  SVG flap lifts on hover/open, envelope drops in + `thunk` on send) opens the
+  `#sbox` sheet: type chips Idea / Shout-out / Nominate someone / Event / Court
+  / Other + message + optional name/contact → Netlify form `name="suggestion"`
+  (form id `6aa21361a2e7540008175e85`, honeypot, AJAX POST to `/`,
+  `thanks.html` fallback). `[data-sbox]` links open it, Esc closes, `?sbox=1`
+  auto-opens it (and suppresses the welcome). Both respect
+  prefers-reduced-motion; the artifact/preview build fakes submits
+  (`data-live="0"`). Test posts to either form → delete via the Netlify MCP
+  `manage-form-submissions` (both forms verified E2E, test rows deleted).
+  Offered, NOT built: nominate-a-hooper wall, updates signup, community polls,
+  Wednesday-night RSVP — Aiman to pick.
 - **Content rules:** everything on the page is from his real posts/bio — no
   invented facts. Real talk section carries Lifeline 13 11 14 / Beyond Blue
   1300 22 4636 / 000. Awaiting Saleh: exact wording sign-off, originals of his
