@@ -438,6 +438,94 @@
   .resp{margin-top:22px;padding:12px 16px;border-left:2px solid var(--gold);color:var(--ash);font-size:13.5px;line-height:1.55}
   @media (max-width:900px){.cgrid{grid-template-columns:1fr}.cside{order:-1}}
   @media (max-width:560px){.cform .row{grid-template-columns:1fr}}
+  /* ---------- welcome moment ---------- */
+  html.lock{overflow:hidden}
+  html.lock .lbox,html.lock .cue{opacity:0;pointer-events:none;transition:opacity .3s}
+  .welcome{position:fixed;inset:0;z-index:80;display:grid;place-items:center;padding:20px;opacity:0;transition:opacity .45s var(--out)}
+  .welcome[hidden]{display:none}
+  .welcome.on{opacity:1}
+  .w-scrim{position:absolute;inset:0;background:rgba(9,9,11,.88);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+  .w-card{position:relative;width:min(680px,100%);text-align:center;padding:clamp(28px,5vw,56px) clamp(20px,4vw,48px);border:1px solid var(--line);border-radius:8px;
+    background:linear-gradient(180deg,var(--court-2),var(--court));box-shadow:inset 0 1px 0 var(--hi),0 60px 120px -40px rgba(0,0,0,1);
+    transform:translateY(16px) scale(.98);transition:transform .6s var(--out)}
+  .welcome.on .w-card{transform:none}
+  .w-card::before{content:"";position:absolute;inset:-1px;border-radius:8px;pointer-events:none;background:radial-gradient(60% 40% at 50% 0%, rgba(226,180,78,.14), transparent 70%)}
+  .w-mark{height:44px;width:auto;display:block;margin:0 auto 18px;position:relative}
+  .w-card .kick{justify-content:center}
+  .w-lines{margin:18px 0 0;display:flex;flex-direction:column;gap:12px;text-wrap:balance;position:relative}
+  .w-lines span{display:block;font-family:var(--body);font-weight:300;font-size:clamp(17px,2.1vw,22px);line-height:1.45;color:var(--chalk-2);
+    opacity:0;transform:translateY(10px);transition:opacity .6s var(--out),transform .6s var(--out)}
+  .w-lines span:first-child{font-family:var(--disp);font-weight:900;font-size:clamp(28px,4.6vw,46px);line-height:1;letter-spacing:-.035em;color:var(--chalk);margin-bottom:6px}
+  .w-lines u{text-decoration:none;color:var(--gold);font-weight:500}
+  .welcome.on .w-lines span{opacity:1;transform:none}
+  .welcome.on .w-lines span:nth-child(1){transition-delay:.25s}.welcome.on .w-lines span:nth-child(2){transition-delay:.75s}
+  .welcome.on .w-lines span:nth-child(3){transition-delay:1.25s}.welcome.on .w-lines span:nth-child(4){transition-delay:1.75s}
+  .w-sign{margin:22px 0 0;font-family:var(--disp);font-weight:700;font-size:11px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);opacity:0;transition:opacity .6s var(--out) 2.2s;position:relative}
+  .welcome.on .w-sign{opacity:1}
+  .welcome .cta{margin-top:22px;opacity:0;transition:opacity .6s var(--out) 2.4s;position:relative}
+  .welcome.on .cta{opacity:1}
+  button.btn{appearance:none;-webkit-appearance:none;font:inherit;font-family:var(--disp);font-weight:700;font-size:12.5px;letter-spacing:.12em;line-height:1.2}
+  @media (max-width:560px){ .welcome{padding:14px} .w-card{padding:30px 20px} .welcome .cta .btn{flex:1 1 auto;justify-content:center} }
+
+  /* ---------- the suggestion box (floating letterbox) ---------- */
+  .lbox{position:fixed;right:18px;bottom:18px;z-index:55;display:flex;align-items:center;gap:10px;background:rgba(9,9,11,.82);
+    backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:999px;padding:6px 16px 6px 6px;
+    color:var(--chalk);cursor:pointer;font-family:var(--disp);font-weight:700;font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;
+    box-shadow:0 24px 60px -24px rgba(0,0,0,.95);transition:border-color .25s,transform .25s var(--out),background .25s}
+  .lbox:hover{border-color:rgba(226,180,78,.65);transform:translateY(-2px);background:rgba(14,14,17,.92)}
+  .lbox:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+  .lbox .lb{width:46px;height:46px;border-radius:50%;background:linear-gradient(180deg,#1B1B20,#0E0E11);border:1px solid rgba(226,180,78,.45);display:grid;place-items:center;flex:0 0 auto}
+  .lbox svg{width:30px;height:30px;overflow:visible}
+  .lbox .flap{transform-box:fill-box;transform-origin:50% 0;transition:transform .35s var(--out)}
+  .lbox .env{transform-box:fill-box;transform-origin:50% 100%;opacity:0;transform:translateY(5px);transition:transform .4s var(--out),opacity .3s}
+  .lbox:hover .flap{transform:rotateX(55deg)}
+  .lbox.open .flap{transform:rotateX(80deg)}
+  .lbox.open .env{opacity:1;transform:translateY(-6px)}
+  .lbox.thunk .lb{animation:thunk .8s var(--out)}
+  .lbox.thunk .env{animation:drop .55s var(--out) forwards}
+  @keyframes thunk{0%{transform:scale(1)}30%{transform:scale(1.12)}55%{transform:scale(.95)}100%{transform:scale(1)}}
+  @keyframes drop{0%{opacity:1;transform:translateY(-6px)}100%{opacity:0;transform:translateY(7px) scaleY(.3)}}
+  .lbox .lbl{white-space:nowrap}
+  .s-scrim{position:fixed;inset:0;z-index:57;background:rgba(9,9,11,.55);opacity:0;transition:opacity .3s}
+  .s-scrim[hidden]{display:none}.s-scrim.on{opacity:1}
+  .sbox{position:fixed;z-index:58;right:18px;bottom:84px;width:min(440px,calc(100vw - 36px));background:linear-gradient(180deg,var(--court-2),var(--court));
+    border:1px solid var(--line);border-radius:6px;box-shadow:inset 0 1px 0 var(--hi),0 40px 90px -30px rgba(0,0,0,.95);padding:22px;
+    opacity:0;transform:translateY(14px) scale(.98);transition:opacity .35s var(--out),transform .35s var(--out)}
+  .sbox[hidden]{display:none}.sbox.on{opacity:1;transform:none}
+  .sbox .sh{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:6px}
+  .sbox h3{font-family:var(--disp);font-weight:900;font-size:22px;letter-spacing:-.02em;margin:0}
+  .sbox .sub{margin:0 0 14px;color:var(--ash);font-size:14px;line-height:1.55}
+  .sbox .x{background:none;border:1px solid var(--line);color:var(--ash);width:34px;height:34px;border-radius:50%;cursor:pointer;display:grid;place-items:center;flex:0 0 auto}
+  .sbox .x:hover{color:var(--chalk);border-color:var(--chalk)}
+  .types{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;position:relative}
+  .types label{cursor:pointer}
+  .types input{position:absolute;opacity:0;pointer-events:none;width:0;height:0}
+  .types span{display:inline-block;font-family:var(--disp);font-weight:700;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--chalk-2);
+    border:1px solid var(--line);padding:8px 11px 7px;border-radius:2px;transition:border-color .2s,background .2s,color .2s}
+  .types input:checked+span{border-color:var(--gold);color:#17130A;background:var(--gold)}
+  .types input:focus-visible+span{outline:2px solid var(--gold);outline-offset:2px}
+  .sbox .f{margin-bottom:10px}
+  .sbox textarea{min-height:110px}
+  .sbox .row2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+  .sbox .btn{width:100%;justify-content:center}
+  .sbox .btn[disabled]{opacity:.7;cursor:default;transform:none}
+  .sbox .cnote{margin-top:10px}
+  .sbox .cerr{margin-top:10px}
+  .sdone{display:none;text-align:center;padding:14px 6px 4px}
+  .sdone .tick{width:52px;height:52px;border-radius:50%;border:1px solid var(--gold);display:grid;place-items:center;margin:0 auto 14px;color:var(--gold)}
+  .sdone .tick svg{width:22px;height:22px}
+  .sdone h3{margin:0 0 6px}
+  .sdone p{margin:0 0 16px;color:var(--ash);font-size:14.5px;line-height:1.55}
+  .sbox.sent form{display:none}.sbox.sent .sdone{display:block}
+  @media (max-width:560px){
+    .lbox{right:12px;bottom:12px;padding:5px} .lbox .lbl{display:none}
+    .sbox{right:0;left:0;bottom:0;width:auto;border-radius:12px 12px 0 0;max-height:88vh;overflow:auto;padding:18px 16px calc(18px + env(safe-area-inset-bottom))}
+    .sbox .row2{grid-template-columns:1fr}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .w-lines span,.w-sign,.welcome .cta{transition:none;opacity:1;transform:none} .w-card{transition:none}
+    .lbox .flap,.lbox .env{transition:none} .lbox.thunk .lb,.lbox.thunk .env{animation:none}
+  }
 </style>
 </head>
 <body>
@@ -822,7 +910,7 @@
           <a href="https://www.threads.net/@loveofthegameaus" target="_blank" rel="noopener"><i>Threads</i>@loveofthegameaus</a>
           <span><i>Based in</i>Sydney, NSW — working right across the state</span>
         </div>
-        <div class="resp">We read everything — schools and event bookings first.</div>
+        <div class="resp">We read everything — schools and event bookings first. Got an idea rather than a booking? <a href="#" data-sbox style="color:var(--chalk);border-bottom:1px solid var(--line);text-decoration:none">Drop it in the suggestion box</a>.</div>
       </aside>
     </div>
   </div>
@@ -851,7 +939,7 @@
       </div>
       <div><h5>Explore</h5><ul>
         <li><a href="#about">What we do</a></li><li><a href="#media">Stories</a></li><li><a href="#talk">Real talk</a></li>
-        <li><a href="#program">The Next Play</a></li><li><a href="#events">Community &amp; events</a></li><li><a href="#contact">Contact &amp; bookings</a></li></ul></div>
+        <li><a href="#program">The Next Play</a></li><li><a href="#events">Community &amp; events</a></li><li><a href="#contact">Contact &amp; bookings</a></li><li><a href="#" data-sbox>Suggestion box</a></li></ul></div>
       <div><h5>Connect</h5><ul>
         <li><a href="https://www.instagram.com/loveofthegameaus" target="_blank" rel="noopener">Instagram<small>@loveofthegameaus</small></a></li>
         <li><a href="https://www.threads.net/@loveofthegameaus" target="_blank" rel="noopener">Threads<small>@loveofthegameaus</small></a></li>
@@ -866,6 +954,65 @@
     </div>
   </div>
 </div>
+<div class="welcome" id="welcome" role="dialog" aria-modal="true" aria-labelledby="wTitle" hidden>
+  <div class="w-scrim"></div>
+  <div class="w-card">
+    <img class="w-mark" src="assets/mark.webp" alt="">
+    <span class="kick">Before you scroll</span>
+    <h2 id="wTitle" class="w-lines">
+      <span>This isn't just a website.</span>
+      <span>You've just walked into a community — through your phone.</span>
+      <span>It's about your journey. <u>Your story.</u></span>
+      <span>And you belong here as much as the 10,000 already in it.</span>
+    </h2>
+    <p class="w-sign">Welcome to Love of the Game</p>
+    <div class="cta">
+      <button class="btn btn-gold" type="button" id="wIn">Let me in</button>
+      <button class="btn btn-ghost" type="button" id="wLater">Not now</button>
+    </div>
+  </div>
+</div>
+
+<button class="lbox" id="lbox" type="button" aria-label="Open the suggestion box" aria-expanded="false" aria-controls="sbox">
+  <span class="lb"><svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="#E2B44E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><g class="env"><rect x="10.5" y="4" width="11" height="8" rx="1" fill="#F2EFE6" stroke="#CFC9BA" stroke-width="1"/><path d="M10.5 5l5.5 4 5.5-4" stroke="#9A958A" stroke-width="1"/></g><rect x="5" y="11" width="22" height="16" rx="2.5"/><path d="M8 27v2M24 27v2"/><rect class="flap" x="9" y="13" width="14" height="3.2" rx="1" fill="#E2B44E"/><path d="M11 21h10" stroke-width="1.2"/></svg></span><span class="lbl">Suggestion box</span>
+</button>
+<div class="s-scrim" id="sScrim" hidden></div>
+<div class="sbox" id="sbox" role="dialog" aria-labelledby="sTitle" hidden>
+  <div class="sh">
+    <div>
+      <h3 id="sTitle">The suggestion box</h3>
+    </div>
+    <button class="x" id="sClose" type="button" aria-label="Close"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <p class="sub">Old school. Drop us an idea, a shout-out, a court, a story — anything. Anonymous is fine.</p>
+  <form name="suggestion" method="POST" action="/thanks.html" data-netlify="true" netlify-honeypot="bot-field" id="sugForm" data-live="1" novalidate>
+    <input type="hidden" name="form-name" value="suggestion">
+    <p class="hp" aria-hidden="true"><label>Leave this empty <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+    <div class="types" role="radiogroup" aria-label="What kind of suggestion">
+      <label><input type="radio" name="type" value="Idea" checked><span>Idea</span></label>
+      <label><input type="radio" name="type" value="Shout-out"><span>Shout-out</span></label>
+      <label><input type="radio" name="type" value="Nominate someone"><span>Nominate someone</span></label>
+      <label><input type="radio" name="type" value="Event"><span>Event</span></label>
+      <label><input type="radio" name="type" value="Court"><span>Court</span></label>
+      <label><input type="radio" name="type" value="Other"><span>Other</span></label>
+    </div>
+    <div class="f"><label for="s-text">Your suggestion <i>*</i></label><textarea id="s-text" name="suggestion" required placeholder="What should we do, cover, run, or fix?"></textarea></div>
+    <div class="row2">
+      <div class="f"><label for="s-name">Name</label><input id="s-name" name="name" placeholder="Optional"></div>
+      <div class="f"><label for="s-contact">Email or @handle</label><input id="s-contact" name="contact" placeholder="Optional — if you want a reply"></div>
+    </div>
+    <button class="btn btn-gold" type="submit" id="sSend">Post it</button>
+    <p class="cerr">That didn't post. Email it instead: <a href="mailto:info@loveofthegame.com.au">info@loveofthegame.com.au</a></p>
+    
+  </form>
+  <div class="sdone" role="status">
+    <div class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></div>
+    <h3>In the box. Thank you.</h3>
+    <p>Every suggestion gets read. The good ones get built.</p>
+    <button class="btn btn-ghost" type="button" id="sAgain">Post another</button>
+  </div>
+</div>
+
 <script>
   document.documentElement.classList.add('js');
   (function(){
@@ -919,6 +1066,44 @@
         .then(function(r){ if(!r.ok) throw new Error(r.status); box.classList.add('sent'); })
         .catch(function(){ box.classList.add('err'); btn.disabled=false; btn.textContent='Send it'; });
     });
+  })();
+</script>
+<script>
+  (function(){ /* welcome moment — once per device; ?welcome=1 forces it */
+    var w=document.getElementById('welcome'); if(!w) return;
+    var force=/[?&#]welcome=1/.test(location.search+location.hash), seen=false;
+    try{ seen=localStorage.getItem('lotg_welcomed')==='1'; }catch(e){}
+    if(/[?&#]sbox=1/.test(location.search+location.hash)) return;
+    if(seen && !force) return;
+    function open(){ w.hidden=false; document.documentElement.classList.add('lock'); requestAnimationFrame(function(){ requestAnimationFrame(function(){ w.classList.add('on'); }); }); }
+    function close(){ w.classList.remove('on'); document.documentElement.classList.remove('lock'); try{ localStorage.setItem('lotg_welcomed','1'); }catch(e){} setTimeout(function(){ w.hidden=true; },450); }
+    setTimeout(open, 1100);
+    document.getElementById('wIn').addEventListener('click',close);
+    document.getElementById('wLater').addEventListener('click',close);
+    w.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
+  })();
+  (function(){ /* the suggestion box — letterbox + sheet; ?sbox=1 opens it */
+    var lb=document.getElementById('lbox'), sb=document.getElementById('sbox'), sc=document.getElementById('sScrim'), f=document.getElementById('sugForm'); if(!lb||!sb||!f) return;
+    var live=f.getAttribute('data-live')!=='0';
+    function open(){ lb.classList.add('open'); sb.hidden=false; sc.hidden=false; requestAnimationFrame(function(){ requestAnimationFrame(function(){ sb.classList.add('on'); sc.classList.add('on'); }); }); lb.setAttribute('aria-expanded','true');
+      setTimeout(function(){ var t=document.getElementById('s-text'); if(t) t.focus({preventScroll:true}); },380); }
+    function close(){ sb.classList.remove('on'); sc.classList.remove('on'); lb.classList.remove('open'); lb.setAttribute('aria-expanded','false'); setTimeout(function(){ sb.hidden=true; sc.hidden=true; },380); }
+    lb.addEventListener('click',function(){ sb.hidden?open():close(); });
+    sc.addEventListener('click',close);
+    document.getElementById('sClose').addEventListener('click',close);
+    document.querySelectorAll('[data-sbox]').forEach(function(a){ a.addEventListener('click',function(e){ e.preventDefault(); open(); }); });
+    sb.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
+    f.addEventListener('submit',function(e){
+      e.preventDefault(); if(!f.checkValidity()){ f.reportValidity(); return; }
+      var btn=document.getElementById('sSend'); btn.disabled=true; btn.textContent='Posting…'; sb.classList.remove('err');
+      function done(){ sb.classList.add('sent'); lb.classList.add('thunk'); setTimeout(function(){ lb.classList.remove('thunk'); },900); }
+      if(!live){ setTimeout(done,600); return; }
+      fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(new FormData(f)).toString()})
+        .then(function(r){ if(!r.ok) throw new Error(r.status); done(); })
+        .catch(function(){ sb.classList.add('err'); btn.disabled=false; btn.textContent='Post it'; });
+    });
+    document.getElementById('sAgain').addEventListener('click',function(){ f.reset(); sb.classList.remove('sent'); var b=document.getElementById('sSend'); b.disabled=false; b.textContent='Post it'; var t=document.getElementById('s-text'); if(t) t.focus(); });
+    if(/[?&#]sbox=1/.test(location.search+location.hash)) setTimeout(open,600);
   })();
 </script>
 

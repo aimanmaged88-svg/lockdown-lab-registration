@@ -31,7 +31,7 @@ bg=Image.open(T/"f11_r1_c1.jpg").convert("L"); bg=ImageOps.autocontrast(bg,cutof
 bg=bg.resize((560,int(560*bg.height/bg.width)),Image.LANCZOS).filter(ImageFilter.GaussianBlur(11)); BG=jpg(bg,62,"hero-bg")
 FEAT=jpg(Image.open(sp/"tile_feat.jpg"),80,"feat")
 
-css=(sp/"premium.css").read_text()+(sp/"talk.css").read_text()+(sp/"contact.css").read_text()
+css=(sp/"premium.css").read_text()+(sp/"talk.css").read_text()+(sp/"contact.css").read_text()+(sp/"community.css").read_text()
 head=f'''<title>Love of the Game</title>
 <meta name="description" content="Love of the Game — a community hub for sport, stories, men's mental health, a schools program and events across NSW.">
 <meta name="theme-color" content="#09090B">
@@ -291,7 +291,7 @@ contact=f'''<section class="sec contact" id="contact">
           <a href="https://www.threads.net/@loveofthegameaus" target="_blank" rel="noopener"><i>Threads</i>@loveofthegameaus</a>
           <span><i>Based in</i>Sydney, NSW — working right across the state</span>
         </div>
-        <div class="resp">We read everything — schools and event bookings first.</div>
+        <div class="resp">We read everything — schools and event bookings first. Got an idea rather than a booking? <a href="#" data-sbox style="color:var(--chalk);border-bottom:1px solid var(--line);text-decoration:none">Drop it in the suggestion box</a>.</div>
       </aside>
     </div>
   </div>
@@ -322,7 +322,7 @@ foot=f'''<div class="sec foot" id="footer" role="contentinfo">
       </div>
       <div><h5>Explore</h5><ul>
         <li><a href="#about">What we do</a></li><li><a href="#media">Stories</a></li><li><a href="#talk">Real talk</a></li>
-        <li><a href="#program">The Next Play</a></li><li><a href="#events">Community &amp; events</a></li><li><a href="#contact">Contact &amp; bookings</a></li></ul></div>
+        <li><a href="#program">The Next Play</a></li><li><a href="#events">Community &amp; events</a></li><li><a href="#contact">Contact &amp; bookings</a></li><li><a href="#" data-sbox>Suggestion box</a></li></ul></div>
       <div><h5>Connect</h5><ul>
         <li><a href="{IG}" target="_blank" rel="noopener">Instagram<small>@loveofthegameaus</small></a></li>
         <li><a href="https://www.threads.net/@loveofthegameaus" target="_blank" rel="noopener">Threads<small>@loveofthegameaus</small></a></li>
@@ -339,7 +339,68 @@ foot=f'''<div class="sec foot" id="footer" role="contentinfo">
 </div>
 '''
 scripts=pathlib.Path(sp/"scripts.html").read_text()
-page=head+hero+about+media+talk+prog+events+contact+close+foot+scripts
+LETTERBOX='<svg viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="#E2B44E" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><g class="env"><rect x="10.5" y="4" width="11" height="8" rx="1" fill="#F2EFE6" stroke="#CFC9BA" stroke-width="1"/><path d="M10.5 5l5.5 4 5.5-4" stroke="#9A958A" stroke-width="1"/></g><rect x="5" y="11" width="22" height="16" rx="2.5"/><path d="M8 27v2M24 27v2"/><rect class="flap" x="9" y="13" width="14" height="3.2" rx="1" fill="#E2B44E"/><path d="M11 21h10" stroke-width="1.2"/></svg>'
+community=f'''<div class="welcome" id="welcome" role="dialog" aria-modal="true" aria-labelledby="wTitle" hidden>
+  <div class="w-scrim"></div>
+  <div class="w-card">
+    <img class="w-mark" src="{MARK}" alt="">
+    <span class="kick">Before you scroll</span>
+    <h2 id="wTitle" class="w-lines">
+      <span>This isn't just a website.</span>
+      <span>You've just walked into a community — through your phone.</span>
+      <span>It's about your journey. <u>Your story.</u></span>
+      <span>And you belong here as much as the 10,000 already in it.</span>
+    </h2>
+    <p class="w-sign">Welcome to Love of the Game</p>
+    <div class="cta">
+      <button class="btn btn-gold" type="button" id="wIn">Let me in</button>
+      <button class="btn btn-ghost" type="button" id="wLater">Not now</button>
+    </div>
+  </div>
+</div>
+
+<button class="lbox" id="lbox" type="button" aria-label="Open the suggestion box" aria-expanded="false" aria-controls="sbox">
+  <span class="lb">{LETTERBOX}</span><span class="lbl">Suggestion box</span>
+</button>
+<div class="s-scrim" id="sScrim" hidden></div>
+<div class="sbox" id="sbox" role="dialog" aria-labelledby="sTitle" hidden>
+  <div class="sh">
+    <div>
+      <h3 id="sTitle">The suggestion box</h3>
+    </div>
+    <button class="x" id="sClose" type="button" aria-label="Close"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+  </div>
+  <p class="sub">Old school. Drop us an idea, a shout-out, a court, a story — anything. Anonymous is fine.</p>
+  <form name="suggestion" method="POST" action="/thanks.html" data-netlify="true" netlify-honeypot="bot-field" id="sugForm" data-live="{LIVE}" novalidate>
+    <input type="hidden" name="form-name" value="suggestion">
+    <p class="hp" aria-hidden="true"><label>Leave this empty <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+    <div class="types" role="radiogroup" aria-label="What kind of suggestion">
+      <label><input type="radio" name="type" value="Idea" checked><span>Idea</span></label>
+      <label><input type="radio" name="type" value="Shout-out"><span>Shout-out</span></label>
+      <label><input type="radio" name="type" value="Nominate someone"><span>Nominate someone</span></label>
+      <label><input type="radio" name="type" value="Event"><span>Event</span></label>
+      <label><input type="radio" name="type" value="Court"><span>Court</span></label>
+      <label><input type="radio" name="type" value="Other"><span>Other</span></label>
+    </div>
+    <div class="f"><label for="s-text">Your suggestion <i>*</i></label><textarea id="s-text" name="suggestion" required placeholder="What should we do, cover, run, or fix?"></textarea></div>
+    <div class="row2">
+      <div class="f"><label for="s-name">Name</label><input id="s-name" name="name" placeholder="Optional"></div>
+      <div class="f"><label for="s-contact">Email or @handle</label><input id="s-contact" name="contact" placeholder="Optional — if you want a reply"></div>
+    </div>
+    <button class="btn btn-gold" type="submit" id="sSend">Post it</button>
+    <p class="cerr">That didn't post. Email it instead: <a href="mailto:{MAIL}">{MAIL}</a></p>
+    {PREV}
+  </form>
+  <div class="sdone" role="status">
+    <div class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></div>
+    <h3>In the box. Thank you.</h3>
+    <p>Every suggestion gets read. The good ones get built.</p>
+    <button class="btn btn-ghost" type="button" id="sAgain">Post another</button>
+  </div>
+</div>
+
+'''
+page=head+hero+about+media+talk+prog+events+contact+close+foot+community+scripts
 if MODE=="deploy":
     og_desc="A community hub for sport, stories, men&#39;s mental health, a schools program and events across NSW."
     extra=f'''<link rel="canonical" href="{SITE_URL}/">
