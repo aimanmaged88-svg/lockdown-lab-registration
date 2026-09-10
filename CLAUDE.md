@@ -1239,6 +1239,32 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   `lotg/` so only the site folder uploads (`lotg/netlify.toml` publishes `.`).
   Do NOT run it from the repo root without swapping the root netlify.toml —
   it would publish the whole repo with Certified Hooper's redirects.
+- **Continuous deployment — auto-deploy on push (2026-09-10, Aiman asked to
+  "make it cloud based so I can work on it remotely").** loveofthegameaus is
+  being linked to the GitHub repo so a push auto-deploys — no more manual npx.
+  Aiman links it once in the Netlify UI (loveofthegameaus → Site configuration
+  → Build & deploy → Continuous deployment → Link repository). Netlify ALREADY
+  has GitHub access to this repo (certifiedhooper deploys from `main`), so no
+  re-authorization. Settings that matter:
+    - Repository: `aimanmaged88-svg/lockdown-lab-registration`
+    - **Branch to deploy: `claude/love-of-game-landing-slv0d2`** (LOTG lives
+      here; keeps it fully separate from Certified Hooper on `main`)
+    - **Base directory: `lotg`** — CRITICAL. This makes Netlify read
+      `lotg/netlify.toml` (`publish="."`, no build command → just uploads the
+      committed pre-built site). If base is left at repo root it reads the ROOT
+      netlify.toml (Certified Hooper's force-redirects to hoopsheaven.html) and
+      the LOTG site breaks. Base = `lotg` is the one setting that must be right.
+    - Build command: EMPTY. Publish directory: `lotg` (netlify.toml governs).
+  The site is deployed PRE-BUILT: the whole `lotg/` folder (23 files, assets
+  included) is committed on the branch, so Netlify needs no Python/PIL — it
+  just serves the static files. Forms still auto-detect (the committed HTML
+  carries `data-netlify="true"` + hidden `form-name` on both `contact` and
+  `suggestion`). **Remote workflow after linking:** edit `lotg-src/*` →
+  `MODE=deploy SITE_URL=https://loveofthegameaus.netlify.app python3
+  lotg-src/build.py` → `git add lotg lotg-src && commit && push` the branch →
+  Netlify auto-builds + deploys. The manual npx `deploy-site` one-shot still
+  works as a fallback. When DNS moves to the custom domain, rebuild with
+  `SITE_URL=https://loveofthegame.com.au`, commit `lotg/`, push.
 - **Contact & bookings** = Netlify Forms (`name="contact"`, honeypot, subject
   quick-select, in-place AJAX submit, `thanks.html` fallback). Forms are enabled
   on the site; email notifications to info@loveofthegame.com.au must be set in
