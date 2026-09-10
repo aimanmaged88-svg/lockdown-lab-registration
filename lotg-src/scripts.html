@@ -64,7 +64,6 @@
     function close(){ w.classList.remove('on'); document.documentElement.classList.remove('lock'); try{ localStorage.setItem('lotg_welcomed','1'); }catch(e){} setTimeout(function(){ w.hidden=true; },450); }
     setTimeout(open, 1100);
     document.getElementById('wIn').addEventListener('click',close);
-    document.getElementById('wLater').addEventListener('click',close);
     w.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
   })();
   (function(){ /* the suggestion box — letterbox + sheet; ?sbox=1 opens it */

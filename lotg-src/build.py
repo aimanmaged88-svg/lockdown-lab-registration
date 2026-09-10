@@ -354,7 +354,6 @@ community=f'''<div class="welcome" id="welcome" role="dialog" aria-modal="true" 
     <p class="w-sign">Welcome to Love of the Game</p>
     <div class="cta">
       <button class="btn btn-gold" type="button" id="wIn">Let me in</button>
-      <button class="btn btn-ghost" type="button" id="wLater">Not now</button>
     </div>
   </div>
 </div>
