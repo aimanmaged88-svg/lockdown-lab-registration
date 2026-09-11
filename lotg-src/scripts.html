@@ -5,6 +5,9 @@
   window.LOTG_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltdXd1aHZxcWZ0Z3B4d2h6b3ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NjUyMzgsImV4cCI6MjA5OTI0MTIzOH0.sOkWQpulWj_ZSqMNSV7YP55T70UFSm2mP5e5xapQyQo';
   window.lotgApi=function(payload){ return fetch(window.LOTG_EDGE,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+window.LOTG_ANON,'apikey':window.LOTG_ANON},body:JSON.stringify(payload)}).then(function(r){ return r.json().catch(function(){return {};}).then(function(j){ return {ok:r.ok,status:r.status,j:j}; }); }); };
   window.lotgDev=function(){ try{ var d=localStorage.getItem('lotg_dev'); if(!d){ d=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():('d'+Date.now().toString(36)+Math.random().toString(36).slice(2,10)); localStorage.setItem('lotg_dev',d); } return d; }catch(e){ return 'd'+Math.random().toString(36).slice(2,12); } };
+  /* ref-counted scroll lock so overlapping overlays (welcome + inbox) don't fight over html.lock */
+  window.lotgLock=function(){ window.__lotgLockN=(window.__lotgLockN||0)+1; document.documentElement.classList.add('lock'); };
+  window.lotgUnlock=function(){ window.__lotgLockN=Math.max(0,(window.__lotgLockN||0)-1); if(!window.__lotgLockN) document.documentElement.classList.remove('lock'); };
   (function(){
     var c=document.getElementById('court'); if(!c)return; var x=c.getContext('2d');
     function draw(){
@@ -65,8 +68,8 @@
     try{ seen=localStorage.getItem('lotg_welcomed')==='1'; }catch(e){}
     if(/[?&#]sbox=1/.test(location.search+location.hash)) return;
     if(seen && !force) return;
-    function open(){ w.hidden=false; document.documentElement.classList.add('lock'); requestAnimationFrame(function(){ requestAnimationFrame(function(){ w.classList.add('on'); }); }); }
-    function close(){ w.classList.remove('on'); document.documentElement.classList.remove('lock'); try{ localStorage.setItem('lotg_welcomed','1'); }catch(e){} setTimeout(function(){ w.hidden=true; },450); }
+    function open(){ w.hidden=false; window.lotgLock(); requestAnimationFrame(function(){ requestAnimationFrame(function(){ w.classList.add('on'); }); }); }
+    function close(){ if(w.hidden) return; w.classList.remove('on'); window.lotgUnlock(); try{ localStorage.setItem('lotg_welcomed','1'); }catch(e){} setTimeout(function(){ w.hidden=true; },450); }
     setTimeout(open, 1100);
     document.getElementById('wIn').addEventListener('click',close);
     w.addEventListener('keydown',function(e){ if(e.key==='Escape') close(); });
@@ -107,8 +110,13 @@
         listEl=document.getElementById('sugList'), tabsEl=document.getElementById('sugTabs'),
         lockBtn=document.getElementById('hqLock'), chgBtn=document.getElementById('hqPinChange');
     var sug=document.getElementById('sugForm'); var live=!sug || sug.getAttribute('data-live')!=='0';
-    var PIN=null, DATA={items:[],counts:{pending:0,approved:0,declined:0}}, TAB='pending', busy=false;
+    var PIN=null, DATA={items:[],counts:{pending:0,approved:0,declined:0}}, TAB='pending', busy=false, lastFocus=null;
     function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+    function focusables(el){ return [].slice.call(el.querySelectorAll('a[href],button:not([disabled]),input:not([disabled]),textarea,[tabindex]:not([tabindex="-1"])')).filter(function(x){ return x.offsetParent!==null; }); }
+    function trap(el,e){ if(e.key!=='Tab') return; var f=focusables(el); if(!f.length) return; var first=f[0], last=f[f.length-1];
+      if(e.shiftKey && document.activeElement===first){ e.preventDefault(); last.focus(); }
+      else if(!e.shiftKey && document.activeElement===last){ e.preventDefault(); first.focus(); } }
+    function restore(){ if(lastFocus && lastFocus.focus){ try{ lastFocus.focus(); }catch(e){} } lastFocus=null; }
     function getStored(){ try{ return localStorage.getItem('lotg_admin_pin')||''; }catch(e){ return ''; } }
     function setStored(p){ try{ if(p) localStorage.setItem('lotg_admin_pin',p); else localStorage.removeItem('lotg_admin_pin'); }catch(e){} }
     function when(iso){ try{ var d=new Date(iso), s=(Date.now()-d.getTime())/1000; if(s<60)return'just now';
@@ -117,12 +125,12 @@
     function showScrim(){ scrim.hidden=false; requestAnimationFrame(function(){ scrim.classList.add('on'); }); }
     function maybeHideScrim(){ if(pinWrap.hidden && inbox.hidden){ scrim.classList.remove('on'); setTimeout(function(){ if(pinWrap.hidden&&inbox.hidden) scrim.hidden=true; },300); } }
     function openPinSheet(msg){ showScrim(); pinWrap.hidden=false; requestAnimationFrame(function(){ pinWrap.classList.add('on'); }); err.textContent=msg||''; input.value=''; setTimeout(function(){ try{input.focus();}catch(e){} },260); }
-    function closePinSheet(){ pinWrap.classList.remove('on'); setTimeout(function(){ pinWrap.hidden=true; maybeHideScrim(); },300); }
-    function openInbox(skipLoad){ showScrim(); inbox.hidden=false; document.documentElement.classList.add('lock'); requestAnimationFrame(function(){ inbox.classList.add('on'); }); if(skipLoad){ counts(); render(); } else load(); }
-    function closeInbox(){ inbox.classList.remove('on'); document.documentElement.classList.remove('lock'); setTimeout(function(){ inbox.hidden=true; maybeHideScrim(); },300); }
-    function expire(msg){ PIN=null; setStored(''); if(!inbox.hidden){ inbox.classList.remove('on'); document.documentElement.classList.remove('lock'); setTimeout(function(){ inbox.hidden=true; openPinSheet(msg); },250); } else openPinSheet(msg); }
+    function closePinSheet(keepFocus){ pinWrap.classList.remove('on'); setTimeout(function(){ pinWrap.hidden=true; maybeHideScrim(); if(!keepFocus && inbox.hidden) restore(); },300); }
+    function openInbox(skipLoad){ showScrim(); inbox.hidden=false; window.lotgLock(); requestAnimationFrame(function(){ inbox.classList.add('on'); try{ lockBtn.focus(); }catch(e){} }); if(skipLoad){ counts(); render(); } else load(); }
+    function closeInbox(){ inbox.classList.remove('on'); window.lotgUnlock(); setTimeout(function(){ inbox.hidden=true; maybeHideScrim(); restore(); },300); }
+    function expire(msg){ PIN=null; setStored(''); if(!inbox.hidden){ inbox.classList.remove('on'); window.lotgUnlock(); setTimeout(function(){ inbox.hidden=true; openPinSheet(msg); },250); } else openPinSheet(msg); }
 
-    function enter(){ var s=getStored(); if(s){ PIN=s; openInbox(false); } else openPinSheet(); }
+    function enter(){ lastFocus=document.activeElement; var s=getStored(); if(s){ PIN=s; openInbox(false); } else openPinSheet(); }
 
     function render(){ counts();
       var rows=(DATA.items||[]).filter(function(it){ return it.status===TAB; });
@@ -150,9 +158,9 @@
     }
     function submitPin(e){ if(e) e.preventDefault(); var p=(input.value||'').trim(); if(!p){ err.textContent='Enter your PIN.'; return; }
       go.disabled=true; go.textContent='Checking…'; err.textContent='';
-      if(!live){ PIN=p; setStored(p); go.disabled=false; go.textContent='Open the inbox'; closePinSheet(); openInbox(true); return; }
+      if(!live){ PIN=p; setStored(p); go.disabled=false; go.textContent='Open the inbox'; closePinSheet(true); openInbox(true); return; }
       window.lotgApi({action:'admin_list', pin:p}).then(function(res){ go.disabled=false; go.textContent='Open the inbox';
-        if(res.ok&&res.j&&res.j.ok){ PIN=p; setStored(p); DATA={items:res.j.items||[],counts:res.j.counts||{pending:0,approved:0,declined:0}}; closePinSheet(); openInbox(true); }
+        if(res.ok&&res.j&&res.j.ok){ PIN=p; setStored(p); DATA={items:res.j.items||[],counts:res.j.counts||{pending:0,approved:0,declined:0}}; closePinSheet(true); openInbox(true); }
         else if(res.status===429) err.textContent='Too many tries — locked for a bit. Try later.';
         else err.textContent='That PIN didn’t work.';
       }).catch(function(){ go.disabled=false; go.textContent='Open the inbox'; err.textContent='Could not reach the inbox. Check your connection.'; });
@@ -161,7 +169,7 @@
       window.lotgApi({action:'admin_set', pin:PIN, id:id, status:status}).then(function(res){ busy=false; if(apply(res)) return; if(res.status===401||res.status===429) expire(res.status===429?'Locked for a bit.':'Enter your PIN.'); }).catch(function(){ busy=false; });
     }
     function del(id){ if(busy||!live) return; if(!confirm('Delete this suggestion for good?')) return; busy=true;
-      window.lotgApi({action:'admin_del', pin:PIN, id:id}).then(function(res){ busy=false; if(apply(res)) return; if(res.status===401) expire('Enter your PIN.'); }).catch(function(){ busy=false; });
+      window.lotgApi({action:'admin_del', pin:PIN, id:id}).then(function(res){ busy=false; if(apply(res)) return; if(res.status===401||res.status===429) expire(res.status===429?'Locked for a bit.':'Enter your PIN.'); }).catch(function(){ busy=false; });
     }
 
     if(trigger) trigger.addEventListener('click',enter);
@@ -174,8 +182,8 @@
       window.lotgApi({action:'pin_set', pin:PIN, newpin:np}).then(function(res){ if(res.ok&&res.j&&res.j.ok){ PIN=np; setStored(np); alert('PIN changed. Use it next time.'); } else { alert('Could not change the PIN.'); } }); });
     tabsEl.addEventListener('click',function(e){ var b=e.target.closest('button[data-tab]'); if(!b) return; TAB=b.getAttribute('data-tab'); [].forEach.call(tabsEl.querySelectorAll('button'),function(x){ x.classList.toggle('on',x===b); }); render(); });
     listEl.addEventListener('click',function(e){ var b=e.target.closest('button[data-act]'); if(!b) return; var card=e.target.closest('.sug'); if(!card) return; var id=card.getAttribute('data-id'), a=b.getAttribute('data-act'); if(a==='del') del(id); else act(id,a); });
-    inbox.addEventListener('keydown',function(e){ if(e.key==='Escape') closeInbox(); });
-    pinWrap.addEventListener('keydown',function(e){ if(e.key==='Escape') closePinSheet(); });
+    inbox.addEventListener('keydown',function(e){ if(e.key==='Escape'){ closeInbox(); return; } trap(inbox,e); });
+    pinWrap.addEventListener('keydown',function(e){ if(e.key==='Escape'){ closePinSheet(); return; } trap(pinWrap,e); });
     if(/[?&# ]hq\b/.test(location.search+' '+location.hash) || /[#?&]inbox\b/.test(location.hash+location.search)) setTimeout(enter,500);
   })();
 </script>

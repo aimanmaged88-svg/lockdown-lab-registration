@@ -77,6 +77,7 @@
   .sdone h3{margin:0 0 6px}
   .sdone p{margin:0 0 16px;color:var(--ash);font-size:14.5px;line-height:1.55}
   .sbox.sent form{display:none}.sbox.sent .sdone{display:block}
+  .sbox .cerr{display:none}.sbox.err .cerr{display:block}
   @media (max-width:560px){
     .lbox{right:12px;bottom:12px;padding:5px} .lbox .lbl{display:none}
     .sbox{right:0;left:0;bottom:0;width:auto;border-radius:12px 12px 0 0;max-height:88vh;overflow:auto;padding:18px 16px calc(18px + env(safe-area-inset-bottom))}

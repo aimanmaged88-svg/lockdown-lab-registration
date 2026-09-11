@@ -404,13 +404,13 @@ community=f'''<div class="welcome" id="welcome" role="dialog" aria-modal="true" 
   <h3>Owner inbox</h3>
   <p>Enter your PIN to read the suggestions.</p>
   <form id="hqPinForm" novalidate>
-    <input id="hqPinInput" inputmode="numeric" autocomplete="off" aria-label="PIN" placeholder="&bull;&bull;&bull;&bull;" maxlength="12">
+    <input id="hqPinInput" inputmode="text" autocomplete="off" aria-label="PIN" placeholder="&bull;&bull;&bull;&bull;" maxlength="12">
     <p class="err" id="hqPinErr" role="alert"></p>
     <button class="btn btn-gold" type="submit" id="hqPinGo">Open the inbox</button>
   </form>
   <button class="cancel" type="button" id="hqPinCancel">Cancel</button>
 </div>
-<div class="inbox" id="inbox" role="dialog" aria-label="Suggestions inbox" hidden>
+<div class="inbox" id="inbox" role="dialog" aria-modal="true" aria-label="Suggestions inbox" hidden>
   <div class="inbox-wrap">
     <div class="inbox-top">
       <div><h2>Suggestions</h2><p class="sub">The community inbox</p></div>
