@@ -11,11 +11,18 @@ def emit(im,name,q,fmt="WEBP"):
         (OUT/"assets"/f"{name}.webp").write_bytes(data); return f"assets/{name}.webp"
     return "data:image/webp;base64,"+base64.b64encode(data).decode()
 def jpg(im,q,name): return emit(im.convert("RGB"),name,q)
+def upsharp(im,scale=2.0):
+    # These media tiles are crops of a 1080-wide phone screen-recording of the IG
+    # grid (~360px per cell), so they have no real detail to recover. Upscaling with
+    # LANCZOS + a light unsharp gives retina screens a pre-sharpened source instead of
+    # leaving the browser to bilinear-upscale the tiny original (which reads as blur).
+    w,h=im.size; im=im.resize((int(round(w*scale)),int(round(h*scale))),Image.LANCZOS)
+    return im.filter(ImageFilter.UnsharpMask(radius=1.4,percent=90,threshold=2))
 def png_webp(p,maxw,q,name):
     im=Image.open(p).convert("RGBA")
     if im.width>maxw: im=im.resize((maxw,int(maxw*im.height/im.width)),Image.LANCZOS)
     return emit(im,name,q)
-def clean(name,q=78):
+def clean(name,q=90):
     im=Image.open(T/f"{name}.jpg").convert("RGB"); W,H=im.size; px=im.convert("L").load(); xs=[];ys=[]
     for y in range(0,110):
         for x in range(W-110,W):
@@ -24,12 +31,12 @@ def clean(name,q=78):
         x0,y0,x1,y1=min(xs)-6,min(ys)-6,max(xs)+7,max(ys)+7; w=x1-x0
         im.paste(im.crop((x0-w,y0,x0,y1)).transpose(Image.FLIP_LEFT_RIGHT),(x0,y0))
         reg=(max(0,x0-4),max(0,y0-4),min(W,x1+4),min(H,y1+4)); im.paste(im.crop(reg).filter(ImageFilter.GaussianBlur(1.6)),reg)
-    return jpg(im,q,"ev-"+name)
-def tile(name,q=78): return jpg(Image.open(T/f"{name}.jpg"),q,"tile-"+name)
+    return jpg(upsharp(im,2.0),q,"ev-"+name)
+def tile(name,q=90): return jpg(upsharp(Image.open(T/f"{name}.jpg"),2.0),q,"tile-"+name)
 CREST=png_webp(REPO/"assets"/"lotg-original.png",960,94,"crest"); MARK=png_webp(sp/"lotg-mark-crop.png",250,95,"mark")
 bg=Image.open(T/"f11_r1_c1.jpg").convert("L"); bg=ImageOps.autocontrast(bg,cutoff=1)
 bg=bg.resize((560,int(560*bg.height/bg.width)),Image.LANCZOS).filter(ImageFilter.GaussianBlur(11)); BG=jpg(bg,62,"hero-bg")
-FEAT=jpg(Image.open(sp/"tile_feat.jpg"),80,"feat")
+FEAT=jpg(upsharp(Image.open(sp/"tile_feat.jpg"),1.6),90,"feat")
 
 css=(sp/"premium.css").read_text()+(sp/"talk.css").read_text()+(sp/"contact.css").read_text()+(sp/"community.css").read_text()+(sp/"admin.css").read_text()
 head=f'''<title>Love of the Game</title>
