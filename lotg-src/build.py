@@ -31,7 +31,7 @@ bg=Image.open(T/"f11_r1_c1.jpg").convert("L"); bg=ImageOps.autocontrast(bg,cutof
 bg=bg.resize((560,int(560*bg.height/bg.width)),Image.LANCZOS).filter(ImageFilter.GaussianBlur(11)); BG=jpg(bg,62,"hero-bg")
 FEAT=jpg(Image.open(sp/"tile_feat.jpg"),80,"feat")
 
-css=(sp/"premium.css").read_text()+(sp/"talk.css").read_text()+(sp/"contact.css").read_text()+(sp/"community.css").read_text()
+css=(sp/"premium.css").read_text()+(sp/"talk.css").read_text()+(sp/"contact.css").read_text()+(sp/"community.css").read_text()+(sp/"admin.css").read_text()
 head=f'''<title>Love of the Game</title>
 <meta name="description" content="Love of the Game — a community hub for sport, stories, men's mental health, a schools program and events across NSW.">
 <meta name="theme-color" content="#09090B">
@@ -369,10 +369,9 @@ community=f'''<div class="welcome" id="welcome" role="dialog" aria-modal="true" 
     </div>
     <button class="x" id="sClose" type="button" aria-label="Close"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   </div>
-  <p class="sub">Old school. Drop us an idea, a shout-out, a court, a story — anything. Anonymous is fine.</p>
-  <form name="suggestion" method="POST" action="/thanks.html" data-netlify="true" netlify-honeypot="bot-field" id="sugForm" data-live="{LIVE}" novalidate>
-    <input type="hidden" name="form-name" value="suggestion">
-    <p class="hp" aria-hidden="true"><label>Leave this empty <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+  <p class="sub">This one's built <b>by the community</b> — and <b>every single suggestion gets read</b>. An idea, a shout-out, a court, a story. Anonymous is fine.</p>
+  <form id="sugForm" data-live="{LIVE}" novalidate>
+    <p class="hp" aria-hidden="true"><label>Leave this empty <input name="website" tabindex="-1" autocomplete="off"></label></p>
     <div class="types" role="radiogroup" aria-label="What kind of suggestion">
       <label><input type="radio" name="type" value="Idea" checked><span>Idea</span></label>
       <label><input type="radio" name="type" value="Shout-out"><span>Shout-out</span></label>
@@ -393,8 +392,39 @@ community=f'''<div class="welcome" id="welcome" role="dialog" aria-modal="true" 
   <div class="sdone" role="status">
     <div class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></div>
     <h3>In the box. Thank you.</h3>
-    <p>Every suggestion gets read. The good ones get built.</p>
+    <p>Every single one gets read — this community is built on them.</p>
     <button class="btn btn-ghost" type="button" id="sAgain">Post another</button>
+  </div>
+</div>
+
+<button class="hqbtn" id="hqbtn" aria-hidden="true" tabindex="-1"></button>
+<div class="hq-scrim" id="hqScrim" hidden></div>
+<div class="hqpin" id="hqPin" role="dialog" aria-modal="true" aria-label="Owner sign in" hidden>
+  <div class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
+  <h3>Owner inbox</h3>
+  <p>Enter your PIN to read the suggestions.</p>
+  <form id="hqPinForm" novalidate>
+    <input id="hqPinInput" inputmode="numeric" autocomplete="off" aria-label="PIN" placeholder="&bull;&bull;&bull;&bull;" maxlength="12">
+    <p class="err" id="hqPinErr" role="alert"></p>
+    <button class="btn btn-gold" type="submit" id="hqPinGo">Open the inbox</button>
+  </form>
+  <button class="cancel" type="button" id="hqPinCancel">Cancel</button>
+</div>
+<div class="inbox" id="inbox" role="dialog" aria-label="Suggestions inbox" hidden>
+  <div class="inbox-wrap">
+    <div class="inbox-top">
+      <div><h2>Suggestions</h2><p class="sub">The community inbox</p></div>
+      <div class="acts">
+        <button class="iconbtn" id="hqPinChange" type="button">Change PIN</button>
+        <button class="iconbtn" id="hqLock" type="button">Lock</button>
+      </div>
+    </div>
+    <div class="tabs" id="sugTabs">
+      <button data-tab="pending" class="on">Pending <span class="n" id="nPending">0</span></button>
+      <button data-tab="approved">Approved <span class="n" id="nApproved">0</span></button>
+      <button data-tab="declined">Declined <span class="n" id="nDeclined">0</span></button>
+    </div>
+    <div id="sugList"><div class="loading">Loading&hellip;</div></div>
   </div>
 </div>
 

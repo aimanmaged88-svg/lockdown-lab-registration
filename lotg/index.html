@@ -526,6 +526,70 @@
     .w-lines span,.w-sign,.welcome .cta{transition:none;opacity:1;transform:none} .w-card{transition:none}
     .lbox .flap,.lbox .env{transition:none} .lbox.thunk .lb,.lbox.thunk .env{animation:none}
   }
+  /* ---------- owner inbox (PIN-gated) ---------- */
+  .hqbtn{position:fixed;left:0;bottom:0;width:56px;height:56px;z-index:54;opacity:0;border:0;background:none;cursor:default;padding:0}
+  .hq-scrim{position:fixed;inset:0;z-index:82;background:rgba(9,9,11,.82);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);opacity:0;transition:opacity .3s}
+  .hq-scrim[hidden]{display:none}.hq-scrim.on{opacity:1}
+  .hqpin{position:fixed;z-index:83;left:50%;top:50%;transform:translate(-50%,-46%) scale(.98);opacity:0;width:min(360px,calc(100vw - 36px));
+    background:linear-gradient(180deg,var(--court-2),var(--court));border:1px solid var(--line);border-radius:8px;
+    box-shadow:inset 0 1px 0 var(--hi),0 50px 100px -30px rgba(0,0,0,.95);padding:28px 26px;text-align:center;
+    transition:opacity .3s var(--out),transform .35s var(--out)}
+  .hqpin[hidden]{display:none}.hqpin.on{opacity:1;transform:translate(-50%,-50%) scale(1)}
+  .hqpin .lock{width:38px;height:38px;margin:0 auto 14px;color:var(--gold)}
+  .hqpin .lock svg{width:100%;height:100%;display:block}
+  .hqpin h3{font-family:var(--disp);font-weight:900;font-size:21px;letter-spacing:-.01em;margin:0 0 4px}
+  .hqpin p{margin:0 0 16px;color:var(--ash);font-size:13.5px;line-height:1.5}
+  .hqpin input{width:100%;text-align:center;letter-spacing:.5em;font-family:var(--disp);font-weight:700;font-size:22px;
+    background:rgba(242,239,230,.04);border:1px solid var(--line);border-radius:4px;color:var(--chalk);padding:15px 12px;outline:none;
+    transition:border-color .2s;-webkit-appearance:none;appearance:none}
+  .hqpin input:focus{border-color:var(--gold);background:rgba(242,239,230,.06)}
+  .hqpin .err{min-height:17px;margin:11px 0 0;color:#E9A6A6;font-size:12.5px;line-height:1.4}
+  .hqpin .btn{width:100%;justify-content:center;margin-top:14px}
+  .hqpin .cancel{margin-top:14px;color:var(--ash-dim);font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+    font-family:var(--disp);font-weight:600;background:none;border:0;cursor:pointer}
+  .hqpin .cancel:hover{color:var(--chalk-2)}
+
+  .inbox{position:fixed;inset:0;z-index:84;background:var(--ink);overflow-y:auto;-webkit-overflow-scrolling:touch;opacity:0;transition:opacity .3s}
+  .inbox[hidden]{display:none}.inbox.on{opacity:1}
+  .inbox-wrap{max-width:760px;margin:0 auto;padding:0 clamp(16px,4vw,28px) 90px}
+  .inbox-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;position:sticky;top:0;z-index:3;
+    padding:clamp(18px,4vw,30px) 0 14px;background:linear-gradient(180deg,var(--ink) 74%,transparent)}
+  .inbox-top h2{font-family:var(--disp);font-weight:900;font-size:clamp(23px,3vw,32px);letter-spacing:-.02em;margin:0;line-height:1}
+  .inbox-top .sub{font-family:var(--disp);font-weight:600;font-size:10px;letter-spacing:.26em;text-transform:uppercase;color:var(--gold);margin:7px 0 0}
+  .inbox-top .acts{display:flex;gap:8px;flex:0 0 auto}
+  .iconbtn{background:rgba(242,239,230,.03);border:1px solid var(--line);color:var(--chalk-2);border-radius:4px;font-family:var(--disp);font-weight:700;
+    font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:10px 12px;cursor:pointer;transition:border-color .2s,color .2s;white-space:nowrap}
+  .iconbtn:hover{border-color:rgba(242,239,230,.4);color:var(--chalk)}
+  .tabs{display:flex;gap:6px;margin:6px 0 18px;flex-wrap:wrap}
+  .tabs button{background:rgba(242,239,230,.03);border:1px solid var(--line);color:var(--chalk-2);border-radius:999px;font-family:var(--disp);
+    font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:9px 15px;cursor:pointer;display:inline-flex;gap:8px;align-items:center;transition:.2s}
+  .tabs button .n{color:var(--ash-dim);font-variant-numeric:tabular-nums}
+  .tabs button.on{border-color:var(--gold);color:#17130A;background:var(--gold)}
+  .tabs button.on .n{color:rgba(23,19,10,.65)}
+  .sug{border:1px solid var(--line);border-radius:6px;background:linear-gradient(180deg,var(--court-2),var(--court));padding:18px;margin-bottom:10px;box-shadow:inset 0 1px 0 var(--hi)}
+  .sug .top{display:flex;align-items:center;gap:9px;margin-bottom:11px;flex-wrap:wrap}
+  .sug .chip{font-family:var(--disp);font-weight:700;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);
+    border:1px solid rgba(226,180,78,.4);border-radius:2px;padding:5px 8px 4px}
+  .sug .st{font-family:var(--disp);font-weight:700;font-size:9px;letter-spacing:.14em;text-transform:uppercase;padding:5px 8px 4px;border-radius:2px}
+  .sug .st.approved{color:#8FE3B0;border:1px solid rgba(143,227,176,.42)}
+  .sug .st.declined{color:#E9A6A6;border:1px solid rgba(233,166,166,.42)}
+  .sug .st.pending{color:var(--ash-dim);border:1px solid var(--line)}
+  .sug .when{margin-left:auto;color:var(--ash-dim);font-size:11.5px;white-space:nowrap}
+  .sug .body{color:var(--chalk);font-size:15.5px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+  .sug .who{margin-top:11px;color:var(--ash);font-size:13px;overflow-wrap:anywhere}
+  .sug .who b{color:var(--chalk-2);font-weight:600}
+  .sug .who a{color:var(--gold);text-decoration:none}
+  .sug .act{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+  .sug .act button{flex:1 1 auto;min-width:118px;justify-content:center;border-radius:4px;font-family:var(--disp);font-weight:700;font-size:11px;
+    letter-spacing:.12em;text-transform:uppercase;padding:12px;cursor:pointer;border:1px solid var(--line);background:rgba(242,239,230,.03);color:var(--chalk-2);transition:.18s}
+  .sug .act button.ap.on{background:rgba(143,227,176,.16);border-color:rgba(143,227,176,.6);color:#8FE3B0}
+  .sug .act button.dc.on{background:rgba(233,166,166,.16);border-color:rgba(233,166,166,.6);color:#E9A6A6}
+  .sug .act button:hover{border-color:rgba(242,239,230,.4);color:var(--chalk)}
+  .sug .act button.del{flex:0 0 auto;min-width:44px;color:var(--ash-dim);font-size:14px;padding:12px 14px}
+  .sug .act button.del:hover{color:#E9A6A6;border-color:rgba(233,166,166,.5)}
+  .inbox .empty{text-align:center;color:var(--ash-dim);padding:70px 20px;font-size:15px;line-height:1.6}
+  .inbox .loading{text-align:center;color:var(--ash-dim);padding:70px 20px;font-size:13px;letter-spacing:.14em;text-transform:uppercase;font-family:var(--disp)}
+  @media (prefers-reduced-motion:reduce){ .hqpin,.hq-scrim,.inbox{transition:none} }
 </style>
 </head>
 <body>
@@ -983,10 +1047,9 @@
     </div>
     <button class="x" id="sClose" type="button" aria-label="Close"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
   </div>
-  <p class="sub">Old school. Drop us an idea, a shout-out, a court, a story — anything. Anonymous is fine.</p>
-  <form name="suggestion" method="POST" action="/thanks.html" data-netlify="true" netlify-honeypot="bot-field" id="sugForm" data-live="1" novalidate>
-    <input type="hidden" name="form-name" value="suggestion">
-    <p class="hp" aria-hidden="true"><label>Leave this empty <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+  <p class="sub">This one's built <b>by the community</b> — and <b>every single suggestion gets read</b>. An idea, a shout-out, a court, a story. Anonymous is fine.</p>
+  <form id="sugForm" data-live="1" novalidate>
+    <p class="hp" aria-hidden="true"><label>Leave this empty <input name="website" tabindex="-1" autocomplete="off"></label></p>
     <div class="types" role="radiogroup" aria-label="What kind of suggestion">
       <label><input type="radio" name="type" value="Idea" checked><span>Idea</span></label>
       <label><input type="radio" name="type" value="Shout-out"><span>Shout-out</span></label>
@@ -1007,13 +1070,49 @@
   <div class="sdone" role="status">
     <div class="tick"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></div>
     <h3>In the box. Thank you.</h3>
-    <p>Every suggestion gets read. The good ones get built.</p>
+    <p>Every single one gets read — this community is built on them.</p>
     <button class="btn btn-ghost" type="button" id="sAgain">Post another</button>
+  </div>
+</div>
+
+<button class="hqbtn" id="hqbtn" aria-hidden="true" tabindex="-1"></button>
+<div class="hq-scrim" id="hqScrim" hidden></div>
+<div class="hqpin" id="hqPin" role="dialog" aria-modal="true" aria-label="Owner sign in" hidden>
+  <div class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></div>
+  <h3>Owner inbox</h3>
+  <p>Enter your PIN to read the suggestions.</p>
+  <form id="hqPinForm" novalidate>
+    <input id="hqPinInput" inputmode="numeric" autocomplete="off" aria-label="PIN" placeholder="&bull;&bull;&bull;&bull;" maxlength="12">
+    <p class="err" id="hqPinErr" role="alert"></p>
+    <button class="btn btn-gold" type="submit" id="hqPinGo">Open the inbox</button>
+  </form>
+  <button class="cancel" type="button" id="hqPinCancel">Cancel</button>
+</div>
+<div class="inbox" id="inbox" role="dialog" aria-label="Suggestions inbox" hidden>
+  <div class="inbox-wrap">
+    <div class="inbox-top">
+      <div><h2>Suggestions</h2><p class="sub">The community inbox</p></div>
+      <div class="acts">
+        <button class="iconbtn" id="hqPinChange" type="button">Change PIN</button>
+        <button class="iconbtn" id="hqLock" type="button">Lock</button>
+      </div>
+    </div>
+    <div class="tabs" id="sugTabs">
+      <button data-tab="pending" class="on">Pending <span class="n" id="nPending">0</span></button>
+      <button data-tab="approved">Approved <span class="n" id="nApproved">0</span></button>
+      <button data-tab="declined">Declined <span class="n" id="nDeclined">0</span></button>
+    </div>
+    <div id="sugList"><div class="loading">Loading&hellip;</div></div>
   </div>
 </div>
 
 <script>
   document.documentElement.classList.add('js');
+  /* Love of the Game backend (public anon key — safe to ship) */
+  window.LOTG_EDGE='https://ymuwuhvqqftgpxwhzoub.supabase.co/functions/v1/lotg-inbox';
+  window.LOTG_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltdXd1aHZxcWZ0Z3B4d2h6b3ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NjUyMzgsImV4cCI6MjA5OTI0MTIzOH0.sOkWQpulWj_ZSqMNSV7YP55T70UFSm2mP5e5xapQyQo';
+  window.lotgApi=function(payload){ return fetch(window.LOTG_EDGE,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+window.LOTG_ANON,'apikey':window.LOTG_ANON},body:JSON.stringify(payload)}).then(function(r){ return r.json().catch(function(){return {};}).then(function(j){ return {ok:r.ok,status:r.status,j:j}; }); }); };
+  window.lotgDev=function(){ try{ var d=localStorage.getItem('lotg_dev'); if(!d){ d=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():('d'+Date.now().toString(36)+Math.random().toString(36).slice(2,10)); localStorage.setItem('lotg_dev',d); } return d; }catch(e){ return 'd'+Math.random().toString(36).slice(2,12); } };
   (function(){
     var c=document.getElementById('court'); if(!c)return; var x=c.getContext('2d');
     function draw(){
@@ -1095,13 +1194,97 @@
       e.preventDefault(); if(!f.checkValidity()){ f.reportValidity(); return; }
       var btn=document.getElementById('sSend'); btn.disabled=true; btn.textContent='Posting…'; sb.classList.remove('err');
       function done(){ sb.classList.add('sent'); lb.classList.add('thunk'); setTimeout(function(){ lb.classList.remove('thunk'); },900); }
+      function fail(res){ var ce=f.querySelector('.cerr'); if(ce && res && res.j && res.j.code==='rate' && res.j.error) ce.textContent=res.j.error; sb.classList.add('err'); btn.disabled=false; btn.textContent='Post it'; }
       if(!live){ setTimeout(done,600); return; }
-      fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(new FormData(f)).toString()})
-        .then(function(r){ if(!r.ok) throw new Error(r.status); done(); })
-        .catch(function(){ sb.classList.add('err'); btn.disabled=false; btn.textContent='Post it'; });
+      var fd=new FormData(f);
+      var payload={ action:'submit', device:window.lotgDev(), ua:(navigator.userAgent||'').slice(0,200),
+        website:fd.get('website')||'', kind:(fd.get('type')||'Idea'), body:fd.get('suggestion')||'',
+        name:fd.get('name')||'', contact:fd.get('contact')||'' };
+      window.lotgApi(payload).then(function(res){ if(res.ok){ done(); } else { fail(res); } }).catch(function(){ fail(); });
     });
     document.getElementById('sAgain').addEventListener('click',function(){ f.reset(); sb.classList.remove('sent'); var b=document.getElementById('sSend'); b.disabled=false; b.textContent='Post it'; var t=document.getElementById('s-text'); if(t) t.focus(); });
     if(/[?&#]sbox=1/.test(location.search+location.hash)) setTimeout(open,600);
+  })();
+</script>
+<script>
+  (function(){ /* owner inbox — PIN gate + approve/decline (server-authed) */
+    var pinWrap=document.getElementById('hqPin'), scrim=document.getElementById('hqScrim'), inbox=document.getElementById('inbox');
+    if(!pinWrap||!inbox) return;
+    var trigger=document.getElementById('hqbtn'), form=document.getElementById('hqPinForm'), input=document.getElementById('hqPinInput'),
+        err=document.getElementById('hqPinErr'), go=document.getElementById('hqPinGo'), cancel=document.getElementById('hqPinCancel'),
+        listEl=document.getElementById('sugList'), tabsEl=document.getElementById('sugTabs'),
+        lockBtn=document.getElementById('hqLock'), chgBtn=document.getElementById('hqPinChange');
+    var sug=document.getElementById('sugForm'); var live=!sug || sug.getAttribute('data-live')!=='0';
+    var PIN=null, DATA={items:[],counts:{pending:0,approved:0,declined:0}}, TAB='pending', busy=false;
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+    function getStored(){ try{ return localStorage.getItem('lotg_admin_pin')||''; }catch(e){ return ''; } }
+    function setStored(p){ try{ if(p) localStorage.setItem('lotg_admin_pin',p); else localStorage.removeItem('lotg_admin_pin'); }catch(e){} }
+    function when(iso){ try{ var d=new Date(iso), s=(Date.now()-d.getTime())/1000; if(s<60)return'just now';
+      if(s<3600)return Math.floor(s/60)+'m ago'; if(s<86400)return Math.floor(s/3600)+'h ago'; if(s<604800)return Math.floor(s/86400)+'d ago'; return d.toLocaleDateString(); }catch(e){ return ''; } }
+    function counts(){ document.getElementById('nPending').textContent=DATA.counts.pending||0; document.getElementById('nApproved').textContent=DATA.counts.approved||0; document.getElementById('nDeclined').textContent=DATA.counts.declined||0; }
+    function showScrim(){ scrim.hidden=false; requestAnimationFrame(function(){ scrim.classList.add('on'); }); }
+    function maybeHideScrim(){ if(pinWrap.hidden && inbox.hidden){ scrim.classList.remove('on'); setTimeout(function(){ if(pinWrap.hidden&&inbox.hidden) scrim.hidden=true; },300); } }
+    function openPinSheet(msg){ showScrim(); pinWrap.hidden=false; requestAnimationFrame(function(){ pinWrap.classList.add('on'); }); err.textContent=msg||''; input.value=''; setTimeout(function(){ try{input.focus();}catch(e){} },260); }
+    function closePinSheet(){ pinWrap.classList.remove('on'); setTimeout(function(){ pinWrap.hidden=true; maybeHideScrim(); },300); }
+    function openInbox(skipLoad){ showScrim(); inbox.hidden=false; document.documentElement.classList.add('lock'); requestAnimationFrame(function(){ inbox.classList.add('on'); }); if(skipLoad){ counts(); render(); } else load(); }
+    function closeInbox(){ inbox.classList.remove('on'); document.documentElement.classList.remove('lock'); setTimeout(function(){ inbox.hidden=true; maybeHideScrim(); },300); }
+    function expire(msg){ PIN=null; setStored(''); if(!inbox.hidden){ inbox.classList.remove('on'); document.documentElement.classList.remove('lock'); setTimeout(function(){ inbox.hidden=true; openPinSheet(msg); },250); } else openPinSheet(msg); }
+
+    function enter(){ var s=getStored(); if(s){ PIN=s; openInbox(false); } else openPinSheet(); }
+
+    function render(){ counts();
+      var rows=(DATA.items||[]).filter(function(it){ return it.status===TAB; });
+      if(!rows.length){ listEl.innerHTML='<div class="empty">Nothing '+esc(TAB)+' yet.</div>'; return; }
+      listEl.innerHTML=rows.map(function(it){
+        var nm=(it.name||'').trim(), ct=(it.contact||'').trim(), who='';
+        if(nm||ct){ who='<div class="who">'+(nm?'<b>'+esc(nm)+'</b>':'')+(nm&&ct?' &middot; ':'')+(ct?esc(ct):'')+'</div>'; }
+        return '<div class="sug" data-id="'+esc(it.id)+'"><div class="top"><span class="chip">'+esc(it.kind||'Idea')+'</span>'
+          +'<span class="st '+esc(it.status)+'">'+esc(it.status)+'</span><span class="when">'+esc(when(it.created_at))+'</span></div>'
+          +'<div class="body">'+esc(it.body||'')+'</div>'+who
+          +'<div class="act"><button class="ap'+(it.status==='approved'?' on':'')+'" data-act="approved">Approve</button>'
+          +'<button class="dc'+(it.status==='declined'?' on':'')+'" data-act="declined">Decline</button>'
+          +'<button class="del" data-act="del" aria-label="Delete">&times;</button></div></div>';
+      }).join('');
+    }
+    function apply(res){ if(res.ok&&res.j&&res.j.ok){ DATA={items:res.j.items||[],counts:res.j.counts||{pending:0,approved:0,declined:0}}; render(); return true; } return false; }
+
+    function load(){ listEl.innerHTML='<div class="loading">Loading&hellip;</div>';
+      if(!live){ listEl.innerHTML='<div class="empty">Preview &mdash; the inbox is live on the real site.</div>'; return; }
+      window.lotgApi({action:'admin_list', pin:PIN}).then(function(res){
+        if(apply(res)) return;
+        if(res.status===429) listEl.innerHTML='<div class="empty">Locked for a bit &mdash; too many tries. Come back later.</div>';
+        else expire('Enter your PIN.');
+      }).catch(function(){ listEl.innerHTML='<div class="empty">Could not load. Check your connection and try again.</div>'; });
+    }
+    function submitPin(e){ if(e) e.preventDefault(); var p=(input.value||'').trim(); if(!p){ err.textContent='Enter your PIN.'; return; }
+      go.disabled=true; go.textContent='Checking…'; err.textContent='';
+      if(!live){ PIN=p; setStored(p); go.disabled=false; go.textContent='Open the inbox'; closePinSheet(); openInbox(true); return; }
+      window.lotgApi({action:'admin_list', pin:p}).then(function(res){ go.disabled=false; go.textContent='Open the inbox';
+        if(res.ok&&res.j&&res.j.ok){ PIN=p; setStored(p); DATA={items:res.j.items||[],counts:res.j.counts||{pending:0,approved:0,declined:0}}; closePinSheet(); openInbox(true); }
+        else if(res.status===429) err.textContent='Too many tries — locked for a bit. Try later.';
+        else err.textContent='That PIN didn’t work.';
+      }).catch(function(){ go.disabled=false; go.textContent='Open the inbox'; err.textContent='Could not reach the inbox. Check your connection.'; });
+    }
+    function act(id, status){ if(busy||!live) return; busy=true;
+      window.lotgApi({action:'admin_set', pin:PIN, id:id, status:status}).then(function(res){ busy=false; if(apply(res)) return; if(res.status===401||res.status===429) expire(res.status===429?'Locked for a bit.':'Enter your PIN.'); }).catch(function(){ busy=false; });
+    }
+    function del(id){ if(busy||!live) return; if(!confirm('Delete this suggestion for good?')) return; busy=true;
+      window.lotgApi({action:'admin_del', pin:PIN, id:id}).then(function(res){ busy=false; if(apply(res)) return; if(res.status===401) expire('Enter your PIN.'); }).catch(function(){ busy=false; });
+    }
+
+    if(trigger) trigger.addEventListener('click',enter);
+    form.addEventListener('submit',submitPin);
+    cancel.addEventListener('click',closePinSheet);
+    scrim.addEventListener('click',function(){ if(!pinWrap.hidden) closePinSheet(); });
+    lockBtn.addEventListener('click',function(){ PIN=null; setStored(''); closeInbox(); });
+    chgBtn.addEventListener('click',function(){ if(!live){ alert('The PIN is set on the live site.'); return; } var np=prompt('New PIN (4–12 letters or numbers):'); if(np==null) return; np=(''+np).trim();
+      if(!/^[0-9A-Za-z]{4,12}$/.test(np)){ alert('PIN must be 4–12 letters or numbers.'); return; }
+      window.lotgApi({action:'pin_set', pin:PIN, newpin:np}).then(function(res){ if(res.ok&&res.j&&res.j.ok){ PIN=np; setStored(np); alert('PIN changed. Use it next time.'); } else { alert('Could not change the PIN.'); } }); });
+    tabsEl.addEventListener('click',function(e){ var b=e.target.closest('button[data-tab]'); if(!b) return; TAB=b.getAttribute('data-tab'); [].forEach.call(tabsEl.querySelectorAll('button'),function(x){ x.classList.toggle('on',x===b); }); render(); });
+    listEl.addEventListener('click',function(e){ var b=e.target.closest('button[data-act]'); if(!b) return; var card=e.target.closest('.sug'); if(!card) return; var id=card.getAttribute('data-id'), a=b.getAttribute('data-act'); if(a==='del') del(id); else act(id,a); });
+    inbox.addEventListener('keydown',function(e){ if(e.key==='Escape') closeInbox(); });
+    pinWrap.addEventListener('keydown',function(e){ if(e.key==='Escape') closePinSheet(); });
+    if(/[?&# ]hq\b/.test(location.search+' '+location.hash) || /[#?&]inbox\b/.test(location.hash+location.search)) setTimeout(enter,500);
   })();
 </script>
 

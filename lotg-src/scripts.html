@@ -1,5 +1,10 @@
 <script>
   document.documentElement.classList.add('js');
+  /* Love of the Game backend (public anon key — safe to ship) */
+  window.LOTG_EDGE='https://ymuwuhvqqftgpxwhzoub.supabase.co/functions/v1/lotg-inbox';
+  window.LOTG_ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltdXd1aHZxcWZ0Z3B4d2h6b3ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NjUyMzgsImV4cCI6MjA5OTI0MTIzOH0.sOkWQpulWj_ZSqMNSV7YP55T70UFSm2mP5e5xapQyQo';
+  window.lotgApi=function(payload){ return fetch(window.LOTG_EDGE,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+window.LOTG_ANON,'apikey':window.LOTG_ANON},body:JSON.stringify(payload)}).then(function(r){ return r.json().catch(function(){return {};}).then(function(j){ return {ok:r.ok,status:r.status,j:j}; }); }); };
+  window.lotgDev=function(){ try{ var d=localStorage.getItem('lotg_dev'); if(!d){ d=(window.crypto&&crypto.randomUUID)?crypto.randomUUID():('d'+Date.now().toString(36)+Math.random().toString(36).slice(2,10)); localStorage.setItem('lotg_dev',d); } return d; }catch(e){ return 'd'+Math.random().toString(36).slice(2,12); } };
   (function(){
     var c=document.getElementById('court'); if(!c)return; var x=c.getContext('2d');
     function draw(){
@@ -81,12 +86,96 @@
       e.preventDefault(); if(!f.checkValidity()){ f.reportValidity(); return; }
       var btn=document.getElementById('sSend'); btn.disabled=true; btn.textContent='Posting…'; sb.classList.remove('err');
       function done(){ sb.classList.add('sent'); lb.classList.add('thunk'); setTimeout(function(){ lb.classList.remove('thunk'); },900); }
+      function fail(res){ var ce=f.querySelector('.cerr'); if(ce && res && res.j && res.j.code==='rate' && res.j.error) ce.textContent=res.j.error; sb.classList.add('err'); btn.disabled=false; btn.textContent='Post it'; }
       if(!live){ setTimeout(done,600); return; }
-      fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(new FormData(f)).toString()})
-        .then(function(r){ if(!r.ok) throw new Error(r.status); done(); })
-        .catch(function(){ sb.classList.add('err'); btn.disabled=false; btn.textContent='Post it'; });
+      var fd=new FormData(f);
+      var payload={ action:'submit', device:window.lotgDev(), ua:(navigator.userAgent||'').slice(0,200),
+        website:fd.get('website')||'', kind:(fd.get('type')||'Idea'), body:fd.get('suggestion')||'',
+        name:fd.get('name')||'', contact:fd.get('contact')||'' };
+      window.lotgApi(payload).then(function(res){ if(res.ok){ done(); } else { fail(res); } }).catch(function(){ fail(); });
     });
     document.getElementById('sAgain').addEventListener('click',function(){ f.reset(); sb.classList.remove('sent'); var b=document.getElementById('sSend'); b.disabled=false; b.textContent='Post it'; var t=document.getElementById('s-text'); if(t) t.focus(); });
     if(/[?&#]sbox=1/.test(location.search+location.hash)) setTimeout(open,600);
+  })();
+</script>
+<script>
+  (function(){ /* owner inbox — PIN gate + approve/decline (server-authed) */
+    var pinWrap=document.getElementById('hqPin'), scrim=document.getElementById('hqScrim'), inbox=document.getElementById('inbox');
+    if(!pinWrap||!inbox) return;
+    var trigger=document.getElementById('hqbtn'), form=document.getElementById('hqPinForm'), input=document.getElementById('hqPinInput'),
+        err=document.getElementById('hqPinErr'), go=document.getElementById('hqPinGo'), cancel=document.getElementById('hqPinCancel'),
+        listEl=document.getElementById('sugList'), tabsEl=document.getElementById('sugTabs'),
+        lockBtn=document.getElementById('hqLock'), chgBtn=document.getElementById('hqPinChange');
+    var sug=document.getElementById('sugForm'); var live=!sug || sug.getAttribute('data-live')!=='0';
+    var PIN=null, DATA={items:[],counts:{pending:0,approved:0,declined:0}}, TAB='pending', busy=false;
+    function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+    function getStored(){ try{ return localStorage.getItem('lotg_admin_pin')||''; }catch(e){ return ''; } }
+    function setStored(p){ try{ if(p) localStorage.setItem('lotg_admin_pin',p); else localStorage.removeItem('lotg_admin_pin'); }catch(e){} }
+    function when(iso){ try{ var d=new Date(iso), s=(Date.now()-d.getTime())/1000; if(s<60)return'just now';
+      if(s<3600)return Math.floor(s/60)+'m ago'; if(s<86400)return Math.floor(s/3600)+'h ago'; if(s<604800)return Math.floor(s/86400)+'d ago'; return d.toLocaleDateString(); }catch(e){ return ''; } }
+    function counts(){ document.getElementById('nPending').textContent=DATA.counts.pending||0; document.getElementById('nApproved').textContent=DATA.counts.approved||0; document.getElementById('nDeclined').textContent=DATA.counts.declined||0; }
+    function showScrim(){ scrim.hidden=false; requestAnimationFrame(function(){ scrim.classList.add('on'); }); }
+    function maybeHideScrim(){ if(pinWrap.hidden && inbox.hidden){ scrim.classList.remove('on'); setTimeout(function(){ if(pinWrap.hidden&&inbox.hidden) scrim.hidden=true; },300); } }
+    function openPinSheet(msg){ showScrim(); pinWrap.hidden=false; requestAnimationFrame(function(){ pinWrap.classList.add('on'); }); err.textContent=msg||''; input.value=''; setTimeout(function(){ try{input.focus();}catch(e){} },260); }
+    function closePinSheet(){ pinWrap.classList.remove('on'); setTimeout(function(){ pinWrap.hidden=true; maybeHideScrim(); },300); }
+    function openInbox(skipLoad){ showScrim(); inbox.hidden=false; document.documentElement.classList.add('lock'); requestAnimationFrame(function(){ inbox.classList.add('on'); }); if(skipLoad){ counts(); render(); } else load(); }
+    function closeInbox(){ inbox.classList.remove('on'); document.documentElement.classList.remove('lock'); setTimeout(function(){ inbox.hidden=true; maybeHideScrim(); },300); }
+    function expire(msg){ PIN=null; setStored(''); if(!inbox.hidden){ inbox.classList.remove('on'); document.documentElement.classList.remove('lock'); setTimeout(function(){ inbox.hidden=true; openPinSheet(msg); },250); } else openPinSheet(msg); }
+
+    function enter(){ var s=getStored(); if(s){ PIN=s; openInbox(false); } else openPinSheet(); }
+
+    function render(){ counts();
+      var rows=(DATA.items||[]).filter(function(it){ return it.status===TAB; });
+      if(!rows.length){ listEl.innerHTML='<div class="empty">Nothing '+esc(TAB)+' yet.</div>'; return; }
+      listEl.innerHTML=rows.map(function(it){
+        var nm=(it.name||'').trim(), ct=(it.contact||'').trim(), who='';
+        if(nm||ct){ who='<div class="who">'+(nm?'<b>'+esc(nm)+'</b>':'')+(nm&&ct?' &middot; ':'')+(ct?esc(ct):'')+'</div>'; }
+        return '<div class="sug" data-id="'+esc(it.id)+'"><div class="top"><span class="chip">'+esc(it.kind||'Idea')+'</span>'
+          +'<span class="st '+esc(it.status)+'">'+esc(it.status)+'</span><span class="when">'+esc(when(it.created_at))+'</span></div>'
+          +'<div class="body">'+esc(it.body||'')+'</div>'+who
+          +'<div class="act"><button class="ap'+(it.status==='approved'?' on':'')+'" data-act="approved">Approve</button>'
+          +'<button class="dc'+(it.status==='declined'?' on':'')+'" data-act="declined">Decline</button>'
+          +'<button class="del" data-act="del" aria-label="Delete">&times;</button></div></div>';
+      }).join('');
+    }
+    function apply(res){ if(res.ok&&res.j&&res.j.ok){ DATA={items:res.j.items||[],counts:res.j.counts||{pending:0,approved:0,declined:0}}; render(); return true; } return false; }
+
+    function load(){ listEl.innerHTML='<div class="loading">Loading&hellip;</div>';
+      if(!live){ listEl.innerHTML='<div class="empty">Preview &mdash; the inbox is live on the real site.</div>'; return; }
+      window.lotgApi({action:'admin_list', pin:PIN}).then(function(res){
+        if(apply(res)) return;
+        if(res.status===429) listEl.innerHTML='<div class="empty">Locked for a bit &mdash; too many tries. Come back later.</div>';
+        else expire('Enter your PIN.');
+      }).catch(function(){ listEl.innerHTML='<div class="empty">Could not load. Check your connection and try again.</div>'; });
+    }
+    function submitPin(e){ if(e) e.preventDefault(); var p=(input.value||'').trim(); if(!p){ err.textContent='Enter your PIN.'; return; }
+      go.disabled=true; go.textContent='Checking…'; err.textContent='';
+      if(!live){ PIN=p; setStored(p); go.disabled=false; go.textContent='Open the inbox'; closePinSheet(); openInbox(true); return; }
+      window.lotgApi({action:'admin_list', pin:p}).then(function(res){ go.disabled=false; go.textContent='Open the inbox';
+        if(res.ok&&res.j&&res.j.ok){ PIN=p; setStored(p); DATA={items:res.j.items||[],counts:res.j.counts||{pending:0,approved:0,declined:0}}; closePinSheet(); openInbox(true); }
+        else if(res.status===429) err.textContent='Too many tries — locked for a bit. Try later.';
+        else err.textContent='That PIN didn’t work.';
+      }).catch(function(){ go.disabled=false; go.textContent='Open the inbox'; err.textContent='Could not reach the inbox. Check your connection.'; });
+    }
+    function act(id, status){ if(busy||!live) return; busy=true;
+      window.lotgApi({action:'admin_set', pin:PIN, id:id, status:status}).then(function(res){ busy=false; if(apply(res)) return; if(res.status===401||res.status===429) expire(res.status===429?'Locked for a bit.':'Enter your PIN.'); }).catch(function(){ busy=false; });
+    }
+    function del(id){ if(busy||!live) return; if(!confirm('Delete this suggestion for good?')) return; busy=true;
+      window.lotgApi({action:'admin_del', pin:PIN, id:id}).then(function(res){ busy=false; if(apply(res)) return; if(res.status===401) expire('Enter your PIN.'); }).catch(function(){ busy=false; });
+    }
+
+    if(trigger) trigger.addEventListener('click',enter);
+    form.addEventListener('submit',submitPin);
+    cancel.addEventListener('click',closePinSheet);
+    scrim.addEventListener('click',function(){ if(!pinWrap.hidden) closePinSheet(); });
+    lockBtn.addEventListener('click',function(){ PIN=null; setStored(''); closeInbox(); });
+    chgBtn.addEventListener('click',function(){ if(!live){ alert('The PIN is set on the live site.'); return; } var np=prompt('New PIN (4–12 letters or numbers):'); if(np==null) return; np=(''+np).trim();
+      if(!/^[0-9A-Za-z]{4,12}$/.test(np)){ alert('PIN must be 4–12 letters or numbers.'); return; }
+      window.lotgApi({action:'pin_set', pin:PIN, newpin:np}).then(function(res){ if(res.ok&&res.j&&res.j.ok){ PIN=np; setStored(np); alert('PIN changed. Use it next time.'); } else { alert('Could not change the PIN.'); } }); });
+    tabsEl.addEventListener('click',function(e){ var b=e.target.closest('button[data-tab]'); if(!b) return; TAB=b.getAttribute('data-tab'); [].forEach.call(tabsEl.querySelectorAll('button'),function(x){ x.classList.toggle('on',x===b); }); render(); });
+    listEl.addEventListener('click',function(e){ var b=e.target.closest('button[data-act]'); if(!b) return; var card=e.target.closest('.sug'); if(!card) return; var id=card.getAttribute('data-id'), a=b.getAttribute('data-act'); if(a==='del') del(id); else act(id,a); });
+    inbox.addEventListener('keydown',function(e){ if(e.key==='Escape') closeInbox(); });
+    pinWrap.addEventListener('keydown',function(e){ if(e.key==='Escape') closePinSheet(); });
+    if(/[?&# ]hq\b/.test(location.search+' '+location.hash) || /[#?&]inbox\b/.test(location.hash+location.search)) setTimeout(enter,500);
   })();
 </script>
