@@ -1288,6 +1288,45 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   `manage-form-submissions` (both forms verified E2E, test rows deleted).
   Offered, NOT built: nominate-a-hooper wall, updates signup, community polls,
   Wednesday-night RSVP — Aiman to pick.
+- **Suggestion box → private in-app inbox (2026-09-11, Aiman asked).** Suggestions
+  moved OFF Netlify Forms onto a NEW Supabase edge fn **`lotg-inbox`** (project
+  ymuwuhvqqftgpxwhzoub; verify_jwt on, anon key Bearer+apikey like the others).
+  New tables only — `lotg_suggestions` (id/created_at/kind/body/name/contact/
+  status[pending|approved|declined]/device/ua) + `lotg_suggest_admin` (k/v:
+  pin_hash, fails, locked_until) + RPC `lotg_suggest_note_fail()` (atomic
+  lockout counter). The WNB `lotg_*` app is untouched. Actions: public `submit`
+  (honeypot `website`, 6/device/day incl. blank-device bucket); owner-PIN
+  `admin_list` / `admin_set`(approve|decline) / `admin_del` / `pin_set`.
+  PIN scheme = sha256(`lotg-suggest:<pin>:loveofthegame`) — **the pepper/scheme
+  live ONLY in the deployed fn, NOT in this public repo**. Lockout: 8 wrong →
+  1h, but a CORRECT pin always bypasses+clears the lock (a stranger can't lock
+  the owner out). **Owner PIN was set by Aiman (6 digits); value NOT recorded
+  here (public repo) — rotate via the panel's Change PIN.** Frontend
+  (build.py community block + scripts.html): suggestion form posts to the fn;
+  hidden inbox opens at **`?hq`** (or `#inbox`, or a discreet bottom-left corner
+  tap) → PIN sheet → Pending/Approved/Declined tabs w/ Approve·Decline·delete
+  (all user text esc()'d), Change PIN + Lock. `lotgApi()`/`lotgDev()` helpers +
+  ref-counted scroll lock (`lotgLock`/`lotgUnlock`) shared with the welcome.
+  admin.css = the inbox styling. **The contact/booking form stays on Netlify
+  Forms.** Deploy: edge via Supabase MCP `deploy_edge_function` (lotg-inbox
+  now v2). Ran an adversarial review workflow (6 lenses → 16 confirmed
+  findings) BEFORE/at deploy; all applied (lockout bypass-on-correct, atomic
+  counter, blank-device rate limit, tight UUID→400, exact counts, inputmode=text,
+  focus trap/restore + aria-modal, sbox error reveal, AA contrast, 44px targets).
+  Backend E2E-verified live (submit/honeypot/empty/wrong-PIN/correct-PIN/approve/
+  bad-status/delete/lock bypass); all test rows deleted, DB clean. NOTE: deploying
+  the fn while the review agents were live let one agent hit `pin_set` and change
+  the PIN — reset directly via SQL after. Don't deploy an endpoint mid-review if
+  review agents have network + Bash.
+- **Media tiles sharpened (2026-09-11, Aiman: IG tiles look blurry/low-res).**
+  The story-wall + event-card tiles are crops of a 1080x2340 phone
+  screen-recording of the IG grid (~360px per cell → the ~349px source tiles),
+  so retina screens were bilinear-upscaling them. build.py `upsharp()` now
+  LANCZOS-upscales tiles 2x (hero 1.6x) + light UnsharpMask, WebP q78→90, so
+  devices get a pre-sharpened source (~698px / hero 1117px). This adds NO real
+  detail — **the true fix is Saleh's original photos/clips**, which swap
+  straight into lotg-src/tiles + tile_feat.jpg. Recording is at
+  /root/.claude/uploads/.../dc9c2af4-Screen_Recording_20260909_115419_Instagram.mp4.
 - **Content rules:** everything on the page is from his real posts/bio — no
   invented facts. Real talk section carries Lifeline 13 11 14 / Beyond Blue
   1300 22 4636 / 000. Awaiting Saleh: exact wording sign-off, originals of his
