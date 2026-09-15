@@ -36,7 +36,7 @@ def tile(name,q=90): return jpg(upsharp(Image.open(T/f"{name}.jpg"),2.0),q,"tile
 CREST=png_webp(REPO/"assets"/"lotg-original.png",960,94,"crest"); MARK=png_webp(sp/"lotg-mark-crop.png",250,95,"mark")
 bg=Image.open(T/"f11_r1_c1.jpg").convert("L"); bg=ImageOps.autocontrast(bg,cutoff=1)
 bg=bg.resize((560,int(560*bg.height/bg.width)),Image.LANCZOS).filter(ImageFilter.GaussianBlur(11)); BG=jpg(bg,62,"hero-bg")
-FEAT=jpg(Image.open(sp/"tile_feat.jpg").convert("RGB"),90,"feat")  # AI-upscaled hi-res source; no synthetic upsharp
+FEAT=jpg(upsharp(Image.open(sp/"tile_feat.jpg"),1.6),90,"feat")
 
 css=(sp/"premium.css").read_text()+(sp/"talk.css").read_text()+(sp/"contact.css").read_text()+(sp/"community.css").read_text()+(sp/"admin.css").read_text()
 head=f'''<title>Love of the Game</title>
