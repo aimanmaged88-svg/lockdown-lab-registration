@@ -5,6 +5,57 @@ REPO=sp.parent if (sp.parent/"assets"/"lotg-original.png").exists() else pathlib
 MODE=os.environ.get("MODE","artifact"); OUT=REPO/"lotg"; SITE_URL=os.environ.get("SITE_URL","https://loveofthegame.netlify.app").rstrip("/")
 if MODE=="deploy": (OUT/"assets").mkdir(parents=True,exist_ok=True)
 IG="https://www.instagram.com/loveofthegameaus"; MAIL="info@loveofthegame.com.au"
+import json
+from bs4 import BeautifulSoup
+EDIT_EDGE="https://ymuwuhvqqftgpxwhzoub.supabase.co/functions/v1/lotg-edit"
+EDIT_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltdXd1aHZxcWZ0Z3B4d2h6b3ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NjUyMzgsImV4cCI6MjA5OTI0MTIzOH0.sOkWQpulWj_ZSqMNSV7YP55T70UFSm2mP5e5xapQyQo"
+SEC_NAMES={"top":"Top / Hero","about":"What we do","media":"Stories","talk":"Real talk","program":"The Next Play","events":"Events","contact":"Contact & bookings","close":"Closing","footer":"Footer"}
+def _secmeta(el):
+    p=el.parent
+    while p is not None:
+        if getattr(p,'name',None) in ('section','div'):
+            pid=p.get('id')
+            if pid in SEC_NAMES: return SEC_NAMES[pid],pid
+            for c in (p.get('class') or []):
+                if c in SEC_NAMES: return SEC_NAMES[c],c
+        p=getattr(p,'parent',None)
+    return "Page","page"
+def tag_content(html):
+    """Add data-ed / data-edimg keys to every editable text + content image, and build
+    the editor manifest. html5lib keeps SVG viewBox casing intact on re-serialize."""
+    soup=BeautifulSoup(html,"html5lib"); body=soup.body
+    txt_sel=['h1','h2','h3','h4','h5','p','.eyebrow','.kick','.count','.box','.tag','.wk','.mail','.resp',
+             '.motto small','.strip span','.direct a','.direct span','.foot-bar span','.brandblock b','.brandblock span',
+             'a.btn','button.btn','.more','.quick b','.quick small','.foot ul a']
+    cids=set()
+    for sel in txt_sel:
+        for el in body.select(sel): cids.add(id(el))
+    imgset=set(id(e) for e in body.select('.tile img, .card img'))
+    def leaf(el):
+        for d in el.descendants:
+            if getattr(d,'name',None) and id(d) in cids: return False
+        return True
+    manifest=[]; ctr={}; ictr={}
+    for el in body.find_all(True):
+        if id(el) in imgset:
+            sname,skey=_secmeta(el)
+            n=ictr.get(skey,0)+1; ictr[skey]=n; key=f"{skey}.img{n}"
+            el['data-edimg']=key
+            cap=''; par=el.find_parent(['a','article','div'])
+            if par:
+                bx=par.select_one('.box') or par.select_one('.tag') or par.select_one('h3')
+                if bx: cap=bx.get_text(' ',strip=True)
+            manifest.append({"key":key,"section":sname,"type":"image","label":(('Photo — '+cap) if cap else 'Photo')[:60],"default":el.get('src','')})
+        elif id(el) in cids and leaf(el):
+            t=el.get_text(" ",strip=True)
+            if not t: continue
+            sname,skey=_secmeta(el)
+            role='h' if el.name in ('h1','h2','h3','h4','h5') else 't'
+            n=ctr.get((skey,role),0)+1; ctr[(skey,role)]=n; key=f"{skey}.{role}{n}"
+            el['data-ed']=key
+            typ='long' if (el.name=='p' and len(t)>70) else 'text'
+            manifest.append({"key":key,"section":sname,"type":typ,"label":(t[:52]+'…') if len(t)>52 else t,"default":t})
+    return body.decode_contents(), manifest
 def emit(im,name,q,fmt="WEBP"):
     b=io.BytesIO(); im.save(b,fmt,quality=q,method=6); data=b.getvalue()
     if MODE=="deploy":
@@ -436,7 +487,9 @@ community=f'''<div class="welcome" id="welcome" role="dialog" aria-modal="true" 
 </div>
 
 '''
-page=head+hero+about+media+talk+prog+events+contact+close+foot+community+scripts
+_content=hero+about+media+talk+prog+events+contact+close+foot
+_tagged,MANIFEST=tag_content(_content)
+page=head+_tagged+community+scripts
 if MODE=="deploy":
     og_desc="A community hub for sport, stories, men&#39;s mental health, a schools program and events across NSW."
     extra=f'''<link rel="canonical" href="{SITE_URL}/">
@@ -471,7 +524,11 @@ if MODE=="deploy":
     (OUT/"robots.txt").write_text("User-agent: *\nAllow: /\n")
     (OUT/"_headers").write_text("/assets/*\n  Cache-Control: public, max-age=31536000, immutable\n/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n")
     (OUT/"netlify.toml").write_text('[build]\n  publish = "."\n')
-    print("deploy bundle:",OUT,"index KB:",round(len(doc)/1024))
+    # self-serve editor page (SJ signs in with email + password and edits the live site)
+    edt=(sp/"editor.html").read_text()
+    edt=edt.replace("__MANIFEST__", json.dumps(MANIFEST, ensure_ascii=False)).replace("__EDGE__", EDIT_EDGE).replace("__ANON__", EDIT_ANON)
+    (OUT/"edit.html").write_text(edt)
+    print("deploy bundle:",OUT,"index KB:",round(len(doc)/1024),"editable fields:",len(MANIFEST))
 else:
     so=pathlib.Path(os.environ.get("LOTG_OUT",str(sp)))
     (so/"lotg-hero.html").write_text(page); print("final page",round(len(page)/1024),"KB")

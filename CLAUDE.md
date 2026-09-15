@@ -1327,6 +1327,46 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   detail — **the true fix is Saleh's original photos/clips**, which swap
   straight into lotg-src/tiles + tile_feat.jpg. Recording is at
   /root/.claude/uploads/.../dc9c2af4-Screen_Recording_20260909_115419_Instagram.mp4.
+- **Self-serve editor — SHIPPED (edge `lotg-edit` v2, 2026-09-15, Aiman: "add a
+  feature to edit the website from SJ's mobile or desktop... give SJ a separate
+  link with login, first time he chooses email + password, full access to all
+  edit tools, desktop and mobile optimised").** So SJ (or Aiman) can reword ANY
+  text and swap ANY photo without going through Claude, live in seconds.
+  - **Where:** `<netlify>/edit.html` — a standalone editor app (NOT linked from
+    the public site). Master `lotg-src/editor.html`; `build.py` injects the
+    field manifest + edge URL + anon key into `__MANIFEST__`/`__EDGE__`/`__ANON__`
+    → writes `lotg/edit.html` on a MODE=deploy build.
+  - **Auth:** email + password, SINGLE owner. First visit shows "Create your
+    login" (claim-once); after that it's login-only. Backend `lotg-edit`
+    (project ymuwuhvqqftgpxwhzoub, verify_jwt on, anon key Bearer+apikey like
+    the others): PBKDF2-SHA256 (120k iters) pass hashing, random 32-byte session
+    token (45-day sliding TTL) in localStorage `lotg_edit_tok`, 8-fail→1h lockout.
+    Tables `lotg_edit_user` (id=1 single row: email/salt/pass_hash/token/token_at/
+    fails/locked_until) + `lotg_content` (k/v overrides) + storage bucket
+    `lotg-site`. Actions: public `content` (returns overrides) / `status`
+    (setup?); token-gated `signup` (claim), `login`, `me`, `logout`, `save`
+    (text), `img` (base64 ≤6MB → bucket → url), `reset`, `passwd`. **Owner
+    email + password are chosen by SJ at first login — NOT recorded here (public
+    repo); reset via SQL (`lotg_edit_user` pass_hash='') if he's locked out.**
+  - **How edits reach the live page (CMS-over-defaults):** `build.py`
+    `tag_content()` (html5lib — preserves SVG viewBox) stamps `data-ed="<sec>.<t|h>N"`
+    on every editable text leaf and `data-edimg="<sec>.imgN"` on every content
+    photo, and emits a MANIFEST (165 fields, grouped by 9 sections with the live
+    text as the label). The public page's applier (scripts.html) fetches
+    `content` on load and lays overrides over the baked-in defaults —
+    **`setEd()` is structure-safe:** children that carry no text (an `<svg>`/`<i>`
+    icon, the eyebrow's decorative `<i>` dashes) are kept in place and only the
+    text run is swapped (never wipes the icon, never duplicates the label);
+    inline text accents (`<u>` gold word, `<b>` emphasis) fall back to a plain
+    textContent set, so an *edited* headline loses just that inline styling
+    (unedited defaults keep everything). Known limits (fine for now): editing a
+    link's visible text does NOT change its href; editing an accent headline
+    flattens its gold word. Verified E2E: backend curl (signup→token/me/save/409/
+    401/rotate), applier keeps the IG-button SVG + eyebrow dashes on override,
+    dashboard renders 9 clean sections/165 rows on desktop + mobile.
+  - **Bug fixed at ship:** `groups()` used `if(!seen[section])` so the FIRST
+    section (index 0, falsy) always split into two headers — changed to
+    `if(!(section in seen))`.
 - **Content rules:** everything on the page is from his real posts/bio — no
   invented facts. Real talk section carries Lifeline 13 11 14 / Beyond Blue
   1300 22 4636 / 000. Awaiting Saleh: exact wording sign-off, originals of his

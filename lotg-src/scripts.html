@@ -8,6 +8,32 @@
   /* ref-counted scroll lock so overlapping overlays (welcome + inbox) don't fight over html.lock */
   window.lotgLock=function(){ window.__lotgLockN=(window.__lotgLockN||0)+1; document.documentElement.classList.add('lock'); };
   window.lotgUnlock=function(){ window.__lotgLockN=Math.max(0,(window.__lotgLockN||0)-1); if(!window.__lotgLockN) document.documentElement.classList.remove('lock'); };
+  window.LOTG_EDIT="https://ymuwuhvqqftgpxwhzoub.supabase.co/functions/v1/lotg-edit";
+  (function(){ /* apply the site owner's saved edits (text + photos) over the baked-in defaults */
+    // Structure-safe text swap: if the element only wraps icons/structural bits that carry no
+    // text of their own (an <svg>/<i> in a button, a decorative dash), keep those children exactly
+    // where they are and replace just the text run — never wipe the icon or duplicate the label.
+    // If a child actually carries text (an inline <u>/<b> accent, a nested <small>/<a>), fall back
+    // to a plain-text set: the edited string loses that inline styling but stays correct and intact.
+    function setEd(el,v){
+      var elemKids=[].filter.call(el.childNodes,function(n){return n.nodeType===1;});
+      var hasTextyChild=elemKids.some(function(n){return (n.textContent||'').trim().length>0;});
+      if(elemKids.length && !hasTextyChild){
+        var placed=false;
+        [].slice.call(el.childNodes).forEach(function(n){ if(n.nodeType===3){ if(!placed){ n.nodeValue=v; placed=true; } else n.nodeValue=''; } });
+        if(!placed) el.appendChild(document.createTextNode(v));
+      } else { el.textContent=v; }
+    }
+    try{
+      fetch(window.LOTG_EDIT,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+window.LOTG_ANON,'apikey':window.LOTG_ANON},body:JSON.stringify({action:'content'})})
+        .then(function(r){ return r.ok?r.json():null; }).then(function(j){ if(!j||!j.items) return; var it=j.items;
+          Object.keys(it).forEach(function(k){ var v=it[k]; if(v==null) return;
+            var t=document.querySelector('[data-ed="'+k+'"]'); if(t) setEd(t,v);
+            var im=document.querySelector('[data-edimg="'+k+'"]'); if(im){ im.src=v; im.removeAttribute('srcset'); }
+          });
+        }).catch(function(){});
+    }catch(e){}
+  })();
   (function(){
     var c=document.getElementById('court'); if(!c)return; var x=c.getContext('2d');
     function draw(){
