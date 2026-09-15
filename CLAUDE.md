@@ -1336,18 +1336,34 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
     the public site). Master `lotg-src/editor.html`; `build.py` injects the
     field manifest + edge URL + anon key into `__MANIFEST__`/`__EDGE__`/`__ANON__`
     → writes `lotg/edit.html` on a MODE=deploy build.
-  - **Auth:** email + password, SINGLE owner. First visit shows "Create your
-    login" (claim-once); after that it's login-only. Backend `lotg-edit`
-    (project ymuwuhvqqftgpxwhzoub, verify_jwt on, anon key Bearer+apikey like
-    the others): PBKDF2-SHA256 (120k iters) pass hashing, random 32-byte session
-    token (45-day sliding TTL) in localStorage `lotg_edit_tok`, 8-fail→1h lockout.
-    Tables `lotg_edit_user` (id=1 single row: email/salt/pass_hash/token/token_at/
-    fails/locked_until) + `lotg_content` (k/v overrides) + storage bucket
-    `lotg-site`. Actions: public `content` (returns overrides) / `status`
-    (setup?); token-gated `signup` (claim), `login`, `me`, `logout`, `save`
-    (text), `img` (base64 ≤6MB → bucket → url), `reset`, `passwd`. **Owner
-    email + password are chosen by SJ at first login — NOT recorded here (public
-    repo); reset via SQL (`lotg_edit_user` pass_hash='') if he's locked out.**
+  - **Auth: MULTI-EDITOR, invite-only (edge v3, 2026-09-15, Aiman: "set an
+    account for me as well").** Both Aiman AND SJ (up to 12) can each have their
+    own login. INVITE-ONLY: an email must have a pre-created row before it can
+    claim a password — a random visitor to /edit.html (repo is public, page is
+    discoverable) canNOT sign themselves up. First time an invited email signs in
+    it "claims" (sets its own password, `claim` action / "Set your password"
+    screen); after that it's login-only. Backend `lotg-edit`
+    (project ymuwuhvqqftgpxwhzoub, verify_jwt on, anon key Bearer+apikey):
+    PBKDF2-SHA256 (120k) pass hashing, random 32-byte session token (45-day
+    sliding TTL, rotated on every login) in localStorage `lotg_edit_tok`,
+    8-fail→1h lockout per email. **`lotg_edit_user` is now EMAIL-KEYED (one row
+    per editor: email pk/salt/pass_hash/token/token_at/fails/locked_until/
+    invited_by/created_at; pass_hash='' = invited-not-yet-claimed)** + `lotg_content`
+    (k/v overrides) + storage bucket `lotg-site`. Actions: public `content` /
+    `status` (counts only, never leaks emails); token-gated `claim`, `login`,
+    `me`, `logout`, `save`, `img` (base64 ≤6MB→bucket→url), `reset`, `passwd`,
+    and editor mgmt `editors_list` / `editor_add` (invite by email) /
+    `editor_del` (can't remove yourself). auth() looks the acting editor up BY
+    TOKEN (validated `^[a-f0-9]{32,160}$`, encodeURIComponent'd). **Aiman
+    (aimanmaged88@gmail.com) is SEEDED as an invited editor — he claims his own
+    password on first login; NOT recorded here.** SJ is invited by Aiman from
+    the editor's "Who can edit" panel (or seed via SQL insert into
+    lotg_edit_user(email,invited_by)). Reset a locked-out editor via SQL
+    (`update lotg_edit_user set pass_hash='',token=null,fails=0,locked_until=null
+    where email=…`). Deployed v3 via Supabase MCP; DB reset clean (only Aiman's
+    row, unclaimed, 0 overrides) after E2E. **"Who can edit" panel** at the
+    bottom of the dashboard lists editors (Active/Invited chips + remove ✕) and
+    invites new ones — so Aiman adds SJ himself, no redeploy.
   - **How edits reach the live page (CMS-over-defaults):** `build.py`
     `tag_content()` (html5lib — preserves SVG viewBox) stamps `data-ed="<sec>.<t|h>N"`
     on every editable text leaf and `data-edimg="<sec>.imgN"` on every content
@@ -1361,9 +1377,12 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
     textContent set, so an *edited* headline loses just that inline styling
     (unedited defaults keep everything). Known limits (fine for now): editing a
     link's visible text does NOT change its href; editing an accent headline
-    flattens its gold word. Verified E2E: backend curl (signup→token/me/save/409/
-    401/rotate), applier keeps the IG-button SVG + eyebrow dashes on override,
-    dashboard renders 9 clean sections/165 rows on desktop + mobile.
+    flattens its gold word. Verified E2E: backend curl 14 checks (status counts /
+    login-before-claim setpw / non-invited claim 403 / claim→token / me / login
+    wrong+right / token rotation on login / save+content round-trip / reset /
+    editor_add+editor_del / can't-remove-self), applier keeps the IG-button SVG +
+    eyebrow dashes on override, dashboard renders 9 clean sections/165 rows +
+    the "Who can edit" panel on desktop + mobile.
   - **Bug fixed at ship:** `groups()` used `if(!seen[section])` so the FIRST
     section (index 0, falsy) always split into two headers — changed to
     `if(!(section in seen))`.

@@ -65,6 +65,19 @@
   .toast.on{opacity:1;transform:translate(-50%,0)}
   .toast.bad{border-color:rgba(233,166,166,.5);color:var(--bad)}
   .hint{color:var(--dim);font-size:12px;margin-top:4px}
+  /* editors panel */
+  .ednote{font-size:12.5px;color:var(--ash);line-height:1.5;margin:-2px 0 12px}
+  .edlist{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}
+  .edrow{display:flex;align-items:center;gap:10px;background:rgba(242,239,230,.03);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+  .edrow .em{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
+  .edrow .mechip{font-size:11px;color:var(--dim)}
+  .edrow .st{font-family:var(--disp);font-weight:700;font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:4px 8px;border-radius:99px;border:1px solid var(--line);white-space:nowrap}
+  .edrow .st.a{color:var(--ok);border-color:rgba(143,227,176,.4)}
+  .edrow .st.i{color:var(--gold);border-color:rgba(226,180,78,.4)}
+  .edrow .rm{background:none;border:0;color:var(--dim);cursor:pointer;font-size:17px;line-height:1;padding:4px 6px;min-height:34px}
+  .edrow .rm:hover{color:var(--bad)}
+  .edadd{display:flex;gap:8px}.edadd input{flex:1 1 auto}
+  .edadd .up{white-space:nowrap}
   [hidden]{display:none!important}
 </style>
 </head>
@@ -89,44 +102,45 @@ window.EDIT_MANIFEST = [{"key": "top.t1", "section": "Top / Hero", "type": "text
   function cur(k){ return (k in overrides)?overrides[k]:(defaults[k]||''); }
 
   // ---------- auth ----------
+  function fail(){ app.innerHTML='<div class="wrap" style="text-align:center;color:var(--bad);padding-top:14vh">Could not reach the editor. Check your connection and reload.</div>'; }
   function boot(){
     token=getTok();
-    Promise.all([ api({action:'content'}), api({action:'status'}) ]).then(function(res){
-      overrides = (res[0].j&&res[0].j.items)||{};
-      var setup = !!(res[1].j&&res[1].j.setup);
-      if(token){ api({action:'me',token:token}).then(function(r){ if(r.ok&&r.j&&r.j.ok) dash(r.j.email); else { setTok(''); authScreen(setup); } }); }
-      else authScreen(setup);
-    }).catch(function(){ app.innerHTML='<div class="wrap" style="text-align:center;color:var(--bad);padding-top:14vh">Could not reach the editor. Check your connection and reload.</div>'; });
+    api({action:'content'}).then(function(r){
+      overrides=(r.j&&r.j.items)||{};
+      if(token){ return api({action:'me',token:token}).then(function(m){ if(m.ok&&m.j&&m.j.ok) dash(m.j.email); else { setTok(''); authScreen('login'); } }); }
+      authScreen('login');
+    }).catch(function(){ fail(); });
   }
-  function authScreen(setup){
-    var mode = setup ? 'login' : 'signup';
+  // mode: 'login' (email + password) or 'claim' (first-time set password for an invited email)
+  function authScreen(mode){
+    var claim = (mode==='claim');
     app.innerHTML =
       '<div class="auth"><div class="mark">LOVE OF THE <span>GAME</span></div><div class="sub">Site editor</div>'
       + '<div class="card">'
-      + '<h2 id="atitle">'+(mode==='signup'?'Create your login':'Sign in')+'</h2>'
-      + '<p class="tip" id="atip">'+(mode==='signup'?'Set the email and password you’ll use to edit the site. Only you get this.':'Welcome back — sign in to edit the site.')+'</p>'
+      + '<h2 id="atitle">'+(claim?'Set your password':'Sign in')+'</h2>'
+      + '<p class="tip" id="atip">'+(claim?'First time? Set the password you’ll use from now on — use the email you were added with.':'Enter your email and password to edit the site.')+'</p>'
       + '<div class="f"><label class="fl" for="em">Email</label><input id="em" type="email" autocomplete="username" placeholder="you@email.com"></div>'
-      + '<div class="f"><label class="fl" for="pw">Password</label><input id="pw" type="password" autocomplete="'+(mode==='signup'?'new-password':'current-password')+'" placeholder="'+(mode==='signup'?'At least 8 characters':'Your password')+'"></div>'
-      + (mode==='signup'?'<div class="f"><label class="fl" for="pw2">Confirm password</label><input id="pw2" type="password" autocomplete="new-password" placeholder="Type it again"></div>':'')
-      + '<button class="btn" id="ago">'+(mode==='signup'?'Create account':'Sign in')+'</button>'
+      + '<div class="f"><label class="fl" for="pw">Password</label><input id="pw" type="password" autocomplete="'+(claim?'new-password':'current-password')+'" placeholder="'+(claim?'At least 8 characters':'Your password')+'"></div>'
+      + (claim?'<div class="f"><label class="fl" for="pw2">Confirm password</label><input id="pw2" type="password" autocomplete="new-password" placeholder="Type it again"></div>':'')
+      + '<button class="btn" id="ago">'+(claim?'Set password &amp; sign in':'Sign in')+'</button>'
       + '<p class="err" id="aerr"></p>'
-      + (setup?'':'<p class="swap">Already set up? <a id="aswap">Sign in</a></p>')
-      + (setup?'<p class="swap"><a id="aswap2">Forgot? Ask whoever built the site.</a></p>':'')
+      + '<p class="swap">'+(claim?'Already set up? <a id="aswap">Sign in</a>':'First time here? <a id="aswap">Set your password</a>')+'</p>'
       + '</div></div>';
     var em=document.getElementById('em'), pw=document.getElementById('pw'), pw2=document.getElementById('pw2'), err=document.getElementById('aerr'), go=document.getElementById('ago');
-    var sw=document.getElementById('aswap'); if(sw) sw.onclick=function(){ authScreen(true); };
+    document.getElementById('aswap').onclick=function(){ authScreen(claim?'login':'claim'); };
     function submit(){
       var e=(em.value||'').trim().toLowerCase(), p=pw.value||'';
       if(!e||!p){ err.textContent='Enter your email and password.'; return; }
-      if(mode==='signup'){ if(p.length<8){ err.textContent='Password needs at least 8 characters.'; return; } if(pw2 && pw2.value!==p){ err.textContent='Those passwords don’t match.'; return; } }
-      go.disabled=true; go.textContent='…'; err.textContent='';
-      api({action:mode, email:e, password:p}).then(function(r){
-        go.disabled=false; go.textContent=(mode==='signup'?'Create account':'Sign in');
-        if(r.ok&&r.j&&r.j.ok&&r.j.token){ setTok(r.j.token); dash(r.j.email); }
-        else if(r.j&&r.j.code==='exists'){ authScreen(true); }
-        else if(r.j&&r.j.code==='nouser'){ authScreen(false); }
-        else err.textContent=(r.j&&r.j.error)||'That didn’t work.';
-      }).catch(function(){ go.disabled=false; go.textContent=(mode==='signup'?'Create account':'Sign in'); err.textContent='Could not reach the editor.'; });
+      if(claim){ if(p.length<8){ err.textContent='Password needs at least 8 characters.'; return; } if(pw2 && pw2.value!==p){ err.textContent='Those passwords don’t match.'; return; } }
+      var lbl=go.textContent; go.disabled=true; go.textContent='…'; err.textContent='';
+      api({action:(claim?'claim':'login'), email:e, password:p}).then(function(r){
+        go.disabled=false; go.textContent=lbl;
+        if(r.ok&&r.j&&r.j.ok&&r.j.token){ setTok(r.j.token); dash(r.j.email); return; }
+        var code=r.j&&r.j.code;
+        if(code==='setpw'){ authScreen('claim'); setTimeout(function(){ var x=document.getElementById('em'); if(x)x.value=e; var er=document.getElementById('aerr'); if(er)er.textContent='Looks like your first time — set a password below.'; var pf=document.getElementById('pw'); if(pf)pf.focus(); },0); return; }
+        if(code==='exists'){ authScreen('login'); setTimeout(function(){ var x=document.getElementById('em'); if(x)x.value=e; var pf=document.getElementById('pw'); if(pf)pf.focus(); },0); return; }
+        err.textContent=(r.j&&r.j.error)||'That didn’t work.';
+      }).catch(function(){ go.disabled=false; go.textContent=lbl; err.textContent='Could not reach the editor.'; });
     }
     go.onclick=submit;
     [em,pw,pw2].forEach(function(el){ if(el) el.addEventListener('keydown',function(ev){ if(ev.key==='Enter') submit(); }); });
@@ -158,9 +172,15 @@ window.EDIT_MANIFEST = [{"key": "top.t1", "section": "Top / Hero", "type": "text
       });
       html+='</div>';
     });
+    html+='<div class="sec" id="editorsSec"><h3>Who can edit</h3>'
+      + '<p class="ednote">Anyone here can change the site. Invite a teammate by email — they set their own password the first time they open the editor link. Send them <b>this same page</b>.</p>'
+      + '<div id="edList" class="edlist"><div class="hint">Loading…</div></div>'
+      + '<div class="edadd"><input id="edEmail" type="email" inputmode="email" autocomplete="off" placeholder="teammate@email.com"><button class="up" id="edAdd">Invite</button></div>'
+      + '<p class="err" id="edErr" style="min-height:0;margin-top:8px"></p></div>';
     html+='</div><div class="savebar" id="savebar"><button class="btn ghost" id="discard" style="flex:.5">Discard</button><button class="btn" id="saveall">Save changes</button></div>';
     app.innerHTML=html;
     document.getElementById('logout').onclick=function(){ api({action:'logout',token:token}); setTok(''); boot(); };
+    wireEditors();
     // text edits
     [].forEach.call(app.querySelectorAll('[data-t]'),function(el){ el.addEventListener('input',function(){ var k=el.getAttribute('data-t'); if(el.value===cur(k)){ delete dirty[k]; } else { dirty[k]=el.value; } refreshBar(); });
       if(el.tagName==='TEXTAREA'){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,360)+'px'; el.addEventListener('input',function(){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,360)+'px'; }); } });
@@ -198,6 +218,45 @@ window.EDIT_MANIFEST = [{"key": "top.t1", "section": "Top / Hero", "type": "text
       c.getContext('2d').drawImage(img,0,0,c.width,c.height); URL.revokeObjectURL(url); resolve(c.toDataURL('image/jpeg',q)); }catch(e){ reject(e); } };
     img.onerror=function(){ URL.revokeObjectURL(url); reject(new Error('img')); }; img.src=url;
   }); }
+
+  // ---------- editors (who can edit) ----------
+  function edRow(e){
+    return '<div class="edrow"><span class="em">'+esc(e.email)+'</span>'
+      + (e.me?'<span class="mechip">you</span>':'')
+      + '<span class="st '+(e.active?'a':'i')+'">'+(e.active?'Active':'Invited')+'</span>'
+      + (e.me?'':'<button class="rm" data-rm="'+esc(e.email)+'" title="Remove">✕</button>')
+      + '</div>';
+  }
+  function paintEditors(list){
+    var el=document.getElementById('edList'); if(!el) return;
+    el.innerHTML = (list&&list.length)? list.map(edRow).join('') : '<div class="hint">No editors yet.</div>';
+    [].forEach.call(el.querySelectorAll('[data-rm]'),function(btn){ btn.onclick=function(){
+      var em=btn.getAttribute('data-rm');
+      if(!confirm('Remove '+em+'? They won’t be able to edit anymore.')) return;
+      api({action:'editor_del',token:token,email:em}).then(function(r){
+        if(r.ok&&r.j&&r.j.ok){ paintEditors(r.j.editors); toast('Removed '+em); }
+        else if(r.status===401){ toast('Signed out — log in again.',true); setTok(''); boot(); }
+        else toast((r.j&&r.j.error)||'Could not remove.',true);
+      }).catch(function(){ toast('Could not reach the editor.',true); });
+    }; });
+  }
+  function wireEditors(){
+    var addBtn=document.getElementById('edAdd'), emIn=document.getElementById('edEmail'), errEl=document.getElementById('edErr');
+    if(!addBtn) return;
+    function add(){
+      var e=(emIn.value||'').trim().toLowerCase(); errEl.textContent='';
+      if(!e){ errEl.textContent='Enter an email.'; return; }
+      addBtn.disabled=true;
+      api({action:'editor_add',token:token,email:e}).then(function(r){
+        addBtn.disabled=false;
+        if(r.ok&&r.j&&r.j.ok){ emIn.value=''; paintEditors(r.j.editors); toast('Invited '+e+' — send them the editor link.'); }
+        else if(r.status===401){ toast('Signed out — log in again.',true); setTok(''); boot(); }
+        else errEl.textContent=(r.j&&r.j.error)||'Could not invite.';
+      }).catch(function(){ addBtn.disabled=false; errEl.textContent='Could not reach the editor.'; });
+    }
+    addBtn.onclick=add; emIn.addEventListener('keydown',function(ev){ if(ev.key==='Enter') add(); });
+    api({action:'editors_list',token:token}).then(function(r){ if(r.ok&&r.j&&r.j.ok) paintEditors(r.j.editors); else { var el=document.getElementById('edList'); if(el) el.innerHTML='<div class="hint">Couldn’t load editors.</div>'; } }).catch(function(){});
+  }
 
   boot();
 })();
