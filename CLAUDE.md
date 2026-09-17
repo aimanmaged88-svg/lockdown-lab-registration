@@ -1192,8 +1192,9 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   **6 full reel scripts** (hook + script + shots + caption + why it works),
   10 spare hooks, IG bio, **5 DM scripts**, where the 20 targets come from,
   the 20-minute call script (5 questions, play-it-back, price-then-silence),
-  price-talk and objection tables, the delivery checklist (what two weeks CAN
-  and CAN'T include), and the revenue maths. 26 copy-to-clipboard blocks.
+  price-talk and objection tables, the delivery checklist (what FRIDAY can and
+  can't include — see the five-days bullet above), and the revenue maths.
+  26 copy-to-clipboard blocks.
   Carries the two standing rules: **never automate Instagram**, never invent a
   client/testimonial/number.
 - netlify.toml: `/coachbuilt` and `/kit` short links.
