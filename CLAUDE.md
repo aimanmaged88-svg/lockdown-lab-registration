@@ -1161,8 +1161,23 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   borrowing anyone's") → 3 steps → pricing → guarantee → 7 FAQs → the form.
 - **Pricing:** Court One $890/mo, Full Court $1,490/mo, The Franchise from
   $2,900/mo — all +GST, build included, no setup fee, 6-month min then
-  month-to-month. Guarantee: **nothing invoiced until day 11 when it's working
-  on their phone.** Ownership: data exports any time; buy-out after 12 months.
+  month-to-month. Ownership: data exports any time; buy-out after 12 months.
+- **THE PROMISE IS FIVE DAYS (2026-09-17, Aiman: "5 days to something real" —
+  he quoted the page's own step heading back with the number cut from 14).**
+  Call Monday → on their phone Friday → weekend to break it. **Nothing invoiced
+  until that Friday.** Changed in ~20 places across both pages (og:description,
+  hero chip, step 2, guarantee, the "five days?" FAQ, reel 4/5/6 + caption, the
+  call script, price talk, objections, delivery, cashflow maths).
+  **Scope was tightened so the promise is keepable, not just shorter:** Friday
+  = branding, member sign-up + searchable list, timetable + bookings w/
+  capacity, attendance, admin screen, installs from a link. **Stripe/payments
+  moved OFF day five** — it waits on the client opening the account and Stripe
+  verifying their business, which is their clock, not his. That caveat is
+  stated in the FAQ, the reel 6 caption, the objection table and the call
+  script ("volunteering the catch is what makes the five days believable").
+  Prereq rule hardened: without all 7 inputs **the five days hasn't started**.
+  Cashflow note rewritten — at 5 days it's one build week at a time; two
+  clients starting the same Monday is one bad week, so stagger start dates.
 - **Lead capture is written twice on purpose.** (1) **Netlify Forms** —
   form detection ENABLED on site 7f6a47a4-… via MCP (was off; there were 0
   forms), form `coachbuilt-apply` with honeypot `website-url`, emails him.
