@@ -1,0 +1,758 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<title>Coachbuilt — the kit</title>
+<meta name="theme-color" content="#15130F">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2315130F'/%3E%3Cpath d='M11 26v-7a5 5 0 0 1 10 0v7' stroke='%23D4541F' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preload" href="assets/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:CB;src:url('assets/fonts/inter-var.woff2') format('woff2');font-weight:100 900;font-display:swap}
+@font-face{font-family:CBL;src:url('assets/fonts/chakrapetch-600.woff2') format('woff2');font-weight:600;font-display:swap}
+:root{
+  --paper:#F4F1EA;--paper2:#EAE5DA;--ink:#15130F;--ink2:#292520;--muted:#6C665A;--dim:#918A7C;
+  --line:rgba(21,19,15,.13);--line2:rgba(21,19,15,.07);--accent:#D4541F;--accent-d:#B0400F;
+  --accent-w:rgba(212,84,31,.10);--ok:#2C7A57;--ease:cubic-bezier(.22,.61,.36,1)
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{background:var(--paper);color:var(--ink);font-family:CB,-apple-system,'Segoe UI',sans-serif;
+  font-size:16.5px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;padding-bottom:70px}
+::selection{background:var(--accent);color:#fff}
+.w{max-width:820px;margin:0 auto;padding:0 18px}
+h1,h2,h3,h4{font-weight:800;letter-spacing:-.032em;line-height:1.1;text-wrap:balance}
+h1{font-size:clamp(30px,7vw,46px)}
+h2{font-size:clamp(23px,4.6vw,32px)}
+h3{font-size:clamp(18px,3.2vw,21px);letter-spacing:-.022em}
+h4{font-size:16px;letter-spacing:-.018em}
+p{text-wrap:pretty}
+.lab{font-family:CBL,sans-serif;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.sub{color:var(--muted)}.sm{font-size:14.5px}.xs{font-size:13px}.hl{color:var(--accent)}
+
+/* header */
+.top{padding:40px 0 22px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.top .brand{display:flex;align-items:center;gap:9px;font-weight:800;letter-spacing:-.03em;font-size:18px;margin-bottom:18px}
+.top .brand svg{width:25px;height:25px}
+.top p{margin-top:14px;color:var(--muted);max-width:620px}
+
+/* sticky contents */
+.toc{position:sticky;top:0;z-index:20;background:rgba(244,241,234,.9);backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line);margin-bottom:34px}
+.toc .in{display:flex;gap:7px;overflow-x:auto;padding:11px 18px;scrollbar-width:none}
+.toc .in::-webkit-scrollbar{display:none}
+.toc a{flex:0 0 auto;text-decoration:none;font-size:13.5px;font-weight:600;letter-spacing:-.012em;
+  color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:8px 14px;background:#fff;white-space:nowrap}
+.toc a:hover{color:var(--ink);border-color:var(--ink)}
+
+section{margin-bottom:52px;scroll-margin-top:66px}
+section > .lab{display:block;margin-bottom:11px}
+section > h2{margin-bottom:12px}
+section > p.intro{color:var(--muted);max-width:640px;margin-bottom:24px}
+
+/* blocks */
+.card{background:#fff;border:1px solid var(--line);border-radius:15px;padding:20px;margin-bottom:14px}
+.card.dark{background:var(--ink);color:#DCD5C6;border-color:var(--ink)}
+.card.dark h3,.card.dark h4,.card.dark b{color:#fff}
+.card.warn{background:var(--accent-w);border-color:rgba(212,84,31,.3)}
+
+/* copy blocks */
+.copy{position:relative;background:#fff;border:1px solid var(--line);border-radius:14px;margin-bottom:14px;overflow:hidden}
+.copy .ch{display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:13px 15px;border-bottom:1px solid var(--line2);background:var(--paper2)}
+.copy .ch .t{font-family:CBL,sans-serif;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.copy .ch button{border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:999px;
+  padding:9px 15px;font-family:CB,sans-serif;font-size:12.5px;font-weight:650;cursor:pointer;
+  letter-spacing:-.01em;transition:all .16s var(--ease);flex:0 0 auto}
+.copy .ch button:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+.copy .ch button.done{background:var(--ok);color:#fff;border-color:var(--ok)}
+.copy .cb{padding:16px 15px;white-space:pre-wrap;font-size:15.5px;line-height:1.62}
+
+/* reel */
+.reel{border:1px solid var(--line);border-radius:15px;background:#fff;margin-bottom:16px;overflow:hidden}
+.reel > summary{list-style:none;cursor:pointer;padding:18px;display:flex;gap:14px;align-items:flex-start;position:relative}
+.reel > summary::-webkit-details-marker{display:none}
+.reel > summary:after{content:'';position:absolute;right:18px;top:26px;width:9px;height:9px;
+  border-right:2px solid var(--dim);border-bottom:2px solid var(--dim);transform:rotate(45deg);transition:transform .2s var(--ease)}
+.reel[open] > summary:after{transform:rotate(-135deg);margin-top:4px}
+.reel .n{flex:0 0 32px;height:32px;border-radius:9px;background:var(--ink);color:#fff;
+  display:grid;place-items:center;font-size:14px;font-weight:700}
+.reel .sm2{min-width:0;padding-right:20px}
+.reel .sm2 b{display:block;font-size:17px;font-weight:700;letter-spacing:-.024em;line-height:1.25}
+.reel .sm2 i{display:block;font-style:normal;font-size:13.5px;color:var(--muted);margin-top:3px}
+.reel .body{padding:0 18px 18px;border-top:1px solid var(--line2);margin-top:2px;padding-top:16px}
+.reel .body h4{margin:18px 0 8px}
+.reel .body h4:first-child{margin-top:0}
+
+/* lists */
+ul.tick,ul.plain{list-style:none;display:flex;flex-direction:column;gap:9px}
+ul.tick li{display:flex;gap:10px;font-size:15.5px;line-height:1.5}
+ul.tick li:before{content:'';flex:0 0 7px;height:7px;border-radius:50%;background:var(--accent);margin-top:9px}
+ul.plain li{display:flex;gap:11px;font-size:15.5px;line-height:1.5}
+ul.plain li b{flex:0 0 auto}
+ol.steps{list-style:none;counter-reset:s;display:flex;flex-direction:column;gap:14px}
+ol.steps li{counter-increment:s;position:relative;padding-left:40px;font-size:15.5px;line-height:1.55}
+ol.steps li:before{content:counter(s);position:absolute;left:0;top:-1px;width:26px;height:26px;border-radius:50%;
+  background:var(--ink);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:700}
+ol.steps li b{display:block}
+
+/* table */
+.tbl{width:100%;border-collapse:collapse;font-size:15px;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.tbl th,.tbl td{text-align:left;padding:12px 14px;border-bottom:1px solid var(--line2)}
+.tbl th{font-family:CBL,sans-serif;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);background:var(--paper2)}
+.tbl tr:last-child td{border-bottom:0}
+.tbl td b{font-variant-numeric:tabular-nums}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:14px}
+
+.days{display:grid;gap:11px}
+@media(min-width:700px){.days{grid-template-columns:1fr 1fr}}
+.day{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px}
+.day .lab{display:block;margin-bottom:7px;color:var(--accent)}
+.day p{font-size:15px;color:var(--muted);margin-top:5px}
+
+.foot2{border-top:1px solid var(--line);padding-top:26px;color:var(--muted);font-size:14.5px}
+a.link{color:var(--accent);font-weight:650}
+@media(prefers-reduced-motion:reduce){*,*:before{transition-duration:.001ms!important}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="w">
+    <div class="brand">
+      <svg viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <rect x="1.4" y="1.4" width="29.2" height="29.2" rx="8" stroke="#15130F" stroke-width="2.4"/>
+        <path d="M11 31V22a5 5 0 0 1 10 0v9" stroke="#D4541F" stroke-width="2.4" stroke-linecap="round"/>
+        <path d="M16 1.4V22" stroke="#15130F" stroke-width="2.2" stroke-linecap="round" opacity=".26"/>
+      </svg>
+      Coachbuilt
+    </div>
+    <span class="lab">Private — don't share this one</span>
+    <h1>The kit.</h1>
+    <p>Everything you need to get the first client. Scripts to say out loud, captions to paste,
+      and the numbers to hold your nerve on. Read the 7-day plan, then just work down the page.</p>
+    <p class="sm" style="margin-top:12px">Your public page: <a class="link" href="coachbuilt.html">coachbuilt.html</a> —
+      that's the link that goes in your bio and every DM.</p>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="in">
+    <a href="#week">7-day plan</a>
+    <a href="#reels">Reels</a>
+    <a href="#bio">Bio</a>
+    <a href="#dms">DMs</a>
+    <a href="#list">Who to hit</a>
+    <a href="#call">The call</a>
+    <a href="#money">Price talk</a>
+    <a href="#objections">Objections</a>
+    <a href="#deliver">Delivery</a>
+    <a href="#numbers">The numbers</a>
+  </div>
+</nav>
+
+<main class="w">
+
+<!-- ===== 7 DAY ===== -->
+<section id="week">
+  <span class="lab">Start here</span>
+  <h2>The first seven days.</h2>
+  <p class="intro">You don't need an audience, a logo or a business name registered to get the first client.
+    You need twenty conversations. This is how you get them.</p>
+
+  <div class="days">
+    <div class="day">
+      <span class="lab">Day 1</span>
+      <h4>Put the link up</h4>
+      <p>Bio link → your page. Post reel 1 (the origin one). Don't explain it in the caption, let the reel do it.</p>
+    </div>
+    <div class="day">
+      <span class="lab">Day 2</span>
+      <h4>Write the list</h4>
+      <p>Twenty gyms, clubs and academies you could name right now. See <a class="link" href="#list">who to hit</a>.
+        Twenty. Not five.</p>
+    </div>
+    <div class="day">
+      <span class="lab">Day 3</span>
+      <h4>Send ten DMs</h4>
+      <p>The cold one below. It's a question, not a pitch. Ten today, ten tomorrow. No follow-ups yet.</p>
+    </div>
+    <div class="day">
+      <span class="lab">Day 4</span>
+      <h4>Post reel 2, send ten more</h4>
+      <p>Reel 2 is the "add it up" one — it's the best hook you've got. Expect the first real replies here.</p>
+    </div>
+    <div class="day">
+      <span class="lab">Day 5</span>
+      <h4>Book calls</h4>
+      <p>Anyone who replied with a real answer, move to a call. "Got twenty minutes Tuesday?" Nothing fancier.</p>
+    </div>
+    <div class="day">
+      <span class="lab">Day 6</span>
+      <h4>Post reel 3, one follow-up round</h4>
+      <p>One follow-up to the silent ones, then leave them alone forever. The follow-up script is below.</p>
+    </div>
+    <div class="day">
+      <span class="lab">Day 7</span>
+      <h4>Take the calls</h4>
+      <p>Use the call script. Don't quote before you've played the problem back to them.</p>
+    </div>
+    <div class="day" style="background:var(--ink);border-color:var(--ink);color:#DCD5C6">
+      <span class="lab" style="color:#E08A5A">Then</span>
+      <h4 style="color:#fff">Repeat until one says yes</h4>
+      <p style="color:#B5AC9A">Twenty DMs is usually three to five conversations and one or two calls.
+        You need roughly three rounds of that to land the first client. That's the actual maths — keep going.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== REELS ===== -->
+<section id="reels">
+  <span class="lab">Content</span>
+  <h2>Six reels. Post one every two days.</h2>
+  <p class="intro">Same structure every time, because it works: say what <em>they</em> think out loud →
+    show something specific → soft CTA. Shot on your phone, talking to camera, no editing tricks.
+    The hook is the first three seconds — if that's flat, nothing else matters.</p>
+
+  <details class="reel" open>
+    <summary>
+      <span class="n">1</span>
+      <span class="sm2"><b>"I'm a coach. I built my own app."</b><i>Origin story · post this first · highest trust</i></span>
+    </summary>
+    <div class="body">
+      <h4>Hook — first 3 seconds, say it flat</h4>
+      <div class="copy"><div class="ch"><span class="t">On screen + spoken</span><button data-copy>Copy</button></div>
+<div class="cb">I'm a basketball coach. I've never worked at a tech company. I built this.</div></div>
+      <h4>Script</h4>
+      <div class="copy"><div class="ch"><span class="t">Say it like you'd say it to a mate</span><button data-copy>Copy</button></div>
+<div class="cb">I coach basketball in Sydney.
+
+I got sick of paying for software that didn't fit how I actually run a session — so I built my own. My members check in on it, follow their programs, earn badges. I open one screen and I can see who showed up and who's slipping.
+
+Then I built a second one for the whole city — every court, who's on it right now.
+
+Both are live. Both built by one person.
+
+So if you run a gym or a club and you're paying for five things that don't talk to each other — that's what I do now.</div></div>
+      <h4>Shots</h4>
+      <ul class="tick">
+        <li>You on a court, talking to camera. Not a desk, not a car.</li>
+        <li>Cut to your actual phone, scrolling your app. Real screen, real data.</li>
+        <li>End on you. No text card outro.</li>
+      </ul>
+      <h4>Caption</h4>
+      <div class="copy"><div class="ch"><span class="t">Paste straight in</span><button data-copy>Copy</button></div>
+<div class="cb">Two apps. One person. Both live.
+
+I didn't set out to build software — I just wanted something that fit how I coach. Turns out most gyms and clubs have the same problem and nobody's fixing it for them.
+
+If your booking app, your website and your spreadsheet don't talk to each other, have a look at the link in my bio. The price is on the page, there's no call required to see it.</div></div>
+      <h4>Why it works</h4>
+      <p class="sub sm">You're not a software company pitching gyms — you're one of them who solved it.
+        That's the only unfair advantage you've got, so lead with it every time.</p>
+    </div>
+  </details>
+
+  <details class="reel">
+    <summary>
+      <span class="n">2</span>
+      <span class="sm2"><b>"Add it up. I'll wait."</b><i>The money one · your strongest hook · expect replies</i></span>
+    </summary>
+    <div class="body">
+      <h4>Hook</h4>
+      <div class="copy"><div class="ch"><span class="t">On screen + spoken</span><button data-copy>Copy</button></div>
+<div class="cb">Add up what your gym pays for software every month. Go on. I'll wait.</div></div>
+      <h4>Script</h4>
+      <div class="copy"><div class="ch"><span class="t">Count them off on your fingers</span><button data-copy>Copy</button></div>
+<div class="cb">Booking software.
+
+The website, and whoever you text when it breaks.
+
+The social media retainer you're not sure is working.
+
+The email tool.
+
+And the admin hours nobody's paying you for.
+
+Most places I talk to land somewhere between one and two grand a month — across five separate bills — and their members still open an app with someone else's logo on it.
+
+One system. Your name on it. One price. That's the whole idea.</div></div>
+      <h4>Shots</h4>
+      <ul class="tick">
+        <li>Numbers stacking on screen as you say each one, then a total.</li>
+        <li>Use <em>your</em> real page for the total — screen record the calculator on coachbuilt.html.</li>
+        <li>Never invent a gym's numbers. Say "most places I talk to", not "gyms pay $1,500".</li>
+      </ul>
+      <h4>Caption</h4>
+      <div class="copy"><div class="ch"><span class="t">Paste straight in</span><button data-copy>Copy</button></div>
+<div class="cb">Nobody adds it up, which is exactly why it keeps creeping.
+
+There's a calculator on the page in my bio — put your own numbers in and see what your stack actually costs you a year. Takes about thirty seconds and it's quite confronting.</div></div>
+      <h4>Why it works</h4>
+      <p class="sub sm">It doesn't sell anything. It makes them do a sum they've been avoiding.
+        The ones who comment a number are your warmest leads — DM them.</p>
+    </div>
+  </details>
+
+  <details class="reel">
+    <summary>
+      <span class="n">3</span>
+      <span class="sm2"><b>"A basketball club runs on this."</b><i>The demo · shows range · very shareable</i></span>
+    </summary>
+    <div class="body">
+      <h4>Hook</h4>
+      <div class="copy"><div class="ch"><span class="t">On screen + spoken</span><button data-copy>Copy</button></div>
+<div class="cb">This is everything a basketball club actually runs on.</div></div>
+      <h4>Script</h4>
+      <div class="copy"><div class="ch"><span class="t">One beat per item, let them land</span><button data-copy>Copy</button></div>
+<div class="cb">Player sign-ups.
+
+The season timetable.
+
+Training attendance.
+
+Term payments.
+
+Parent updates.
+
+And the one screen that tells you who turned up and what the term's actually worth.
+
+Most clubs run that across a booking app, a spreadsheet, a group chat and somebody's memory.
+
+It should be one thing. It can be one thing.</div></div>
+      <h4>Shots</h4>
+      <ul class="tick">
+        <li>Screen record the diagram on your page — tap through club → gym → academy → solo coach.</li>
+        <li>That tap-through is the point: it shows you build for <em>their</em> shape, not a template.</li>
+      </ul>
+      <h4>Caption</h4>
+      <div class="copy"><div class="ch"><span class="t">Paste straight in</span><button data-copy>Copy</button></div>
+<div class="cb">Swap "club" for gym, studio or academy — same problem, different words.
+
+The bit that matters isn't any one feature, it's that they're connected. A sign-up becomes a booking becomes a roll becomes the number you look at on Sunday night, without you re-typing it three times.
+
+Link in bio.</div></div>
+    </div>
+  </details>
+
+  <details class="reel">
+    <summary>
+      <span class="n">4</span>
+      <span class="sm2"><b>"The Sunday night job."</b><i>The relatable one · best comments · best DMs</i></span>
+    </summary>
+    <div class="body">
+      <h4>Hook</h4>
+      <div class="copy"><div class="ch"><span class="t">On screen + spoken</span><button data-copy>Copy</button></div>
+<div class="cb">Every gym owner has a Sunday night job they hate.</div></div>
+      <h4>Script</h4>
+      <div class="copy"><div class="ch"><span class="t">Slow. This one's meant to sting a bit.</span><button data-copy>Copy</button></div>
+<div class="cb">For some of you it's chasing who's actually paid for term.
+
+For some it's re-typing the roll into a spreadsheet you built two years ago.
+
+For some it's texting the six parents who missed the notice.
+
+You didn't start a gym to do that.
+
+And here's the annoying part — every one of those is a software problem. Which means it's fixable. Usually in about two weeks.
+
+What's yours? Tell me in the comments, I'll tell you straight if it's fixable.</div></div>
+      <h4>Caption</h4>
+      <div class="copy"><div class="ch"><span class="t">Paste straight in</span><button data-copy>Copy</button></div>
+<div class="cb">Genuine question, not a pitch: what's the one job you do every single week that you shouldn't have to?
+
+Drop it below. I'll tell you honestly whether it's a software problem or just part of running a gym — plenty of them are the second one.</div></div>
+      <h4>Why it works</h4>
+      <p class="sub sm">It asks a question you can actually answer in a comment. Every comment is a lead
+        who has just told you their exact pain in their own words. Reply to every single one.</p>
+    </div>
+  </details>
+
+  <details class="reel">
+    <summary>
+      <span class="n">5</span>
+      <span class="sm2"><b>"I'm not technical." Good.</b><i>Kills the main objection before the call</i></span>
+    </summary>
+    <div class="body">
+      <h4>Hook</h4>
+      <div class="copy"><div class="ch"><span class="t">On screen + spoken</span><button data-copy>Copy</button></div>
+<div class="cb">"I'm not technical." Good. You shouldn't have to be.</div></div>
+      <h4>Script</h4>
+      <div class="copy"><div class="ch"><span class="t">Calm. This is reassurance, not hype.</span><button data-copy>Copy</button></div>
+<div class="cb">You don't need to learn software. You run a gym, not a tech company.
+
+You need someone who's already built it to build yours.
+
+So it goes like this. You talk me through how the place actually runs — twenty minutes, on the phone. Two weeks later it's on your phone with your name on it and your real members in it.
+
+If it's not right, you say so, you walk, and you've paid nothing.
+
+That's it. That's the whole process. There's no onboarding portal and no six-week implementation.</div></div>
+      <h4>Caption</h4>
+      <div class="copy"><div class="ch"><span class="t">Paste straight in</span><button data-copy>Copy</button></div>
+<div class="cb">The number one thing people say to me is "I wouldn't know where to start."
+
+You don't need to. That's the job. You know how your gym runs better than any software company ever will — that's the only part that can't be outsourced.
+
+Link in bio. Price is on the page.</div></div>
+    </div>
+  </details>
+
+  <details class="reel">
+    <summary>
+      <span class="n">6</span>
+      <span class="sm2"><b>"Two weeks. Here's what actually happens."</b><i>The offer one · post after the others have warmed people up</i></span>
+    </summary>
+    <div class="body">
+      <h4>Hook</h4>
+      <div class="copy"><div class="ch"><span class="t">On screen + spoken</span><button data-copy>Copy</button></div>
+<div class="cb">Two weeks from a phone call to your own system. Here's the actual timeline.</div></div>
+      <h4>Script</h4>
+      <div class="copy"><div class="ch"><span class="t">Fast cuts, one line per day card</span><button data-copy>Copy</button></div>
+<div class="cb">Day one — twenty minutes on the phone. You tell me how the place runs, I tell you straight if I can help.
+
+Day two to ten — I build. You don't do anything.
+
+Day eleven — it's on your phone. Your name, your colours, your actual members in it. Not a demo.
+
+Day twelve to fourteen — you use it and try to break it. I fix whatever you find.
+
+Then every month after that, you tell me what's annoying you and I build that.
+
+If day eleven isn't right, you walk, and you've been invoiced nothing.</div></div>
+      <h4>Caption</h4>
+      <div class="copy"><div class="ch"><span class="t">Paste straight in</span><button data-copy>Copy</button></div>
+<div class="cb">No setup fee, no build invoice, no six-month implementation.
+
+Monthly, build included, six month minimum — and you don't pay anything until you've seen it working on your own phone. That's me taking the risk instead of you, which feels like the right way round.
+
+Everything's on the page in my bio, price included.</div></div>
+    </div>
+  </details>
+
+  <h3 style="margin:26px 0 12px">Ten more hooks when you run dry</h3>
+  <div class="copy"><div class="ch"><span class="t">First three seconds only</span><button data-copy>Copy</button></div>
+<div class="cb">1. Your booking software wasn't built for you. It was built for ten thousand of you.
+2. The reason your members don't open your app is that it isn't yours.
+3. I'll tell you exactly what I charge. It's on the page. Nobody does that, which is weird.
+4. Name one thing your gym software does that you actually love. I'll wait.
+5. Every club I talk to has the same spreadsheet. Same one. It's always got a tab called "old".
+6. You're not paying for software. You're paying for the workarounds.
+7. Three things your gym app should do that it probably doesn't.
+8. If your price goes up every time you get more members, you're renting, not owning.
+9. I built my own app because nobody would build the one I wanted for a coach's money.
+10. Your members judge your gym by the worst thing you hand them. Usually that's the sign-up form.</div></div>
+
+  <div class="card warn">
+    <h4>Two rules, non-negotiable</h4>
+    <ul class="tick" style="margin-top:9px">
+      <li>Post it yourself, by hand, every time. Never automate Instagram — not posting, not DMs, not follows.
+        It's the one thing that can cost you the account, and the account is the business right now.</li>
+      <li>Never invent a number, a client or a testimonial. You don't have clients yet and that's fine —
+        "I built two apps and here they are" beats a made-up case study, and it can't blow up on you later.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== BIO ===== -->
+<section id="bio">
+  <span class="lab">Setup</span>
+  <h2>Bio and link.</h2>
+  <p class="intro">You've got about four seconds and 150 characters. Say what you do and who for.
+    No "entrepreneur", no rocket emoji.</p>
+  <div class="copy"><div class="ch"><span class="t">Instagram bio</span><button data-copy>Copy</button></div>
+<div class="cb">Coachbuilt
+I build gyms, clubs &amp; academies their own system — bookings, roll, payments, member app.
+Basketball coach who got sick of software that didn't fit.
+Sydney. Price is on the page ↓</div></div>
+  <ul class="tick">
+    <li>Link goes straight to your page. Not Linktree — one link, one job.</li>
+    <li>Make a separate account (<b>@coachbuilt.au</b> or similar) once you've got two clients.
+      Until then post it from the account that already has people on it — a real coach with a real following
+      beats an empty business page every time.</li>
+    <li>Pin reels 1, 2 and 4 to the top of the grid in that order.</li>
+  </ul>
+</section>
+
+<!-- ===== DMs ===== -->
+<section id="dms">
+  <span class="lab">Outreach</span>
+  <h2>The DMs.</h2>
+  <p class="intro">The first message is a question, never a pitch. You're finding out what they use and what
+    annoys them — which is also exactly what you need to know to sell them. Don't send the link until they've replied.</p>
+
+  <h3>1 · Cold — a gym or club you don't know</h3>
+  <div class="copy"><div class="ch"><span class="t">Swap the [bracket] bits</span><button data-copy>Copy</button></div>
+<div class="cb">Hey [name] — I coach basketball over in [your suburb].
+
+Random question: what do you use to run [gym name]'s bookings and roll?
+
+I ended up building my own app for my program because nothing fit properly, and I've started doing it for other coaches. Not pitching you — genuinely curious what you're on and what does your head in about it.</div></div>
+
+  <h3>2 · They replied and named their software</h3>
+  <div class="copy"><div class="ch"><span class="t">Now you can show the link</span><button data-copy>Copy</button></div>
+<div class="cb">Yeah, that's the one everyone says. [Their specific gripe] is the bit I could never get around either.
+
+That's basically why I built my own — it does [the thing they just complained about] the way I'd actually do it by hand.
+
+If you ever want to see what yours would look like, I put the whole thing on one page: [link]. Price is on there too, no call needed to see it. Have a scroll, tell me if it's rubbish.</div></div>
+
+  <h3>3 · Warm — someone in your network, or a comment on a reel</h3>
+  <div class="copy"><div class="ch"><span class="t">Shorter, because they already know you</span><button data-copy>Copy</button></div>
+<div class="cb">Appreciate that mate. Serious question — how are you running [the thing they mentioned] at the moment?
+
+I've started building these for gyms and clubs properly now. If it sounds useful: [link], price and all.
+
+And if you know someone who'd need it more than you, send it to them instead — that's genuinely more useful to me right now.</div></div>
+
+  <h3>4 · One follow-up. Only one, then leave it.</h3>
+  <div class="copy"><div class="ch"><span class="t">Send 4-5 days later, then stop forever</span><button data-copy>Copy</button></div>
+<div class="cb">No stress if it's not a thing for you — last one from me.
+
+If it ever gets to the point where the admin's eating your week, I'm here: [link].
+
+Good luck with the season either way.</div></div>
+
+  <h3>5 · They asked the price in a comment</h3>
+  <div class="copy"><div class="ch"><span class="t">Answer it in public. Always.</span><button data-copy>Copy</button></div>
+<div class="cb">$890 a month for a single gym or club, $1,490 if you've got staff, juniors and parents to manage. Build's included, no setup fee, six month minimum — and you don't pay until you've seen it working on your phone.
+
+Full breakdown's on the page in my bio.</div></div>
+  <p class="sub sm">Answering price publicly is worth more than the lead you might lose. It's the single
+    biggest trust signal you have against every agency that says "book a call to discuss pricing".</p>
+</section>
+
+<!-- ===== LIST ===== -->
+<section id="list">
+  <span class="lab">Targets</span>
+  <h2>Where the twenty come from.</h2>
+  <div class="card">
+    <ul class="plain">
+      <li><b>1.</b> Every basketball club and academy you've played against, trained at, or know a coach at.
+        Start here — this is your actual edge and nobody else has it.</li>
+      <li><b>2.</b> The coaches in your phone. Not the gyms — the individual coaches who run their own programs.
+        They're the easiest yes and they'll refer you upward.</li>
+      <li><b>3.</b> Instagram: search your suburb + "basketball academy", "strength gym", "PT studio", "junior program".
+        Follow, watch a few reels, then DM. Don't DM cold off a search result with no context.</li>
+      <li><b>4.</b> Anyone who's ever posted "sorry for the late notice" or a payment reminder to their members' story.
+        That's a person with the exact problem you solve, advertising it publicly.</li>
+      <li><b>5.</b> Gyms whose booking link is a Google Form or a DM. Instant qualifier — they've already
+        outgrown what they've got.</li>
+    </ul>
+  </div>
+  <div class="card dark">
+    <h4>Who to say no to</h4>
+    <p class="sm" style="margin-top:8px">Under 50 members with no growth plan, anyone who wants to pay per feature,
+      anyone who says "can you just build it cheap and I'll pay you when it makes money", and anyone who needs it
+      integrated with a system they won't give you access to. Saying no to those keeps you alive for the good ones.</p>
+  </div>
+</section>
+
+<!-- ===== CALL ===== -->
+<section id="call">
+  <span class="lab">The call</span>
+  <h2>Twenty minutes, in this order.</h2>
+  <p class="intro">You're not presenting. You're diagnosing, then repeating their problem back to them
+    more clearly than they said it. That's the moment they decide to buy — before you've named a price.</p>
+
+  <ol class="steps">
+    <li><b>0–2 min · Open and shut up</b>
+      "Thanks for the time. Just walk me through how the place actually runs day to day." Then say nothing.
+      Let them talk for two minutes without you filling the gaps.</li>
+    <li><b>2–10 min · The five questions</b>
+      Ask these, in this order, and write down their exact words:
+      <div class="copy" style="margin-top:10px"><div class="ch"><span class="t">Ask exactly these</span><button data-copy>Copy</button></div>
+<div class="cb">1. How does someone new actually sign up right now — walk me through it like I'm them.
+2. How do you take the roll, and where does it end up?
+3. How do people pay you, and how do you know who hasn't?
+4. What do you end up doing on a Sunday night that you shouldn't be doing?
+5. If I could only fix one of those, which one?</div></div>
+    </li>
+    <li><b>10–14 min · Play it back</b>
+      "So the actual job here is [their thing, in their words]. Everything else is downstream of that."
+      If they say "yeah, exactly" — you've sold it. If they correct you, even better, ask more.</li>
+    <li><b>14–18 min · What you'd build</b>
+      Describe their system in their language, not features. "You'd have one screen on a Sunday that tells you
+      who trained and who hasn't paid, and the parents get told automatically." Then the two weeks, then the
+      "if it's not right you walk" line.</li>
+    <li><b>18–20 min · Price, then silence</b>
+      Say the number. Stop talking. Do not fill the pause, do not justify it, do not offer a discount into the
+      silence — that pause is them deciding, and whoever talks first loses.</li>
+    <li><b>Close</b>
+      "I can start Monday. I'll send you a one-pager tonight with exactly what's in it and the six-month terms —
+      have a read and tell me yes or no by Friday." Book the build date on the call.</li>
+  </ol>
+
+  <div class="card warn">
+    <h4>The one rule</h4>
+    <p class="sm" style="margin-top:7px">Never quote before you've played their problem back to them.
+      A price with no diagnosis is just a number to compare against Mindbody. A price after the diagnosis is
+      the cost of fixing the thing they just spent ten minutes complaining about.</p>
+  </div>
+</section>
+
+<!-- ===== MONEY ===== -->
+<section id="money">
+  <span class="lab">Price</span>
+  <h2>Talking about money.</h2>
+  <div class="scroll">
+    <table class="tbl">
+      <tr><th>They say</th><th>You say</th></tr>
+      <tr><td>"That's a lot."</td><td>"Compared to what? Let's add up what you're on now — genuinely, get the bills up."
+        Then walk them through the calculator on your page.</td></tr>
+      <tr><td>"Can you do it cheaper?"</td><td>"I can do you <b>less</b> — Court One instead of Full Court.
+        I won't do the same thing for less, because then I'd resent it by month three and you'd feel it."</td></tr>
+      <tr><td>"Why six months?"</td><td>"Because I'm not charging you a build fee. The build costs me two weeks
+        either way — six months is how I get that back. If I charged $6k upfront you could go monthly from day one."</td></tr>
+      <tr><td>"Can I pay for the build and own it?"</td><td>"Yes — after twelve months you can buy it out.
+        Before that it doesn't work for me, and honestly it wouldn't work for you either: you'd own code with
+        nobody maintaining it."</td></tr>
+      <tr><td>"What if it doesn't work out?"</td><td>"You've seen it working before you pay anything.
+        After that, six months, then you're free. Your data exports the day you leave."</td></tr>
+      <tr><td>"Send me a proposal."</td><td>"I'll send you one page tonight — what's in it, the price, the terms.
+        If it needs more than a page I've overcomplicated it."</td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Hold these lines</h4>
+    <ul class="tick" style="margin-top:9px">
+      <li>Never discount the monthly. Drop the scope instead. A discount tells them the first number was made up.</li>
+      <li>Never do a free build "for the portfolio". You already have a portfolio — it's your two apps.</li>
+      <li>Never price per member. That's the trap the incumbents are in and the reason you beat them.</li>
+      <li>First client can have a founding rate if you want one — but call it that, make it permanent for them,
+        and never repeat it. "Founding rate, locked for as long as you stay" is a gift. "I'll do you a deal" is a leak.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ===== OBJECTIONS ===== -->
+<section id="objections">
+  <span class="lab">Objections</span>
+  <h2>What you'll actually hear.</h2>
+  <div class="scroll">
+    <table class="tbl">
+      <tr><th>Objection</th><th>The answer</th></tr>
+      <tr><td>"We're already on Clubworx / Mindbody."</td>
+          <td>"How much of it do you actually use? Everyone I talk to uses about a third and works around the rest.
+            I'm not selling you more software — I'm selling you the third you use, shaped right, with your name on it."</td></tr>
+      <tr><td>"How do I know you won't disappear?"</td>
+          <td>"You don't, yet. So here's what protects you: your data exports any time, and it's written down that
+            if I stop, the code's yours. That's more than your current provider gives you."</td></tr>
+      <tr><td>"Have you done this for a gym before?"</td>
+          <td>Don't dodge it. "Not a gym — I've done it twice for myself, and both are live, you can open one now.
+            You'd be my first gym, which is exactly why you're not paying a build fee and why you can walk at day eleven."</td></tr>
+      <tr><td>"Two weeks sounds too fast."</td>
+          <td>"It's fast because I'm not starting from scratch — sign-ups, check-ins, payments, notifications,
+            staff logins all already exist. Your build is arranging them around how you run it."</td></tr>
+      <tr><td>"My members won't use another app."</td>
+          <td>"They won't download one. This installs off a link in two taps, no app store, and it's got your logo
+            on it not a stranger's. Different thing entirely."</td></tr>
+      <tr><td>"Let me think about it."</td>
+          <td>"Course. What's the bit you're unsure on — the money, or whether it'll actually fix the Sunday job?"
+            Then answer <em>that</em>. "Let me think" almost always means one specific unspoken doubt.</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ===== DELIVERY ===== -->
+<section id="deliver">
+  <span class="lab">After they say yes</span>
+  <h2>What two weeks can and can't be.</h2>
+  <p class="intro">The fastest way to lose the first client is to promise week-six things in week one.
+    Be exact about what lands on day eleven.</p>
+  <div class="card">
+    <h4>In the first two weeks — promise these</h4>
+    <ul class="tick" style="margin-top:9px">
+      <li>Their branding: name, logo, colours, their own link</li>
+      <li>Member sign-up and a member list you can search</li>
+      <li>Timetable and bookings, with capacity</li>
+      <li>Attendance / check-in, however they actually take a roll</li>
+      <li>A payment link that goes to <b>their</b> Stripe account, not yours</li>
+      <li>An admin screen: who's in, who's paid, who's gone quiet</li>
+      <li>Installs on a phone from a link</li>
+    </ul>
+  </div>
+  <div class="card dark">
+    <h4>Say "month two" to these — out loud, on the call</h4>
+    <ul class="tick" style="margin-top:9px">
+      <li>Migrating years of old member history out of their current system</li>
+      <li>Direct debit, refunds, failed-payment chasing, anything accounting-shaped</li>
+      <li>Integrating with software they can't give you a login for</li>
+      <li>An App Store / Play Store listing (it installs from a link — that's the point)</li>
+      <li>Push notifications if you're on Court One — that's a Full Court thing</li>
+    </ul>
+    <p class="sm" style="margin-top:12px;color:#B5AC9A">Naming these before they ask makes you look like you've
+      done it fifty times. Getting caught out by one in week three makes you look like you haven't.</p>
+  </div>
+  <div class="card warn">
+    <h4>Take these on day one</h4>
+    <p class="sm" style="margin-top:7px">Their logo file, their colours, their current member list as a spreadsheet,
+      their timetable, their Stripe login (they create it, you connect it), and one sentence describing every
+      membership type they sell. If you don't have all seven, don't start the clock on the two weeks.</p>
+  </div>
+</section>
+
+<!-- ===== NUMBERS ===== -->
+<section id="numbers">
+  <span class="lab">The maths</span>
+  <h2>What this is actually worth.</h2>
+  <div class="scroll">
+    <table class="tbl">
+      <tr><th>Clients</th><th>Mix</th><th>Per month</th><th>Per year</th></tr>
+      <tr><td><b>1</b></td><td>Court One</td><td><b>$890</b></td><td><b>$10,680</b></td></tr>
+      <tr><td><b>3</b></td><td>2 × Court One + 1 × Full Court</td><td><b>$3,270</b></td><td><b>$39,240</b></td></tr>
+      <tr><td><b>5</b></td><td>3 × Court One + 2 × Full Court</td><td><b>$5,650</b></td><td><b>$67,800</b></td></tr>
+      <tr><td><b>8</b></td><td>4 × Court One + 4 × Full Court</td><td><b>$9,520</b></td><td><b>$114,240</b></td></tr>
+    </table>
+  </div>
+  <div class="card">
+    <h4>Read this bit properly</h4>
+    <ul class="tick" style="margin-top:9px">
+      <li><b>Three clients is the real goal.</b> Not ten. Three paying clients is about $39k a year and,
+        more importantly, three case studies — which is what turns cold DMs into inbound.</li>
+      <li><b>Somewhere around eight, delivery becomes the constraint,</b> not sales. Eight clients all wanting
+        "one new feature a month" is eight builds a month on top of support. Put the price up before you hit that,
+        not after.</li>
+      <li><b>Cashflow is the catch of monthly-only.</b> You carry two weeks of build before a single dollar arrives,
+        every time. Two builds at once is fine. Four is not — stagger the start dates.</li>
+      <li><b>The six-month minimum is what makes this survivable.</b> $890 × 6 = $5,340 guaranteed per client.
+        Don't ever let someone talk you out of it; it's the only thing standing in for the build fee you're not charging.</li>
+    </ul>
+  </div>
+</section>
+
+<div class="foot2">
+  <p><b>Before you send the link to anyone:</b> the name Coachbuilt is clear in the gym and sports software space
+    (Baseline, the one I checked first, is already taken by a US sports facility platform — that's why it's not that).
+    Do a quick ABN and domain search before you print anything or take money under it.</p>
+  <p style="margin-top:12px">Public page: <a class="link" href="coachbuilt.html">coachbuilt.html</a> ·
+    Leads land in Netlify Forms and in your Supabase <code>cb_leads</code> table.</p>
+</div>
+</main>
+
+<script>
+document.addEventListener('click', function(e){
+  var b = e.target.closest('[data-copy]');
+  if (!b) return;
+  var box = b.closest('.copy').querySelector('.cb');
+  var txt = box.textContent.trim();
+  var mark = function(){
+    b.textContent = 'Copied'; b.classList.add('done');
+    setTimeout(function(){ b.textContent = 'Copy'; b.classList.remove('done'); }, 1600);
+  };
+  if (navigator.clipboard && window.isSecureContext){
+    navigator.clipboard.writeText(txt).then(mark, fallback);
+  } else { fallback(); }
+  function fallback(){
+    var ta = document.createElement('textarea');
+    ta.value = txt; ta.style.position='fixed'; ta.style.opacity='0';
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); mark(); }
+    catch(_){ b.textContent = 'Select it'; }
+    document.body.removeChild(ta);
+  }
+});
+</script>
+</body>
+</html>
