@@ -43,3 +43,16 @@
     X-Frame-Options = "SAMEORIGIN"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+
+# --- Coachbuilt -----------------------------------------------------------
+# Short links: /coachbuilt is what goes in the IG bio and every DM, /kit is
+# the private playbook. Both are plain pages, so no publish-dir change.
+[[redirects]]
+  from = "/coachbuilt"
+  to = "/coachbuilt.html"
+  status = 301
+
+[[redirects]]
+  from = "/kit"
+  to = "/coachbuilt-kit.html"
+  status = 301
