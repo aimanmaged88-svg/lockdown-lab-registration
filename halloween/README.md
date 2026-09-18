@@ -1,76 +1,145 @@
-# Halloween Shop Run — Pinterest seasonal play (2026)
+# Hollow Press — Halloween printables shop (2026)
 
-Aiman's side business for the 2026 Halloween season: Pinterest shops riding the
-aesthetics of this season's film releases, then turning over to Christmas.
+Aiman's Halloween-season side business. Two parts:
 
-`playbook.html` is the whole deliverable — a self-contained operational page
-(movie calendar, five shop dossiers with copy-paste keyword/pin blocks, a dated
-launch sprint checklist, the IP rules, the Christmas turn, unit economics).
-Published as a private Artifact: <https://claude.ai/artifact/FGovE2zs9ucE7pGzqjBgGq>
+1. **`playbook.html`** — the strategy: what's releasing this season, the five
+   Pinterest shop concepts, the launch sprint, the IP rules, the Christmas turn.
+   Artifact: <https://claude.ai/artifact/FGovE2zs9ucE7pGzqjBgGq>
+2. **The shop itself** — a real product line, a storefront and Pinterest pins,
+   all built here. This is shop 03 from the playbook ("Haunted Carnival"),
+   built out in full because it's the highest-trending concept
+   (vintage Halloween ~200% YoY on Pinterest) and carries **zero IP risk** —
+   every act, label, name and line is original to this shop.
 
-Not wired into the Netlify site. This folder is notes + deliverable only, same
-as `giveaway/` and `pokemon-trade/`.
+Brand: **Hollow Press**, a fictional Victorian print house. Name is unregistered
+— **trademark-check it before printing anything with it on** (it's set in one
+place per file if you want to change it).
 
-## The three findings that shaped it
+---
 
-1. **No new Scream this season.** Scream 8 is tracking for 2027 (a Paramount
-   horror slot sits on 16 Jul 2027). The parody *Scary Movie* already ran in
-   2026 (~$231M) and Ghostface stays a top costume search — so Scream is an
-   **affiliate** line, never a product line.
-2. **The shipping cliff.** Started 18 Sep. Physical print-on-demand must be
-   listed by ~10 Oct (customer order cutoff ~17 Oct) to land before the 31st.
-   Digital (printables, party packs, cut files, wallpapers) has no cutoff and
-   sells through Halloween night — so digital first, physical only if listed in
-   the first fortnight. Printify/Printful publish exact cutoffs mid-October;
-   the page says to check their fulfilment pages then.
-3. **IP is the thing that ends shops.** You cannot sell a film's title,
-   characters, masks, logos, taglines or artwork — "inspired by" in a listing
-   title is still trademark use. Sell the *aesthetic* the film drives into
-   search; affiliate the licensed goods (full URLs only — Pinterest blocks
-   cloaked/shortened links, and FTC disclosure is required).
+## ⚠️ The products are NOT in this repo, on purpose
 
-## The five shops (aesthetic, not title)
+This repo is **public** and auto-deploys to Netlify. Anything committed here is
+a free download for anyone who guesses the URL. So `products/`, `dist/` and
+`previews/` are git-ignored and the sellable files live **only** on whatever
+platform takes the money and delivers them.
 
-| # | Shop | Wave behind it | Date |
-|---|------|----------------|------|
-| 01 | The Owens House — kitchen-witch autumn | Practical Magic 2 | 11 Sep, cinemas |
-| 02 | Prom Night, Red — 70s prom gone wrong | Carrie (Mike Flanagan, 8 eps) | 7 Oct, Prime Video |
-| 03 | Haunted Carnival — Victorian sideshow | vintage Halloween ~200% YoY; Pan's Labyrinth 4K | season |
-| 04 | Camp Final Girl — 80s summer camp | Crystal Lake (Friday the 13th prequel) | 15 Oct, Peacock |
-| 05 | The Manuscript — dark academia thriller | Verity (Colleen Hoover) | 2 Oct, cinemas |
+Regenerate them any time:
 
-Deliberately skipped: Resident Evil (18 Sep — gaming/gore audience, wrong
-platform), Clayface (23 Oct — comics crowd), Whalefall (16 Oct — no decor
-language), Insidious: The Bleeding World (21 Aug).
+```bash
+cd halloween/build
+ln -sfn /opt/node22/lib/node_modules node_modules   # or: npm i playwright
+node render.mjs          # 5 print products → ../products/*.pdf (A4 + US Letter)
+node walls.mjs           # 24 wallpapers    → ../products/gaslight-wallpapers/
+node shopimg.mjs         # storefront images → ../shop-img/
+node pinrender.mjs       # 12 Pinterest pins → ../pins/
+```
 
-## Key dates
+Then re-zip for upload (writes `dist/*.zip` with the licence file included) —
+the packaging step is in the session notes; it's ~30 lines of `zipfile`.
 
-- **Halloween 2026 is a Saturday** — parties run both 23–25 and 30–31 Oct.
-- ~10 Oct: last safe day to list anything that ships.
-- ~17 Oct: physical order cutoff; storefront goes digital-only.
-- 20 Oct: Christmas catalogue live (Pinterest Christmas search ramps through
-  October, peaks November).
-- 1 Nov: flip all five boards to their Christmas turn. Gothic-Christmas films
-  carry it: Ebenezer: A Christmas Carol (13 Nov), Violent Night 2 (4 Dec),
-  Werwulf (25 Dec).
+What *is* committed: the build sources (`build/`), the fonts, the storefront,
+the small shop images and the pins. Those are marketing, or they regenerate
+everything else.
 
-## Store decision
+---
 
-A true Pinterest shop (Shop tab, catalogue, shopping ads) needs a claimed
-website with a product feed → Shopify/WooCommerce. Etsy can't feed a Pinterest
-catalogue but lists digital goods in minutes and delivers them itself. **Call:
-Etsy now + manual pinning for Halloween, Shopify catalogue for Christmas.**
+## The product line
 
-## Maintaining the page
+| # | Product | Sheets | Price | File |
+|---|---------|--------|-------|------|
+| 1 | The Sideshow Set — 8 Victorian posters | 8 | $12 | `p1-sideshow.html` |
+| 2 | Poison & Apothecary Labels — 30 labels | 2 | $7 | `p2-poison.html` |
+| 3 | Haunted Carnival Party Pack | 8 | $14 | `p3-party.html` |
+| 4 | Admit One — 40 tickets, tags, tokens | 3 | $5 | `p4-tickets.html` |
+| 5 | The Mourning Table — dinner set for 16 | 6 | $9 | `p5-table.html` |
+| 6 | Gaslight Wallpapers — 12 designs × 2 sizes | 24 files | $4 | `p6-wallpapers.html` |
+| 7 | The Whole Vault — all of it | — | $29 | (bundle zip) |
 
-Edit `playbook.html` and republish to the SAME Artifact URL (pass it as `url`
-from a new conversation, or republish the same file path in the original one) —
-publishing without the URL creates a duplicate.
+27 printable pages + 24 wallpapers. Prices USD; AUD equivalents in `LISTINGS.md`.
 
-The sprint checklist persists via the Artifact `db` capability (doc
-`progress/sprint`, `{done:{<id>:true}}`), with a localStorage fallback
-(`hsr_done`) so it still works if db is unavailable. Declaring `db` makes the
-artifact organisation-internal — it cannot be shared by public link.
+---
 
-Release dates were current at 18 Sep 2026 and move. Recheck before building a
-listing on one.
+## Design decisions worth keeping
+
+- **Printables are ink-on-white line work, never flood-filled.** A customer
+  prints these on a home printer. Solid dark backgrounds drain cartridges and
+  streak, and it's also what a real letterpress broadside looked like. The
+  banner pennants were rebuilt from filled triangles to outlines for exactly
+  this reason. The wallpapers are the one dark product — they only touch a screen.
+- **No `clip-path` in print artwork.** Chromium's print-to-PDF rasterises it,
+  which makes cut edges print soft — and it bloated the tickets PDF from 182KB
+  to 1067KB. Shaped artwork (tags, pennants) is inline SVG with
+  `vector-effect="non-scaling-stroke"`, so it stays vector at any scale.
+- **Everything inside a 12mm safe margin.** Home printers can't full-bleed.
+- **Ornaments are SVG backgrounds, not glyphs.** `❧`/`❦` aren't in IM Fell, so
+  they fell back to something ugly. Fixed in `brand.css`.
+- **Fold-over items print in two halves, the top rotated 180°.** Place cards,
+  table numbers and table tents all read from both sides and no type ever
+  straddles the crease. (The table tents shipped broken first — text sat
+  directly on the fold.)
+- **Storefront previews are 560px wide** — fine on screen, far too soft to
+  print. A preview should never be usable as the product.
+
+## Fonts
+
+`assets/fonts/` — Rye, Alfa Slab One, IM Fell English (roman + italic), IM Fell
+English SC, Cinzel (variable 400–700), Special Elite, Pirata One. All OFL /
+Apache, all cleared for commercial print use, latin subsets, 280KB total.
+
+Pulled from the Google Fonts CSS2 API — note it returns **multiple unicode
+subsets per weight** and some families are variable (one file covers the whole
+range), so pick the block whose `unicode-range` contains `U+0000-00FF` per
+weight/style or you end up with latin-ext files named as weights.
+
+---
+
+## The storefront
+
+`index.html` — deploys with the repo, reachable at `/halloween/`.
+
+**To make it sell, paste checkout links.** One `CHECKOUT` object near the bottom
+of the file, one URL per product. Until they're filled in, the buttons are
+disabled and a yellow setup banner explains what to do; the banner removes
+itself once every link is set.
+
+Those links should come from a platform that takes the money **and** delivers
+the file — Payhip, Gumroad, Lemon Squeezy or Etsy — so card details, file
+delivery and GST/VAT are never handled here.
+
+**Store recommendation** (from the playbook): Etsy first for its own search
+traffic, own storefront alongside it for margin, Shopify + a real Pinterest
+catalogue later for Christmas. Etsy cannot feed a Pinterest catalogue; Shopify
+can.
+
+**Domain:** it currently sits under the Certified Hooper Netlify site, which is
+an odd neighbour for a Halloween brand. Fine for launch; a cheap dedicated
+domain (or its own Netlify site pointed at this folder) is tidier.
+
+---
+
+## Files
+
+```
+halloween/
+  playbook.html        the strategy page (also a published artifact)
+  index.html           the storefront — paste checkout links here
+  LISTINGS.md          titles, 13 Etsy tags, descriptions, pin copy per product
+  assets/fonts/        7 OFL/Apache faces
+  shop-img/            small storefront previews (committed)
+  pins/                12 finished 1000×1500 Pinterest pins (committed)
+  build/
+    brand.css          shared print brand: tokens, type roles, rules, ornaments
+    p1…p6*.html        the products; repetitive content is generated in JS
+    render.mjs         products → A4 + US Letter PDFs + preview PNGs
+    walls.mjs          wallpapers → JPEGs at two phone sizes
+    shopimg.mjs        storefront images
+    pins.html          pin layouts (light + dark variants)
+    pinrender.mjs      pins → JPEGs
+    sheet.mjs          contact sheet of any product, for reviewing a whole pack
+    overflow.mjs       checks every sheet for content escaping the page
+  products/ dist/ previews/    GIT-IGNORED — the sellable files
+```
+
+Run `node build/overflow.mjs` after editing any product — it catches content
+running off a sheet, which is invisible until someone prints it.

@@ -1,0 +1,14 @@
+# The sellable files must NEVER be committed.
+#
+# This repository is public and auto-deploys to Netlify, so anything in here
+# becomes a free download for anyone who guesses the URL. The products live
+# only on the platform that takes the money and delivers them (Payhip /
+# Gumroad / Etsy). Everything here is regenerated with `node build/render.mjs`.
+products/
+dist/
+previews/
+
+# build scratch
+build/node_modules
+build/_wp.html
+build/_pin.html

@@ -1,0 +1,419 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Hollow Press — printable vintage Halloween</title>
+<meta name="description" content="Letterpress-style Halloween printables: sideshow posters, poison jar labels, party kits, tickets and table sets. Instant download, A4 and US Letter.">
+<meta property="og:title" content="Hollow Press — printable vintage Halloween">
+<meta property="og:description" content="Sideshow posters, poison labels, party kits. Instant download, print at home tonight.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="pins/pin-01_8-sideshow-posters.jpg">
+<meta name="theme-color" content="#120A10">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23120A10'/><path d='M16 6l8 10-8 10-8-10z' fill='%23E8C27A'/></svg>">
+<style>
+  @font-face{font-family:"HPShow";   src:url("assets/fonts/rye-400.woff2") format("woff2");          font-display:swap}
+  @font-face{font-family:"HPSlab";   src:url("assets/fonts/alfaslab-400.woff2") format("woff2");     font-display:swap}
+  @font-face{font-family:"HPText";   src:url("assets/fonts/imfell-400.woff2") format("woff2");       font-style:normal; font-display:swap}
+  @font-face{font-family:"HPText";   src:url("assets/fonts/imfell-400i.woff2") format("woff2");      font-style:italic; font-display:swap}
+  @font-face{font-family:"HPCaps";   src:url("assets/fonts/imfellsc-400.woff2") format("woff2");     font-display:swap}
+  @font-face{font-family:"HPEngrave";src:url("assets/fonts/cinzel-400.woff2") format("woff2");       font-weight:400 700; font-display:swap}
+  @font-face{font-family:"HPType";   src:url("assets/fonts/specialelite-400.woff2") format("woff2"); font-display:swap}
+
+  /* A shop commits to its brand rather than following the OS theme. */
+  :root{
+    --bg:#120A10; --bg2:#1B0F18; --card:#1E1119; --line:#3A2430;
+    --bone:#F0E4CA; --dim:#B6A28F; --faint:#8A7A6D;
+    --ox:#C0424E; --gold:#E8C27A; --plum:#4A2740;
+    --disp:"HPSlab",Georgia,serif;
+    --show:"HPShow",Georgia,serif;
+    --text:"HPText",Georgia,serif;
+    --caps:"HPCaps",Georgia,serif;
+    --eng:"HPEngrave",Georgia,serif;
+    --tw:"HPType",ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{margin:0; background:var(--bg); color:var(--bone);
+    font-family:var(--text); font-size:17px; line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+    background-image:radial-gradient(120% 60% at 50% -8%, rgba(232,194,122,.10) 0%, rgba(0,0,0,0) 62%)}
+  a{color:var(--gold)}
+  img{max-width:100%; display:block}
+  .wrap{max-width:1080px; margin:0 auto; padding-inline:18px}
+
+  .caps{font-family:var(--caps); text-transform:uppercase; letter-spacing:.28em}
+  .rule{border:0; border-top:1px solid var(--line); margin:0}
+
+  /* ---------- setup banner: removes itself once checkout links are set ---------- */
+  #setup{background:var(--gold); color:#1A1418; font-family:var(--tw);
+    font-size:13.5px; line-height:1.55; padding:14px 18px}
+  #setup b{font-family:var(--caps); letter-spacing:.2em; text-transform:uppercase;
+    font-size:12px; display:block; margin-bottom:5px}
+  #setup code{background:rgba(0,0,0,.14); padding:1px 5px}
+
+  /* ---------- header ---------- */
+  header{border-bottom:1px solid var(--line); background:rgba(10,6,9,.72);
+    backdrop-filter:blur(8px); position:sticky; top:0; z-index:20}
+  header .row{display:flex; align-items:center; justify-content:space-between;
+    gap:16px; padding-block:14px}
+  .mark{display:flex; align-items:center; gap:11px; text-decoration:none; color:var(--bone)}
+  .mark .dia{width:17px; height:17px; background:var(--gold);
+    clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%); flex:none}
+  .mark .nm{font-family:var(--eng); font-weight:700; font-size:19px;
+    letter-spacing:.2em; text-transform:uppercase; white-space:nowrap}
+  header nav{display:flex; gap:22px; font-family:var(--caps);
+    text-transform:uppercase; letter-spacing:.2em; font-size:12px}
+  header nav a{color:var(--dim); text-decoration:none}
+  header nav a:hover{color:var(--gold)}
+  @media(max-width:620px){ header nav{display:none} }
+
+  /* ---------- hero ---------- */
+  .hero{text-align:center; padding-block:62px 46px; position:relative}
+  .hero .eyebrow{font-family:var(--caps); text-transform:uppercase;
+    letter-spacing:.38em; font-size:12.5px; color:var(--dim)}
+  .hero h1{font-family:var(--show); font-size:clamp(2.6rem,8vw,5.1rem);
+    line-height:1.0; margin:20px 0 0; color:var(--bone); text-wrap:balance}
+  .hero .lead{font-style:italic; font-size:clamp(1.05rem,2.6vw,1.34rem);
+    color:var(--dim); max-width:31ch; margin:20px auto 0; line-height:1.45}
+  .orn{width:210px; height:16px; margin:26px auto 0;
+    background:center/contain no-repeat
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 20"><g fill="%23E8C27A"><path d="M120 2l7 8-7 8-7-8z"/><path d="M96 6l4 4-4 4-4-4z"/><path d="M144 6l4 4-4 4-4-4z"/><rect x="8" y="9.4" width="76" height="1.2"/><rect x="156" y="9.4" width="76" height="1.2"/><circle cx="8" cy="10" r="2"/><circle cx="232" cy="10" r="2"/></g></svg>')}
+  .badges{display:flex; flex-wrap:wrap; gap:9px; justify-content:center; margin-top:30px}
+  .badges span{font-family:var(--tw); font-size:12px; letter-spacing:.1em;
+    text-transform:uppercase; border:1px solid var(--line); color:var(--dim);
+    padding:6px 12px}
+
+  /* ---------- products ---------- */
+  section{padding-block:56px}
+  .shead{text-align:center; margin-bottom:34px}
+  .shead .k{font-family:var(--caps); text-transform:uppercase;
+    letter-spacing:.34em; font-size:12px; color:var(--gold)}
+  .shead h2{font-family:var(--disp); font-size:clamp(1.7rem,4.4vw,2.5rem);
+    margin:10px 0 0; line-height:1.05}
+  .shead p{color:var(--dim); max-width:56ch; margin:12px auto 0; font-size:1rem}
+
+  .grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(285px,1fr)); gap:22px}
+  .card{background:var(--card); border:1px solid var(--line);
+    display:flex; flex-direction:column; overflow:hidden}
+  .card .shot{background:#0C070A; padding:26px 26px 0; position:relative;
+    display:flex; justify-content:center; align-items:flex-end; min-height:212px;
+    overflow:hidden}
+  .card .shot img{width:66%; box-shadow:0 16px 34px rgba(0,0,0,.6);
+    transform:rotate(-2.2deg) translateY(10px); transition:transform .3s}
+  .card:hover .shot img{transform:rotate(-1deg) translateY(2px)}
+  .card .shot .tag{position:absolute; top:0; right:0; background:var(--ox);
+    color:#fff; font-family:var(--tw); font-size:11px; letter-spacing:.14em;
+    text-transform:uppercase; padding:6px 12px}
+  .card .body{padding:20px 22px 22px; display:flex; flex-direction:column; flex:1}
+  .card h3{font-family:var(--disp); font-size:1.32rem; margin:0; line-height:1.12}
+  .card .cnt{font-family:var(--caps); text-transform:uppercase; letter-spacing:.2em;
+    font-size:11px; color:var(--gold); margin-top:7px}
+  .card .desc{color:var(--dim); font-size:.97rem; margin:11px 0 0}
+  .card ul{margin:13px 0 0; padding-left:17px; color:var(--dim);
+    font-size:.9rem; line-height:1.5}
+  .card li{margin-bottom:3px}
+  .card .buy{display:flex; align-items:center; justify-content:space-between;
+    gap:12px; margin-top:auto; padding-top:16px; border-top:1px solid var(--line)}
+  .card ul{margin-bottom:19px}
+  .card .price{font-family:var(--eng); font-weight:700; font-size:1.5rem;
+    letter-spacing:.04em}
+  .btn{font-family:var(--caps); text-transform:uppercase; letter-spacing:.2em;
+    font-size:12px; background:var(--gold); color:#1A1418; border:1px solid var(--gold);
+    padding:11px 19px; text-decoration:none; cursor:pointer; display:inline-block;
+    transition:background .16s,color .16s}
+  .btn:hover{background:transparent; color:var(--gold)}
+  .btn[aria-disabled="true"]{background:transparent; color:var(--faint);
+    border-color:var(--line); cursor:not-allowed}
+
+  /* ---------- bundle ---------- */
+  .bundle{border:1px solid var(--gold); background:
+    linear-gradient(180deg, rgba(232,194,122,.09), rgba(232,194,122,0) 70%);
+    padding:34px; display:grid; grid-template-columns:1.1fr .9fr; gap:32px;
+    align-items:center}
+  @media(max-width:760px){ .bundle{grid-template-columns:1fr; padding:26px} }
+  .bundle .k{font-family:var(--caps); text-transform:uppercase;
+    letter-spacing:.32em; font-size:11.5px; color:var(--gold)}
+  .bundle h2{font-family:var(--show); font-size:clamp(1.9rem,5vw,2.9rem);
+    margin:10px 0 0; line-height:1.02}
+  .bundle p{color:var(--dim); margin:14px 0 0}
+  .bundle .was{color:var(--faint); text-decoration:line-through;
+    font-family:var(--tw); font-size:15px; margin-left:9px}
+  .bundle .shots{display:flex; gap:10px; justify-content:center}
+  .bundle .shots img{width:31%; box-shadow:0 14px 30px rgba(0,0,0,.6)}
+  .bundle .shots img:nth-child(2){transform:translateY(-14px)}
+
+  /* ---------- how / faq ---------- */
+  .how{display:grid; grid-template-columns:repeat(3,1fr); gap:24px}
+  @media(max-width:760px){ .how{grid-template-columns:1fr} }
+  .how .h{border-top:2px solid var(--gold); padding-top:15px}
+  .how .h .n{font-family:var(--tw); font-size:12px; letter-spacing:.16em;
+    color:var(--gold); text-transform:uppercase}
+  .how .h h3{font-family:var(--disp); font-size:1.18rem; margin:8px 0 7px}
+  .how .h p{color:var(--dim); font-size:.96rem; margin:0}
+
+  details{border-bottom:1px solid var(--line); padding:15px 0}
+  details summary{cursor:pointer; font-family:var(--eng); font-weight:700;
+    font-size:1.03rem; letter-spacing:.03em; list-style:none}
+  details summary::-webkit-details-marker{display:none}
+  details summary::before{content:"+ "; color:var(--gold)}
+  details[open] summary::before{content:"\2212 "}
+  details p{color:var(--dim); margin:11px 0 0; font-size:.97rem}
+
+  /* ---------- footer ---------- */
+  footer{border-top:1px solid var(--line); padding-block:34px 44px;
+    color:var(--faint); font-size:.88rem; text-align:center}
+  footer .fm{font-family:var(--eng); font-weight:700; letter-spacing:.24em;
+    text-transform:uppercase; color:var(--dim); font-size:.92rem}
+  footer p{margin:11px auto 0; max-width:62ch}
+  @media (prefers-reduced-motion:reduce){ *{transition:none!important} }
+</style>
+</head>
+<body>
+
+<div id="setup" hidden></div>
+
+<header>
+  <div class="wrap row">
+    <a class="mark" href="#top"><span class="dia"></span><span class="nm">Hollow Press</span></a>
+    <nav>
+      <a href="#shop">The Sheets</a>
+      <a href="#vault">The Vault</a>
+      <a href="#how">How It Works</a>
+      <a href="#faq">Questions</a>
+    </nav>
+  </div>
+</header>
+
+<main id="top">
+  <div class="wrap hero">
+    <div class="eyebrow">Printable &middot; Instant &middot; A4 &amp; US&nbsp;Letter</div>
+    <h1>A Quieter<br>Halloween</h1>
+    <p class="lead">Victorian sideshow printables in burgundy, plum and antique gold. Letterpress, not clip art.</p>
+    <div class="orn"></div>
+    <div class="badges">
+      <span>Download in seconds</span>
+      <span>Print at home tonight</span>
+      <span>Easy on ink &mdash; line work, no flood fills</span>
+      <span>Print it as often as you like</span>
+    </div>
+  </div>
+
+  <hr class="rule">
+
+  <section id="shop" class="wrap">
+    <div class="shead">
+      <div class="k">The Sheets</div>
+      <h2>Everything on the shelf</h2>
+      <p>Every pack comes as two PDFs &mdash; A4 and US Letter &mdash; so it fits whatever paper is in your drawer. Cut lines, fold lines and printing notes are included.</p>
+    </div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section class="wrap" id="vault">
+    <div class="bundle">
+      <div>
+        <div class="k">Best Value</div>
+        <h2>The Whole Vault</h2>
+        <p>Every sheet on this page &mdash; 27 printable pages and 24 wallpapers &mdash; plus everything we print for the rest of the season, sent to the same download link.</p>
+        <div class="buy" style="border:0;margin-top:22px;padding:0;justify-content:flex-start;gap:18px">
+          <span class="price">$29<span class="was">$51</span></span>
+          <a class="btn" data-buy="vault" href="#">Take the lot</a>
+        </div>
+      </div>
+      <div class="shots">
+        <img src="shop-img/the-sideshow-set.jpg" alt="Sideshow poster sheet" loading="lazy">
+        <img src="shop-img/poison-apothecary-labels.jpg" alt="Poison label sheet" loading="lazy">
+        <img src="shop-img/party-menu.jpg" alt="Drinks menu sheet" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap" id="how">
+    <div class="shead">
+      <div class="k">How It Works</div>
+      <h2>Bought at nine, on the wall by ten</h2>
+    </div>
+    <div class="how">
+      <div class="h">
+        <div class="n">First</div>
+        <h3>Pay, and the files are yours</h3>
+        <p>The download link arrives straight away. Nothing is posted, so there is no cut-off date and nothing to miss.</p>
+      </div>
+      <div class="h">
+        <div class="n">Then</div>
+        <h3>Print at 100%</h3>
+        <p>Pick the A4 or US Letter file and print at actual size, not &ldquo;fit to page&rdquo;. Card stock for labels and tickets, plain paper for posters.</p>
+      </div>
+      <div class="h">
+        <div class="n">Last</div>
+        <h3>Cut on the heavy lines</h3>
+        <p>Solid lines are cuts, dashed lines are guides, dotted lines are folds. Scissors are plenty &mdash; no machine needed.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap" id="faq">
+    <div class="shead">
+      <div class="k">Questions</div>
+      <h2>Before you buy</h2>
+    </div>
+    <div style="max-width:70ch;margin:0 auto">
+      <details open>
+        <summary>What actually turns up?</summary>
+        <p>A zip holding two PDFs &mdash; one A4, one US Letter &mdash; and a short printing and licence note. Wallpapers arrive as JPEGs in two phone sizes. No physical items, nothing in the post.</p>
+      </details>
+      <details>
+        <summary>Will it eat my ink?</summary>
+        <p>No. Every printable sheet is line work and type on white, the way a letterpress broadside actually was. There are no full-bleed dark backgrounds anywhere in the printables &mdash; that is a deliberate design decision, not a shortcut. The wallpapers are dark, but they only ever touch a screen.</p>
+      </details>
+      <details>
+        <summary>Can I use these for my shop, my event, my client?</summary>
+        <p>Print as much as you like for yourself, your home, your party or your classroom. You may not resell the files, share them, sell printed copies or fold them into another product. If you want to use them commercially, ask &mdash; we will usually say yes.</p>
+      </details>
+      <details>
+        <summary>My printer cuts off the edges.</summary>
+        <p>Everything sits inside a 12mm safe margin, so a normal home printer will not clip it &mdash; as long as you print at 100% and not &ldquo;fit to page&rdquo;, which shrinks the sheet and throws the cut lines out.</p>
+      </details>
+      <details>
+        <summary>Is any of this from a film or a TV show?</summary>
+        <p>None of it. Every act, label, name and line here was written and drawn for this shop. Nothing is borrowed from anyone's film, book or franchise, and nothing carries anyone else's trademark.</p>
+      </details>
+      <details>
+        <summary>Refunds?</summary>
+        <p>Digital files cannot really be returned, so we do not offer refunds as a rule &mdash; but if something is broken, wrong, or not what the listing promised, reply to your order and we will fix it or refund you.</p>
+      </details>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="fm">Hollow Press</div>
+    <p>Printable ephemera for the last night of October. All artwork original. Typeset in Rye, Alfa Slab One, IM Fell English and Cinzel, all open-licensed.</p>
+  </div>
+</footer>
+
+<script>
+/* ===========================================================================
+   CHECKOUT LINKS — the only thing you need to edit.
+   ---------------------------------------------------------------------------
+   Paste the payment link for each product between the quotes. Any product
+   left blank shows a disabled button, and the yellow setup banner at the top
+   of the page disappears by itself once every link is filled in.
+
+   Where the links come from: set each product up on a platform that takes the
+   money AND delivers the file (Payhip, Gumroad, Lemon Squeezy or Etsy), then
+   copy its product URL in here. That way you never handle card details or
+   file delivery yourself, and GST/VAT is worked out for you.
+
+   Prices below are USD — most Pinterest traffic is American. Change the
+   `price` strings if you would rather sell in AUD.
+   =========================================================================== */
+const CHECKOUT = {
+  "sideshow":   "",
+  "poison":     "",
+  "party":      "",
+  "tickets":    "",
+  "table":      "",
+  "wallpapers": "",
+  "vault":      ""
+};
+
+const PRODUCTS = [
+  { key:"sideshow", title:"The Sideshow Set", price:"$12", tag:"8 posters",
+    count:"8 sheets &middot; A4 + US Letter",
+    img:"shop-img/the-sideshow-set.jpg",
+    desc:"Eight Victorian sideshow bills — the Hollow Man, Madame Vesper, the Hall of Mirrors, the Last Carousel. Each one a full page of proper playbill typography.",
+    bullets:["Eight different posters, five layouts","Prints on plain paper","Frame them or peg them on a line"] },
+
+  { key:"poison", title:"Poison &amp; Apothecary Labels", price:"$7", tag:"30 labels",
+    count:"2 sheets &middot; 30 labels",
+    img:"shop-img/poison-apothecary-labels.jpg",
+    desc:"Thirty jar labels in three alternating treatments. Real botanicals, real Latin names, and dosing notes that are none of your business.",
+    bullets:["Belladonna, hemlock, wolfsbane, mandrake…","Fits standard jam and spice jars","Cut guides on every label"] },
+
+  { key:"party", title:"Haunted Carnival Party Pack", price:"$14", tag:"best value",
+    count:"8 sheets &middot; the whole room",
+    img:"shop-img/haunted-carnival-party-pack.jpg",
+    desc:"One download and the room is done: invitations, a banner that spells HAUNTED CARNIVAL, photo-booth signs, table tents and a drinks menu.",
+    bullets:["Invitations, 2 per sheet, lines to fill in","18 banner pennants, outlined not flooded","4 photo-booth signs + 4 table tents + menu"] },
+
+  { key:"tickets", title:"Admit One — Tickets &amp; Tags", price:"$5", tag:"40 pieces",
+    count:"3 sheets &middot; 40 pieces",
+    img:"shop-img/admit-one-tickets-and-tags.jpg",
+    desc:"Twelve tear-off admission stubs with numbered spines, twelve gift tags and sixteen ride tokens. The small things that make a party look planned.",
+    bullets:["Numbered stubs with a torn spine","Punch-hole gift tags","Drink and ride tokens"] },
+
+  { key:"table", title:"The Mourning Table", price:"$9", tag:"dinner set",
+    count:"6 sheets &middot; seats 16",
+    img:"shop-img/the-mourning-table.jpg",
+    desc:"A dinner service for the last night of October: sixteen fold-over place cards, a six-course menu, table numbers I–XII and a seating plan for the door.",
+    bullets:["Place cards read from both sides","Menu you can print as-is","Table numbers I to XII"] },
+
+  { key:"wallpapers", title:"Gaslight Wallpapers", price:"$4", tag:"24 files",
+    count:"12 designs &middot; 2 phone sizes",
+    img:"shop-img/party-menu.jpg",
+    desc:"Twelve phone wallpapers from the same world, set low on the screen so they sit clear of your clock. Supplied for both iPhone and Android.",
+    bullets:["1290 × 2796 and 1440 × 3120","Type clear of the lock-screen clock","Dark enough that your icons still read"] },
+];
+
+/* ---- wallpapers get their own artwork rather than a printed sheet ---- */
+const WALL_IMG = "pins/pin-09_12-phone-wallpapers.jpg";
+
+const grid = document.getElementById("grid");
+grid.innerHTML = PRODUCTS.map(p => {
+  const href = CHECKOUT[p.key];
+  const live = !!href;
+  const img = p.key === "wallpapers" ? WALL_IMG : p.img;
+  const fit = p.key === "wallpapers" ? "width:92%;transform:none" : "";
+  return `
+  <article class="card">
+    <div class="shot">
+      ${p.tag ? `<span class="tag">${p.tag}</span>` : ""}
+      <img src="${img}" alt="${p.title.replace(/&amp;/g,"&")}" loading="lazy" style="${fit}">
+    </div>
+    <div class="body">
+      <h3>${p.title}</h3>
+      <div class="cnt">${p.count}</div>
+      <p class="desc">${p.desc}</p>
+      <ul>${p.bullets.map(b => `<li>${b}</li>`).join("")}</ul>
+      <div class="buy">
+        <span class="price">${p.price}</span>
+        ${live
+          ? `<a class="btn" href="${href}" rel="noopener">Get it</a>`
+          : `<a class="btn" href="#" aria-disabled="true" title="Checkout link not set yet">Get it</a>`}
+      </div>
+    </div>
+  </article>`;
+}).join("");
+
+/* the vault button */
+(function(){
+  const a = document.querySelector('[data-buy="vault"]');
+  if (CHECKOUT.vault) { a.href = CHECKOUT.vault; a.rel = "noopener"; }
+  else { a.setAttribute("aria-disabled", "true"); a.title = "Checkout link not set yet"; }
+})();
+
+/* disabled buttons must not navigate */
+document.addEventListener("click", e => {
+  const a = e.target.closest('.btn[aria-disabled="true"]');
+  if (a) e.preventDefault();
+});
+
+/* ---- the setup banner, which deletes itself once the links are in ---- */
+(function(){
+  const missing = Object.keys(CHECKOUT).filter(k => !CHECKOUT[k]);
+  if (!missing.length) return;
+  const el = document.getElementById("setup");
+  el.hidden = false;
+  el.innerHTML = `<b>Setup — only you see this</b>
+    ${missing.length} of ${Object.keys(CHECKOUT).length} checkout links are still empty
+    (<code>${missing.join("</code>, <code>")}</code>).
+    Open <code>halloween/index.html</code>, find the <code>CHECKOUT</code> block near the
+    bottom, and paste each product's payment link between the quotes.
+    This banner disappears on its own once they are all filled in.`;
+})();
+</script>
+</body>
+</html>

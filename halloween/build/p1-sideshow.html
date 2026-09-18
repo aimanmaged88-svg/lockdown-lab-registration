@@ -1,0 +1,136 @@
+<title>The Sideshow Set</title>
+<link rel="stylesheet" href="brand.css">
+<style>
+  .po{display:flex; flex-direction:column; height:100%; text-align:center;
+      position:relative; z-index:1; padding:8mm 6mm}
+  .po .top{font-family:"HPCaps",serif; font-size:3.4mm; letter-spacing:.34em;
+      text-transform:uppercase; color:var(--smoke)}
+  .po .only{font-family:"HPText",serif; font-style:italic; font-size:6mm; margin-top:2mm}
+  .po .name{margin:0; line-height:.92; letter-spacing:-.01em; word-break:break-word}
+  .po .sub{font-family:"HPText",serif; font-style:italic; font-size:6.4mm;
+      line-height:1.25; margin-top:4mm}
+  .po .pitch{font-family:"HPText",serif; font-size:5mm; line-height:1.52;
+      max-width:142mm; margin:0 auto}
+  .po .cry{font-family:"HPText",serif; font-style:italic; font-size:11mm;
+      line-height:1.1; max-width:150mm}
+  .po .adm{font-family:"HPEngrave",serif; font-size:4.2mm; letter-spacing:.18em;
+      text-transform:uppercase}
+  .po .fine{font-family:"HPType",monospace; font-size:2.7mm; letter-spacing:.09em;
+      line-height:1.7; text-transform:uppercase; color:var(--smoke)}
+  .po .docket{font-family:"HPCaps",serif; font-size:3mm; letter-spacing:.28em;
+      text-transform:uppercase; color:var(--smoke)}
+  .po .foot{display:flex; justify-content:space-between; align-items:baseline;
+      font-family:"HPCaps",serif; font-size:2.8mm; letter-spacing:.22em;
+      text-transform:uppercase; color:var(--smoke); margin-top:2.5mm}
+  .spacer{flex:0 1 auto; display:flex; align-items:center; justify-content:center;
+      padding:3mm 0; min-height:5mm}
+  .spacer.big{flex:1 1 auto}
+
+  /* A — centred broadside, fat slab name */
+  .lA .name{font-family:"HPSlab",serif; font-size:26mm}
+  /* B — carnival, arched feel via staggered scale */
+  .lB .name{font-family:"HPShow",serif; font-size:20mm; color:var(--oxblood)}
+  .lB .name span{display:block}
+  .lB .name span:nth-child(2){font-size:.72em}
+  /* C — two-colour, heavy rules */
+  .lC .name{font-family:"HPSlab",serif; font-size:22mm; color:var(--oxblood)}
+  .lC .band{background:var(--ink); color:#fff; padding:2mm 0; margin:3mm 0;
+      font-family:"HPEngrave",serif; font-size:4mm; letter-spacing:.3em; text-transform:uppercase}
+  /* D — sombre, engraved + blackletter */
+  .lD .name{font-family:"HPBlack",serif; font-size:23mm; color:var(--plum)}
+  .lD .sub{font-family:"HPCaps",serif; font-style:normal; letter-spacing:.14em;
+      text-transform:uppercase; font-size:4.6mm}
+  /* E — all type, no frame, big engraved */
+  .lE .name{font-family:"HPEngrave",serif; font-weight:700; font-size:15mm;
+      letter-spacing:.04em; line-height:1.05}
+</style>
+
+<div id="out"></div>
+
+<script>
+const ACTS = [
+  { l:"A", name:"THE<br>HOLLOW<br>MAN", sub:"He Casts No Shadow", cry:"Look At The Ground!",
+    pitch:"Brought at great expense from the drowned villages of the north, where he was found standing in a field at first light and has not sat down since. Stand close. Hold up your lamp. Watch the ground beside him stay bright.",
+    adm:"Admission — One Shilling", frame:1,
+    fine:"Persons of nervous disposition are advised to remain outside · No refunds" },
+
+  { l:"B", name:"MADAME<span>VESPER</span>", sub:"She Reads The Dead", cry:"Ask Her Anything",
+    pitch:"Bring the name of one you have lost and she will tell you the last thing they thought. She has been wrong twice in forty years and both were liars to begin with.",
+    adm:"One Penny, One Truth", frame:1,
+    fine:"Madame Vesper does not answer questions about money · Cash only" },
+
+  { l:"C", name:"THE SPIDER GIRL", sub:"Eight Legs, One Sorrow", cry:"Do Not Tap The Glass",
+    pitch:"She will not speak of how it happened and we have stopped asking. She takes her tea at four and asks only that you do not tap the glass.",
+    adm:"Sixpence", band:"Beyond The Green Curtain", frame:0,
+    fine:"Do not tap the glass · Do not tap the glass · Do not tap the glass" },
+
+  { l:"A", name:"THE HALL<br>OF MIRRORS", sub:"Enter As One,<br>Leave As Many", cry:"Sign The Register",
+    pitch:"Ninety-four panes of Belgian glass, set at angles a mathematician walked out of. The management keeps a register at the door. You are asked to sign it going in and again coming out, and to note any discrepancy.",
+    adm:"Threepence — Children Half Price", frame:1,
+    fine:"The management is not liable for what follows you home" },
+
+  { l:"E", name:"PROFESSOR MORNE'S<br>CABINET OF<br>CURIOSITIES", sub:"Curiosities Beyond Reason", cry:"Mind The Ninth Drawer",
+    pitch:"Two hundred specimens under glass. A tooth that grew in a locked box. A clock that runs backwards near candlelight. The hand of a man who is still alive and wants it returned.",
+    adm:"Admission Ninepence", frame:1,
+    fine:"Catalogue available · Do not open the ninth drawer" },
+
+  { l:"B", name:"THE LAST<span>CAROUSEL</span>", sub:"It Never Stops Turning", cry:"Ride If You Dare",
+    pitch:"Wound once in 1871 and never since. Forty-one horses, one of them not a horse. Ride at your own pleasure — the attendant will help you off when it slows, which it has not yet done.",
+    adm:"Two Pence A Ride", frame:1,
+    fine:"Riders are counted on and counted off · Keep the ticket" },
+
+  { l:"D", name:"The Weeping<br>Wax Works", sub:"They Were All Alive Once", cry:"Mind The Cold",
+    pitch:"Sixty figures, each modelled from life, each still warm to the touch at the wrist. The gallery is kept cold for reasons the proprietor declines to print.",
+    adm:"Admission Fourpence", frame:1,
+    fine:"The gallery is kept at forty degrees · Coats may be hired at the door" },
+
+  { l:"C", name:"THE MIDNIGHT MENAGERIE", sub:"Feeding At Half Past Twelve", cry:"Stay Behind The Rope",
+    pitch:"Creatures collected from four continents and one place that is not on the map. The keeper has all his fingers and would like to keep them, so stay behind the rope.",
+    adm:"One Shilling — Feeding Included", band:"Stay Behind The Rope", frame:0,
+    fine:"Last entry midnight · The rope is not a suggestion" },
+];
+
+/* playbill running order — the dense small type that makes a broadside read real */
+const BILLS = [
+  "Doors at Seven &middot; Brass Band at Eight &middot; The Curtain at Nine",
+  "Readings on the Hour &middot; The Small Tent, Behind the Organ",
+  "Continuous Viewing &middot; Six Persons Admitted at a Time",
+  "Open Till the Lamps Go Out &middot; Register Kept at the Door",
+  "Viewing by Candle &middot; The Catalogue, Twopence Extra",
+  "Turning Since 1871 &middot; No Attendant After Midnight",
+  "The Cold Gallery &middot; Enter by the East Door Only",
+  "Feeding at Half Twelve &middot; The Keeper Will Ring the Bell",
+];
+const ROMAN = ["I","II","III","IV","V","VI","VII","VIII"];
+
+const out = document.getElementById("out");
+out.innerHTML = ACTS.map((a, i) => {
+  const ox = (a.l === "B" || a.l === "C");
+  return `
+  <div class="page l${a.l}">
+    ${a.frame ? `<div class="frame${ox ? " ox" : ""}"></div>` : ""}
+    <div class="po">
+      <div class="top">Hollow Park Pleasure Grounds &middot; All Hallows' Eve</div>
+      <hr class="rule dbl${ox ? " ox" : ""}">
+      <div class="only">For One Night Only</div>
+      <h1 class="name">${a.name}</h1>
+      ${a.band ? `<div class="band">${a.band}</div>` : `<hr class="rule thin">`}
+      <div class="sub">${a.sub}</div>
+      <div class="spacer"><div class="orn${ox ? " ox" : ""}"></div></div>
+      <div class="spacer big"><div class="cry">&ldquo;${a.cry}&rdquo;</div></div>
+      <div class="pitch">${a.pitch}</div>
+      <div class="spacer big"><div class="pip"></div></div>
+      <div class="docket">${BILLS[i]}</div>
+      <hr class="rule">
+      <div class="adm">${a.adm}</div>
+      <hr class="rule thin">
+      <div class="fine">${a.fine}</div>
+      <div class="foot">
+        <span>No. ${ROMAN[i]} of VIII</span>
+        <span>Hollow Press</span>
+      </div>
+    </div>
+  </div>`;
+}).join("");
+document.documentElement.dataset.ready = "1";
+</script>

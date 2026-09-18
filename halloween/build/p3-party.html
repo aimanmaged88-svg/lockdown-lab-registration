@@ -1,0 +1,217 @@
+<title>Haunted Carnival Party Pack</title>
+<link rel="stylesheet" href="brand.css">
+<style>
+  /* ---------- invitations, 2 up ---------- */
+  .inv2{display:grid; grid-template-rows:1fr 1fr; height:100%; gap:4mm}
+  .inv{border:var(--hair) dashed #b9b2bb; padding:7mm; position:relative;
+       display:flex; flex-direction:column; align-items:center; text-align:center;
+       justify-content:center}
+  .inv .fr{position:absolute; inset:4mm; border:var(--rule) solid var(--oxblood)}
+  .inv .fr::after{content:""; position:absolute; inset:1.5mm;
+       border:var(--hair) solid var(--oxblood)}
+  .inv .kick{font-family:"HPCaps",serif; font-size:3.4mm; letter-spacing:.32em;
+       text-transform:uppercase; color:var(--smoke)}
+  .inv h2{font-family:"HPShow",serif; font-size:19mm; color:var(--oxblood);
+       margin:2mm 0 0; line-height:.98}
+  .inv .sub{font-family:"HPText",serif; font-style:italic; font-size:5.6mm; margin-top:2.5mm}
+  .inv .lines{font-family:"HPText",serif; font-size:4mm; line-height:2.1;
+       margin-top:4mm; width:100%; max-width:142mm}
+  .inv .lines .row{display:flex; gap:2mm; align-items:baseline}
+  .inv .lines .lab{font-family:"HPCaps",serif; font-size:3.2mm; letter-spacing:.2em;
+       text-transform:uppercase; color:var(--smoke); white-space:nowrap}
+  .inv .lines .fill{flex:1; border-bottom:var(--hair) solid var(--ink)}
+  .inv .fine{font-family:"HPType",monospace; font-size:2.5mm; letter-spacing:.08em;
+       text-transform:uppercase; color:var(--smoke); margin-top:3mm}
+
+  /* ---------- pennant banner ----------
+     Outlined, not filled: eighteen solid triangles would drain a home
+     cartridge and streak. Drawn as SVG so the edge stays vector in the PDF. */
+  .pens{display:grid; grid-template-columns:repeat(2,1fr);
+        grid-template-rows:repeat(3,1fr); height:100%; gap:3mm}
+  .pen{position:relative}
+  .pen svg{position:absolute; inset:0; width:100%; height:100%; display:block}
+  .pen .ch{position:absolute; top:22%; left:0; right:0; text-align:center;
+       font-family:"HPSlab",serif; font-size:30mm; line-height:1; z-index:2}
+  .pen .ch.star{font-family:"HPEngrave",serif; font-size:22mm; font-weight:700}
+  .pen.t1 .ch{color:var(--ink)}
+  .pen.t2 .ch{color:var(--oxblood)}
+  .pen.t3 .ch{color:var(--plum)}
+
+  /* ---------- photo-booth signs, 2 up ---------- */
+  .sg2{display:grid; grid-template-rows:1fr 1fr; height:100%; gap:4mm}
+  .sg{border:var(--hair) dashed #b9b2bb; display:flex; flex-direction:column;
+      align-items:center; justify-content:center; text-align:center; padding:6mm;
+      position:relative}
+  .sg .big{font-family:"HPSlab",serif; font-size:19mm; line-height:.98}
+  .sg .big.ox{color:var(--oxblood)}
+  .sg .sm{font-family:"HPText",serif; font-style:italic; font-size:5mm; margin-top:2mm}
+  .sg .stick{font-family:"HPType",monospace; font-size:2.4mm; letter-spacing:.14em;
+      text-transform:uppercase; color:var(--smoke); position:absolute; bottom:3mm}
+
+  /* ---------- table tents, 4 up ----------
+     Two halves: the top prints inverted so the tent reads from both sides
+     once folded, and no type ever straddles the crease. */
+  .tt4{display:grid; grid-template-rows:repeat(4,1fr); height:100%; gap:2mm}
+  .tt{border:var(--hair) dashed #b9b2bb; position:relative;
+      display:grid; grid-template-rows:1fr 1fr}
+  .tt .half{display:flex; flex-direction:column; align-items:center;
+      justify-content:center; text-align:center; padding:3mm 5mm}
+  .tt .back{transform:rotate(180deg)}
+  .tt .t{font-family:"HPEngrave",serif; font-weight:700; font-size:6.4mm;
+      letter-spacing:.1em; text-transform:uppercase; line-height:1.15}
+  .tt .d{font-family:"HPText",serif; font-style:italic; font-size:3.8mm;
+      color:var(--smoke); margin-top:1.2mm}
+  .tt .fl{position:absolute; left:0; right:0; top:50%; z-index:3;
+      border-top:var(--hair) dotted #b9b2bb}
+  .tt .flab{position:absolute; right:2mm; top:calc(50% + .6mm); z-index:3;
+      font-family:"HPType",monospace; font-size:2mm; letter-spacing:.1em;
+      color:#b9b2bb; text-transform:uppercase}
+
+  /* ---------- menu ---------- */
+  .mnu{display:flex; flex-direction:column; height:100%; text-align:center;
+       padding:6mm 4mm}
+  .mnu h2{font-family:"HPShow",serif; font-size:16mm; color:var(--oxblood);
+       margin:1mm 0 0; line-height:1}
+  .mnu .kick{font-family:"HPCaps",serif; font-size:3.2mm; letter-spacing:.3em;
+       text-transform:uppercase; color:var(--smoke)}
+  .mnu .list{margin-top:5mm; text-align:left; flex:1}
+  .mnu .it{display:flex; align-items:baseline; gap:2mm; margin-bottom:4.5mm}
+  .mnu .it .n{font-family:"HPEngrave",serif; font-weight:700; font-size:5mm;
+       letter-spacing:.06em; text-transform:uppercase; white-space:nowrap}
+  .mnu .it .dots{flex:1; border-bottom:var(--hair) dotted var(--smoke);
+       transform:translateY(-1mm)}
+  .mnu .it .p{font-family:"HPType",monospace; font-size:3.4mm; white-space:nowrap}
+  .mnu .it .d{font-family:"HPText",serif; font-style:italic; font-size:3.8mm;
+       color:var(--smoke); width:100%; margin-top:.5mm}
+  .mnu .it .wrap{flex:1}
+</style>
+
+<div id="out"></div>
+
+<script>
+const out = document.getElementById("out");
+let H = "";
+
+/* ---------------- 1. invitation, two per sheet ---------------- */
+const invite = () => `
+  <div class="inv">
+    <div class="fr"></div>
+    <div class="kick">You Are Summoned To The</div>
+    <h2>Haunted<br>Carnival</h2>
+    <div class="sub">One night only, and then the tents come down</div>
+    <div class="orn ox" style="margin:3mm auto 0"></div>
+    <div class="lines">
+      <div class="row"><span class="lab">Where</span><span class="fill"></span></div>
+      <div class="row"><span class="lab">When</span><span class="fill"></span></div>
+      <div class="row"><span class="lab">Gates Open</span><span class="fill"></span></div>
+      <div class="row"><span class="lab">Wear</span><span class="fill"></span></div>
+    </div>
+    <div class="fine">Admit one &middot; Costume expected &middot; No refunds, no exceptions</div>
+  </div>`;
+H += `<div class="page"><div class="inv2">${invite()}${invite()}</div>
+      <div class="guide">Invitation &middot; two per sheet &middot; cut along the dashed line</div></div>`;
+
+/* ---------------- 2. pennant banner: HAUNTED CARNIVAL ---------------- */
+const LETTERS = "HAUNTEDCARNIVAL".split("");   // 15 letters
+const cells = LETTERS.concat(["✦", "✦", "✦"]);  // + 3 spare stars = 18 = 3 sheets
+const INKS = ["#1A1418", "#7B1E28", "#3E2138"];
+
+/* One pennant: heavy outline, hairline inner rule, two punch guides.
+   vector-effect keeps the stroke true when the viewBox is stretched. */
+const pennant = (ink) => `
+  <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+    <g fill="none" stroke="${ink}" vector-effect="non-scaling-stroke">
+      <path d="M1 1 H99 L50 99 Z" stroke-width="3.2"/>
+      <path d="M5.5 6 H94.5 L50 91 Z" stroke-width="0.9"/>
+      <circle cx="22" cy="9" r="2.6" stroke-width="0.9"/>
+      <circle cx="78" cy="9" r="2.6" stroke-width="0.9"/>
+    </g>
+  </svg>`;
+
+for (let s = 0; s < 3; s++) {
+  H += `<div class="page"><div class="pens">`;
+  for (let i = 0; i < 6; i++) {
+    const n = s * 6 + i;
+    const ch = cells[n] || "";
+    const isStar = ch === "✦";
+    const t = (n % 3);
+    H += `
+      <div class="pen t${t + 1}">
+        ${pennant(INKS[t])}
+        <div class="ch${isStar ? " star" : ""}">${ch}</div>
+      </div>`;
+  }
+  H += `</div><div class="guide">Banner pennants &middot; sheet ${s + 1} of 3 &middot; spells HAUNTED CARNIVAL &middot; cut the outer line, punch the circles, thread with twine</div></div>`;
+}
+
+/* ---------------- 3. photo-booth signs ---------------- */
+const SIGNS = [
+  { big: "STEP<br>RIGHT UP", sm: "and never step back", ox: 0 },
+  { big: "I SURVIVED<br>THE SIDESHOW", sm: "mostly", ox: 1 },
+  { big: "DO NOT TAP<br>THE GLASS", sm: "she has asked nicely", ox: 0 },
+  { big: "LAST SEEN<br>AT THIS PARTY", sm: "if found, return to the carousel", ox: 1 },
+];
+for (let s = 0; s < 2; s++) {
+  H += `<div class="page"><div class="sg2">`;
+  for (let i = 0; i < 2; i++) {
+    const g = SIGNS[s * 2 + i];
+    H += `<div class="sg">
+            <div class="big${g.ox ? " ox" : ""}">${g.big}</div>
+            <div class="sm">&mdash; ${g.sm} &mdash;</div>
+            <div class="stick">Mount on card &middot; tape a skewer to the back</div>
+          </div>`;
+  }
+  H += `</div><div class="guide">Photo-booth signs &middot; sheet ${s + 1} of 2</div></div>`;
+}
+
+/* ---------------- 4. table tents ---------------- */
+const TENTS = [
+  ["Elixirs &amp; Potions", "pour your own, at your own risk"],
+  ["The Feeding", "help yourself before it helps itself"],
+  ["Fortunes Told", "one penny, one truth"],
+  ["Leave Your Coat", "and anything else you are done with"],
+];
+H += `<div class="page"><div class="tt4">` + TENTS.map(([t, d]) => {
+  const face = `<div class="half"><div class="t">${t}</div><div class="d">${d}</div></div>`;
+  return `
+  <div class="tt">
+    <div class="fl"></div><div class="flab">fold</div>
+    <div class="back">${face}</div>${face}
+  </div>`;
+}).join("") +
+  `</div><div class="guide">Table tents &middot; cut, fold on the dotted line, stand up &middot; reads from both sides</div></div>`;
+
+/* ---------------- 5. drinks menu ---------------- */
+const DRINKS = [
+  ["Widow's Tears", "Two Pence", "gin, elderflower, a great deal of ice"],
+  ["The Hollow Man", "Three Pence", "black rum, cold coffee, no shadow on the surface"],
+  ["Madame's Reading", "Two Pence", "spiced cider, orange, cloves — tells you nothing"],
+  ["Carousel", "Three Pence", "prosecco, blackberry, keeps going round"],
+  ["Laudanum (So Called)", "Four Pence", "amaro, cherry, bitters — strictly medicinal"],
+  ["The Ninth Drawer", "Ask", "the barman decides and will not explain"],
+  ["Temperance Punch", "Free", "for the sensible, and the driving"],
+];
+H += `<div class="page">
+  <div class="frame ox"></div>
+  <div class="mnu">
+    <div class="kick">Hollow Park Pleasure Grounds</div>
+    <h2>Elixirs &amp;<br>Potions</h2>
+    <hr class="rule dbl ox">
+    <div class="list">` + DRINKS.map(([n, p, d]) => `
+      <div class="it">
+        <div class="wrap">
+          <div style="display:flex;align-items:baseline;gap:2mm">
+            <span class="n">${n}</span><span class="dots"></span><span class="p">${p}</span>
+          </div>
+          <div class="d">${d}</div>
+        </div>
+      </div>`).join("") + `
+    </div>
+    <hr class="rule thin">
+    <div class="kick">Served until the lamps go out</div>
+  </div>
+</div>`;
+
+out.innerHTML = H;
+document.documentElement.dataset.ready = "1";
+</script>

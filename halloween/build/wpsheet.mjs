@@ -1,0 +1,12 @@
+import { chromium } from 'playwright';
+import fs from 'fs';
+const dir='../products/gaslight-wallpapers';
+const files=fs.readdirSync(dir).filter(f=>f.includes('iphone')).sort();
+const imgs=files.map(f=>`<img src="${dir}/${f}">`).join('');
+fs.writeFileSync('_wp.html',`<style>body{margin:0;background:#2a262e;display:grid;
+ grid-template-columns:repeat(6,1fr);gap:8px;padding:8px}img{width:100%;display:block}</style>${imgs}`);
+const b=await chromium.launch();const p=await b.newPage({viewport:{width:1400,height:900}});
+await p.goto('file://'+process.cwd()+'/_wp.html',{waitUntil:'load'});
+await p.waitForTimeout(1200);
+await p.screenshot({path:'../previews/_sheet-wallpapers.png',fullPage:true});
+await b.close();console.log('ok',files.length);

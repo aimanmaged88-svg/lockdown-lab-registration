@@ -1,0 +1,153 @@
+<title>Admit One — Tickets &amp; Tags</title>
+<link rel="stylesheet" href="brand.css">
+<style>
+  /* ---------- ticket stubs: 2 cols x 6 rows = 12 ---------- */
+  .tks{display:grid; grid-template-columns:repeat(2,1fr);
+       grid-template-rows:repeat(6,1fr); height:100%; gap:2mm}
+  .tk{border:var(--hair) dashed #b9b2bb; display:grid;
+      grid-template-columns:1fr 22mm; position:relative; overflow:hidden}
+  .tk .body{border:var(--rule) solid var(--ink); border-right:0;
+      padding:2.5mm 3mm; display:flex; flex-direction:column;
+      justify-content:center}
+  .tk .body.ox{border-color:var(--oxblood)}
+  .tk .kick{font-family:"HPCaps",serif; font-size:2.2mm; letter-spacing:.24em;
+      text-transform:uppercase; color:var(--smoke)}
+  .tk .nm{font-family:"HPSlab",serif; font-size:5.4mm; line-height:1; margin:.6mm 0}
+  .tk .nm.ox{color:var(--oxblood)}
+  .tk .ln{font-family:"HPText",serif; font-style:italic; font-size:2.9mm;
+      color:var(--smoke)}
+  /* the perforation: a dotted spine, the way a real stub tears */
+  .tk .stub{border:var(--rule) solid var(--ink); border-left:var(--hair) dotted var(--ink);
+      display:flex; flex-direction:column; align-items:center;
+      justify-content:center; text-align:center; padding:1.5mm}
+  .tk .stub.ox{border-color:var(--oxblood); border-left-color:var(--oxblood)}
+  .tk .stub .a1{font-family:"HPEngrave",serif; font-weight:700; font-size:2.6mm;
+      letter-spacing:.14em; text-transform:uppercase; line-height:1.2}
+  .tk .stub .no{font-family:"HPType",monospace; font-size:3.4mm; margin-top:1mm}
+  .tk .stub .tiny{font-family:"HPType",monospace; font-size:1.8mm;
+      letter-spacing:.08em; text-transform:uppercase; color:var(--smoke); margin-top:.6mm}
+
+  /* ---------- gift tags: 3 cols x 4 rows = 12 ----------
+     The tag silhouette and its cut line are one SVG — clip-path rasterises
+     in print-to-PDF and the cut edge comes out soft. */
+  .tgs{display:grid; grid-template-columns:repeat(3,1fr);
+       grid-template-rows:repeat(4,1fr); height:100%; gap:2mm}
+  .tg{position:relative}
+  .tg svg{position:absolute; inset:0; width:100%; height:100%; display:block}
+  .tg .in{position:absolute; inset:0; display:flex; flex-direction:column;
+      align-items:center; justify-content:center; text-align:center;
+      padding:11mm 5mm 4mm; z-index:2}
+  .tg .t{font-family:"HPEngrave",serif; font-weight:700; font-size:4mm;
+      letter-spacing:.06em; text-transform:uppercase; line-height:1.15; color:var(--plum)}
+  .tg .s{font-family:"HPText",serif; font-style:italic; font-size:2.9mm;
+      color:var(--smoke); margin-top:1mm; line-height:1.3}
+  .tg .to{font-family:"HPCaps",serif; font-size:2.3mm; letter-spacing:.18em;
+      text-transform:uppercase; margin-top:auto; width:84%;
+      border-bottom:var(--hair) solid var(--ink); text-align:left;
+      color:var(--smoke); padding-bottom:.4mm}
+
+  /* ---------- tokens: 4 x 4 = 16 ---------- */
+  .tks2{display:grid; grid-template-columns:repeat(4,1fr);
+        grid-template-rows:repeat(4,1fr); height:100%; gap:2mm;
+        align-items:center; justify-items:center}
+  /* width-driven so four across always fit the sheet */
+  .tok{position:relative; width:100%; aspect-ratio:1; display:flex}
+  .tok .in{flex:1; border-radius:50%;
+      border:var(--rule) solid var(--ink);
+      display:flex; flex-direction:column; align-items:center;
+      justify-content:center; text-align:center; padding:3mm}
+  .tok .in.ox{border-color:var(--oxblood); color:var(--oxblood)}
+  .tok .v{font-family:"HPSlab",serif; font-size:6mm; line-height:1}
+  .tok .w{font-family:"HPCaps",serif; font-size:2.1mm; letter-spacing:.16em;
+      text-transform:uppercase; margin-top:.8mm; line-height:1.2}
+</style>
+
+<div id="out"></div>
+
+<script>
+const out = document.getElementById("out");
+let H = "";
+const pad = n => String(n).padStart(4, "0");
+
+/* ---------- sheet 1: 12 admission stubs ---------- */
+const RIDES = [
+  ["THE SIDESHOW", "beyond the green curtain"],
+  ["THE CAROUSEL", "it never stops turning"],
+  ["HALL OF MIRRORS", "enter as one, leave as many"],
+  ["MADAME VESPER", "one penny, one truth"],
+  ["THE MENAGERIE", "feeding at half twelve"],
+  ["THE WAX WORKS", "they were all alive once"],
+];
+H += `<div class="page"><div class="tks">`;
+for (let i = 0; i < 12; i++) {
+  const [nm, ln] = RIDES[i % RIDES.length];
+  const ox = i % 2 === 1;
+  H += `
+    <div class="tk">
+      <div class="body${ox ? " ox" : ""}">
+        <div class="kick">Hollow Park &middot; All Hallows' Eve</div>
+        <div class="nm${ox ? " ox" : ""}">${nm}</div>
+        <div class="ln">${ln}</div>
+      </div>
+      <div class="stub${ox ? " ox" : ""}">
+        <div class="a1">Admit<br>One</div>
+        <div class="no">${pad(101 + i * 7)}</div>
+        <div class="tiny">keep this</div>
+      </div>
+    </div>`;
+}
+H += `</div><div class="guide">Admission stubs &middot; 12 per sheet &middot; tear along the dotted spine</div></div>`;
+
+/* ---------- sheet 2: 12 gift tags ---------- */
+const TAGS = [
+  ["A Small Curiosity", "do not open after dark"],
+  ["From The Cabinet", "specimen no. IX"],
+  ["Handle With Care", "it has opinions"],
+  ["Not To Be Opened", "until it is"],
+  ["A Trifle", "found in the mirror hall"],
+  ["Contents Unknown", "the proprietor declines to say"],
+  ["For You", "it followed me home"],
+  ["Souvenir", "of a night that did not happen"],
+  ["Perishable", "as are we all"],
+  ["One Wish", "spend it badly"],
+  ["Keep Dry", "and out of the moonlight"],
+  ["Fragile", "so is the story behind it"],
+];
+/* tag outline: shouldered top, heavy edge, hairline inner rule, punch guide */
+const tagSvg = `
+  <svg viewBox="0 0 100 130" preserveAspectRatio="none" aria-hidden="true">
+    <g fill="none" stroke="#3E2138" vector-effect="non-scaling-stroke">
+      <path d="M50 1.5 L98.5 13 V128.5 H1.5 V13 Z" stroke-width="2.6"/>
+      <path d="M50 6 L94 16.5 V124 H6 V16.5 Z" stroke-width="0.8"/>
+      <circle cx="50" cy="13" r="3.4" stroke-width="0.9"/>
+    </g>
+  </svg>`;
+H += `<div class="page"><div class="tgs">` + TAGS.map(([t, s]) => `
+  <div class="tg">
+    ${tagSvg}
+    <div class="in">
+      <div class="t">${t}</div>
+      <div class="s">${s}</div>
+      <div class="to">To</div>
+    </div>
+  </div>`).join("") +
+  `</div><div class="guide">Gift tags &middot; 12 per sheet &middot; cut the heavy line, punch the circle, thread with twine</div></div>`;
+
+/* ---------- sheet 3: 16 drink / ride tokens ---------- */
+const TOKENS = [
+  ["I", "one ride"], ["II", "two rides"], ["I", "one drink"], ["✦", "on the house"],
+];
+H += `<div class="page"><div class="tks2">`;
+for (let i = 0; i < 16; i++) {
+  const [v, w] = TOKENS[i % TOKENS.length];
+  const ox = Math.floor(i / 4) % 2 === 1;
+  H += `<div class="tok">
+          <div class="in${ox ? " ox" : ""}"><div class="v">${v}</div><div class="w">${w}</div></div>
+          <div class="cut"></div>
+        </div>`;
+}
+H += `</div><div class="guide">Tokens &middot; 16 per sheet &middot; hand them out at the gate</div></div>`;
+
+out.innerHTML = H;
+document.documentElement.dataset.ready = "1";
+</script>

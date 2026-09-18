@@ -1,0 +1,108 @@
+/* ==========================================================================
+   HOLLOW PRESS — shared print brand
+   Letterpress broadside language: flat ink on paper, no ink-hungry fills,
+   10mm safe margin everywhere (home printers cannot full-bleed).
+   All faces are OFL/Apache licensed — commercial print use is permitted.
+   ========================================================================== */
+
+@font-face{font-family:"HPShow";   src:url("../assets/fonts/rye-400.woff2") format("woff2");          font-weight:400; font-display:block}
+@font-face{font-family:"HPSlab";   src:url("../assets/fonts/alfaslab-400.woff2") format("woff2");     font-weight:400; font-display:block}
+@font-face{font-family:"HPText";   src:url("../assets/fonts/imfell-400.woff2") format("woff2");       font-weight:400; font-style:normal; font-display:block}
+@font-face{font-family:"HPText";   src:url("../assets/fonts/imfell-400i.woff2") format("woff2");      font-weight:400; font-style:italic; font-display:block}
+@font-face{font-family:"HPCaps";   src:url("../assets/fonts/imfellsc-400.woff2") format("woff2");     font-weight:400; font-display:block}
+@font-face{font-family:"HPEngrave";src:url("../assets/fonts/cinzel-400.woff2") format("woff2");       font-weight:400 700; font-display:block}
+@font-face{font-family:"HPType";   src:url("../assets/fonts/specialelite-400.woff2") format("woff2"); font-weight:400; font-display:block}
+@font-face{font-family:"HPBlack";  src:url("../assets/fonts/pirata-400.woff2") format("woff2");       font-weight:400; font-display:block}
+
+:root{
+  --ink:#1A1418;        /* warm near-black — the press ink */
+  --oxblood:#7B1E28;
+  --plum:#3E2138;
+  --gold:#8A6A2B;
+  --smoke:#6B6069;
+  --paper:#FFFFFF;      /* the customer's paper does the work */
+  --hair:0.4mm;
+  --rule:0.9mm;
+  --safe:12mm;
+}
+
+*{box-sizing:border-box; -webkit-print-color-adjust:exact; print-color-adjust:exact}
+
+html,body{margin:0; padding:0; background:#fff; color:var(--ink);
+  font-family:"HPText",Georgia,serif; font-kerning:normal;
+  font-variant-ligatures:common-ligatures}
+
+@page{ size:A4; margin:0 }
+
+.page{
+  width:210mm; height:297mm; position:relative; overflow:hidden;
+  background:var(--paper); page-break-after:always; break-after:page;
+  padding:var(--safe);
+}
+.page:last-child{page-break-after:auto; break-after:auto}
+
+/* screen-only preview scaffolding — never prints */
+@media screen{
+  body{background:#57505a; padding:24px 0}
+  .page{margin:0 auto 24px; box-shadow:0 6px 30px rgba(0,0,0,.45)}
+}
+
+/* ---------- type roles ---------- */
+.show   {font-family:"HPShow",serif}      /* carnival display — use sparingly */
+.slab   {font-family:"HPSlab",serif}      /* fat-face headline */
+.caps   {font-family:"HPCaps",serif}      /* antique small caps */
+.engrave{font-family:"HPEngrave",serif; letter-spacing:.08em}
+.tw     {font-family:"HPType",monospace}  /* typewriter / docket */
+.black  {font-family:"HPBlack",serif}     /* blackletter accent */
+
+.u{text-transform:uppercase}
+.c{text-align:center}
+.it{font-style:italic}
+.ox{color:var(--oxblood)} .pl{color:var(--plum)} .gd{color:var(--gold)} .sm{color:var(--smoke)}
+
+/* ---------- letterpress furniture ---------- */
+.rule      {border:0; border-top:var(--rule) solid var(--ink); margin:3mm 0}
+.rule.thin {border-top-width:var(--hair)}
+.rule.dbl  {border:0; border-top:var(--rule) solid var(--ink);
+             border-bottom:var(--hair) solid var(--ink); height:1.6mm}
+.rule.ox   {border-color:var(--oxblood)}
+
+/* Printer's ornaments as inline SVG backgrounds — stays vector in the PDF and
+   never depends on a glyph the face might not carry. */
+.orn{height:5mm; width:64mm; background-repeat:no-repeat; background-position:center;
+  background-size:contain;
+  background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 20"><g fill="%231A1418"><path d="M120 2l7 8-7 8-7-8z"/><path d="M96 6l4 4-4 4-4-4z"/><path d="M144 6l4 4-4 4-4-4z"/><rect x="8" y="9.4" width="76" height="1.2"/><rect x="156" y="9.4" width="76" height="1.2"/><circle cx="8" cy="10" r="2"/><circle cx="232" cy="10" r="2"/></g></svg>')}
+.orn.sm{height:3.4mm; width:26mm;
+  background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 20"><g fill="%231A1418"><path d="M30 3l7 7-7 7-7-7z"/><path d="M12 7l3 3-3 3-3-3z"/><path d="M48 7l3 3-3 3-3-3z"/></g></svg>')}
+.orn.ox{background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 20"><g fill="%237B1E28"><path d="M120 2l7 8-7 8-7-8z"/><path d="M96 6l4 4-4 4-4-4z"/><path d="M144 6l4 4-4 4-4-4z"/><rect x="8" y="9.4" width="76" height="1.2"/><rect x="156" y="9.4" width="76" height="1.2"/><circle cx="8" cy="10" r="2"/><circle cx="232" cy="10" r="2"/></g></svg>')}
+/* single spot, for tight spaces */
+.pip{height:2.6mm; width:4mm; background-repeat:no-repeat; background-position:center;
+  background-size:contain;
+  background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M10 2l8 8-8 8-8-8z" fill="%231A1418"/></svg>')}
+
+.frame{position:absolute; inset:var(--safe);
+  border:var(--rule) solid var(--ink); pointer-events:none}
+.frame::after{content:""; position:absolute; inset:2mm;
+  border:var(--hair) solid var(--ink)}
+.frame.ox{border-color:var(--oxblood)}
+.frame.ox::after{border-color:var(--oxblood)}
+
+/* corner stars, the cheap Victorian trick */
+.cnr{position:absolute; font-size:4mm; line-height:1}
+.cnr.tl{top:15mm;left:15mm} .cnr.tr{top:15mm;right:15mm}
+.cnr.bl{bottom:15mm;left:15mm} .cnr.br{bottom:15mm;right:15mm}
+
+/* ---------- cut + fold guides ---------- */
+.cut{border:var(--hair) dashed var(--smoke)}
+.fold{border-top:var(--hair) dotted var(--smoke)}
+.guide{position:absolute; bottom:4mm; left:0; right:0; text-align:center;
+  font-family:"HPType",monospace; font-size:2.4mm; letter-spacing:.14em;
+  color:var(--smoke); text-transform:uppercase}
+
+/* the press mark that goes on every sheet */
+.mark{position:absolute; bottom:4mm; right:var(--safe);
+  font-family:"HPCaps",serif; font-size:2.8mm; letter-spacing:.22em;
+  color:var(--smoke); text-transform:uppercase}
+
+/* ---------- grids ---------- */
+.grid{display:grid; gap:0}

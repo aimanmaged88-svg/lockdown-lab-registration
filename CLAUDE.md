@@ -1259,3 +1259,59 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   (`hsr_done`); declaring `db` makes the artifact org-internal (no public
   link). Republish to the SAME artifact URL or it duplicates. Release dates
   were current at 2026-09-18 and move — recheck before building a listing.
+
+### The shop got BUILT — Hollow Press (2026-09-18, "make me a full shop")
+
+- **Real product line, storefront and pins all exist now**, in `halloween/`.
+  This is shop 03 from the playbook built out in full (highest-trending concept,
+  ZERO IP risk — every act, label, name and line is original). Brand =
+  **Hollow Press**, a fictional Victorian print house. Name is UNREGISTERED —
+  he must trademark-check before printing merch with it.
+- **7 sellable products, 27 printable pages + 24 wallpapers:** The Sideshow Set
+  (8 Victorian posters, $12) · Poison & Apothecary Labels (30 labels, real
+  botanicals + Latin, $7) · Haunted Carnival Party Pack (8 sheets: invites,
+  18-pennant banner, photo-booth signs, table tents, drinks menu, $14) ·
+  Admit One (40 tickets/tags/tokens, $5) · The Mourning Table (dinner set for
+  16, $9) · Gaslight Wallpapers (12 designs × 2 phone sizes, $4) · The Whole
+  Vault bundle ($29, vs $51 separately). Prices USD (Pinterest traffic is
+  US-heavy); AUD in LISTINGS.md.
+- **⚠️ PRODUCTS ARE GIT-IGNORED ON PURPOSE.** This repo is PUBLIC and
+  auto-deploys — committing the PDFs would make them a free download for anyone
+  who guesses the URL. `products/`, `dist/`, `previews/` are ignored; the
+  sellable files live only on the platform that takes the money. Regenerate with
+  `cd halloween/build && node render.mjs && node walls.mjs && node shopimg.mjs
+  && node pinrender.mjs` (needs `ln -sfn /opt/node22/lib/node_modules
+  node_modules` — playwright is global, and ESM ignores NODE_PATH).
+- **Render engine = Chromium print-to-PDF** (vector type, resolution-free).
+  Hard-won print lessons, all in halloween/README.md: **no `clip-path` in print
+  artwork** (Chromium rasterises it — soft cut edges, and it bloated the tickets
+  PDF 182KB→1067KB; shaped art is inline SVG with
+  `vector-effect="non-scaling-stroke"`) · **printables are ink-on-white line
+  work, never flood-filled** (home printers; the banner pennants were rebuilt
+  from solid triangles to outlines) · 12mm safe margin everywhere (no
+  full-bleed) · ornaments are SVG backgrounds not glyphs (❧/❦ aren't in IM Fell)
+  · fold-over items print as two halves with the top rotated 180° (table tents
+  shipped broken first — text sat on the crease) · storefront previews are
+  560px so a preview can never be used as the product.
+- **Fonts** `halloween/assets/fonts/` — Rye, Alfa Slab One, IM Fell English
+  (+italic +SC), Cinzel (variable 400-700), Special Elite, Pirata One. All
+  OFL/Apache = commercial print OK, 280KB. GOTCHA: the Google Fonts CSS2 API
+  returns several unicode subsets per weight and some families are variable
+  (one file covers the range) — pick the block whose `unicode-range` holds
+  `U+0000-00FF` per weight/style or you get latin-ext files named as weights.
+- **Storefront** `halloween/index.html` → live at `/halloween/` on the existing
+  Netlify site. **One `CHECKOUT` object near the bottom = the only thing he
+  edits**; until links are pasted the buy buttons are disabled and a yellow
+  setup banner says what to do, and it removes itself once all 7 are filled.
+  Checkout+delivery must come from Payhip/Gumroad/Lemon Squeezy/Etsy so we never
+  touch card details, file delivery or GST/VAT. Tested clean at 1200px and
+  390px, no JS errors, no h-scroll.
+- **12 Pinterest pins** (1000×1500, light + dark variants) in `halloween/pins/`,
+  and `halloween/LISTINGS.md` has paste-ready titles, **all 13 Etsy tags**,
+  descriptions and pin copy for every product. Every listing carries "All
+  artwork original. Not from any film or franchise."
+- Domain note: the shop currently sits under the Certified Hooper Netlify site —
+  odd neighbour for a Halloween brand; a dedicated domain (or its own Netlify
+  site pointed at `halloween/`) is tidier when he's ready.
+- Delivered to him as upload-ready zips (each with a LICENCE-AND-PRINTING.txt:
+  personal use, no resale/redistribution, print at 100% not fit-to-page).

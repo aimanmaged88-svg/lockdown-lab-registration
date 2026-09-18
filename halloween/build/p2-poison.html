@@ -1,0 +1,109 @@
+<title>Poison &amp; Apothecary Labels</title>
+<link rel="stylesheet" href="brand.css">
+<style>
+  .sheet{display:grid; grid-template-columns:repeat(3,1fr);
+         grid-template-rows:repeat(5,1fr); height:100%; gap:0}
+  .lb{position:relative; padding:1.5mm; display:flex}
+  .lb .in{flex:1; border:var(--hair) dashed #b9b2bb; display:flex;
+          flex-direction:column; align-items:center; justify-content:center;
+          text-align:center; padding:3mm 2.5mm; overflow:hidden}
+  .lb .bx{position:absolute; inset:1.5mm; pointer-events:none}
+
+  .nm{font-family:"HPEngrave",serif; font-weight:700; font-size:4.6mm;
+      letter-spacing:.06em; text-transform:uppercase; line-height:1.05}
+  .nm.long{font-size:3.8mm}
+  .la{font-family:"HPText",serif; font-style:italic; font-size:3mm;
+      color:var(--smoke); margin-top:.8mm}
+  .dose{font-family:"HPType",monospace; font-size:2.3mm; letter-spacing:.06em;
+      text-transform:uppercase; color:var(--smoke); line-height:1.5; margin-top:1.5mm}
+  .band{font-family:"HPEngrave",serif; font-size:2.6mm; letter-spacing:.3em;
+      text-transform:uppercase; background:var(--ink); color:#fff;
+      padding:.7mm 3mm; margin:1.5mm 0 0}
+  .band.ox{background:var(--oxblood)}
+  .hr{width:60%; border:0; border-top:var(--hair) solid currentColor; margin:1.5mm 0}
+  .hse{font-family:"HPCaps",serif; font-size:2.2mm; letter-spacing:.2em;
+      text-transform:uppercase; color:var(--smoke); margin-top:1.2mm}
+
+  /* three label treatments, cycled so a shelf of jars has rhythm */
+  .d1 .frm{position:absolute; inset:0; border:var(--rule) solid var(--ink)}
+  .d1 .frm::after{content:""; position:absolute; inset:1.2mm;
+      border:var(--hair) solid var(--ink)}
+  .d2 .frm{position:absolute; inset:0; border:var(--hair) solid var(--oxblood);
+      border-top-width:var(--rule); border-bottom-width:var(--rule)}
+  .d3 .frm{position:absolute; inset:0; border:var(--hair) solid var(--plum);
+      border-radius:14mm/9mm}
+  .d3 .frm::after{content:""; position:absolute; inset:1.3mm;
+      border:var(--hair) solid var(--plum); border-radius:13mm/8mm}
+  .d3 .nm{color:var(--plum)}
+  .d2 .nm{color:var(--oxblood)}
+</style>
+
+<div id="out"></div>
+
+<script>
+/* 30 labels — apothecary names, every one a real historical materia-medica or
+   folklore botanical, so the jar reads true rather than random-spooky. */
+const JARS = [
+  ["Wolfsbane","Aconitum napellus","Two drops. No more."],
+  ["Belladonna","Atropa bella-donna","For the eyes. Never the mouth."],
+  ["Nightshade","Solanum nigrum","Handle with gloves."],
+  ["Hemlock","Conium maculatum","Do not decant near food."],
+  ["Mandrake Root","Mandragora officinarum","Pull at dusk. Stop your ears."],
+  ["Henbane","Hyoscyamus niger","Sleep follows. Sometimes waking does not."],
+  ["Foxglove","Digitalis purpurea","One grain steadies. Two stops."],
+  ["Valerian","Valeriana officinalis","Steep nine minutes."],
+  ["Yew Berry","Taxus baccata","The flesh only. Never the seed."],
+  ["Thorn Apple","Datura stramonium","Keep from children and cats."],
+  ["Hellebore","Helleborus niger","Christmas rose. Winter poison."],
+  ["Oleander","Nerium oleander","Burn nothing of this plant."],
+  ["Monkshood","Aconitum lycoctonum","Sealed. Signed. Shelved high."],
+  ["Bitter Almond","Prunus amara","Six is flavour. Sixty is not."],
+  ["Laudanum","Tinctura opii","Twenty drops in water at night."],
+  ["Snake Root","Ageratina altissima","The cow ate first. Then the milk."],
+  ["Moonseed","Menispermum canadense","Not a grape. Remember that."],
+  ["Ergot","Claviceps purpurea","From the rye. Bread gone wrong."],
+  ["Devil's Trumpet","Datura metel","Blooms at night, and only once."],
+  ["Meadow Saffron","Colchicum autumnale","For the gout. And for the grave."],
+  ["Spurge Laurel","Daphne mezereum","Blisters the skin on contact."],
+  ["White Bryony","Bryonia dioica","The root, dried. Half a grain."],
+  ["Lords &amp; Ladies","Arum maculatum","Berries look like sweets. They are not."],
+  ["Water Hemlock","Cicuta virosa","The most violent thing on this shelf."],
+  ["Black Bryony","Tamus communis","Rub on bruises. Swallow nothing."],
+  ["Corn Cockle","Agrostemma githago","Sift the flour. Always sift."],
+  ["Wormwood","Artemisia absinthium","Bitter as its name."],
+  ["Pennyroyal","Mentha pulegium","A little in the tea. A little."],
+  ["Rue","Ruta graveolens","For grace, for grief, for keeping."],
+  ["Graveyard Moss","Lichen sepulchralis","Scraped from the north face only."],
+];
+
+const HOUSE = "Hollow Press Apothecary";
+const out = document.getElementById("out");
+let html = "";
+
+for (let page = 0; page < 2; page++) {
+  html += `<div class="page"><div class="sheet">`;
+  for (let i = 0; i < 15; i++) {
+    const n = page * 15 + i;
+    if (n >= JARS.length) { html += `<div class="lb"></div>`; continue; }
+    const [name, latin, dose] = JARS[n];
+    const d = (n % 3) + 1;                       // cycle the three treatments
+    const long = name.replace(/&amp;/g, "&").length > 12 ? " long" : "";
+    const bandOx = d === 2;
+    html += `
+      <div class="lb d${d}">
+        <div class="bx"><div class="frm"></div></div>
+        <div class="in">
+          <div class="nm${long}">${name}</div>
+          <div class="la">${latin}</div>
+          <hr class="hr">
+          <div class="dose">${dose}</div>
+          <div class="band${bandOx ? " ox" : ""}">Poison</div>
+          <div class="hse">${HOUSE}</div>
+        </div>
+      </div>`;
+  }
+  html += `</div><div class="guide">Cut along the dashed lines &middot; sheet ${page + 1} of 2 &middot; 30 labels</div></div>`;
+}
+out.innerHTML = html;
+document.documentElement.dataset.ready = "1";
+</script>

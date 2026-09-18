@@ -1,0 +1,111 @@
+<title>Gaslight Wallpapers</title>
+<link rel="stylesheet" href="brand.css">
+<style>
+  /* Screen-only product: no ink to worry about, so these go dark and rich.
+     Type sits in the lower third — clear of the lock-screen clock and of
+     the top rows of home-screen icons. */
+  html,body{margin:0; padding:0; background:#000; overflow:hidden}
+  @media screen{ body{background:#000; padding:0} }
+
+  .wp{position:relative; overflow:hidden; display:flex;
+      flex-direction:column; justify-content:flex-end;
+      align-items:center; text-align:center}
+
+  /* grounds */
+  .g-plum  {background:radial-gradient(120% 85% at 50% 22%, #4A2740 0%, #2A1526 46%, #120A10 100%)}
+  .g-ox    {background:radial-gradient(120% 85% at 50% 24%, #7A2029 0%, #3E1318 48%, #120708 100%)}
+  .g-ink   {background:radial-gradient(125% 90% at 50% 20%, #23202B 0%, #14121A 50%, #07060A 100%)}
+  .g-gold  {background:radial-gradient(120% 80% at 50% 26%, #4A3A17 0%, #241B0C 50%, #0C0906 100%)}
+  .g-soot  {background:linear-gradient(180deg, #1B1218 0%, #0B070A 62%, #050305 100%)}
+
+  /* the lamp — a single warm source, like a gas mantle above the tent */
+  .lamp{position:absolute; left:50%; transform:translateX(-50%);
+        border-radius:50%; filter:blur(0px); mix-blend-mode:screen;
+        background:radial-gradient(circle, rgba(255,214,140,.30) 0%,
+                    rgba(255,190,100,.13) 34%, rgba(255,170,80,0) 70%)}
+
+  /* vignette keeps the edges dark so icons read */
+  .vig{position:absolute; inset:0; pointer-events:none;
+       background:radial-gradient(130% 92% at 50% 34%, rgba(0,0,0,0) 38%, rgba(0,0,0,.62) 100%)}
+
+  /* fine engine-turned rings, the way a ticket is guilloched */
+  .rings{position:absolute; inset:0; pointer-events:none; opacity:.20}
+
+  .type{position:relative; z-index:3; width:100%; padding:0 9% 0}
+  .kick{font-family:"HPCaps",serif; letter-spacing:.42em; text-transform:uppercase;
+        color:rgba(232,214,178,.62)}
+  .big{font-family:"HPSlab",serif; color:#F0E4CA; line-height:.98;
+       text-shadow:0 0 .12em rgba(255,200,120,.16)}
+  .big.show{font-family:"HPShow",serif}
+  .big.eng{font-family:"HPEngrave",serif; font-weight:700; letter-spacing:.05em; line-height:1.08}
+  .big.blk{font-family:"HPBlack",serif; line-height:1.02}
+  .sub{font-family:"HPText",serif; font-style:italic; color:rgba(226,206,172,.74)}
+  .gold{color:#E4BE86}
+  .amber{color:#E8C27A}
+  .bone{color:#F0E4CA}
+  .hr{border:0; border-top:1px solid rgba(232,214,178,.34); width:38%; margin:0 auto}
+  .press{font-family:"HPCaps",serif; letter-spacing:.34em; text-transform:uppercase;
+         color:rgba(232,214,178,.34)}
+</style>
+
+<div id="stage"></div>
+
+<script>
+const WALLS = [
+  { g:"g-ink",  face:"",     kick:"Hollow Park",        big:"IT NEVER<br>STOPS<br>TURNING", sub:"the last carousel", rings:1 },
+  { g:"g-plum", face:"eng",  kick:"The Hall of Mirrors", big:"ENTER AS ONE<br>LEAVE AS MANY", sub:"ninety-four panes of Belgian glass" },
+  { g:"g-ox",   face:"",     kick:"Beyond the Green Curtain", big:"DO NOT<br>TAP THE<br>GLASS", sub:"she has asked nicely" },
+  { g:"g-gold", face:"show", kick:"Madame Vesper",      big:"One Penny<br>One Truth", sub:"she reads the dead", rings:1 },
+  { g:"g-soot", face:"eng",  kick:"For One Night Only",  big:"HE CASTS<br>NO SHADOW", sub:"look at the ground" },
+  { g:"g-ox",   face:"eng",  kick:"The Midnight Menagerie", big:"STAY<br>BEHIND<br>THE ROPE", sub:"the rope is not a suggestion" },
+  { g:"g-plum", face:"blk",  kick:"The Weeping Wax Works", big:"They Were<br>All Alive<br>Once", sub:"the gallery is kept cold" },
+  { g:"g-ink",  face:"eng",  kick:"Professor Morne's Cabinet", big:"MIND THE<br>NINTH<br>DRAWER", sub:"two hundred specimens under glass" },
+  { g:"g-soot", face:"",     kick:"Hollow Park Pleasure Grounds", big:"ADMIT<br>ONE", sub:"keep this", rings:1 },
+  { g:"g-gold", face:"eng",  kick:"The Thirty-First of October", big:"ALL<br>HALLOWS'<br>EVE", sub:"and then the tents come down" },
+  { g:"g-ox",   face:"show", kick:"The Barker",         big:"Step<br>Right Up", sub:"and never step back" },
+  { g:"g-plum", face:"show", kick:"Wound Once in 1871",  big:"The Last<br>Carousel", sub:"forty-one horses, one of them not a horse", rings:1 },
+];
+
+/* engine-turned rings, drawn to the exact canvas so they never pixellate */
+function ringSvg(w, h) {
+  const cx = w / 2, cy = h * 0.30;
+  let out = "";
+  for (let i = 0; i < 26; i++) {
+    const r = (h * 0.055) + i * (h * 0.0255);
+    out += `<circle cx="${cx}" cy="${cy}" r="${r.toFixed(1)}" fill="none"
+             stroke="rgba(232,214,178,0.5)" stroke-width="${(w/1290*1.1).toFixed(2)}"/>`;
+  }
+  return `<svg class="rings" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}">${out}</svg>`;
+}
+
+function render(i, w, h) {
+  const d = WALLS[i];
+  const u = h / 2796;                       // scale everything off the tall axis
+  const stage = document.getElementById("stage");
+  stage.innerHTML = `
+    <div class="wp ${d.g}" style="width:${w}px;height:${h}px;
+         padding-bottom:${Math.round(320*u)}px">
+      ${d.rings ? ringSvg(w, h) : ""}
+      <div class="lamp" style="top:${-0.16*h}px; width:${1.25*w}px; height:${0.62*h}px"></div>
+      <div class="vig"></div>
+      <div class="type">
+        <div class="kick" style="font-size:${Math.round(30*u)}px;
+             margin-bottom:${Math.round(34*u)}px">${d.kick}</div>
+        <div class="big ${d.face}" style="font-size:${Math.round((d.face==="show"?122:d.face==="blk"?128:d.face==="eng"?98:132)*u)}px">${d.big}</div>
+        <hr class="hr" style="margin-top:${Math.round(44*u)}px">
+        <div class="sub" style="font-size:${Math.round(40*u)}px;
+             margin-top:${Math.round(30*u)}px">${d.sub}</div>
+        <div class="press" style="font-size:${Math.round(23*u)}px;
+             margin-top:${Math.round(52*u)}px">Hollow Press</div>
+      </div>
+    </div>`;
+}
+
+/* the renderer drives this: ?i=0&w=1290&h=2796 */
+const q = new URLSearchParams(location.search);
+if (q.has("i")) {
+  render(+q.get("i"), +q.get("w") || 1290, +q.get("h") || 2796);
+}
+window.WALLS = WALLS;
+document.documentElement.dataset.ready = "1";
+</script>

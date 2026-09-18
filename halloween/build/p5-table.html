@@ -1,0 +1,161 @@
+<title>The Mourning Table</title>
+<link rel="stylesheet" href="brand.css">
+<style>
+  /* ---------- place cards, 2 x 4, folding ---------- */
+  .pcs{display:grid; grid-template-columns:repeat(2,1fr);
+       grid-template-rows:repeat(4,1fr); height:100%; gap:3mm}
+  .pc{border:var(--hair) dashed #b9b2bb; position:relative;
+      display:grid; grid-template-rows:1fr 1fr}
+  .pc .fl{position:absolute; left:0; right:0; top:50%;
+      border-top:var(--hair) dotted #b9b2bb}
+  .pc .flab{position:absolute; right:1.5mm; top:calc(50% + .5mm);
+      font-family:"HPType",monospace; font-size:1.9mm; letter-spacing:.1em;
+      color:#b9b2bb; text-transform:uppercase}
+  /* upper half prints upside-down so it reads on the far side when folded */
+  .pc .back{transform:rotate(180deg); display:flex; align-items:center;
+      justify-content:center; text-align:center; padding:3mm}
+  .pc .front{display:flex; flex-direction:column; align-items:center;
+      justify-content:center; text-align:center; padding:3mm}
+  .pc .nm{font-family:"HPEngrave",serif; font-weight:700; font-size:5mm;
+      letter-spacing:.1em; text-transform:uppercase; border-bottom:var(--hair) solid var(--ink);
+      min-width:44mm; padding-bottom:1.5mm}
+  .pc .seat{font-family:"HPText",serif; font-style:italic; font-size:3.2mm;
+      color:var(--smoke); margin-top:2mm}
+  .pc .crest{font-family:"HPCaps",serif; font-size:2.2mm; letter-spacing:.2em;
+      text-transform:uppercase; color:var(--smoke)}
+
+  /* ---------- table numbers, 6 up, tent fold ---------- */
+  .tns{display:grid; grid-template-columns:repeat(2,1fr);
+       grid-template-rows:repeat(3,1fr); height:100%; gap:3mm}
+  .tn{border:var(--hair) dashed #b9b2bb; position:relative;
+      display:grid; grid-template-rows:1fr 1fr}
+  .tn .fl{position:absolute; left:0; right:0; top:50%;
+      border-top:var(--hair) dotted #b9b2bb}
+  .tn .back{transform:rotate(180deg)}
+  .tn .half{display:flex; flex-direction:column; align-items:center;
+      justify-content:center; text-align:center; padding:2mm}
+  .tn .rn{font-family:"HPEngrave",serif; font-weight:700; font-size:16mm;
+      line-height:1; letter-spacing:.04em}
+  .tn .rn.ox{color:var(--oxblood)}
+  .tn .lb{font-family:"HPCaps",serif; font-size:2.4mm; letter-spacing:.24em;
+      text-transform:uppercase; color:var(--smoke); margin-top:1mm}
+
+  /* ---------- menu ---------- */
+  .mn{display:flex; flex-direction:column; height:100%; text-align:center;
+      padding:8mm 6mm}
+  .mn .kick{font-family:"HPCaps",serif; font-size:3.2mm; letter-spacing:.32em;
+      text-transform:uppercase; color:var(--smoke)}
+  .mn h2{font-family:"HPBlack",serif; font-size:17mm; color:var(--plum);
+      margin:2mm 0 0; line-height:1}
+  .mn .sub{font-family:"HPText",serif; font-style:italic; font-size:5mm; margin-top:1mm}
+  .mn .crs{flex:1; display:flex; flex-direction:column; justify-content:center;
+      gap:7mm; margin-top:4mm}
+  .mn .crs .c .no{font-family:"HPCaps",serif; font-size:2.8mm; letter-spacing:.3em;
+      text-transform:uppercase; color:var(--smoke)}
+  .mn .crs .c .d{font-family:"HPEngrave",serif; font-weight:700; font-size:6.4mm;
+      letter-spacing:.06em; text-transform:uppercase; margin-top:1mm; line-height:1.15}
+  .mn .crs .c .n{font-family:"HPText",serif; font-style:italic; font-size:4mm;
+      color:var(--smoke); margin-top:1.5mm; max-width:120mm; margin-inline:auto}
+
+  /* ---------- seating plan ---------- */
+  .sp{display:flex; flex-direction:column; height:100%; padding:6mm 2mm}
+  .sp .kick{font-family:"HPCaps",serif; font-size:3mm; letter-spacing:.3em;
+      text-transform:uppercase; color:var(--smoke); text-align:center}
+  .sp h2{font-family:"HPEngrave",serif; font-weight:700; font-size:11mm;
+      letter-spacing:.06em; text-transform:uppercase; text-align:center;
+      margin:2mm 0 0}
+  .sp .cols{flex:1; display:grid; grid-template-columns:repeat(2,1fr);
+      gap:6mm; margin-top:6mm}
+  .sp .tb{border:var(--hair) solid var(--ink); padding:3mm 4mm}
+  .sp .tb h3{font-family:"HPEngrave",serif; font-weight:700; font-size:4.4mm;
+      letter-spacing:.14em; text-transform:uppercase; margin:0 0 2mm;
+      text-align:center; border-bottom:var(--hair) solid var(--ink); padding-bottom:1.5mm}
+  .sp .tb .sl{border-bottom:var(--hair) dotted var(--smoke); height:7mm}
+</style>
+
+<div id="out"></div>
+
+<script>
+const out = document.getElementById("out");
+let H = "";
+const ROMAN = ["I","II","III","IV","V","VI","VII","VIII","IX","X","XI","XII"];
+
+/* ---------- sheet 1 + 2: 16 place cards ---------- */
+for (let s = 0; s < 2; s++) {
+  H += `<div class="page"><div class="pcs">`;
+  for (let i = 0; i < 8; i++) {
+    H += `
+      <div class="pc">
+        <div class="fl"></div><div class="flab">fold</div>
+        <div class="back"><div class="crest">The Mourning Table</div></div>
+        <div class="front">
+          <div class="nm">&nbsp;</div>
+          <div class="seat">kindly sit where you are put</div>
+        </div>
+      </div>`;
+  }
+  H += `</div><div class="guide">Place cards &middot; sheet ${s + 1} of 2 &middot; 8 per sheet &middot; write the name, fold on the dots</div></div>`;
+}
+
+/* ---------- sheet 3 + 4: table numbers I to XII ---------- */
+for (let s = 0; s < 2; s++) {
+  H += `<div class="page"><div class="tns">`;
+  for (let i = 0; i < 6; i++) {
+    const n = s * 6 + i;
+    const ox = n % 2 === 1;
+    const inner = `<div class="half"><div class="rn${ox ? " ox" : ""}">${ROMAN[n]}</div>
+                   <div class="lb">Table</div></div>`;
+    H += `<div class="tn"><div class="fl"></div>
+            <div class="back">${inner}</div>${inner}</div>`;
+  }
+  H += `</div><div class="guide">Table numbers &middot; sheet ${s + 1} of 2 &middot; fold to stand &middot; reads from both sides</div></div>`;
+}
+
+/* ---------- sheet 5: the menu ---------- */
+const COURSES = [
+  ["First", "Cold Broth of Beetroot &amp; Bone", "served in the dark, as is traditional"],
+  ["Second", "Bread, Black Butter, Salt", "take a piece for the one who is missing"],
+  ["Third", "Something Roasted", "the cook will not be drawn on what"],
+  ["Fourth", "Root Vegetables, Buried &amp; Recovered", "dug up this afternoon"],
+  ["Fifth", "Burnt Honey Cream", "scorched on purpose"],
+  ["Last", "Port, Cheese, Confession", "in that order, strictly"],
+];
+H += `<div class="page">
+  <div class="frame"></div>
+  <div class="mn">
+    <div class="kick">All Hallows' Eve &middot; Eight O'Clock</div>
+    <h2>The Mourning<br>Table</h2>
+    <div class="sub">six courses, one empty chair</div>
+    <hr class="rule dbl">
+    <div class="crs">` + COURSES.map(([no, d, n]) => `
+      <div class="c">
+        <div class="no">${no} Course</div>
+        <div class="d">${d}</div>
+        <div class="n">${n}</div>
+      </div>`).join("") + `
+    </div>
+    <hr class="rule thin">
+    <div class="kick">Hollow Press</div>
+  </div>
+</div>`;
+
+/* ---------- sheet 6: seating plan ---------- */
+H += `<div class="page">
+  <div class="sp">
+    <div class="kick">Please Find Your Name</div>
+    <h2>Seating</h2>
+    <hr class="rule dbl">
+    <div class="cols">` +
+      ROMAN.slice(0, 6).map(r => `
+      <div class="tb">
+        <h3>Table ${r}</h3>
+        <div class="sl"></div><div class="sl"></div><div class="sl"></div><div class="sl"></div>
+      </div>`).join("") + `
+    </div>
+  </div>
+  <div class="guide">Seating plan &middot; write names in, pin by the door</div>
+</div>`;
+
+out.innerHTML = H;
+document.documentElement.dataset.ready = "1";
+</script>
