@@ -128,3 +128,52 @@ create index if not exists rc_rsvp_here on public.rc_rsvp(member_id, here_on);
 -- Distance/pace logging is gone with the tracker. The table was empty, so
 -- there is nothing to migrate out of it.
 drop table if exists public.rc_logs;
+
+-- ============================================================
+-- runclub_posts — the community wall (2026-09-18)
+-- Chat is for talk that scrolls away; the wall is what the club
+-- keeps.  A post is either something a member SAID, or an auto
+-- entry the app writes when someone turns up ('showed') or joins
+-- ('joined'), so the feed is a record of attendance as much as a
+-- place to talk.  `n` snapshots the author's total shows at the
+-- moment of the post, so "that's their 12th" stays true forever.
+-- ============================================================
+create table if not exists public.rc_posts (
+  id         uuid primary key default gen_random_uuid(),
+  club_id    uuid not null references public.rc_clubs(id) on delete cascade,
+  member_id  text not null,
+  name       text not null,
+  kind       text not null default 'said',
+  text       text not null default '',
+  run_id     uuid references public.rc_runs(id) on delete set null,
+  photo      text,
+  n          int  not null default 0,
+  pinned     boolean not null default false,
+  created_at timestamptz not null default now()
+);
+create index if not exists rc_posts_club on public.rc_posts(club_id, created_at desc);
+create index if not exists rc_posts_run  on public.rc_posts(run_id);
+
+-- One reaction per member per post; changing it replaces it.
+create table if not exists public.rc_props (
+  post_id    uuid not null references public.rc_posts(id) on delete cascade,
+  member_id  text not null,
+  emoji      text not null default '👏',
+  created_at timestamptz not null default now(),
+  primary key (post_id, member_id)
+);
+
+create table if not exists public.rc_comments (
+  id         uuid primary key default gen_random_uuid(),
+  post_id    uuid not null references public.rc_posts(id) on delete cascade,
+  club_id    uuid not null references public.rc_clubs(id) on delete cascade,
+  member_id  text not null,
+  name       text not null,
+  text       text not null,
+  created_at timestamptz not null default now()
+);
+create index if not exists rc_comments_post on public.rc_comments(post_id, created_at asc);
+
+alter table public.rc_posts    enable row level security;
+alter table public.rc_props    enable row level security;
+alter table public.rc_comments enable row level security;

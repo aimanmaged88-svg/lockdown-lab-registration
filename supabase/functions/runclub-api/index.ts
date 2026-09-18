@@ -231,7 +231,7 @@ async function stateFor(m: Member, todayLocal: string) {
   if (!club) throw J({ error: "club not found", code: "noclub" }, 404);
   const members: Member[] = await db(`rc_members?club_id=eq.${uid(m.club_id)}&banned=is.false&select=*&order=joined_at.asc`) || [];
   const now = Date.now();
-  const [upcoming, past, routes, myHere, chatRows] = await Promise.all([
+  const [upcoming, past, routes, myHere, chatRows, postRows] = await Promise.all([
     runsFor(m.club_id, new Date(now - 6 * 36e5).toISOString(), new Date(now + 120 * dayMs).toISOString(), false, 40),
     runsFor(m.club_id, new Date(now - 60 * dayMs).toISOString(), new Date(now - 6 * 36e5).toISOString(), true, 10),
     db(`rc_routes?club_id=eq.${uid(m.club_id)}&select=*&order=km.asc&limit=80`),
@@ -239,6 +239,7 @@ async function stateFor(m: Member, todayLocal: string) {
     // One query gives the club thread's size and every run thread's, so the
     // UI can badge unread without a request per run.
     db(`rc_chat?club_id=eq.${uid(m.club_id)}&select=run_id&limit=4000`),
+    db(`rc_posts?club_id=eq.${uid(m.club_id)}&select=id&limit=4000`),
   ]);
   const week = mondayOf(todayLocal);
   const mine = myHere || [];
@@ -266,6 +267,7 @@ async function stateFor(m: Member, todayLocal: string) {
     board,
     chat_n,
     chat_runs,
+    feed_n: (postRows || []).length,
     stats: {
       week_shows: days.filter((d: string) => d >= week).length,
       total_shows: days.length,
@@ -285,6 +287,103 @@ async function chatFor(club_id: string, run_id: string | null, limit = 80) {
     `rc_chat?club_id=eq.${uid(club_id)}${q}&select=id,run_id,member_id,name,text,created_at&order=created_at.desc&limit=${limit}`,
   ) || [];
   return rows.reverse();
+}
+
+// ---------- the wall ----------
+// Chat scrolls away; the wall is what the club keeps.  Reactions are a fixed
+// set so nobody can stuff an emoji field with markup.
+const PROPS = ["👏", "🔥", "💪", "🏃", "❤️", "😮"];
+
+// A base64 data-url image goes into the public `pack` bucket (writes are
+// service-role only; the client never touches storage directly).
+async function uploadPhoto(dataUrl: unknown, path: string): Promise<string> {
+  const m = String(dataUrl ?? "").match(/^data:image\/(jpeg|png|webp);base64,(.+)$/);
+  if (!m) throw J({ error: "that photo didn't come through", code: "badphoto" }, 400);
+  let bytes: Uint8Array;
+  try { bytes = Uint8Array.from(atob(m[2]), (c) => c.charCodeAt(0)); }
+  catch { throw J({ error: "that photo didn't come through", code: "badphoto" }, 400); }
+  if (bytes.length > 3_500_000) throw J({ error: "that photo’s too big — try a smaller one", code: "bigphoto" }, 400);
+  const ext = m[1] === "jpeg" ? "jpg" : m[1];
+  const full = `${path}.${ext}`;
+  const up = await fetch(`${SUPABASE_URL}/storage/v1/object/pack/${full}`, {
+    method: "POST",
+    headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}`, "Content-Type": `image/${m[1]}`, "x-upsert": "true" },
+    body: bytes,
+  });
+  if (!up.ok) { console.error("upload", await up.text()); throw J({ error: "the photo wouldn't upload" }, 500); }
+  return `${SUPABASE_URL}/storage/v1/object/public/pack/${full}`;
+}
+const PHOTO_PREFIX = () => `${SUPABASE_URL}/storage/v1/object/public/pack/`;
+// Only ever deletes something inside our own bucket, and only by the exact
+// URL we minted for that post.
+async function dropPhoto(url: unknown) {
+  const u = String(url ?? "");
+  if (!u.startsWith(PHOTO_PREFIX())) return;
+  const path = u.slice(PHOTO_PREFIX().length);
+  if (!/^[A-Za-z0-9._\/-]{1,200}$/.test(path)) return;
+  try {
+    await fetch(`${SUPABASE_URL}/storage/v1/object/pack/${path}`, {
+      method: "DELETE",
+      headers: { apikey: SERVICE_KEY, Authorization: `Bearer ${SERVICE_KEY}` },
+    });
+  } catch (e) { console.error("dropPhoto", e); }
+}
+
+// The app writes its own entries so the wall is a record of the club, not an
+// empty box waiting for someone brave enough to post first.  A failure here
+// must never sink the action that triggered it.
+async function autoPost(m: Member, kind: string, extra: Record<string, unknown> = {}) {
+  try {
+    await ins("rc_posts", { club_id: m.club_id, member_id: m.id, name: m.name, kind, text: "", ...extra });
+  } catch (e) { console.error("autoPost", kind, e); }
+}
+
+// Posts newest first with their reactions and comments attached, so the feed
+// renders from one round trip.  Pinned posts ride the first page only — they’d
+// otherwise reappear on every page of the cursor.
+async function feedFor(club_id: string, meId: string, before = "", limit = 20) {
+  const cut = /^\d{4}-\d{2}-\d{2}T[\d:.]+/.test(before) ? `&created_at=lt.${encodeURIComponent(before)}` : "";
+  const [pins, rest] = await Promise.all([
+    cut ? Promise.resolve([]) : db(`rc_posts?club_id=eq.${uid(club_id)}&pinned=is.true&select=*&order=created_at.desc&limit=3`),
+    db(`rc_posts?club_id=eq.${uid(club_id)}&pinned=is.false${cut}&select=*&order=created_at.desc&limit=${limit}`),
+  ]);
+  const tail = rest || [];
+  const posts = [...(pins || []), ...tail];
+  const out = { posts: [] as unknown[], more: tail.length >= limit, cursor: tail.length ? tail[tail.length - 1].created_at : "" };
+  if (!posts.length) return out;
+  const ids = posts.map((p: { id: string }) => `"${uid(p.id)}"`).join(",");
+  const [props, comments] = await Promise.all([
+    db(`rc_props?post_id=in.(${ids})&select=post_id,member_id,emoji`),
+    db(`rc_comments?post_id=in.(${ids})&select=*&order=created_at.asc&limit=600`),
+  ]);
+  const pByPost: Record<string, { member_id: string; emoji: string }[]> = {};
+  for (const x of props || []) (pByPost[x.post_id] ||= []).push(x);
+  const cByPost: Record<string, unknown[]> = {};
+  for (const c of comments || []) {
+    (cByPost[c.post_id] ||= []).push({ id: c.id, member_id: c.member_id, name: c.name, text: c.text, created_at: c.created_at });
+  }
+  out.posts = posts.map((p: Record<string, unknown>) => {
+    const pr = pByPost[p.id as string] || [];
+    const tally: Record<string, number> = {};
+    for (const x of pr) tally[x.emoji] = (tally[x.emoji] || 0) + 1;
+    return {
+      id: p.id, member_id: p.member_id, name: p.name, kind: p.kind, text: p.text,
+      run_id: p.run_id, photo: p.photo, n: p.n, pinned: p.pinned, created_at: p.created_at,
+      props: tally, props_n: pr.length,
+      mine: pr.find((x) => x.member_id === meId)?.emoji || "",
+      comments: cByPost[p.id as string] || [],
+    };
+  });
+  return out;
+}
+
+// A post must belong to the caller's club before they can touch it.
+async function postIn(club_id: string, post: unknown) {
+  const id = uid(post);
+  if (!isUuid(id)) throw J({ error: "which post?", code: "bad" }, 400);
+  const row = (await db(`rc_posts?id=eq.${id}&club_id=eq.${uid(club_id)}&select=*`))?.[0];
+  if (!row) throw J({ error: "post not found", code: "nopost" }, 404);
+  return row as Record<string, unknown>;
 }
 
 // A run must belong to the caller's club before they can touch it.
@@ -363,6 +462,8 @@ Deno.serve(async (req) => {
         const m = prev
           ? (await upd("rc_members", `id=eq.${encodeURIComponent(device)}`, row))[0]
           : (await ins("rc_members", { id: device, ...row }))[0];
+        // New face in this club — the wall says hello so nobody arrives to silence.
+        if (!prev || prev.club_id !== c.id) await autoPost(m as Member, "joined");
         return J(await stateFor(m as Member, today));
       }
       case "state": {
@@ -463,6 +564,7 @@ Deno.serve(async (req) => {
         }))[0];
         // The host is in by default — a run with nobody in it looks dead.
         await ins("rc_rsvp", { run_id: run.id, member_id: m.id, pace: m.pace });
+        await autoPost(m, "called", { run_id: run.id });
         return J(await stateFor(m, today));
       }
       case "run_edit": {
@@ -565,6 +667,21 @@ Deno.serve(async (req) => {
         // row if it isn't there rather than refusing.
         if (ex) await upd("rc_rsvp", q, patch);
         else await ins("rc_rsvp", { run_id: r.id, member_id: m.id, pace: m.pace, ...patch });
+        if (on) {
+          // One wall entry per member per run, however many times they toggle.
+          const had = (await db(
+            `rc_posts?club_id=eq.${uid(m.club_id)}&member_id=eq.${encodeURIComponent(sid(m.id))}` +
+              `&run_id=eq.${uid(r.id as string)}&kind=eq.showed&select=id`,
+          )) || [];
+          if (!had.length) {
+            // `n` snapshots their total turn-ups now, so "that's their 12th"
+            // stays true no matter what happens later.
+            const all = (await db(
+              `rc_rsvp?member_id=eq.${encodeURIComponent(sid(m.id))}&here=is.true&select=run_id&limit=4000`,
+            )) || [];
+            await autoPost(m, "showed", { run_id: r.id, n: all.length });
+          }
+        }
         return J(await stateFor(m, today));
       }
       case "versus": {
@@ -624,6 +741,83 @@ Deno.serve(async (req) => {
         if (!m.captain && row.member_id !== m.id) return J({ error: "not yours to delete", code: "notyours" }, 403);
         await del("rc_chat", `id=eq.${id}`);
         return J({ run: row.run_id || null, chat: await chatFor(m.club_id, row.run_id || null) });
+      }
+
+      // ---------- the wall ----------
+      case "feed_get": {
+        const m = await guard(b.device);
+        return J(await feedFor(m.club_id, m.id, str(b.before, 40)));
+      }
+      case "post_add": {
+        const m = await guard(b.device);
+        const text = str(b.text, 600);
+        const photo = b.photo ? await uploadPhoto(b.photo, `posts/${uid(m.club_id).slice(0, 8)}-${Date.now()}`) : "";
+        // A post is words, a picture, or both — but not nothing.
+        if (!text && !photo) return J({ error: "say something, or add a photo", code: "empty" }, 400);
+        const run = b.run ? (await runIn(m.club_id, b.run)).id as string : null;
+        const recent = await db(
+          `rc_posts?member_id=eq.${encodeURIComponent(sid(m.id))}&kind=eq.said&created_at=gte.${new Date(Date.now() - 36e5).toISOString()}&select=id`,
+        ) || [];
+        if (recent.length >= 10) return J({ error: "give the wall a breather", code: "slow" }, 429);
+        await ins("rc_posts", {
+          club_id: m.club_id, member_id: m.id, name: m.name, kind: "said",
+          text, run_id: run, photo: photo || null,
+        });
+        return J(await feedFor(m.club_id, m.id));
+      }
+      case "post_del": {
+        const m = await guard(b.device);
+        const row = await postIn(m.club_id, b.post);
+        // Your own, or the captain's call.
+        if (!m.captain && row.member_id !== m.id) return J({ error: "not yours to delete", code: "notyours" }, 403);
+        await del("rc_posts", `id=eq.${uid(row.id as string)}`);
+        await dropPhoto(row.photo);
+        return J(await feedFor(m.club_id, m.id));
+      }
+      case "post_pin": {
+        const m = await guard(b.device);
+        if (!m.captain) return J({ error: "the captain pins posts", code: "notcaptain" }, 403);
+        const row = await postIn(m.club_id, b.post);
+        await upd("rc_posts", `id=eq.${uid(row.id as string)}`, { pinned: b.on !== false });
+        return J(await feedFor(m.club_id, m.id));
+      }
+      case "post_prop": {
+        const m = await guard(b.device);
+        const row = await postIn(m.club_id, b.post);
+        const q = `post_id=eq.${uid(row.id as string)}&member_id=eq.${encodeURIComponent(sid(m.id))}`;
+        const emoji = String(b.emoji ?? "");
+        const ex = (await db(`rc_props?${q}&select=emoji`))?.[0];
+        // Tapping the one you already gave takes it back; anything else swaps it.
+        if (!emoji || (ex && ex.emoji === emoji)) {
+          await del("rc_props", q);
+        } else {
+          if (!PROPS.includes(emoji)) return J({ error: "pick one of the reactions", code: "bad" }, 400);
+          if (ex) await upd("rc_props", q, { emoji });
+          else await ins("rc_props", { post_id: row.id, member_id: m.id, emoji });
+        }
+        return J(await feedFor(m.club_id, m.id));
+      }
+      case "comment_add": {
+        const m = await guard(b.device);
+        const row = await postIn(m.club_id, b.post);
+        const text = str(b.text, 300);
+        if (!text) return J({ error: "say something", code: "empty" }, 400);
+        const recent = await db(
+          `rc_comments?member_id=eq.${encodeURIComponent(sid(m.id))}&created_at=gte.${new Date(Date.now() - 5 * 6e4).toISOString()}&select=id`,
+        ) || [];
+        if (recent.length >= 30) return J({ error: "slow down a second", code: "slow" }, 429);
+        await ins("rc_comments", { post_id: row.id, club_id: m.club_id, member_id: m.id, name: m.name, text });
+        return J(await feedFor(m.club_id, m.id));
+      }
+      case "comment_del": {
+        const m = await guard(b.device);
+        const id = uid(b.comment);
+        if (!isUuid(id)) return J({ error: "which comment?", code: "bad" }, 400);
+        const row = (await db(`rc_comments?id=eq.${id}&club_id=eq.${uid(m.club_id)}&select=id,member_id`))?.[0];
+        if (!row) return J({ error: "comment not found", code: "bad" }, 404);
+        if (!m.captain && row.member_id !== m.id) return J({ error: "not yours to delete", code: "notyours" }, 403);
+        await del("rc_comments", `id=eq.${id}`);
+        return J(await feedFor(m.club_id, m.id));
       }
 
       case "board": {

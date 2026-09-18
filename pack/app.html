@@ -758,7 +758,7 @@ header.top{
 nav.tabs{
   position:fixed;left:0;right:0;bottom:0;z-index:45;margin-inline:auto;
   width:min(520px,calc(100% - 24px));
-  display:grid;grid-template-columns:repeat(5,1fr);gap:2px;padding:7px;
+  display:grid;grid-template-columns:repeat(6,1fr);gap:2px;padding:7px;
   margin-bottom:calc(10px + env(safe-area-inset-bottom,0));
   background:color-mix(in srgb,var(--deep) 94%,transparent);
   backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
@@ -771,6 +771,12 @@ nav.tabs button{
   transition:background .2s var(--ease),color .2s var(--ease);
 }
 nav.tabs button i{font-style:normal;font-size:18px;line-height:1;transition:transform .3s var(--spring)}
+/* Six across gets tight on a small phone — shrink the label, never the icon. */
+@media(max-width:380px){
+  nav.tabs{width:calc(100% - 16px);padding:6px 4px}
+  nav.tabs button{font-size:8.5px;letter-spacing:.03em;padding:7px 0 5px}
+  nav.tabs button i{font-size:17px}
+}
 nav.tabs button.on{background:color-mix(in srgb,var(--ondeep) 12%,transparent);color:var(--ondeep)}
 nav.tabs button.on i{transform:translateY(-1px) scale(1.12)}
 nav.tabs button:active i{transform:scale(.86)}
@@ -1096,6 +1102,75 @@ select.inp{appearance:none;background-image:linear-gradient(45deg,transparent 49
 }
 .fab:active{transform:scale(.9)}
 /* ---------- chat ---------- */
+/* ---------- the wall ---------- */
+.composer{display:flex;gap:10px;align-items:flex-start;margin:0 0 14px}
+.composer .av{width:38px;height:38px;font-size:13px}
+.composer .gr{flex:1 1 auto;min-width:0}
+.composer .cbox{
+  width:100%;padding:12px 14px;border-radius:16px;border:1px solid var(--line);
+  background:var(--card2);color:var(--ink);font-size:15px;font-weight:500;line-height:1.4;
+  resize:none;min-height:46px;transition:border-color .2s,background .2s;
+}
+.composer .cbox:focus{outline:0;border-color:var(--ink);background:var(--card)}
+.composer .cbox::placeholder{color:var(--dim)}
+.cactions{display:flex;gap:8px;align-items:center;margin-top:9px}
+.cactions .sp{flex:1 1 auto}
+.cthumb{position:relative;margin-top:10px;border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+.cthumb img{display:block;width:100%;max-height:260px;object-fit:cover}
+.cthumb button{
+  position:absolute;top:8px;right:8px;width:30px;height:30px;border-radius:50%;
+  background:rgba(12,12,14,.72);color:#fff;font-size:14px;display:grid;place-items:center;backdrop-filter:blur(6px);
+}
+.post{
+  background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+  padding:15px 16px;box-shadow:var(--shadow);margin-bottom:12px;
+}
+.post.auto{background:var(--card2);box-shadow:none;padding:13px 15px}
+.post.pin{border-color:color-mix(in srgb,var(--hot) 45%,var(--line))}
+.post .phd{display:flex;gap:10px;align-items:center}
+.post .phd .gr{flex:1 1 auto;min-width:0}
+.post .who{font-size:14px;font-weight:800;letter-spacing:-.02em;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.post .sub{font-size:11.5px;color:var(--muted);margin-top:1px}
+.post .body{margin-top:11px;font-size:15px;line-height:1.45;white-space:pre-wrap;word-break:break-word}
+.post .pphoto{margin-top:11px;border-radius:14px;overflow:hidden;border:1px solid var(--line2);background:var(--sunk)}
+.post .pphoto img{display:block;width:100%;max-height:420px;object-fit:cover}
+.post .pin-tag,.post .ntag{
+  font-size:9.5px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;
+  padding:2px 7px;border-radius:999px;background:var(--sunk);color:var(--muted);
+}
+.post .ntag.hot{background:color-mix(in srgb,var(--hot) 15%,transparent);color:var(--hot)}
+.post .runlink{
+  display:inline-flex;align-items:center;gap:6px;margin-top:10px;padding:8px 12px;
+  border-radius:12px;background:var(--sunk);border:1px solid var(--line2);
+  font-size:13px;font-weight:700;letter-spacing:-.01em;max-width:100%;
+}
+.pfoot{display:flex;gap:6px;align-items:center;margin-top:12px;flex-wrap:wrap}
+.prop{
+  display:inline-flex;align-items:center;gap:5px;padding:6px 10px;border-radius:999px;
+  border:1px solid var(--line2);background:var(--card2);font-size:13px;font-weight:700;
+  transition:transform .18s var(--spring),border-color .2s,background .2s;
+}
+.prop:active{transform:scale(.9)}
+.prop.on{border-color:var(--hot);background:color-mix(in srgb,var(--hot) 12%,transparent);color:var(--hot)}
+.prop.add{color:var(--muted);font-size:14px;padding:6px 11px}
+.pfoot .sp{flex:1 1 auto}
+.pfoot .lnk{font-size:12px;font-weight:700;color:var(--muted);padding:6px 4px}
+.propbar{display:flex;gap:6px;margin-top:10px;padding-top:11px;border-top:1px solid var(--line2);flex-wrap:wrap}
+.propbar button{font-size:19px;padding:5px 8px;border-radius:12px;transition:transform .18s var(--spring)}
+.propbar button:active{transform:scale(.85)}
+.cmts{margin-top:11px;padding-top:11px;border-top:1px solid var(--line2);display:flex;flex-direction:column;gap:9px}
+.cmt{display:flex;gap:8px;align-items:flex-start}
+.cmt .av{width:26px;height:26px;font-size:10px}
+.cmt .cb{flex:1 1 auto;min-width:0;font-size:14px;line-height:1.38;word-break:break-word}
+.cmt .cb b{font-weight:800;font-size:12.5px;letter-spacing:-.01em}
+.cmt .cb .tm{font-size:10px;color:var(--dim);margin-left:5px;font-weight:600}
+.cmt .del{opacity:.45;font-size:11px;padding:3px}
+.cmtbar{display:flex;gap:7px;align-items:center;margin-top:10px}
+.cmtbar input{
+  flex:1 1 auto;min-width:0;padding:9px 12px;border-radius:12px;border:1px solid var(--line);
+  background:var(--card2);color:var(--ink);font-size:14.5px;font-weight:500;
+}
+.cmtbar input:focus{outline:0;border-color:var(--ink)}
 .chatwrap{
   max-height:52vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
   display:flex;flex-direction:column;gap:9px;padding:4px 0 8px;
@@ -1151,9 +1226,24 @@ select.inp{appearance:none;background-image:linear-gradient(45deg,transparent 49
 @media(min-width:760px){
   #app{max-width:760px;padding-bottom:40px}
   nav.tabs{width:min(560px,calc(100% - 24px))}
-  .sheet{align-items:center;justify-content:center;top:0;display:flex}
-  .sheet .panel{margin:auto;max-width:520px;width:100%;border-radius:26px}
+  /* Sheets become centred dialogs. The mobile sheet is bottom-anchored and
+     capped at 92vh, which on a desktop viewport leaves ~8vh of dead space
+     under the panel with the tab bar showing through it. So here the sheet
+     fills the viewport, fades in place (no slide), and the panel is what
+     animates and what carries the height cap. */
+  .sheet{
+    inset:0;max-height:none;padding:24px;display:flex;
+    align-items:center;justify-content:center;
+    transform:none;opacity:0;transition:opacity .2s var(--ease);
+  }
+  .sheet.on{transform:none;opacity:1}
+  .sheet.closing{transition:opacity .18s var(--ease)}
+  .sheet .panel{
+    margin:0;max-width:520px;width:100%;border-radius:26px;
+    max-height:100%;box-shadow:0 26px 64px -20px rgba(0,0,0,.55);
+  }
   .sheet.on .panel{animation:pop .36s var(--out)}
+  .sheet .grab{display:none}
 }
 @media(prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
@@ -1260,6 +1350,30 @@ select.inp{appearance:none;background-image:linear-gradient(45deg,transparent 49
     <div class="card"><div class="stats" id="wkClub"></div><div id="wkTop"></div></div>
   </section>
 
+  <!-- ---- THE WALL ---- -->
+  <section id="vFeed" class="view hide">
+    <div style="margin:18px 0 12px">
+      <div class="eyebrow">The club</div>
+      <h1>Wall.</h1>
+    </div>
+    <div class="composer">
+      <div class="av" id="cpAv">?</div>
+      <div class="gr">
+        <textarea class="cbox" id="cpText" rows="1" maxlength="600" placeholder="How was the run?"></textarea>
+        <div class="cthumb hide" id="cpThumb"><img id="cpImg" alt=""><button id="cpDrop" title="Remove">✕</button></div>
+        <div class="cactions">
+          <button class="prop add" id="cpPhoto" title="Add a photo">📷</button>
+          <select class="prop add" id="cpRun" style="max-width:150px"></select>
+          <span class="sp"></span>
+          <button class="btn hot sm" id="cpGo">Post</button>
+        </div>
+      </div>
+    </div>
+    <input type="file" id="cpFile" accept="image/*" class="hide">
+    <div id="feedList"></div>
+    <button class="btn ghost sm hide" id="feedMore" style="margin:4px 0 8px">Older posts</button>
+  </section>
+
   <!-- ---- SCHEDULE ---- -->
   <section id="vRuns" class="view hide">
     <div style="margin:18px 0 12px">
@@ -1328,6 +1442,7 @@ select.inp{appearance:none;background-image:linear-gradient(45deg,transparent 49
 
 <nav class="tabs hide" id="tabs">
   <button data-v="Week" class="on"><i>⚡</i>Week</button>
+  <button data-v="Feed"><i>📣</i>Wall<span class="nudot hide" id="feedDot"></span></button>
   <button data-v="Runs"><i>🗓</i>Schedule</button>
   <button data-v="Routes"><i>🗺</i>Routes</button>
   <button data-v="Board"><i>🏆</i>Board</button>
@@ -1549,6 +1664,19 @@ const ago=d=>{
   return days<=0?'today':days===1?'yesterday':days<7?days+' days ago'
     :days<14?'last week':days<60?Math.round(days/7)+' weeks ago':Math.round(days/30)+' months ago';
 };
+/* ago() works in whole days, which a feed can't use — "today" tells you
+   nothing when six things happened today. This one counts from the clock. */
+const agoT=iso=>{
+  const t=new Date(iso).getTime();
+  if(!t) return '';
+  const mins=Math.round((Date.now()-t)/6e4);
+  if(mins<1) return 'just now';
+  if(mins<60) return mins+'m ago';
+  if(mins<1440){ const h=Math.round(mins/60); return h+'h ago'; }
+  const days=Math.round(mins/1440);
+  return days===1?'yesterday':days<7?days+' days ago'
+    :days<14?'last week':days<60?Math.round(days/7)+' weeks ago':Math.round(days/30)+' months ago';
+};
 /* Instagram is how run clubs find each other; Strava is where the running
    actually lives. Both are optional, so render only what someone gave us. */
 function socialLinks(m,sep){
@@ -1667,14 +1795,46 @@ function demoSeed(){
     C('rn2','d4','Running 5 late, start without me',45),
     C('rn2',DEMO_ME,'All good, we\u2019ll wait at the car park',40)
   ];
+  const P=(member_id,kind,text,minsAgo,extra)=>Object.assign({
+    id:'po'+member_id+minsAgo,club_id:'demo',member_id,
+    name:(members.find(m=>m.id===member_id)||{}).name||'Someone',
+    kind,text:text||'',run_id:null,photo:null,n:0,pinned:false,
+    created_at:new Date(Date.now()-minsAgo*6e4).toISOString()
+  },extra||{});
+  const posts=[
+    P('d2','said','Bay Run this morning was flat out. Whoever set that pace on the last k — respect.',180),
+    P('d3','showed','',200,{run_id:'rp1',n:14}),
+    P('d6','said','Reminder the bakery does the good sourdough on Thursdays. Post-run business.',420),
+    P(DEMO_ME,'showed','',430,{run_id:'rp1',n:9}),
+    P('d7','joined','',1500),
+    P('d4','said','New shoes, first run in them, no blisters. Miracle.',2400)
+  ];
+  const props=[
+    {post_id:posts[0].id,member_id:'d3',emoji:'\u{1F525}'},
+    {post_id:posts[0].id,member_id:'d6',emoji:'\u{1F525}'},
+    {post_id:posts[0].id,member_id:'d4',emoji:'\u{1F44F}'},
+    {post_id:posts[2].id,member_id:DEMO_ME,emoji:'\u2764\uFE0F'},
+    {post_id:posts[4].id,member_id:'d2',emoji:'\u{1F44F}'}
+  ];
+  const comments=[
+    {id:'cm1',post_id:posts[0].id,club_id:'demo',member_id:'d6',name:'Hannah T',
+     text:'That was Priya. She does that every week.',created_at:new Date(Date.now()-170*6e4).toISOString()},
+    {id:'cm2',post_id:posts[0].id,club_id:'demo',member_id:'d4',name:'Priya N',
+     text:'Guilty. Sorry not sorry \u{1F60C}',created_at:new Date(Date.now()-160*6e4).toISOString()},
+    {id:'cm3',post_id:posts[2].id,club_id:'demo',member_id:'d5',name:'Dan O',
+     text:'I\u2019m in for the sourdough, less sure about the 6am',created_at:new Date(Date.now()-400*6e4).toISOString()}
+  ];
   return {
     club:{id:'demo',name:'Inner West Milers',city:'Sydney',blurb:'6am Thursdays. Coffee after. Nobody gets dropped.',
       code:'DEMO01',captain_id:DEMO_ME,created_at:new Date(Date.now()-120*864e5).toISOString()},
-    members,routes,runs:runs.concat(past),rsvp,chat
+    members,routes,runs:runs.concat(past),rsvp,chat,posts,props,comments
   };
 }
 function demoLoad(){
-  try{ const j=JSON.parse(localStorage.getItem(DEMOKEY)||'null'); if(j&&j.club&&j.members&&j.chat) return j; }catch(e){}
+  try{
+    const j=JSON.parse(localStorage.getItem(DEMOKEY)||'null');
+    if(j&&j.club&&j.members&&j.chat&&j.posts) return j;
+  }catch(e){}
   const s=demoSeed(); demoSave(s); return s;
 }
 function demoSave(d){ try{ localStorage.setItem(DEMOKEY,JSON.stringify(d)); }catch(e){} }
@@ -1719,12 +1879,27 @@ function demoState(D){
   const days=here.map(h=>h.here_on).filter(Boolean).sort();
   return {joined:true,me:me,club:Object.assign({},D.club,{members:D.members.length}),
     members:D.members,runs:runs,past:past,routes:D.routes,here:here,board:board,
-    chat_n:chat_n,chat_runs:chat_runs,
+    chat_n:chat_n,chat_runs:chat_runs,feed_n:(D.posts||[]).length,
     stats:{week_shows:days.filter(d=>d>=wk).length,total_shows:days.length,
       streak:demoStreak(days),last:days.length?days[days.length-1]:'',
       coming:runs.filter(r=>(r.going||[]).some(g=>g.id===DEMO_ME)).length,
       club_week_shows:board.reduce((t,r)=>t+r.shows,0),
       club_streakers:board.filter(r=>r.streak>0).length}};
+}
+function demoFeed(D,before){
+  const all=(D.posts||[]).slice().sort((a,z)=>new Date(z.created_at)-new Date(a.created_at));
+  const pins=before?[]:all.filter(p=>p.pinned).slice(0,3);
+  const rest=all.filter(p=>!p.pinned&&(!before||p.created_at<before)).slice(0,20);
+  const shape=p=>{
+    const pr=(D.props||[]).filter(x=>x.post_id===p.id);
+    const tally={}; pr.forEach(x=>{ tally[x.emoji]=(tally[x.emoji]||0)+1; });
+    return Object.assign({},p,{props:tally,props_n:pr.length,
+      mine:(pr.find(x=>x.member_id===DEMO_ME)||{}).emoji||'',
+      comments:(D.comments||[]).filter(c=>c.post_id===p.id)
+        .sort((a,z)=>new Date(a.created_at)-new Date(z.created_at))});
+  };
+  return {posts:pins.concat(rest).map(shape),more:rest.length>=20,
+    cursor:rest.length?rest[rest.length-1].created_at:''};
 }
 function demoChat(D,run){
   return D.chat.filter(c=>(run?c.run_id===run:!c.run_id))
@@ -1748,6 +1923,12 @@ async function demoApi(action,b){
       let row=D.rsvp.find(v=>v.run_id===b.run&&v.member_id===DEMO_ME);
       if(!row){ row={run_id:b.run,member_id:DEMO_ME,pace:(D.members[0]||{}).pace||''}; D.rsvp.push(row); }
       row.here=on; row.here_on=on?TODAY():null;
+      if(on&&!D.posts.some(p=>p.kind==='showed'&&p.member_id===DEMO_ME&&p.run_id===b.run)){
+        D.posts.push({id:uid(),club_id:'demo',member_id:DEMO_ME,
+          name:(D.members.find(m=>m.id===DEMO_ME)||{}).name||'You',kind:'showed',text:'',
+          run_id:b.run,photo:null,n:D.rsvp.filter(v=>v.member_id===DEMO_ME&&v.here).length,
+          pinned:false,created_at:new Date().toISOString()});
+      }
       return back();
     }
     case 'versus': {
@@ -1763,6 +1944,47 @@ async function demoApi(action,b){
       const mineRuns=D.rsvp.filter(v=>v.member_id===DEMO_ME&&v.here).map(v=>v.run_id);
       const together=D.rsvp.filter(v=>v.member_id===b.member&&v.here&&mineRuns.indexOf(v.run_id)>=0).length;
       return {window:b.window,me:side(DEMO_ME),them:side(b.member),together:together};
+    }
+    case 'feed_get': return demoFeed(D,b.before||'');
+    case 'post_add': {
+      const text=String(b.text||'').slice(0,600).trim();
+      if(!text&&!b.photo) throw new Error('say something, or add a photo');
+      D.posts.push({id:uid(),club_id:'demo',member_id:DEMO_ME,
+        name:(D.members.find(m=>m.id===DEMO_ME)||{}).name||'You',kind:'said',
+        text:text,run_id:b.run||null,photo:b.photo||null,n:0,pinned:false,
+        created_at:new Date().toISOString()});
+      demoSave(D); return demoFeed(D,'');
+    }
+    case 'post_del': {
+      D.posts=D.posts.filter(x=>x.id!==b.post);
+      D.props=(D.props||[]).filter(x=>x.post_id!==b.post);
+      D.comments=(D.comments||[]).filter(x=>x.post_id!==b.post);
+      demoSave(D); return demoFeed(D,'');
+    }
+    case 'post_pin': {
+      const p=D.posts.find(x=>x.id===b.post); if(p) p.pinned=b.on!==false;
+      demoSave(D); return demoFeed(D,'');
+    }
+    case 'post_prop': {
+      D.props=D.props||[];
+      const ex=D.props.find(x=>x.post_id===b.post&&x.member_id===DEMO_ME);
+      if(!b.emoji||(ex&&ex.emoji===b.emoji)) D.props=D.props.filter(x=>!(x.post_id===b.post&&x.member_id===DEMO_ME));
+      else if(ex) ex.emoji=b.emoji;
+      else D.props.push({post_id:b.post,member_id:DEMO_ME,emoji:b.emoji});
+      demoSave(D); return demoFeed(D,'');
+    }
+    case 'comment_add': {
+      const text=String(b.text||'').slice(0,300).trim();
+      if(!text) throw new Error('say something');
+      D.comments=D.comments||[];
+      D.comments.push({id:uid(),post_id:b.post,club_id:'demo',member_id:DEMO_ME,
+        name:(D.members.find(m=>m.id===DEMO_ME)||{}).name||'You',
+        text:text,created_at:new Date().toISOString()});
+      demoSave(D); return demoFeed(D,'');
+    }
+    case 'comment_del': {
+      D.comments=(D.comments||[]).filter(c=>c.id!==b.comment);
+      demoSave(D); return demoFeed(D,'');
     }
     case 'chat_get': return {run:b.run||null,chat:demoChat(D,b.run||null)};
     case 'chat_send': {
@@ -1789,6 +2011,9 @@ async function demoApi(action,b){
         paces:b.paces||[],notes:b.notes||'',cancelled:false,host_id:DEMO_ME,
         created_at:new Date().toISOString()});
       D.rsvp.push({run_id:id,member_id:DEMO_ME,pace:(D.members[0]||{}).pace||'',here:false,here_on:null});
+      D.posts.push({id:uid(),club_id:'demo',member_id:DEMO_ME,
+        name:(D.members.find(m=>m.id===DEMO_ME)||{}).name||'You',kind:'called',text:'',
+        run_id:id,photo:null,n:0,pinned:false,created_at:new Date().toISOString()});
       return back();
     }
     case 'run_edit': {
@@ -1835,6 +2060,8 @@ async function demoApi(action,b){
       D.members=D.members.filter(m=>m.id!==b.member);
       D.rsvp=D.rsvp.filter(v=>v.member_id!==b.member);
       D.chat=D.chat.filter(c=>c.member_id!==b.member);
+      D.posts=D.posts.filter(p=>p.member_id!==b.member);
+      D.comments=(D.comments||[]).filter(c=>c.member_id!==b.member);
       return back();
     }
     case 'leave': { try{ localStorage.removeItem(DEMOKEY); }catch(e){} return {ok:true,joined:false}; }
@@ -1871,10 +2098,11 @@ document.addEventListener('click',e=>{
 /* ============================ VIEWS ============================ */
 function view(v){
   VIEW=v;
-  ['Week','Runs','Routes','Board','You'].forEach(n=>$('#v'+n).classList.toggle('hide',n!==v));
+  ['Week','Feed','Runs','Routes','Board','You'].forEach(n=>$('#v'+n).classList.toggle('hide',n!==v));
   $$('nav.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
   const el=$('#v'+v); el.classList.remove('view'); void el.offsetWidth; el.classList.add('view');
   $('#fabChat').classList.toggle('hide',v!=='Week');
+  if(v==='Feed'){ markFeedSeen(); if(!FEED.length) loadFeed(); }
   window.scrollTo({top:0,behavior:'instant'});
 }
 
@@ -2115,7 +2343,8 @@ function render(){
   $('#hCity').textContent=c.city||'run club';
   $('#demoBar').classList.toggle('hide',!DEMO);
   refreshChatDot();
-  renderWeek(); renderRuns(); renderRoutes();
+  renderWeek(); renderRuns(); renderRoutes(); renderFeed();
+  if(VIEW==='Feed') loadFeed();
   if(BWIN==='week'){ BOARD=S.board; }
   renderBoard(); renderYou();
 }
@@ -2214,6 +2443,24 @@ function openRoute(id){
   sheet('shRouteV');
 }
 
+/* Which runs they actually turned up to — the club's own receipts, read
+   straight off the rosters we already hold. */
+function turnedUpTo(id,max){
+  const rows=allRuns()
+    .filter(r=>(r.going||[]).some(g=>g.id===id&&g.here))
+    .sort((a,z)=>new Date(z.starts_at)-new Date(a.starts_at))
+    .slice(0,max||6);
+  if(!rows.length) return '';
+  return `<div class="sect" style="margin-top:16px"><h2>Turned up to</h2></div>`+
+    rows.map(r=>{
+      const d=new Date(r.starts_at);
+      return `<button class="row" style="width:100%;text-align:left" data-gorun="${esc(r.id)}">
+        <div class="gr"><div class="t">${esc(runName(r))}</div>
+        <div class="s">${esc(fmtDate(d))} · ${esc(fmtTime(d))}</div></div>
+        <div class="chip">✓</div></button>`;
+    }).join('');
+}
+
 /* ============================ MEMBER SHEET ============================ */
 function openMember(id){
   const m=(S.members||[]).find(x=>x.id===id); if(!m) return;
@@ -2231,6 +2478,7 @@ function openMember(id){
       <div class="stat"><b>${b.coming||0}</b><span>in for next</span></div>
     </div>
     ${b.last?`<p class="hint" style="text-align:center;margin-top:10px">Last turned up ${esc(ago(b.last))}.</p>`:''}
+    ${turnedUpTo(id)}
     ${m.id!==S.me.id?`<button class="btn hot" style="margin-top:14px" data-vs="${esc(m.id)}">Versus me →</button>`:''}
     ${S.me.captain&&m.id!==S.me.id?`<button class="btn ghost sm" style="margin-top:10px;color:var(--bad);border-color:color-mix(in srgb,var(--bad) 40%,transparent)" data-kick="${esc(m.id)}">Remove from club</button>`:''}`;
   sheet('shMember');
@@ -2336,6 +2584,147 @@ $('#rGo').addEventListener('click',async()=>{
   btn.disabled=false; btn.textContent='Add to the library';
 });
 
+/* ============================ THE WALL ============================
+   Chat scrolls away; the wall is what the club keeps. Members post, and the
+   app writes its own entries when someone joins, calls a run or turns up —
+   so the feed doubles as the record of who showed up to what. */
+const PROPS=['👏','🔥','💪','🏃','❤️','😮'];
+let FEED=[], FEEDCUR='', FEEDMORE=false, FEEDOPEN={}, CPPHOTO='';
+const feedSeenKey=()=>'rc_feedseen_'+((S.club||{}).id||'x');
+function markFeedSeen(){ try{ localStorage.setItem(feedSeenKey(),String(S.feed_n||0)); }catch(e){} refreshFeedDot(); }
+function refreshFeedDot(){
+  let seen=0; try{ seen=+(localStorage.getItem(feedSeenKey())||0); }catch(e){}
+  const el=$('#feedDot'); if(el) el.classList.toggle('hide',!((S.feed_n||0)>seen));
+}
+function runTitleOf(id){
+  const r=allRuns().find(x=>x.id===id);
+  return r?runName(r):'a club run';
+}
+/* The app's own entries read as sentences, not as log lines. */
+function autoLine(p){
+  if(p.kind==='joined') return '<b>'+esc(p.name)+'</b> joined the pack.';
+  if(p.kind==='called') return '<b>'+esc(p.name)+'</b> called a run.';
+  if(p.kind==='showed') return '<b>'+esc(p.name)+'</b> turned up.';
+  return esc(p.name);
+}
+function postHTML(p){
+  const auto=p.kind!=='said';
+  const own=p.member_id===S.me.id, cap=S.me.captain;
+  const props=Object.keys(p.props||{}).filter(e=>p.props[e]>0);
+  const tally=props.map(e=>`<button class="prop${p.mine===e?' on':''}" data-prop="${esc(p.id)}" data-emoji="${esc(e)}">${e} ${p.props[e]}</button>`).join('');
+  const cmts=(p.comments||[]);
+  const open=!!FEEDOPEN[p.id];
+  const run=p.run_id?allRuns().find(x=>x.id===p.run_id):null;
+  return `<div class="post${auto?' auto':''}${p.pinned?' pin':''}">
+    <div class="phd">
+      <div class="av" data-mem="${esc(p.member_id)}">${esc(initials(p.name))}</div>
+      <div class="gr">
+        <div class="who">${auto?autoLine(p):'<b>'+esc(p.name)+'</b>'}
+          ${p.pinned?'<span class="pin-tag">📌 pinned</span>':''}
+          ${p.kind==='showed'&&p.n?`<span class="ntag hot">run #${p.n}</span>`:''}</div>
+        <div class="sub">${esc(agoT(p.created_at))}</div>
+      </div>
+      ${(own||cap)?`<button class="prop add" data-postmenu="${esc(p.id)}" title="Options">⋯</button>`:''}
+    </div>
+    ${p.text?`<div class="body">${esc(p.text)}</div>`:''}
+    ${p.photo?`<div class="pphoto"><img src="${esc(p.photo)}" alt="" loading="lazy"></div>`:''}
+    ${run?`<button class="runlink" data-gorun="${esc(run.id)}">🗓 ${esc(runName(run))} · ${esc(whenShort(run))}</button>`:''}
+    <div class="pfoot">
+      ${tally}
+      <button class="prop add" data-propbar="${esc(p.id)}" title="React">${props.length?'＋':'👏'}</button>
+      <button class="prop add" data-cmt="${esc(p.id)}">💬${cmts.length?' '+cmts.length:''}</button>
+    </div>
+    <div class="propbar hide" id="pb-${esc(p.id)}">
+      ${PROPS.map(e=>`<button data-prop="${esc(p.id)}" data-emoji="${esc(e)}">${e}</button>`).join('')}
+    </div>
+    ${(open||cmts.length)?`<div class="cmts">
+      ${cmts.map(c=>`<div class="cmt">
+        <div class="av" data-mem="${esc(c.member_id)}">${esc(initials(c.name))}</div>
+        <div class="cb"><b>${esc(c.name)}</b><span class="tm">${esc(agoT(c.created_at))}</span><br>${esc(c.text)}</div>
+        ${(c.member_id===S.me.id||cap)?`<button class="del" data-delcmt="${esc(c.id)}" title="Delete">🗑</button>`:''}
+      </div>`).join('')}
+      ${open?`<div class="cmtbar"><input id="ci-${esc(p.id)}" maxlength="300" placeholder="Say something…" autocomplete="off">
+        <button class="btn hot sm" data-cmtgo="${esc(p.id)}">Send</button></div>`:''}
+    </div>`:''}
+  </div>`;
+}
+function whenShort(r){
+  const d=new Date(r.starts_at);
+  return (isToday(d)?'today':DOWL[d.getDay()])+' · '+fmtTime(d);
+}
+function paintFeed(){
+  const el=$('#feedList'); if(!el) return;
+  if(!FEED.length){
+    el.innerHTML=`<div class="card"><div class="empty">
+      <div class="ico">📣</div><h3>Nothing on the wall yet</h3>
+      <p>This is the club's own feed — how the run went, a photo from the park, who's turning up. Start it off.</p></div></div>`;
+  } else {
+    el.innerHTML=FEED.map(postHTML).join('');
+  }
+  $('#feedMore').classList.toggle('hide',!FEEDMORE);
+}
+async function loadFeed(more){
+  try{
+    const r=await api('feed_get',more?{before:FEEDCUR}:{});
+    FEED=more?FEED.concat(r.posts||[]):(r.posts||[]);
+    FEEDCUR=r.cursor||''; FEEDMORE=!!r.more;
+    paintFeed();
+  }catch(e){
+    $('#feedList').innerHTML='<div class="card"><div class="empty"><p>'+esc(e.message)+'</p></div></div>';
+  }
+}
+/* A feed action hands back the whole first page, so the wall stays in step. */
+function takeFeed(r){ FEED=r.posts||[]; FEEDCUR=r.cursor||''; FEEDMORE=!!r.more; paintFeed(); }
+function renderFeed(){
+  const me=S.me||{};
+  $('#cpAv').textContent=initials(me.name||'?');
+  /* Attach a post to a run: the ones that just happened, then what's next. */
+  const sel=$('#cpRun'); if(sel){
+    const keep=sel.value;
+    const past=(S.past||[]).slice(0,5), next=(S.runs||[]).slice(0,5);
+    sel.innerHTML='<option value="">No run</option>'+
+      past.concat(next).map(r=>`<option value="${esc(r.id)}">${esc(runName(r))} · ${esc(whenShort(r))}</option>`).join('');
+    if(keep) sel.value=keep;
+  }
+  refreshFeedDot();
+}
+/* Photos are downscaled in the browser before they ever leave the phone —
+   a 12MP camera shot would otherwise be a 4MB upload. */
+function pickPhoto(file){
+  if(!file) return;
+  if(!/^image\//.test(file.type)){ toast('That needs to be an image'); return; }
+  const fr=new FileReader();
+  fr.onload=()=>{
+    const img=new Image();
+    img.onload=()=>{
+      const max=1280, sc=Math.min(1,max/Math.max(img.width,img.height));
+      const c=document.createElement('canvas');
+      c.width=Math.round(img.width*sc); c.height=Math.round(img.height*sc);
+      c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+      CPPHOTO=c.toDataURL('image/jpeg',.82);
+      $('#cpImg').src=CPPHOTO;
+      $('#cpThumb').classList.remove('hide');
+    };
+    img.onerror=()=>toast("Couldn't read that photo");
+    img.src=fr.result;
+  };
+  fr.onerror=()=>toast("Couldn't read that photo");
+  fr.readAsDataURL(file);
+}
+function dropPhoto(){ CPPHOTO=''; $('#cpThumb').classList.add('hide'); $('#cpImg').src=''; $('#cpFile').value=''; }
+async function sendPost(){
+  const t=$('#cpText').value.trim();
+  if(!t&&!CPPHOTO){ toast('Say something, or add a photo'); return; }
+  const btn=$('#cpGo'); btn.disabled=true; btn.textContent='Posting…';
+  try{
+    const r=await api('post_add',{text:t,photo:CPPHOTO||undefined,run:$('#cpRun').value||undefined});
+    $('#cpText').value=''; $('#cpRun').value=''; dropPhoto();
+    takeFeed(r); buzz(18);
+    S.feed_n=(S.feed_n||0)+1; markFeedSeen();
+  }catch(e){ toast(e.message); }
+  btn.disabled=false; btn.textContent='Post';
+}
+
 /* ============================ CHAT ============================
    One club thread plus a thread per run. This is the whole point of the app:
    Strava can have the kilometres, we have the conversation. */
@@ -2391,6 +2780,30 @@ async function sendChat(){
     else { S.chat_runs=S.chat_runs||{}; S.chat_runs[CHATRUN]=(S.chat_runs[CHATRUN]||0)+1; }
   }catch(e){ toast(e.message); $('#chatIn').value=t; }
 }
+/* ---- composer wiring ---- */
+async function sendComment(id){
+  const inp=$('#ci-'+id); if(!inp) return;
+  const t=inp.value.trim(); if(!t) return;
+  inp.value='';
+  try{ takeFeed(await api('comment_add',{post:id,text:t})); buzz(10); const n=$('#ci-'+id); if(n) n.focus(); }
+  catch(e){ toast(e.message); inp.value=t; }
+}
+$('#cpGo').addEventListener('click',sendPost);
+$('#cpPhoto').addEventListener('click',()=>$('#cpFile').click());
+$('#cpFile').addEventListener('change',e=>pickPhoto(e.target.files&&e.target.files[0]));
+$('#cpDrop').addEventListener('click',dropPhoto);
+$('#feedMore').addEventListener('click',()=>loadFeed(true));
+/* Grow the box with the text instead of making people scroll a 46px slot. */
+$('#cpText').addEventListener('input',e=>{
+  e.target.style.height='auto';
+  e.target.style.height=Math.min(200,e.target.scrollHeight)+'px';
+});
+$('#feedList').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&e.target.id&&e.target.id.indexOf('ci-')===0){
+    e.preventDefault(); sendComment(e.target.id.slice(3));
+  }
+});
+
 $('#chatGo').addEventListener('click',sendChat);
 $('#chatIn').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); sendChat(); } });
 
@@ -2617,6 +3030,51 @@ document.addEventListener('click',async e=>{
   }
   const cp=t.closest('[data-cp]');
   if(cp){ const p=cp.dataset.cp; const i=CPICK.indexOf(p); if(i<0) CPICK.push(p); else CPICK.splice(i,1); paintPaces(); buzz(8); return; }
+
+  /* ---- the wall ---- */
+  const gr=t.closest('[data-gorun]');
+  if(gr){ openRun(gr.dataset.gorun); return; }
+  const pb=t.closest('[data-propbar]');
+  if(pb){ const el=$('#pb-'+pb.dataset.propbar); if(el) el.classList.toggle('hide'); return; }
+  const pr=t.closest('[data-prop]');
+  if(pr){
+    buzz(12);
+    try{ takeFeed(await api('post_prop',{post:pr.dataset.prop,emoji:pr.dataset.emoji})); }
+    catch(err){ toast(err.message); }
+    return;
+  }
+  const cm=t.closest('[data-cmt]');
+  if(cm){
+    const id=cm.dataset.cmt;
+    FEEDOPEN[id]=!FEEDOPEN[id];
+    paintFeed();
+    if(FEEDOPEN[id]){ const inp=$('#ci-'+id); if(inp) inp.focus(); }
+    return;
+  }
+  const cg=t.closest('[data-cmtgo]');
+  if(cg){ await sendComment(cg.dataset.cmtgo); return; }
+  const dc=t.closest('[data-delcmt]');
+  if(dc){
+    if(!confirm('Delete this comment?')) return;
+    try{ takeFeed(await api('comment_del',{comment:dc.dataset.delcmt})); }
+    catch(err){ toast(err.message); }
+    return;
+  }
+  const pm=t.closest('[data-postmenu]');
+  if(pm){
+    const id=pm.dataset.postmenu, p=FEED.find(x=>x.id===id);
+    if(!p) return;
+    /* Captain gets pin as well as delete; everyone else just their own bin. */
+    const pin=S.me.captain&&p.kind==='said';
+    const what=pin?prompt('Type "pin" to '+(p.pinned?'unpin':'pin')+' this, or "delete" to remove it.',''):(confirm('Delete this post?')?'delete':'');
+    if(!what) return;
+    const w=String(what).trim().toLowerCase();
+    try{
+      if(w==='pin') takeFeed(await api('post_pin',{post:id,on:!p.pinned}));
+      else if(w==='delete'){ takeFeed(await api('post_del',{post:id})); S.feed_n=Math.max(0,(S.feed_n||1)-1); markFeedSeen(); }
+    }catch(err){ toast(err.message); }
+    return;
+  }
 
   if(t.closest('[data-run]')&&!t.closest('[data-rsvp]')){ openRun(t.closest('[data-run]').dataset.run); return; }
   if(t.closest('[data-route]')){ openRoute(t.closest('[data-route]').dataset.route); return; }

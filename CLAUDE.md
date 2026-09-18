@@ -1165,11 +1165,12 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   run_create / run_edit / run_cancel / run_del / rsvp / route_add / route_del /
   **checkin** / **versus** / **chat_get** / **chat_send** / **chat_del** / board. `state` returns everything in one call (club,
   members, upcoming+past runs with rosters, routes, my logs, board, stats).
-- **The five screens:** ⚡Week (next-run hero w/ live countdown + one-tap I'm
+- **The six screens:** ⚡Week (next-run hero w/ live countdown + one-tap I'm
   in, Mon-Sun strip of your km + club-run dots, club-week stats, top 3),
   🗓Schedule (grouped by day, ＋Call a run — ANY member can), 🗺Routes (library:
   km/surface/shape/start pin/link/notes), 🏆Board (week / 30 days / all time),
-  👤You (streak ring, 6 stats, your log, club card).
+  👤You (streak ring, 6 stats, your log, club card) — plus 📣Wall, the
+  community feed (see THE WALL below).
 - **Run-club-specific bits that make it not-a-generic-fitness-app:** pace
   groups are first-class — a run advertises them, you pick yours when you tap
   in, and the run sheet shows **who's in each group** (that's the thing a club
@@ -1369,6 +1370,64 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
     from the same folder. NOTE: the sandbox Chromium can't trust the egress CA,
     so the browser pass runs against `pack/` served locally — the byte
     comparison is what ties it to the live site. Did NOT disable TLS verification.
+- **DESKTOP SHEET FIX (2026-09-18).** His screenshot showed the "ADD A ROUTE"
+  sheet looking cut off on a 1863px desktop with the tab bar showing through
+  underneath. Diagnosis: the mobile sheet is bottom-anchored and capped at
+  `max-height:92vh`, and the desktop media query only added `top:0` — so the
+  sheet box was 92vh pinned to the TOP, leaving ~8vh of dead space below it,
+  while `.panel{max-height:90vh}` nearly filled it (9px margin). His frame also
+  caught it mid-transition. Fix (in the `@media(min-width:760px)` block): sheet
+  gets `inset:0;max-height:none;padding:24px`, fades in place instead of
+  sliding (`transform:none;opacity:0→1`), the PANEL carries the cap
+  (`max-height:100%`) and animates (`pop`), `.grab` hidden. Verified: panel is
+  520px wide, 24px even margins top and bottom, `cutOffBelowFold:false`,
+  `verticallyCentred:true` at 1863x903 and 1440x900.
+- **THE WALL — community posts area (edge v6→v9, 2026-09-18, Aiman: "a chatting
+  app, a community, a posts area, a community posts area, all that sort of
+  jazz… showing how many times they've showed up, which runs they've showed up
+  to").** Chat scrolls away; the wall is what the club keeps.
+  - Migration `runclub_posts`: **rc_posts** (kind said|joined|called|showed,
+    text, run_id, photo, `n` = the author's turn-up count snapshotted at post
+    time, pinned), **rc_props** (pk post_id+member_id — ONE reaction each,
+    changing it swaps rather than doubles), **rc_comments**. Storage bucket
+    **`pack`** (public read, 4MB cap, jpeg/png/webp; writes service-role only).
+  - **The app writes its own entries** so the wall is never an empty box:
+    `club_join` → "joined the pack", `run_create` → "called a run",
+    `checkin` → "turned up" + RUN #N (once per member per run, however many
+    times they toggle). That's his "how many times they've showed up" — the
+    feed IS the attendance record, and each entry links its run.
+  - Actions: `feed_get` (cursor-paged 20, pinned ride page one only),
+    `post_add` (600 chars, optional run + base64 photo → `pack/posts/*`,
+    10/hour), `post_del` (own or captain, deletes the photo too),
+    `post_pin` (captain), `post_prop` (fixed 6-emoji set, tap again = take it
+    back), `comment_add` (300 chars, 30/5min), `comment_del`. `state` returns
+    `feed_n` for the unread badge.
+  - **App: 6th tab 📣 Wall** (tab grid → repeat(6,1fr), labels shrink ≤380px).
+    Composer (avatar + growing textarea + 📷 client-downscale to 1280px jpeg +
+    attach-a-run select + Post), post cards with reaction chips, inline
+    comments, ⋯ menu (delete, or pin for the captain), unread dot vs
+    `rc_feedseen_<clubid>`. `agoT()` added — the existing `ago()` works in whole
+    days, useless on a feed. Member sheet gained **"Turned up to"** — the last 6
+    runs they checked into, straight off the rosters already in state (no
+    backend change), answering "which runs they've showed up to".
+  - Demo mode seeds 6 posts + props + 3 comments and implements every feed
+    action, so the wall is exercised with zero writes.
+  - **`leave`/`kick` were leaving wall rows behind** (no FK on member_id) and
+    `club_join` carried your old club's posts to the new one — all three now
+    clean up rc_posts/rc_props/rc_comments. That also cleared a `leave` 500
+    the suite caught.
+  - **DEPLOY GOTCHA, cost two versions:** the deploy subagent **doubled the
+    backslashes in `\u{...}` escapes**, so `PROPS` shipped as literal
+    `\u{1F525}` strings and every reaction was refused ("pick one of the
+    reactions"). Regex `\d` survived; only `\u` was mangled. Fix: the source
+    now uses **literal emoji characters** (nothing left to escape) and the
+    deploy was done INLINE by me, not by an agent. **Never let a subagent
+    retype an edge function containing unicode escapes.**
+  - Verified: **wall backend 48/48** live (auto-entries, one-per-run turn-up,
+    photo → our bucket only + junk/foreign URL refused, reaction swap/untap,
+    comment ownership, captain pin/delete, cross-club isolation, pagination,
+    impersonation ignored), **wall UI 66/66** at 360/390/desktop, **existing UI
+    65/65 no regressions**. All test rows deleted; rc_* tables empty.
 - **Still open (his call):** the jersey restyle and **per-club colour + crest**
   — the latter now matters much more, because a template you sell to ten clubs
   should look like each club, not like ours; push notifications (a Pack-scoped
