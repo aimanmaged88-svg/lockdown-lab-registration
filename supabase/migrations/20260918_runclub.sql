@@ -97,3 +97,34 @@ alter table public.rc_logs    enable row level security;
 -- Instagram, and a logged run can point at the activity itself.
 alter table public.rc_members add column if not exists strava text not null default '';
 alter table public.rc_logs    add column if not exists link   text not null default '';
+
+-- Chat. One table, two thread kinds: run_id null = the club-wide thread,
+-- run_id set = that run's own thread ("running 5 late", "meet at the gate").
+-- `name` is snapshotted at send time so a renamed or departed member's old
+-- messages still read sensibly.
+create table if not exists public.rc_chat (
+  id         uuid primary key default gen_random_uuid(),
+  club_id    uuid not null references public.rc_clubs(id) on delete cascade,
+  run_id     uuid references public.rc_runs(id) on delete cascade,
+  member_id  text not null,
+  name       text not null,
+  text       text not null,
+  created_at timestamptz not null default now()
+);
+create index if not exists rc_chat_thread on public.rc_chat(club_id, run_id, created_at);
+alter table public.rc_chat enable row level security;
+
+-- PURELY SOCIAL (2026-09-18, Aiman: "I want it to be purely social, check ins,
+-- verse each other all that stuff"). The app is the communication bridge, not a
+-- tracker: Strava keeps the distance, we keep who turned up. So rc_rsvp carries
+-- the whole social record — you said you were in, then you confirmed you came.
+-- `here_on` is the runner's LOCAL date (client-sent) so week maths can't be
+-- shifted by a 6am Sydney run landing on the previous UTC day.
+alter table public.rc_rsvp add column if not exists here    boolean not null default false;
+alter table public.rc_rsvp add column if not exists here_at timestamptz;
+alter table public.rc_rsvp add column if not exists here_on date;
+create index if not exists rc_rsvp_here on public.rc_rsvp(member_id, here_on);
+
+-- Distance/pace logging is gone with the tracker. The table was empty, so
+-- there is nothing to migrate out of it.
+drop table if exists public.rc_logs;

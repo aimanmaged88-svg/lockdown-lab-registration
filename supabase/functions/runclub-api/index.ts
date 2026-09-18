@@ -13,9 +13,12 @@ import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 //   runs    — a group run: when, where you meet, distance, pace groups.
 //   rsvp    — "I'm in", with the pace group you're running.
 //   routes  — the club's route library (distance, surface, shape, start pin).
-//   logs    — a run you actually ran.  Feeds the board and your streak.
-// The board ranks on SHOWING UP (runs logged) as well as km — a run club is
-// a habit, not a race, so a 3km-every-week runner can lead it.
+//   chat    — one club thread + a thread per run ("running 5 late").
+// PURELY SOCIAL, deliberately: this is the communication bridge, not a
+// tracker.  Strava keeps the kilometres; we keep who turned up.  So there is
+// no distance, pace or time anywhere in here — the only number the app owns
+// is attendance, recorded by a check-in on rc_rsvp, and that is what the
+// board ranks and what runners verse each other on.
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
@@ -145,7 +148,7 @@ async function runsFor(club_id: string, fromIso: string, toIso: string, desc = f
   ) || [];
   if (!rows.length) return [];
   const ids = rows.map((r: { id: string }) => `"${uid(r.id)}"`).join(",");
-  const rsvps = await db(`rc_rsvp?run_id=in.(${ids})&select=run_id,member_id,pace`) || [];
+  const rsvps = await db(`rc_rsvp?run_id=in.(${ids})&select=run_id,member_id,pace,here`) || [];
   const mem = await db(`rc_members?club_id=eq.${uid(club_id)}&select=id,name,handle,strava,captain`) || [];
   const byId: Record<string, { name: string; handle: string; strava: string }> = {};
   for (const m of mem) byId[m.id] = { name: m.name, handle: m.handle, strava: m.strava };
@@ -157,57 +160,56 @@ async function runsFor(club_id: string, fromIso: string, toIso: string, desc = f
       handle: byId[r.member_id]?.handle || "",
       strava: byId[r.member_id]?.strava || "",
       pace: r.pace,
+      here: !!r.here,
     });
   }
   return rows.map((r: Record<string, unknown>) => ({ ...r, going: roster[r.id as string] || [] }));
 }
 
-// The board.  km and runs from rc_logs, "shows" from RSVPs on club runs that
-// have already happened — so turning up is measured, not just distance.
-async function boardFor(club_id: string, fromDay: string | null, members: Member[]) {
-  const q = fromDay ? `&ran_on=gte.${fromDay}` : "";
-  const logs = await db(`rc_logs?club_id=eq.${uid(club_id)}${q}&select=member_id,km,secs,ran_on&limit=5000`) || [];
-  const nowIso = new Date().toISOString();
-  const fromIso = fromDay ? fromDay + "T00:00:00Z" : "1970-01-01T00:00:00Z";
-  const pastRuns = await db(
-    `rc_runs?club_id=eq.${uid(club_id)}&cancelled=is.false&starts_at=gte.${fromIso}&starts_at=lte.${encodeURIComponent(nowIso)}&select=id&limit=400`,
-  ) || [];
+// The board.  Ranked on TURNING UP, because attendance is the one number this
+// app owns — nothing here comes from a tracker.  `shows` = club runs you
+// checked in to inside the window; `streak` = consecutive weeks you turned up
+// (all-time, so it survives the window switch); `coming` = runs you're in for
+// next.
+async function boardFor(club_id: string, fromDay: string | null, members: Member[], todayLocal: string) {
+  const ids = members.map((m) => `"${sid(m.id)}"`).join(",");
+  // All-time attendance for these members.  A member id belongs to exactly one
+  // club, and club_join clears the old rows, so this can't leak another club's.
+  const all = ids
+    ? (await db(`rc_rsvp?member_id=in.(${ids})&here=is.true&select=member_id,run_id,here_on&limit=8000`) || [])
+    : [];
+  const daysBy: Record<string, string[]> = {};
+  for (const r of all) if (r.here_on) (daysBy[r.member_id] ||= []).push(r.here_on);
   const shows: Record<string, number> = {};
-  if (pastRuns.length) {
-    const ids = pastRuns.map((r: { id: string }) => `"${uid(r.id)}"`).join(",");
-    const rs = await db(`rc_rsvp?run_id=in.(${ids})&select=member_id&limit=5000`) || [];
-    for (const r of rs) shows[r.member_id] = (shows[r.member_id] || 0) + 1;
+  for (const r of all) {
+    if (fromDay && !(r.here_on && r.here_on >= fromDay)) continue;
+    shows[r.member_id] = (shows[r.member_id] || 0) + 1;
   }
-  const agg: Record<string, { km: number; runs: number; secs: number; days: Set<string> }> = {};
-  for (const l of logs) {
-    const a = (agg[l.member_id] ||= { km: 0, runs: 0, secs: 0, days: new Set() });
-    a.km += +l.km;
-    a.runs += 1;
-    a.secs += l.secs || 0;
-    a.days.add(l.ran_on);
+  // Who has said they're in for what's still to come.
+  const soon = await db(
+    `rc_runs?club_id=eq.${uid(club_id)}&cancelled=is.false&starts_at=gte.${new Date().toISOString()}&select=id&limit=120`,
+  ) || [];
+  const coming: Record<string, number> = {};
+  if (soon.length) {
+    const rids = soon.map((r: { id: string }) => `"${uid(r.id)}"`).join(",");
+    const rs = await db(`rc_rsvp?run_id=in.(${rids})&select=member_id&limit=4000`) || [];
+    for (const r of rs) coming[r.member_id] = (coming[r.member_id] || 0) + 1;
   }
   return members
     .map((m) => {
-      const a = agg[m.id];
-      const km = a ? Math.round(a.km * 10) / 10 : 0;
-      const secs = a ? a.secs : 0;
+      const days = (daysBy[m.id] || []).slice().sort();
       return {
         id: m.id, name: m.name, handle: m.handle, strava: m.strava, captain: m.captain,
-        km, runs: a ? a.runs : 0, days: a ? a.days.size : 0,
         shows: shows[m.id] || 0,
-        // Average pace only when both sides are real, so nobody gets a
-        // fake 0:00 next to their name.
-        pace: km > 0 && secs > 0 ? paceStr(secs / km) : "",
+        total: days.length,
+        streak: streakOf(days, todayLocal),
+        coming: coming[m.id] || 0,
+        last: days.length ? days[days.length - 1] : "",
       };
     })
-    .sort((a, z) => z.km - a.km || z.runs - a.runs || a.name.localeCompare(z.name));
+    .sort((a, z) => z.shows - a.shows || z.streak - a.streak || z.total - a.total || a.name.localeCompare(z.name));
 }
-const paceStr = (secsPerKm: number) => {
-  const s = Math.round(secsPerKm);
-  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
-};
-
-// Consecutive Monday-start weeks with at least one logged run.  The current
+// Consecutive Monday-start weeks you turned up at least once.  The current
 // week only breaks a streak once it's over, so Monday morning doesn't wipe
 // the work you did all last week.
 function streakOf(days: string[], todayLocal: string) {
@@ -229,18 +231,25 @@ async function stateFor(m: Member, todayLocal: string) {
   if (!club) throw J({ error: "club not found", code: "noclub" }, 404);
   const members: Member[] = await db(`rc_members?club_id=eq.${uid(m.club_id)}&banned=is.false&select=*&order=joined_at.asc`) || [];
   const now = Date.now();
-  const [upcoming, past, routes, myLogs, clubLogs] = await Promise.all([
+  const [upcoming, past, routes, myHere, chatRows] = await Promise.all([
     runsFor(m.club_id, new Date(now - 6 * 36e5).toISOString(), new Date(now + 120 * dayMs).toISOString(), false, 40),
     runsFor(m.club_id, new Date(now - 60 * dayMs).toISOString(), new Date(now - 6 * 36e5).toISOString(), true, 10),
     db(`rc_routes?club_id=eq.${uid(m.club_id)}&select=*&order=km.asc&limit=80`),
-    db(`rc_logs?member_id=eq.${encodeURIComponent(sid(m.id))}&select=*&order=ran_on.desc,created_at.desc&limit=60`),
-    db(`rc_logs?club_id=eq.${uid(m.club_id)}&ran_on=gte.${mondayOf(todayLocal)}&select=km,member_id&limit=5000`),
+    db(`rc_rsvp?member_id=eq.${encodeURIComponent(sid(m.id))}&here=is.true&select=run_id,here_on,here_at&order=here_on.desc&limit=400`),
+    // One query gives the club thread's size and every run thread's, so the
+    // UI can badge unread without a request per run.
+    db(`rc_chat?club_id=eq.${uid(m.club_id)}&select=run_id&limit=4000`),
   ]);
   const week = mondayOf(todayLocal);
-  const mine = myLogs || [];
-  const myWeek = mine.filter((l: { ran_on: string }) => l.ran_on >= week);
-  const kmOf = (rows: { km: number }[]) => Math.round(rows.reduce((t, r) => t + +r.km, 0) * 10) / 10;
-  const longest = mine.reduce((t: number, l: { km: number }) => Math.max(t, +l.km), 0);
+  const mine = myHere || [];
+  const days = mine.map((r: { here_on: string }) => r.here_on).filter(Boolean).sort();
+  let chat_n = 0;
+  const chat_runs: Record<string, number> = {};
+  for (const c of chatRows || []) {
+    if (c.run_id) chat_runs[c.run_id] = (chat_runs[c.run_id] || 0) + 1;
+    else chat_n++;
+  }
+  const board = await boardFor(m.club_id, week, members, todayLocal);
   return {
     joined: true,
     me: pub(m),
@@ -253,19 +262,29 @@ async function stateFor(m: Member, todayLocal: string) {
     runs: upcoming,
     past,
     routes: routes || [],
-    logs: mine,
-    board: await boardFor(m.club_id, week, members),
+    here: mine,
+    board,
+    chat_n,
+    chat_runs,
     stats: {
-      week_km: kmOf(myWeek),
-      week_runs: myWeek.length,
-      total_km: kmOf(mine),
-      total_runs: mine.length,
-      longest_km: Math.round(longest * 10) / 10,
-      streak: streakOf(mine.map((l: { ran_on: string }) => l.ran_on), todayLocal),
-      club_week_km: kmOf(clubLogs || []),
-      club_week_runs: (clubLogs || []).length,
+      week_shows: days.filter((d: string) => d >= week).length,
+      total_shows: days.length,
+      streak: streakOf(days, todayLocal),
+      last: days.length ? days[days.length - 1] : "",
+      coming: upcoming.filter((r: { going: { id: string }[] }) => (r.going || []).some((g) => g.id === m.id)).length,
+      club_week_shows: board.reduce((t, r) => t + r.shows, 0),
+      club_streakers: board.filter((r) => r.streak > 0).length,
     },
   };
+}
+
+// A thread is either the club-wide one (run_id null) or one run's.
+async function chatFor(club_id: string, run_id: string | null, limit = 80) {
+  const q = run_id ? `&run_id=eq.${uid(run_id)}` : "&run_id=is.null";
+  const rows = await db(
+    `rc_chat?club_id=eq.${uid(club_id)}${q}&select=id,run_id,member_id,name,text,created_at&order=created_at.desc&limit=${limit}`,
+  ) || [];
+  return rows.reverse();
 }
 
 // A run must belong to the caller's club before they can touch it.
@@ -336,6 +355,11 @@ Deno.serve(async (req) => {
           // Founding a club makes you captain; joining one never does.
           captain: false,
         };
+        // Switching clubs leaves the old club's RSVPs behind, which would
+        // otherwise follow you onto the new club's board.
+        if (prev && prev.club_id !== c.id) {
+          await del("rc_rsvp", `member_id=eq.${encodeURIComponent(device)}`);
+        }
         const m = prev
           ? (await upd("rc_members", `id=eq.${encodeURIComponent(device)}`, row))[0]
           : (await ins("rc_members", { id: device, ...row }))[0];
@@ -369,7 +393,7 @@ Deno.serve(async (req) => {
       case "leave": {
         const m = await guard(b.device);
         await del("rc_rsvp", `member_id=eq.${encodeURIComponent(sid(m.id))}`);
-        await del("rc_logs", `member_id=eq.${encodeURIComponent(sid(m.id))}`);
+        await del("rc_chat", `member_id=eq.${encodeURIComponent(sid(m.id))}`);
         await del("rc_members", `id=eq.${encodeURIComponent(sid(m.id))}`);
         // A club without a captain can't be run.  When the captain walks,
         // the longest-standing member left inherits it.
@@ -399,7 +423,7 @@ Deno.serve(async (req) => {
         const t = (await db(`rc_members?id=eq.${encodeURIComponent(who)}&club_id=eq.${uid(m.club_id)}&select=id`))?.[0];
         if (!t) return J({ error: "not in your club", code: "bad" }, 404);
         await del("rc_rsvp", `member_id=eq.${encodeURIComponent(who)}`);
-        await del("rc_logs", `member_id=eq.${encodeURIComponent(who)}`);
+        await del("rc_chat", `member_id=eq.${encodeURIComponent(who)}`);
         await del("rc_members", `id=eq.${encodeURIComponent(who)}`);
         return J(await stateFor(m, today));
       }
@@ -520,55 +544,94 @@ Deno.serve(async (req) => {
         return J(await stateFor(m, today));
       }
 
-      // ---------- logs ----------
-      case "log_add": {
+      // ---------- turning up ----------
+      case "checkin": {
         const m = await guard(b.device);
-        const rawKm = +(b.km as number);
-        if (!Number.isFinite(rawKm) || rawKm <= 0) return J({ error: "how far did you go?", code: "badkm" }, 400);
-        const km = Math.min(200, rawKm);
-        const ran_on = isDate(b.date) ? String(b.date) : today;
-        // A log has to be plausibly recent — no back-filling a marathon
-        // into last year to top the all-time board.
-        if (ran_on > shiftDay(today, 1) || ran_on < shiftDay(today, -31)) {
-          return J({ error: "pick a date in the last month", code: "baddate" }, 400);
+        const r = await runIn(m.club_id, b.run);
+        if (r.cancelled) return J({ error: "that run was called off", code: "cancelled" }, 409);
+        // You can't confirm you turned up to something that hasn't started.
+        if (new Date(String(r.starts_at)).getTime() > Date.now() + 30 * 6e4) {
+          return J({ error: "check in once the run starts", code: "early" }, 400);
         }
-        const same = await db(
-          `rc_logs?member_id=eq.${encodeURIComponent(sid(m.id))}&ran_on=eq.${ran_on}&select=id`,
+        const on = b.on !== false;
+        const patch = {
+          here: on,
+          here_at: on ? new Date().toISOString() : null,
+          here_on: on ? today : null,
+        };
+        const q = `run_id=eq.${uid(r.id)}&member_id=eq.${encodeURIComponent(sid(m.id))}`;
+        const ex = (await db(`rc_rsvp?${q}&select=member_id`))?.[0];
+        // Turning up without having said you would is normal, so create the
+        // row if it isn't there rather than refusing.
+        if (ex) await upd("rc_rsvp", q, patch);
+        else await ins("rc_rsvp", { run_id: r.id, member_id: m.id, pace: m.pace, ...patch });
+        return J(await stateFor(m, today));
+      }
+      case "versus": {
+        const m = await guard(b.device);
+        const who = sid(b.member);
+        if (!who || who === m.id) return J({ error: "pick someone else", code: "bad" }, 400);
+        const other = (await db(`rc_members?id=eq.${encodeURIComponent(who)}&club_id=eq.${uid(m.club_id)}&banned=is.false&select=*`))?.[0];
+        if (!other) return J({ error: "not in your club", code: "bad" }, 404);
+        const w = String(b.window || "month");
+        const from = w === "all" ? null : w === "week" ? mondayOf(today) : shiftDay(today, -30);
+        const rows = await db(
+          `rc_rsvp?member_id=in.("${sid(m.id)}","${sid(who)}")&here=is.true&select=member_id,run_id,here_on&limit=8000`,
         ) || [];
-        if (same.length >= 6) return J({ error: "that's enough runs for one day", code: "slow" }, 429);
-        let run_id: string | null = null;
-        if (b.run) {
-          const r = await runIn(m.club_id, b.run);
-          run_id = r.id as string;
-          // Logging a club run counts as having turned up to it.
-          await db("rc_rsvp?on_conflict=run_id,member_id", {
-            method: "POST",
-            body: JSON.stringify({ run_id, member_id: m.id, pace: m.pace }),
-            headers: { Prefer: "resolution=merge-duplicates" },
-          });
-        }
-        await ins("rc_logs", {
-          club_id: m.club_id, member_id: m.id, run_id, km,
-          secs: int(b.secs, 0, 86400, 0), felt: int(b.felt, 0, 5, 0),
-          note: str(b.note, 200), ran_on, link: httpish(b.link),
-        });
-        return J(await stateFor(m, today));
+        const side = (id: string, name: string) => {
+          const all = rows.filter((r: { member_id: string }) => r.member_id === id);
+          const days = all.map((r: { here_on: string }) => r.here_on).filter(Boolean).sort();
+          return {
+            id, name,
+            shows: from ? days.filter((d: string) => d >= from).length : days.length,
+            total: days.length,
+            streak: streakOf(days, today),
+            last: days.length ? days[days.length - 1] : "",
+          };
+        };
+        // Runs you both turned up to — the point of a club.
+        const mineRuns = new Set(rows.filter((r: { member_id: string }) => r.member_id === m.id).map((r: { run_id: string }) => r.run_id));
+        const together = rows.filter((r: { member_id: string; run_id: string }) => r.member_id === who && mineRuns.has(r.run_id)).length;
+        return J({ window: w, me: side(m.id, m.name), them: side(who, other.name), together });
       }
-      case "log_del": {
+
+      // ---------- chat ----------
+      case "chat_get": {
         const m = await guard(b.device);
-        const id = uid(b.log);
-        if (!isUuid(id)) return J({ error: "which log?", code: "bad" }, 400);
-        const l = (await db(`rc_logs?id=eq.${id}&member_id=eq.${encodeURIComponent(sid(m.id))}&select=id`))?.[0];
-        if (!l) return J({ error: "log not found", code: "bad" }, 404);
-        await del("rc_logs", `id=eq.${id}`);
-        return J(await stateFor(m, today));
+        const run = b.run ? (await runIn(m.club_id, b.run)).id as string : null;
+        return J({ run, chat: await chatFor(m.club_id, run) });
       }
+      case "chat_send": {
+        const m = await guard(b.device);
+        const text = str(b.text, 500);
+        if (!text) return J({ error: "say something", code: "empty" }, 400);
+        const run = b.run ? (await runIn(m.club_id, b.run)).id as string : null;
+        const recent = await db(
+          `rc_chat?member_id=eq.${encodeURIComponent(sid(m.id))}&created_at=gte.${new Date(Date.now() - 5 * 6e4).toISOString()}&select=id`,
+        ) || [];
+        if (recent.length >= 30) return J({ error: "slow down a second", code: "slow" }, 429);
+        await ins("rc_chat", { club_id: m.club_id, run_id: run, member_id: m.id, name: m.name, text });
+        return J({ run, chat: await chatFor(m.club_id, run) });
+      }
+      case "chat_del": {
+        const m = await guard(b.device);
+        const id = uid(b.msg);
+        if (!isUuid(id)) return J({ error: "which message?", code: "bad" }, 400);
+        const row = (await db(`rc_chat?id=eq.${id}&club_id=eq.${uid(m.club_id)}&select=id,member_id,run_id`))?.[0];
+        if (!row) return J({ error: "message not found", code: "bad" }, 404);
+        // Your own, or the captain's call — a club you can't moderate is a
+        // club nobody wants to run.
+        if (!m.captain && row.member_id !== m.id) return J({ error: "not yours to delete", code: "notyours" }, 403);
+        await del("rc_chat", `id=eq.${id}`);
+        return J({ run: row.run_id || null, chat: await chatFor(m.club_id, row.run_id || null) });
+      }
+
       case "board": {
         const m = await guard(b.device);
         const w = String(b.window || "week");
         const from = w === "all" ? null : w === "month" ? shiftDay(today, -30) : mondayOf(today);
         const members: Member[] = await db(`rc_members?club_id=eq.${uid(m.club_id)}&banned=is.false&select=*`) || [];
-        return J({ window: w, board: await boardFor(m.club_id, from, members) });
+        return J({ window: w, board: await boardFor(m.club_id, from, members, today) });
       }
 
       default:

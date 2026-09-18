@@ -1095,6 +1095,50 @@ select.inp{appearance:none;background-image:linear-gradient(45deg,transparent 49
   transition:transform .2s var(--spring);
 }
 .fab:active{transform:scale(.9)}
+/* ---------- chat ---------- */
+.chatwrap{
+  max-height:52vh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  display:flex;flex-direction:column;gap:9px;padding:4px 0 8px;
+}
+.msg{display:flex;gap:9px;align-items:flex-start}
+.msg .bub{
+  background:var(--card2);border:1px solid var(--line2);border-radius:15px;
+  padding:9px 12px;max-width:78%;font-size:14.5px;line-height:1.35;
+  word-break:break-word;position:relative;
+}
+.msg .who{font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:3px}
+.msg .tm{font-size:10px;color:var(--dim);margin-top:4px}
+.msg.me{flex-direction:row-reverse}
+.msg.me .bub{background:var(--hot);color:var(--onhot);border-color:transparent}
+.msg.me .who,.msg.me .tm{color:color-mix(in srgb,var(--onhot) 72%,transparent)}
+.msg .del{opacity:.5;font-size:12px;align-self:center;padding:4px}
+.chatbar{display:flex;gap:8px;align-items:center;padding-top:10px;border-top:1px solid var(--line2)}
+.chatbar .inp{flex:1 1 auto}
+.chatbar .btn{flex:0 0 auto}
+.chatempty{text-align:center;padding:26px 10px;color:var(--muted);font-size:13.5px}
+.nudot{
+  position:absolute;top:5px;right:5px;width:9px;height:9px;border-radius:50%;
+  background:var(--hot);border:2px solid var(--paper);
+}
+.tbtn{position:relative}
+
+/* ---------- head to head ---------- */
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center}
+.vsrow{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;padding:11px 0;border-top:1px solid var(--line2)}
+.vsrow:first-child{border-top:0}
+.vsn{font-size:26px;font-weight:900;letter-spacing:-.04em;line-height:1;text-align:center}
+.vsn.win{color:var(--hot)}
+.vsl{font-size:9.5px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:center;white-space:nowrap}
+.vshead{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;margin-bottom:6px}
+.vshead .nm{font-size:13px;font-weight:800;text-align:center;letter-spacing:-.01em}
+.vsmid{font-family:var(--mark);font-size:15px;color:var(--dim)}
+.together{
+  margin-top:14px;padding:12px;border-radius:var(--r2);text-align:center;
+  background:color-mix(in srgb,var(--hi) 26%,transparent);
+  border:1px solid color-mix(in srgb,var(--hi) 45%,transparent);
+}
+.together b{display:block;font-size:26px;font-weight:900;letter-spacing:-.04em}
+.together span{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .codebig{
   font-size:36px;font-weight:900;letter-spacing:.2em;text-align:center;padding:16px 8px;
   border-radius:var(--r2);background:var(--deep);color:var(--ondeep);font-variant-numeric:tabular-nums;
@@ -1190,6 +1234,7 @@ select.inp{appearance:none;background-image:linear-gradient(45deg,transparent 49
         <div class="sub" id="hCity">run club</div>
       </div>
     </div>
+    <button class="tbtn" id="btnChat" title="Club chat">💬<span class="nudot hide" id="chatDot"></span></button>
     <button class="tbtn" id="btnCode" title="Invite code">🔑</button>
     <button class="tbtn" id="btnMode" title="Light / dark">🌙</button>
   </header>
@@ -1207,6 +1252,7 @@ select.inp{appearance:none;background-image:linear-gradient(45deg,transparent 49
     </div>
     <div id="wkHero"></div>
     <div class="sect"><h2>Your week</h2><span class="eyebrow" id="wkKm"></span></div>
+    <p class="hint" style="margin:0 0 8px">Orange = a club run. Filled = you were there.</p>
     <div class="wk" id="wkStrip"></div>
     <div class="sect"><h2>Coming up</h2><button class="linkb" data-v="Runs">All runs →</button></div>
     <div id="wkNext"></div>
@@ -1239,7 +1285,7 @@ select.inp{appearance:none;background-image:linear-gradient(45deg,transparent 49
   <!-- ---- BOARD ---- -->
   <section id="vBoard" class="view hide">
     <div style="margin:18px 0 12px">
-      <div class="eyebrow">Distance counts. Turning up counts more.</div>
+      <div class="eyebrow">The only stat that matters is turning up</div>
       <h1>The board.</h1>
     </div>
     <div class="seg" id="bWin">
@@ -1248,7 +1294,7 @@ select.inp{appearance:none;background-image:linear-gradient(45deg,transparent 49
       <button data-w="all">All time</button>
     </div>
     <div class="card" style="margin-top:12px"><div id="boardList"></div></div>
-    <p class="hint" style="text-align:center;margin-top:12px">Ranked on kilometres, but <b>shows</b> is the number that matters — club runs you turned up to.</p>
+    <p class="hint" style="text-align:center;margin-top:12px">Ranked on <b>shows</b> — club runs you actually turned up to. No distances, no pace. Keep your running on Strava; this is who's really in the club.</p>
   </section>
 
   <!-- ---- YOU ---- -->
@@ -1268,17 +1314,17 @@ select.inp{appearance:none;background-image:linear-gradient(45deg,transparent 49
       <div class="stats" style="margin-top:14px" id="yStats"></div>
       <div class="btnrow">
         <button class="btn ghost sm wide" id="yEdit">Edit profile</button>
-        <button class="btn ghost sm wide" id="yShare">Share my week</button>
+        <button class="btn ghost sm wide" id="yShare">Share my card</button>
       </div>
     </div>
-    <div class="sect"><h2>Your log</h2><button class="linkb" id="yLog">＋ Log a run</button></div>
+    <div class="sect"><h2>You turned up</h2><button class="linkb" data-v="Runs">Schedule →</button></div>
     <div class="card" id="logList"></div>
     <div class="sect"><h2>The club</h2></div>
     <div class="card" id="clubCard"></div>
   </section>
 </div>
 
-<button class="fab hide" id="fabLog" title="Log a run">＋</button>
+<button class="fab hide" id="fabChat" title="Club chat">💬</button>
 
 <nav class="tabs hide" id="tabs">
   <button data-v="Week" class="on"><i>⚡</i>Week</button>
@@ -1346,30 +1392,23 @@ select.inp{appearance:none;background-image:linear-gradient(45deg,transparent 49
   <button class="btn hot" id="rGo" style="margin-top:14px">Add to the library</button>
 </div></div>
 
-<div class="sheet" id="shLog"><div class="panel">
+<div class="sheet" id="shChat"><div class="panel">
   <div class="grab"></div>
-  <div class="shhd"><div class="gr"><h3>Log a run</h3><p>Club run or solo — it all counts.</p></div><button class="x" data-close>✕</button></div>
-  <div class="two">
-    <label class="f"><span>Distance (km)</span><input class="inp" id="lKm" type="number" step="0.01" min="0.1" max="200" placeholder="7.2" inputmode="decimal"></label>
-    <label class="f"><span>Date</span><input class="inp" id="lDate" type="date"></label>
+  <div class="shhd"><div class="gr"><h3 id="chatHd">Club chat</h3><p id="chatSub">Everyone in the club</p></div><button class="x" data-close>✕</button></div>
+  <div id="chatBody" class="chatwrap"></div>
+  <div class="chatbar">
+    <input class="inp" id="chatIn" placeholder="Say something…" maxlength="500" autocomplete="off">
+    <button class="btn hot sm" id="chatGo">Send</button>
   </div>
-  <label class="f"><span>Time <span style="text-transform:none;letter-spacing:0">(optional)</span></span></label>
-  <div class="two">
-    <input class="inp" id="lMin" type="number" min="0" max="1439" placeholder="minutes" inputmode="numeric">
-    <input class="inp" id="lSec" type="number" min="0" max="59" placeholder="seconds" inputmode="numeric">
+</div></div>
+
+<div class="sheet" id="shVersus"><div class="panel">
+  <div class="grab"></div>
+  <div class="shhd"><div class="gr"><div class="eyebrow">Head to head</div><h3 id="vsHd">Versus</h3></div><button class="x" data-close>✕</button></div>
+  <div class="seg" id="vsWin">
+    <button data-vw="week">This week</button><button data-vw="month" class="on">30 days</button><button data-vw="all">All time</button>
   </div>
-  <div class="hint" id="lPace">Add a time and we'll work out your pace.</div>
-  <label class="f"><span>Was it a club run?</span><select class="inp" id="lRun"></select></label>
-  <label class="f"><span>How did it feel</span></label>
-  <div class="feel" id="lFeel">
-    <button data-f="1" title="Rough">😖</button><button data-f="2" title="Hard">😮‍💨</button>
-    <button data-f="3" title="Fine">🙂</button><button data-f="4" title="Good">😁</button><button data-f="5" title="Flying">🚀</button>
-  </div>
-  <label class="f"><span>Note</span><input class="inp" id="lNote" placeholder="Negative split. Legs finally came good." maxlength="200" autocomplete="off"></label>
-  <label class="f"><span>Activity link <span style="text-transform:none;letter-spacing:0">(optional)</span></span><input class="inp" id="lLink" placeholder="https://strava.app.link/…" maxlength="400" autocomplete="off" inputmode="url"></label>
-  <div class="hint">Paste the Strava (or Garmin, or Komoot) link and the club can open the actual run.</div>
-  <div class="err" id="lErr"></div>
-  <button class="btn hot" id="lGo" style="margin-top:14px">Log it</button>
+  <div id="vsBody" style="margin-top:14px"></div>
 </div></div>
 
 <div class="sheet" id="shCode"><div class="panel">
@@ -1500,16 +1539,16 @@ function relWhen(d){
   return 'in '+Math.round(days/7)+' week'+(days>=14?'s':'');
 }
 const isToday=d=>dstr(d)===TODAY();
-/* pace + duration */
-function paceOf(km,secs){ if(!km||!secs) return ''; const s=Math.round(secs/km); return Math.floor(s/60)+':'+pad(s%60); }
-function hms(secs){
-  secs=Math.round(secs||0); if(!secs) return '';
-  const h=Math.floor(secs/3600), m=Math.floor(secs%3600/60), s=secs%60;
-  return h? h+':'+pad(m)+':'+pad(s) : m+':'+pad(s);
-}
+/* A route or a run still has a distance — that's what you're turning up FOR.
+   What the app never records is what YOU ran. That lives on Strava. */
 const km1=n=>{ const v=Math.round((+n||0)*10)/10; return (Number.isInteger(v)?v:v.toFixed(1))+''; };
 const initials=n=>String(n||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase()||'?';
-const FEEL=['','😖','😮‍💨','🙂','😁','🚀'];
+const ago=d=>{
+  if(!d) return '';
+  const days=Math.round((dparse(TODAY())-dparse(d))/864e5);
+  return days<=0?'today':days===1?'yesterday':days<7?days+' days ago'
+    :days<14?'last week':days<60?Math.round(days/7)+' weeks ago':Math.round(days/30)+' months ago';
+};
 /* Instagram is how run clubs find each other; Strava is where the running
    actually lives. Both are optional, so render only what someone gave us. */
 function socialLinks(m,sep){
@@ -1586,68 +1625,59 @@ function demoSeed(){
   if(shake.getHours()>=18) shake.setDate(shake.getDate()+1);
   shake.setHours(18,15,0,0);
   const runs=[
-    mk('rn1','Easy shakeout',shake,'rt2',5,'Iron Cove Bridge, Rozelle',['5:30','6:00','social'],'Conversation pace only. If you can’t talk, you’re going too hard.','d3'),
-    mk('rn2','',nextDow(4,6,0,1),'rt1',7,'Timbrell Park car park, Five Dock',['4:30','5:00','5:30','social'],'The Thursday one. Coffee at the bakery after — bring a fiver.',DEMO_ME),
-    mk('rn3','The long one',nextDow(6,7,0,1),'rt1',14,'Timbrell Park car park, Five Dock',['5:00','5:30','6:15'],'Two laps. Water bottle if it’s warm.','d2'),
+    mk('rn1','Easy shakeout',shake,'rt2',5,'Iron Cove Bridge, Rozelle',['5:30','6:00','social'],'Conversation pace only. If you can\u2019t talk, you\u2019re going too hard.','d3'),
+    mk('rn2','',nextDow(4,6,0,1),'rt1',7,'Timbrell Park car park, Five Dock',['4:30','5:00','5:30','social'],'The Thursday one. Coffee at the bakery after \u2014 bring a fiver.',DEMO_ME),
+    mk('rn3','The long one',nextDow(6,7,0,1),'rt1',14,'Timbrell Park car park, Five Dock',['5:00','5:30','6:15'],'Two laps. Water bottle if it\u2019s warm.','d2'),
     mk('rn4','Track night',nextDow(2,6,15,3),'rt4',8,'Leichhardt Oval No. 2',['4:00','4:30','5:00'],'10 x 400m. Come warmed up if you can.','d2')
   ];
-  const past=[
-    mk('rp1','',new Date(Date.now()-3*864e5+36e5*0),'rt1',7,'Timbrell Park car park, Five Dock',['4:30','5:00','5:30','social'],'','d2'),
-    mk('rp2','Hill repeats',new Date(Date.now()-8*864e5),'rt3',6.4,'Callan Park gates, Lilyfield',['5:00','5:45'],'','d3')
-  ];
-  const rsvp=[
-    ['rn1',DEMO_ME,'5:30'],['rn1','d3','5:00'],['rn1','d5','6:00'],['rn1','d7','social'],
-    ['rn2',DEMO_ME,'5:30'],['rn2','d2','4:30'],['rn2','d3','5:00'],['rn2','d4','5:30'],['rn2','d6','4:30'],['rn2','d8','5:30'],
-    ['rn3','d2','5:00'],['rn3','d4','5:30'],['rn3','d6','5:00'],
-    ['rn4','d2','4:00'],['rn4','d6','4:30'],
-    ['rp1',DEMO_ME,'5:30'],['rp1','d2','4:30'],['rp1','d3','5:00'],['rp1','d4','5:30'],['rp1','d6','4:30'],['rp1','d8','5:30'],
-    ['rp2','d3','5:00'],['rp2','d5','5:45'],['rp2','d7','6:30']
-  ].map(([run_id,member_id,pace])=>({run_id,member_id,pace}));
-  const L=(member_id,dayAgo,km,secs,run_id,note,felt,link)=>({
-    id:'lg'+member_id+dayAgo,club_id:'demo',member_id,run_id:run_id||null,km,secs,felt:felt||0,
-    note:note||'',link:link||'',ran_on:shift(TODAY(),-dayAgo),created_at:new Date().toISOString()
+  /* Weekly past runs so streaks have something real behind them. */
+  const PAST=[[3,'rt1',7,'Timbrell Park car park, Five Dock',''],[10,'rt3',6.4,'Callan Park gates, Lilyfield','Hill repeats'],
+              [17,'rt1',7,'Timbrell Park car park, Five Dock',''],[24,'rt2',5,'Iron Cove Bridge, Rozelle','Shakeout']];
+  const past=PAST.map(([ago,rt,km,meet,title],i)=>{
+    const d=new Date(Date.now()-ago*864e5); d.setHours(6,0,0,0);
+    return mk('rp'+(i+1),title,d,rt,km,meet,['4:30','5:00','5:30','social'],'',i%2?'d3':'d2');
   });
-  const logs=[
-    L(DEMO_ME,0,6.1,1947,null,'Before work. Cold start, felt better by 3k.',4,'https://www.strava.com/activities/0000000000'),
-    L(DEMO_ME,3,7.0,2310,'rp1','Club run. Sat in the 5:30 group the whole way.',4,'https://www.strava.com/activities/0000000001'),
-    L(DEMO_ME,5,10.2,3540,null,'Long-ish. Legs good.',3),
-    L(DEMO_ME,8,6.4,2180,'rp2','Hills hurt.',2),
-    L(DEMO_ME,10,5.0,1620,null,'',3),
-    L(DEMO_ME,12,8.0,2760,null,'',4),
-    L('d2',1,12.4,3300,null,'',5), L('d2',3,7.0,1890,'rp1','',4), L('d2',4,16.0,4560,null,'',4),
-    L('d3',0,5.2,1660,null,'',3), L('d3',3,7.0,2170,'rp1','',4), L('d3',8,6.4,2090,'rp2','',3),
-    L('d4',2,8.1,2700,null,'',4), L('d4',3,7.0,2380,'rp1','',3),
-    L('d5',3,4.0,1560,null,'',3), L('d5',8,6.4,2520,'rp2','',2),
-    L('d6',1,14.0,4060,null,'',5), L('d6',3,7.0,2030,'rp1','',5), L('d6',6,9.0,2700,null,'',4),
-    L('d7',8,6.4,2760,'rp2','',3), L('d7',2,3.2,1400,null,'First 3k without stopping.',5),
-    L('d8',3,7.0,2450,'rp1','',3)
+  const R=(run_id,member_id,pace,here,here_on)=>({run_id,member_id,pace,here:!!here,here_on:here?here_on:null});
+  const rsvp=[
+    R('rn1',DEMO_ME,'5:30'),R('rn1','d3','5:00'),R('rn1','d5','6:00'),R('rn1','d7','social'),
+    R('rn2',DEMO_ME,'5:30'),R('rn2','d2','4:30'),R('rn2','d3','5:00'),R('rn2','d4','5:30'),R('rn2','d6','4:30'),R('rn2','d8','5:30'),
+    R('rn3','d2','5:00'),R('rn3','d4','5:30'),R('rn3','d6','5:00'),
+    R('rn4','d2','4:00'),R('rn4','d6','4:30')
+  ];
+  /* Who actually turned up to each past run. */
+  const WHO=[[DEMO_ME,'d2','d3','d4','d6','d8'],[DEMO_ME,'d3','d5','d7'],[DEMO_ME,'d2','d3','d6'],['d2','d3','d6','d8']];
+  past.forEach((r,i)=>{
+    const on=dstr(new Date(r.starts_at));
+    WHO[i].forEach(mid=>{
+      const pace=(members.find(m=>m.id===mid)||{}).pace||'';
+      rsvp.push(R(r.id,mid,pace,true,on));
+    });
+  });
+  const C=(run_id,member_id,text,minsAgo)=>({
+    id:'ch'+member_id+minsAgo,club_id:'demo',run_id:run_id||null,member_id,
+    name:(members.find(m=>m.id===member_id)||{}).name||'Someone',
+    text,created_at:new Date(Date.now()-minsAgo*6e4).toISOString()
+  });
+  const chat=[
+    C(null,'d2','Morning. Anyone got a spare headlamp for Thursday?',600),
+    C(null,'d3','I\u2019ve got two, bring one for you',560),
+    C(null,'d6','Coffee after the long run? The bakery opens at 7',300),
+    C(null,DEMO_ME,'Always coffee after the long run',280),
+    C(null,'d7','First proper week back for me, taking the social group',120),
+    C('rn2','d4','Running 5 late, start without me',45),
+    C('rn2',DEMO_ME,'All good, we\u2019ll wait at the car park',40)
   ];
   return {
     club:{id:'demo',name:'Inner West Milers',city:'Sydney',blurb:'6am Thursdays. Coffee after. Nobody gets dropped.',
       code:'DEMO01',captain_id:DEMO_ME,created_at:new Date(Date.now()-120*864e5).toISOString()},
-    members,routes,runs:runs.concat(past),rsvp,logs
+    members,routes,runs:runs.concat(past),rsvp,chat
   };
 }
 function demoLoad(){
-  try{ const j=JSON.parse(localStorage.getItem(DEMOKEY)||'null'); if(j&&j.club&&j.members) return j; }catch(e){}
+  try{ const j=JSON.parse(localStorage.getItem(DEMOKEY)||'null'); if(j&&j.club&&j.members&&j.chat) return j; }catch(e){}
   const s=demoSeed(); demoSave(s); return s;
 }
 function demoSave(d){ try{ localStorage.setItem(DEMOKEY,JSON.stringify(d)); }catch(e){} }
-function demoBoard(D,fromDay){
-  const logs=D.logs.filter(l=>!fromDay||l.ran_on>=fromDay);
-  const now=Date.now();
-  const pastIds=D.runs.filter(r=>!r.cancelled&&new Date(r.starts_at)<=now&&(!fromDay||dstr(new Date(r.starts_at))>=fromDay)).map(r=>r.id);
-  const shows={}; D.rsvp.forEach(r=>{ if(pastIds.indexOf(r.run_id)>=0) shows[r.member_id]=(shows[r.member_id]||0)+1; });
-  const agg={};
-  logs.forEach(l=>{ const a=agg[l.member_id]||(agg[l.member_id]={km:0,runs:0,secs:0,days:{}});
-    a.km+=+l.km; a.runs++; a.secs+=l.secs||0; a.days[l.ran_on]=1; });
-  return D.members.map(m=>{
-    const a=agg[m.id], km=a?Math.round(a.km*10)/10:0, secs=a?a.secs:0;
-    return {id:m.id,name:m.name,handle:m.handle,captain:m.captain,km,runs:a?a.runs:0,
-      days:a?Object.keys(a.days).length:0,shows:shows[m.id]||0,
-      pace:(km>0&&secs>0)?paceOf(km,secs):''};
-  }).sort((a,z)=>z.km-a.km||z.runs-a.runs||a.name.localeCompare(z.name));
-}
 function demoStreak(days){
   if(!days.length) return 0;
   const weeks={}; days.forEach(d=>weeks[monday(d)]=1);
@@ -1657,26 +1687,48 @@ function demoStreak(days){
   let n=0; while(weeks[cur]){ n++; cur=shift(cur,-7); }
   return n;
 }
+function demoBoard(D,fromDay){
+  const now=Date.now();
+  const soon=D.runs.filter(r=>!r.cancelled&&new Date(r.starts_at)>now).map(r=>r.id);
+  return D.members.map(m=>{
+    const hers=D.rsvp.filter(v=>v.member_id===m.id&&v.here&&v.here_on);
+    const days=hers.map(v=>v.here_on).sort();
+    return {id:m.id,name:m.name,handle:m.handle,strava:m.strava,captain:m.captain,
+      shows:days.filter(d=>!fromDay||d>=fromDay).length,
+      total:days.length,
+      streak:demoStreak(days),
+      coming:D.rsvp.filter(v=>v.member_id===m.id&&soon.indexOf(v.run_id)>=0).length,
+      last:days.length?days[days.length-1]:''};
+  }).sort((a,z)=>z.shows-a.shows||z.streak-a.streak||z.total-a.total||a.name.localeCompare(z.name));
+}
 function demoState(D){
   const me=D.members.find(m=>m.id===DEMO_ME);
   const now=Date.now(), cut=now-6*36e5;
   const withGoing=r=>Object.assign({},r,{going:D.rsvp.filter(v=>v.run_id===r.id).map(v=>{
     const m=D.members.find(x=>x.id===v.member_id)||{};
-    return {id:v.member_id,name:m.name||'Someone',handle:m.handle||'',strava:m.strava||'',pace:v.pace};
+    return {id:v.member_id,name:m.name||'Someone',handle:m.handle||'',strava:m.strava||'',pace:v.pace,here:!!v.here};
   })});
   const runs=D.runs.filter(r=>new Date(r.starts_at)>=cut).sort((a,z)=>new Date(a.starts_at)-new Date(z.starts_at)).map(withGoing);
   const past=D.runs.filter(r=>new Date(r.starts_at)<cut).sort((a,z)=>new Date(z.starts_at)-new Date(a.starts_at)).slice(0,10).map(withGoing);
-  const mine=D.logs.filter(l=>l.member_id===DEMO_ME).sort((a,z)=>z.ran_on<a.ran_on?-1:z.ran_on>a.ran_on?1:0);
+  const here=D.rsvp.filter(v=>v.member_id===DEMO_ME&&v.here).map(v=>({run_id:v.run_id,here_on:v.here_on,here_at:v.here_on}))
+    .sort((a,z)=>z.here_on<a.here_on?-1:z.here_on>a.here_on?1:0);
   const wk=monday(TODAY());
-  const myWeek=mine.filter(l=>l.ran_on>=wk);
-  const clubWeek=D.logs.filter(l=>l.ran_on>=wk);
-  const sum=rows=>Math.round(rows.reduce((t,r)=>t+ +r.km,0)*10)/10;
+  const board=demoBoard(D,wk);
+  let chat_n=0; const chat_runs={};
+  D.chat.forEach(c=>{ if(c.run_id) chat_runs[c.run_id]=(chat_runs[c.run_id]||0)+1; else chat_n++; });
+  const days=here.map(h=>h.here_on).filter(Boolean).sort();
   return {joined:true,me:me,club:Object.assign({},D.club,{members:D.members.length}),
-    members:D.members,runs:runs,past:past,routes:D.routes,logs:mine,
-    board:demoBoard(D,wk),
-    stats:{week_km:sum(myWeek),week_runs:myWeek.length,total_km:sum(mine),total_runs:mine.length,
-      longest_km:mine.reduce((t,l)=>Math.max(t,+l.km),0),streak:demoStreak(mine.map(l=>l.ran_on)),
-      club_week_km:sum(clubWeek),club_week_runs:clubWeek.length}};
+    members:D.members,runs:runs,past:past,routes:D.routes,here:here,board:board,
+    chat_n:chat_n,chat_runs:chat_runs,
+    stats:{week_shows:days.filter(d=>d>=wk).length,total_shows:days.length,
+      streak:demoStreak(days),last:days.length?days[days.length-1]:'',
+      coming:runs.filter(r=>(r.going||[]).some(g=>g.id===DEMO_ME)).length,
+      club_week_shows:board.reduce((t,r)=>t+r.shows,0),
+      club_streakers:board.filter(r=>r.streak>0).length}};
+}
+function demoChat(D,run){
+  return D.chat.filter(c=>(run?c.run_id===run:!c.run_id))
+    .sort((a,z)=>new Date(a.created_at)-new Date(z.created_at)).slice(-80);
 }
 async function demoApi(action,b){
   const D=demoLoad();
@@ -1688,21 +1740,70 @@ async function demoApi(action,b){
       const from=b.window==='all'?null:b.window==='month'?shift(TODAY(),-30):monday(TODAY());
       return {window:b.window,board:demoBoard(D,from)};
     }
+    case 'checkin': {
+      const r=D.runs.find(x=>x.id===b.run);
+      if(!r) throw new Error('run not found');
+      if(new Date(r.starts_at).getTime()>Date.now()+30*6e4) throw new Error('check in once the run starts');
+      const on=b.on!==false;
+      let row=D.rsvp.find(v=>v.run_id===b.run&&v.member_id===DEMO_ME);
+      if(!row){ row={run_id:b.run,member_id:DEMO_ME,pace:(D.members[0]||{}).pace||''}; D.rsvp.push(row); }
+      row.here=on; row.here_on=on?TODAY():null;
+      return back();
+    }
+    case 'versus': {
+      const other=D.members.find(m=>m.id===b.member);
+      if(!other) throw new Error('not in your club');
+      const from=b.window==='all'?null:b.window==='week'?monday(TODAY()):shift(TODAY(),-30);
+      const side=id=>{
+        const days=D.rsvp.filter(v=>v.member_id===id&&v.here&&v.here_on).map(v=>v.here_on).sort();
+        return {id,name:(D.members.find(m=>m.id===id)||{}).name||'',
+          shows:from?days.filter(d=>d>=from).length:days.length,
+          total:days.length,streak:demoStreak(days),last:days.length?days[days.length-1]:''};
+      };
+      const mineRuns=D.rsvp.filter(v=>v.member_id===DEMO_ME&&v.here).map(v=>v.run_id);
+      const together=D.rsvp.filter(v=>v.member_id===b.member&&v.here&&mineRuns.indexOf(v.run_id)>=0).length;
+      return {window:b.window,me:side(DEMO_ME),them:side(b.member),together:together};
+    }
+    case 'chat_get': return {run:b.run||null,chat:demoChat(D,b.run||null)};
+    case 'chat_send': {
+      const text=String(b.text||'').slice(0,500).trim();
+      if(!text) throw new Error('say something');
+      D.chat.push({id:uid(),club_id:'demo',run_id:b.run||null,member_id:DEMO_ME,
+        name:(D.members.find(m=>m.id===DEMO_ME)||{}).name||'You',text:text,created_at:new Date().toISOString()});
+      demoSave(D);
+      return {run:b.run||null,chat:demoChat(D,b.run||null)};
+    }
+    case 'chat_del': {
+      const row=D.chat.find(c=>c.id===b.msg);
+      D.chat=D.chat.filter(c=>c.id!==b.msg); demoSave(D);
+      return {run:(row&&row.run_id)||null,chat:demoChat(D,(row&&row.run_id)||null)};
+    }
     case 'run_create': {
       const when=new Date(b.when);
       if(isNaN(when.getTime())) throw new Error('when is it?');
       const rt=D.routes.find(r=>r.id===b.route_id);
-      D.runs.push({id:uid(),club_id:'demo',title:b.title||'',starts_at:when.toISOString(),
+      const id=uid();
+      D.runs.push({id:id,club_id:'demo',title:b.title||'',starts_at:when.toISOString(),
         meet:b.meet||(rt?rt.start_name:''),km:+b.km||(rt?+rt.km:0),
         lat:rt?rt.lat:null,lon:rt?rt.lon:null,route_id:b.route_id||null,
         paces:b.paces||[],notes:b.notes||'',cancelled:false,host_id:DEMO_ME,
         created_at:new Date().toISOString()});
-      D.rsvp.push({run_id:D.runs[D.runs.length-1].id,member_id:DEMO_ME,pace:(D.members[0]||{}).pace||''});
+      D.rsvp.push({run_id:id,member_id:DEMO_ME,pace:(D.members[0]||{}).pace||'',here:false,here_on:null});
+      return back();
+    }
+    case 'run_edit': {
+      const r=D.runs.find(x=>x.id===b.run); if(!r) throw new Error('run not found');
+      if(b.title!=null) r.title=b.title;
+      if(b.meet!=null) r.meet=b.meet;
+      if(b.notes!=null) r.notes=b.notes;
+      if(b.km!=null) r.km=+b.km||0;
+      if(b.paces) r.paces=b.paces;
+      if(b.when){ const w=new Date(b.when); if(!isNaN(w.getTime())) r.starts_at=w.toISOString(); }
       return back();
     }
     case 'rsvp': {
       D.rsvp=D.rsvp.filter(v=>!(v.run_id===b.run&&v.member_id===DEMO_ME));
-      if(b.in!==false) D.rsvp.push({run_id:b.run,member_id:DEMO_ME,pace:b.pace||''});
+      if(b.in!==false) D.rsvp.push({run_id:b.run,member_id:DEMO_ME,pace:b.pace||'',here:false,here_on:null});
       return back();
     }
     case 'run_cancel': {
@@ -1716,16 +1817,6 @@ async function demoApi(action,b){
       return back();
     }
     case 'route_del': { D.routes=D.routes.filter(r=>r.id!==b.route); return back(); }
-    case 'log_add': {
-      D.logs.push({id:uid(),club_id:'demo',member_id:DEMO_ME,run_id:b.run||null,km:+b.km,
-        secs:+b.secs||0,felt:+b.felt||0,note:b.note||'',
-        link:/^https?:\/\//i.test(b.link||'')?b.link:'',
-        ran_on:b.date||TODAY(),created_at:new Date().toISOString()});
-      if(b.run&&!D.rsvp.some(v=>v.run_id===b.run&&v.member_id===DEMO_ME))
-        D.rsvp.push({run_id:b.run,member_id:DEMO_ME,pace:''});
-      return back();
-    }
-    case 'log_del': { D.logs=D.logs.filter(l=>l.id!==b.log); return back(); }
     case 'profile_edit': {
       const me=D.members.find(m=>m.id===DEMO_ME);
       me.name=b.name||me.name; me.handle=(b.handle||'').replace(/^@+/,''); me.pace=b.pace||'';
@@ -1740,7 +1831,12 @@ async function demoApi(action,b){
       demoSave(D); return {club:D.club};
     }
     case 'club_recode': { D.club.code='DEMO'+String(Math.floor(Math.random()*90)+10); return back(); }
-    case 'kick': { D.members=D.members.filter(m=>m.id!==b.member); return back(); }
+    case 'kick': {
+      D.members=D.members.filter(m=>m.id!==b.member);
+      D.rsvp=D.rsvp.filter(v=>v.member_id!==b.member);
+      D.chat=D.chat.filter(c=>c.member_id!==b.member);
+      return back();
+    }
     case 'leave': { try{ localStorage.removeItem(DEMOKEY); }catch(e){} return {ok:true,joined:false}; }
     default: throw new Error('that one only works in a real club');
   }
@@ -1778,7 +1874,7 @@ function view(v){
   ['Week','Runs','Routes','Board','You'].forEach(n=>$('#v'+n).classList.toggle('hide',n!==v));
   $$('nav.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));
   const el=$('#v'+v); el.classList.remove('view'); void el.offsetWidth; el.classList.add('view');
-  $('#fabLog').classList.toggle('hide',v!=='Week');
+  $('#fabChat').classList.toggle('hide',v!=='Week');
   window.scrollTo({top:0,behavior:'instant'});
 }
 
@@ -1852,16 +1948,16 @@ function renderWeek(){
   const up=(S.runs||[]).filter(r=>!r.cancelled);
   $('#wkHero').innerHTML=heroHTML(up[0]);
   const st=S.stats||{};
-  $('#wkKm').textContent=km1(st.week_km||0)+' km · '+(st.week_runs||0)+' run'+((st.week_runs||0)===1?'':'s');
+  $('#wkKm').textContent=(st.week_shows||0)+' turned up'+((st.streak||0)>1?' · '+st.streak+'-week streak':'');
 
-  /* Monday→Sunday: your logged runs (filled) and club runs (dot) */
+  /* Monday→Sunday: club runs get a dot, the ones you turned up to are filled */
   const wk=monday(TODAY());
-  const byDay={}; (S.logs||[]).forEach(l=>{ byDay[l.ran_on]=(byDay[l.ran_on]||0)+ +l.km; });
+  const hereDays={}; (S.here||[]).forEach(h=>{ if(h.here_on) hereDays[h.here_on]=1; });
   const runDays={}; allRuns().forEach(r=>{ if(!r.cancelled) runDays[dstr(new Date(r.starts_at))]=1; });
   $('#wkStrip').innerHTML=Array.from({length:7},(_,i)=>{
-    const ds=shift(wk,i), d=dparse(ds), km=byDay[ds];
-    return `<div class="wkd${ds===TODAY()?' today':''}${km?' ran':''}">
-      <b>${DOW[d.getDay()][0]}${DOW[d.getDay()][1]}</b><i>${km?km1(km):'·'}</i>
+    const ds=shift(wk,i), d=dparse(ds), was=hereDays[ds];
+    return `<div class="wkd${ds===TODAY()?' today':''}${was?' ran':''}">
+      <b>${DOW[d.getDay()][0]}${DOW[d.getDay()][1]}</b><i>${was?'✓':'·'}</i>
       ${runDays[ds]?'<span class="dot"></span>':''}</div>`;
   }).join('');
 
@@ -1872,15 +1968,15 @@ function renderWeek(){
       <button class="btn ghost sm" data-call="1">＋ Run</button></div></div>`;
 
   $('#wkClub').innerHTML=[
-    ['b',km1(st.club_week_km||0),'club km'],
-    ['b',st.club_week_runs||0,'runs logged'],
-    ['b',(S.club||{}).members||0,'in the club']
-  ].map(([,v,l])=>`<div class="stat"><b>${v}</b><span>${l}</span></div>`).join('');
+    [st.club_week_shows||0,'turned up'],
+    [st.club_streakers||0,'on a streak'],
+    [(S.club||{}).members||0,'in the club']
+  ].map(([v,l])=>`<div class="stat"><b>${v}</b><span>${l}</span></div>`).join('');
 
-  const top=(S.board||[]).filter(r=>r.km>0).slice(0,3);
-  $('#wkTop').innerHTML=top.length?`<div style="margin-top:14px">${top.map((r,i)=>boardRowHTML(r,i,top[0].km)).join('')}</div>
+  const top=(S.board||[]).filter(r=>r.shows>0).slice(0,3);
+  $('#wkTop').innerHTML=top.length?`<div style="margin-top:14px">${top.map((r,i)=>boardRowHTML(r,i,top[0].shows)).join('')}</div>
     <button class="linkb" data-v="Board" style="display:block;margin-top:12px">Full board →</button>`
-    :`<p class="hint" style="margin-top:12px">Nobody's logged a run this week yet. First one on the board sets the pace.</p>`;
+    :`<p class="hint" style="margin-top:12px">Nobody's turned up yet this week. Be the one who did.</p>`;
 }
 
 /* ---------- SCHEDULE ---------- */
@@ -1928,27 +2024,27 @@ function renderRoutes(){
 }
 
 /* ---------- BOARD ---------- */
-function boardRowHTML(r,i,topKm){
+function boardRowHTML(r,i,topShows){
   const medal=['🥇','🥈','🥉'][i]||(i+1);
   const bits=[];
-  if(r.runs) bits.push(r.runs+' run'+(r.runs===1?'':'s'));
-  if(r.shows) bits.push(r.shows+' show'+(r.shows===1?'':'s'));
-  if(r.pace) bits.push(r.pace+'/km');
+  if(r.streak) bits.push('🔥 '+r.streak+' week'+(r.streak===1?'':'s')+' running');
+  if(r.coming) bits.push('in for '+r.coming+' more');
+  if(!bits.length) bits.push(r.last?'last seen '+ago(r.last):'hasn’t made one yet');
   return `<div class="brow p${i+1}${r.id===S.me.id?' mine':''}" data-mem="${esc(r.id)}">
     <div class="rk">${medal}</div>
     <div class="gr">
       <div class="nm">${esc(r.name)}${r.captain?' ·&nbsp;<span class="dimtx" style="font-size:11px">captain</span>':''}</div>
-      <div class="mt">${bits.join(' · ')||'no runs logged yet'}</div>
-      ${topKm>0?`<div class="bbar"><i style="width:${clamp(r.km/topKm*100,0,100)}%"></i></div>`:''}
+      <div class="mt">${bits.join(' · ')}</div>
+      ${topShows>0?`<div class="bbar"><i style="width:${clamp(r.shows/topShows*100,0,100)}%"></i></div>`:''}
     </div>
-    <div class="km"><b>${km1(r.km)}</b><span>km</span></div>
+    <div class="km"><b>${r.shows}</b><span>show${r.shows===1?'':'s'}</span></div>
   </div>`;
 }
 function renderBoard(){
   const rows=BOARD||S.board||[];
-  const top=rows.length?rows[0].km:0;
+  const top=rows.length?rows[0].shows:0;
   $('#boardList').innerHTML=rows.length?rows.map((r,i)=>boardRowHTML(r,i,top)).join('')
-    :'<div class="empty"><div class="ico">🏆</div><h3>Empty board</h3><p>Log a run and you’re on it.</p></div>';
+    :'<div class="empty"><div class="ico">🏆</div><h3>Empty board</h3><p>Turn up to a club run and check in — that puts you on it.</p></div>';
 }
 async function loadBoard(w){
   BWIN=w; $$('#bWin button').forEach(b=>b.classList.toggle('on',b.dataset.w===w));
@@ -1980,26 +2076,24 @@ function renderYou(){
   </svg><div class="in"><b>${wks}</b><span>week${wks===1?'':'s'}</span></div>`;
 
   $('#yStats').innerHTML=[
-    [km1(st.week_km||0),'this week'],[km1(st.total_km||0),'total km'],
-    [km1(st.longest_km||0),'longest'],[st.total_runs||0,'runs logged'],
+    [st.week_shows||0,'this week'],[st.total_shows||0,'all time'],
+    [st.coming||0,'in for next'],[st.streak||0,'week streak'],
     [(S.board||[]).findIndex(b=>b.id===me.id)+1||'—','on the board'],
-    [(S.board||[]).find(b=>b.id===me.id)?.shows||0,'shows']
+    [(S.club||{}).members||0,'in the club']
   ].map(([v,l])=>`<div class="stat"><b>${v}</b><span>${l}</span></div>`).join('');
 
-  const logs=S.logs||[];
-  $('#logList').innerHTML=logs.length?logs.slice(0,25).map(l=>{
-    const d=dparse(l.ran_on), cr=(S.runs||[]).concat(S.past||[]).find(r=>r.id===l.run_id);
+  const here=S.here||[];
+  $('#logList').innerHTML=here.length?here.slice(0,25).map(h=>{
+    const r=allRuns().find(x=>x.id===h.run_id);
     return `<div class="row">
-      <div class="av" style="background:var(--sunk)">${l.felt?FEEL[l.felt]:'🏃'}</div>
+      <div class="av" style="background:color-mix(in srgb,var(--hi) 40%,transparent)">✓</div>
       <div class="gr">
-        <div class="t">${km1(l.km)} km${l.secs?' · '+hms(l.secs):''}${l.secs?' · '+paceOf(l.km,l.secs)+'/km':''}</div>
-        <div class="s">${fmtDate(d)}${cr?' · '+esc(runName(cr)):''}${l.note?' · '+esc(l.note):''}</div>
+        <div class="t">${r?esc(runName(r)):'A club run'}</div>
+        <div class="s">${h.here_on?fmtDate(dparse(h.here_on)):''}${r&&r.meet?' · '+esc(r.meet):''}</div>
       </div>
-      ${l.link?`<button class="x" data-href="${esc(l.link)}" title="Open the activity">↗</button>`:''}
-      <button class="x" data-dellog="${esc(l.id)}" title="Delete">🗑</button>
     </div>`;
   }).join('')
-  :'<div class="empty"><div class="ico">📓</div><h3>Nothing logged</h3><p>Log your first run — it puts you on the board and starts your streak.</p><button class="btn hot" data-log="1" style="max-width:220px;margin:0 auto">Log a run</button></div>';
+  :'<div class="empty"><div class="ico">👋</div><h3>Nothing yet</h3><p>Turn up to a club run and check in. That\u2019s the whole stat.</p><button class="btn hot" data-v="Runs" style="max-width:220px;margin:0 auto">See what\u2019s on</button></div>';
 
   const c=S.club||{};
   $('#clubCard').innerHTML=`
@@ -2008,6 +2102,8 @@ function renderYou(){
     <div class="row"><div class="gr"><div class="t">Join code</div><div class="s">Hand this to anyone you want in</div></div>
       <button class="btn ghost sm" data-code="1">${esc(c.code||'')}</button></div>
     ${me.captain?'<div class="row"><div class="gr"><div class="t">Club settings</div><div class="s">Name, city, the roster</div></div><button class="btn ghost sm" data-club="1">Open</button></div>':''}
+    <div class="row"><div class="gr"><div class="t">Club chat</div><div class="s">${(S.chat_n||0)?S.chat_n+' message'+(S.chat_n===1?'':'s'):'nothing said yet'}</div></div>
+      <button class="btn ghost sm" data-chat="club">Open</button></div>
     <div class="row"><div class="gr"><div class="t">Look &amp; feel</div><div class="s">Light or dark</div></div>
       <button class="btn ghost sm" id="yMode">Switch</button></div>`;
 }
@@ -2018,6 +2114,7 @@ function render(){
   $('#hClub').textContent=c.name||'The Pack';
   $('#hCity').textContent=c.city||'run club';
   $('#demoBar').classList.toggle('hide',!DEMO);
+  refreshChatDot();
   renderWeek(); renderRuns(); renderRoutes();
   if(BWIN==='week'){ BOARD=S.board; }
   renderBoard(); renderYou();
@@ -2043,9 +2140,13 @@ function openRun(id){
   const gHTML=order.filter(k=>groups[k]||((r.paces||[]).indexOf(k)>=0)).map(k=>{
     const gs=groups[k]||[];
     return `<div class="row"><div class="chip${gs.some(g=>g.id===S.me.id)?' on':''}" style="min-width:66px;justify-content:center">${esc(k)}</div>
-      <div class="gr">${gs.length?`${avStack(gs,6)}<div class="s" style="margin-top:5px">${gs.map(g=>esc(g.name)).join(', ')}</div>`
+      <div class="gr">${gs.length?`${avStack(gs,6)}<div class="s" style="margin-top:5px">${gs.map(g=>esc(g.name)+(g.here?' ✓':'')).join(', ')}</div>`
         :'<div class="s">nobody in this group yet</div>'}</div></div>`;
   }).join('');
+  const started=d.getTime()<=Date.now()+30*6e4;
+  const iWasHere=((r.going||[]).find(g=>g.id===S.me.id)||{}).here;
+  const showed=(r.going||[]).filter(g=>g.here).length;
+  const chatN=(S.chat_runs||{})[r.id]||0;
 
   $('#runBody').innerHTML=`
     <div class="shhd"><div class="gr">
@@ -2057,7 +2158,8 @@ function openRun(id){
     <div class="chips">
       ${+r.km?`<span class="chip hi">${km1(r.km)} km</span>`:''}
       ${rt?`<span class="chip">${esc(rt.shape||'loop')}${rt.surface?' · '+esc(rt.surface):''}</span>`:''}
-      <span class="chip">${(r.going||[]).length} ${past?'turned up':'in'}</span>
+      <span class="chip">${(r.going||[]).length} in</span>
+      ${started?`<span class="chip${showed?' hi':''}">${showed} turned up</span>`:''}
     </div>
     ${r.meet?`<div class="card flat" style="margin-top:12px"><div class="row"><div class="gr">
       <div class="eyebrow">Meeting point</div><div class="t" style="margin-top:3px">${esc(r.meet)}</div></div>
@@ -2067,20 +2169,19 @@ function openRun(id){
     ${rt&&rt.link?`<button class="btn ghost" style="margin-top:12px" data-href="${esc(rt.link)}">Open the route ↗</button>`:''}
     <div class="sect"><h2 style="font-size:16px">Pace groups</h2></div>
     <div class="card flat">${gHTML||'<div class="s">No groups set — just turn up.</div>'}</div>
-    ${!past&&!r.cancelled?`
+    ${!started&&!r.cancelled?`
       <div class="sect"><h2 style="font-size:16px">${mine?'Change your group':'Which group are you running?'}</h2></div>
       <div class="pacegrid" id="runPaces">
         ${(r.paces||[]).map(p=>`<button class="pacebtn${myPace(r)===p?' on':''}" data-pp="${esc(p)}">${esc(p)}</button>`).join('')}
         <button class="pacebtn${mine&&!myPace(r)?' on':''}" data-pp="">no group</button>
-      </div>
-      <div class="btnrow">
-        <button class="btn ${mine?'ghost':'hot'} wide" data-rsvp="${esc(r.id)}">${mine?"I'm out":"I'm in"}</button>
-        <button class="btn ghost wide" data-share="run">Share</button>
-      </div>`:`
-      <div class="btnrow">
-        <button class="btn hot wide" data-log="${esc(r.id)}">Log this run</button>
-        <button class="btn ghost wide" data-share="run">Share</button>
-      </div>`}
+      </div>`:''}
+    <div class="btnrow">
+      ${r.cancelled?'' : started
+        ? `<button class="btn ${iWasHere?'ghost':'hot'} wide" data-ci="${esc(r.id)}">${iWasHere?'I wasn\u2019t there':'I was there'}</button>`
+        : `<button class="btn ${mine?'ghost':'hot'} wide" data-rsvp="${esc(r.id)}">${mine?"I'm out":"I'm in"}</button>`}
+      <button class="btn ghost wide" data-chat="${esc(r.id)}">💬 Chat${chatN?' '+chatN:''}</button>
+    </div>
+    <button class="btn ghost sm wide" style="margin-top:10px" data-share="run">Share this run</button>
     ${canEdit?`<div class="sect"><h2 style="font-size:16px">Host controls</h2></div>
       <div class="btnrow">
         <button class="btn ghost sm wide" data-edit="${esc(r.id)}">Edit</button>
@@ -2125,12 +2226,13 @@ function openMember(id){
     </div><button class="x" data-close>✕</button></div>
     <div class="eyebrow" style="margin-bottom:8px">${win}</div>
     <div class="stats">
-      <div class="stat"><b>${km1(b.km||0)}</b><span>km</span></div>
-      <div class="stat"><b>${b.runs||0}</b><span>runs</span></div>
       <div class="stat"><b>${b.shows||0}</b><span>shows</span></div>
+      <div class="stat"><b>${b.streak||0}</b><span>week streak</span></div>
+      <div class="stat"><b>${b.coming||0}</b><span>in for next</span></div>
     </div>
-    ${b.pace?`<p class="hint" style="text-align:center;margin-top:10px">Averaging ${esc(b.pace)}/km across those.</p>`:''}
-    ${S.me.captain&&m.id!==S.me.id?`<button class="btn ghost sm" style="margin-top:16px;color:var(--bad);border-color:color-mix(in srgb,var(--bad) 40%,transparent)" data-kick="${esc(m.id)}">Remove from club</button>`:''}`;
+    ${b.last?`<p class="hint" style="text-align:center;margin-top:10px">Last turned up ${esc(ago(b.last))}.</p>`:''}
+    ${m.id!==S.me.id?`<button class="btn hot" style="margin-top:14px" data-vs="${esc(m.id)}">Versus me →</button>`:''}
+    ${S.me.captain&&m.id!==S.me.id?`<button class="btn ghost sm" style="margin-top:10px;color:var(--bad);border-color:color-mix(in srgb,var(--bad) 40%,transparent)" data-kick="${esc(m.id)}">Remove from club</button>`:''}`;
   sheet('shMember');
 }
 
@@ -2234,49 +2336,100 @@ $('#rGo').addEventListener('click',async()=>{
   btn.disabled=false; btn.textContent='Add to the library';
 });
 
-/* ============================ LOG A RUN ============================ */
-let LFEEL=0;
-function openLog(runId){
-  const runs=(S.past||[]).concat((S.runs||[]).filter(r=>new Date(r.starts_at)<=Date.now()+6*36e5));
-  $('#lRun').innerHTML='<option value="">Solo run</option>'+runs.map(r=>{
-    const d=new Date(r.starts_at);
-    return `<option value="${esc(r.id)}">${esc(runName(r))} · ${DOW[d.getDay()]} ${d.getDate()} ${MON[d.getMonth()]}</option>`;
+/* ============================ CHAT ============================
+   One club thread plus a thread per run. This is the whole point of the app:
+   Strava can have the kilometres, we have the conversation. */
+let CHATRUN=null, CHATPOLL=null, CHAT=[];
+const seenKey=()=>'rc_chatseen_'+((S.club||{}).id||'x');
+function markChatSeen(){ try{ localStorage.setItem(seenKey(),String(S.chat_n||0)); }catch(e){} refreshChatDot(); }
+function refreshChatDot(){
+  let seen=0; try{ seen=+(localStorage.getItem(seenKey())||0); }catch(e){}
+  const el=$('#chatDot'); if(el) el.classList.toggle('hide',!((S.chat_n||0)>seen));
+}
+function openChat(runId){
+  CHATRUN=(runId&&runId!=='club')?runId:null;
+  const r=CHATRUN?allRuns().find(x=>x.id===CHATRUN):null;
+  $('#chatHd').textContent=r?runName(r):'Club chat';
+  $('#chatSub').textContent=r?'Just this run':(((S.club||{}).members||0)+' in the club');
+  $('#chatBody').innerHTML='<div class="chatempty">Loading…</div>';
+  $('#chatIn').value='';
+  sheet('shChat');
+  loadChat(); startChatPoll();
+  if(!CHATRUN) markChatSeen();
+}
+async function loadChat(){
+  try{ const r=await api('chat_get',{run:CHATRUN}); CHAT=r.chat||[]; paintChat(); }
+  catch(e){ $('#chatBody').innerHTML='<div class="chatempty">'+esc(e.message)+'</div>'; }
+}
+function paintChat(){
+  const el=$('#chatBody'); if(!el) return;
+  if(!CHAT.length){
+    el.innerHTML='<div class="chatempty">Nothing here yet.<br>Say the first thing.</div>'; return;
+  }
+  el.innerHTML=CHAT.map(c=>{
+    const own=c.member_id===S.me.id, t=new Date(c.created_at);
+    return `<div class="msg${own?' me':''}">
+      <div class="av${own?' me':''}">${esc(initials(c.name))}</div>
+      <div class="bub"><div class="who">${esc(c.name)}</div>${esc(c.text)}<div class="tm">${fmtTime(t)}</div></div>
+      ${(own||S.me.captain)?`<button class="del" data-delmsg="${esc(c.id)}" title="Delete">🗑</button>`:''}
+    </div>`;
   }).join('');
-  $('#lDate').value=TODAY();
-  $('#lDate').max=shift(TODAY(),1); $('#lDate').min=shift(TODAY(),-31);
-  if(runId){
-    const r=runs.find(x=>x.id===runId);
-    if(r){ $('#lRun').value=runId; $('#lKm').value=r.km||''; $('#lDate').value=dstr(new Date(r.starts_at)); }
-  }else{ $('#lKm').value=''; }
-  $('#lMin').value=''; $('#lSec').value=''; $('#lNote').value=''; $('#lLink').value=''; $('#lErr').textContent='';
-  LFEEL=0; $$('#lFeel button').forEach(b=>b.classList.remove('on'));
-  paintLogPace();
-  sheet('shLog');
+  el.scrollTop=el.scrollHeight;
 }
-function paintLogPace(){
-  const km=+$('#lKm').value||0, secs=(+$('#lMin').value||0)*60+(+$('#lSec').value||0);
-  $('#lPace').textContent=(km&&secs)?'That’s '+paceOf(km,secs)+' per km · '+hms(secs)+' total'
-    :'Add a time and we’ll work out your pace.';
+function startChatPoll(){
+  stopChatPoll();
+  CHATPOLL=setInterval(()=>{ if(openSh==='shChat') loadChat(); else stopChatPoll(); },7000);
 }
-['#lKm','#lMin','#lSec'].forEach(s=>$(s).addEventListener('input',paintLogPace));
-$('#lFeel').addEventListener('click',e=>{
-  const b=e.target.closest('button[data-f]'); if(!b) return;
-  LFEEL=+b.dataset.f; $$('#lFeel button').forEach(x=>x.classList.toggle('on',x===b)); buzz(8);
-});
-$('#lGo').addEventListener('click',async()=>{
-  const km=+$('#lKm').value;
-  if(!km||km<=0){ $('#lErr').textContent='How far did you go?'; return; }
-  const secs=(+$('#lMin').value||0)*60+(+$('#lSec').value||0);
-  const btn=$('#lGo'); btn.disabled=true; btn.textContent='Logging…';
+function stopChatPoll(){ if(CHATPOLL){ clearInterval(CHATPOLL); CHATPOLL=null; } }
+async function sendChat(){
+  const t=$('#chatIn').value.trim(); if(!t) return;
+  $('#chatIn').value='';
   try{
-    const before=(S.stats||{}).streak||0;
-    S=await api('log_add',{km,secs,felt:LFEEL,note:$('#lNote').value,link:$('#lLink').value.trim(),
-      run:$('#lRun').value||null,date:$('#lDate').value});
-    render(); closeSheet(); buzz(26);
-    const now=(S.stats||{}).streak||0;
-    toast(now>before&&now>1?'Logged · '+now+' weeks in a row 🔥':'Logged · '+km1(km)+' km 🏃');
-  }catch(e){ $('#lErr').textContent=e.message; }
-  btn.disabled=false; btn.textContent='Log it';
+    const r=await api('chat_send',{run:CHATRUN,text:t});
+    CHAT=r.chat||[]; paintChat(); buzz(10);
+    if(!CHATRUN){ S.chat_n=(S.chat_n||0)+1; markChatSeen(); }
+    else { S.chat_runs=S.chat_runs||{}; S.chat_runs[CHATRUN]=(S.chat_runs[CHATRUN]||0)+1; }
+  }catch(e){ toast(e.message); $('#chatIn').value=t; }
+}
+$('#chatGo').addEventListener('click',sendChat);
+$('#chatIn').addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); sendChat(); } });
+
+/* ============================ VERSUS ============================
+   Head to head on the only thing we measure: who keeps showing up. */
+let VSWHO=null, VSWIN='month';
+function openVersus(id){
+  VSWHO=id;
+  const m=(S.members||[]).find(x=>x.id===id);
+  $('#vsHd').textContent='You vs '+((m&&m.name)||'them');
+  $$('#vsWin button').forEach(b=>b.classList.toggle('on',b.dataset.vw===VSWIN));
+  $('#vsBody').innerHTML='<div class="chatempty">Counting…</div>';
+  sheet('shVersus');
+  loadVersus();
+}
+async function loadVersus(){
+  try{
+    const r=await api('versus',{member:VSWHO,window:VSWIN});
+    const row=(label,a,b)=>`<div class="vsrow">
+      <div class="vsn${a>b?' win':''}">${a}</div>
+      <div class="vsl">${label}</div>
+      <div class="vsn${b>a?' win':''}">${b}</div>
+    </div>`;
+    $('#vsBody').innerHTML=`
+      <div class="vshead">
+        <div class="nm">${esc(r.me.name)}</div><div class="vsmid">vs</div><div class="nm">${esc(r.them.name)}</div>
+      </div>
+      <div class="card flat">
+        ${row('turned up',r.me.shows,r.them.shows)}
+        ${row('week streak',r.me.streak,r.them.streak)}
+        ${row('all time',r.me.total,r.them.total)}
+      </div>
+      <div class="together"><b>${r.together}</b><span>runs you both turned up to</span></div>
+      <p class="hint" style="text-align:center;margin-top:10px">No distances, no pace — just who keeps turning up.</p>`;
+  }catch(e){ $('#vsBody').innerHTML='<div class="chatempty">'+esc(e.message)+'</div>'; }
+}
+$('#vsWin').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-vw]'); if(!b) return;
+  VSWIN=b.dataset.vw; $$('#vsWin button').forEach(x=>x.classList.toggle('on',x===b)); loadVersus();
 });
 
 /* ============================ CODE / PROFILE / CLUB ============================ */
@@ -2408,16 +2561,16 @@ function shareWeek(){
   const st=S.stats||{}, me=S.me||{};
   const c=cardCanvas(g=>{
     g.fillStyle='#FF3B18'; g.font='900 40px Inter,system-ui,sans-serif';
-    g.fillText('THIS WEEK',80,340);
-    const bigKm=km1(st.week_km||0);
+    g.fillText('TURNED UP',80,340);
+    const bigN=String(st.total_shows||0);
     g.fillStyle='#F4F2EC'; g.font='900 200px Inter,system-ui,sans-serif';
-    const bigW=g.measureText(bigKm).width;
-    g.fillText(bigKm,80,520);
+    const bigW=g.measureText(bigN).width;
+    g.fillText(bigN,80,520);
     g.font='900 64px Inter,system-ui,sans-serif'; g.fillStyle='#D9FF3F';
-    g.fillText('KM',80+bigW+26,520);
+    g.fillText(st.total_shows===1?'RUN':'RUNS',80+bigW+26,520);
     g.fillStyle='#F4F2EC'; g.font='900 72px Inter,system-ui,sans-serif';
     wrapText(g,(me.name||'').toUpperCase(),80,660,920,76);
-    const rows=[[String(st.week_runs||0),'runs this week'],[String(st.streak||0),'week streak'],[km1(st.total_km||0),'km all time']];
+    const rows=[[String(st.week_shows||0),'turned up this week'],[String(st.streak||0),'week streak'],[String(st.coming||0),'in for next']];
     let y=830;
     rows.forEach(([v,l])=>{
       g.fillStyle='#F4F2EC'; g.font='900 78px Inter,system-ui,sans-serif'; g.fillText(v,80,y);
@@ -2428,7 +2581,7 @@ function shareWeek(){
     g.fillStyle='rgba(244,242,236,.62)'; g.font='700 32px Inter,system-ui,sans-serif';
     g.fillText((S.club||{}).name||'',80,1200);
   });
-  shareCanvas(c,'the-pack-week.png',km1(st.week_km||0)+' km this week with '+((S.club||{}).name||'the club')+'.');
+  shareCanvas(c,'the-pack-card.png',(st.total_shows||0)+' club runs turned up to with '+((S.club||{}).name||'the club')+'.');
 }
 
 /* ============================ EVENTS ============================ */
@@ -2476,8 +2629,29 @@ document.addEventListener('click',async e=>{
   if(t.closest('#yShare')){ shareWeek(); return; }
   if(t.closest('[data-share]')&&SHRUN){ shareRun(SHRUN); return; }
   if(t.closest('#btnRoute')){ $('#rErr').textContent=''; sheet('shRoute'); return; }
-  const lg=t.closest('[data-log],#fabLog,#yLog');
-  if(lg){ const rid=lg.dataset&&lg.dataset.log&&lg.dataset.log!=='1'?lg.dataset.log:null; openLog(rid); return; }
+  const ch=t.closest('[data-chat],#btnChat,#fabChat');
+  if(ch){ const rid=ch.dataset&&ch.dataset.chat?ch.dataset.chat:null; openChat(rid); return; }
+  const vs=t.closest('[data-vs]');
+  if(vs){ VSWIN='month'; openVersus(vs.dataset.vs); return; }
+  const ci=t.closest('[data-ci]');
+  if(ci){
+    const id=ci.dataset.ci, r=allRuns().find(x=>x.id===id);
+    const was=((r&&r.going||[]).find(g=>g.id===S.me.id)||{}).here;
+    ci.disabled=true;
+    try{
+      S=await api('checkin',{run:id,on:!was}); render(); buzz(was?8:26);
+      if(openSh==='shRun') openRun(id);
+      toast(was?'Taken off the list':'Marked down — you were there ✓');
+    }catch(err){ toast(err.message); }
+    ci.disabled=false; return;
+  }
+  const dm=t.closest('[data-delmsg]');
+  if(dm){
+    if(!confirm('Delete this message?')) return;
+    try{ const r=await api('chat_del',{msg:dm.dataset.delmsg}); CHAT=r.chat||[]; paintChat(); }
+    catch(err){ toast(err.message); }
+    return;
+  }
   if(t.closest('#yMode,#btnMode')){
     const cur=document.documentElement.getAttribute('data-theme');
     setMode(cur==='night'?'day':'night'); return;
@@ -2487,12 +2661,6 @@ document.addEventListener('click',async e=>{
     const k=mp.dataset.map;
     if(k==='run'&&SHRUN&&SHRUN.lat) openMap(SHRUN.lat,SHRUN.lon,runName(SHRUN),SHRUN.meet);
     if(k==='route'&&SHROUTE&&SHROUTE.lat) openMap(SHROUTE.lat,SHROUTE.lon,SHROUTE.name,SHROUTE.start_name);
-    return;
-  }
-  const dl=t.closest('[data-dellog]');
-  if(dl){
-    if(!confirm('Delete this run from your log?')) return;
-    try{ S=await api('log_del',{log:dl.dataset.dellog}); render(); toast('Deleted'); }catch(err){ toast(err.message); }
     return;
   }
   const dr=t.closest('[data-delrun]');
@@ -2587,13 +2755,13 @@ $('#jGo').addEventListener('click',async()=>{
 /* ============================ BOOT ============================ */
 function showGate(){
   $('#gate').classList.remove('hide');
-  $('#app').classList.add('hide'); $('#tabs').classList.add('hide'); $('#fabLog').classList.add('hide');
+  $('#app').classList.add('hide'); $('#tabs').classList.add('hide'); $('#fabChat').classList.add('hide');
   const q=new URLSearchParams(location.search).get('join');
   if(q){ gShow('gStep2'); $('#jCode').value=q.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,6); setTimeout(()=>$('#jGo').click(),260); }
 }
 function startApp(){
   $('#gate').classList.add('hide');
-  $('#app').classList.remove('hide'); $('#tabs').classList.remove('hide'); $('#fabLog').classList.remove('hide');
+  $('#app').classList.remove('hide'); $('#tabs').classList.remove('hide'); $('#fabChat').classList.remove('hide');
   render(); view('Week');
 }
 async function boot(){

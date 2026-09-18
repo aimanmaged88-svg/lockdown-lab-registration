@@ -1160,10 +1160,10 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   device to a member row and the server always uses the REGISTERED name, so
   you can't post as someone else by editing a request. Deep link
   `?join=CODE` prefills + auto-submits the join form.
-- **Actions:** club_find (public preview, leaks no ids) / club_create /
+- **Actions (edge v5):** club_find (public preview, leaks no ids) / club_create /
   club_join / state / profile_edit / club_edit / club_recode / leave / kick /
   run_create / run_edit / run_cancel / run_del / rsvp / route_add / route_del /
-  log_add / log_del / board. `state` returns everything in one call (club,
+  **checkin** / **versus** / **chat_get** / **chat_send** / **chat_del** / board. `state` returns everything in one call (club,
   members, upcoming+past runs with rosters, routes, my logs, board, stats).
 - **The five screens:** ⚡Week (next-run hero w/ live countdown + one-tap I'm
   in, Mon-Sun strip of your km + club-run dots, club-week stats, top 3),
@@ -1173,11 +1173,10 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
 - **Run-club-specific bits that make it not-a-generic-fitness-app:** pace
   groups are first-class — a run advertises them, you pick yours when you tap
   in, and the run sheet shows **who's in each group** (that's the thing a club
-  actually needs to know). The board ranks on km but also counts **shows**
-  (club runs you turned up to) and the copy says so — "distance counts,
-  turning up counts more" — so a 3km-every-week runner can lead it. Streak is
-  **weeks, not days** (a run club is weekly; a day streak punishes rest days),
-  and the current week only breaks it once it's over.
+  actually needs to know). Streak is **weeks, not days** (a run club is weekly;
+  a day streak punishes rest days), and the current week only breaks it once
+  it's over. See the PURELY SOCIAL pivot below — the board no longer touches
+  distance at all.
 - **Demo mode.** Gate offers "Have a look around first" → `rc_demo` flag routes
   `api()` to `demoApi()`, a localStorage club (Inner West Milers, 8 members, 4
   routes, 6 runs, ~22 logs) that implements the SAME payload shape as the edge
@@ -1263,8 +1262,70 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   inline, verify by subagent.
 - **Final verification: backend 97/97, UI 95/95** (both suites extended for
   Strava). All test rows deleted; the six rc_* tables are empty.
-- **Still open from that reference (his call):** the jersey restyle, per-club
-  colour + crest, and wiring a run club into Certified Hooper.
+- **THE BUSINESS MODEL (2026-09-18, Aiman): sell it as a template.** "so i can
+  approach different run clubs and offer them this template so their runner can
+  have stats and verse each other and chat." **The app is ALREADY multi-tenant** —
+  one URL, unlimited clubs, each isolated by its own 6-char join code; he can
+  hand the same link to ten clubs and none of them see each other's runs,
+  routes, board or chat. Nothing had to be built for that. This is the
+  white-label idea in Parked ideas, now concrete.
+- **STRAVA API — investigated and DELIBERATELY NOT BUILT.** He asked "can we
+  connect strava data to it". Technically yes (OAuth2 + a registered app; the
+  client secret would live safely in the edge fn). The blocker is legal, not
+  technical: Strava's API terms restrict displaying one athlete's data to OTHER
+  people, which is exactly what a club leaderboard is — a Strava-fed board is
+  the thing their agreement exists to prevent. Plus per-club rate limits. **If
+  this ever comes back, verify against their CURRENT terms before writing a
+  line.** We link OUT to profiles instead (rc_members.strava), which needs no
+  API, no OAuth and no permission.
+- **PURELY SOCIAL PIVOT — edge v5 (2026-09-18).** His call, in his words: "make
+  it that we dont collect hard running data we are the social communication
+  bridge" → "I want it to be purely social, check ins, verse each other all
+  that stuff". So the tracker is GONE:
+  - **Removed:** distance/time/pace logging, the whole log-a-run sheet, km and
+    pace on the board, week/total/longest km stats, `paceOf`/`hms`/felt. The
+    `rc_logs` table was **dropped** (verified 0 rows first).
+  - **Kept, because it's ours not Strava's:** attendance. Migration
+    `runclub_social_checkins` put `here` / `here_at` / `here_on` on **rc_rsvp**,
+    so one table is the whole social record — you said you were in (rsvp), then
+    you confirmed you came (checkin). `here_on` is the runner's LOCAL date so a
+    6am Sydney run can't land in the previous UTC week.
+  - **`checkin {run,on}`** refuses before the run starts (`early`) and on a
+    cancelled run, and CREATES the rsvp row if you turned up without saying you
+    would. Un-checking-in works (toggle).
+  - **Board ranks on `shows`** (check-ins in the window), then streak, then
+    all-time. Rows carry shows / total / streak / coming / last. No km, no pace
+    — asserted in the suite. Copy: "The only stat that matters is turning up"
+    and it names Strava as where your running belongs.
+  - **`versus {member,window}`** = head to head on turned-up / week-streak /
+    all-time, plus **runs you both turned up to**. Self and out-of-club refused.
+  - Fixed while here: switching clubs used to leave the old club's RSVPs
+    behind, which would have followed you onto the new club's board —
+    `club_join` now clears them when the club actually changes.
+- **CHAT — SHIPPED (edge v5).** Migration `runclub_chat`, table **rc_chat**:
+  `run_id` null = the club-wide thread, set = that run's thread ("running 5
+  late"). `name` is snapshotted at send time so a renamed/departed member's old
+  messages still read. Actions chat_get / chat_send (500 chars, 30 msgs per
+  5 min) / chat_del (**your own, or the captain's call** — a club you can't
+  moderate is one nobody wants to run). `state` returns `chat_n` + `chat_runs`
+  from ONE query so the UI badges unread without a request per run. Frontend:
+  header 💬 with an unread dot (`rc_chatseen_<clubid>` vs chat_n), the FAB is
+  now chat, a 💬 button inside each run sheet opens that run's thread, 7s poll
+  while the sheet is open, Enter to send, own messages right-aligned in accent.
+- **Verified after the pivot: backend 59/59 + UI 65/65** (both suites rewritten
+  for the social model; UI proves a run-thread message does NOT leak into the
+  club thread, and that no km/pace stat renders anywhere). edge **v5**
+  byte-verified identical (`300bcbdb…`), verify_jwt still true, other functions
+  untouched. All test rows deleted; the five rc_* tables are empty.
+- **Two test bugs of mine, not app bugs:** the UI suite clicked board row 2 to
+  open "versus" — but the board is streak-sorted so row 2 was MY row, and you
+  can't verse yourself (now targets `.brow:not(.mine)`); and the backend suite
+  hard-coded a member count after another test had already moved that member to
+  a second club (now relative).
+- **Still open (his call):** the jersey restyle and **per-club colour + crest**
+  — the latter now matters much more, because a template you sell to ten clubs
+  should look like each club, not like ours; push notifications (a Pack-scoped
+  SW + the VAPID hop); and wiring a run club into Certified Hooper.
 
 ## Parked ideas (Aiman asked to save these)
 
