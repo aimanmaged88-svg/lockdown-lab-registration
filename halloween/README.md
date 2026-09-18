@@ -32,8 +32,11 @@ ln -sfn /opt/node22/lib/node_modules node_modules   # or: npm i playwright
 node render.mjs          # 5 print products → ../products/*.pdf (A4 + US Letter)
 node walls.mjs           # 24 wallpapers    → ../products/gaslight-wallpapers/
 node shopimg.mjs         # storefront images → ../shop-img/
-node pinrender.mjs       # 12 Pinterest pins → ../pins/
+node pinterest.mjs       # landing pages + feed + pin CSV + 17 pin images
 ```
+
+Run `walls.mjs` before `pinterest.mjs` — the wallpaper pins composite the real
+wallpaper JPEGs, and those live in the git-ignored `products/` folder.
 
 Then re-zip for upload (writes `dist/*.zip` with the licence file included) —
 the packaging step is in the session notes; it's ~30 lines of `zipfile`.
@@ -118,6 +121,43 @@ domain (or its own Netlify site pointed at this folder) is tidier.
 
 ---
 
+## The Pinterest side
+
+`PINTEREST.md` is the runbook — profile copy, the six boards with descriptions,
+how to register the catalog, how to validate Rich Pins, and the posting cadence.
+
+Three things make this a Pinterest *shop* rather than a pile of pictures:
+
+1. **`feed/products.tsv`** — the product catalogue feed. Registering it in
+   Pinterest (Ads → Catalogs) gives the profile a Shop tab and puts a live
+   price on every product pin. Carries all seven required fields plus brand,
+   product_type, google_product_category, additional_image_link and sale_price.
+2. **`p/<key>.html`** — a landing page per product, carrying `og:type=product`,
+   `product:price:amount` and a schema.org `Product` block. That's what
+   Pinterest reads for Rich Pins, and it's where the feed's `link` points.
+3. **`PINTEREST-PINS.csv`** — a row per pin: image, title, description,
+   destination, board, alt text. 17 pins across the six boards.
+
+All three are generated from **`build/catalog.js`**, which is the single source
+of truth. Add a pin entry or change a price there and run:
+
+```bash
+node build/pinterest.mjs           # pages + feed + CSV + pin images
+node build/pinterest.mjs --no-img  # skip re-rendering images
+```
+
+`SITE` at the top of `catalog.js` is the only place the domain is written — the
+whole feed re-points if the shop moves.
+
+**Pinterest must be able to fetch the URLs**, so the shop has to be publicly
+deployed before the feed or Rich Pins will validate. Merging to `main`
+auto-deploys it.
+
+Two verification scripts worth re-running after any pin change:
+`build/tonecheck.mjs` samples each pin's background and confirms the light/dark
+treatment matches the catalog; `build/lptest.mjs` checks a landing page's OG
+tags, JSON-LD and images.
+
 ## Files
 
 ```
@@ -128,14 +168,23 @@ halloween/
   assets/fonts/        7 OFL/Apache faces
   shop-img/            small storefront previews (committed)
   pins/                12 finished 1000×1500 Pinterest pins (committed)
+  PINTEREST.md         the Pinterest runbook — do this, in this order
+  PINTEREST-PINS.csv   per-pin title / description / link / board / alt
+  p/                   a landing page per product (Rich Pin markup)
+  feed/products.tsv    the Pinterest product catalogue feed
   build/
+    catalog.js         SINGLE SOURCE OF TRUTH — products, pins, boards, profile
+    pinterest.mjs      -> p/*.html + feed/products.tsv + the CSV + pin images
+    tonecheck.mjs      confirms each pin's light/dark ground matches the catalog
+    lptest.mjs         checks a landing page's OG tags, JSON-LD and images
     brand.css          shared print brand: tokens, type roles, rules, ornaments
     p1…p6*.html        the products; repetitive content is generated in JS
     render.mjs         products → A4 + US Letter PDFs + preview PNGs
     walls.mjs          wallpapers → JPEGs at two phone sizes
     shopimg.mjs        storefront images
-    pins.html          pin layouts (light + dark variants)
-    pinrender.mjs      pins → JPEGs
+    pins.html          pin layouts; exposes window.renderPin(data) because
+                       file:// blocks ES module imports, so the generator
+                       injects the catalogue rather than the page importing it
     sheet.mjs          contact sheet of any product, for reviewing a whole pack
     overflow.mjs       checks every sheet for content escaping the page
   products/ dist/ previews/    GIT-IGNORED — the sellable files

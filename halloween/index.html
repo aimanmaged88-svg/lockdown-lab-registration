@@ -8,7 +8,7 @@
 <meta property="og:title" content="Hollow Press — printable vintage Halloween">
 <meta property="og:description" content="Sideshow posters, poison labels, party kits. Instant download, print at home tonight.">
 <meta property="og:type" content="website">
-<meta property="og:image" content="pins/pin-01_8-sideshow-posters.jpg">
+<meta property="og:image" content="pins/sideshow-1_8-sideshow-posters.jpg">
 <meta name="theme-color" content="#120A10">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' fill='%23120A10'/><path d='M16 6l8 10-8 10-8-10z' fill='%23E8C27A'/></svg>">
 <style>
@@ -107,6 +107,9 @@
     text-transform:uppercase; padding:6px 12px}
   .card .body{padding:20px 22px 22px; display:flex; flex-direction:column; flex:1}
   .card h3{font-family:var(--disp); font-size:1.32rem; margin:0; line-height:1.12}
+  .card h3 a{color:inherit; text-decoration:none}
+  .card h3 a:hover{color:var(--gold)}
+  a.shot{text-decoration:none}
   .card .cnt{font-family:var(--caps); text-transform:uppercase; letter-spacing:.2em;
     font-size:11px; color:var(--gold); margin-top:7px}
   .card .desc{color:var(--dim); font-size:.97rem; margin:11px 0 0}
@@ -219,6 +222,7 @@
         <div class="buy" style="border:0;margin-top:22px;padding:0;justify-content:flex-start;gap:18px">
           <span class="price">$29<span class="was">$51</span></span>
           <a class="btn" data-buy="vault" href="#">Take the lot</a>
+          <a href="p/vault.html" style="font-family:var(--caps);text-transform:uppercase;letter-spacing:.18em;font-size:11.5px;color:var(--dim)">what’s inside</a>
         </div>
       </div>
       <div class="shots">
@@ -359,7 +363,7 @@ const PRODUCTS = [
 ];
 
 /* ---- wallpapers get their own artwork rather than a printed sheet ---- */
-const WALL_IMG = "pins/pin-09_12-phone-wallpapers.jpg";
+const WALL_IMG = "pins/wallpapers-1_12-phone-wallpapers.jpg";
 
 const grid = document.getElementById("grid");
 grid.innerHTML = PRODUCTS.map(p => {
@@ -369,12 +373,12 @@ grid.innerHTML = PRODUCTS.map(p => {
   const fit = p.key === "wallpapers" ? "width:92%;transform:none" : "";
   return `
   <article class="card">
-    <div class="shot">
+    <a class="shot" href="p/${p.key}.html">
       ${p.tag ? `<span class="tag">${p.tag}</span>` : ""}
       <img src="${img}" alt="${p.title.replace(/&amp;/g,"&")}" loading="lazy" style="${fit}">
-    </div>
+    </a>
     <div class="body">
-      <h3>${p.title}</h3>
+      <h3><a href="p/${p.key}.html">${p.title}</a></h3>
       <div class="cnt">${p.count}</div>
       <p class="desc">${p.desc}</p>
       <ul>${p.bullets.map(b => `<li>${b}</li>`).join("")}</ul>

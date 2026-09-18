@@ -1315,3 +1315,53 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   site pointed at `halloween/`) is tidier when he's ready.
 - Delivered to him as upload-ready zips (each with a LICENCE-AND-PRINTING.txt:
   personal use, no resale/redistribution, print at 100% not fit-to-page).
+
+### Pinterest side built out (2026-09-18, "this is for pintrest")
+
+- Pins alone aren't a Pinterest *shop*. Added the three things that make it one,
+  all generated from **`halloween/build/catalog.js`** (SINGLE SOURCE OF TRUTH
+  for products, pins, boards and profile copy) via
+  **`node build/pinterest.mjs`** (`--no-img` skips re-rendering images):
+  1. **`halloween/feed/products.tsv`** — the product catalogue feed. Registering
+     it at Pinterest → Ads → Catalogs gives the profile a **Shop tab** and puts
+     a live price on every product pin. All 7 required fields (id/title/
+     description/link/image_link/price/availability) plus condition, brand,
+     product_type, google_product_category, additional_image_link and
+     sale_price (bundle shows $29 struck from $51).
+  2. **`halloween/p/<key>.html`** — a landing page per product carrying
+     `og:type=product` + `product:price:amount` + schema.org `Product` JSON-LD,
+     which is what Pinterest reads for **Rich Pins**. The feed's `link` points
+     here (or at the checkout URL once `CHECKOUT` in catalog.js is filled).
+     Storefront cards now link to them too.
+  3. **`halloween/PINTEREST-PINS.csv`** — 17 pins × image / title / description
+     / destination / board / alt text, spread across all 6 boards (a pin can
+     override its product's board via `board:` — used for the two urgency pins
+     on "Printables to Print Tonight").
+- **`halloween/PINTEREST.md` = the runbook**, in order: business account +
+  search-weighted display name (`Hollow Press | Vintage Halloween Printables`)
+  → **claim the website** (needs his `p:domain_verify` meta tag pasted into
+  index.html; the catalog will NOT work unclaimed) → the 6 boards with written
+  descriptions → register the feed → validate Rich Pins at
+  developers.pinterest.com/tools/url-debugger → cadence: 3 pins/day for the
+  first week, then 1–3 **new** pin images daily (Pinterest treats a fresh image
+  as fresh content and repeat images as spam — never re-pin the same image).
+- **HARD DEPENDENCY: the shop must be publicly deployed before any of it
+  validates** — Pinterest has to fetch the images and pages. The branch is not
+  deployed; merging to `main` auto-deploys and every URL starts working. NOT
+  merged (his call — merging main auto-deploys the live site).
+- `SITE` at the top of catalog.js is the ONLY place the domain is written, so
+  the whole feed re-points in one edit if the shop moves off
+  certifiedhooper.netlify.app (recommended — a basketball domain on Halloween
+  pins hurts trust, and Pinterest shows the claimed domain on every pin).
+- Pin filenames are now **derived** (`<key>-<n>_<slug>.jpg`) from the catalog
+  rather than hand-written, after a real bug: the old hardcoded `hero:
+  "pin-01_…jpg"` values went stale the moment pins were renamed, silently
+  breaking every `image_link` in the feed. Nothing hardcodes a pin filename now.
+- `build/pins.html` exposes `window.renderPin(data)` and the generator injects
+  the catalogue — **file:// blocks ES module imports**, so the page cannot
+  import catalog.js itself.
+- Verification scripts: **`build/tonecheck.mjs`** samples each pin's background
+  luminance and asserts the light/dark treatment matches the catalog (17/17 ok;
+  needs `--allow-file-access-from-files` for canvas pixel reads over file://),
+  **`build/lptest.mjs`** checks a landing page's OG tags, JSON-LD, images and
+  h-scroll. Superseded scripts deleted (pinrender/pinsheet/wpsheet).
