@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="en" data-theme="day">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#F2EFE8">
+<title>The Pack — the app for running a run club</title>
+<meta name="description" content="One schedule your whole club can see: the meeting point, the pace groups, who's actually coming, and a board that counts turning up. No app store, no accounts — one code gets your runners in.">
+<meta property="og:title" content="The Pack — the app for running a run club">
+<meta property="og:description" content="Strava keeps your kilometres. The Pack keeps your club. One schedule, the meeting point, pace groups, check-ins, a board that counts turning up, and chat.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23141519'/%3E%3Cpath d='M12 44h12l8-24 8 24h12' stroke='%23FF3B18' stroke-width='6' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<style>
+@font-face{font-family:'PKBody';src:url('assets/fonts/inter-var.woff2') format('woff2');font-weight:100 900;font-display:swap}
+@font-face{font-family:'PKMark';src:url('assets/fonts/permanentmarker-400.woff2') format('woff2');font-weight:400;font-display:swap}
+:root{
+  --body:'PKBody',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --mark:'PKMark','PKBody',cursive;
+  --paper:#F2EFE8; --card:#FFFFFF; --card2:#FAF8F2; --sunk:#EDE9E0;
+  --ink:#141519; --muted:#6B6E77; --dim:#9B9EA6;
+  --line:rgba(20,21,25,.11); --line2:rgba(20,21,25,.055);
+  --hot:#FF3B18; --onhot:#fff; --hi:#D9FF3F; --deep:#111B17; --ondeep:#F4F2EC;
+  --good:#0E8A57;
+  --r:20px; --r2:14px;
+  --shadow:0 1px 2px rgba(20,21,25,.04),0 8px 24px -12px rgba(20,21,25,.14);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;opacity:.5;
+  background:repeating-linear-gradient(115deg,transparent 0 38px,var(--line2) 38px 39px)}
+.wrap{position:relative;z-index:1;max-width:1040px;margin:0 auto;padding:0 20px}
+a{color:inherit}
+h1,h2,h3{margin:0;font-weight:900;letter-spacing:-.035em;line-height:.98}
+h1{font-size:clamp(38px,8.5vw,76px);text-transform:uppercase}
+h2{font-size:clamp(28px,5.5vw,42px);text-transform:uppercase}
+h3{font-size:19px;letter-spacing:-.02em}
+p{margin:0}
+.eyebrow{font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.mark{font-family:var(--mark)}
+.mute{color:var(--muted)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:15px 24px;border-radius:14px;
+  font-weight:800;font-size:16px;background:var(--ink);color:var(--paper);text-decoration:none;border:1px solid transparent;
+  transition:transform .16s cubic-bezier(.34,1.4,.5,1)}
+.btn:active{transform:scale(.975)}
+.btn.hot{background:var(--hot);color:var(--onhot)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.big{padding:17px 30px;font-size:17px}
+
+/* nav */
+nav{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--paper) 88%,transparent);
+  backdrop-filter:blur(14px);border-bottom:1px solid var(--line2)}
+nav .in{display:flex;align-items:center;gap:12px;max-width:1040px;margin:0 auto;padding:12px 20px}
+nav .lg{display:flex;align-items:center;gap:9px;flex:1 1 auto;text-decoration:none}
+nav svg{width:30px;height:30px}
+nav b{font-size:16px;font-weight:900;letter-spacing:-.02em;text-transform:uppercase}
+nav .nl{font-size:14px;font-weight:700;text-decoration:none;color:var(--muted)}
+
+/* hero */
+header.hero{padding:clamp(44px,8vw,86px) 0 clamp(36px,6vw,64px)}
+.stripe{height:6px;border-radius:999px;background:linear-gradient(90deg,var(--hot),var(--hi));margin:22px 0;max-width:260px}
+.lede{margin-top:20px;font-size:clamp(17px,2.4vw,21px);line-height:1.5;color:var(--muted);max-width:620px}
+.lede b{color:var(--ink)}
+.ctas{display:flex;flex-wrap:wrap;gap:11px;margin-top:28px}
+.fine{margin-top:16px;font-size:13.5px;color:var(--dim)}
+
+/* three-column truth */
+.truth{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin-top:20px}
+.tcard{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)}
+.tcard.us{background:var(--deep);color:var(--ondeep);border-color:transparent}
+.tcard .lbl{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.tcard.us .lbl{color:color-mix(in srgb,var(--ondeep) 62%,transparent)}
+.tcard h3{margin:8px 0 7px}
+.tcard p{font-size:14.5px;color:var(--muted)}
+.tcard.us p{color:color-mix(in srgb,var(--ondeep) 80%,transparent)}
+
+section{padding:clamp(40px,7vw,72px) 0}
+.sechd{max-width:640px;margin-bottom:26px}
+.sechd p{margin-top:12px;font-size:17px;color:var(--muted)}
+
+/* feature grid */
+.feats{display:grid;grid-template-columns:repeat(auto-fit,minmax(268px,1fr));gap:12px}
+.feat{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)}
+.feat .ico{font-size:24px;line-height:1}
+.feat h3{margin:12px 0 7px}
+.feat p{font-size:14.5px;color:var(--muted)}
+
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;counter-reset:s}
+.step{background:var(--card2);border:1px solid var(--line2);border-radius:var(--r);padding:22px;position:relative}
+.step::before{counter-increment:s;content:counter(s);display:block;font-size:34px;font-weight:900;
+  letter-spacing:-.05em;color:var(--hot);line-height:1;margin-bottom:10px}
+.step h3{margin-bottom:6px}
+.step p{font-size:14.5px;color:var(--muted)}
+
+/* pricing */
+.plans{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;align-items:start}
+.plan{background:var(--card);border:1px solid var(--line);border-radius:26px;padding:24px;box-shadow:var(--shadow);position:relative}
+.plan.pick{border-color:var(--ink);border-width:2px}
+.plan .tag{position:absolute;top:-12px;left:24px;background:var(--ink);color:var(--paper);
+  font-size:10.5px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;padding:5px 11px;border-radius:999px}
+.plan .nm{font-size:13px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.price{display:flex;align-items:flex-end;gap:7px;margin:12px 0 4px}
+.price b{font-size:46px;font-weight:900;letter-spacing:-.045em;line-height:.9}
+.price span{font-size:14px;font-weight:700;color:var(--muted);padding-bottom:5px}
+.plan .yr{font-size:13px;color:var(--dim)}
+.plan .who{margin-top:14px;padding-top:14px;border-top:1px solid var(--line2);font-size:14.5px;color:var(--muted)}
+.plan ul{list-style:none;margin:16px 0 0;padding:0;display:flex;flex-direction:column;gap:9px}
+.plan li{display:flex;gap:9px;font-size:14.5px;align-items:flex-start}
+.plan li i{font-style:normal;flex:0 0 auto;color:var(--good);font-weight:900}
+.soon{font-size:9.5px;font-weight:800;letter-spacing:.09em;text-transform:uppercase;
+  background:color-mix(in srgb,var(--hot) 13%,transparent);color:var(--hot);
+  padding:2px 7px;border-radius:999px;margin-left:5px;white-space:nowrap;vertical-align:1px}
+.plan .btn{width:100%;margin-top:20px}
+.pnote{margin-top:18px;font-size:13.5px;color:var(--dim);max-width:640px}
+
+/* faq */
+.faq{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.qa{background:var(--card2);border:1px solid var(--line2);border-radius:var(--r2);padding:18px}
+.qa h3{font-size:16px;margin-bottom:7px}
+.qa p{font-size:14.5px;color:var(--muted)}
+
+/* contact */
+.talk{background:var(--deep);color:var(--ondeep);border-radius:28px;padding:clamp(26px,5vw,44px)}
+.talk h2{color:var(--ondeep)}
+.talk p{color:color-mix(in srgb,var(--ondeep) 78%,transparent);margin-top:12px;max-width:520px}
+.frm{margin-top:24px;display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:640px}
+.frm label{display:block}
+.frm label.full{grid-column:1/-1}
+.frm span{display:block;font-size:10.5px;font-weight:800;letter-spacing:.11em;text-transform:uppercase;
+  color:color-mix(in srgb,var(--ondeep) 58%,transparent);margin-bottom:6px}
+.frm input,.frm textarea{width:100%;padding:13px 14px;border-radius:13px;font-family:var(--body);
+  background:color-mix(in srgb,var(--ondeep) 9%,transparent);color:var(--ondeep);
+  border:1px solid color-mix(in srgb,var(--ondeep) 18%,transparent);font-size:16px;font-weight:600}
+.frm textarea{min-height:92px;resize:vertical;font-weight:500}
+.frm input::placeholder,.frm textarea::placeholder{color:color-mix(in srgb,var(--ondeep) 38%,transparent)}
+.frm input:focus,.frm textarea:focus{outline:0;border-color:var(--ondeep)}
+.hp{position:absolute;left:-9999px}
+footer{padding:36px 0 54px;border-top:1px solid var(--line2);margin-top:20px}
+footer p{font-size:13.5px;color:var(--dim)}
+@media(max-width:560px){ .frm{grid-template-columns:1fr} }
+@media(prefers-reduced-motion:reduce){ *{transition:none!important;animation:none!important} }
+</style>
+</head>
+<body>
+
+<nav><div class="in">
+  <a class="lg" href="/">
+    <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#141519"/><path d="M12 44h12l8-24 8 24h12" stroke="#FF3B18" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <b>The Pack</b>
+  </a>
+  <a class="nl" href="#pricing">Pricing</a>
+  <a class="btn hot" href="/app" style="padding:10px 16px;font-size:14px">Open the app</a>
+</div></nav>
+
+<div class="wrap">
+
+<header class="hero">
+  <div class="eyebrow">The run club app</div>
+  <h1>Everyone's starting<br>a run club.<br><span style="color:var(--hot)">This is for<br>running one.</span></h1>
+  <div class="stripe"></div>
+  <p class="lede">One schedule your whole club can see. The meeting point, the pace groups, who's
+    actually coming — and a board that counts <b>turning up</b>, not kilometres.</p>
+  <div class="ctas">
+    <a class="btn hot big" href="/app">Have a look around →</a>
+    <a class="btn ghost big" href="#pricing">See pricing</a>
+  </div>
+  <p class="fine">No app store. No accounts. One six-character code gets your runners in.</p>
+</header>
+
+<section style="padding-top:0">
+  <div class="sechd">
+    <h2>Strava keeps your&nbsp;kilometres.<br>We keep your club.</h2>
+    <p>The Pack isn't another tracker. It's the bit that's always been a mess — knowing when
+      you're running, where you're meeting, and who's actually turning up.</p>
+  </div>
+  <div class="truth">
+    <div class="tcard">
+      <div class="lbl">Strava · Garmin</div>
+      <h3>Your running</h3>
+      <p>Splits, PBs, segments, the lot. Keep it exactly where it is — we don't touch your data and
+        we don't ask for it. Put your profile on your card so the club can find you there.</p>
+    </div>
+    <div class="tcard">
+      <div class="lbl">The group chat</div>
+      <h3>Six threads deep</h3>
+      <p>"What time Thursday?" asked again. The meeting point buried 200 messages up. Nobody sure
+        whether four people are coming or fourteen.</p>
+    </div>
+    <div class="tcard us">
+      <div class="lbl">The Pack</div>
+      <h3>One place it all lives</h3>
+      <p>The schedule, the meeting point on a map, the pace groups, who's in, who turned up, and a
+        thread per run for "running five late".</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="sechd">
+    <h2>What your runners get</h2>
+    <p>All of it on every plan. Nothing here is locked behind a tier.</p>
+  </div>
+  <div class="feats">
+    <div class="feat"><div class="ico">🗓</div><h3>One schedule</h3>
+      <p>Every run, grouped by day, with a live countdown to the next one. Any member can call a
+        run — it doesn't all fall on the captain.</p></div>
+    <div class="feat"><div class="ico">📍</div><h3>The meeting point</h3>
+      <p>Pinned on a map with a directions button. Save your regular routes once — distance,
+        surface, loop or out-and-back — and reuse them in two taps.</p></div>
+    <div class="feat"><div class="ico">🏃</div><h3>Pace groups</h3>
+      <p>A run advertises its groups; you pick yours when you tap in. Everyone can see who's in
+        which group before they turn up, so nobody gets dropped.</p></div>
+    <div class="feat"><div class="ico">✅</div><h3>Check in</h3>
+      <p>Tap "I was there" after the run. That's the whole stat — no distance to enter, nothing to
+        sync, nothing to fake.</p></div>
+    <div class="feat"><div class="ico">🏆</div><h3>A board worth being on</h3>
+      <p>Ranked on turning up, with week-long streaks. Verse anyone in the club head to head —
+        including how many runs you've both turned up to.</p></div>
+    <div class="feat"><div class="ico">💬</div><h3>Chat that stays on topic</h3>
+      <p>One club thread, plus its own thread on every run. Captains can moderate. The code is the
+        door, so it's only ever your club in there.</p></div>
+  </div>
+</section>
+
+<section>
+  <div class="sechd"><h2>Up and running in a minute</h2></div>
+  <div class="steps">
+    <div class="step"><h3>Start your club</h3>
+      <p>Name it, name yourself. You're the captain. Thirty seconds, no card, no sign-up form.</p></div>
+    <div class="step"><h3>Hand out the code</h3>
+      <p>Six characters. Drop it in the group chat, text it, print it on a flyer. Or send the join
+        link and it fills itself in.</p></div>
+    <div class="step"><h3>They're in</h3>
+      <p>Open the link, type the code, type a name. No download, no password, no email. It adds to
+        their home screen like an app.</p></div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PRICING — to change a price, edit the number in .price b and
+     the line under it. Nothing in the app enforces these tiers
+     yet; this page is the offer, billing is still by invoice.
+     ============================================================ -->
+<section id="pricing">
+  <div class="sechd">
+    <h2>Pricing</h2>
+    <p>In Australian dollars. Start free with your whole club — pay only when you want it to be
+      properly yours.</p>
+  </div>
+  <div class="plans">
+
+    <div class="plan">
+      <div class="nm">Free</div>
+      <div class="price"><b>$0</b><span>forever</span></div>
+      <div class="yr">No card, no trial clock.</div>
+      <div class="who">For a club finding its feet, or any club under 25 runners.</div>
+      <ul>
+        <li><i>✓</i><div>Up to <b>25 runners</b></div></li>
+        <li><i>✓</i><div>The schedule, meeting points and pace groups</div></li>
+        <li><i>✓</i><div>Route library</div></li>
+        <li><i>✓</i><div>Check-ins, streaks and the board</div></li>
+        <li><i>✓</i><div>Club chat and a thread per run</div></li>
+        <li><i>✓</i><div>Head to head</div></li>
+      </ul>
+      <a class="btn ghost" href="/app">Start a club</a>
+    </div>
+
+    <div class="plan pick">
+      <div class="tag">Most clubs</div>
+      <div class="nm">Club</div>
+      <div class="price"><b>$29</b><span>/ month</span></div>
+      <div class="yr">or <b>$290 a year</b> — two months free</div>
+      <div class="who">For a club that's properly going: a weekly run, a real roster, people who'd notice if it stopped.</div>
+      <ul>
+        <li><i>✓</i><div><b>Unlimited runners</b></div></li>
+        <li><i>✓</i><div>Everything in Free</div></li>
+        <li><i>✓</i><div>A person to talk to, not a form</div></li>
+        <li><i>✓</i><div>Your club's colours and crest <span class="soon">landing soon</span></div></li>
+        <li><i>✓</i><div>Your own link <span class="soon">landing soon</span></div></li>
+        <li><i>✓</i><div>Run-day reminders on their phones <span class="soon">landing soon</span></div></li>
+      </ul>
+      <a class="btn hot" href="#talk">Talk to us</a>
+    </div>
+
+    <div class="plan">
+      <div class="nm">Network</div>
+      <div class="price"><b>$99</b><span>/ month</span></div>
+      <div class="yr">or <b>$990 a year</b></div>
+      <div class="who">For a club running several squads — different suburbs, different nights, more than one captain.</div>
+      <ul>
+        <li><i>✓</i><div>Everything in Club</div></li>
+        <li><i>✓</i><div>Several squads under one club <span class="soon">landing soon</span></div></li>
+        <li><i>✓</i><div>More than one captain <span class="soon">landing soon</span></div></li>
+        <li><i>✓</i><div>We set it up with you and get your roster in</div></li>
+      </ul>
+      <a class="btn ghost" href="#talk">Talk to us</a>
+    </div>
+
+  </div>
+  <p class="pnote"><b>Straight with you:</b> the lines marked <span class="soon">landing soon</span>
+    aren't built yet. They're on the roadmap and they're included when they land — the price
+    doesn't move. Everything unmarked works today, and you can go and use it right now without
+    paying anyone. Billing is by invoice while we're this early; there's no card form to fill in.</p>
+</section>
+
+<section>
+  <div class="sechd"><h2>The honest bit</h2></div>
+  <div class="faq">
+    <div class="qa"><h3>Do our runners have to download anything?</h3>
+      <p>No. It's a link. Their phone can add it to the home screen so it opens like a normal app,
+        but there's no app store and nothing to install.</p></div>
+    <div class="qa"><h3>Do they need accounts?</h3>
+      <p>No passwords, no emails, no sign-up. A name and the club's code. That's the whole door —
+        which is also why there's nothing to reset when someone forgets something.</p></div>
+    <div class="qa"><h3>What if they already use Strava?</h3>
+      <p>Good, keep it. We deliberately don't collect distance, pace or times — you'd only be
+        entering the same run twice. Runners can put their Strava on their card so the club can
+        find them on it.</p></div>
+    <div class="qa"><h3>So what do you actually measure?</h3>
+      <p>Turning up. Check-ins on club runs, and how many weeks in a row you've made one. It's the
+        one number a run club actually cares about and the one no tracker owns.</p></div>
+    <div class="qa"><h3>Is our chat private?</h3>
+      <p>Only people with your club's code can get in, and clubs can't see each other at all. If
+        the code gets out, the captain rolls it and the old one stops working.</p></div>
+    <div class="qa"><h3>Can we leave?</h3>
+      <p>Monthly, whenever. Ask and we'll hand you your club's data. Stop paying and you drop back
+        to Free rather than getting locked out.</p></div>
+  </div>
+</section>
+
+<section id="talk">
+  <div class="talk">
+    <div class="eyebrow" style="color:color-mix(in srgb,var(--ondeep) 58%,transparent)">Get your club on it</div>
+    <h2 style="margin-top:8px">Tell us about your club</h2>
+    <p>Where you run, what night, roughly how many turn up. We'll get you set up and hand you the
+      code to pass around.</p>
+    <form class="frm" name="club-enquiry" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+      <p class="hp"><label>Don't fill this in <input name="bot-field"></label></p>
+      <label><span>Your name</span><input type="text" name="name" required placeholder="First name"></label>
+      <label><span>Club name</span><input type="text" name="club" placeholder="Inner West Milers"></label>
+      <label><span>Email</span><input type="email" name="email" required placeholder="you@example.com"></label>
+      <label><span>Where you run</span><input type="text" name="where" placeholder="Sydney — Inner West"></label>
+      <label class="full"><span>How many turn up, and what night?</span>
+        <textarea name="about" placeholder="About 30 of us, 6am Thursdays and a long run Saturday."></textarea></label>
+      <label class="full"><button class="btn hot big" type="submit" style="width:100%">Send it</button></label>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <p><b>The Pack</b> — the app for running a run club.
+    <a href="/app" style="color:var(--hot);font-weight:700;text-decoration:none">Open the app</a></p>
+  <p style="margin-top:8px">Built for clubs in Australia. Prices in AUD.</p>
+</footer>
+
+</div>
+</body>
+</html>

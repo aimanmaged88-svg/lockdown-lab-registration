@@ -2,14 +2,24 @@
   "name": "The Pack",
   "short_name": "The Pack",
   "description": "The app for running a run club: the schedule, the meeting point, the pace groups, the routes, and a board that rewards turning up.",
-  "start_url": "runclub.html",
-  "scope": "runclub.html",
+  "start_url": "app.html",
+  "scope": "app.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#111B17",
   "theme_color": "#F2EFE8",
   "icons": [
-    { "src": "assets/pk-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "assets/pk-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    {
+      "src": "assets/pk-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/pk-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ]
 }

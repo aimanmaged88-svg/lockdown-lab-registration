@@ -1,0 +1,29 @@
+# The Pack — its own Netlify site, deployed from this folder as the base
+# directory so nothing from the Lab / Certified Hooper monorepo is published
+# alongside it. `/` is the sales page; `/app` is the app itself.
+[build]
+  publish = "."
+
+[[redirects]]
+  from = "/app"
+  to = "/app.html"
+  status = 302
+
+# Join links handed out by a captain: /join/ABC123 → the app with the code
+# prefilled (the app reads ?join=).
+[[redirects]]
+  from = "/join/:code"
+  to = "/app.html?join=:code"
+  status = 302
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "/assets/fonts/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"

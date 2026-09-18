@@ -1322,6 +1322,53 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   can't verse yourself (now targets `.brow:not(.mine)`); and the backend suite
   hard-coded a member count after another test had already moved that member to
   a second club (now relative).
+- **ITS OWN NETLIFY SITE + PRICING — LIVE (2026-09-18, Aiman: "Turn it into a
+  netlify app please with pricing" / "im selling this").**
+  **https://jointhepack.netlify.app** — Netlify project `jointhepack`, site id
+  `0872bf4a-eaa4-47f2-a726-c68911207565`, team 6a34dad3663c3c9798f5bf17 (Pro).
+  A **SEPARATE site from certifiedhooper** on purpose: wrong brand to hang a run
+  club app off the basketball domain, and merging to main would have clobbered
+  the live Hooper site.
+  - **New folder `pack/` is the whole deployable site** (self-contained, so the
+    Lab/Hooper monorepo is NOT published with it — verified: /hoopsheaven.html,
+    /admin.html and /courts.json all 404 on the new domain).
+    `pack/index.html` = sales page, `pack/app.html` = the app (git-moved from
+    root `runclub.html`; the root `/run` redirect was removed because the file
+    left), `pack/thepack.webmanifest` (start_url/scope → app.html),
+    `pack/assets/fonts/{inter-var,permanentmarker-400}.woff2` (COPIED — the root
+    ones are still used by Hooper) + `pack/assets/pk-icon-*.png` (moved).
+  - **`pack/netlify.toml`**: publish ".", `/app` → app.html, **`/join/:code` →
+    `app.html?join=:code`** so a captain can hand out jointhepack.netlify.app/
+    join/ABC123 and the code prefills itself. Security headers + 1-year
+    immutable cache on fonts.
+  - **DEPLOY METHOD:** the Netlify MCP `deploy-site` doesn't deploy — it returns
+    an `npx -y @netlify/mcp@latest --site-id … --proxy-path …` command that must
+    be **run from the folder you want uploaded**. Run it from `pack/`, not the
+    repo root, or the whole monorepo goes up. Netlify Forms had to be turned on
+    separately (`update-forms`).
+  - **PRICING (AUD, on the page, easy to change — one `.price b` per plan):**
+    **Free $0** up to 25 runners, everything unlocked · **Club $29/mo or
+    $290/yr** unlimited runners · **Network $99/mo or $990/yr** multi-squad.
+    Tiers are marked **live now vs "landing soon"** per line, with a note that
+    soon-items are included when they land at no extra cost. Colours/crest, own
+    link, run-day reminders, multi-squad and multi-captain are all flagged as
+    NOT BUILT. No invented club counts or testimonials anywhere on the page.
+  - **⚠️ NOTHING IS ENFORCED IN CODE.** No billing, no Stripe, no 25-runner cap
+    — the page is the commercial offer, the app doesn't meter anyone. If a club
+    says yes he invoices them manually. Wiring Stripe needs his account; the
+    seat cap would need a check in `club_join`.
+  - **Lead capture = Netlify Forms** (`club-enquiry`, honeypot `bot-field`).
+    Submissions land in the Netlify UI for site `jointhepack` → Forms. Netlify's
+    post-processor rewrites the `<form>` tag and injects the hidden `form-name`
+    field, so the served index.html legitimately differs from the repo copy by
+    exactly that one line (checked; everything else byte-identical).
+  - **Verified:** live path checks by curl (/, /app, /app.html, manifest, fonts,
+    icons all 200; /join/:code 302s correctly; monorepo files 404), live-vs-local
+    byte comparison on index/app/manifest/icon, and **26/26** rendering +
+    structure + no-overflow checks at 360/390/430/1100px with the app booting
+    from the same folder. NOTE: the sandbox Chromium can't trust the egress CA,
+    so the browser pass runs against `pack/` served locally — the byte
+    comparison is what ties it to the live site. Did NOT disable TLS verification.
 - **Still open (his call):** the jersey restyle and **per-club colour + crest**
   — the latter now matters much more, because a template you sell to ten clubs
   should look like each club, not like ours; push notifications (a Pack-scoped
