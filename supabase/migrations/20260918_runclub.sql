@@ -91,3 +91,9 @@ alter table public.rc_routes  enable row level security;
 alter table public.rc_runs    enable row level security;
 alter table public.rc_rsvp    enable row level security;
 alter table public.rc_logs    enable row level security;
+
+-- Strava is where run clubs actually keep the activity (the Kingsville post
+-- links straight out to it), so a member carries their Strava alongside their
+-- Instagram, and a logged run can point at the activity itself.
+alter table public.rc_members add column if not exists strava text not null default '';
+alter table public.rc_logs    add column if not exists link   text not null default '';

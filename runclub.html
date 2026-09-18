@@ -1145,8 +1145,9 @@ select.inp{appearance:none;background-image:linear-gradient(45deg,transparent 49
         <label class="f"><span>Your name</span><input class="inp" id="nName" placeholder="First name" maxlength="40" autocomplete="off"></label>
       </div>
       <label class="f"><span>One line about the club</span><input class="inp" id="nBlurb" placeholder="6am Thursdays. Coffee after. Nobody gets dropped." maxlength="200" autocomplete="off"></label>
+      <label class="f"><span>Your Strava <span style="text-transform:none;letter-spacing:0">(optional)</span></span><input class="inp" id="nStrava" placeholder="paste your Strava profile link" maxlength="200" autocomplete="off"></label>
       <div class="two">
-        <label class="f"><span>@ handle <span style="text-transform:none;letter-spacing:0">(optional)</span></span><input class="inp" id="nHandle" placeholder="instagram / strava" maxlength="30" autocomplete="off"></label>
+        <label class="f"><span>Instagram <span style="text-transform:none;letter-spacing:0">(optional)</span></span><input class="inp" id="nHandle" placeholder="@yourhandle" maxlength="30" autocomplete="off"></label>
         <label class="f"><span>Your usual pace</span><input class="inp" id="nPace" placeholder="5:30" maxlength="14" autocomplete="off"></label>
       </div>
       <div class="err" id="nErr"></div>
@@ -1168,7 +1169,10 @@ select.inp{appearance:none;background-image:linear-gradient(45deg,transparent 49
           <label class="f"><span>Your name</span><input class="inp" id="jYou" placeholder="First name" maxlength="40" autocomplete="off"></label>
           <label class="f"><span>Your usual pace</span><input class="inp" id="jPace" placeholder="5:30" maxlength="14" autocomplete="off"></label>
         </div>
-        <label class="f"><span>@ handle <span style="text-transform:none;letter-spacing:0">(optional)</span></span><input class="inp" id="jHandle" placeholder="instagram / strava" maxlength="30" autocomplete="off"></label>
+        <div class="two">
+          <label class="f"><span>Instagram <span style="text-transform:none;letter-spacing:0">(optional)</span></span><input class="inp" id="jHandle" placeholder="@yourhandle" maxlength="30" autocomplete="off"></label>
+          <label class="f"><span>Strava <span style="text-transform:none;letter-spacing:0">(optional)</span></span><input class="inp" id="jStrava" placeholder="profile link" maxlength="200" autocomplete="off"></label>
+        </div>
       </div>
       <div class="err" id="jErr"></div>
       <button class="btn hot" id="jGo" style="margin-top:16px">Find my club</button>
@@ -1362,6 +1366,8 @@ select.inp{appearance:none;background-image:linear-gradient(45deg,transparent 49
     <button data-f="3" title="Fine">🙂</button><button data-f="4" title="Good">😁</button><button data-f="5" title="Flying">🚀</button>
   </div>
   <label class="f"><span>Note</span><input class="inp" id="lNote" placeholder="Negative split. Legs finally came good." maxlength="200" autocomplete="off"></label>
+  <label class="f"><span>Activity link <span style="text-transform:none;letter-spacing:0">(optional)</span></span><input class="inp" id="lLink" placeholder="https://strava.app.link/…" maxlength="400" autocomplete="off" inputmode="url"></label>
+  <div class="hint">Paste the Strava (or Garmin, or Komoot) link and the club can open the actual run.</div>
   <div class="err" id="lErr"></div>
   <button class="btn hot" id="lGo" style="margin-top:14px">Log it</button>
 </div></div>
@@ -1383,9 +1389,11 @@ select.inp{appearance:none;background-image:linear-gradient(45deg,transparent 49
   <div class="shhd"><div class="gr"><h3>Your details</h3><p>How you show up on the board and the roster.</p></div><button class="x" data-close>✕</button></div>
   <label class="f"><span>Name</span><input class="inp" id="mName" maxlength="40" autocomplete="off"></label>
   <div class="two">
-    <label class="f"><span>@ handle</span><input class="inp" id="mHandle" placeholder="instagram / strava" maxlength="30" autocomplete="off"></label>
+    <label class="f"><span>Instagram</span><input class="inp" id="mHandle" placeholder="@yourhandle" maxlength="30" autocomplete="off"></label>
     <label class="f"><span>Usual pace</span><input class="inp" id="mPace" placeholder="5:30" maxlength="14" autocomplete="off"></label>
   </div>
+  <label class="f"><span>Strava</span><input class="inp" id="mStrava" placeholder="paste your profile link, or your athlete id" maxlength="200" autocomplete="off"></label>
+  <div class="hint">Run clubs keep the actual running on Strava. Put yours here and the club can find you on it.</div>
   <div class="err" id="mErr"></div>
   <button class="btn hot" id="mGo" style="margin-top:14px">Save</button>
   <div class="tog" style="margin-top:16px">
@@ -1502,6 +1510,14 @@ function hms(secs){
 const km1=n=>{ const v=Math.round((+n||0)*10)/10; return (Number.isInteger(v)?v:v.toFixed(1))+''; };
 const initials=n=>String(n||'?').trim().split(/\s+/).slice(0,2).map(w=>w[0]).join('').toUpperCase()||'?';
 const FEEL=['','😖','😮‍💨','🙂','😁','🚀'];
+/* Instagram is how run clubs find each other; Strava is where the running
+   actually lives. Both are optional, so render only what someone gave us. */
+function socialLinks(m,sep){
+  const out=[];
+  if(m&&m.handle) out.push(`<a href="https://instagram.com/${encodeURIComponent(m.handle)}" target="_blank" rel="noopener">@${esc(m.handle)}</a>`);
+  if(m&&m.strava) out.push(`<a href="https://www.strava.com/athletes/${encodeURIComponent(m.strava)}" target="_blank" rel="noopener">Strava ↗</a>`);
+  return out.join(sep||' · ');
+}
 
 /* ---------- theme ---------- */
 function applyMode(m){
@@ -1542,16 +1558,16 @@ function nextDow(dow,hh,mm,minDays){
   d.setDate(d.getDate()+add); return d;
 }
 function demoSeed(){
-  const M=(id,name,handle,pace)=>({id,name,handle,pace,captain:id===DEMO_ME,joined_at:new Date(Date.now()-86400e3*(20+name.length)).toISOString()});
+  const M=(id,name,handle,pace,strava)=>({id,name,handle,strava:strava||'',pace,captain:id===DEMO_ME,joined_at:new Date(Date.now()-86400e3*(20+name.length)).toISOString()});
   const members=[
-    M(DEMO_ME,'You','','5:30'),
-    M('d2','Sam K','samk.runs','4:35'),
-    M('d3','Mel R','melruns','5:05'),
-    M('d4','Priya N','priya.n','5:30'),
-    M('d5','Dan O','','6:10'),
-    M('d6','Hannah T','hannaht','4:50'),
-    M('d7','Jules A','julesruns','6:40'),
-    M('d8','Tom B','','5:55')
+    M(DEMO_ME,'You','','5:30','demo-you'),
+    M('d2','Sam K','samk.runs','4:35','demo-samk'),
+    M('d3','Mel R','melruns','5:05','demo-melr'),
+    M('d4','Priya N','priya.n','5:30',''),
+    M('d5','Dan O','','6:10','demo-dano'),
+    M('d6','Hannah T','hannaht','4:50','demo-hannaht'),
+    M('d7','Jules A','julesruns','6:40',''),
+    M('d8','Tom B','','5:55','')
   ];
   const routes=[
     {id:'rt1',name:'Bay Run loop',km:7,surface:'road',shape:'loop',start_name:'Timbrell Park car park, Five Dock',lat:-33.8686,lon:151.1385,link:'',notes:'Flat the whole way. Water at the halfway bridge. Gets busy after 7am.',added_by:DEMO_ME},
@@ -1587,13 +1603,13 @@ function demoSeed(){
     ['rp1',DEMO_ME,'5:30'],['rp1','d2','4:30'],['rp1','d3','5:00'],['rp1','d4','5:30'],['rp1','d6','4:30'],['rp1','d8','5:30'],
     ['rp2','d3','5:00'],['rp2','d5','5:45'],['rp2','d7','6:30']
   ].map(([run_id,member_id,pace])=>({run_id,member_id,pace}));
-  const L=(member_id,dayAgo,km,secs,run_id,note,felt)=>({
+  const L=(member_id,dayAgo,km,secs,run_id,note,felt,link)=>({
     id:'lg'+member_id+dayAgo,club_id:'demo',member_id,run_id:run_id||null,km,secs,felt:felt||0,
-    note:note||'',ran_on:shift(TODAY(),-dayAgo),created_at:new Date().toISOString()
+    note:note||'',link:link||'',ran_on:shift(TODAY(),-dayAgo),created_at:new Date().toISOString()
   });
   const logs=[
-    L(DEMO_ME,0,6.1,1947,null,'Before work. Cold start, felt better by 3k.',4),
-    L(DEMO_ME,3,7.0,2310,'rp1','Club run. Sat in the 5:30 group the whole way.',4),
+    L(DEMO_ME,0,6.1,1947,null,'Before work. Cold start, felt better by 3k.',4,'https://www.strava.com/activities/0000000000'),
+    L(DEMO_ME,3,7.0,2310,'rp1','Club run. Sat in the 5:30 group the whole way.',4,'https://www.strava.com/activities/0000000001'),
     L(DEMO_ME,5,10.2,3540,null,'Long-ish. Legs good.',3),
     L(DEMO_ME,8,6.4,2180,'rp2','Hills hurt.',2),
     L(DEMO_ME,10,5.0,1620,null,'',3),
@@ -1646,7 +1662,7 @@ function demoState(D){
   const now=Date.now(), cut=now-6*36e5;
   const withGoing=r=>Object.assign({},r,{going:D.rsvp.filter(v=>v.run_id===r.id).map(v=>{
     const m=D.members.find(x=>x.id===v.member_id)||{};
-    return {id:v.member_id,name:m.name||'Someone',handle:m.handle||'',pace:v.pace};
+    return {id:v.member_id,name:m.name||'Someone',handle:m.handle||'',strava:m.strava||'',pace:v.pace};
   })});
   const runs=D.runs.filter(r=>new Date(r.starts_at)>=cut).sort((a,z)=>new Date(a.starts_at)-new Date(z.starts_at)).map(withGoing);
   const past=D.runs.filter(r=>new Date(r.starts_at)<cut).sort((a,z)=>new Date(z.starts_at)-new Date(a.starts_at)).slice(0,10).map(withGoing);
@@ -1702,7 +1718,9 @@ async function demoApi(action,b){
     case 'route_del': { D.routes=D.routes.filter(r=>r.id!==b.route); return back(); }
     case 'log_add': {
       D.logs.push({id:uid(),club_id:'demo',member_id:DEMO_ME,run_id:b.run||null,km:+b.km,
-        secs:+b.secs||0,felt:+b.felt||0,note:b.note||'',ran_on:b.date||TODAY(),created_at:new Date().toISOString()});
+        secs:+b.secs||0,felt:+b.felt||0,note:b.note||'',
+        link:/^https?:\/\//i.test(b.link||'')?b.link:'',
+        ran_on:b.date||TODAY(),created_at:new Date().toISOString()});
       if(b.run&&!D.rsvp.some(v=>v.run_id===b.run&&v.member_id===DEMO_ME))
         D.rsvp.push({run_id:b.run,member_id:DEMO_ME,pace:''});
       return back();
@@ -1711,6 +1729,7 @@ async function demoApi(action,b){
     case 'profile_edit': {
       const me=D.members.find(m=>m.id===DEMO_ME);
       me.name=b.name||me.name; me.handle=(b.handle||'').replace(/^@+/,''); me.pace=b.pace||'';
+      me.strava=String(b.strava||'').replace(/^https?:\/\/(?:www\.)?strava\.com\/athletes\//i,'').replace(/^@+/,'');
       demoSave(D); return {me:me};
     }
     case 'club_edit': {
@@ -1741,6 +1760,14 @@ function closeSheet(quiet){
 }
 $('#scrim').addEventListener('click',()=>closeSheet());
 document.addEventListener('click',e=>{ if(e.target.closest('[data-close]')) closeSheet(); });
+/* Links the club pasted (routes, Strava activities) open from here rather than
+   from an inline onclick built out of their text. */
+document.addEventListener('click',e=>{
+  const h=e.target.closest('[data-href]'); if(!h) return;
+  e.stopPropagation();
+  const u=h.getAttribute('data-href')||'';
+  if(/^https?:\/\//i.test(u)) window.open(u,'_blank','noopener');
+});
 
 /* ============================ VIEWS ============================ */
 function view(v){
@@ -1932,7 +1959,7 @@ async function loadBoard(w){
 function renderYou(){
   const st=S.stats||{}, me=S.me||{};
   $('#yName').textContent=(me.name||'You')+'.';
-  $('#yHandle').innerHTML=me.handle?`<a href="https://instagram.com/${encodeURIComponent(me.handle)}" target="_blank" rel="noopener">@${esc(me.handle)}</a>`:'<span class="dimtx">no handle set</span>';
+  $('#yHandle').innerHTML=socialLinks(me)||'<span class="dimtx">no handle set</span>';
   const chips=[];
   if((st.streak||0)>0) chips.push(`<span class="chip hi">🔥 ${st.streak} week${st.streak===1?'':'s'} in a row</span>`);
   if(me.pace) chips.push(`<span class="chip">usually ${esc(me.pace)}/km</span>`);
@@ -1965,6 +1992,7 @@ function renderYou(){
         <div class="t">${km1(l.km)} km${l.secs?' · '+hms(l.secs):''}${l.secs?' · '+paceOf(l.km,l.secs)+'/km':''}</div>
         <div class="s">${fmtDate(d)}${cr?' · '+esc(runName(cr)):''}${l.note?' · '+esc(l.note):''}</div>
       </div>
+      ${l.link?`<button class="x" data-href="${esc(l.link)}" title="Open the activity">↗</button>`:''}
       <button class="x" data-dellog="${esc(l.id)}" title="Delete">🗑</button>
     </div>`;
   }).join('')
@@ -2033,7 +2061,7 @@ function openRun(id){
       ${r.lat?`<button class="btn ghost sm" data-map="run">Map</button>`:''}</div></div>`:''}
     ${r.notes?`<div class="card flat" style="margin-top:12px"><div class="eyebrow">From the host</div>
       <p style="margin:6px 0 0;font-size:14px;line-height:1.45">${esc(r.notes)}</p></div>`:''}
-    ${rt&&rt.link?`<button class="btn ghost" style="margin-top:12px" onclick="window.open('${esc(rt.link)}','_blank','noopener')">Open the route ↗</button>`:''}
+    ${rt&&rt.link?`<button class="btn ghost" style="margin-top:12px" data-href="${esc(rt.link)}">Open the route ↗</button>`:''}
     <div class="sect"><h2 style="font-size:16px">Pace groups</h2></div>
     <div class="card flat">${gHTML||'<div class="s">No groups set — just turn up.</div>'}</div>
     ${!past&&!r.cancelled?`
@@ -2076,7 +2104,7 @@ function openRoute(id){
       ${r.lat?'<button class="btn ghost sm" data-map="route">Map</button>':''}</div></div>`:''}
     ${r.notes?`<div class="card flat" style="margin-top:12px"><div class="eyebrow">What it's like</div>
       <p style="margin:6px 0 0;font-size:14px;line-height:1.45">${esc(r.notes)}</p></div>`:''}
-    ${r.link?`<button class="btn ghost" style="margin-top:12px" onclick="window.open('${esc(r.link)}','_blank','noopener')">Open the route ↗</button>`:''}
+    ${r.link?`<button class="btn ghost" style="margin-top:12px" data-href="${esc(r.link)}">Open the route ↗</button>`:''}
     <button class="btn hot" style="margin-top:12px" data-callroute="${esc(r.id)}">Call a run on this route</button>
     ${mine?`<button class="btn ghost sm" style="margin-top:10px;color:var(--bad);border-color:color-mix(in srgb,var(--bad) 40%,transparent)" data-delroute="${esc(r.id)}">Delete route</button>`:''}`;
   sheet('shRouteV');
@@ -2090,7 +2118,7 @@ function openMember(id){
   $('#memBody').innerHTML=`
     <div class="shhd"><div class="gr"><div class="eyebrow">${m.captain?'captain':'in the pack'}</div>
       <h3 style="margin-top:4px">${esc(m.name)}</h3>
-      <p>${m.handle?`<a href="https://instagram.com/${encodeURIComponent(m.handle)}" target="_blank" rel="noopener">@${esc(m.handle)}</a> · `:''}${m.pace?'usually '+esc(m.pace)+'/km':'no pace set'}</p>
+      <p>${socialLinks(m)?socialLinks(m)+' · ':''}${m.pace?'usually '+esc(m.pace)+'/km':'no pace set'}</p>
     </div><button class="x" data-close>✕</button></div>
     <div class="eyebrow" style="margin-bottom:8px">${win}</div>
     <div class="stats">
@@ -2217,7 +2245,7 @@ function openLog(runId){
     const r=runs.find(x=>x.id===runId);
     if(r){ $('#lRun').value=runId; $('#lKm').value=r.km||''; $('#lDate').value=dstr(new Date(r.starts_at)); }
   }else{ $('#lKm').value=''; }
-  $('#lMin').value=''; $('#lSec').value=''; $('#lNote').value=''; $('#lErr').textContent='';
+  $('#lMin').value=''; $('#lSec').value=''; $('#lNote').value=''; $('#lLink').value=''; $('#lErr').textContent='';
   LFEEL=0; $$('#lFeel button').forEach(b=>b.classList.remove('on'));
   paintLogPace();
   sheet('shLog');
@@ -2239,7 +2267,8 @@ $('#lGo').addEventListener('click',async()=>{
   const btn=$('#lGo'); btn.disabled=true; btn.textContent='Logging…';
   try{
     const before=(S.stats||{}).streak||0;
-    S=await api('log_add',{km,secs,felt:LFEEL,note:$('#lNote').value,run:$('#lRun').value||null,date:$('#lDate').value});
+    S=await api('log_add',{km,secs,felt:LFEEL,note:$('#lNote').value,link:$('#lLink').value.trim(),
+      run:$('#lRun').value||null,date:$('#lDate').value});
     render(); closeSheet(); buzz(26);
     const now=(S.stats||{}).streak||0;
     toast(now>before&&now>1?'Logged · '+now+' weeks in a row 🔥':'Logged · '+km1(km)+' km 🏃');
@@ -2271,7 +2300,7 @@ $('#codeRoll').addEventListener('click',async()=>{
   try{ S=await api('club_recode'); render(); openCode(); toast('New code — hand it out again'); }catch(e){ toast(e.message); }
 });
 function openMe(){
-  $('#mName').value=S.me.name||''; $('#mHandle').value=S.me.handle||'';
+  $('#mName').value=S.me.name||''; $('#mHandle').value=S.me.handle||''; $('#mStrava').value=S.me.strava||'';
   $('#mPace').value=S.me.pace||''; $('#mErr').textContent='';
   sheet('shMe');
 }
@@ -2279,9 +2308,10 @@ $('#mGo').addEventListener('click',async()=>{
   const name=$('#mName').value.trim();
   if(!name){ $('#mErr').textContent='We need something to call you.'; return; }
   try{
-    const r=await api('profile_edit',{name,handle:$('#mHandle').value,pace:$('#mPace').value});
+    const r=await api('profile_edit',{name,handle:$('#mHandle').value,strava:$('#mStrava').value,pace:$('#mPace').value});
     S.me=r.me;
-    const mm=(S.members||[]).find(m=>m.id===S.me.id); if(mm){ mm.name=r.me.name; mm.handle=r.me.handle; mm.pace=r.me.pace; }
+    const mm=(S.members||[]).find(m=>m.id===S.me.id);
+    if(mm){ mm.name=r.me.name; mm.handle=r.me.handle; mm.strava=r.me.strava; mm.pace=r.me.pace; }
     render(); closeSheet(); toast('Saved');
   }catch(e){ $('#mErr').textContent=e.message; }
 });
@@ -2296,7 +2326,7 @@ function openClub(){
   $('#clMembers').innerHTML=(S.members||[]).map(m=>`<div class="row">
     <div class="av${m.id===S.me.id?' me':''}">${esc(initials(m.name))}</div>
     <div class="gr"><div class="t">${esc(m.name)}${m.captain?' · captain':''}</div>
-      <div class="s">${m.handle?'@'+esc(m.handle):'no handle'}${m.pace?' · '+esc(m.pace)+'/km':''}</div></div>
+      <div class="s">${socialLinks(m)||'no handle'}${m.pace?' · '+esc(m.pace)+'/km':''}</div></div>
     ${m.id!==S.me.id?`<button class="x" data-kick="${esc(m.id)}" title="Remove">✕</button>`:''}</div>`).join('');
   sheet('shClub');
 }
@@ -2517,7 +2547,7 @@ $('#nGo').addEventListener('click',async()=>{
   const btn=$('#nGo'); btn.disabled=true; btn.textContent='Creating…';
   try{
     S=await api('club_create',{club,city:$('#nCity').value,blurb:$('#nBlurb').value,
-      name,handle:$('#nHandle').value,pace:$('#nPace').value});
+      name,handle:$('#nHandle').value,strava:$('#nStrava').value,pace:$('#nPace').value});
     startApp(); buzz(30); setTimeout(openCode,700);
   }catch(e){ $('#nErr').textContent=e.message; btn.disabled=false; btn.textContent='Create the club'; }
 });
@@ -2546,7 +2576,7 @@ $('#jGo').addEventListener('click',async()=>{
   if(!name){ $('#jErr').textContent='What do we call you?'; return; }
   btn.disabled=true; btn.textContent='Joining…';
   try{
-    S=await api('club_join',{code,name,handle:$('#jHandle').value,pace:$('#jPace').value});
+    S=await api('club_join',{code,name,handle:$('#jHandle').value,strava:$('#jStrava').value,pace:$('#jPace').value});
     startApp(); buzz(30); toast('You’re in — welcome to '+((S.club||{}).name||'the club'));
   }catch(e){ $('#jErr').textContent=e.message; btn.disabled=false; btn.textContent="I'm in"; }
 });

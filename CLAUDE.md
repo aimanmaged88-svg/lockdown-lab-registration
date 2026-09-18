@@ -1216,6 +1216,38 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
 - **White-label angle:** this is the cleanest candidate yet for the sellable
   template in Parked ideas — swap the copy strings + accent and it's a club app
   for any weekly-meetup sport.
+- **Reference Aiman sent (2026-09-18): @kingsville_basketball's run club post.**
+  A BASKETBALL club launching a run club ("We've started a run club. All are
+  welcome to join."), loud mascot/jersey branding (teal-pink-orange stripes,
+  heavy italic wordmark, black base), and **"Activity posted on Strava"** with
+  a strava.app.link. Three reads: (1) the real shape is an existing sports club
+  adding a running arm — his exact position, and a run club could hang off
+  Certified Hooper; (2) run-club visual culture is team/streetwear loud, the
+  opposite of The Pack's cream editorial look; (3) **Strava is where the
+  activity actually lives.** Offered him a jersey-energy restyle and/or
+  per-club colour+crest theming — **he chose "just context for now": leave the
+  look, keep building function.** So the restyle + per-club branding are NOT
+  built and are his call later. Never reproduce Kingsville's mascot/wordmark —
+  that's their identity, not ours.
+- **Strava + activity links — SHIPPED (edge v3 of runclub-api, 2026-09-18),**
+  the function half of that reference. Migration `runclub_strava`:
+  `rc_members.strava text`, `rc_logs.link text`. Edge: `stravaClean()` takes a
+  pasted `strava.com/athletes/<id>` URL **or** a bare id and stores just the
+  id/slug (junk is stripped to `[A-Za-z0-9._-]`, so no `javascript:`); strava
+  flows through club_create / club_join / profile_edit / `pub()` / run rosters
+  (`going[]`) / board rows; `log_add` accepts `link` through the existing
+  `httpish()` (https only). App: Instagram and Strava are now SEPARATE fields
+  (the old single "@ handle — instagram / strava" was ambiguous) on the create
+  gate, the join gate and the profile sheet; shared `socialLinks(m)` renders
+  whichever exist on the profile, the member card and the club roster; the log
+  sheet gained an optional **Activity link** field and log rows get a ↗ button.
+  Also hardened while in there: the two route-link buttons no longer build an
+  inline `onclick="window.open('<user text>')"` — all pasted links now go
+  through one delegated `[data-href]` handler that requires `^https?://`.
+  Demo Strava slugs are deliberately non-numeric (`demo-samk`) so they can
+  never resolve to a real stranger's profile.
+- **Still open from that reference (his call):** the jersey restyle, per-club
+  colour + crest, and wiring a run club into Certified Hooper.
 
 ## Parked ideas (Aiman asked to save these)
 

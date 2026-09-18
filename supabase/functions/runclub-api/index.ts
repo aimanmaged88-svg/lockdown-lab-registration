@@ -72,6 +72,16 @@ const paceClean = (v: unknown) => {
   return s.toLowerCase().replace(/[^a-z0-9:'+\- ]/g, "").trim();
 };
 const isDate = (v: unknown) => /^\d{4}-\d{2}-\d{2}$/.test(String(v ?? ""));
+// Strava is where the running actually gets logged, so a member carries theirs
+// next to their Instagram.  Accept a pasted profile URL or a bare athlete id;
+// store just the id/slug and let the client build the link.
+const stravaClean = (v: unknown): string => {
+  const raw = String(v ?? "").trim().slice(0, 200);
+  if (!raw) return "";
+  const m = raw.match(/^https?:\/\/(?:www\.)?strava\.com\/athletes\/([A-Za-z0-9._-]{1,40})/i);
+  if (m) return m[1];
+  return raw.replace(/^@+/, "").replace(/[^A-Za-z0-9._-]/g, "").slice(0, 40);
+};
 const httpish = (v: unknown) => {
   const s = str(v, 400);
   return /^https?:\/\/\S+$/i.test(s) ? s : "";
@@ -108,7 +118,7 @@ function shiftDay(d: string, days: number) {
   return new Date(new Date(d + "T00:00:00Z").getTime() + days * dayMs).toISOString().slice(0, 10);
 }
 
-type Member = { id: string; club_id: string; name: string; handle: string; pace: string; captain: boolean; banned: boolean; joined_at: string };
+type Member = { id: string; club_id: string; name: string; handle: string; strava: string; pace: string; captain: boolean; banned: boolean; joined_at: string };
 
 async function guard(device: unknown): Promise<Member> {
   const id = sid(device);
@@ -119,7 +129,7 @@ async function guard(device: unknown): Promise<Member> {
   if (m.banned) throw J({ error: "your spot in this club was removed", code: "banned" }, 403);
   return m as Member;
 }
-const pub = (m: Member) => ({ id: m.id, name: m.name, handle: m.handle, pace: m.pace, captain: m.captain, joined_at: m.joined_at });
+const pub = (m: Member) => ({ id: m.id, name: m.name, handle: m.handle, strava: m.strava, pace: m.pace, captain: m.captain, joined_at: m.joined_at });
 
 // Runs in a window, with their RSVP rosters attached.
 async function runsFor(club_id: string, fromIso: string, toIso: string, desc = false, limit = 40) {
@@ -130,15 +140,16 @@ async function runsFor(club_id: string, fromIso: string, toIso: string, desc = f
   if (!rows.length) return [];
   const ids = rows.map((r: { id: string }) => `"${uid(r.id)}"`).join(",");
   const rsvps = await db(`rc_rsvp?run_id=in.(${ids})&select=run_id,member_id,pace`) || [];
-  const mem = await db(`rc_members?club_id=eq.${uid(club_id)}&select=id,name,handle,captain`) || [];
-  const byId: Record<string, { name: string; handle: string }> = {};
-  for (const m of mem) byId[m.id] = { name: m.name, handle: m.handle };
+  const mem = await db(`rc_members?club_id=eq.${uid(club_id)}&select=id,name,handle,strava,captain`) || [];
+  const byId: Record<string, { name: string; handle: string; strava: string }> = {};
+  for (const m of mem) byId[m.id] = { name: m.name, handle: m.handle, strava: m.strava };
   const roster: Record<string, unknown[]> = {};
   for (const r of rsvps) {
     (roster[r.run_id] ||= []).push({
       id: r.member_id,
       name: byId[r.member_id]?.name || "Someone",
       handle: byId[r.member_id]?.handle || "",
+      strava: byId[r.member_id]?.strava || "",
       pace: r.pace,
     });
   }
@@ -175,7 +186,7 @@ async function boardFor(club_id: string, fromDay: string | null, members: Member
       const km = a ? Math.round(a.km * 10) / 10 : 0;
       const secs = a ? a.secs : 0;
       return {
-        id: m.id, name: m.name, handle: m.handle, captain: m.captain,
+        id: m.id, name: m.name, handle: m.handle, strava: m.strava, captain: m.captain,
         km, runs: a ? a.runs : 0, days: a ? a.days.size : 0,
         shows: shows[m.id] || 0,
         // Average pace only when both sides are real, so nobody gets a
@@ -298,7 +309,8 @@ Deno.serve(async (req) => {
           name: club, city: str(b.city, 40), blurb: str(b.blurb, 200), code, captain_id: device,
         }))[0];
         const m = (await ins("rc_members", {
-          id: device, club_id: c.id, name, handle: handleClean(b.handle), pace: paceClean(b.pace), captain: true,
+          id: device, club_id: c.id, name, handle: handleClean(b.handle),
+          strava: stravaClean(b.strava), pace: paceClean(b.pace), captain: true,
         }))[0];
         return J(await stateFor(m as Member, today));
       }
@@ -313,7 +325,8 @@ Deno.serve(async (req) => {
         const prev = (await db(`rc_members?id=eq.${encodeURIComponent(device)}&select=*`))?.[0];
         if (prev?.banned) return J({ error: "your spot in this club was removed", code: "banned" }, 403);
         const row = {
-          club_id: c.id, name, handle: handleClean(b.handle), pace: paceClean(b.pace),
+          club_id: c.id, name, handle: handleClean(b.handle),
+          strava: stravaClean(b.strava), pace: paceClean(b.pace),
           // Founding a club makes you captain; joining one never does.
           captain: false,
         };
@@ -335,7 +348,7 @@ Deno.serve(async (req) => {
         const m = await guard(b.device);
         const name = str(b.name, 40) || m.name;
         const up = (await upd("rc_members", `id=eq.${encodeURIComponent(sid(m.id))}`, {
-          name, handle: handleClean(b.handle), pace: paceClean(b.pace),
+          name, handle: handleClean(b.handle), strava: stravaClean(b.strava), pace: paceClean(b.pace),
         }))[0];
         return J({ me: pub(up as Member) });
       }
@@ -531,7 +544,7 @@ Deno.serve(async (req) => {
         await ins("rc_logs", {
           club_id: m.club_id, member_id: m.id, run_id, km,
           secs: int(b.secs, 0, 86400, 0), felt: int(b.felt, 0, 5, 0),
-          note: str(b.note, 200), ran_on,
+          note: str(b.note, 200), ran_on, link: httpish(b.link),
         });
         return J(await stateFor(m, today));
       }
