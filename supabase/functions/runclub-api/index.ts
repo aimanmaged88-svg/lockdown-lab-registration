@@ -78,8 +78,14 @@ const isDate = (v: unknown) => /^\d{4}-\d{2}-\d{2}$/.test(String(v ?? ""));
 const stravaClean = (v: unknown): string => {
   const raw = String(v ?? "").trim().slice(0, 200);
   if (!raw) return "";
-  const m = raw.match(/^https?:\/\/(?:www\.)?strava\.com\/athletes\/([A-Za-z0-9._-]{1,40})/i);
+  // A pasted profile link, with or without the scheme — people copy
+  // "strava.com/athletes/123" as often as the full URL.
+  const m = raw.match(/^(?:https?:\/\/)?(?:www\.)?strava\.com\/athletes\/([A-Za-z0-9._-]{1,40})/i);
   if (m) return m[1];
+  // Anything else carrying a slash or colon is a link we don't recognise (an
+  // activity URL, someone else's site, a javascript: payload). Drop it rather
+  // than strip the punctuation out and store a dead link.
+  if (/[/:]/.test(raw)) return "";
   return raw.replace(/^@+/, "").replace(/[^A-Za-z0-9._-]/g, "").slice(0, 40);
 };
 const httpish = (v: unknown) => {

@@ -1729,7 +1729,10 @@ async function demoApi(action,b){
     case 'profile_edit': {
       const me=D.members.find(m=>m.id===DEMO_ME);
       me.name=b.name||me.name; me.handle=(b.handle||'').replace(/^@+/,''); me.pace=b.pace||'';
-      me.strava=String(b.strava||'').replace(/^https?:\/\/(?:www\.)?strava\.com\/athletes\//i,'').replace(/^@+/,'');
+      /* mirrors the server's stravaClean: scheme optional, unknown links dropped */
+      const sraw=String(b.strava||'').trim();
+      const sm=sraw.match(/^(?:https?:\/\/)?(?:www\.)?strava\.com\/athletes\/([A-Za-z0-9._-]{1,40})/i);
+      me.strava=sm?sm[1]:(/[/:]/.test(sraw)?'':sraw.replace(/^@+/,'').replace(/[^A-Za-z0-9._-]/g,'').slice(0,40));
       demoSave(D); return {me:me};
     }
     case 'club_edit': {

@@ -1195,7 +1195,7 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   + keyless OSM tiles, CSS-inverted in night mode. Pins come from a pasted
   "lat, lon" or 📍use-my-location — deliberately NO Maps-link resolver (that
   needs the SSRF-safe server hop oc has; not built here yet).
-- **Verified:** backend 82/82 live E2E (scratchpad/rc/backend-e2e.mjs — joining,
+- **Verified (first pass, pre-Strava):** backend 83/83 live E2E (scratchpad/rc/backend-e2e.mjs — joining,
   guard, routes, runs, rsvp, logs, board windows, club admin, captain handover,
   injection) + UI 85/85 Playwright at 360/390/430 + desktop
   (scratchpad/rc/ui-e2e.mjs, demo mode so it needs no network). Three real bugs
@@ -1246,6 +1246,23 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   through one delegated `[data-href]` handler that requires `^https?://`.
   Demo Strava slugs are deliberately non-numeric (`demo-samk`) so they can
   never resolve to a real stranger's profile.
+- **stravaClean bug caught by the suite → edge v4 (2026-09-18).** v3's regex
+  required `^https?://`, so a scheme-less paste (`strava.com/athletes/111222`
+  — how people actually copy it) fell through to the character-strip branch
+  and became `strava.comathletes111222`, i.e. a dead link. v4: scheme is
+  optional (`(?:https?:\/\/)?(?:www\.)?`), and anything else containing a
+  `/` or `:` is **dropped to ""** rather than mangled — so an ACTIVITY url,
+  an unrelated site, or a `javascript:` payload stores nothing instead of
+  garbage. The demo driver mirrors the same rule. Regression tests added for
+  scheme-less, www+trailing-slash, activity-url and unrelated-url. **Deploys
+  v3 and v4 were done by ME directly, not a subagent** — two deploy subagents
+  stalled a step short of deploying (killed via TaskStop), so I read the file
+  and passed the content to `deploy_edge_function` myself, then had a
+  read-only subagent hash-verify the served copy (v3 confirmed byte-identical,
+  `31f0de5d…`). That's the cheaper pattern when a deploy agent hangs: deploy
+  inline, verify by subagent.
+- **Final verification: backend 97/97, UI 95/95** (both suites extended for
+  Strava). All test rows deleted; the six rc_* tables are empty.
 - **Still open from that reference (his call):** the jersey restyle, per-club
   colour + crest, and wiring a run club into Certified Hooper.
 
