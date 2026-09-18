@@ -1132,6 +1132,91 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
 - v2 ideas discussed: KOTC proper, run chat, POTW weekly archive/all-time
   wall, PWA manifest + install, native app for background geofencing.
 
+## THE PACK — run club app (2026-09-18, codename runclub)
+
+- **NEW standalone product** (Aiman: "everyone's starting a run club — make an
+  app for run clubs"). Named **The Pack**; no Lab / Certified Hooper tie-in.
+  File **runclub.html** (single file, ~270KB incl. inlined Leaflet), manifest
+  `thepack.webmanifest`, icons `assets/pk-icon-{180,192,512}.png` (rendered from
+  scratchpad `icon.html` via Chromium). netlify.toml: `/run` → 302 runclub.html.
+  **Pushed to `claude/run-club-app-p396qn` only — NOT merged to main, so it is
+  not live.** Merging main auto-deploys (see the Netlify warning above).
+- **Design is deliberately NOT Hooper's.** Two themes via `data-theme` on
+  <html> (`rc_mode`): **day** (warm cream #F2EFE8 paper, ink #141519) and
+  **night** (#0B0C0E). One accent `--hot #FF3B18` vermillion in BOTH themes +
+  high-vis `--hi #D9FF3F` for streaks/live/active, `--deep #111B17` for the
+  hero block and tab bar. Fonts reuse what's already in assets/fonts —
+  **inter-var as PKBody (100-900)** + permanentmarker as PKMark — so zero new
+  font downloads and no Chakra Petch (that's Hooper's look).
+- **Backend: edge fn `runclub-api` (verify_jwt ON — anon key as Bearer +
+  apikey, same as opencourt-api).** Migration `runclub_the_pack` →
+  `rc_clubs` / `rc_members` / `rc_routes` / `rc_runs` / `rc_rsvp` / `rc_logs`
+  (all RLS on, zero policies, service-role only). Prefix `rc_` — touches
+  NOTHING in ll_* or oc_*. Source committed at
+  supabase/functions/runclub-api/index.ts + supabase/migrations/20260918_runclub.sql.
+- **Identity = the device, like oc_players.** No passwords, no email. You found
+  a club or join one with a **6-character code** (alphabet skips I/L/O/0/1 —
+  they get misread in DMs); that phone is the account. `guard()` resolves the
+  device to a member row and the server always uses the REGISTERED name, so
+  you can't post as someone else by editing a request. Deep link
+  `?join=CODE` prefills + auto-submits the join form.
+- **Actions:** club_find (public preview, leaks no ids) / club_create /
+  club_join / state / profile_edit / club_edit / club_recode / leave / kick /
+  run_create / run_edit / run_cancel / run_del / rsvp / route_add / route_del /
+  log_add / log_del / board. `state` returns everything in one call (club,
+  members, upcoming+past runs with rosters, routes, my logs, board, stats).
+- **The five screens:** ⚡Week (next-run hero w/ live countdown + one-tap I'm
+  in, Mon-Sun strip of your km + club-run dots, club-week stats, top 3),
+  🗓Schedule (grouped by day, ＋Call a run — ANY member can), 🗺Routes (library:
+  km/surface/shape/start pin/link/notes), 🏆Board (week / 30 days / all time),
+  👤You (streak ring, 6 stats, your log, club card).
+- **Run-club-specific bits that make it not-a-generic-fitness-app:** pace
+  groups are first-class — a run advertises them, you pick yours when you tap
+  in, and the run sheet shows **who's in each group** (that's the thing a club
+  actually needs to know). The board ranks on km but also counts **shows**
+  (club runs you turned up to) and the copy says so — "distance counts,
+  turning up counts more" — so a 3km-every-week runner can lead it. Streak is
+  **weeks, not days** (a run club is weekly; a day streak punishes rest days),
+  and the current week only breaks it once it's over.
+- **Demo mode.** Gate offers "Have a look around first" → `rc_demo` flag routes
+  `api()` to `demoApi()`, a localStorage club (Inner West Milers, 8 members, 4
+  routes, 6 runs, ~22 logs) that implements the SAME payload shape as the edge
+  fn's `state`, so every renderer and button is exercised with zero writes to
+  the real backend. Amber "made-up data" bar while in it. Wiped on "Start mine".
+- **Captain rules:** founder is captain; joining never makes you one. Captain
+  can edit the club, roll the join code (old code dies), kick, and delete
+  anyone's run/route. Host can edit/cancel/delete their own run. **If the
+  captain leaves, the longest-standing member inherits it** (a club with no
+  captain can't be run).
+- **Share cards** are canvas-drawn (never an <img>, so the export is never
+  tainted): a run card and a "this week" card via navigator.share with a
+  download fallback.
+- **Map** = Leaflet 1.9.4 inlined (extracted from hoopsheaven.html, same copy)
+  + keyless OSM tiles, CSS-inverted in night mode. Pins come from a pasted
+  "lat, lon" or 📍use-my-location — deliberately NO Maps-link resolver (that
+  needs the SSRF-safe server hop oc has; not built here yet).
+- **Verified:** backend 82/82 live E2E (scratchpad/rc/backend-e2e.mjs — joining,
+  guard, routes, runs, rsvp, logs, board windows, club admin, captain handover,
+  injection) + UI 85/85 Playwright at 360/390/430 + desktop
+  (scratchpad/rc/ui-e2e.mjs, demo mode so it needs no network). Three real bugs
+  caught and fixed by the first backend run: `num()` clamping to its LOW bound
+  turned `km:0` into a phantom 0.1km log; `kick` returned `{ok:true}` while the
+  client assigns results straight to its state; junk non-uuid ids reached
+  Postgres and surfaced as generic 500s (now `isUuid()` → clean 400). All test
+  rows deleted after the run.
+- **NOTE — Node fetch in this sandbox ignores HTTPS_PROXY.** Test scripts need
+  `NODE_USE_ENV_PROXY=1` or every call comes back 503. Chromium in the sandbox
+  can't reach tile.openstreetmap.org (untrusted CA), so the map pane is grey in
+  screenshots — that's the sandbox, not the app.
+- **Not built (told him):** push notifications (needs a Pack-scoped SW + the
+  VAPID hop — the Lab's keys are reusable), run chat (the club already has a
+  group chat; the app's job is the schedule), weather on the hero (no API key),
+  multi-club membership (one club per device for now — rejoining moves you),
+  and a Maps-link → coords resolver for route pins.
+- **White-label angle:** this is the cleanest candidate yet for the sellable
+  template in Parked ideas — swap the copy strings + accent and it's a club app
+  for any weekly-meetup sport.
+
 ## Parked ideas (Aiman asked to save these)
 
 - **"A.I. MAN" Instagram post** — saved 2026-07-18, for a few weeks out.

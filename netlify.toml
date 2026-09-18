@@ -10,6 +10,13 @@
   status = 302
   force = true
 
+# --- The Pack (run clubs) -------------------------------------------------
+# Clean short entry: /run → the run club app.
+[[redirects]]
+  from = "/run"
+  to = "/runclub.html"
+  status = 302
+
 # --- Athlete OS -----------------------------------------------------------
 # Clean short entry: /os → the Athlete OS landing (real folder, no loop).
 # One-hop 302 to the real /athlete-os/ directory (which serves index.html
