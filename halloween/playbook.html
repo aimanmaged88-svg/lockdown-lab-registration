@@ -1,0 +1,831 @@
+<title>Halloween Shop Run</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,600;0,6..96,700;1,6..96,600&family=Oswald:wght@300;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --ground:#EFE7D6; --surface:#F8F2E5; --surface2:#E7DCC6;
+    --ink:#24131A; --ink-soft:#5E4B52; --rule:#D4C4A9;
+    --oxblood:#8C1F2E; --gold:#8A6210; --gold-ink:#6E4E0C;
+    --open:#2A6559; --closing:#9C5A12; --closed:#8C1F2E;
+    --shadow:0 1px 0 rgba(36,19,26,.06);
+    --disp:"Bodoni Moda",Georgia,"Times New Roman",serif;
+    --lab:"Oswald","Arial Narrow",Arial,sans-serif;
+    --body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root:not([data-theme="light"]){
+      --ground:#150C11; --surface:#21141B; --surface2:#2C1B24;
+      --ink:#EFE3D2; --ink-soft:#A8909A; --rule:#3C2632;
+      --oxblood:#D4565F; --gold:#D9AE3C; --gold-ink:#E7C468;
+      --open:#5FAE9C; --closing:#E2953F; --closed:#D9606B;
+      --shadow:0 1px 0 rgba(0,0,0,.4);
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#150C11; --surface:#21141B; --surface2:#2C1B24;
+    --ink:#EFE3D2; --ink-soft:#A8909A; --rule:#3C2632;
+    --oxblood:#D4565F; --gold:#D9AE3C; --gold-ink:#E7C468;
+    --open:#5FAE9C; --closing:#E2953F; --closed:#D9606B;
+    --shadow:0 1px 0 rgba(0,0,0,.4);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    background:var(--ground); color:var(--ink);
+    font-family:var(--body); font-size:16px; line-height:1.55;
+    margin:0; padding-block:0 64px; padding-left:16px; padding-right:16px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:900px; margin:0 auto}
+  h1,h2,h3{font-family:var(--disp); font-weight:700; text-wrap:balance; margin:0}
+  h1{font-size:clamp(2.4rem,7vw,4rem); line-height:1.02; letter-spacing:-.01em}
+  h2{font-size:clamp(1.5rem,3.6vw,2.05rem); line-height:1.1}
+  h3{font-size:1.08rem; font-weight:600}
+  p{margin:0}
+  a{color:var(--oxblood)}
+  .lab{
+    font-family:var(--lab); font-weight:500; text-transform:uppercase;
+    letter-spacing:.13em; font-size:.7rem; color:var(--ink-soft);
+  }
+  .num{font-variant-numeric:tabular-nums}
+
+  /* ---- masthead ---- */
+  header.mast{padding-block:44px 30px; border-bottom:2px solid var(--ink)}
+  .mast .lab{display:block; margin-bottom:14px}
+  .deck{
+    font-family:var(--disp); font-style:italic; font-size:clamp(1.12rem,2.5vw,1.4rem);
+    line-height:1.4; color:var(--ink-soft); margin-top:18px; max-width:38ch;
+  }
+
+  /* ---- status strip ---- */
+  .strip{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--rule);
+    border:1px solid var(--rule); margin-top:28px}
+  .cell{background:var(--surface); padding:16px 14px}
+  .cell > b{display:block; font-family:var(--disp); font-size:2rem; line-height:1;
+    font-variant-numeric:tabular-nums; margin:6px 0 4px}
+  .cell small{display:block; font-size:.78rem; color:var(--ink-soft); line-height:1.35}
+  .cell small b{font-weight:600; color:var(--ink)}
+  .cell.open > b{color:var(--open)} .cell.closing > b{color:var(--closing)} .cell.closed > b{color:var(--closed)}
+  @media (max-width:560px){ .strip{grid-template-columns:1fr} }
+
+  /* ---- sections ---- */
+  section{padding-block:46px}
+  section + section{border-top:1px solid var(--rule)}
+  .shead{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; margin-bottom:6px}
+  .shead .lab{color:var(--oxblood)}
+  .intro{color:var(--ink-soft); max-width:62ch; margin-top:12px}
+
+  /* ---- verdict ---- */
+  .verdict{margin-top:24px; display:grid; gap:14px}
+  .vrow{display:grid; grid-template-columns:auto 1fr; gap:14px; align-items:start;
+    padding:15px 16px; background:var(--surface); border-left:3px solid var(--oxblood)}
+  .vrow .k{font-family:var(--lab); font-weight:500; text-transform:uppercase;
+    letter-spacing:.1em; font-size:.66rem; color:var(--oxblood); padding-top:3px; white-space:nowrap}
+  .vrow p{font-size:.94rem}
+  @media (max-width:560px){ .vrow{grid-template-columns:1fr; gap:6px} }
+
+  /* ---- calendar ---- */
+  .cal{margin-top:24px; border-top:1px solid var(--rule)}
+  .ev{display:grid; grid-template-columns:78px 1fr 88px; gap:16px;
+    padding:14px 0; border-bottom:1px solid var(--rule); align-items:start}
+  .ev .d{font-family:var(--lab); font-weight:500; text-transform:uppercase;
+    letter-spacing:.06em; font-size:.76rem; color:var(--ink-soft); padding-top:3px;
+    font-variant-numeric:tabular-nums}
+  .ev.past .d{opacity:.6}
+  .ev .t{font-weight:600; font-size:1rem}
+  .ev .t em{font-style:normal; color:var(--ink-soft); font-weight:400; font-size:.87rem}
+  .ev .note{font-size:.87rem; color:var(--ink-soft); margin-top:3px}
+  .fit{text-align:right; padding-top:4px}
+  .pips{display:inline-flex; gap:3px}
+  .pip{width:7px; height:7px; border:1px solid var(--ink-soft); border-radius:50%}
+  .pip.on{background:var(--oxblood); border-color:var(--oxblood)}
+  .fit small{display:block; font-family:var(--lab); text-transform:uppercase;
+    letter-spacing:.09em; font-size:.6rem; color:var(--ink-soft); margin-top:4px}
+  .ev.hero{background:var(--surface); margin-inline:-12px; padding-inline:12px}
+  .ev.hero .t{font-family:var(--disp); font-size:1.22rem; font-weight:700}
+  @media (max-width:600px){
+    .ev{grid-template-columns:1fr auto; gap:4px 12px}
+    .ev .d{grid-column:1; grid-row:1}
+    .fit{grid-column:2; grid-row:1; padding-top:0}
+    .ev .t,.ev .note{grid-column:1/-1}
+  }
+
+  /* ---- shops ---- */
+  .shops{margin-top:26px; display:grid; gap:22px}
+  .shop{background:var(--surface); border:1px solid var(--rule); border-top:3px solid var(--gold)}
+  .shop > .hd{padding:18px 18px 0}
+  .reel{font-family:var(--lab); font-weight:500; text-transform:uppercase;
+    letter-spacing:.14em; font-size:.66rem; color:var(--gold-ink)}
+  .shop h3{font-family:var(--disp); font-size:1.5rem; font-weight:700; margin:4px 0 8px}
+  .wave{display:inline-block; font-size:.8rem; color:var(--ink-soft);
+    border:1px solid var(--rule); padding:3px 9px; margin-bottom:10px}
+  .wave b{color:var(--ink); font-weight:600}
+  .aes{font-size:.94rem; color:var(--ink-soft); max-width:58ch}
+  .cols{display:grid; grid-template-columns:1fr 1fr; gap:0 26px; padding:18px}
+  .cols h4{font-family:var(--lab); font-weight:500; text-transform:uppercase;
+    letter-spacing:.11em; font-size:.66rem; color:var(--ink-soft); margin:0 0 8px}
+  .cols ul{margin:0 0 16px; padding-left:18px; font-size:.91rem}
+  .cols li{margin-bottom:5px}
+  @media (max-width:620px){ .cols{grid-template-columns:1fr} }
+  .copybox{border-top:1px solid var(--rule); padding:14px 18px; background:var(--surface2)}
+  .copybox + .copybox{border-top:1px solid var(--rule)}
+  .cbhd{display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:7px}
+  .cbhd span{font-family:var(--lab); font-weight:500; text-transform:uppercase;
+    letter-spacing:.11em; font-size:.64rem; color:var(--ink-soft)}
+  .cbtn{font-family:var(--lab); font-weight:500; text-transform:uppercase; letter-spacing:.08em;
+    font-size:.64rem; background:none; color:var(--oxblood); border:1px solid var(--oxblood);
+    padding:4px 10px; cursor:pointer; transition:background .15s,color .15s}
+  .cbtn:hover{background:var(--oxblood); color:var(--surface)}
+  .cbtn:focus-visible{outline:2px solid var(--gold); outline-offset:2px}
+  .cbtn.ok{background:var(--open); border-color:var(--open); color:#fff}
+  .copybox p{font-size:.9rem; line-height:1.5}
+  .kw{font-family:var(--lab); font-weight:300; font-size:.92rem; letter-spacing:.02em; line-height:1.7}
+
+  /* ---- sprint ---- */
+  .meter{display:flex; align-items:center; gap:12px; margin-top:22px}
+  .bar{flex:1; height:8px; background:var(--surface2); border:1px solid var(--rule); overflow:hidden}
+  .bar i{display:block; height:100%; width:0; background:var(--oxblood); transition:width .25s}
+  .meter .lab{white-space:nowrap}
+  .sprint{margin-top:20px; display:grid; gap:2px}
+  .day{background:var(--surface); border-left:3px solid var(--rule)}
+  .day.key{border-left-color:var(--oxblood)}
+  .day.now{border-left-color:var(--gold)}
+  .dhd{display:flex; gap:10px; align-items:baseline; flex-wrap:wrap; padding:13px 16px 4px}
+  .dhd .dt{font-family:var(--lab); font-weight:500; text-transform:uppercase;
+    letter-spacing:.09em; font-size:.74rem; color:var(--ink)}
+  .dhd .why{font-size:.82rem; color:var(--ink-soft)}
+  .day ul{list-style:none; margin:0; padding:0 16px 14px}
+  .day li{display:flex; gap:11px; align-items:flex-start; padding:5px 0; font-size:.93rem}
+  .day input[type=checkbox]{margin:3px 0 0; width:17px; height:17px; flex:none;
+    accent-color:var(--oxblood); cursor:pointer}
+  .day label{cursor:pointer}
+  li.done label{text-decoration:line-through; color:var(--ink-soft)}
+  .synced{font-size:.78rem; color:var(--ink-soft); margin-top:12px}
+
+  /* ---- plain tables ---- */
+  .tw{overflow-x:auto; margin-top:22px}
+  table{border-collapse:collapse; width:100%; font-size:.91rem; min-width:480px}
+  th,td{text-align:left; padding:10px 12px; border-bottom:1px solid var(--rule); vertical-align:top}
+  th{font-family:var(--lab); font-weight:500; text-transform:uppercase;
+    letter-spacing:.1em; font-size:.64rem; color:var(--ink-soft)}
+  td b{font-weight:600}
+
+  /* ---- rules ---- */
+  .rules{display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-top:24px}
+  @media (max-width:620px){ .rules{grid-template-columns:1fr} }
+  .rule{padding:16px 18px; background:var(--surface); border:1px solid var(--rule)}
+  .rule.yes{border-left:3px solid var(--open)}
+  .rule.no{border-left:3px solid var(--closed)}
+  .rule h4{font-family:var(--lab); font-weight:500; text-transform:uppercase;
+    letter-spacing:.11em; font-size:.68rem; margin:0 0 10px}
+  .rule.yes h4{color:var(--open)} .rule.no h4{color:var(--closed)}
+  .rule ul{margin:0; padding-left:18px; font-size:.91rem}
+  .rule li{margin-bottom:6px}
+  .fineprint{margin-top:26px; font-size:.84rem; color:var(--ink-soft); max-width:62ch}
+  footer{padding-block:34px 0; border-top:2px solid var(--ink); margin-top:10px;
+    font-size:.84rem; color:var(--ink-soft)}
+  @media (prefers-reduced-motion:reduce){ *{transition:none!important} }
+</style>
+
+<div class="wrap">
+
+<header class="mast">
+  <span class="lab">Sydney · run window 18 Sep → 31 Oct 2026</span>
+  <h1>Halloween<br>Shop Run</h1>
+  <p class="deck">Five Pinterest shops built on the aesthetics this season's films are driving — not on the films themselves.</p>
+
+  <div class="strip">
+    <div class="cell open">
+      <span class="lab">Halloween falls</span>
+      <b id="dDays">43</b>
+      <small><b id="dWeek">Saturday 31 Oct</b> — the best-case night. Parties run both weekends: 23–25 and 30–31 Oct.</small>
+    </div>
+    <div class="cell closing">
+      <span class="lab">Physical goods close</span>
+      <b id="dPod">22</b>
+      <small>Days left to list print-on-demand. Last safe listing ≈ 10 Oct, customer order cutoff ≈ 17 Oct.</small>
+    </div>
+    <div class="cell">
+      <span class="lab">Digital sells until</span>
+      <b>31 Oct</b>
+      <small>Instant downloads have no shipping cliff. They are the only thing that still converts in the final fortnight.</small>
+    </div>
+  </div>
+</header>
+
+<section>
+  <div class="shead"><span class="lab">The read</span></div>
+  <h2>Three things decide this before you build anything</h2>
+  <div class="verdict">
+    <div class="vrow">
+      <span class="k">On Scream</span>
+      <p>There is no new <em>Scream</em> this season — <b>Scream 8</b> is tracking for 2027 (a Paramount horror slot sits on 16 July 2027). But the parody <b>Scary Movie</b> already ran this year to roughly <b>$231M</b>, and Ghostface stays a permanent top-tier costume search. So Scream is an <b>affiliate</b> line, never a product line. Same for every mask you were picturing.</p>
+    </div>
+    <div class="vrow">
+      <span class="k">On timing</span>
+      <p>It is 18 September. A physical product listed after about <b>10 October</b> cannot reliably land before the 31st, and print-on-demand fulfilment slows as the queue fills. Digital — printables, party packs, cut files, poster art, wallpapers — launches today and sells at full margin until Halloween night. Digital first, physical only if it is listed this fortnight.</p>
+    </div>
+    <div class="vrow">
+      <span class="k">On the shops</span>
+      <p>You cannot sell a film's name, characters, masks or artwork. What you <em>can</em> sell is the look each film pushes into search: witch-house autumn, blood-red prom, haunted carnival, camp slasher, dark-academia thriller. The film is the traffic wave. The aesthetic is the shelf. Pinterest's own data has <b>vintage Halloween up about 200% year on year</b> — that demand does not belong to any studio.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="lab">The wave</span></div>
+  <h2>What's actually landing, now through Halloween</h2>
+  <p class="intro">Scored on Pinterest fit, not on how good the film is. Pinterest is planning-led and decor / party / costume / gift-driven, so a witchy legacy sequel outranks a prestige video-game adaptation every time.</p>
+
+  <div class="cal">
+    <div class="ev past hero">
+      <span class="d">11 Sep</span>
+      <div><div class="t">Practical Magic 2 <em>· cinemas</em></div>
+        <div class="note">Bullock and Kidman back as the Owens sisters. Witch-house, herb jars, candles, autumn kitchens — the single best-matched film to Pinterest's core audience all year.</div></div>
+      <div class="fit"><span class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i></span><small>Build it</small></div>
+    </div>
+    <div class="ev past">
+      <span class="d">21 Aug</span>
+      <div><div class="t">Insidious: The Bleeding World <em>· cinemas → digital</em></div>
+        <div class="note">Sixth Insidious. Rolls onto digital through the season — keeps "red door" horror in search.</div></div>
+      <div class="fit"><span class="pips"><i class="pip on"></i><i class="pip"></i><i class="pip"></i></span><small>Skip</small></div>
+    </div>
+    <div class="ev">
+      <span class="d">18 Sep</span>
+      <div><div class="t">Resident Evil <em>· cinemas · today</em></div>
+        <div class="note">Zach Cregger's reboot, Austin Abrams, Raccoon City in a blizzard. Big opening, but a gaming-and-gore audience that lives on TikTok and Reddit, not Pinterest boards.</div></div>
+      <div class="fit"><span class="pips"><i class="pip on"></i><i class="pip"></i><i class="pip"></i></span><small>Skip</small></div>
+    </div>
+    <div class="ev">
+      <span class="d">25 Sep</span>
+      <div><div class="t">The Backrooms <em>· HBO Max</em></div>
+        <div class="note">This year's ~$394M hit hits streaming. Liminal / analog-horror aesthetic — strong for wallpapers and poster art, weak for party and decor.</div></div>
+      <div class="fit"><span class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip"></i></span><small>Pin it</small></div>
+    </div>
+    <div class="ev hero">
+      <span class="d">2 Oct</span>
+      <div><div class="t">Verity <em>· cinemas</em></div>
+        <div class="note">Anne Hathaway, Dakota Johnson, Josh Hartnett in the Colleen Hoover thriller. The book audience and the Pinterest audience are close to the same people — bookish gifting that carries straight into Christmas.</div></div>
+      <div class="fit"><span class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i></span><small>Build it</small></div>
+    </div>
+    <div class="ev hero">
+      <span class="d">7 Oct</span>
+      <div><div class="t">Carrie <em>· Prime Video · all 8 episodes</em></div>
+        <div class="note">Mike Flanagan's reinvention, Matthew Lillard in the cast. Prom, blood-red, 70s — a party theme and a costume in one, dropping three weekends out.</div></div>
+      <div class="fit"><span class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i></span><small>Build it</small></div>
+    </div>
+    <div class="ev">
+      <span class="d">9 Oct</span>
+      <div><div class="t">Other Mommy <em>· cinemas</em></div>
+        <div class="note">Jessica Chastain, Rob Savage, James Wan producing. Closet-door dread and one very quotable line. Feeds creepy-nursery and haunted-house decor pins.</div></div>
+      <div class="fit"><span class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip"></i></span><small>Pin it</small></div>
+    </div>
+    <div class="ev hero">
+      <span class="d">15 Oct</span>
+      <div><div class="t">Crystal Lake <em>· Peacock · all 8 episodes</em></div>
+        <div class="note">The Friday the 13th prequel, Linda Cardellini as Pamela Voorhees. Slasher merch converts harder than any other horror category — and carries the heaviest legal risk. Camp aesthetic only.</div></div>
+      <div class="fit"><span class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip on"></i></span><small>Build it</small></div>
+    </div>
+    <div class="ev">
+      <span class="d">16 Oct</span>
+      <div><div class="t">Whalefall <em>· cinemas</em></div>
+        <div class="note">Diving survival horror. No decor language in it at all.</div></div>
+      <div class="fit"><span class="pips"><i class="pip on"></i><i class="pip"></i><i class="pip"></i></span><small>Skip</small></div>
+    </div>
+    <div class="ev">
+      <span class="d">23 Oct</span>
+      <div><div class="t">Clayface <em>· cinemas</em></div>
+        <div class="note">DC body horror, James Watkins directing from a Mike Flanagan script, parked deliberately in the Halloween corridor. Comics crowd — good for the calendar, not for a shop.</div></div>
+      <div class="fit"><span class="pips"><i class="pip on"></i><i class="pip"></i><i class="pip"></i></span><small>Skip</small></div>
+    </div>
+    <div class="ev">
+      <span class="d">23 Oct</span>
+      <div><div class="t">Wildwood <em>· cinemas</em></div>
+        <div class="note">Stop-motion woodland fantasy. Family-friendly autumn forest imagery — useful filler pins for the vintage board.</div></div>
+      <div class="fit"><span class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip"></i></span><small>Pin it</small></div>
+    </div>
+    <div class="ev">
+      <span class="d">30 Oct</span>
+      <div><div class="t">Stiletto <em>· cinemas</em></div>
+        <div class="note">Dancer hunting her sister's killer; a masked murderer working through a company of performers. Dark-ballet imagery lands on Pinterest — but it opens the day before Halloween, too late to build on.</div></div>
+      <div class="fit"><span class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip"></i></span><small>Pin it</small></div>
+    </div>
+    <div class="ev">
+      <span class="d">Season</span>
+      <div><div class="t">Pan's Labyrinth, 20th anniversary 4K <em>· event cinemas</em></div>
+        <div class="note">Del Toro back on the big screen for Halloween. Dark-fairytale and Victorian-gothic searches lift with it — pure fuel for the vintage board.</div></div>
+      <div class="fit"><span class="pips"><i class="pip on"></i><i class="pip on"></i><i class="pip"></i></span><small>Pin it</small></div>
+    </div>
+    <div class="ev">
+      <span class="d">Season</span>
+      <div><div class="t">Shudder's October run <em>· V/H/S/Mixtape, Hallowarrior, The Cycle, Big Baby</em></div>
+        <div class="note">A drop most Thursdays plus American Horror Story 13 and The Creep Tapes S3. Background noise that keeps the genre trending — nothing to build a shelf on.</div></div>
+      <div class="fit"><span class="pips"><i class="pip on"></i><i class="pip"></i><i class="pip"></i></span><small>Skip</small></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="lab">The build</span></div>
+  <h2>Five shops</h2>
+  <p class="intro">One store behind all five (see the money note below), five keyworded Pinterest boards in front. Every product listed here is legal to make and sell yourself — no titles, no characters, no masks. Copy the keyword and pin blocks straight out.</p>
+
+  <div class="shops">
+
+    <article class="shop">
+      <div class="hd">
+        <span class="reel">Shop 01</span>
+        <h3>The Owens House</h3>
+        <span class="wave">Wave: <b>Practical Magic 2</b> · in cinemas now</span>
+        <p class="aes">Kitchen-witch autumn. Dried herbs on twine, handwritten labels, brass and beeswax, botanical grimoire pages, a house that smells of cloves. The highest-volume aesthetic of the five and the only one that still sells in February.</p>
+      </div>
+      <div class="cols">
+        <div>
+          <h4>Make — digital, list today</h4>
+          <ul>
+            <li>Apothecary jar label set (60 herbs, print-and-cut)</li>
+            <li>Grimoire pages — botanical plates to frame</li>
+            <li>Candle wrap templates, editable</li>
+            <li>Autumn tablescape kit: place cards, menu, napkin rings</li>
+            <li>Phone and tablet wallpaper pack</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Add — physical or affiliate</h4>
+          <ul>
+            <li>Printed botanical poster set (list by 10 Oct)</li>
+            <li>Tea towel with the herb chart</li>
+            <li>Affiliate: amber glass jars, black taper candles, cast-iron pots, dried bundles</li>
+          </ul>
+        </div>
+      </div>
+      <div class="copybox">
+        <div class="cbhd"><span>Board keywords</span><button class="cbtn" data-copy="kw1">Copy</button></div>
+        <p class="kw" id="kw1">witchy kitchen decor · apothecary jar labels printable · herb label set · grimoire page printable · cottage witch aesthetic · autumn mantel styling · dried flower decor · dark cottagecore · witch aesthetic home · autumn kitchen ideas</p>
+      </div>
+      <div class="copybox">
+        <div class="cbhd"><span>First pin</span><button class="cbtn" data-copy="pn1">Copy</button></div>
+        <p id="pn1"><b>Turn your pantry into a witch's kitchen (printable labels)</b> — 60 hand-lettered apothecary labels for herbs, salts and tinctures. Print at home, cut, stick. Instant download, no waiting on post. Perfect for an autumn kitchen refresh or a Halloween table.</p>
+      </div>
+    </article>
+
+    <article class="shop">
+      <div class="hd">
+        <span class="reel">Shop 02</span>
+        <h3>Prom Night, Red</h3>
+        <span class="wave">Wave: <b>Carrie</b> · Prime Video, 7 Oct</span>
+        <p class="aes">A 1970s school gym dressed for a dance that goes wrong. Crepe streamers, sashes, a tiara, a red handprint. Party theme and costume in one, landing exactly three weekends before the night.</p>
+      </div>
+      <div class="cols">
+        <div>
+          <h4>Make — digital, list today</h4>
+          <ul>
+            <li>Prom-gone-wrong party pack: invites, banner, photo-booth signs, ballot cards</li>
+            <li>"Crowned" printable poster set in blood-red and gold</li>
+            <li>Retro prom photo frame overlays for stories</li>
+            <li>Playlist card and drinks menu, 70s type</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Add — physical or affiliate</h4>
+          <ul>
+            <li>Sash and pennant prints (list by 10 Oct)</li>
+            <li>Affiliate: red satin slip dress, rhinestone tiara, fake blood, corsage, crepe paper</li>
+            <li>Costume-guide pin — five items, one look, all links</li>
+          </ul>
+        </div>
+      </div>
+      <div class="copybox">
+        <div class="cbhd"><span>Board keywords</span><button class="cbtn" data-copy="kw2">Copy</button></div>
+        <p class="kw" id="kw2">bloody prom party ideas · 70s prom costume · red halloween party decor · prom queen costume diy · retro prom decorations · halloween party printables · last minute costume ideas · red aesthetic party</p>
+      </div>
+      <div class="copybox">
+        <div class="cbhd"><span>First pin</span><button class="cbtn" data-copy="pn2">Copy</button></div>
+        <p id="pn2"><b>Throw a prom that goes horribly wrong — full party kit</b> — Invites, banner, photo-booth signs and ballots in 70s gym-dance type, all in blood-red and gold. Download, print, tape it up. The easiest themed party you'll run this October.</p>
+      </div>
+    </article>
+
+    <article class="shop">
+      <div class="hd">
+        <span class="reel">Shop 03</span>
+        <h3>Haunted Carnival</h3>
+        <span class="wave">Wave: <b>vintage Halloween, ~200% YoY</b> · plus Pan's Labyrinth 4K</span>
+        <p class="aes">Sideshow banners, ticket stubs, fortune-teller signage, moth-eaten velvet. Burgundy, plum, smoke grey and antique gold instead of orange and black. The safest shop of the five — the trend belongs to nobody, and it sources from public-domain Victorian ephemera.</p>
+      </div>
+      <div class="cols">
+        <div>
+          <h4>Make — digital, list today</h4>
+          <ul>
+            <li>Sideshow poster set — six framable prints</li>
+            <li>Admit-one ticket stubs and carnival signage pack</li>
+            <li>Poison and elixir bottle labels</li>
+            <li>Vintage photo-booth props and fortune cards</li>
+            <li>Haunted-carnival invitation, editable</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Add — physical or affiliate</h4>
+          <ul>
+            <li>Framed print trio in plum and gold (list by 10 Oct)</li>
+            <li>Affiliate: brass candelabra, antique mirrors, velvet runners, bell jars, string lights</li>
+            <li>The string-light pins are the bridge into Christmas — start them here</li>
+          </ul>
+        </div>
+      </div>
+      <div class="copybox">
+        <div class="cbhd"><span>Board keywords</span><button class="cbtn" data-copy="kw3">Copy</button></div>
+        <p class="kw" id="kw3">vintage halloween decor printable · haunted carnival party · retro halloween poster · victorian halloween · antique circus aesthetic · plum and gold decor · apothecary poison labels · gothic halloween table</p>
+      </div>
+      <div class="copybox">
+        <div class="cbhd"><span>First pin</span><button class="cbtn" data-copy="pn3">Copy</button></div>
+        <p id="pn3"><b>Vintage haunted carnival — six printable posters</b> — Sideshow banners and fortune-teller signage in burgundy, plum and antique gold. Print A3 or A4, frame or peg them up. Reads expensive, costs a download.</p>
+      </div>
+    </article>
+
+    <article class="shop">
+      <div class="hd">
+        <span class="reel">Shop 04</span>
+        <h3>Camp Final Girl</h3>
+        <span class="wave">Wave: <b>Crystal Lake</b> · Peacock, 15 Oct</span>
+        <p class="aes">1980s summer camp after dark. Felt pennants, embroidered badges, canoe paddles, a torch beam in the trees. Highest-converting merch category in horror — and the one to be most careful with. Generic camp, always.</p>
+      </div>
+      <div class="cols">
+        <div>
+          <h4>Make — digital, list today</h4>
+          <ul>
+            <li>Camp pennant and cabin-sign printables (invent your own camp name)</li>
+            <li>Merit-badge sticker sheet: "survived the night", "last one awake"</li>
+            <li>Bonfire party pack — invites, s'mores tags, campfire song cards</li>
+            <li>"Final girl" typographic print, your own wording</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Add — physical or affiliate</h4>
+          <ul>
+            <li>Final-girl tee and hoodie, your own type only (list by 10 Oct)</li>
+            <li>Enamel-style badge, own design</li>
+            <li>Affiliate: this is where the licensed masks and costumes go — linked, never made</li>
+          </ul>
+        </div>
+      </div>
+      <div class="copybox">
+        <div class="cbhd"><span>Board keywords</span><button class="cbtn" data-copy="kw4">Copy</button></div>
+        <p class="kw" id="kw4">80s summer camp aesthetic · final girl shirt · camp party decorations · retro camp pennant · bonfire party ideas · slasher movie night · halloween movie marathon setup · camp counselor costume</p>
+      </div>
+      <div class="copybox">
+        <div class="cbhd"><span>First pin</span><button class="cbtn" data-copy="pn4">Copy</button></div>
+        <p id="pn4"><b>Run an 80s camp horror movie night — printable kit</b> — Pennants, cabin signs, merit badges and s'mores tags for the best movie night of the month. Instant download, print tonight, host Saturday.</p>
+      </div>
+    </article>
+
+    <article class="shop">
+      <div class="hd">
+        <span class="reel">Shop 05</span>
+        <h3>The Manuscript</h3>
+        <span class="wave">Wave: <b>Verity</b> · cinemas, 2 Oct</span>
+        <p class="aes">Dark academia meets a thriller you shouldn't have read. Typewriter pages, a locked drawer, oxblood leather, a reading chair in one lamp. The one shop that turns into a Christmas gift shop without changing a single product.</p>
+      </div>
+      <div class="cols">
+        <div>
+          <h4>Make — digital, list today</h4>
+          <ul>
+            <li>Bookplate set — "this book does not leave this house"</li>
+            <li>Reading journal and thriller book-club kit, printable</li>
+            <li>Typewriter-page art prints, your own text</li>
+            <li>Book-nook styling guide and shelf label set</li>
+            <li>Blackout-poetry kit for a book club night</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Add — physical or affiliate</h4>
+          <ul>
+            <li>Bookmark and bookplate sets, printed (list by 10 Oct)</li>
+            <li>Affiliate: reading lamps, oxblood throws, book stands, candle sets — high gift intent</li>
+            <li>Hold this shop's budget back for November</li>
+          </ul>
+        </div>
+      </div>
+      <div class="copybox">
+        <div class="cbhd"><span>Board keywords</span><button class="cbtn" data-copy="kw5">Copy</button></div>
+        <p class="kw" id="kw5">dark academia decor · bookish gifts · book lover printable · reading nook ideas · thriller book club kit · personalised bookplate · book journal printable · gifts for readers</p>
+      </div>
+      <div class="copybox">
+        <div class="cbhd"><span>First pin</span><button class="cbtn" data-copy="pn5">Copy</button></div>
+        <p id="pn5"><b>Bookplates for the books you don't lend out</b> — A set of printable bookplates and shelf labels in oxblood and ink, for the reader whose books never come back. Instant download — and a finished gift by Christmas.</p>
+      </div>
+    </article>
+
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="lab">The sprint</span></div>
+  <h2>What happens on which day</h2>
+  <p class="intro">Every film date is a traffic spike you can pin into. Tick these off as you go — progress saves and follows you between your phone and laptop.</p>
+
+  <div class="meter">
+    <span class="lab" id="mLab">0 of 34 done</span>
+    <span class="bar"><i id="mBar"></i></span>
+  </div>
+
+  <div class="sprint" id="sprint">
+    <div class="day now">
+      <div class="dhd"><span class="dt">Fri 18 Sep · today</span><span class="why">Set the rails. Nothing sells until the account exists.</span></div>
+      <ul>
+        <li><input type="checkbox" id="t01"><label for="t01">Pinterest <b>business</b> account created (convert if personal)</label></li>
+        <li><input type="checkbox" id="t02"><label for="t02">Domain claimed and verified in Pinterest settings — this unlocks analytics and rich pins</label></li>
+        <li><input type="checkbox" id="t03"><label for="t03">Store opened. Etsy for speed today; Shopify later for a true Pinterest catalogue</label></li>
+        <li><input type="checkbox" id="t04"><label for="t04">Five boards created with the keyword names above, each with a written description</label></li>
+        <li><input type="checkbox" id="t05"><label for="t05">Return and refund policy written — Pinterest merchant guidelines require a clear one</label></li>
+      </ul>
+    </div>
+    <div class="day">
+      <div class="dhd"><span class="dt">Sat 19 – Sun 20 Sep</span><span class="why">Ten listings beats one perfect one.</span></div>
+      <ul>
+        <li><input type="checkbox" id="t06"><label for="t06">Two digital products live per shop — ten listings total</label></li>
+        <li><input type="checkbox" id="t07"><label for="t07">Every listing has a 2:3 vertical hero image (1000×1500) — Pinterest's shape, not Etsy's square</label></li>
+        <li><input type="checkbox" id="t08"><label for="t08">Three pins per listing, different image and different title each</label></li>
+        <li><input type="checkbox" id="t09"><label for="t09">Rich pins confirmed working on one listing URL</label></li>
+      </ul>
+    </div>
+    <div class="day key">
+      <div class="dhd"><span class="dt">Mon 21 – Wed 24 Sep</span><span class="why">Pins need days to surface. Volume now, not later.</span></div>
+      <ul>
+        <li><input type="checkbox" id="t10"><label for="t10">Five fresh pins a day, spread across the five boards</label></li>
+        <li><input type="checkbox" id="t11"><label for="t11">One board set as the shop's featured board</label></li>
+        <li><input type="checkbox" id="t12"><label for="t12">Amazon Associates (or equivalent) approved, for the licensed-merch pins</label></li>
+      </ul>
+    </div>
+    <div class="day">
+      <div class="dhd"><span class="dt">Thu 25 Sep</span><span class="why">The Backrooms lands on HBO Max.</span></div>
+      <ul>
+        <li><input type="checkbox" id="t13"><label for="t13">Liminal / analog-horror wallpaper pack listed and pinned</label></li>
+      </ul>
+    </div>
+    <div class="day key">
+      <div class="dhd"><span class="dt">Fri 2 Oct</span><span class="why">Verity opens. Bookish search spikes.</span></div>
+      <ul>
+        <li><input type="checkbox" id="t14"><label for="t14">Shop 05 pushed hard — ten pins across the day</label></li>
+        <li><input type="checkbox" id="t15"><label for="t15">Book-club kit listed while the film is in its opening weekend</label></li>
+      </ul>
+    </div>
+    <div class="day key">
+      <div class="dhd"><span class="dt">Wed 7 Oct</span><span class="why">Carrie drops, all eight episodes.</span></div>
+      <ul>
+        <li><input type="checkbox" id="t16"><label for="t16">Prom party pack front and centre on the storefront</label></li>
+        <li><input type="checkbox" id="t17"><label for="t17">Costume-guide pin published with affiliate links and an "affiliate link" disclosure in the description</label></li>
+      </ul>
+    </div>
+    <div class="day">
+      <div class="dhd"><span class="dt">Fri 9 Oct</span><span class="why">Other Mommy opens.</span></div>
+      <ul>
+        <li><input type="checkbox" id="t18"><label for="t18">Creepy-nursery and haunted-house pins into shop 03</label></li>
+      </ul>
+    </div>
+    <div class="day key">
+      <div class="dhd"><span class="dt">Sat 10 Oct</span><span class="why">Last safe day for anything that ships.</span></div>
+      <ul>
+        <li><input type="checkbox" id="t19"><label for="t19">All physical listings live — after today, digital only</label></li>
+        <li><input type="checkbox" id="t20"><label for="t20">Printify or Printful cutoff dates checked on their fulfilment page and written on the listings</label></li>
+        <li><input type="checkbox" id="t21"><label for="t21">Delivery-by date stated in every physical listing description</label></li>
+      </ul>
+    </div>
+    <div class="day key">
+      <div class="dhd"><span class="dt">Thu 15 Oct</span><span class="why">Crystal Lake drops. Peak slasher week.</span></div>
+      <ul>
+        <li><input type="checkbox" id="t22"><label for="t22">Shop 04 pinned daily through the weekend</label></li>
+        <li><input type="checkbox" id="t23"><label for="t23">Movie-night kit bundled with the bonfire pack as one higher-priced listing</label></li>
+      </ul>
+    </div>
+    <div class="day">
+      <div class="dhd"><span class="dt">Sat 17 Oct</span><span class="why">Shipping window shuts.</span></div>
+      <ul>
+        <li><input type="checkbox" id="t24"><label for="t24">Physical listings paused or marked "arrives after Halloween"</label></li>
+        <li><input type="checkbox" id="t25"><label for="t25">Storefront hero switched to "instant download, ready tonight"</label></li>
+      </ul>
+    </div>
+    <div class="day key">
+      <div class="dhd"><span class="dt">Mon 20 Oct</span><span class="why">Christmas search is already climbing. Beat it.</span></div>
+      <ul>
+        <li><input type="checkbox" id="t26"><label for="t26">Christmas boards created and first ten Christmas listings up</label></li>
+        <li><input type="checkbox" id="t27"><label for="t27">Shopify plus product catalogue started, if you want a real Pinterest shop tab for Christmas</label></li>
+      </ul>
+    </div>
+    <div class="day key">
+      <div class="dhd"><span class="dt">Fri 23 – Sun 25 Oct</span><span class="why">First party weekend. Peak intent.</span></div>
+      <ul>
+        <li><input type="checkbox" id="t28"><label for="t28">Party packs pinned as "print tonight, host tomorrow"</label></li>
+        <li><input type="checkbox" id="t29"><label for="t29">Last-minute costume pins live, every one affiliate-linked</label></li>
+        <li><input type="checkbox" id="t30"><label for="t30">Best three pins of the month identified in analytics and reworked into five new ones each</label></li>
+      </ul>
+    </div>
+    <div class="day key">
+      <div class="dhd"><span class="dt">Fri 30 – Sat 31 Oct</span><span class="why">Halloween is a Saturday. Best night in years.</span></div>
+      <ul>
+        <li><input type="checkbox" id="t31"><label for="t31">Instant-download bundles only, priced for impulse</label></li>
+        <li><input type="checkbox" id="t32"><label for="t32">Storefront banner: ready in minutes, nothing to post</label></li>
+      </ul>
+    </div>
+    <div class="day">
+      <div class="dhd"><span class="dt">Sun 1 Nov</span><span class="why">Same shops, new season.</span></div>
+      <ul>
+        <li><input type="checkbox" id="t33"><label for="t33">All five boards flipped to their Christmas turn (table below)</label></li>
+        <li><input type="checkbox" id="t34"><label for="t34">Halloween listings kept live and unlisted from boards — they rank higher next July for having history</label></li>
+      </ul>
+    </div>
+  </div>
+  <p class="synced" id="syncNote">Progress saves to this page.</p>
+</section>
+
+<section>
+  <div class="shead"><span class="lab">The rules</span></div>
+  <h2>What you can and can't put on a product</h2>
+  <p class="intro">This is the part that ends shops. Studios file takedowns through October — Etsy and Pinterest action them automatically, and repeat strikes close accounts. The line is simple and it is not about how much you change the artwork.</p>
+  <div class="rules">
+    <div class="rule yes">
+      <h4>Yours to sell</h4>
+      <ul>
+        <li>Aesthetics, palettes, motifs — witch kitchen, prom red, haunted carnival, camp horror</li>
+        <li>Generic archetypes: final girl, camp counsellor, fortune teller, the babysitter</li>
+        <li>Public-domain sources — Victorian ephemera, Poe, Dickens, pre-1930 illustration</li>
+        <li>Your own type, your own camp names, your own slogans</li>
+        <li>Film titles as <em>commentary</em>: in a board description or a blog post, never on a product or in a listing title</li>
+      </ul>
+    </div>
+    <div class="rule no">
+      <h4>Not yours, at any price</h4>
+      <ul>
+        <li>Titles and character names — Scream, Ghostface, Jason, Carrie, Camp Crystal Lake, Resident Evil</li>
+        <li>Masks, logos, taglines, poster recreations, redrawn characters</li>
+        <li>"Inspired by" in a listing title — that is still a trademark use</li>
+        <li>Costume replicas of a specific film look</li>
+        <li>Cloaked or shortened affiliate links — Pinterest flags them as spam and blocks accounts. Paste the full URL</li>
+      </ul>
+    </div>
+  </div>
+  <p class="fineprint">The licensed merchandise is still earnable: <b>affiliate it</b>. Link the official mask from a retailer, disclose it ("affiliate link" near the top of the description, per Pinterest and FTC rules), take the commission. It is the only legal way to monetise a search for a film's name — and it needs no stock, no shipping and no cutoff date.</p>
+</section>
+
+<section>
+  <div class="shead"><span class="lab">The turn</span></div>
+  <h2>Then Christmas, from the same five shops</h2>
+  <p class="intro">Do not start over on 1 November. Every board has a Christmas version of itself, and two films carry the gothic-Christmas angle straight through: <b>Ebenezer: A Christmas Carol</b> (13 Nov) and <b>Violent Night 2</b> (4 Dec), with Robert Eggers' <b>Werwulf</b> on Christmas Day. Pinterest Christmas search ramps through October and peaks in November — the catalogue has to be live by about the 20th.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Shop</th><th>Christmas turn</th><th>Lead product</th></tr></thead>
+      <tbody>
+        <tr><td><b>The Owens House</b></td><td>Cosy cottage Christmas — spice, greenery, handwritten labels</td><td>Gift-jar and preserve label sets; advent printables</td></tr>
+        <tr><td><b>Prom Night, Red</b></td><td>Red-and-gold party — the same palette, new occasion</td><td>New Year's Eve party pack; place cards and menus</td></tr>
+        <tr><td><b>Haunted Carnival</b></td><td>Victorian Christmas — this is the strongest turn you have, and Ebenezer lands right in it</td><td>Vintage Christmas poster set; ornament and gift-tag printables; <b>the lights pins you started in October</b></td></tr>
+        <tr><td><b>Camp Final Girl</b></td><td>Winter lodge — plaid, pine, cocoa</td><td>Lodge signage; hot-chocolate bar kit</td></tr>
+        <tr><td><b>The Manuscript</b></td><td>Gifts for readers — no product change at all</td><td>Bookplates and journals, repositioned as gifts; wrapping printables</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <div class="shead"><span class="lab">The money</span></div>
+  <h2>Where the store lives, and what a sale actually pays</h2>
+  <p class="intro">One decision to make today. A true Pinterest shop — the Shop tab, a product catalogue, shopping ads — needs a claimed website with a product feed, which means Shopify or WooCommerce. Etsy can't feed a Pinterest catalogue, but it lists digital products in minutes, delivers them itself and brings its own search traffic.</p>
+  <p class="intro" style="margin-top:14px"><b>The call: open on Etsy today and pin manually, then build the Shopify catalogue for Christmas.</b> The Halloween window is too short to spend on store plumbing; the Christmas window is long enough to deserve it.</p>
+  <div class="tw">
+    <table>
+      <thead><tr><th>Line</th><th>Typical price</th><th>What you keep</th><th>Cutoff</th></tr></thead>
+      <tbody>
+        <tr><td><b>Digital download</b></td><td>$6–14</td><td>Most of it — a listing fee, roughly 6.5% transaction, plus payment processing</td><td><b>31 Oct</b>, no shipping</td></tr>
+        <tr><td><b>Print-on-demand tee</b></td><td>$38–48</td><td>Retail less base cost and shipping; the thinnest margin of the three</td><td><b>≈17 Oct</b> to arrive</td></tr>
+        <tr><td><b>Affiliate link</b></td><td>—</td><td>A few percent of the order, no stock, no risk</td><td>Retailer's own cutoff</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="fineprint">Rates move — check Etsy's current fee schedule and your affiliate program's category rates before you price anything. And check Printify or Printful's own fulfilment page around mid-October: they publish exact seasonal cutoffs then, and those dates beat any estimate on this page.</p>
+  <p class="fineprint" style="margin-top:14px">Volume is the only variable that matters here. Ten listings with thirty pins will tell you within a fortnight which of the five shops is real — and that answer is worth more than this whole plan, because it is the shop you take into Christmas.</p>
+</section>
+
+<footer>
+  Built 18 September 2026 · release dates from studio and distributor schedules current at that date, and they move — recheck anything you're building a listing on.
+</footer>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---- live window maths ---- */
+  var HALLOWEEN = new Date(2026,9,31), POD = new Date(2026,9,10);
+  function days(to){
+    var now = new Date(); now.setHours(0,0,0,0);
+    return Math.round((to - now)/86400000);
+  }
+  function put(id,v){ var e=document.getElementById(id); if(e) e.textContent=v; }
+  var dH = days(HALLOWEEN), dP = days(POD);
+  put("dDays", dH > 0 ? dH : 0);
+  put("dPod", dP > 0 ? dP : 0);
+  if(dH <= 0) put("dWeek","Halloween has passed — run the Christmas turn");
+  if(dP <= 0){
+    var c = document.querySelector(".cell.closing");
+    if(c){ c.classList.remove("closing"); c.classList.add("closed"); }
+  }
+
+  /* ---- copy buttons ---- */
+  document.addEventListener("click", function(e){
+    var b = e.target.closest("[data-copy]"); if(!b) return;
+    var src = document.getElementById(b.getAttribute("data-copy"));
+    if(!src) return;
+    var txt = src.textContent.trim(), label = b.textContent;
+    function ok(){
+      b.textContent = "Copied"; b.classList.add("ok");
+      setTimeout(function(){ b.textContent = label; b.classList.remove("ok"); }, 1600);
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(ok, function(){ b.textContent = "Select and copy"; });
+    } else {
+      var r = document.createRange(); r.selectNodeContents(src);
+      var s = window.getSelection(); s.removeAllRanges(); s.addRange(r);
+      b.textContent = "Selected — copy it";
+    }
+  });
+
+  /* ---- checklist ---- */
+  var boxes = Array.prototype.slice.call(
+    document.querySelectorAll('#sprint input[type=checkbox]'));
+  var total = boxes.length, done = {}, store = null, writing = false, pending = false;
+
+  function paint(){
+    var n = 0;
+    boxes.forEach(function(b){
+      var on = !!done[b.id];
+      b.checked = on;
+      b.closest("li").classList.toggle("done", on);
+      if(on) n++;
+    });
+    put("mLab", n + " of " + total + " done");
+    var bar = document.getElementById("mBar");
+    if(bar) bar.style.width = (total ? (n/total*100) : 0) + "%";
+  }
+
+  function readLocal(){
+    try{
+      var raw = localStorage.getItem("hsr_done");
+      if(raw) done = JSON.parse(raw) || {};
+    }catch(err){ /* private window, blocked storage */ }
+  }
+  function writeLocal(){
+    try{ localStorage.setItem("hsr_done", JSON.stringify(done)); }
+    catch(err){ /* no-op */ }
+  }
+
+  /* one write at a time, coalesced */
+  function push(){
+    if(!store){ writeLocal(); return; }
+    if(writing){ pending = true; return; }
+    writing = true;
+    store.set({ done: done, at: new Date().toISOString() }).then(function(){
+      writing = false;
+      if(pending){ pending = false; push(); }
+    }, function(){
+      writing = false; pending = false;
+      writeLocal();
+      put("syncNote","Couldn't sync — progress saved on this device only.");
+    });
+  }
+
+  readLocal();
+  paint();
+
+  boxes.forEach(function(b){
+    b.addEventListener("change", function(){
+      if(b.checked) done[b.id] = true; else delete done[b.id];
+      paint();
+      writeLocal();
+      push();
+    });
+  });
+
+  /* db is optional: the page is complete without it */
+  if(window.claude && typeof window.claude.use === "function"){
+    window.claude.use("db").then(function(db){
+      if(!db) return;
+      try{ store = db.doc("progress/sprint"); }
+      catch(err){ return; }
+      store.onSnapshot(function(snap){
+        var d = snap.exists && snap.data() ? snap.data().done : null;
+        if(d && typeof d === "object"){
+          done = Object.assign({}, d);
+          paint();
+          writeLocal();
+        } else if(snap.exists === false && Object.keys(done).length){
+          push(); /* seed the store from what this device already had */
+        }
+        put("syncNote","Progress syncs across your devices.");
+      }, function(){
+        store = null;
+        put("syncNote","Couldn't sync — progress saved on this device only.");
+      });
+    }, function(){ /* stays local */ });
+  }
+})();
+</script>

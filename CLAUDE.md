@@ -1212,3 +1212,50 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   Verified E2E via scratchpad/deskcoach-light.mjs + coach-light2.mjs (temp
   coach minted → dashboard shot → deleted). Masters: admin-base.html,
   coach-base.html.
+
+## Halloween Shop Run — Pinterest seasonal business (2026-09-18)
+
+- **NEW side business, nothing to do with the Lab or Hooper.** Aiman asked to
+  run a Halloween-season play: Pinterest shops tied to the movies landing now
+  and next month, then Christmas after it ("most important is Halloween, let's
+  do Halloween first"). Deliverable = `halloween/playbook.html` (self-contained
+  operational page) + `halloween/README.md`. Artifact (private, db-backed
+  checklist): https://claude.ai/artifact/FGovE2zs9ucE7pGzqjBgGq
+  NOT wired into Netlify — notes-and-deliverable folder like `giveaway/` and
+  `pokemon-trade/`.
+- **Three findings that shaped the plan.** (1) **No new Scream this season** —
+  Scream 8 tracks for 2027 (Paramount horror slot 16 Jul 2027); the parody
+  *Scary Movie* already ran in 2026 (~$231M) and Ghostface stays a top costume
+  search, so Scream is an AFFILIATE line, never a product line. (2) **Shipping
+  cliff** — print-on-demand must be listed by ~10 Oct (order cutoff ~17 Oct) to
+  land by the 31st, so DIGITAL FIRST (printables/party packs/cut files/
+  wallpapers sell to Halloween night at full margin); Printify/Printful publish
+  exact cutoffs mid-Oct. (3) **IP is what ends shops** — no titles, characters,
+  masks, logos, taglines or poster art, and "inspired by" in a listing title is
+  still trademark use; sell the AESTHETIC the film drives into search and
+  affiliate the licensed goods (full URLs only — Pinterest blocks cloaked/
+  shortened links; FTC disclosure required).
+- **Five shops = aesthetics, not titles.** 01 The Owens House (kitchen-witch
+  autumn ← Practical Magic 2, 11 Sep) · 02 Prom Night, Red (70s prom ← Carrie,
+  Mike Flanagan, 8 eps, Prime, 7 Oct) · 03 Haunted Carnival (Victorian sideshow
+  ← vintage Halloween ~200% YoY + Pan's Labyrinth 20th 4K) · 04 Camp Final Girl
+  (80s camp ← Crystal Lake, Friday the 13th prequel, Peacock, 15 Oct) · 05 The
+  Manuscript (dark academia ← Verity, Colleen Hoover, 2 Oct). Each carries a
+  digital product list, a physical/affiliate list, and copy-paste keyword + pin
+  blocks. Deliberately SKIPPED: Resident Evil (18 Sep, Cregger — gaming/gore
+  audience, wrong platform), Clayface (23 Oct), Whalefall (16 Oct), Insidious:
+  The Bleeding World (21 Aug).
+- **Dates.** Halloween 2026 is a **Saturday** (parties both 23–25 and 30–31
+  Oct). ~10 Oct last safe listing for physical · ~17 Oct order cutoff → digital
+  only · 20 Oct Christmas catalogue live · 1 Nov flip all five boards to their
+  Christmas turn, carried by Ebenezer: A Christmas Carol (13 Nov), Violent
+  Night 2 (4 Dec), Werwulf (25 Dec).
+- **Store call:** a true Pinterest shop (Shop tab/catalogue/shopping ads) needs
+  a claimed site with a product feed → Shopify/WooCommerce; Etsy can't feed a
+  Pinterest catalogue but lists digital goods in minutes. So **Etsy + manual
+  pinning for Halloween, Shopify catalogue for Christmas.**
+- Page internals: sprint checklist persists via the Artifact `db` capability
+  (doc `progress/sprint`, `{done:{<id>:true}}`) with a localStorage fallback
+  (`hsr_done`); declaring `db` makes the artifact org-internal (no public
+  link). Republish to the SAME artifact URL or it duplicates. Release dates
+  were current at 2026-09-18 and move — recheck before building a listing.
