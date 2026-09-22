@@ -1134,6 +1134,21 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
 
 ## Parked ideas (Aiman asked to save these)
 
+- **Burnout / "still functioning" content idea** — saved 2026-09-22. Aiman
+  sent https://www.facebook.com/share/r/1HpwWyQUE1/ — a reel by Elena Carroll,
+  on-screen title "What autistic burnout actually looks like when you're still
+  'functioning'" (~10K views, 7.3K reactions). Caption's hook: *"the more
+  burnout/tired I am, the more I mask to show people I'm still capable… your
+  burnout may present like these…"*. NOTE: the video's on-screen LIST is behind
+  Facebook's login wall — only the caption + cover frame are readable from here
+  (don't try to bypass it; ask him to screenshot the list if it's needed). The
+  original is specifically about AUTISTIC burnout — any UNC THOUGHTS version
+  should be general athlete/coach burnout, NOT the autism angle. Two uses if he
+  ever greenlights one (he has not): an IG mindset post on burnout hiding behind
+  "I'm fine", and/or a burnout signal in the Lab's Mind section / check-ins
+  (flag a player whose energy + confidence are sliding while their streak keeps
+  going = masking it).
+
 - **"A.I. MAN" Instagram post** — saved 2026-07-18, for a few weeks out.
   Wordplay on his name: AIMAN = A·I·MAN, "the AI man". Perfect drop for when
   the Ask The Coaches AI answers go live ("the Lab's AI was named after me the
