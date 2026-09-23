@@ -1,0 +1,749 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Abbas Payments Ledger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+:root{
+  --bg:#F3F2EE; --card:#FFFFFF; --sunk:#F8F7F3; --ink:#1B1E24; --muted:#5E6470; --line:#DEDBD2; --line2:#ECEAE3;
+  --band:#F1C62E; --bandInk:#2A2206; --accent:#1F4E8C; --accentInk:#fff; --accentSoft:#E3EBF6;
+  --good:#1E7A46; --goodSoft:#E1F2E8; --bad:#B42318; --badSoft:#FBE6E3; --warn:#8A5A00; --warnSoft:#FFF2CC;
+  --shadow:0 1px 2px rgba(20,24,32,.06),0 4px 16px rgba(20,24,32,.05);
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#121417; --card:#1B1E23; --sunk:#16191D; --ink:#ECEDEF; --muted:#A0A6B1; --line:#30343B; --line2:#262A30;
+    --band:#D9B21F; --bandInk:#1E1803; --accent:#7FA8E6; --accentInk:#0D1624; --accentSoft:#1D2940;
+    --good:#5CC98A; --goodSoft:#16301F; --bad:#F2887D; --badSoft:#3A1A17; --warn:#E9C15A; --warnSoft:#33290F;
+    --shadow:0 1px 2px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#121417; --card:#1B1E23; --sunk:#16191D; --ink:#ECEDEF; --muted:#A0A6B1; --line:#30343B; --line2:#262A30;
+  --band:#D9B21F; --bandInk:#1E1803; --accent:#7FA8E6; --accentInk:#0D1624; --accentSoft:#1D2940;
+  --good:#5CC98A; --goodSoft:#16301F; --bad:#F2887D; --badSoft:#3A1A17; --warn:#E9C15A; --warnSoft:#33290F;
+  --shadow:0 1px 2px rgba(0,0,0,.3);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font:14px/1.5 var(--sans);margin:0}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:16px;padding-block:20px 60px}
+.num,.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+header.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px 20px;margin-bottom:18px}
+.eyebrow{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+h1{font-size:26px;line-height:1.15;margin:2px 0 0;font-weight:700;text-wrap:balance}
+.actions{display:flex;flex-wrap:wrap;gap:8px}
+.btn{border:1px solid var(--line);background:var(--card);border-radius:8px;padding:8px 13px;font-weight:600;font-size:13px;display:inline-flex;gap:6px;align-items:center}
+.btn:hover{border-color:var(--muted)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accentInk)}
+.btn.ai{background:var(--band);border-color:var(--band);color:var(--bandInk)}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--muted);padding-inline:8px}
+.btn.ghost:hover{color:var(--ink)}
+.btn.danger{color:var(--bad)}
+.btn:disabled{opacity:.5;cursor:default}
+
+.bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:14px}
+.bar label{font-size:12px;color:var(--muted);font-weight:600}
+select,input[type=text],input[type=number],input[type=date],textarea{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:7px 10px;min-width:0}
+input[type=number]{font-family:var(--mono)}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--card)}
+.seg button{border:0;background:transparent;padding:7px 14px;font-weight:600;font-size:13px;color:var(--muted)}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+.search{flex:1 1 180px;max-width:280px}
+
+.stats{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));border:1px solid var(--line);border-radius:12px;background:var(--card);box-shadow:var(--shadow);margin-bottom:16px;overflow:hidden}
+.stat{padding:12px 14px;border-right:1px solid var(--line2)}
+.stat:last-child{border-right:0}
+.stat .k{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.stat .v{font-family:var(--mono);font-size:20px;font-weight:600;margin-top:2px;white-space:nowrap}
+.stat .s{font-size:12px;color:var(--muted)}
+.v.good{color:var(--good)} .v.bad{color:var(--bad)}
+@media (max-width:760px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.stat{border-bottom:1px solid var(--line2)}.stat:nth-child(2n){border-right:0}.stat:last-child{grid-column:1/-1}}
+
+.banner{border:1px dashed var(--warn);background:var(--warnSoft);color:var(--ink);border-radius:10px;padding:10px 14px;margin-bottom:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+.banner b{color:var(--warn)}
+.note{font-size:12px;color:var(--muted)}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:14px;align-items:start}
+@media (max-width:420px){.grid{grid-template-columns:1fr}}
+.inv{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.inv.sample{opacity:.92}
+.inv-head{background:var(--band);color:var(--bandInk);padding:10px 14px;display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.inv-head .who{font-weight:700;font-size:15px;line-height:1.25}
+.inv-head .meta{font-size:12px;opacity:.8;font-family:var(--mono)}
+.inv-head .amt{font-family:var(--mono);font-weight:600;font-size:16px;text-align:right;white-space:nowrap}
+.pill{border:0;border-radius:999px;padding:3px 10px;font-size:12px;font-weight:700;letter-spacing:.02em;display:inline-flex;gap:5px;align-items:center;white-space:nowrap}
+.pill.paid{background:var(--goodSoft);color:var(--good)}
+.pill.unpaid{background:var(--badSoft);color:var(--bad)}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.inv-sub{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 14px;border-bottom:1px solid var(--line2);flex-wrap:wrap}
+table{border-collapse:collapse;width:100%}
+th{font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);font-weight:600;text-align:left;padding:7px 14px 5px}
+td{padding:6px 14px;border-top:1px solid var(--line2);vertical-align:top}
+td.r,th.r{text-align:right}
+tr.tot td{font-weight:700;background:var(--sunk)}
+tr.profit td{font-weight:700}
+.pos{color:var(--good)} .neg{color:var(--bad)}
+.inv-foot{display:flex;justify-content:flex-end;gap:4px;padding:6px 8px;border-top:1px solid var(--line2)}
+.empty{padding:36px 16px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:12px}
+
+.wk{background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);overflow:hidden}
+.wk-head{padding:10px 14px;display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid var(--line2);align-items:baseline}
+.wk-head b{font-size:15px}
+.chip{font-size:11px;border:1px solid var(--line);border-radius:999px;padding:1px 8px;color:var(--muted);font-weight:600}
+
+/* sheets */
+.scrim{position:fixed;inset:0;background:rgba(10,12,16,.45);display:flex;align-items:flex-start;justify-content:center;padding:max(24px,env(safe-area-inset-top,0px)) 16px 24px;overflow-y:auto;z-index:20}
+.sheet{background:var(--card);border:1px solid var(--line);border-radius:14px;width:100%;max-width:640px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.sheet h2{font-size:18px;margin:0}
+.sh-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--line2);gap:10px}
+.sh-body{padding:14px 16px;display:grid;gap:12px}
+.sh-foot{display:flex;justify-content:space-between;gap:8px;padding:12px 16px;border-top:1px solid var(--line2);flex-wrap:wrap}
+.f2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:520px){.f2{grid-template-columns:1fr}}
+.fld{display:grid;gap:4px}
+.fld>span{font-size:12px;font-weight:600;color:var(--muted)}
+.wrow{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) minmax(0,1fr) auto;gap:6px;align-items:center}
+.wrow.h span{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.x{border:0;background:transparent;color:var(--muted);font-size:18px;width:30px;height:30px;border-radius:6px}
+.x:hover{background:var(--sunk);color:var(--bad)}
+.calc{background:var(--sunk);border-radius:8px;padding:10px 12px;display:flex;flex-wrap:wrap;gap:6px 18px;font-size:13px}
+.calc b{font-family:var(--mono)}
+textarea{width:100%;min-height:150px;resize:vertical;font-family:var(--mono);font-size:12.5px}
+.err{color:var(--bad);font-size:13px}
+.prev{border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.prev-row{display:flex;gap:10px;justify-content:space-between;padding:8px 12px;border-top:1px solid var(--line2);align-items:center}
+.prev-row:first-child{border-top:0}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:999px;font-weight:600;font-size:13px;z-index:40;box-shadow:var(--shadow)}
+.save-state{font-size:12px;color:var(--muted)}
+.tw{overflow-x:auto}
+.conn{display:flex;gap:8px;align-items:center;font-weight:600;background:var(--sunk);border-radius:8px;padding:9px 12px}
+.conn .dot{width:9px;height:9px;border-radius:50%;background:var(--muted)}
+.conn.ok .dot{background:var(--good)} .conn.bad .dot{background:var(--bad)} .conn.warn .dot{background:var(--warn)}
+.steps{margin:0 0 10px;padding-left:20px;display:grid;gap:6px} .steps code{font-family:var(--mono);font-size:12px;background:var(--sunk);padding:1px 5px;border-radius:4px}
+.dets summary{cursor:pointer;font-weight:600;color:var(--muted);font-size:13px}
+.mypb{font-size:11px;font-weight:700;border-radius:999px;padding:2px 8px;background:var(--accentSoft);color:var(--accent);white-space:nowrap}
+.mypb.paid{background:var(--goodSoft);color:var(--good)}
+.prow{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr) auto;gap:6px;align-items:center}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow">Participant invoices · support worker pay · profit</div>
+      <h1>Payments Ledger</h1>
+    </div>
+    <div class="actions">
+      <button class="btn ai" id="mypBtn">⇄ MYP</button>
+      <button class="btn primary" id="newBtn">＋ New invoice</button>
+      <button class="btn" id="expBtn">Export to Excel</button>
+      <button class="btn" id="impBtn">Import Excel</button>
+      <input type="file" id="impFile" accept=".xlsx,.xls,.csv" hidden>
+    </div>
+  </header>
+
+  <div class="bar">
+    <label for="period">Pay period</label>
+    <select id="period"></select>
+    <label for="clientF">Client</label>
+    <select id="clientF"></select>
+    <label for="statusF">Status</label>
+    <select id="statusF"><option value="">All</option><option value="unpaid">Unpaid only</option><option value="paid">Paid only</option></select>
+    <input type="text" id="q" class="search" placeholder="Search client, worker or invoice #">
+    <span style="flex:1"></span>
+    <div class="seg" role="group" aria-label="View">
+      <button id="vClients" aria-pressed="true">By client</button>
+      <button id="vWorkers" aria-pressed="false">By worker</button>
+    </div>
+  </div>
+
+  <section class="stats" id="stats" aria-label="Totals"></section>
+  <div id="banner"></div>
+  <main id="list"></main>
+  <p class="note" id="saveState" style="margin-top:18px"></p>
+</div>
+
+<div class="scrim" id="edScrim" hidden>
+  <form class="sheet" id="edForm" autocomplete="off">
+    <div class="sh-head"><h2 id="edTitle">New invoice</h2><button type="button" class="x" id="edClose" aria-label="Close">×</button></div>
+    <div class="sh-body">
+      <div class="f2">
+        <label class="fld"><span>Participant (client)</span><input type="text" id="fClient" list="dlClients" required></label>
+        <label class="fld"><span>Invoice number</span><input type="text" id="fInv" placeholder="INV-0001" required></label>
+      </div>
+      <div class="f2">
+        <label class="fld"><span>Full invoice amount ($)</span><input type="number" id="fAmt" step="0.01" min="0" required></label>
+        <label class="fld"><span>Pay period</span><input type="text" id="fPeriod" list="dlPeriods" placeholder="23 Mar – 5 Apr 2026"></label>
+      </div>
+      <div class="f2">
+        <label class="fld"><span>Status (check the bank)</span>
+          <select id="fStatus"><option value="unpaid">Unpaid</option><option value="paid">Paid</option></select></label>
+        <label class="fld"><span>Invoice date</span><input type="date" id="fDate"></label>
+      </div>
+      <div class="fld">
+        <span>Support workers on this client</span>
+        <div class="wrow h"><span>Worker</span><span>Billed for them ($)</span><span>Paid to them ($)</span><span></span></div>
+        <div id="wRows" style="display:grid;gap:6px"></div>
+        <div><button type="button" class="btn ghost" id="addW">＋ Add worker</button></div>
+        <div class="note">"Billed" is the part of this invoice that worker's shifts make up. Leave it blank and profit is worked out for the whole invoice.</div>
+      </div>
+      <div class="calc" id="edCalc"></div>
+      <label class="fld"><span>Notes</span><input type="text" id="fNote" placeholder="Optional"></label>
+    </div>
+    <div class="sh-foot">
+      <button type="button" class="btn danger" id="edDel" hidden>Delete invoice</button>
+      <span style="flex:1"></span>
+      <button type="button" class="btn" id="edCancel">Cancel</button>
+      <button type="submit" class="btn primary">Save invoice</button>
+    </div>
+  </form>
+</div>
+
+<div class="scrim" id="mypScrim" hidden>
+  <div class="sheet">
+    <div class="sh-head"><h2>MYP</h2><button type="button" class="x" id="mypClose" aria-label="Close">×</button></div>
+    <div class="sh-body">
+      <div class="conn" id="mypConn"><span class="dot"></span><span id="mypConnTxt">Checking the connection…</span></div>
+      <div id="mypSetup" hidden>
+        <p style="margin:0 0 8px"><b>Not connected yet.</b> Three things to do once, then this all works by itself.</p>
+        <ol class="steps">
+          <li>In MYP go to <b>CRM → Administration → API applications</b> and register an application called <b>Payments Ledger</b>. Copy the <b>Client ID</b> and <b>Client Secret</b> — the secret only shows once. (If that menu isn’t there, your MYP Champion needs to turn on API permissions for you.)</li>
+          <li>In Netlify open <b>abbas-ledger → Site configuration → Environment variables</b> and paste them into <code>MYP_CLIENT_ID</code> and <code>MYP_CLIENT_SECRET</code>.</li>
+          <li>Come back here, tap <b>Check again</b>.</li>
+        </ol>
+        <button type="button" class="btn" id="mypRecheck">Check again</button>
+      </div>
+      <div id="mypReady" hidden>
+        <div class="fld"><span>Pull invoices from MYP</span>
+          <div class="f2" style="grid-template-columns:1fr 1fr auto;align-items:end">
+            <label class="fld"><span>From</span><input type="date" id="mypFrom"></label>
+            <label class="fld"><span>To</span><input type="date" id="mypTo"></label>
+            <button type="button" class="btn primary" id="mypPull">Pull</button>
+          </div>
+          <div class="note">Brings in every invoice MYP has in that window (participant, number, total, paid/unpaid) and, where MYP has approved timesheets, what each worker earned — invoices you already have keep their worker pay.</div>
+        </div>
+        <div class="err" id="mypErr"></div>
+        <div id="mypPrev"></div>
+        <details class="dets">
+          <summary>Defaults for sending invoices to MYP</summary>
+          <div class="f2" style="margin-top:8px">
+            <label class="fld"><span>Invoice to</span><select id="dfClaim"><option value="InvoiceToNdia">NDIA</option><option value="InvoiceToClient">Client / plan manager</option></select></label>
+            <label class="fld"><span>Cost centre</span><select id="dfCC"><option value="">— none —</option></select></label>
+          </div>
+          <label class="fld" style="margin-top:8px"><span>Product used for support lines</span><select id="dfProduct"></select></label>
+          <label class="fld" style="margin-top:8px"><span>Your staff record (who signs the invoice)</span><select id="dfStaff"></select></label>
+          <div class="note" style="margin-top:6px">Saved on this device. Each send lets you change them for that invoice.</div>
+        </details>
+      </div>
+    </div>
+    <div class="sh-foot">
+      <span class="note" id="mypStatus"></span><span style="flex:1"></span>
+      <button type="button" class="btn ghost" id="mypPin">Ledger PIN</button>
+      <button type="button" class="btn primary" id="mypImport" hidden>Import these</button>
+    </div>
+  </div>
+</div>
+
+<div class="scrim" id="pushScrim" hidden>
+  <form class="sheet" id="pushForm" autocomplete="off">
+    <div class="sh-head"><h2>Send to MYP</h2><button type="button" class="x" id="pushClose" aria-label="Close">×</button></div>
+    <div class="sh-body">
+      <div class="calc" id="pushHead"></div>
+      <div class="f2">
+        <label class="fld"><span>Participant in MYP</span><select id="pContact" required></select></label>
+        <label class="fld"><span>Invoice number</span><input type="text" id="pInvNo" maxlength="47"></label>
+      </div>
+      <div class="f2">
+        <label class="fld"><span>Service from</span><input type="date" id="pStart" required></label>
+        <label class="fld"><span>Service to</span><input type="date" id="pEnd" required></label>
+      </div>
+      <div class="f2">
+        <label class="fld"><span>Invoice to</span><select id="pClaim"><option value="InvoiceToNdia">NDIA</option><option value="InvoiceToClient">Client / plan manager</option></select></label>
+        <label class="fld"><span>Signed by (staff)</span><select id="pStaff" required></select></label>
+      </div>
+      <label class="fld"><span>Product (NDIS line item)</span><select id="pProduct" required></select></label>
+      <div class="fld"><span>Lines</span><div id="pLines" style="display:grid;gap:6px"></div>
+        <div class="note">One line per support worker, priced at what was billed for them. Change the amounts here if MYP needs them split differently.</div></div>
+      <div class="err" id="pushErr"></div>
+    </div>
+    <div class="sh-foot">
+      <span class="note" id="pushStatus"></span><span style="flex:1"></span>
+      <button type="button" class="btn" id="pushCancel">Cancel</button>
+      <button type="submit" class="btn primary" id="pushGo">Send to MYP</button>
+    </div>
+  </form>
+</div>
+
+<datalist id="dlClients"></datalist>
+<datalist id="dlWorkers"></datalist>
+<datalist id="dlPeriods"></datalist>
+
+<script>
+const $ = s => document.querySelector(s);
+const KEY = "abbas_ledger_v1";
+const AUD = new Intl.NumberFormat("en-AU",{style:"currency",currency:"AUD"});
+const money = n => AUD.format(+n||0);
+const esc = s => String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const uid = () => Math.random().toString(36).slice(2,10)+Date.now().toString(36).slice(-4);
+const num = v => { const n = parseFloat(String(v??"").replace(/[^0-9.\-]/g,"")); return isFinite(n)?n:0; };
+
+/* ---------- demo book (loaded once, fully editable) ---------- */
+const P1="10 Aug – 23 Aug 2026", P2="24 Aug – 6 Sep 2026", P3="7 Sep – 20 Sep 2026";
+const SEED_RAW = [
+  [P1,"Jordan Mackay","INV-2041","paid","2026-08-24","",[["Daniel Cruz",2340,1440],["Fatima Rahman",1755,1080]]],
+  [P1,"Priya Nair","INV-2042","paid","2026-08-24","",[["Tom Ellery",3120,1920],["Chloe Nguyen",1560,960]]],
+  [P1,"Liam O'Connell","INV-2043","paid","2026-08-24","Plan manager: Leap in!",[["Sam Okafor",4290,2640]]],
+  [P1,"Sofia Haddad","INV-2044","paid","2026-08-25","",[["Fatima Rahman",1950,1200],["Bianca Rossi",2730,1680]]],
+  [P1,"Ethan Whitfield","INV-2045","paid","2026-08-25","",[["Daniel Cruz",1170,720],["Hassan Karimi",2925,1800]]],
+  [P2,"Jordan Mackay","INV-2046","paid","2026-09-07","",[["Daniel Cruz",2535,1560],["Fatima Rahman",1560,960]]],
+  [P2,"Priya Nair","INV-2047","paid","2026-09-07","",[["Tom Ellery",3315,2040],["Chloe Nguyen",1365,840]]],
+  [P2,"Liam O'Connell","INV-2048","unpaid","2026-09-07","Chased 18 Sep — plan manager processing",[["Sam Okafor",4485,2760]]],
+  [P2,"Sofia Haddad","INV-2049","paid","2026-09-08","",[["Bianca Rossi",2925,1800],["Fatima Rahman",1170,720]]],
+  [P2,"Mei Tanaka","INV-2050","paid","2026-09-08","New participant — started 26 Aug",[["Chloe Nguyen",2145,1320]]],
+  [P2,"Ethan Whitfield","INV-2051","unpaid","2026-09-08","",[["Hassan Karimi",3120,1920],["Daniel Cruz",975,600]]],
+  [P2,"Noah Brennan","INV-2052","paid","2026-09-09","",[["Tom Ellery",1950,1200],["Sam Okafor",1365,840]]],
+  [P3,"Jordan Mackay","INV-2053","unpaid","2026-09-21","",[["Daniel Cruz",2340,1440],["Fatima Rahman",1755,1080]]],
+  [P3,"Priya Nair","INV-2054","unpaid","2026-09-21","",[["Tom Ellery",3120,1920],["Chloe Nguyen",1560,960]]],
+  [P3,"Liam O'Connell","INV-2055","unpaid","2026-09-21","",[["Sam Okafor",4290,2640]]],
+  [P3,"Sofia Haddad","INV-2056","unpaid","2026-09-22","",[["Bianca Rossi",2730,1680],["Fatima Rahman",1365,840]]],
+  [P3,"Mei Tanaka","INV-2057","unpaid","2026-09-22","",[["Chloe Nguyen",2340,1440],["Hassan Karimi",780,480]]],
+  [P3,"Ethan Whitfield","INV-2058","unpaid","2026-09-22","",[["Hassan Karimi",2925,1800],["Daniel Cruz",1170,720]]],
+  [P3,"Noah Brennan","INV-2059","unpaid","2026-09-22","Draft — send Monday",[["Tom Ellery",2145,1320],["Sam Okafor",1170,720]]],
+  [P3,"Amira Yousef","INV-2060","unpaid","2026-09-23","Intake done, first fortnight",[["Bianca Rossi",1560,960]]]
+];
+const seedBook = () => SEED_RAW.map(([period,client,invoiceNo,status,date,note,ws],k)=>({
+  id:"seed"+(k+1), period, client, invoiceNo, status, date, note,
+  amount: +ws.reduce((a,w)=>a+w[1],0).toFixed(2),
+  workers: ws.map(([name,billed,paid])=>({name,billed,paid}))
+}));
+
+/* ---------- storage ---------- */
+let S = {invoices:[]}, storageOK = true, lastSaved = null;
+try { const raw = localStorage.getItem(KEY); if (raw) S = JSON.parse(raw); } catch(e){ storageOK = false; }
+if (!Array.isArray(S.invoices)) S.invoices = [];
+if (!S.invoices.length && !S.cleared) { S.invoices = seedBook(); try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+function persist(){
+  try { localStorage.setItem(KEY, JSON.stringify(S)); lastSaved = new Date(); storageOK = true; }
+  catch(e){ storageOK = false; }
+  paintSaveState();
+}
+function paintSaveState(){
+  $("#saveState").textContent = storageOK
+    ? "Saved in this browser on this device. Use “Export to Excel” now and then as a backup — the export can be imported back in on any device."
+    : "This browser isn’t letting the page save. Export to Excel before you close the page so nothing is lost.";
+  $("#saveState").innerHTML += ` <button class="btn ghost" data-act="reseed" style="font-size:12px">Load demo book</button><button class="btn ghost" data-act="clear" style="font-size:12px">Clear everything</button>`;
+}
+const usingExamples = () => false;
+const data = () => S.invoices;
+
+/* ---------- maths ---------- */
+function calc(inv){
+  const paid = inv.workers.reduce((a,w)=>a+num(w.paid),0);
+  const profit = num(inv.amount) - paid;
+  return {paid, profit, margin: num(inv.amount) ? profit/num(inv.amount) : 0};
+}
+const wProfit = w => (w.billed===null||w.billed===""||w.billed===undefined) ? null : num(w.billed)-num(w.paid);
+
+/* ---------- view state ---------- */
+let view = "clients";
+function prefs(){ try{ const p = JSON.parse(localStorage.getItem(KEY+"_ui")||"{}"); if(p.view) view=p.view; }catch(e){} }
+function savePrefs(){ try{ localStorage.setItem(KEY+"_ui", JSON.stringify({view})); }catch(e){} }
+prefs();
+
+function filtered(){
+  const per = $("#period").value, cl = $("#clientF").value, st = $("#statusF").value, q = $("#q").value.trim().toLowerCase();
+  return data().filter(i => (!per || i.period===per) && (!cl || i.client===cl) && (!st || i.status===st) &&
+    (!q || [i.client,i.invoiceNo,i.note,...i.workers.map(w=>w.name)].join(" ").toLowerCase().includes(q)));
+}
+
+function paintPeriods(){
+  const sel = $("#period"), cur = sel.value;
+  const ps = [...new Set(data().map(i=>i.period).filter(Boolean))];
+  sel.innerHTML = `<option value="">All periods</option>` + ps.map(p=>`<option>${esc(p)}</option>`).join("");
+  if (ps.includes(cur)) sel.value = cur;
+  $("#dlPeriods").innerHTML = ps.map(p=>`<option value="${esc(p)}">`).join("");
+  const cs = $("#clientF"), curC = cs.value, cl = [...new Set(data().map(i=>i.client))].sort((a,b)=>a.localeCompare(b));
+  cs.innerHTML = `<option value="">All clients</option>` + cl.map(c=>`<option>${esc(c)}</option>`).join("");
+  if (cl.includes(curC)) cs.value = curC;
+  $("#dlClients").innerHTML = [...new Set(S.invoices.map(i=>i.client))].map(c=>`<option value="${esc(c)}">`).join("");
+  $("#dlWorkers").innerHTML = [...new Set(S.invoices.flatMap(i=>i.workers.map(w=>w.name)))].map(c=>`<option value="${esc(c)}">`).join("");
+}
+
+function paintStats(rows){
+  let inv=0, rec=0, out=0, wp=0, nOut=0;
+  rows.forEach(i=>{ const c=calc(i); inv+=num(i.amount); wp+=c.paid; if(i.status==="paid") rec+=num(i.amount); else {out+=num(i.amount); nOut++;} });
+  const profit = inv-wp;
+  $("#stats").innerHTML = `
+    <div class="stat"><div class="k">Invoiced</div><div class="v">${money(inv)}</div><div class="s">${rows.length} invoice${rows.length===1?"":"s"}</div></div>
+    <div class="stat"><div class="k">Paid in</div><div class="v good">${money(rec)}</div><div class="s">${rows.length-nOut} paid</div></div>
+    <div class="stat"><div class="k">Still unpaid</div><div class="v ${out?"bad":""}">${money(out)}</div><div class="s">${nOut} to chase</div></div>
+    <div class="stat"><div class="k">Paid to workers</div><div class="v">${money(wp)}</div><div class="s">${new Set(rows.flatMap(i=>i.workers.map(w=>w.name.trim().toLowerCase()))).size} worker(s)</div></div>
+    <div class="stat"><div class="k">Company profit</div><div class="v ${profit<0?"bad":"good"}">${money(profit)}</div><div class="s">${inv?Math.round(profit/inv*100):0}% of invoiced</div></div>`;
+}
+
+function paintBanner(){ $("#banner").innerHTML = ""; }
+
+function invCard(i){
+  const c = calc(i), ex = usingExamples();
+  const rows = i.workers.map(w=>{ const p=wProfit(w); return `<tr><td>${esc(w.name)||"<span class=note>—</span>"}</td>
+      <td class="r num">${money(w.paid)}</td><td class="r num ${p===null?"":p<0?"neg":"pos"}">${p===null?"<span class=note>—</span>":money(p)}</td></tr>`;}).join("");
+  return `<article class="inv${ex?" sample":""}">
+    <div class="inv-head"><div><div class="who">${esc(i.client)}</div><div class="meta">${esc(i.invoiceNo)}${i.period?" · "+esc(i.period):""}</div></div>
+      <div class="amt">${money(i.amount)}</div></div>
+    <div class="inv-sub">
+      <button class="pill ${i.status}" data-act="toggle" data-id="${i.id}" title="Tap to switch paid / unpaid">${i.status==="paid"?"Paid":"Unpaid"}</button>
+      ${i.myp?.number?`<span class="mypb${i.status==="paid"?" paid":""}" title="${esc(i.myp.status||"")}">In MYP${i.myp.status?" · "+esc(i.myp.status.replace(/([a-z])([A-Z])/g,"$1 $2")):""}</span>`:""}
+      ${i.note?`<span class="note">${esc(i.note)}</span>`:""}
+    </div>
+    <div class="tw"><table>
+      <thead><tr><th>Support worker</th><th class="r">Paid to them</th><th class="r">Company profit</th></tr></thead>
+      <tbody>${rows || `<tr><td colspan="3" class="note">No workers added yet</td></tr>`}
+        <tr class="tot"><td>Total paid</td><td class="r num">${money(c.paid)}</td><td></td></tr>
+        <tr class="profit"><td>Invoice profit</td><td></td><td class="r num ${c.profit<0?"neg":"pos"}">${money(c.profit)}</td></tr>
+      </tbody></table></div>
+    <div class="inv-foot">${i.myp?.number?"":`<button class="btn ghost" data-act="push" data-id="${i.id}">Send to MYP</button>`}<button class="btn ghost" data-act="edit" data-id="${i.id}">Edit</button></div>
+  </article>`;
+}
+
+function paintWorkers(rows){
+  const map = new Map();
+  rows.forEach(i=>i.workers.forEach(w=>{
+    const k = w.name.trim().toLowerCase(); if(!k) return;
+    if(!map.has(k)) map.set(k,{name:w.name.trim(),lines:[],total:0,profit:0,hasProfit:false});
+    const m = map.get(k), p = wProfit(w);
+    m.lines.push({client:i.client,inv:i.invoiceNo,period:i.period,paid:num(w.paid),profit:p,status:i.status});
+    m.total += num(w.paid); if(p!==null){m.profit+=p;m.hasProfit=true;}
+  }));
+  const list = [...map.values()].sort((a,b)=>b.total-a.total);
+  if(!list.length) return `<div class="empty">No support workers in this view.</div>`;
+  return `<div class="grid">` + list.map(m=>`<article class="wk">
+    <div class="wk-head"><b>${esc(m.name)}</b><span class="chip">${new Set(m.lines.map(l=>l.client)).size} client${new Set(m.lines.map(l=>l.client)).size===1?"":"s"}</span></div>
+    <div class="tw"><table><thead><tr><th>Client · invoice</th><th class="r">Paid to them</th><th class="r">Profit</th></tr></thead><tbody>
+    ${m.lines.map(l=>`<tr><td>${esc(l.client)}<div class="note mono">${esc(l.inv)}</div></td><td class="r num">${money(l.paid)}</td><td class="r num">${l.profit===null?"<span class=note>—</span>":money(l.profit)}</td></tr>`).join("")}
+    <tr class="tot"><td>Total</td><td class="r num">${money(m.total)}</td><td class="r num">${m.hasProfit?money(m.profit):""}</td></tr>
+    </tbody></table></div></article>`).join("") + `</div>`;
+}
+
+function render(){
+  paintPeriods();
+  const rows = filtered();
+  paintStats(rows); paintBanner();
+  $("#vClients").setAttribute("aria-pressed", view==="clients");
+  $("#vWorkers").setAttribute("aria-pressed", view==="workers");
+  if (view==="workers") $("#list").innerHTML = paintWorkers(rows);
+  else $("#list").innerHTML = rows.length
+    ? `<div class="grid">${[...rows].sort((a,b)=>(b.date||"").localeCompare(a.date||"")||(a.status===b.status?0:a.status==="unpaid"?-1:1)||a.client.localeCompare(b.client)).map(invCard).join("")}</div>`
+    : `<div class="empty">No invoices match. Change the filters or add a new invoice.</div>`;
+}
+
+/* ---------- toast ---------- */
+let tt; function toast(m){ let t=$(".toast"); if(!t){t=document.createElement("div");t.className="toast";document.body.append(t);} t.textContent=m; t.hidden=false; clearTimeout(tt); tt=setTimeout(()=>t.hidden=true,2400); }
+
+/* ---------- list actions ---------- */
+document.addEventListener("click", e=>{
+  const b = e.target.closest("[data-act]"); if(!b) return;
+  const act=b.dataset.act, id=b.dataset.id;
+  if (act==="new") openEditor();
+  if (act==="reseed" || act==="clear") {
+    if(!b.dataset.arm){ b.dataset.arm="1"; b.textContent = act==="clear" ? "Tap again — wipes every invoice" : "Tap again — replaces the book with demo data"; return; }
+    S.invoices = act==="clear" ? [] : seedBook(); S.cleared = act==="clear"; persist(); render(); toast(act==="clear"?"Ledger cleared":"Demo book loaded");
+  }
+  if (act==="push") { openPush(S.invoices.find(i=>i.id===id)); return; }
+  if (act==="edit") { if(usingExamples()) { toast("That's an example — add your own invoice first"); return; } openEditor(S.invoices.find(i=>i.id===id)); }
+  if (act==="toggle") {
+    if(usingExamples()){ toast("That's an example — add your own invoice first"); return; }
+    const i = S.invoices.find(x=>x.id===id); if(!i) return;
+    i.status = i.status==="paid"?"unpaid":"paid"; persist(); render();
+    toast(`${i.invoiceNo} marked ${i.status}`);
+  }
+});
+$("#newBtn").onclick = ()=>openEditor();
+["#period","#clientF","#statusF"].forEach(s=>$(s).onchange=render);
+$("#q").oninput = render;
+$("#vClients").onclick = ()=>{view="clients";savePrefs();render();};
+$("#vWorkers").onclick = ()=>{view="workers";savePrefs();render();};
+
+/* ---------- editor ---------- */
+let editing = null;
+function wRow(w={name:"",billed:"",paid:""}){
+  const d=document.createElement("div"); d.className="wrow";
+  d.innerHTML=`<input type="text" list="dlWorkers" placeholder="Name" aria-label="Worker name" value="${esc(w.name)}">
+    <input type="number" step="0.01" min="0" placeholder="optional" aria-label="Billed for this worker" value="${w.billed??""}">
+    <input type="number" step="0.01" min="0" placeholder="0.00" aria-label="Paid to this worker" value="${w.paid??""}">
+    <button type="button" class="x" aria-label="Remove worker">×</button>`;
+  d.querySelector(".x").onclick=()=>{d.remove();edCalc();};
+  d.querySelectorAll("input").forEach(x=>x.oninput=edCalc);
+  $("#wRows").append(d);
+}
+function readWorkers(){
+  return [...$("#wRows").children].map(r=>{const [n,b,p]=r.querySelectorAll("input");
+    const prev = editing?.workers?.find(w=>w.name.trim().toLowerCase()===n.value.trim().toLowerCase());
+    return {name:n.value.trim(), billed:b.value===""?null:num(b.value), paid:num(p.value), ...(prev?.staffGuid?{staffGuid:prev.staffGuid}:{})};}).filter(w=>w.name||w.paid);
+}
+function edCalc(){
+  const ws=readWorkers(), amt=num($("#fAmt").value), paid=ws.reduce((a,w)=>a+w.paid,0), billed=ws.reduce((a,w)=>a+(w.billed??0),0);
+  const anyB = ws.some(w=>w.billed!==null);
+  $("#edCalc").innerHTML = `<span>Paid to workers <b>${money(paid)}</b></span><span>Company profit <b class="${amt-paid<0?"neg":"pos"}">${money(amt-paid)}</b></span>`+
+    (anyB && Math.abs(billed-amt)>0.5 ? `<span class="note">Billed lines add to ${money(billed)} — the invoice is ${money(amt)}</span>`:"");
+}
+function openEditor(inv){
+  editing = inv||null;
+  $("#edTitle").textContent = inv?"Edit invoice":"New invoice";
+  $("#fClient").value = inv?.client||""; $("#fInv").value = inv?.invoiceNo||"";
+  $("#fAmt").value = inv?.amount??""; $("#fPeriod").value = inv?.period || ($("#period").value||S.invoices.at(-1)?.period||"");
+  $("#fStatus").value = inv?.status||"unpaid"; $("#fDate").value = inv?.date||""; $("#fNote").value = inv?.note||"";
+  $("#wRows").innerHTML=""; (inv?.workers?.length?inv.workers:[{name:"",billed:"",paid:""}]).forEach(wRow);
+  $("#edDel").hidden = !inv; $("#edDel").textContent="Delete invoice"; $("#edDel").dataset.arm="";
+  edCalc(); $("#edScrim").hidden=false; setTimeout(()=>$("#fClient").focus(),30);
+}
+function closeEditor(){ $("#edScrim").hidden=true; editing=null; }
+$("#addW").onclick=()=>{wRow(); $("#wRows").lastElementChild.querySelector("input").focus();};
+$("#fAmt").oninput=edCalc;
+$("#edClose").onclick=$("#edCancel").onclick=closeEditor;
+$("#edScrim").addEventListener("click",e=>{ if(e.target.id==="edScrim") closeEditor(); });
+$("#edDel").onclick=()=>{
+  const b=$("#edDel");
+  if(!b.dataset.arm){ b.dataset.arm="1"; b.textContent="Tap again to delete"; return; }
+  S.invoices = S.invoices.filter(i=>i.id!==editing.id); persist(); closeEditor(); render(); toast("Invoice deleted");
+};
+$("#edForm").onsubmit=e=>{
+  e.preventDefault();
+  const rec = {id: editing?.id||uid(), myp: editing?.myp, client:$("#fClient").value.trim(), invoiceNo:$("#fInv").value.trim(), amount:num($("#fAmt").value),
+    period:$("#fPeriod").value.trim(), status:$("#fStatus").value, date:$("#fDate").value, note:$("#fNote").value.trim(), workers:readWorkers()};
+  if(!rec.client||!rec.invoiceNo){ toast("Add the participant and invoice number"); return; }
+  const dup = S.invoices.find(i=>i.invoiceNo.toLowerCase()===rec.invoiceNo.toLowerCase() && i.id!==rec.id);
+  if(dup){ toast(`${rec.invoiceNo} is already in the ledger (${dup.client})`); return; }
+  if(editing) S.invoices[S.invoices.findIndex(i=>i.id===editing.id)] = rec; else S.invoices.push(rec);
+  persist(); closeEditor(); render(); toast("Invoice saved");
+};
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ if(!$("#edScrim").hidden) closeEditor(); }});
+
+/* ---------- Excel export (his layout) + restore ---------- */
+function buildWorkbook(rows){
+  const XL = window.XLSX, wb = XL.utils.book_new();
+  const ledger = [["Participant","Invoice number","Full amount","Paid / unpaid","Pay period",""],[]];
+  const byPeriod = rows;
+  byPeriod.forEach(i=>{
+    const c=calc(i);
+    ledger.push([i.client,i.invoiceNo,num(i.amount),i.status==="paid"?"Paid":"Unpaid",i.period||"",i.note||""]);
+    ledger.push(["  Workers name","Workers payments","Company profit"]);
+    i.workers.forEach(w=>{const p=wProfit(w); ledger.push(["  "+w.name,num(w.paid),p===null?"":p]);});
+    ledger.push(["  Total amount been paid",c.paid,""]);
+    ledger.push(["  Company profit (invoice)","",c.profit]);
+    ledger.push([]);
+  });
+  const ws1 = XL.utils.aoa_to_sheet(ledger); ws1["!cols"]=[{wch:34},{wch:18},{wch:16},{wch:14},{wch:24},{wch:24}];
+  XL.utils.book_append_sheet(wb, ws1, "Ledger");
+
+  const wm=new Map(); rows.forEach(i=>i.workers.forEach(w=>{const k=w.name.trim(); if(!k)return; (wm.get(k)||wm.set(k,[]).get(k)).push([k,i.client,i.invoiceNo,num(w.paid)]);}));
+  const wk=[["Worker","Client","Invoice","Paid to them"]];
+  [...wm.keys()].sort().forEach(k=>{ const ls=wm.get(k); ls.forEach(l=>wk.push(l)); wk.push([k+" — total","","",ls.reduce((a,l)=>a+l[3],0)]); wk.push([]); });
+  const ws2=XL.utils.aoa_to_sheet(wk); ws2["!cols"]=[{wch:28},{wch:28},{wch:16},{wch:14}];
+  XL.utils.book_append_sheet(wb, ws2, "By worker");
+
+  const dat=[["id","period","client","invoiceNo","amount","status","date","note","worker","billed","paid","mypGuid","mypNumber","mypStatus","staffGuid"]];
+  rows.forEach(i=>{ const ws=i.workers.length?i.workers:[{name:"",billed:null,paid:""}];
+    ws.forEach(w=>dat.push([i.id,i.period,i.client,i.invoiceNo,num(i.amount),i.status,i.date||"",i.note||"",w.name,w.billed??"",w.paid===""?"":num(w.paid),i.myp?.guid||"",i.myp?.number||"",i.myp?.status||"",w.staffGuid||""])); });
+  XL.utils.book_append_sheet(wb, XL.utils.aoa_to_sheet(dat), "Data (for import)");
+  return wb;
+}
+let downloads=null;
+$("#expBtn").onclick=async()=>{
+  if(!window.XLSX){ toast("Excel tools are still loading — try again in a second"); return; }
+  if(usingExamples()){ toast("Add an invoice first — there's nothing of yours to export yet"); return; }
+  const rows=filtered(); const per=$("#period").value;
+  const buf = XLSX.write(buildWorkbook(rows),{bookType:"xlsx",type:"array"});
+  const name = `Payments ledger${per?" - "+per.replace(/[\\/:*?"<>|]/g,"-"):""} ${new Date().toISOString().slice(0,10)}.xlsx`;
+  if(!downloads){ toast("Downloads aren't available in this view"); return; }
+  try{ await downloads.save({filename:name,data:new Blob([buf])}); toast("Exported"); }
+  catch(e){ if(e?.code!=="declined") toast("Couldn't save the file here"); }
+};
+$("#impBtn").onclick=()=>$("#impFile").click();
+$("#impFile").onchange=async e=>{
+  const f=e.target.files[0]; e.target.value=""; if(!f) return;
+  if(!window.XLSX){ toast("Excel tools are still loading — try again"); return; }
+  try{
+    const wb=XLSX.read(await f.arrayBuffer());
+    const sh=wb.Sheets["Data (for import)"] || wb.Sheets[wb.SheetNames.find(n=>/data/i.test(n))||""];
+    if(!sh){ toast("That file wasn't exported from this ledger — use “Fill from MYP” for other files"); return; }
+    const rows=XLSX.utils.sheet_to_json(sh,{defval:""}); const by=new Map();
+    rows.forEach(r=>{ const k=String(r.id||r.invoiceNo); if(!k) return;
+      if(!by.has(k)) by.set(k,{id:String(r.id||uid()),period:String(r.period),client:String(r.client),invoiceNo:String(r.invoiceNo),amount:num(r.amount),
+        status:String(r.status).toLowerCase()==="paid"?"paid":"unpaid",date:String(r.date||""),note:String(r.note||""),workers:[],
+        ...(r.mypGuid||r.mypNumber?{myp:{guid:String(r.mypGuid||""),number:String(r.mypNumber||""),status:String(r.mypStatus||"")}}:{})});
+      if(String(r.worker).trim()) by.get(k).workers.push({name:String(r.worker).trim(),billed:r.billed===""?null:num(r.billed),paid:num(r.paid),...(r.staffGuid?{staffGuid:String(r.staffGuid)}:{})}); });
+    let add=0, upd=0;
+    by.forEach(v=>{ const at=S.invoices.findIndex(i=>i.id===v.id||i.invoiceNo.toLowerCase()===v.invoiceNo.toLowerCase());
+      if(at>=0){S.invoices[at]={...v,id:S.invoices[at].id};upd++;} else {S.invoices.push(v);add++;} });
+    persist(); render(); toast(`Imported: ${add} new, ${upd} updated`);
+  }catch(err){ toast("Couldn't read that file"); }
+};
+
+/* ---------- MYP bridge ---------- */
+const MYP = { refs:null, pulled:null, pay:{} };
+const PINKEY = KEY+"_mypin", DFKEY = KEY+"_mypdef";
+const getPin = () => { try{ return localStorage.getItem(PINKEY)||""; }catch(e){ return ""; } };
+function askPin(msg){ const v = prompt(msg||"Ledger PIN (set in Netlify as LEDGER_PIN)"); if(v===null) return null; try{ localStorage.setItem(PINKEY, v.trim()); }catch(e){} return v.trim(); }
+async function mypApi(action, extra={}, retry=true){
+  let r, d=null;
+  for (let attempt=0; attempt<4; attempt++){
+    r = await fetch("/api/myp", {method:"POST", headers:{"content-type":"application/json"}, body: JSON.stringify({action, pin:getPin(), ...extra})});
+    const txt = await r.text();
+    try{ d = JSON.parse(txt); break; }catch(e){ d={error:"server", message:"The bridge didn’t answer properly"}; }
+    if (r.status < 500 || attempt===3) break;
+    await new Promise(res=>setTimeout(res, 350*(attempt+1)));
+  }
+  if (r.status===401 && d?.error==="pin" && retry){ const p = askPin("This ledger needs its PIN to talk to MYP. Enter the ledger PIN:"); if(p===null) throw d; return mypApi(action, extra, false); }
+  if (!r.ok) throw d;
+  return d;
+}
+const defaults = () => { try{ return JSON.parse(localStorage.getItem(DFKEY)||"{}"); }catch(e){ return {}; } };
+const saveDefaults = (o) => { try{ localStorage.setItem(DFKEY, JSON.stringify({...defaults(), ...o})); }catch(e){} };
+const isoDay = d => d.toISOString().slice(0,10);
+const MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+function fmtPeriod(a,b){ if(!a) return ""; const A=new Date(a+"T00:00:00"), B=new Date((b||a)+"T00:00:00");
+  return `${A.getDate()} ${MON[A.getMonth()]} – ${B.getDate()} ${MON[B.getMonth()]} ${B.getFullYear()}`; }
+function parsePeriod(p){ const m = /^(\d{1,2}) (\w{3}) – (\d{1,2}) (\w{3}) (\d{4})$/.exec(p||""); if(!m) return null;
+  const y=+m[5], m1=MON.indexOf(m[2]), m2=MON.indexOf(m[4]); if(m1<0||m2<0) return null;
+  const y1 = m1>m2 ? y-1 : y; return {start:isoDay(new Date(Date.UTC(y1,m1,+m[1]))), end:isoDay(new Date(Date.UTC(y,m2,+m[3])))}; }
+const norm = s => String(s||"").toLowerCase().replace(/[^a-z0-9]/g,"");
+function bestMatch(name, list){ const n=norm(name); if(!n) return null;
+  return list.find(x=>norm(x.name)===n) || list.find(x=>norm(x.name).includes(n)||n.includes(norm(x.name))) || null; }
+
+function setConn(state, txt){ const c=$("#mypConn"); c.className="conn "+state; $("#mypConnTxt").textContent=txt; }
+async function mypStatus(){
+  setConn("", "Checking the connection…"); $("#mypSetup").hidden=true; $("#mypReady").hidden=true;
+  try{
+    const st = await mypApi("status");
+    if(!st.configured){ setConn("warn","Not connected — MYP credentials haven’t been added yet"); $("#mypSetup").hidden=false; return; }
+    if(!st.connected){ setConn("bad", "MYP refused the connection: "+(st.message||st.error)); $("#mypSetup").hidden=false; return; }
+    setConn("ok","Connected to MYP"+(st.pinSet?"":" · no ledger PIN set (anyone with the link could use this — set LEDGER_PIN in Netlify)")); $("#mypReady").hidden=false;
+    if(!MYP.refs) loadRefs();
+  }catch(e){ setConn("bad","Couldn’t reach the bridge: "+(e.message||e.error||"unknown")); }
+}
+async function loadRefs(){
+  $("#mypStatus").textContent="Loading participants, staff and price books…";
+  try{ MYP.refs = await mypApi("refs"); paintDefaults(); $("#mypStatus").textContent=`${MYP.refs.contacts.length} participants · ${MYP.refs.staff.length} staff · ${MYP.refs.pricebooks.reduce((a,b)=>a+b.products.length,0)} products`; }
+  catch(e){ $("#mypStatus").textContent=""; $("#mypErr").textContent="Couldn’t load MYP lists: "+(e.message||e.error); }
+}
+function productOptions(sel, chosen){
+  sel.innerHTML = (MYP.refs?.pricebooks||[]).map(b=>`<optgroup label="${esc(b.name)}">`+b.products.map(p=>`<option value="${b.guid}|${p.guid}" ${chosen===b.guid+"|"+p.guid?"selected":""}>${esc(p.code?p.code+" · ":"")}${esc(p.name)}${p.price?" · "+money(p.price):""}</option>`).join("")+`</optgroup>`).join("");
+}
+function paintDefaults(){
+  const d=defaults(), R=MYP.refs;
+  productOptions($("#dfProduct"), d.product);
+  $("#dfStaff").innerHTML = R.staff.map(x=>`<option value="${x.guid}" ${d.staff===x.guid?"selected":""}>${esc(x.name)}</option>`).join("");
+  $("#dfCC").innerHTML = `<option value="">— none —</option>`+R.costcentres.map(x=>`<option value="${x.guid}" ${d.cc===x.guid?"selected":""}>${esc(x.name)}</option>`).join("");
+  $("#dfClaim").value = d.claim||"InvoiceToNdia";
+  ["#dfProduct","#dfStaff","#dfCC","#dfClaim"].forEach(id=>$(id).onchange=()=>saveDefaults({product:$("#dfProduct").value, staff:$("#dfStaff").value, cc:$("#dfCC").value, claim:$("#dfClaim").value}));
+}
+$("#mypBtn").onclick=()=>{ const t=new Date(), f=new Date(t-60*864e5); $("#mypFrom").value=isoDay(f); $("#mypTo").value=isoDay(t);
+  const sel=parsePeriod($("#period").value); if(sel){ $("#mypFrom").value=sel.start; $("#mypTo").value=sel.end; }
+  $("#mypErr").textContent=""; $("#mypPrev").innerHTML=""; $("#mypImport").hidden=true; $("#mypScrim").hidden=false; mypStatus(); };
+$("#mypClose").onclick=()=>$("#mypScrim").hidden=true;
+$("#mypScrim").addEventListener("click",e=>{ if(e.target.id==="mypScrim") $("#mypScrim").hidden=true; });
+$("#mypRecheck").onclick=mypStatus;
+$("#mypPin").onclick=()=>{ if(askPin("Ledger PIN (the LEDGER_PIN value in Netlify):")!==null) toast("PIN saved on this device"); };
+$("#mypPull").onclick=async()=>{
+  $("#mypErr").textContent=""; $("#mypPull").disabled=true; $("#mypStatus").textContent="Pulling from MYP…"; $("#mypImport").hidden=true;
+  try{
+    const d = await mypApi("pull",{from:$("#mypFrom").value,to:$("#mypTo").value});
+    MYP.pulled=d.invoices; MYP.pay=d.pay||{};
+    const byNo = new Map(S.invoices.map(i=>[i.invoiceNo.toLowerCase(),i]));
+    if(!d.invoices.length){ $("#mypPrev").innerHTML=`<div class="empty">MYP has no invoices in that window.</div>`; $("#mypStatus").textContent=""; return; }
+    $("#mypPrev").innerHTML=`<div class="prev">${d.invoices.map(i=>{const ex=byNo.get(i.invoiceNo.toLowerCase());
+      return `<div class="prev-row"><div><b>${esc(i.client)||"(no participant)"}</b> <span class="note mono">${esc(i.invoiceNo)}</span><div class="note">${i.workers.map(w=>esc(w.name)).join(", ")||"no staff on it"} · ${esc(i.note)}</div></div>
+      <div class="num" style="text-align:right">${money(i.amount)}<div class="note">${ex?"update":"new"}</div></div></div>`;}).join("")}</div>`;
+    const payN=Object.keys(MYP.pay).length;
+    $("#mypStatus").textContent=`${d.invoices.length} invoice${d.invoices.length===1?"":"s"}${payN?` · timesheet pay for ${payN} worker${payN===1?"":"s"}`:""}${d.payNote?" · "+d.payNote:""}`;
+    $("#mypImport").hidden=false;
+  }catch(e){ $("#mypStatus").textContent=""; $("#mypErr").textContent=(e.message||e.error||"Pull failed")+(e.detail?" — "+JSON.stringify(e.detail).slice(0,200):""); }
+  finally{ $("#mypPull").disabled=false; }
+};
+$("#mypImport").onclick=()=>{
+  const pulled=MYP.pulled||[]; let add=0,upd=0;
+  const billedByWorker={}; pulled.forEach(i=>i.workers.forEach(w=>{ billedByWorker[w.name]=(billedByWorker[w.name]||0)+num(w.billed); }));
+  pulled.forEach(p=>{
+    const at=S.invoices.findIndex(i=>(p.myp.guid&&i.myp?.guid===p.myp.guid)||i.invoiceNo.toLowerCase()===p.invoiceNo.toLowerCase());
+    const period = fmtPeriod(p.start,p.end);
+    const workers = p.workers.map(w=>{ const tot=MYP.pay[w.name]; const share = tot&&billedByWorker[w.name] ? +(tot*num(w.billed)/billedByWorker[w.name]).toFixed(2) : 0;
+      return {name:w.name, staffGuid:w.staffGuid, billed:w.billed, paid:share}; });
+    if(at>=0){ const cur=S.invoices[at];
+      const merged = workers.map(w=>{ const old=cur.workers.find(x=>x.name.trim().toLowerCase()===w.name.trim().toLowerCase()); return old?{...w, paid: old.paid||w.paid, billed: old.billed??w.billed}:w; });
+      cur.workers.filter(x=>!merged.some(m=>m.name.trim().toLowerCase()===x.name.trim().toLowerCase())).forEach(x=>merged.push(x));
+      S.invoices[at]={...cur, myp:p.myp, client:p.client||cur.client, amount:p.amount||cur.amount, status:p.status, date:p.date||cur.date, period:cur.period||period, note:cur.note||p.note, workers:merged}; upd++;
+    } else { S.invoices.push({id:uid(), myp:p.myp, client:p.client, invoiceNo:p.invoiceNo, amount:p.amount, status:p.status, date:p.date, period, note:p.note, workers}); add++; }
+  });
+  S.cleared=false; persist(); render(); $("#mypScrim").hidden=true; toast(`From MYP: ${add} new, ${upd} updated`);
+};
+
+/* push one invoice */
+let pushing=null;
+function pLine(w){
+  const d=document.createElement("div"); d.className="prow";
+  d.innerHTML=`<input type="text" value="${esc(w.label)}" aria-label="Line note"><input type="number" step="0.01" min="0" value="${w.amount}" aria-label="Amount"><button type="button" class="x" aria-label="Remove line">×</button>`;
+  d.querySelector(".x").onclick=()=>d.remove(); $("#pLines").append(d);
+}
+async function openPush(inv){
+  if(!inv) return;
+  if(!MYP.refs){ toast("Open ⇄ MYP first so it can load your MYP lists"); $("#mypBtn").click(); return; }
+  pushing=inv; const R=MYP.refs, d=defaults();
+  $("#pushErr").textContent=""; $("#pushStatus").textContent="";
+  $("#pushHead").innerHTML=`<span><b>${esc(inv.client)}</b></span><span>Invoice <b>${money(inv.amount)}</b></span><span class="note">${esc(inv.period||"")}</span>`;
+  const cm = bestMatch(inv.client, R.contacts);
+  $("#pContact").innerHTML=`<option value="">— pick the participant —</option>`+R.contacts.map(c=>`<option value="${c.guid}" ${cm?.guid===c.guid?"selected":""}>${esc(c.name)}${c.ndis?" · "+esc(c.ndis):""}</option>`).join("");
+  $("#pInvNo").value=inv.invoiceNo;
+  const per=parsePeriod(inv.period)||{start:inv.date||isoDay(new Date()),end:inv.date||isoDay(new Date())};
+  $("#pStart").value=per.start; $("#pEnd").value=per.end;
+  $("#pClaim").value=d.claim||"InvoiceToNdia";
+  const wm = inv.workers.map(w=>w.staffGuid||bestMatch(w.name,R.staff)?.guid).filter(Boolean)[0];
+  $("#pStaff").innerHTML=R.staff.map(x=>`<option value="${x.guid}" ${(d.staff||wm)===x.guid?"selected":""}>${esc(x.name)}</option>`).join("");
+  productOptions($("#pProduct"), d.product);
+  $("#pLines").innerHTML="";
+  const ws = inv.workers.filter(w=>w.name);
+  if(ws.length){ const anyB=ws.some(w=>w.billed!==null&&w.billed!==undefined&&w.billed!==""); const sumB=ws.reduce((a,w)=>a+(num(w.billed)||0),0);
+    ws.forEach(w=>{ const amt = anyB&&sumB ? +(num(inv.amount)*num(w.billed)/sumB).toFixed(2) : +(num(inv.amount)/ws.length).toFixed(2); pLine({label:`Support — ${w.name}`, amount:amt}); }); }
+  else pLine({label:"Support services", amount:num(inv.amount)});
+  $("#pushScrim").hidden=false;
+}
+const closePush=()=>{ $("#pushScrim").hidden=true; pushing=null; };
+$("#pushClose").onclick=$("#pushCancel").onclick=closePush;
+$("#pushScrim").addEventListener("click",e=>{ if(e.target.id==="pushScrim") closePush(); });
+$("#pushForm").onsubmit=async e=>{
+  e.preventDefault(); if(!pushing) return;
+  const [priceBookGuid, productGuid]=($("#pProduct").value||"|").split("|");
+  const lines=[...$("#pLines").children].map(r=>{const [n,a]=r.querySelectorAll("input"); return {notes:n.value.trim(), qty:1, price:num(a.value), priceBookGuid, productGuid, costCentreGuid:defaults().cc||"", tax:34700};}).filter(l=>l.price>0);
+  if(!$("#pContact").value){ $("#pushErr").textContent="Pick the participant in MYP."; return; }
+  if(!lines.length){ $("#pushErr").textContent="Add at least one line with an amount."; return; }
+  const tot=lines.reduce((a,l)=>a+l.price,0); if(Math.abs(tot-num(pushing.amount))>0.05 && !confirm(`Lines add to ${money(tot)} but the invoice is ${money(pushing.amount)}. Send anyway?`)) return;
+  $("#pushGo").disabled=true; $("#pushErr").textContent=""; $("#pushStatus").textContent="Sending to MYP…";
+  saveDefaults({product:$("#pProduct").value, staff:$("#pStaff").value, claim:$("#pClaim").value});
+  const invoice={invoiceNo:$("#pInvNo").value.trim(), contactGuid:$("#pContact").value, staffGuid:$("#pStaff").value, start:$("#pStart").value, end:$("#pEnd").value, claimType:$("#pClaim").value, lines};
+  try{
+    let d; try{ d=await mypApi("push",{invoice}); }
+    catch(err){ if(err?.error==="myp" && err?.detail && confirm("MYP sent a warning:\n"+JSON.stringify(err.detail).slice(0,400)+"\n\nSend it anyway?")) d=await mypApi("push",{invoice:{...invoice,ignoreWarnings:true}}); else throw err; }
+    const i=S.invoices.find(x=>x.id===pushing.id); if(i){ i.myp=d.myp; if(d.myp.number) i.invoiceNo=d.myp.number; const cname=MYP.refs.contacts.find(c=>c.guid===invoice.contactGuid)?.name; if(cname) i.client=cname;
+      i.workers.forEach(w=>{ const m=bestMatch(w.name,MYP.refs.staff); if(m) w.staffGuid=m.guid; }); }
+    persist(); render(); closePush(); toast(`Sent to MYP as ${d.myp.number||"a new invoice"}`);
+  }catch(err){ $("#pushStatus").textContent=""; $("#pushErr").textContent=(err.message||err.error||"Send failed")+(err.detail?" — "+JSON.stringify(err.detail).slice(0,300):""); }
+  finally{ $("#pushGo").disabled=false; }
+};
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"){ if(!$("#mypScrim").hidden) $("#mypScrim").hidden=true; if(!$("#pushScrim").hidden) closePush(); }});
+
+/* ---------- boot ---------- */
+paintSaveState(); render();
+(async()=>{
+  if(window.claude?.use){ claude.use("downloads").then(d=>{ downloads=d; }); return; }
+  downloads = { save: async ({filename,data}) => { const u=URL.createObjectURL(data); const a=document.createElement("a"); a.href=u; a.download=filename; document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),4000); return {status:"saved"}; } };
+})();
+</script>
+
+</body></html>

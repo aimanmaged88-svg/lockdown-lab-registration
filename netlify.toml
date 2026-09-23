@@ -43,3 +43,11 @@
     X-Frame-Options = "SAMEORIGIN"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+
+# --- Abbas ledger source lives in _abbas-ledger/ but is its OWN Netlify site
+# (abbas-ledger.netlify.app). Never serve it from here.
+[[redirects]]
+  from = "/_abbas-ledger/*"
+  to = "/404.html"
+  status = 404
+  force = true
