@@ -1,0 +1,1062 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Coachbuilt — one system your club actually owns</title>
+<meta name="description" content="Gyms, clubs and academies rent five bits of software that don't talk to each other. I build you one system with your name on it, and run it for you. One monthly fee, build included.">
+<meta property="og:title" content="Coachbuilt — one system your club actually owns">
+<meta property="og:description" content="Built by a coach, not an agency. Five days from a phone call to a working system with your name on it.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#15130F">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2315130F'/%3E%3Cpath d='M11 26v-7a5 5 0 0 1 10 0v7' stroke='%23D4541F' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="preload" href="assets/fonts/inter-var.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+@font-face{font-family:CB;src:url('assets/fonts/inter-var.woff2') format('woff2');font-weight:100 900;font-display:swap}
+@font-face{font-family:CBL;src:url('assets/fonts/chakrapetch-600.woff2') format('woff2');font-weight:600;font-display:swap}
+
+:root{
+  --paper:#F4F1EA; --paper2:#EAE5DA; --paper3:#DFD9CB;
+  --ink:#15130F; --ink2:#292520; --muted:#6C665A; --dim:#918A7C;
+  --line:rgba(21,19,15,.13); --line2:rgba(21,19,15,.07);
+  --accent:#D4541F; --accent-d:#B0400F; --accent-w:rgba(212,84,31,.10);
+  --ok:#2C7A57;
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --maxw:1080px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{
+  background:var(--paper);color:var(--ink);
+  font-family:CB,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  font-size:17px;line-height:1.6;font-weight:400;
+  -webkit-font-smoothing:antialiased;overflow-x:hidden;
+}
+img{max-width:100%;display:block}
+a{color:inherit}
+::selection{background:var(--accent);color:#fff}
+
+.w{width:100%;max-width:var(--maxw);margin:0 auto;padding:0 20px}
+.wn{width:100%;max-width:720px;margin:0 auto;padding:0 20px}
+
+/* ---------- type ---------- */
+h1,h2,h3{font-weight:800;letter-spacing:-.033em;line-height:1.04;text-wrap:balance}
+h1{font-size:clamp(34px,8.4vw,68px)}
+h2{font-size:clamp(28px,6vw,46px)}
+h3{font-size:clamp(19px,3.4vw,24px);letter-spacing:-.022em;line-height:1.2}
+p{text-wrap:pretty}
+.lab{font-family:CBL,sans-serif;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.lead{font-size:clamp(17px,2.4vw,20px);color:var(--ink2);line-height:1.55}
+.sub{color:var(--muted)}
+.hl{color:var(--accent)}
+.sm{font-size:14.5px}
+.xs{font-size:13px}
+
+/* ---------- buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  padding:16px 26px;border-radius:999px;border:1px solid transparent;
+  font-family:CB,sans-serif;font-size:16.5px;font-weight:650;letter-spacing:-.01em;
+  text-decoration:none;cursor:pointer;background:var(--accent);color:#fff;
+  transition:transform .18s var(--ease),background .18s var(--ease),box-shadow .18s var(--ease);
+  box-shadow:0 2px 0 rgba(21,19,15,.16);
+}
+.btn:hover{background:var(--accent-d)}
+.btn:active{transform:translateY(2px);box-shadow:0 0 0 rgba(21,19,15,.16)}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line);box-shadow:none}
+.btn.ghost:hover{background:rgba(21,19,15,.05)}
+.btn.onink{background:var(--paper);color:var(--ink);box-shadow:0 2px 0 rgba(0,0,0,.4)}
+.btn.onink:hover{background:#fff}
+.btn.wide{width:100%}
+
+/* ---------- nav ---------- */
+.nav{
+  position:sticky;top:0;z-index:50;background:rgba(244,241,234,.82);
+  backdrop-filter:saturate(1.6) blur(14px);-webkit-backdrop-filter:saturate(1.6) blur(14px);
+  border-bottom:1px solid transparent;transition:border-color .2s var(--ease)
+}
+.nav.stuck{border-bottom-color:var(--line)}
+.nav .in{display:flex;align-items:center;justify-content:space-between;gap:14px;height:62px}
+.brand{display:flex;align-items:center;gap:9px;text-decoration:none;font-weight:800;letter-spacing:-.03em;font-size:18.5px}
+.brand .mk{width:26px;height:26px;flex:0 0 26px}
+.nav .lk{display:none;gap:26px;align-items:center}
+.nav .lk a{text-decoration:none;font-size:15px;font-weight:520;color:var(--muted)}
+.nav .lk a:hover{color:var(--ink)}
+.nav .btn{padding:10px 18px;font-size:14.5px}
+@media(min-width:880px){.nav .lk{display:flex}}
+
+/* ---------- hero ---------- */
+.hero{position:relative;padding:52px 0 60px;overflow:hidden}
+.hero .grid{
+  position:absolute;inset:-2px;pointer-events:none;opacity:.5;
+  background-image:linear-gradient(var(--line2) 1px,transparent 1px),linear-gradient(90deg,var(--line2) 1px,transparent 1px);
+  background-size:38px 38px;
+  -webkit-mask-image:radial-gradient(120% 78% at 50% 6%,#000 22%,transparent 76%);
+  mask-image:radial-gradient(120% 78% at 50% 6%,#000 22%,transparent 76%);
+}
+.hero .in{position:relative}
+.quote{
+  border-left:3px solid var(--accent);padding:4px 0 4px 18px;margin:0 0 26px;
+  font-size:clamp(17px,3.1vw,21px);font-weight:560;color:var(--ink2);line-height:1.45;max-width:560px;
+  letter-spacing:-.015em;
+}
+.quote .who{display:block;margin-top:9px;font-size:13.5px;font-weight:500;color:var(--dim);letter-spacing:0}
+h1 .u{
+  background-image:linear-gradient(transparent 62%,var(--accent-w) 62%);
+  padding:0 .06em;
+}
+.hero p.lead{margin-top:22px;max-width:580px}
+.cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:32px}
+.assure{display:flex;flex-wrap:wrap;gap:8px 20px;margin-top:26px;align-items:center}
+.assure span{display:inline-flex;align-items:center;gap:7px;font-size:14px;color:var(--muted)}
+.assure svg{flex:0 0 15px;color:var(--ok)}
+
+/* ---------- sections ---------- */
+section{padding:66px 0}
+.dark{background:var(--ink);color:var(--paper)}
+.dark h1,.dark h2,.dark h3{color:#fff}
+.dark .lab{color:#A69C89}
+.dark .sub,.dark .lead{color:#C3BCAE}
+.dark .card{background:#1E1A15;border-color:rgba(255,255,255,.1)}
+.tint{background:var(--paper2)}
+.head{max-width:640px;margin-bottom:38px}
+.head .lab{margin-bottom:14px;display:block}
+.head p{margin-top:16px}
+
+/* ---------- cards ---------- */
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;padding:24px}
+.cards{display:grid;gap:16px}
+@media(min-width:760px){.cards.c2{grid-template-columns:1fr 1fr}.cards.c3{grid-template-columns:repeat(3,1fr)}}
+
+/* ---------- the bill / calculator ---------- */
+.calc{display:grid;gap:22px}
+@media(min-width:900px){.calc{grid-template-columns:1.05fr .95fr;gap:30px;align-items:start}}
+.rows{display:flex;flex-direction:column;gap:2px}
+.row{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--line2)}
+.row:last-child{border-bottom:0}
+.row .nm{flex:1;min-width:0}
+.row .nm b{display:block;font-weight:600;font-size:15.5px;letter-spacing:-.012em}
+.row .nm i{display:block;font-style:normal;font-size:12.5px;color:var(--dim);margin-top:1px}
+.row .amt{display:flex;align-items:center;gap:3px;flex:0 0 auto;
+  background:#fff;border:1px solid var(--line);border-radius:10px;padding:8px 11px;
+  transition:border-color .18s var(--ease),box-shadow .18s var(--ease)}
+.row .amt:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-w)}
+.row .amt s{text-decoration:none;color:var(--dim);font-size:14px}
+.row .amt input{
+  width:74px;border:0;outline:0;background:transparent;text-align:right;
+  font-family:CB,sans-serif;font-size:16px;font-weight:650;color:var(--ink);letter-spacing:-.01em;
+  -moz-appearance:textfield;
+}
+.row .amt input::-webkit-outer-spin-button,.row .amt input::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.tally{background:var(--ink);color:var(--paper);border-radius:18px;padding:26px;position:sticky;top:78px}
+.tally .lab{color:#A69C89;display:block;margin-bottom:8px}
+.big{font-size:clamp(36px,8vw,52px);font-weight:800;letter-spacing:-.04em;line-height:1;color:#fff;font-variant-numeric:tabular-nums}
+.tally .yr{margin-top:6px;font-size:14.5px;color:#B5AC9A}
+.vs{margin-top:22px;padding-top:20px;border-top:1px solid rgba(255,255,255,.14)}
+.vs .line{display:flex;justify-content:space-between;align-items:baseline;gap:12px;padding:7px 0;font-size:15px;color:#C3BCAE}
+.vs .line b{color:#fff;font-weight:650;font-variant-numeric:tabular-nums}
+.verdict{margin-top:18px;border-radius:12px;padding:14px 16px;font-size:14.5px;line-height:1.5;background:rgba(255,255,255,.07);color:#DCD5C6}
+.verdict.good{background:rgba(44,122,87,.22);color:#9FE0C0}
+.verdict b{color:#fff}
+.pick{display:flex;gap:6px;margin-top:16px;background:rgba(255,255,255,.07);padding:4px;border-radius:999px}
+.pick button{
+  flex:1;border:0;background:transparent;color:#B5AC9A;padding:12px 6px;border-radius:999px;cursor:pointer;
+  font-family:CB,sans-serif;font-size:13px;font-weight:600;letter-spacing:-.01em;transition:all .18s var(--ease)
+}
+.pick button[aria-pressed="true"]{background:var(--accent);color:#fff}
+
+/* ---------- system diagram ---------- */
+.segs{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:26px}
+.segs button{
+  border:1px solid var(--line);background:#fff;color:var(--muted);border-radius:999px;
+  padding:9px 16px;cursor:pointer;font-family:CB,sans-serif;font-size:14px;font-weight:600;letter-spacing:-.01em;
+  transition:all .18s var(--ease)
+}
+.segs button[aria-pressed="true"]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.sysbox{border:1px solid var(--line);border-radius:18px;background:#fff;padding:22px 18px 18px;position:relative;overflow:hidden}
+.sysbox .grid2{position:absolute;inset:0;opacity:.6;pointer-events:none;
+  background-image:linear-gradient(var(--line2) 1px,transparent 1px),linear-gradient(90deg,var(--line2) 1px,transparent 1px);
+  background-size:26px 26px}
+.nodes{position:relative;display:flex;flex-wrap:wrap;gap:9px;justify-content:center}
+.node{
+  display:inline-flex;align-items:center;gap:8px;background:var(--paper);border:1px solid var(--line);
+  border-radius:999px;padding:10px 15px;font-size:14.5px;font-weight:600;letter-spacing:-.012em;
+  animation:pop .38s var(--ease) both;
+}
+.node .dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex:0 0 6px}
+@keyframes pop{from{opacity:0;transform:translateY(7px) scale(.96)}to{opacity:1;transform:none}}
+.sysfoot{position:relative;text-align:center;margin-top:20px;padding-top:16px;border-top:1px solid var(--line2)}
+.sysfoot .lab{color:var(--ink)}
+
+/* ---------- proof ---------- */
+.proof{display:grid;gap:16px}
+@media(min-width:820px){.proof{grid-template-columns:1fr 1fr}}
+.pcard{background:#1E1A15;border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:24px;display:flex;flex-direction:column}
+.pcard .tag{font-family:CBL,sans-serif;font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin-bottom:12px}
+.pcard h3{margin-bottom:10px}
+.pcard ul{list-style:none;margin:16px 0 0;display:flex;flex-direction:column;gap:9px}
+.pcard li{display:flex;gap:10px;font-size:14.5px;color:#C3BCAE;line-height:1.45}
+.pcard li svg{flex:0 0 15px;margin-top:4px;color:var(--accent)}
+.pcard .foot{margin-top:auto;padding-top:20px}
+
+/* ---------- steps ---------- */
+.steps{counter-reset:s;display:grid;gap:16px}
+@media(min-width:820px){.steps{grid-template-columns:repeat(3,1fr)}}
+.step{position:relative;padding-top:46px}
+.step:before{
+  counter-increment:s;content:counter(s);
+  position:absolute;top:0;left:0;width:34px;height:34px;border-radius:50%;
+  background:var(--ink);color:#fff;display:grid;place-items:center;
+  font-size:15px;font-weight:700;letter-spacing:-.02em;
+}
+.step h3{margin-bottom:8px}
+.step p{font-size:15.5px;color:var(--muted)}
+
+/* ---------- pricing ---------- */
+.plans{display:grid;gap:16px;align-items:start}
+@media(min-width:900px){.plans{grid-template-columns:repeat(3,1fr)}}
+.plan{background:#fff;border:1px solid var(--line);border-radius:18px;padding:26px;display:flex;flex-direction:column;position:relative}
+.plan.best{border-color:var(--ink);box-shadow:0 0 0 1px var(--ink),0 14px 34px -20px rgba(21,19,15,.5)}
+.plan .flag{
+  position:absolute;top:-11px;left:26px;background:var(--accent);color:#fff;border-radius:999px;
+  padding:4px 12px;font-family:CBL,sans-serif;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase
+}
+.plan .nm{font-family:CBL,sans-serif;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+.plan .pr{display:flex;align-items:baseline;gap:5px;margin:12px 0 4px}
+.plan .pr b{font-size:clamp(32px,6vw,42px);font-weight:800;letter-spacing:-.04em;line-height:1}
+.plan .pr s{text-decoration:none;font-size:15px;color:var(--muted);font-weight:500}
+.plan .who{font-size:14.5px;color:var(--muted);min-height:44px}
+.plan ul{list-style:none;margin:20px 0 0;display:flex;flex-direction:column;gap:11px;padding-top:20px;border-top:1px solid var(--line2)}
+.plan li{display:flex;gap:10px;font-size:15px;line-height:1.45}
+.plan li svg{flex:0 0 15px;margin-top:4px;color:var(--accent)}
+.plan li.was{color:var(--muted);font-weight:600}
+.plan .foot{margin-top:auto;padding-top:24px}
+.guar{margin-top:20px;border:1px solid var(--line);border-radius:16px;padding:22px;background:#fff;display:grid;gap:14px}
+@media(min-width:760px){.guar{grid-template-columns:1fr 1fr;gap:26px}}
+.guar h3{margin-bottom:7px}
+.guar p{font-size:15px;color:var(--muted)}
+
+/* ---------- faq ---------- */
+.faq{border-top:1px solid var(--line)}
+.faq details{border-bottom:1px solid var(--line)}
+.faq summary{
+  list-style:none;cursor:pointer;padding:20px 40px 20px 0;position:relative;
+  font-size:clamp(16.5px,2.4vw,19px);font-weight:650;letter-spacing:-.02em;line-height:1.35
+}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary:after{
+  content:'';position:absolute;right:6px;top:50%;width:11px;height:11px;margin-top:-7px;
+  border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);
+  transform:rotate(45deg);transition:transform .22s var(--ease)
+}
+.faq details[open] summary:after{transform:rotate(-135deg);margin-top:-2px}
+.faq .ans{padding:0 0 22px;color:var(--muted);font-size:16px;max-width:660px}
+.faq .ans p+p{margin-top:12px}
+
+/* ---------- form ---------- */
+.formwrap{background:#fff;border:1px solid var(--line);border-radius:20px;padding:26px 22px;box-shadow:0 20px 50px -34px rgba(21,19,15,.5)}
+/* The form is a light card inside a .dark section — without this every label
+   inherits paper-white and disappears against the white surface. */
+.dark .formwrap{color:var(--ink)}
+.dark .formwrap h3,.formwrap .q{color:var(--ink)}
+.dark .formwrap .sub,.dark .formwrap .done p{color:var(--muted)}
+.dark .formwrap .fset > legend{color:var(--dim)}
+.formwrap .hint{color:var(--dim)}
+.opt span{color:var(--ink)}
+.fld label{color:var(--ink)}
+.fld label s{color:var(--dim)}
+@media(min-width:760px){.formwrap{padding:34px}}
+.fset{border:0;padding:0;margin:0 0 26px}
+.fset:last-of-type{margin-bottom:0}
+.fset > legend{font-family:CBL,sans-serif;font-size:11.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;padding:0}
+.fset .q{font-size:17.5px;font-weight:650;letter-spacing:-.02em;margin-bottom:4px;line-height:1.3}
+.fset .hint{font-size:13.5px;color:var(--dim);margin-bottom:13px}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opt{position:relative}
+.opt input{position:absolute;opacity:0;width:0;height:0}
+.opt span{
+  display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--paper);
+  border-radius:999px;padding:11px 16px;cursor:pointer;font-size:14.5px;font-weight:550;letter-spacing:-.012em;
+  transition:all .16s var(--ease);user-select:none
+}
+.opt span:before{
+  content:'';width:15px;height:15px;border-radius:50%;border:1.5px solid var(--dim);flex:0 0 15px;
+  transition:all .16s var(--ease)
+}
+.opt input[type=checkbox]+span:before{border-radius:5px}
+.opt input:checked+span{border-color:var(--ink);background:var(--ink);color:#fff}
+.opt input:checked+span:before{border-color:var(--accent);background:var(--accent);box-shadow:inset 0 0 0 2.5px var(--ink)}
+.opt input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px}
+.fld{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.fld label{font-size:14px;font-weight:600;letter-spacing:-.01em}
+.fld label s{text-decoration:none;color:var(--dim);font-weight:400}
+.fld input,.fld textarea,.fld select{
+  width:100%;border:1px solid var(--line);border-radius:11px;background:var(--paper);
+  padding:14px 15px;font-family:CB,sans-serif;font-size:16.5px;color:var(--ink);
+  outline:0;transition:border-color .16s var(--ease),box-shadow .16s var(--ease)
+}
+.fld textarea{min-height:126px;resize:vertical;line-height:1.5}
+.fld input:focus,.fld textarea:focus,.fld select:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-w);background:#fff}
+.fld input::placeholder,.fld textarea::placeholder{color:var(--dim)}
+.two{display:grid;gap:0}
+@media(min-width:620px){.two{grid-template-columns:1fr 1fr;gap:0 14px}}
+.hp{position:absolute!important;left:-9999px;width:1px;height:1px;overflow:hidden}
+.err{background:rgba(212,84,31,.1);border:1px solid rgba(212,84,31,.34);color:var(--accent-d);
+  border-radius:11px;padding:13px 15px;font-size:14.5px;margin-bottom:14px;display:none}
+.err.on{display:block}
+.err a{color:var(--accent-d);font-weight:650}
+.done{display:none;text-align:center;padding:26px 6px}
+.done.on{display:block;animation:pop .4s var(--ease) both}
+.done .tick{width:62px;height:62px;border-radius:50%;background:var(--ok);display:grid;place-items:center;margin:0 auto 20px}
+.done h3{margin-bottom:10px}
+.done p{color:var(--muted);max-width:420px;margin:0 auto}
+form.gone{display:none}
+
+/* ---------- footer ---------- */
+/* Scoped to the page footer element: `.foot` is also the card-footer class
+   inside .plan / .pcard, and an unscoped `.foot a` greyed out every CTA. */
+footer.foot{border-top:1px solid var(--line);padding:38px 0;color:var(--muted)}
+footer.foot .in{display:flex;flex-wrap:wrap;gap:16px;justify-content:space-between;align-items:center}
+footer.foot a{color:var(--muted);text-decoration:none;font-size:14.5px}
+footer.foot a:hover{color:var(--ink)}
+footer.foot .links{display:flex;flex-wrap:wrap;gap:18px}
+
+/* ---------- reveal ---------- */
+.rv{opacity:0;transform:translateY(16px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.rv.in{opacity:1;transform:none}
+
+@media(prefers-reduced-motion:reduce){
+  *,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+  html{scroll-behavior:auto}
+  .rv{opacity:1;transform:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ================= NAV ================= -->
+<header class="nav" id="nav">
+  <div class="w in">
+    <a class="brand" href="#top">
+      <svg class="mk" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <rect x="1.4" y="1.4" width="29.2" height="29.2" rx="8" stroke="#15130F" stroke-width="2.4"/>
+        <path d="M11 31V22a5 5 0 0 1 10 0v9" stroke="#D4541F" stroke-width="2.4" stroke-linecap="round"/>
+        <path d="M16 1.4V22" stroke="#15130F" stroke-width="2.2" stroke-linecap="round" opacity=".26"/>
+      </svg>
+      Coachbuilt
+    </a>
+    <nav class="lk">
+      <a href="#bill">The bill</a>
+      <a href="#built">What I've built</a>
+      <a href="#price">Price</a>
+      <a href="#faq">Questions</a>
+    </nav>
+    <a class="btn" href="#apply">See if it fits</a>
+  </div>
+</header>
+
+<!-- ================= HERO ================= -->
+<main id="top">
+<section class="hero">
+  <div class="grid"></div>
+  <div class="w in">
+    <span class="lab">Coachbuilt · Sydney · Gyms, clubs &amp; academies</span>
+    <blockquote class="quote">
+      “I've got a booking app, a website guy, a spreadsheet and a group chat.
+      None of them talk to each other.”
+      <span class="who">— every gym owner I've ever spoken to</span>
+    </blockquote>
+    <h1>Stop renting five systems.<br>Own <span class="u">one</span> that fits how you actually run the place.</h1>
+    <p class="lead">
+      I build gyms, clubs and academies a single system with their own name on it —
+      sign-ups, timetable, attendance, payments, a member app that installs on their phone —
+      and I run it for you. One monthly fee. The build is included.
+    </p>
+    <div class="cta">
+      <a class="btn" href="#apply">See if it fits →</a>
+      <a class="btn ghost" href="#built">See what I've built</a>
+    </div>
+    <div class="assure">
+      <span><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Five days to a working system</span>
+      <span><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> No setup fee, ever</span>
+      <span><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M2.5 8.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Don't like it? You've paid nothing</span>
+    </div>
+  </div>
+</section>
+
+<!-- ================= THE BILL ================= -->
+<section class="tint" id="bill">
+  <div class="w">
+    <div class="head rv">
+      <span class="lab">The part nobody adds up</span>
+      <h2>What are you actually paying every month?</h2>
+      <p class="lead sub">Put your real numbers in. Most places have never seen them in one column —
+        which is exactly why it keeps creeping up.</p>
+    </div>
+
+    <div class="calc rv">
+      <div class="rows card">
+        <div class="row">
+          <div class="nm"><b>Booking &amp; membership software</b><i>Mindbody, Clubworx, Glofox, Hapana, TeamApp…</i></div>
+          <label class="amt"><s>$</s><input type="number" inputmode="numeric" min="0" max="99999" value="220" data-cost aria-label="Booking and membership software, dollars per month"></label>
+        </div>
+        <div class="row">
+          <div class="nm"><b>Website + whoever edits it</b><i>Hosting, the plugin renewals, the guy you text</i></div>
+          <label class="amt"><s>$</s><input type="number" inputmode="numeric" min="0" max="99999" value="150" data-cost aria-label="Website and maintenance, dollars per month"></label>
+        </div>
+        <div class="row">
+          <div class="nm"><b>Social media / ads retainer</b><i>The monthly one you're not sure is working</i></div>
+          <label class="amt"><s>$</s><input type="number" inputmode="numeric" min="0" max="99999" value="700" data-cost aria-label="Social media or ads retainer, dollars per month"></label>
+        </div>
+        <div class="row">
+          <div class="nm"><b>Email &amp; SMS tools</b><i>Mailchimp, a texting credit, a form builder</i></div>
+          <label class="amt"><s>$</s><input type="number" inputmode="numeric" min="0" max="99999" value="60" data-cost aria-label="Email and SMS tools, dollars per month"></label>
+        </div>
+        <div class="row">
+          <div class="nm"><b>Admin help</b><i>Enquiries, follow-ups, chasing payments — yours or someone's</i></div>
+          <label class="amt"><s>$</s><input type="number" inputmode="numeric" min="0" max="99999" value="400" data-cost aria-label="Admin help, dollars per month"></label>
+        </div>
+      </div>
+
+      <div class="tally">
+        <span class="lab">Your stack, right now</span>
+        <div class="big" id="perMonth">$1,530</div>
+        <div class="yr" id="perYear">$18,360 a year — across five separate bills</div>
+
+        <div class="vs">
+          <div class="line"><span>Compare against</span></div>
+          <div class="pick" role="group" aria-label="Choose a Coachbuilt plan to compare">
+            <button type="button" data-plan="890" aria-pressed="true">Court One</button>
+            <button type="button" data-plan="1490" aria-pressed="false">Full Court</button>
+          </div>
+          <div class="line" style="margin-top:12px"><span id="planName">Coachbuilt Court One</span><b id="planMo">$890/mo</b></div>
+          <div class="line"><span>Bills to keep track of</span><b>1</b></div>
+          <div class="line"><span>Whose logo your members see</span><b>Yours</b></div>
+        </div>
+
+        <div class="verdict" id="verdict"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= THE SYSTEM ================= -->
+<section id="system">
+  <div class="w">
+    <div class="head rv">
+      <span class="lab">What "one system" actually means</span>
+      <h2>Everything in one place, talking to itself.</h2>
+      <p class="lead sub">Not five tools bolted together. One thing, shaped around your business —
+        so a sign-up becomes a booking becomes an attendance record becomes the number you look at on Sunday night.</p>
+    </div>
+    <div class="rv">
+      <div class="segs" role="group" aria-label="Choose a type of business">
+        <button type="button" data-sys="club" aria-pressed="true">Basketball club</button>
+        <button type="button" data-sys="gym" aria-pressed="false">Gym / studio</button>
+        <button type="button" data-sys="acad" aria-pressed="false">Junior academy</button>
+        <button type="button" data-sys="solo" aria-pressed="false">Solo coach / PT</button>
+      </div>
+      <div class="sysbox">
+        <div class="grid2"></div>
+        <div class="nodes" id="nodes"></div>
+        <div class="sysfoot"><span class="lab">— one connected system —</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PROOF ================= -->
+<section class="dark" id="built">
+  <div class="w">
+    <div class="head rv">
+      <span class="lab">Why me</span>
+      <h2>I'm not an agency. I'm a coach who builds.</h2>
+      <p class="lead">
+        I'm Aiman. I coach basketball in Sydney. I got sick of paying for software that didn't fit
+        how I actually run a session, so I built my own. Then I built a second one for the whole city.
+        Both are live right now. Both were built by one person. You can open one of them from this page.
+      </p>
+    </div>
+    <div class="proof rv">
+
+      <article class="pcard">
+        <div class="tag">Live · open it yourself</div>
+        <h3>Certified Hooper</h3>
+        <p class="sub sm">A pickup basketball network for Sydney. Every vetted court on a map, GPS check-ins so you
+          can see who's on a court right now, player profiles, member-rated reviews, and a moderation desk behind it.</p>
+        <ul>
+          <li><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Installs on a phone like a real app — no app store</li>
+          <li><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Push notifications that land with the app closed</li>
+          <li><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> GPS-fenced check-ins — you can't fake being there</li>
+          <li><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> An admin desk to approve, edit, ban and export</li>
+        </ul>
+        <div class="foot"><a class="btn onink" href="/hoopsheaven.html" target="_blank" rel="noopener">Open it →</a></div>
+      </article>
+
+      <article class="pcard">
+        <div class="tag">Live · invite-only</div>
+        <h3>Lockdown Lab</h3>
+        <p class="sub sm">My own coaching app, running my own members. This is the closest thing to what a club
+          or academy gets — because it was built for exactly that job.</p>
+        <ul>
+          <li><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Daily check-ins, streaks and a 55-badge reward system</li>
+          <li><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> A staff portal — each coach with their own login and permissions</li>
+          <li><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> A drawer on every member: sessions, notes, homework, messages</li>
+          <li><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> A money desk — seats, sessions, what a block is actually worth</li>
+        </ul>
+        <div class="foot"><span class="xs" style="color:#8C8474">Members only — I'll walk you through it on the call.</span></div>
+      </article>
+
+    </div>
+    <p class="sub sm rv" style="margin-top:22px;max-width:620px">
+      No client logos on this page yet, and I'm not going to borrow anyone's.
+      What's above is mine, it's real, and it's the same hands that would build yours.
+    </p>
+  </div>
+</section>
+
+<!-- ================= HOW ================= -->
+<section id="how">
+  <div class="w">
+    <div class="head rv">
+      <span class="lab">How it goes</span>
+      <h2>Three steps, and the first one is free.</h2>
+    </div>
+    <div class="steps rv">
+      <div class="step">
+        <h3>Twenty minutes on the phone</h3>
+        <p>You walk me through how the place actually runs — the bookings, the no-shows, the thing that eats your
+          Sunday. If I can't help, I'll say so on that call and you've lost twenty minutes.</p>
+      </div>
+      <div class="step">
+        <h3>Five days to something real</h3>
+        <p>Call me Monday, it's on your phone Friday. Not a mockup or a slide deck — a working system with
+          your name and colours on it and your actual members in it. If it's not right, you walk and
+          you've paid nothing.</p>
+      </div>
+      <div class="step">
+        <h3>Then it keeps getting better</h3>
+        <p>Every month you tell me what's annoying you and I build it. No change requests, no quotes,
+          no waiting on a ticket. That's what the monthly fee is for.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PRICING ================= -->
+<section class="tint" id="price">
+  <div class="w">
+    <div class="head rv">
+      <span class="lab">Price</span>
+      <h2>Monthly. Build included. No setup fee.</h2>
+      <p class="lead sub">Six month minimum, then month to month. Cancel any time after that —
+        I'd rather you stay because it's working than because you're locked in.</p>
+    </div>
+
+    <div class="plans rv">
+      <article class="plan">
+        <div class="nm">Court One</div>
+        <div class="pr"><b>$890</b><s>/ month +GST</s></div>
+        <p class="who">One system, done properly. For a single-location gym, studio or club that's outgrown spreadsheets.</p>
+        <ul>
+          <li><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Member app with your name and logo, installs on their phone</li>
+          <li><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Sign-ups, timetable, bookings, attendance</li>
+          <li><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Payments wired to your Stripe — money lands in your account</li>
+          <li><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Your admin desk — who's in, who's paid, who's gone quiet</li>
+          <li><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Hosting, backups, fixes and small changes — all in</li>
+        </ul>
+        <div class="foot"><a class="btn ghost wide" href="#apply">Start here</a></div>
+      </article>
+
+      <article class="plan best">
+        <div class="flag">Most clubs</div>
+        <div class="nm">Full Court</div>
+        <div class="pr"><b>$1,490</b><s>/ month +GST</s></div>
+        <p class="who">The whole thing. For clubs and academies with staff, juniors, parents and a season to run.</p>
+        <ul>
+          <li class="was">Everything in Court One, plus —</li>
+          <li><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Push notifications straight to your members' phones</li>
+          <li><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Staff portal — a login per coach, permissions you control</li>
+          <li><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Programs, homework and notes on every member</li>
+          <li><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Parent access for juniors, and a squad feed</li>
+          <li><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> One new feature a month — you pick it</li>
+        </ul>
+        <div class="foot"><a class="btn wide" href="#apply">Start here</a></div>
+      </article>
+
+      <article class="plan">
+        <div class="nm">The Franchise</div>
+        <div class="pr"><b>$2,900</b><s>/ month +GST, from</s></div>
+        <p class="who">Multiple locations, or a brand you want to license to other coaches under your own name.</p>
+        <ul>
+          <li class="was">Everything in Full Court, plus —</li>
+          <li><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Multi-site — each location its own timetable and numbers</li>
+          <li><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> White-label — hand your own clients a branded version</li>
+          <li><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> Front of the build queue</li>
+          <li><svg viewBox="0 0 16 16" fill="none"><path d="M2.5 8.5l3.5 3.5 7.5-8" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg> We scope it properly before anyone signs anything</li>
+        </ul>
+        <div class="foot"><a class="btn ghost wide" href="#apply">Let's talk</a></div>
+      </article>
+    </div>
+
+    <div class="guar rv">
+      <div>
+        <h3>You don't pay until you've seen it working.</h3>
+        <p>Five days after the call you get the real thing on your phone. If it's not right, you say so,
+          you walk, and you've been invoiced for nothing. I'd rather lose a week than have you stuck
+          paying for something you don't use — that's the whole reason you're reading this page.</p>
+      </div>
+      <div>
+        <h3>Your data is yours. Always.</h3>
+        <p>One click and you've got every member, booking and payment record as a spreadsheet — while you're
+          a client and on the day you stop being one. After twelve months you can buy the system out and take
+          the code with you. No hostage-taking.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= FAQ ================= -->
+<section id="faq">
+  <div class="wn" style="padding-left:20px;padding-right:20px">
+    <div class="head rv" style="margin-bottom:26px">
+      <span class="lab">Straight answers</span>
+      <h2>The things you're already thinking.</h2>
+    </div>
+    <div class="faq rv">
+      <details>
+        <summary>I already pay for Clubworx / Mindbody / Glofox. Why would I change?</summary>
+        <div class="ans">
+          <p>Because that software was built to fit ten thousand businesses, so it fits yours about 70%.
+            The other 30% is the workaround you've got in a spreadsheet, the thing you explain to every new
+            staff member, and the four taps it takes to do something that should take one.</p>
+          <p>And their price climbs as you grow — more members, more locations, more per month. Mine doesn't.
+            You're also handing your members an app with someone else's brand on it, at the exact moment they're
+            deciding whether they're part of something.</p>
+        </div>
+      </details>
+      <details>
+        <summary>Do I own it, or am I renting from you now instead?</summary>
+        <div class="ans">
+          <p>Fair question — it's the right one to ask. Your <b>data</b> is yours outright, from day one,
+            exportable to a spreadsheet whenever you like, including the day you leave.</p>
+          <p>The system runs on my hosting while you're a client, which is what keeps it at one flat fee instead
+            of a build invoice. After twelve months you can buy it out and take the code. And I'll put that in
+            writing before you pay anything.</p>
+        </div>
+      </details>
+      <details>
+        <summary>What if I need something changed?</summary>
+        <div class="ans">
+          <p>You message me and I build it. No quote, no change request form, no "that's out of scope".</p>
+          <p>That's the actual point of paying monthly instead of once — a system that gets shaped around you
+            for as long as you're running it, rather than one that was right in the week it launched and slowly
+            stopped fitting.</p>
+        </div>
+      </details>
+      <details>
+        <summary>Five days? That can't be a real system.</summary>
+        <div class="ans">
+          <p>It's five days because I'm not starting from a blank page. Sign-ups, check-ins, bookings,
+            staff logins with permissions, push notifications, admin desks — I've already built every one of
+            those, twice over, in two apps that are live right now. Your build is those pieces arranged
+            around how you run your place, not invented from scratch.</p>
+          <p>I use AI heavily for the mechanical work, which is why it's days instead of months. What isn't
+            automated is knowing what a coach actually needs on a Tuesday night — and that part I've lived.</p>
+          <p>The honest limit: day five is your core system — branding, sign-ups, timetable, bookings,
+            attendance and your admin screen. Taking money through it lands the week after, because that
+            waits on your Stripe account and their verification, not on me. I'll say the same thing on the
+            call, before you've paid anything.</p>
+        </div>
+      </details>
+      <details>
+        <summary>What happens if you get sick of it, or hit by a bus?</summary>
+        <div class="ans">
+          <p>Your data exports any time, so you're never locked in a box. And it's written into the agreement
+            that if I stop operating, the code comes to you. You'd be moving on with everything in hand,
+            which is more than your current software would give you.</p>
+        </div>
+      </details>
+      <details>
+        <summary>I'm small — thirty members and a group chat. Am I wasting your time?</summary>
+        <div class="ans">
+          <p>Possibly, and I'll tell you on the call rather than take your money. At thirty members a group chat
+            and a spreadsheet genuinely might be right, and I'd rather you come back at a hundred and fifty than
+            resent a bill at thirty.</p>
+          <p>If you're growing fast, though, the best time to put the system in is just <em>before</em> you need it —
+            not in the middle of the mess.</p>
+        </div>
+      </details>
+      <details>
+        <summary>Is this just a website?</summary>
+        <div class="ans">
+          <p>No. A website is a poster. This is the thing your business runs on: your members sign up in it,
+            book in it, get reminded by it, pay through it, and you open a desk that tells you who showed,
+            who's drifting and what the month is worth.</p>
+          <p>A website can be part of it if you want one. It's the least interesting part.</p>
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ================= APPLY ================= -->
+<section class="dark" id="apply">
+  <div class="wn" style="padding-left:20px;padding-right:20px">
+    <div class="head rv" style="margin-bottom:28px">
+      <span class="lab">Step one</span>
+      <h2>Tell me what I'd be walking into.</h2>
+      <p class="lead">Two minutes. No sales sequence, no newsletter, no "book a strategy session" funnel —
+        I read these myself and reply to the ones I can actually help.</p>
+    </div>
+
+    <div class="formwrap rv">
+      <div class="err" id="err"></div>
+
+      <form name="coachbuilt-apply" id="applyForm" method="POST" novalidate
+            data-netlify="true" netlify-honeypot="website-url">
+        <input type="hidden" name="form-name" value="coachbuilt-apply">
+        <p class="hp"><label>Leave this empty: <input name="website-url" tabindex="-1" autocomplete="off"></label></p>
+
+        <fieldset class="fset">
+          <legend>01</legend>
+          <div class="q">What are you paying for right now?</div>
+          <div class="hint">Tick anything that leaves your account every month. Be honest, it's not a test.</div>
+          <div class="opts">
+            <label class="opt"><input type="checkbox" name="paying_for" value="Booking / membership software"><span>Booking / membership software</span></label>
+            <label class="opt"><input type="checkbox" name="paying_for" value="Website or a web person"><span>Website or a web person</span></label>
+            <label class="opt"><input type="checkbox" name="paying_for" value="Social media / ads retainer"><span>Social or ads retainer</span></label>
+            <label class="opt"><input type="checkbox" name="paying_for" value="Admin or front desk help"><span>Admin / front desk help</span></label>
+            <label class="opt"><input type="checkbox" name="paying_for" value="Bookkeeping and invoices"><span>Bookkeeping &amp; invoices</span></label>
+            <label class="opt"><input type="checkbox" name="paying_for" value="Email or SMS tools"><span>Email / SMS tools</span></label>
+            <label class="opt"><input type="checkbox" name="paying_for" value="Nothing yet - spreadsheets and DMs"><span>Nothing — spreadsheets &amp; DMs</span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="fset">
+          <legend>02</legend>
+          <div class="q">All up, roughly what's that a month?</div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="spend" value="Under $200"><span>Under $200</span></label>
+            <label class="opt"><input type="radio" name="spend" value="$200 - $500"><span>$200–500</span></label>
+            <label class="opt"><input type="radio" name="spend" value="$500 - $1,500"><span>$500–1,500</span></label>
+            <label class="opt"><input type="radio" name="spend" value="$1,500 - $3,000"><span>$1,500–3,000</span></label>
+            <label class="opt"><input type="radio" name="spend" value="Over $3,000"><span>Over $3,000</span></label>
+            <label class="opt"><input type="radio" name="spend" value="No idea"><span>No idea</span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="fset">
+          <legend>03</legend>
+          <div class="q">What do you run?</div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="kind" value="Gym"><span>Gym</span></label>
+            <label class="opt"><input type="radio" name="kind" value="Basketball or sports club"><span>Basketball / sports club</span></label>
+            <label class="opt"><input type="radio" name="kind" value="Junior academy"><span>Junior academy</span></label>
+            <label class="opt"><input type="radio" name="kind" value="Studio"><span>Studio</span></label>
+            <label class="opt"><input type="radio" name="kind" value="Solo coach or PT"><span>Solo coach / PT</span></label>
+            <label class="opt"><input type="radio" name="kind" value="Something else"><span>Something else</span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="fset">
+          <legend>04</legend>
+          <div class="q">How many members or players?</div>
+          <div class="opts">
+            <label class="opt"><input type="radio" name="members" value="Under 50"><span>Under 50</span></label>
+            <label class="opt"><input type="radio" name="members" value="50 - 150"><span>50–150</span></label>
+            <label class="opt"><input type="radio" name="members" value="150 - 400"><span>150–400</span></label>
+            <label class="opt"><input type="radio" name="members" value="400 - 1000"><span>400–1,000</span></label>
+            <label class="opt"><input type="radio" name="members" value="Over 1000"><span>1,000+</span></label>
+          </div>
+        </fieldset>
+
+        <fieldset class="fset">
+          <legend>05</legend>
+          <div class="q">What eats your week?</div>
+          <div class="hint">The one job you do every week that you shouldn't have to. This is the most useful thing you can tell me.</div>
+          <div class="fld">
+            <textarea name="timesink" maxlength="900"
+              placeholder="e.g. Sunday nights chasing who's paid for term, then re-typing the roll into a spreadsheet, then texting the six parents who missed it."></textarea>
+          </div>
+        </fieldset>
+
+        <fieldset class="fset">
+          <legend>06</legend>
+          <div class="q">Who are you?</div>
+          <div class="two">
+            <div class="fld">
+              <label for="f-name">Your name</label>
+              <input id="f-name" name="name" required maxlength="80" autocomplete="name" placeholder="First and last">
+            </div>
+            <div class="fld">
+              <label for="f-biz">Business name <s>— if you've got one</s></label>
+              <input id="f-biz" name="business" maxlength="90" autocomplete="organization" placeholder="The gym / club">
+            </div>
+          </div>
+          <div class="two">
+            <div class="fld">
+              <label for="f-phone">Mobile</label>
+              <input id="f-phone" name="phone" type="tel" maxlength="24" autocomplete="tel" placeholder="04…">
+            </div>
+            <div class="fld">
+              <label for="f-email">Email</label>
+              <input id="f-email" name="email" type="email" maxlength="120" autocomplete="email" placeholder="you@…">
+            </div>
+          </div>
+          <div class="fld">
+            <label for="f-ig">Instagram <s>— easiest way for me to see what you're about</s></label>
+            <input id="f-ig" name="instagram" maxlength="60" placeholder="@yourgym">
+          </div>
+          <p class="xs sub" style="margin-top:4px">Leave a mobile or an email — I need one way to reach you.</p>
+        </fieldset>
+
+        <input type="hidden" name="source" value="coachbuilt.html">
+        <button class="btn wide" type="submit" id="sendBtn" style="margin-top:6px">Send it →</button>
+        <p class="xs sub" style="text-align:center;margin-top:14px">
+          Goes to me, nobody else. No list, no automated follow-ups.
+        </p>
+      </form>
+
+      <div class="done" id="done">
+        <div class="tick"><svg viewBox="0 0 24 24" width="30" height="30" fill="none"><path d="M4 12.5l5 5 11-11.5" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <h3>Got it.</h3>
+        <p>I read every one of these myself. If I think I can help you'll hear from me within a day or two —
+          and if I don't think I can, I'll tell you that too.</p>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ================= FOOTER ================= -->
+<footer class="foot">
+  <div class="w in">
+    <div>
+      <div style="font-weight:800;letter-spacing:-.03em;color:var(--ink);font-size:16px">Coachbuilt</div>
+      <div class="xs">Software for gyms, clubs and academies. Sydney, Australia.</div>
+    </div>
+    <div class="links">
+      <a href="#bill">The bill</a>
+      <a href="#built">What I've built</a>
+      <a href="#price">Price</a>
+      <a href="#apply">Apply</a>
+      <a id="igLink" href="#" target="_blank" rel="noopener">Instagram</a>
+      <a id="mailLink" href="#">Email</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+'use strict';
+
+/* ─────────────────────────────────────────────────────────────
+   CONFIG — the only things you'd ever need to change by hand.
+   ───────────────────────────────────────────────────────────── */
+var CFG = {
+  ig:    'uncsthoughts',              // swap for @coachbuilt handle once you make one
+  email: 'aimanmaged88@gmail.com',    // swap for a business address when you have one
+  sbUrl: 'https://ymuwuhvqqftgpxwhzoub.supabase.co/rest/v1/cb_leads',
+  sbKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltdXd1aHZxcWZ0Z3B4d2h6b3ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NjUyMzgsImV4cCI6MjA5OTI0MTIzOH0.sOkWQpulWj_ZSqMNSV7YP55T70UFSm2mP5e5xapQyQo'
+};
+
+var $  = function(s,r){ return (r||document).querySelector(s); };
+var $$ = function(s,r){ return Array.prototype.slice.call((r||document).querySelectorAll(s)); };
+
+/* contact links */
+$('#igLink').href   = 'https://instagram.com/' + CFG.ig;
+$('#mailLink').href = 'mailto:' + CFG.email + '?subject=' + encodeURIComponent('Coachbuilt enquiry');
+
+/* ── nav shadow ─────────────────────────────────────────────── */
+var nav = $('#nav');
+var onScroll = function(){ nav.classList.toggle('stuck', window.scrollY > 8); };
+addEventListener('scroll', onScroll, {passive:true}); onScroll();
+
+/* ── reveal on scroll ───────────────────────────────────────── */
+var rv = $$('.rv');
+if ('IntersectionObserver' in window && !matchMedia('(prefers-reduced-motion: reduce)').matches){
+  var io = new IntersectionObserver(function(es){
+    es.forEach(function(e){ if (e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, {rootMargin:'0px 0px -8% 0px', threshold:.05});
+  rv.forEach(function(el){ io.observe(el); });
+} else {
+  rv.forEach(function(el){ el.classList.add('in'); });
+}
+
+/* ── the bill calculator ────────────────────────────────────── */
+var money = function(n){
+  return '$' + Math.round(n).toLocaleString('en-AU');
+};
+var plan = 890, planLabel = 'Court One';
+
+function recalc(){
+  var total = 0;
+  $$('[data-cost]').forEach(function(i){
+    var v = parseFloat(i.value);
+    if (!isFinite(v) || v < 0) v = 0;
+    if (v > 99999) v = 99999;
+    total += v;
+  });
+
+  $('#perMonth').textContent = money(total);
+  var filled = $$('[data-cost]').filter(function(i){ return parseFloat(i.value) > 0; }).length;
+  $('#perYear').textContent = money(total * 12) + ' a year'
+    + (filled > 1 ? ' — across ' + filled + ' separate bills' : '');
+
+  $('#planName').textContent = 'Coachbuilt ' + planLabel;
+  $('#planMo').textContent   = money(plan) + '/mo';
+
+  var v = $('#verdict'), diff = total - plan;
+  if (total === 0){
+    v.className = 'verdict';
+    v.innerHTML = 'Put your real numbers in above and this will tell you something useful.';
+  } else if (diff > 0){
+    v.className = 'verdict good';
+    v.innerHTML = 'You’d be <b>' + money(diff) + ' a month lighter</b> — ' + money(diff * 12) +
+      ' over a year — and you’d have one system with your name on it instead of ' +
+      (filled > 1 ? filled + ' that don’t talk to each other.' : 'one that was never built for you.');
+  } else {
+    v.className = 'verdict';
+    v.innerHTML = 'You’re running lean — ' + money(Math.abs(diff)) + '/mo under Coachbuilt. ' +
+      'So this isn’t a saving for you, it’s an upgrade: ask yourself what those hours of admin ' +
+      'and the members you lose to a clunky sign-up are actually costing.';
+  }
+}
+$$('[data-cost]').forEach(function(i){ i.addEventListener('input', recalc); });
+$$('.pick button').forEach(function(b){
+  b.addEventListener('click', function(){
+    $$('.pick button').forEach(function(x){ x.setAttribute('aria-pressed','false'); });
+    b.setAttribute('aria-pressed','true');
+    plan = parseInt(b.dataset.plan, 10);
+    planLabel = b.textContent.trim();
+    recalc();
+  });
+});
+recalc();
+
+/* ── system diagram ─────────────────────────────────────────── */
+var SYS = {
+  club: ['Player sign-ups','Season timetable','Training attendance','Term payments','Team rosters',
+         'Parent updates','Game-day notices','Coach notes','Your numbers'],
+  gym:  ['Memberships','Class timetable','Bookings & waitlist','Check-in at the door','Payments & failed cards',
+         'Casual passes','Member app','Win-back list','Your numbers'],
+  acad: ['Enrolments','Term calendar','Roll & attendance','Parent portal','Term invoices',
+         'Player reports','Homework & drills','Pickup notices','Your numbers'],
+  solo: ['Enquiries','Your availability','1-on-1 bookings','Session packs','Payments',
+         'Programs & homework','Check-ins','Progress notes','Your numbers']
+};
+var nodesEl = $('#nodes');
+function paintSys(k){
+  nodesEl.innerHTML = '';
+  SYS[k].forEach(function(n, i){
+    var d = document.createElement('span');
+    d.className = 'node';
+    d.style.animationDelay = (i * 32) + 'ms';
+    d.innerHTML = '<i class="dot"></i>' + n;
+    nodesEl.appendChild(d);
+  });
+}
+$$('.segs button').forEach(function(b){
+  b.addEventListener('click', function(){
+    $$('.segs button').forEach(function(x){ x.setAttribute('aria-pressed','false'); });
+    b.setAttribute('aria-pressed','true');
+    paintSys(b.dataset.sys);
+  });
+});
+paintSys('club');
+
+/* ── the form ───────────────────────────────────────────────── */
+var form = $('#applyForm'), btn = $('#sendBtn'), err = $('#err'), done = $('#done');
+
+function fail(msg, focusSel){
+  err.innerHTML = msg;
+  err.classList.add('on');
+  err.scrollIntoView({block:'center', behavior:'smooth'});
+  if (focusSel){ var f = $(focusSel); if (f) f.focus({preventScroll:true}); }
+}
+
+form.addEventListener('submit', function(e){
+  e.preventDefault();
+  err.classList.remove('on');
+
+  var fd = new FormData(form);
+
+  /* honeypot — a bot filled the hidden field. Pretend it worked. */
+  if ((fd.get('website-url') || '').trim()){
+    form.classList.add('gone'); done.classList.add('on');
+    return;
+  }
+
+  var name  = (fd.get('name')  || '').trim();
+  var email = (fd.get('email') || '').trim();
+  var phone = (fd.get('phone') || '').trim();
+
+  if (!name){ return fail('Pop your name in so I know who I’m talking to.', '#f-name'); }
+  if (!email && !phone){ return fail('I need one way to reach you — a mobile or an email.', '#f-phone'); }
+
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+
+  var lead = {
+    name:       name,
+    business:  (fd.get('business')  || '').trim() || null,
+    kind:       fd.get('kind')      || null,
+    members:    fd.get('members')   || null,
+    paying_for: fd.getAll('paying_for'),
+    spend:      fd.get('spend')     || null,
+    timesink:  (fd.get('timesink')  || '').trim() || null,
+    email:      email || null,
+    phone:      phone || null,
+    instagram: (fd.get('instagram') || '').trim().replace(/^@/,'') || null,
+    source:     fd.get('source')    || 'coachbuilt.html'
+  };
+
+  /* Written twice on purpose: Netlify Forms emails Aiman, Supabase keeps
+     the permanent record. A lead is captured if EITHER lands. */
+  var toNetlify = fetch(location.pathname, {
+    method:  'POST',
+    headers: {'Content-Type':'application/x-www-form-urlencoded'},
+    body:    new URLSearchParams(fd).toString()
+  }).then(function(r){
+    if (r.ok) return true;
+    return fetch('/', {
+      method:'POST',
+      headers:{'Content-Type':'application/x-www-form-urlencoded'},
+      body:new URLSearchParams(fd).toString()
+    }).then(function(r2){ return r2.ok; });
+  }).catch(function(){ return false; });
+
+  var toSupabase = fetch(CFG.sbUrl, {
+    method:  'POST',
+    headers: {
+      'apikey':        CFG.sbKey,
+      'Authorization': 'Bearer ' + CFG.sbKey,
+      'Content-Type':  'application/json',
+      'Prefer':        'return=minimal'
+    },
+    body: JSON.stringify(lead)
+  }).then(function(r){ return r.ok; }).catch(function(){ return false; });
+
+  Promise.all([toNetlify, toSupabase]).then(function(res){
+    btn.disabled = false;
+    btn.textContent = 'Send it →';
+
+    if (res[0] || res[1]){
+      form.classList.add('gone');
+      done.classList.add('on');
+      done.scrollIntoView({block:'center', behavior:'smooth'});
+      return;
+    }
+
+    fail('That didn’t send — something on my end. Don’t lose the effort: ' +
+         '<a href="mailto:' + CFG.email + '?subject=' + encodeURIComponent('Coachbuilt enquiry') +
+         '">email me</a> or <a href="https://instagram.com/' + CFG.ig + '" target="_blank" rel="noopener">DM me</a>' +
+         ' and I’ll come back to you.');
+  });
+});
+
+})();
+</script>
+</body>
+</html>

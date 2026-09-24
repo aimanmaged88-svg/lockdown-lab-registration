@@ -1132,6 +1132,88 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
 - v2 ideas discussed: KOTC proper, run chat, POTW weekly archive/all-time
   wall, PWA manifest + install, native app for background geofencing.
 
+## Coachbuilt — the agency play (2026-09-17, NEW product)
+
+- **Where it came from.** Aiman sent a FB Reels lead ad from **Makeitinhouse**
+  ("I've never written a line of code and I don't want to learn. I run a
+  business, not a software company" → "32 businesses we've taught, coached &
+  consulted on AI" → a crane company's quotes/job calendar/crew tickets/
+  timesheets/invoices as ONE CONNECTED SYSTEM → Apply now → instant lead form
+  whose first question is *"What retainer are you currently paying as a
+  service?"*). He said **"I want to do this and make money."**
+- **His three calls** (asked, answered): sell to **coaches / gyms / clubs**
+  first; **monthly only, build included, 6-month minimum** (no build fee);
+  **organic IG/reels first**, paid ads later.
+- **Name = COACHBUILT.** First pick "Baseline" was killed by a clash check —
+  baselinepro.com is a US sports-facility/team management platform with a
+  basketball page (same trap as "Fives"). Coachbuilt is clear in the gym/sports
+  software space; the automotive sense ("coachbuilt" = bespoke, hand-made) is a
+  different category. **Still needs an ABN + domain check before he prints
+  anything or takes money under it** — flagged on the kit page.
+- **coachbuilt.html** (public, the bio link) — paper/ink/orange "blueprint"
+  look, Inter var + Chakra Petch labels, self-hosted from assets/fonts.
+  Sections: customer-voice hero quote → **live "what are you paying" calculator**
+  (5 number inputs → per-month/per-year, Court One vs Full Court toggle, and an
+  HONEST verdict that says "you're running lean, this is an upgrade not a
+  saving" when they're under) → **connected-system diagram** with 4 presets
+  (club/gym/academy/solo coach) → proof (his two real apps, Certified Hooper
+  linked live, Lab described; explicit "no client logos yet and I'm not
+  borrowing anyone's") → 3 steps → pricing → guarantee → 7 FAQs → the form.
+- **Pricing:** Court One $890/mo, Full Court $1,490/mo, The Franchise from
+  $2,900/mo — all +GST, build included, no setup fee, 6-month min then
+  month-to-month. Ownership: data exports any time; buy-out after 12 months.
+- **THE PROMISE IS FIVE DAYS (2026-09-17, Aiman: "5 days to something real" —
+  he quoted the page's own step heading back with the number cut from 14).**
+  Call Monday → on their phone Friday → weekend to break it. **Nothing invoiced
+  until that Friday.** Changed in ~20 places across both pages (og:description,
+  hero chip, step 2, guarantee, the "five days?" FAQ, reel 4/5/6 + caption, the
+  call script, price talk, objections, delivery, cashflow maths).
+  **Scope was tightened so the promise is keepable, not just shorter:** Friday
+  = branding, member sign-up + searchable list, timetable + bookings w/
+  capacity, attendance, admin screen, installs from a link. **Stripe/payments
+  moved OFF day five** — it waits on the client opening the account and Stripe
+  verifying their business, which is their clock, not his. That caveat is
+  stated in the FAQ, the reel 6 caption, the objection table and the call
+  script ("volunteering the catch is what makes the five days believable").
+  Prereq rule hardened: without all 7 inputs **the five days hasn't started**.
+  Cashflow note rewritten — at 5 days it's one build week at a time; two
+  clients starting the same Monday is one bad week, so stagger start dates.
+- **Lead capture is written twice on purpose.** (1) **Netlify Forms** —
+  form detection ENABLED on site 7f6a47a4-… via MCP (was off; there were 0
+  forms), form `coachbuilt-apply` with honeypot `website-url`, emails him.
+  (2) **Supabase `cb_leads`** (migration `coachbuilt_leads`) — RLS on with an
+  **anon INSERT-only policy and no select policy**, so the public can submit
+  and the anon key can never read a lead back. Verified live: anon POST → 201,
+  anon GET → `[]`, row confirmed by service role, test row deleted. A lead
+  counts as captured if EITHER lands; if both fail the page shows email + DM
+  fallbacks. He reads leads in the Netlify dashboard / his inbox, or the
+  Supabase table.
+- **coachbuilt-kit.html** (private, `noindex`) — the playbook: 7-day plan,
+  **6 full reel scripts** (hook + script + shots + caption + why it works),
+  10 spare hooks, IG bio, **5 DM scripts**, where the 20 targets come from,
+  the 20-minute call script (5 questions, play-it-back, price-then-silence),
+  price-talk and objection tables, the delivery checklist (what FRIDAY can and
+  can't include — see the five-days bullet above), and the revenue maths.
+  26 copy-to-clipboard blocks.
+  Carries the two standing rules: **never automate Instagram**, never invent a
+  client/testimonial/number.
+- netlify.toml: `/coachbuilt` and `/kit` short links.
+- **Bugs caught in test and fixed** (worth remembering, all were invisible in
+  code review and obvious in screenshots): the white form card inherited
+  `.dark`'s paper-white text → every label invisible on white; an unscoped
+  `.foot a` rule (site footer) also matched the `.foot` card footers → every
+  pricing CTA rendered grey-on-orange at the wrong size (now `footer.foot a`);
+  native `required` was swallowing the custom validation so the "mobile or
+  email" rule never fired (now `novalidate` + own messages + focus). Test
+  suites: scratchpad `cbtest.mjs` 20/20, `kittest.mjs` 15/15 — both include a
+  **contrast sweep** that computes WCAG ratios against the nearest opaque
+  ancestor, which is what caught the first two.
+- **NOT deployed.** Branch only (`claude/making-money-o0yp8e`, a clean
+  fast-forward superset of main). Netlify auto-deploys from main, so nothing
+  is live until he merges — and Netlify Forms only registers the form on a
+  deploy of the HTML, so **the first submission can only be captured after a
+  merge to main**.
+
 ## Parked ideas (Aiman asked to save these)
 
 - **"A.I. MAN" Instagram post** — saved 2026-07-18, for a few weeks out.
