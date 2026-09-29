@@ -103,14 +103,14 @@
   .sec{position:relative;z-index:5}
   .wrap{max-width:var(--maxw);margin:0 auto;padding-inline:clamp(20px,5vw,64px)}
   .wrap.wide{max-width:var(--wide);padding-inline:clamp(14px,3vw,40px)}
-  .about,.program,.media,.events{padding-block:clamp(96px,14vh,176px);border-top:1px solid var(--line-2);scroll-margin-top:60px}
+  .about,.program,.media,.events,.shop{padding-block:clamp(96px,14vh,176px);border-top:1px solid var(--line-2);scroll-margin-top:60px}
 
   .kick{display:inline-flex;align-items:center;gap:12px;font-family:var(--disp);font-weight:700;font-size:11px;letter-spacing:.3em;
     text-transform:uppercase;color:var(--ash)}
   .kick::before{content:"";width:22px;height:1px;background:var(--gold)}
-  .about h2,.media-head h2,.ev-head h2{font-family:var(--disp);font-weight:900;font-size:clamp(34px,5.2vw,62px);line-height:.96;
+  .about h2,.media-head h2,.ev-head h2,.shop h2{font-family:var(--disp);font-weight:900;font-size:clamp(34px,5.2vw,62px);line-height:.96;
     letter-spacing:-.035em;text-wrap:balance;margin:22px 0 0;max-width:16ch}
-  .about h2 u,.media-head h2 u,.ev-head h2 u,.forwho h3 u,.prog-head h2 u,.close h2 u{text-decoration:none;color:var(--gold)}
+  .about h2 u,.media-head h2 u,.ev-head h2 u,.forwho h3 u,.prog-head h2 u,.close h2 u,.shop h2 u{text-decoration:none;color:var(--gold)}
   .about h2{max-width:20ch}
   .intro{font-size:clamp(17px,1.9vw,21px);line-height:1.6;color:var(--chalk-2);max-width:58ch;margin:24px 0 0;font-weight:300}
   .intro b{color:var(--chalk);font-weight:600}
@@ -255,6 +255,12 @@
   .involve h4{font-family:var(--disp);font-weight:800;font-size:clamp(18px,2vw,23px);letter-spacing:-.02em;margin:0 0 6px}
   .involve p{margin:0;color:var(--ash);font-size:14.5px;line-height:1.6;max-width:60ch}
   .involve .cta{margin:0;justify-content:flex-end;width:auto}
+  .shop{background:radial-gradient(60% 50% at 0% 0%, rgba(226,180,78,.05), transparent 60%),var(--ink)}
+  .shop-card{margin-top:28px;border-color:rgba(226,180,78,.28);
+    background:linear-gradient(180deg,rgba(226,180,78,.06),var(--court))}
+  .shop-card h4{display:flex;align-items:center;gap:10px}
+  .shop-card .bag{display:inline-flex;color:var(--gold)}
+  .shop-card .bag svg{width:20px;height:20px}
 
   /* closing statement */
   .close{padding:clamp(110px,16vh,200px) 0 clamp(90px,12vh,150px);text-align:center;border-top:1px solid var(--line-2);

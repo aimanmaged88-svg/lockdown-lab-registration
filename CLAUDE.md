@@ -1412,6 +1412,26 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
     (contact mirror fires w/ right category+fields, Netlify path still fires,
     Refresh pulls a new enquiry into the open inbox, badge updates). Diag test
     row deleted; `lotg_suggestions` clean.
+- **Shop section — SHIPPED (2026-09-29, Aiman: "add this shop to the website").**
+  New **`#shop` section** on the landing page (build.py `shop=`, inserted
+  `events+shop+contact` in the assembly), linking out to the **Love of the Game
+  collection on Strong Will Sports** — `SHOP="https://strongwillsports.com.au/
+  lotg/"` (his fbclid tracking param STRIPPED). Design reuses the site system:
+  `.kick` "Shop" + gold-underlined `<h2>` "Rep the game." + `.intro`, then a
+  gold-tinted `.involve.shop-card` (bag SVG + "The Love of the Game collection"
+  + copy) with a gold **Shop the collection** button (→ store, target=_blank
+  rel=noopener) and a ghost **See it on Instagram**. Added `.shop` to the
+  section padding + gold-`u` CSS rules; scoped `.shop`/`.shop-card`/`.bag`
+  polish in premium.css. Nav gains **Shop** (topbar + hero nav + footer Explore,
+  placed after Events); `SEC_NAMES["shop"]="Shop"` so the editor labels it. **NO
+  invented products/prices** — the store is behind an `sgcaptcha` bot-wall so
+  it can't be scraped, and per the content rule the section only links out +
+  describes it truthfully (a collection with Strong Will Sports, ordering on
+  their store). Shop copy is 7 editable fields in the SJ dashboard's Edit-site
+  tab (manifest 165→173) — but the shop URL/href is NOT CMS-editable (text-only
+  applier), so changing where it points is a rebuild. Verified: built clean
+  (fbclid=0, 3 `#shop` nav links), Playwright screenshots desktop + phone
+  (stacks, gold accents, buttons) render premium.
 - **Content rules:** everything on the page is from his real posts/bio — no
   invented facts. Real talk section carries Lifeline 13 11 14 / Beyond Blue
   1300 22 4636 / 000. Awaiting Saleh: exact wording sign-off, originals of his

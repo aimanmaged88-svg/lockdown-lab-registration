@@ -125,14 +125,14 @@
   .sec{position:relative;z-index:5}
   .wrap{max-width:var(--maxw);margin:0 auto;padding-inline:clamp(20px,5vw,64px)}
   .wrap.wide{max-width:var(--wide);padding-inline:clamp(14px,3vw,40px)}
-  .about,.program,.media,.events{padding-block:clamp(96px,14vh,176px);border-top:1px solid var(--line-2);scroll-margin-top:60px}
+  .about,.program,.media,.events,.shop{padding-block:clamp(96px,14vh,176px);border-top:1px solid var(--line-2);scroll-margin-top:60px}
 
   .kick{display:inline-flex;align-items:center;gap:12px;font-family:var(--disp);font-weight:700;font-size:11px;letter-spacing:.3em;
     text-transform:uppercase;color:var(--ash)}
   .kick::before{content:"";width:22px;height:1px;background:var(--gold)}
-  .about h2,.media-head h2,.ev-head h2{font-family:var(--disp);font-weight:900;font-size:clamp(34px,5.2vw,62px);line-height:.96;
+  .about h2,.media-head h2,.ev-head h2,.shop h2{font-family:var(--disp);font-weight:900;font-size:clamp(34px,5.2vw,62px);line-height:.96;
     letter-spacing:-.035em;text-wrap:balance;margin:22px 0 0;max-width:16ch}
-  .about h2 u,.media-head h2 u,.ev-head h2 u,.forwho h3 u,.prog-head h2 u,.close h2 u{text-decoration:none;color:var(--gold)}
+  .about h2 u,.media-head h2 u,.ev-head h2 u,.forwho h3 u,.prog-head h2 u,.close h2 u,.shop h2 u{text-decoration:none;color:var(--gold)}
   .about h2{max-width:20ch}
   .intro{font-size:clamp(17px,1.9vw,21px);line-height:1.6;color:var(--chalk-2);max-width:58ch;margin:24px 0 0;font-weight:300}
   .intro b{color:var(--chalk);font-weight:600}
@@ -277,6 +277,12 @@
   .involve h4{font-family:var(--disp);font-weight:800;font-size:clamp(18px,2vw,23px);letter-spacing:-.02em;margin:0 0 6px}
   .involve p{margin:0;color:var(--ash);font-size:14.5px;line-height:1.6;max-width:60ch}
   .involve .cta{margin:0;justify-content:flex-end;width:auto}
+  .shop{background:radial-gradient(60% 50% at 0% 0%, rgba(226,180,78,.05), transparent 60%),var(--ink)}
+  .shop-card{margin-top:28px;border-color:rgba(226,180,78,.28);
+    background:linear-gradient(180deg,rgba(226,180,78,.06),var(--court))}
+  .shop-card h4{display:flex;align-items:center;gap:10px}
+  .shop-card .bag{display:inline-flex;color:var(--gold)}
+  .shop-card .bag svg{width:20px;height:20px}
 
   /* closing statement */
   .close{padding:clamp(110px,16vh,200px) 0 clamp(90px,12vh,150px);text-align:center;border-top:1px solid var(--line-2);
@@ -602,6 +608,7 @@
         <a class="txt" href="#talk">Real talk</a>
         <a class="txt" href="#program">Program</a>
         <a class="txt" href="#events">Events</a>
+        <a class="txt" href="#shop">Shop</a>
         <a class="txt" href="#contact">Contact</a>
         <a class="pill" href="https://www.instagram.com/loveofthegameaus" rel="noopener" target="_blank">Instagram</a>
   </nav>
@@ -621,6 +628,7 @@
         <a class="txt" href="#talk">Real talk</a>
         <a class="txt" href="#program">Program</a>
         <a class="txt" href="#events">Events</a>
+        <a class="txt" href="#shop">Shop</a>
         <a class="txt" href="#contact">Contact</a>
         <a class="ig" href="https://www.instagram.com/loveofthegameaus" rel="noopener" target="_blank">Instagram</a>
       </nav>
@@ -920,6 +928,23 @@
     </div>
   </div>
 </section>
+<section class="sec shop" id="shop">
+  <div class="wrap">
+    <span class="kick rv" data-ed="shop.t1">Shop</span>
+    <h2 class="rv dl1" data-ed="shop.h1">Rep the <u>game</u>.</h2>
+    <p class="intro rv dl2" data-ed="shop.t2">Love of the Game gear — a collection with Strong Will Sports. Take the community with you, on the court and off it.</p>
+    <div class="involve shop-card rv dl2">
+      <div>
+        <h4 data-ed="shop.h2"><span class="bag"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" viewBox="0 0 24 24"><path d="M6 8h12l-1 12H7z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path></svg></span>The Love of the Game collection</h4>
+        <p data-ed="shop.t3">Browse the full range and order over on the Strong Will Sports store — checkout and shipping are handled there.</p>
+      </div>
+      <div class="cta">
+        <a class="btn btn-gold" data-ed="shop.t4" href="https://strongwillsports.com.au/lotg/" rel="noopener" target="_blank">Shop the collection</a>
+        <a class="btn btn-ghost" data-ed="shop.t5" href="https://www.instagram.com/loveofthegameaus" rel="noopener" target="_blank">See it on Instagram</a>
+      </div>
+    </div>
+  </div>
+</section>
 <section class="sec contact" id="contact">
   <div class="wrap">
     <span class="kick rv" data-ed="contact.t1">Contact &amp; bookings</span>
@@ -1004,18 +1029,18 @@
       </div>
       <div><h5 data-ed="footer.h1">Explore</h5><ul>
         <li><a data-ed="footer.t4" href="#about">What we do</a></li><li><a data-ed="footer.t5" href="#media">Stories</a></li><li><a data-ed="footer.t6" href="#talk">Real talk</a></li>
-        <li><a data-ed="footer.t7" href="#program">The Next Play</a></li><li><a data-ed="footer.t8" href="#events">Community &amp; events</a></li><li><a data-ed="footer.t9" href="#contact">Contact &amp; bookings</a></li><li><a data-ed="footer.t10" data-sbox="" href="#">Suggestion box</a></li></ul></div>
+        <li><a data-ed="footer.t7" href="#program">The Next Play</a></li><li><a data-ed="footer.t8" href="#events">Community &amp; events</a></li><li><a data-ed="footer.t9" href="#shop">Shop</a></li><li><a data-ed="footer.t10" href="#contact">Contact &amp; bookings</a></li><li><a data-ed="footer.t11" data-sbox="" href="#">Suggestion box</a></li></ul></div>
       <div><h5 data-ed="footer.h2">Connect</h5><ul>
-        <li><a data-ed="footer.t11" href="https://www.instagram.com/loveofthegameaus" rel="noopener" target="_blank">Instagram<small>@loveofthegameaus</small></a></li>
-        <li><a data-ed="footer.t12" href="https://www.threads.net/@loveofthegameaus" rel="noopener" target="_blank">Threads<small>@loveofthegameaus</small></a></li>
-        <li><a data-ed="footer.t13" href="https://linktr.ee/loveofthegameaus" rel="noopener" target="_blank">Linktree<small>All the links</small></a></li></ul></div>
+        <li><a data-ed="footer.t12" href="https://www.instagram.com/loveofthegameaus" rel="noopener" target="_blank">Instagram<small>@loveofthegameaus</small></a></li>
+        <li><a data-ed="footer.t13" href="https://www.threads.net/@loveofthegameaus" rel="noopener" target="_blank">Threads<small>@loveofthegameaus</small></a></li>
+        <li><a data-ed="footer.t14" href="https://linktr.ee/loveofthegameaus" rel="noopener" target="_blank">Linktree<small>All the links</small></a></li></ul></div>
       <div><h5 data-ed="footer.h3">Get in touch</h5><ul>
-        <li><a data-ed="footer.t14" href="mailto:info@loveofthegame.com.au">info@loveofthegame.com.au<small>Schools · events · media</small></a></li>
-        <li><a data-ed="footer.t15" href="mailto:info@loveofthegame.com.au?subject=The%20Next%20Play%20Program%20for%20our%20school">Book The Next Play<small>For schools</small></a></li></ul></div>
+        <li><a data-ed="footer.t15" href="mailto:info@loveofthegame.com.au">info@loveofthegame.com.au<small>Schools · events · media</small></a></li>
+        <li><a data-ed="footer.t16" href="mailto:info@loveofthegame.com.au?subject=The%20Next%20Play%20Program%20for%20our%20school">Book The Next Play<small>For schools</small></a></li></ul></div>
     </div>
     <div class="foot-bar">
-      <span data-ed="footer.t16">© 2026 <b>Love of the Game</b> · Sydney, NSW · Est. 2024</span>
-      <span data-ed="footer.t17">Making a difference for the community</span>
+      <span data-ed="footer.t17">© 2026 <b>Love of the Game</b> · Sydney, NSW · Est. 2024</span>
+      <span data-ed="footer.t18">Making a difference for the community</span>
     </div>
   </div>
 </div>

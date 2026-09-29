@@ -5,11 +5,12 @@ REPO=sp.parent if (sp.parent/"assets"/"lotg-original.png").exists() else pathlib
 MODE=os.environ.get("MODE","artifact"); OUT=REPO/"lotg"; SITE_URL=os.environ.get("SITE_URL","https://loveofthegame.netlify.app").rstrip("/")
 if MODE=="deploy": (OUT/"assets").mkdir(parents=True,exist_ok=True)
 IG="https://www.instagram.com/loveofthegameaus"; MAIL="info@loveofthegame.com.au"
+SHOP="https://strongwillsports.com.au/lotg/"  # LOTG collection on Strong Will Sports (tracking params stripped)
 import json
 from bs4 import BeautifulSoup
 EDIT_EDGE="https://ymuwuhvqqftgpxwhzoub.supabase.co/functions/v1/lotg-edit"
 EDIT_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltdXd1aHZxcWZ0Z3B4d2h6b3ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NjUyMzgsImV4cCI6MjA5OTI0MTIzOH0.sOkWQpulWj_ZSqMNSV7YP55T70UFSm2mP5e5xapQyQo"
-SEC_NAMES={"top":"Top / Hero","about":"What we do","media":"Stories","talk":"Real talk","program":"The Next Play","events":"Events","contact":"Contact & bookings","close":"Closing","footer":"Footer"}
+SEC_NAMES={"top":"Top / Hero","about":"What we do","media":"Stories","talk":"Real talk","program":"The Next Play","events":"Events","shop":"Shop","contact":"Contact & bookings","close":"Closing","footer":"Footer"}
 def _secmeta(el):
     p=el.parent
     while p is not None:
@@ -104,6 +105,7 @@ NAV='''<a class="txt" href="#about">What we do</a>
         <a class="txt" href="#talk">Real talk</a>
         <a class="txt" href="#program">Program</a>
         <a class="txt" href="#events">Events</a>
+        <a class="txt" href="#shop">Shop</a>
         <a class="txt" href="#contact">Contact</a>'''
 PLAY='<span class="play"><svg viewBox="0 0 24 24"><path d="M6 3l14 9-14 9z"/></svg></span>'
 VIEW='<span class="play"><svg viewBox="0 0 24 24"><path d="M4 8h12v12H4zM8 4h12v12h-2V6H8z"/></svg></span>'
@@ -292,6 +294,25 @@ events=f'''<section class="sec events" id="events">
   </div>
 </section>
 '''
+BAG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12l-1 12H7z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>'
+shop=f'''<section class="sec shop" id="shop">
+  <div class="wrap">
+    <span class="kick rv">Shop</span>
+    <h2 class="rv dl1">Rep the <u>game</u>.</h2>
+    <p class="intro rv dl2">Love of the Game gear — a collection with Strong Will Sports. Take the community with you, on the court and off it.</p>
+    <div class="involve shop-card rv dl2">
+      <div>
+        <h4><span class="bag">{BAG}</span>The Love of the Game collection</h4>
+        <p>Browse the full range and order over on the Strong Will Sports store — checkout and shipping are handled there.</p>
+      </div>
+      <div class="cta">
+        <a class="btn btn-gold" href="{SHOP}" target="_blank" rel="noopener">Shop the collection</a>
+        <a class="btn btn-ghost" href="{IG}" target="_blank" rel="noopener">See it on Instagram</a>
+      </div>
+    </div>
+  </div>
+</section>
+'''
 LIVE = "1" if MODE=="deploy" else "0"
 PREV = "" if LIVE=="1" else '<p class="cnote prev">Preview: on the live site this sends straight to the inbox.</p>'
 contact=f'''<section class="sec contact" id="contact">
@@ -380,7 +401,7 @@ foot=f'''<div class="sec foot" id="footer" role="contentinfo">
       </div>
       <div><h5>Explore</h5><ul>
         <li><a href="#about">What we do</a></li><li><a href="#media">Stories</a></li><li><a href="#talk">Real talk</a></li>
-        <li><a href="#program">The Next Play</a></li><li><a href="#events">Community &amp; events</a></li><li><a href="#contact">Contact &amp; bookings</a></li><li><a href="#" data-sbox>Suggestion box</a></li></ul></div>
+        <li><a href="#program">The Next Play</a></li><li><a href="#events">Community &amp; events</a></li><li><a href="#shop">Shop</a></li><li><a href="#contact">Contact &amp; bookings</a></li><li><a href="#" data-sbox>Suggestion box</a></li></ul></div>
       <div><h5>Connect</h5><ul>
         <li><a href="{IG}" target="_blank" rel="noopener">Instagram<small>@loveofthegameaus</small></a></li>
         <li><a href="https://www.threads.net/@loveofthegameaus" target="_blank" rel="noopener">Threads<small>@loveofthegameaus</small></a></li>
@@ -487,7 +508,7 @@ community=f'''<div class="welcome" id="welcome" role="dialog" aria-modal="true" 
 </div>
 
 '''
-_content=hero+about+media+talk+prog+events+contact+close+foot
+_content=hero+about+media+talk+prog+events+shop+contact+close+foot
 _tagged,MANIFEST=tag_content(_content)
 page=head+_tagged+community+scripts
 if MODE=="deploy":
