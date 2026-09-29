@@ -1432,6 +1432,47 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   applier), so changing where it points is a rebuild. Verified: built clean
   (fbclid=0, 3 `#shop` nav links), Playwright screenshots desktop + phone
   (stacks, gold accents, buttons) render premium.
+  - **STOREFRONT elevation + SJ's reorder/copy (2026-09-29, Aiman: "very
+    important it has its own section… the complete store or a link… look the
+    most amazing"; SJ via Aiman: tailored-program line, Next Play 2nd, shop
+    3rd, 15–25 audience).** The complete store CANNOT be embedded: the
+    WooCommerce site sits behind SiteGround's `sgcaptcha` (IP-reputation +
+    rate-based — even the public WC Store API `/wp-json/wc/store/v1/*` and
+    `product_cat`/`product` REST routes get walled; only `/wp-json/wp/v2/
+    taxonomies` + a 404 page slipped through; taxonomies show `product_brand`/
+    `product_cat`, so `/lotg/` is a brand or category page), framing headers are
+    unknowable from here, and an iframed checkout breaks on Safari (3rd-party
+    cookies). Decision: **cinematic storefront section, no invented products.**
+    `#shop` is now a full stage: `.shop-stage` (ghosted `MARK` watermark
+    `.shop-wm` + `.shop-glow` + `.grain`), centred head (kick "The store — with
+    Strong Will Sports", 112px-max "Rep the game."), a gold **marquee ticker**
+    `.marq/.marq-track` (brand lines only, duplicated ×2 for a seamless
+    `translateX(-50%)` loop, mask-faded edges, `aria-hidden`, static under
+    reduced-motion), then the `.storefront` panel: `.sf-badge` gold-ringed
+    circle with the REAL `CREST`, `.sf-tag` "The LOTG collection", h3 "Wear the
+    community.", copy, **Enter the store** (gold → `SHOP`) + See it on Instagram,
+    `.sf-notes` (checkout/shipping by SWS · get in touch → #contact). **Product
+    grid wired, hidden until real data:** `PRODUCTS=[]` in build.py (`{"name",
+    "price","img","url"}` — photos go in `lotg-src/shop/`, `product_card()`
+    thumbnails to 900×1125 WebP via `emit`), renders `.shop-grid` of `.pcard`
+    (4:5 photo, name, gold price, hover "Shop →" pill) + "See the full range";
+    `.pcard img` added to the CMS imgset and `.sf-tag`/`.pcard .price` to
+    txt_sel so product photos/prices become dashboard-editable the moment they
+    exist. `import re` added for the slug. **SJ's edits:** page order is now
+    **hero → program → shop → about → media → talk → events → contact → close →
+    foot** (`_content`), NAV + footer Explore reordered to match (Program, Shop,
+    What we do, Stories, Real talk, Events, Contact), hero scroll cue →
+    `#program`. prog.html: new gold `.tailor` line "Every program can be
+    tailored — the duration and the content are shaped to what you need, on
+    request", spec chips + "Ages 15 – 25" + "Tailored on request", and the
+    `.forwho` block now opens with SJ's audience sentence (young people aged
+    15 to 25 experiencing behaviours like defiance and low confidence, or at
+    risk of juvenile justice intervention and homelessness) before the
+    delivered-beside-the-student paragraph. Manifest 173→176. Verified: built
+    clean (order/nav/cue/copy grep'd, fbclid=0, no grid markup while PRODUCTS
+    empty), Playwright program+shop desktop+phone. **To light the product grid:
+    get Saleh's product photos + names + prices (or store screenshots), drop
+    photos in `lotg-src/shop/`, fill PRODUCTS, rebuild.**
 - **Content rules:** everything on the page is from his real posts/bio — no
   invented facts. Real talk section carries Lifeline 13 11 14 / Beyond Blue
   1300 22 4636 / 000. Awaiting Saleh: exact wording sign-off, originals of his

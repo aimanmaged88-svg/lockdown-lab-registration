@@ -277,12 +277,60 @@
   .involve h4{font-family:var(--disp);font-weight:800;font-size:clamp(18px,2vw,23px);letter-spacing:-.02em;margin:0 0 6px}
   .involve p{margin:0;color:var(--ash);font-size:14.5px;line-height:1.6;max-width:60ch}
   .involve .cta{margin:0;justify-content:flex-end;width:auto}
-  .shop{background:radial-gradient(60% 50% at 0% 0%, rgba(226,180,78,.05), transparent 60%),var(--ink)}
-  .shop-card{margin-top:28px;border-color:rgba(226,180,78,.28);
-    background:linear-gradient(180deg,rgba(226,180,78,.06),var(--court))}
-  .shop-card h4{display:flex;align-items:center;gap:10px}
-  .shop-card .bag{display:inline-flex;color:var(--gold)}
-  .shop-card .bag svg{width:20px;height:20px}
+  /* the store */
+  .shop{position:relative;overflow:hidden;background:radial-gradient(70% 55% at 50% 0%, rgba(226,180,78,.07), transparent 60%),linear-gradient(180deg,var(--ink-2),var(--ink) 50%)}
+  .shop-stage{position:absolute;inset:0;z-index:0;pointer-events:none}
+  .shop-wm{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);height:min(120vh,900px);width:auto;opacity:.035}
+  .shop-glow{position:absolute;left:50%;top:38%;width:min(900px,110vw);height:min(600px,80vw);transform:translate(-50%,-50%);
+    background:radial-gradient(closest-side, rgba(226,180,78,.16), transparent 70%);filter:blur(40px)}
+  .shop .wrap{position:relative;z-index:1}
+  .shop-head{text-align:center;max-width:var(--maxw);margin:0 auto}
+  .shop h2{font-size:clamp(44px,8.5vw,112px);line-height:.9;letter-spacing:-.045em;max-width:none;margin:22px auto 0}
+  .shop .intro{margin:24px auto 0;max-width:52ch}
+  .marq{margin-top:clamp(36px,5vw,56px);border-top:1px solid var(--line-2);border-bottom:1px solid var(--line-2);overflow:hidden;
+    -webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
+  .marq-track{display:flex;align-items:center;gap:clamp(22px,4vw,44px);width:max-content;padding:14px 0;animation:marq 38s linear infinite}
+  .marq-track span{font-family:var(--disp);font-weight:700;font-size:clamp(11px,1.3vw,13px);letter-spacing:.28em;text-transform:uppercase;color:var(--gold);white-space:nowrap}
+  .marq-track i{width:5px;height:5px;border-radius:50%;background:var(--gold);opacity:.7;flex:0 0 auto}
+  @keyframes marq{to{transform:translateX(-50%)}}
+  .storefront{margin-top:clamp(40px,6vw,72px);display:grid;grid-template-columns:minmax(220px,.9fr) 1.6fr;gap:clamp(24px,4vw,56px);align-items:center;
+    border:1px solid rgba(226,180,78,.3);border-radius:6px;padding:clamp(26px,4vw,56px);
+    background:linear-gradient(135deg,rgba(226,180,78,.10),transparent 50%),linear-gradient(180deg,var(--court-2),var(--court));
+    box-shadow:inset 0 1px 0 var(--hi),0 50px 100px -60px rgba(0,0,0,.95),0 0 0 1px rgba(0,0,0,.4)}
+  .sf-badge{display:grid;place-items:center;aspect-ratio:1;border-radius:50%;
+    background:radial-gradient(closest-side, rgba(226,180,78,.18), rgba(226,180,78,.04) 70%, transparent 72%);
+    box-shadow:inset 0 0 0 1px rgba(226,180,78,.25)}
+  .sf-badge img{width:72%;height:auto;filter:drop-shadow(0 20px 40px rgba(0,0,0,.6))}
+  .sf-tag{display:inline-flex;align-items:center;gap:8px;font-family:var(--disp);font-weight:700;font-size:10.5px;letter-spacing:.26em;text-transform:uppercase;
+    color:#17130A;background:var(--gold);padding:7px 11px;border-radius:2px}
+  .sf-body h3{font-family:var(--disp);font-weight:900;font-size:clamp(26px,3.2vw,42px);letter-spacing:-.03em;line-height:1;margin:16px 0 12px}
+  .sf-body p{margin:0;color:var(--chalk-2);font-size:clamp(15px,1.5vw,17.5px);line-height:1.65;max-width:52ch;font-weight:300}
+  .sf-body .cta{margin-top:24px;justify-content:flex-start}
+  .sf-notes{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:22px;padding-top:18px;border-top:1px solid var(--line-2)}
+  .sf-notes span,.sf-notes a{display:inline-flex;align-items:center;gap:8px;color:var(--ash);font-size:13px;letter-spacing:.02em;text-decoration:none}
+  .sf-notes a:hover{color:var(--gold)}
+  .sf-notes i{width:5px;height:5px;border-radius:50%;background:var(--gold);flex:0 0 auto}
+  .shop-grid{margin-top:clamp(36px,5vw,64px);display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px}
+  .pcard{position:relative;display:block;border:1px solid var(--line);border-radius:6px;overflow:hidden;background:linear-gradient(180deg,var(--court-2),var(--court));
+    text-decoration:none;color:var(--chalk);box-shadow:inset 0 1px 0 var(--hi);transition:transform .35s var(--out),border-color .35s var(--out)}
+  .pcard:hover{transform:translateY(-4px);border-color:rgba(226,180,78,.45)}
+  .pimg{aspect-ratio:4/5;background:#0B0B0E}.pimg img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .8s var(--out)}
+  .pcard:hover .pimg img{transform:scale(1.04)}
+  .pmeta{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:14px 16px 16px}
+  .pmeta h4{font-family:var(--disp);font-weight:800;font-size:15px;letter-spacing:-.01em;margin:0}
+  .pmeta .price{font-family:var(--disp);font-weight:700;font-size:13px;color:var(--gold);white-space:nowrap}
+  .pgo{position:absolute;top:12px;right:12px;font-family:var(--disp);font-weight:700;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;
+    color:#17130A;background:var(--gold);padding:6px 9px;border-radius:2px;opacity:0;transform:translateY(-4px);transition:opacity .3s,transform .3s}
+  .pcard:hover .pgo{opacity:1;transform:none}
+  .shop-more{text-align:center;margin:26px 0 0}
+  .tailor{margin:14px 0 0;color:var(--gold-2);font-size:clamp(14.5px,1.4vw,16.5px);line-height:1.55;font-weight:400;max-width:58ch}
+  @media (max-width:820px){
+    .storefront{grid-template-columns:1fr;gap:22px;text-align:center}
+    .sf-badge{width:min(58%,220px);margin:0 auto}
+    .sf-body .cta{justify-content:center}.sf-body p{margin-inline:auto}.sf-notes{justify-content:center}
+    .shop h2{font-size:clamp(42px,13vw,64px)}
+  }
+  @media (prefers-reduced-motion:reduce){ .marq-track{animation:none;width:auto;flex-wrap:wrap;justify-content:center} .pcard,.pimg img,.pgo{transition:none} }
 
   /* closing statement */
   .close{padding:clamp(110px,16vh,200px) 0 clamp(90px,12vh,150px);text-align:center;border-top:1px solid var(--line-2);
@@ -603,12 +651,12 @@
 <div class="topbar" id="topbar">
   <a class="brand" href="#top"><img alt="" src="assets/mark.webp"/><b>Love of the Game</b></a>
   <nav>
+        <a class="txt" href="#program">Program</a>
+        <a class="txt" href="#shop">Shop</a>
         <a class="txt" href="#about">What we do</a>
         <a class="txt" href="#media">Stories</a>
         <a class="txt" href="#talk">Real talk</a>
-        <a class="txt" href="#program">Program</a>
         <a class="txt" href="#events">Events</a>
-        <a class="txt" href="#shop">Shop</a>
         <a class="txt" href="#contact">Contact</a>
         <a class="pill" href="https://www.instagram.com/loveofthegameaus" rel="noopener" target="_blank">Instagram</a>
   </nav>
@@ -623,12 +671,12 @@
     <header class="rise">
       <a class="brand" href="#top"><img alt="" src="assets/mark.webp"/><b>Love of the Game</b></a>
       <nav>
+        <a class="txt" href="#program">Program</a>
+        <a class="txt" href="#shop">Shop</a>
         <a class="txt" href="#about">What we do</a>
         <a class="txt" href="#media">Stories</a>
         <a class="txt" href="#talk">Real talk</a>
-        <a class="txt" href="#program">Program</a>
         <a class="txt" href="#events">Events</a>
-        <a class="txt" href="#shop">Shop</a>
         <a class="txt" href="#contact">Contact</a>
         <a class="ig" href="https://www.instagram.com/loveofthegameaus" rel="noopener" target="_blank">Instagram</a>
       </nav>
@@ -658,8 +706,120 @@
       </div>
     </footer>
   </div>
-  <a aria-label="Scroll to what we do" class="cue" href="#about"><span>Scroll</span>
+  <a aria-label="Scroll to The Next Play" class="cue" href="#program"><span>Scroll</span>
     <svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"></path></svg></a>
+</section>
+<section class="sec program" id="program">
+  <div aria-hidden="true" class="ghost">Next Play</div>
+  <div class="wrap">
+    <div class="prog-head rv">
+      <span class="kick" data-ed="program.t1">Schools program</span>
+      <h2 data-ed="program.h1">The Next <u>Play</u></h2>
+      <p class="sub" data-ed="program.t2">Educator-developed · Built on the NSW PDHPE syllabus</p>
+      <p class="intro" data-ed="program.t3">A nine-week, school-based mentoring and behaviour-support program that takes
+        <b>Your Journey, Your Story</b> off the court and into the classroom — built for the
+        young people who need it most.</p>
+      <p class="tailor" data-ed="program.t4">Every program can be tailored — the duration and the content are shaped to what you need, on request.</p>
+      <ul class="specs">
+        <li><b>9</b>Weeks</li>
+        <li><b>3</b>Phases</li>
+        <li>Ages 15 – 25</li>
+        <li>NSW PDHPE syllabus</li>
+        <li>School-based</li>
+        <li>Mentoring + behaviour support</li>
+        <li>Tailored on request</li>
+      </ul>
+    </div>
+
+    <div class="track rv dl1" id="track">
+      <div class="timeline">
+        <div aria-hidden="true" class="rail"><i class="fill"></i></div>
+        <ol class="phases">
+          <li class="phase">
+            <span aria-hidden="true" class="num">01</span>
+            <span class="wk" data-ed="program.t5">Weeks 1 – 3</span>
+            <h3 data-ed="program.h2">Understanding your journey</h3>
+            <p data-ed="program.t6">Your goals, your ambitions, your plans — and who you are.</p>
+          </li>
+          <li class="phase">
+            <span aria-hidden="true" class="num">02</span>
+            <span class="wk" data-ed="program.t7">Weeks 4 – 6</span>
+            <h3 data-ed="program.h3">Creating your story</h3>
+            <p data-ed="program.t8">Finding what needs to get done — and building the skills to do it.</p>
+          </li>
+          <li class="phase">
+            <span aria-hidden="true" class="num">03</span>
+            <span class="wk" data-ed="program.t9">Weeks 7 – 9</span>
+            <h3 data-ed="program.h4">Make it great</h3>
+            <p data-ed="program.t10">Knowing that your next steps are truly yours.</p>
+          </li>
+        </ol>
+      </div>
+      <div aria-hidden="true" class="ruler">
+        <i class="q">1</i><i>2</i><i>3</i><i class="q">4</i><i>5</i><i>6</i><i class="q">7</i><i>8</i><i>9</i>
+      </div>
+      <div aria-hidden="true" class="ruler-lbl"><span>Week one</span><span>Week nine</span></div>
+    </div>
+
+    <div class="forwho rv">
+      <div>
+        <h3 data-ed="program.h5">For the young people who need it <u>the most</u>.</h3>
+        <p data-ed="program.t11">The Next Play is built for young people aged 15 to 25 who are experiencing behaviours like
+          defiance and low confidence, or who are at risk of juvenile justice intervention and homelessness.</p>
+        <p data-ed="program.t12">It runs inside the school and is delivered beside the student — never above
+          them, never below them. If your school could use it, let's talk.</p>
+        <span class="mail" data-ed="program.t13">Email <a href="mailto:info@loveofthegame.com.au">info@loveofthegame.com.au</a></span>
+      </div>
+      <div class="cta">
+        <a class="btn btn-gold" data-about="The Next Play — for my school" data-ed="program.t14" href="#contact">Bring it to your school</a>
+        <a class="btn btn-ghost" data-ed="program.t15" href="https://www.instagram.com/loveofthegameaus" rel="noopener" target="_blank">Message on Instagram</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  (function(){
+    var t=document.getElementById('track'); if(!t)return;
+    if(!('IntersectionObserver' in window)){t.classList.add('on');return;}
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){ if(e.isIntersecting){t.classList.add('on');io.disconnect();} });
+    },{threshold:.25});
+    io.observe(t);
+  })();
+</script>
+
+<section class="sec shop" id="shop">
+  <div aria-hidden="true" class="shop-stage">
+    <img alt="" class="shop-wm" src="assets/mark.webp"/>
+    <div class="shop-glow"></div>
+    <div class="grain"></div>
+  </div>
+  <div class="wrap wide">
+    <div class="shop-head rv">
+      <span class="kick" data-ed="shop.t1">The store — with Strong Will Sports</span>
+      <h2 data-ed="shop.h1">Rep the <u>game</u>.</h2>
+      <p class="intro" data-ed="shop.t2">Love of the Game gear — the collection with Strong Will Sports. Take the community with you, on the court and off it.</p>
+    </div>
+    <div aria-hidden="true" class="marq rv dl1"><div class="marq-track"><span>The Love of the Game collection</span><i></i><span>With Strong Will Sports</span><i></i><span>Rep the game</span><i></i><span>Your journey, your story</span><i></i><span>The Love of the Game collection</span><i></i><span>With Strong Will Sports</span><i></i><span>Rep the game</span><i></i><span>Your journey, your story</span><i></i></div></div>
+    <div class="storefront rv dl2">
+      <div class="sf-badge"><img alt="Love of the Game crest" src="assets/crest.webp"/></div>
+      <div class="sf-body">
+        <span class="sf-tag" data-ed="shop.t3">The LOTG collection</span>
+        <h3 data-ed="shop.h2">Wear the community.</h3>
+        <p data-ed="shop.t4">The full Love of the Game range lives on the Strong Will Sports store — browse it, pick your piece, and checkout and shipping are handled there.</p>
+        <div class="cta">
+          <a class="btn btn-gold" data-ed="shop.t5" href="https://strongwillsports.com.au/lotg/" rel="noopener" target="_blank">Enter the store</a>
+          <a class="btn btn-ghost" data-ed="shop.t6" href="https://www.instagram.com/loveofthegameaus" rel="noopener" target="_blank">See it on Instagram</a>
+        </div>
+        <div class="sf-notes">
+          <span><i></i>Checkout &amp; shipping by Strong Will Sports</span>
+          <a data-about="Something else" href="#contact"><i></i>Questions about the range? Get in touch</a>
+        </div>
+      </div>
+    </div>
+    
+  </div>
 </section>
 <section class="sec about" id="about">
   <div class="wrap">
@@ -794,81 +954,6 @@
     </div>
   </div>
 </section>
-<section class="sec program" id="program">
-  <div aria-hidden="true" class="ghost">Next Play</div>
-  <div class="wrap">
-    <div class="prog-head rv">
-      <span class="kick" data-ed="program.t1">Schools program</span>
-      <h2 data-ed="program.h1">The Next <u>Play</u></h2>
-      <p class="sub" data-ed="program.t2">Educator-developed · Built on the NSW PDHPE syllabus</p>
-      <p class="intro" data-ed="program.t3">A nine-week, school-based mentoring and behaviour-support program that takes
-        <b>Your Journey, Your Story</b> off the court and into the classroom — built for the
-        young people who need it most.</p>
-      <ul class="specs">
-        <li><b>9</b>Weeks</li>
-        <li><b>3</b>Phases</li>
-        <li>NSW PDHPE syllabus</li>
-        <li>School-based</li>
-        <li>Mentoring + behaviour support</li>
-      </ul>
-    </div>
-
-    <div class="track rv dl1" id="track">
-      <div class="timeline">
-        <div aria-hidden="true" class="rail"><i class="fill"></i></div>
-        <ol class="phases">
-          <li class="phase">
-            <span aria-hidden="true" class="num">01</span>
-            <span class="wk" data-ed="program.t4">Weeks 1 – 3</span>
-            <h3 data-ed="program.h2">Understanding your journey</h3>
-            <p data-ed="program.t5">Your goals, your ambitions, your plans — and who you are.</p>
-          </li>
-          <li class="phase">
-            <span aria-hidden="true" class="num">02</span>
-            <span class="wk" data-ed="program.t6">Weeks 4 – 6</span>
-            <h3 data-ed="program.h3">Creating your story</h3>
-            <p data-ed="program.t7">Finding what needs to get done — and building the skills to do it.</p>
-          </li>
-          <li class="phase">
-            <span aria-hidden="true" class="num">03</span>
-            <span class="wk" data-ed="program.t8">Weeks 7 – 9</span>
-            <h3 data-ed="program.h4">Make it great</h3>
-            <p data-ed="program.t9">Knowing that your next steps are truly yours.</p>
-          </li>
-        </ol>
-      </div>
-      <div aria-hidden="true" class="ruler">
-        <i class="q">1</i><i>2</i><i>3</i><i class="q">4</i><i>5</i><i>6</i><i class="q">7</i><i>8</i><i>9</i>
-      </div>
-      <div aria-hidden="true" class="ruler-lbl"><span>Week one</span><span>Week nine</span></div>
-    </div>
-
-    <div class="forwho rv">
-      <div>
-        <h3 data-ed="program.h5">For the young people who need it <u>the most</u>.</h3>
-        <p data-ed="program.t10">The Next Play runs inside the school and is delivered beside the student — never above
-          them, never below them. If your school could use it, let's talk.</p>
-        <span class="mail" data-ed="program.t11">Email <a href="mailto:info@loveofthegame.com.au">info@loveofthegame.com.au</a></span>
-      </div>
-      <div class="cta">
-        <a class="btn btn-gold" data-about="The Next Play — for my school" data-ed="program.t12" href="#contact">Bring it to your school</a>
-        <a class="btn btn-ghost" data-ed="program.t13" href="https://www.instagram.com/loveofthegameaus" rel="noopener" target="_blank">Message on Instagram</a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<script>
-  (function(){
-    var t=document.getElementById('track'); if(!t)return;
-    if(!('IntersectionObserver' in window)){t.classList.add('on');return;}
-    var io=new IntersectionObserver(function(es){
-      es.forEach(function(e){ if(e.isIntersecting){t.classList.add('on');io.disconnect();} });
-    },{threshold:.25});
-    io.observe(t);
-  })();
-</script>
-
 <section class="sec events" id="events">
   <div class="wrap wide">
     <div class="ev-head rv">
@@ -924,23 +1009,6 @@
       <div class="cta">
         <a class="btn btn-gold" data-ed="events.t12" href="https://www.instagram.com/loveofthegameaus" rel="noopener" target="_blank">Message on Instagram</a>
         <a class="btn btn-ghost" data-about="Sponsorship &amp; partnerships" data-ed="events.t13" href="#contact">Sponsor an event</a>
-      </div>
-    </div>
-  </div>
-</section>
-<section class="sec shop" id="shop">
-  <div class="wrap">
-    <span class="kick rv" data-ed="shop.t1">Shop</span>
-    <h2 class="rv dl1" data-ed="shop.h1">Rep the <u>game</u>.</h2>
-    <p class="intro rv dl2" data-ed="shop.t2">Love of the Game gear — a collection with Strong Will Sports. Take the community with you, on the court and off it.</p>
-    <div class="involve shop-card rv dl2">
-      <div>
-        <h4 data-ed="shop.h2"><span class="bag"><svg aria-hidden="true" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" viewBox="0 0 24 24"><path d="M6 8h12l-1 12H7z"></path><path d="M9 8V6a3 3 0 0 1 6 0v2"></path></svg></span>The Love of the Game collection</h4>
-        <p data-ed="shop.t3">Browse the full range and order over on the Strong Will Sports store — checkout and shipping are handled there.</p>
-      </div>
-      <div class="cta">
-        <a class="btn btn-gold" data-ed="shop.t4" href="https://strongwillsports.com.au/lotg/" rel="noopener" target="_blank">Shop the collection</a>
-        <a class="btn btn-ghost" data-ed="shop.t5" href="https://www.instagram.com/loveofthegameaus" rel="noopener" target="_blank">See it on Instagram</a>
       </div>
     </div>
   </div>
@@ -1028,8 +1096,8 @@
         <p data-ed="footer.t3">A community built around sport, stories and looking out for each other — making a difference on and off the court, across NSW.</p>
       </div>
       <div><h5 data-ed="footer.h1">Explore</h5><ul>
-        <li><a data-ed="footer.t4" href="#about">What we do</a></li><li><a data-ed="footer.t5" href="#media">Stories</a></li><li><a data-ed="footer.t6" href="#talk">Real talk</a></li>
-        <li><a data-ed="footer.t7" href="#program">The Next Play</a></li><li><a data-ed="footer.t8" href="#events">Community &amp; events</a></li><li><a data-ed="footer.t9" href="#shop">Shop</a></li><li><a data-ed="footer.t10" href="#contact">Contact &amp; bookings</a></li><li><a data-ed="footer.t11" data-sbox="" href="#">Suggestion box</a></li></ul></div>
+        <li><a data-ed="footer.t4" href="#program">The Next Play</a></li><li><a data-ed="footer.t5" href="#shop">Shop</a></li><li><a data-ed="footer.t6" href="#about">What we do</a></li>
+        <li><a data-ed="footer.t7" href="#media">Stories</a></li><li><a data-ed="footer.t8" href="#talk">Real talk</a></li><li><a data-ed="footer.t9" href="#events">Community &amp; events</a></li><li><a data-ed="footer.t10" href="#contact">Contact &amp; bookings</a></li><li><a data-ed="footer.t11" data-sbox="" href="#">Suggestion box</a></li></ul></div>
       <div><h5 data-ed="footer.h2">Connect</h5><ul>
         <li><a data-ed="footer.t12" href="https://www.instagram.com/loveofthegameaus" rel="noopener" target="_blank">Instagram<small>@loveofthegameaus</small></a></li>
         <li><a data-ed="footer.t13" href="https://www.threads.net/@loveofthegameaus" rel="noopener" target="_blank">Threads<small>@loveofthegameaus</small></a></li>

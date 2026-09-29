@@ -27,11 +27,11 @@ def tag_content(html):
     soup=BeautifulSoup(html,"html5lib"); body=soup.body
     txt_sel=['h1','h2','h3','h4','h5','p','.eyebrow','.kick','.count','.box','.tag','.wk','.mail','.resp',
              '.motto small','.strip span','.direct a','.direct span','.foot-bar span','.brandblock b','.brandblock span',
-             'a.btn','button.btn','.more','.quick b','.quick small','.foot ul a']
+             'a.btn','button.btn','.more','.quick b','.quick small','.foot ul a','.sf-tag','.pcard .price']
     cids=set()
     for sel in txt_sel:
         for el in body.select(sel): cids.add(id(el))
-    imgset=set(id(e) for e in body.select('.tile img, .card img'))
+    imgset=set(id(e) for e in body.select('.tile img, .card img, .pcard img'))
     def leaf(el):
         for d in el.descendants:
             if getattr(d,'name',None) and id(d) in cids: return False
@@ -100,12 +100,12 @@ head=f'''<title>Love of the Game</title>
 <style>
 {css}</style>
 '''
-NAV='''<a class="txt" href="#about">What we do</a>
+NAV='''<a class="txt" href="#program">Program</a>
+        <a class="txt" href="#shop">Shop</a>
+        <a class="txt" href="#about">What we do</a>
         <a class="txt" href="#media">Stories</a>
         <a class="txt" href="#talk">Real talk</a>
-        <a class="txt" href="#program">Program</a>
         <a class="txt" href="#events">Events</a>
-        <a class="txt" href="#shop">Shop</a>
         <a class="txt" href="#contact">Contact</a>'''
 PLAY='<span class="play"><svg viewBox="0 0 24 24"><path d="M6 3l14 9-14 9z"/></svg></span>'
 VIEW='<span class="play"><svg viewBox="0 0 24 24"><path d="M4 8h12v12H4zM8 4h12v12h-2V6H8z"/></svg></span>'
@@ -155,7 +155,7 @@ hero=f'''<div class="topbar" id="topbar">
       </div>
     </footer>
   </div>
-  <a class="cue" href="#about" aria-label="Scroll to what we do"><span>Scroll</span>
+  <a class="cue" href="#program" aria-label="Scroll to The Next Play"><span>Scroll</span>
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></a>
 </section>
 '''
@@ -294,22 +294,56 @@ events=f'''<section class="sec events" id="events">
   </div>
 </section>
 '''
-BAG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 8h12l-1 12H7z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/></svg>'
+# ---- The store -------------------------------------------------------------
+# Real products only. The Strong Will Sports storefront sits behind a bot-wall so it
+# can't be scraped; when Saleh sends product shots they go in lotg-src/shop/ and get
+# listed here — until then PRODUCTS is empty and the grid simply doesn't render.
+#   {"name":"LOTG Hoodie","price":"$89","img":"hoodie.jpg","url":"https://strongwillsports.com.au/…"}
+import re
+PRODUCTS=[]
+SHOP_DIR=sp/"shop"
+def product_card(p):
+    slug=re.sub(r'[^a-z0-9]+','-',p["name"].lower()).strip('-')
+    im=Image.open(SHOP_DIR/p["img"]); im.thumbnail((900,1125),Image.LANCZOS)
+    src=emit(im.convert("RGB"),"shop-"+slug,88)
+    return f'''      <a class="pcard" href="{p.get("url") or SHOP}" target="_blank" rel="noopener">
+        <div class="pimg"><img src="{src}" alt="{p["name"]}" loading="lazy" decoding="async"></div>
+        <div class="pmeta"><h4>{p["name"]}</h4><span class="price">{p.get("price","")}</span></div>
+        <span class="pgo">Shop →</span>
+      </a>'''
+grid=('<div class="shop-grid rv">\n'+'\n'.join(product_card(p) for p in PRODUCTS)+'\n    </div>\n'
+      f'    <p class="shop-more rv"><a class="btn btn-ghost" href="{SHOP}" target="_blank" rel="noopener">See the full range</a></p>') if PRODUCTS else ''
+MQ=''.join(f'<span>{t}</span><i></i>' for t in ["The Love of the Game collection","With Strong Will Sports","Rep the game","Your journey, your story"])
 shop=f'''<section class="sec shop" id="shop">
-  <div class="wrap">
-    <span class="kick rv">Shop</span>
-    <h2 class="rv dl1">Rep the <u>game</u>.</h2>
-    <p class="intro rv dl2">Love of the Game gear — a collection with Strong Will Sports. Take the community with you, on the court and off it.</p>
-    <div class="involve shop-card rv dl2">
-      <div>
-        <h4><span class="bag">{BAG}</span>The Love of the Game collection</h4>
-        <p>Browse the full range and order over on the Strong Will Sports store — checkout and shipping are handled there.</p>
-      </div>
-      <div class="cta">
-        <a class="btn btn-gold" href="{SHOP}" target="_blank" rel="noopener">Shop the collection</a>
-        <a class="btn btn-ghost" href="{IG}" target="_blank" rel="noopener">See it on Instagram</a>
+  <div class="shop-stage" aria-hidden="true">
+    <img class="shop-wm" src="{MARK}" alt="">
+    <div class="shop-glow"></div>
+    <div class="grain"></div>
+  </div>
+  <div class="wrap wide">
+    <div class="shop-head rv">
+      <span class="kick">The store — with Strong Will Sports</span>
+      <h2>Rep the <u>game</u>.</h2>
+      <p class="intro">Love of the Game gear — the collection with Strong Will Sports. Take the community with you, on the court and off it.</p>
+    </div>
+    <div class="marq rv dl1" aria-hidden="true"><div class="marq-track">{MQ}{MQ}</div></div>
+    <div class="storefront rv dl2">
+      <div class="sf-badge"><img src="{CREST}" alt="Love of the Game crest"></div>
+      <div class="sf-body">
+        <span class="sf-tag">The LOTG collection</span>
+        <h3>Wear the community.</h3>
+        <p>The full Love of the Game range lives on the Strong Will Sports store — browse it, pick your piece, and checkout and shipping are handled there.</p>
+        <div class="cta">
+          <a class="btn btn-gold" href="{SHOP}" target="_blank" rel="noopener">Enter the store</a>
+          <a class="btn btn-ghost" href="{IG}" target="_blank" rel="noopener">See it on Instagram</a>
+        </div>
+        <div class="sf-notes">
+          <span><i></i>Checkout &amp; shipping by Strong Will Sports</span>
+          <a href="#contact" data-about="Something else"><i></i>Questions about the range? Get in touch</a>
+        </div>
       </div>
     </div>
+    {grid}
   </div>
 </section>
 '''
@@ -400,8 +434,8 @@ foot=f'''<div class="sec foot" id="footer" role="contentinfo">
         <p>A community built around sport, stories and looking out for each other — making a difference on and off the court, across NSW.</p>
       </div>
       <div><h5>Explore</h5><ul>
-        <li><a href="#about">What we do</a></li><li><a href="#media">Stories</a></li><li><a href="#talk">Real talk</a></li>
-        <li><a href="#program">The Next Play</a></li><li><a href="#events">Community &amp; events</a></li><li><a href="#shop">Shop</a></li><li><a href="#contact">Contact &amp; bookings</a></li><li><a href="#" data-sbox>Suggestion box</a></li></ul></div>
+        <li><a href="#program">The Next Play</a></li><li><a href="#shop">Shop</a></li><li><a href="#about">What we do</a></li>
+        <li><a href="#media">Stories</a></li><li><a href="#talk">Real talk</a></li><li><a href="#events">Community &amp; events</a></li><li><a href="#contact">Contact &amp; bookings</a></li><li><a href="#" data-sbox>Suggestion box</a></li></ul></div>
       <div><h5>Connect</h5><ul>
         <li><a href="{IG}" target="_blank" rel="noopener">Instagram<small>@loveofthegameaus</small></a></li>
         <li><a href="https://www.threads.net/@loveofthegameaus" target="_blank" rel="noopener">Threads<small>@loveofthegameaus</small></a></li>
@@ -508,7 +542,7 @@ community=f'''<div class="welcome" id="welcome" role="dialog" aria-modal="true" 
 </div>
 
 '''
-_content=hero+about+media+talk+prog+events+shop+contact+close+foot
+_content=hero+prog+shop+about+media+talk+events+contact+close+foot
 _tagged,MANIFEST=tag_content(_content)
 page=head+_tagged+community+scripts
 if MODE=="deploy":
