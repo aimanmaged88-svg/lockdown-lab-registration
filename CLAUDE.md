@@ -1391,6 +1391,27 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   - **Contact form now mirrors every inquiry into the inbox** (scripts.html contact handler → `lotgApi submit`), tagged by the "I'm contacting about" reason mapped to a filter category (Next Play / Event booking / Sponsorship / Media / Story / General); phone/org/dates folded into the body, email as `contact`. **The email-to-info@ path is untouched** — the form still posts to Netlify Forms; the inbox is an added copy. (Netlify form email notification to info@loveofthegame.com.au is still Aiman's own dashboard click — Forms → Submission notifications; no MCP/API op for it.)
   - **One login for both surfaces:** `lotg-inbox` v4 added `editorAuth(token)` — admin_list/set/del accept EITHER the editor session token (validated against `lotg_edit_user`, 45-day TTL, `adminOk()`) OR the legacy owner PIN (the `?hq` desk on the main site still works on the PIN). KINDS extended with the 6 inquiry categories + "Inquiry". Deployed via Supabase MCP (v4); E2E-verified (token auth ok, bad token 401, "Next Play" stored not collapsed to Other); test rows + temp editor deleted. `pin_set` stays PIN-only.
   - Verified: JS clean, dashboard renders Inbox (filter chips + status + cards) / Edit / Team on mobile + desktop; contact mirror wired + public JS syntax clean.
+  - **Auto-refreshing inbox + installable desk (2026-09-29, commit 820d927).**
+    Aiman tested the live contact form and it "didn't come in". Diagnosed:
+    his submit (09-29 03:28:29 UTC) hit right as the mirror deploy was still
+    landing (mirror committed 03:22, pushed ~03:24, Netlify build ~2-4min) — his
+    page was **stale** (no mirror JS yet), so no inbox row; Netlify also
+    spam-flagged that submission (form `submission_count:0`). Backend + deployed
+    mirror both verified 100% correct AFTER deploy (live curl `{"ok":true}` →
+    row lands; the whole path re-tested). TWO real gaps fixed so it can't bite
+    again: (1) **inbox auto-refreshes** — was load-on-tab-open only; now
+    `startInboxPoll()` every 20s + reload on `visibilitychange`/window focus +
+    a manual **↻ Refresh** button, with `ibSig()` change-detection so a poll
+    never repaints mid-read; badge/counts live. (2) **desk installs as an app**
+    — `edit.webmanifest` (start_url /edit.html, standalone), apple-touch-icon +
+    iOS metas, gold LOTG mark icons `desk-180/192/512.png` (built by build.py
+    `goldm`), and a dismissible **install bar** (`refreshInstallBar()`,
+    `lotg_desk_hideinstall`) that teaches the gesture per-platform (Android menu
+    → Add to Home screen; iOS Share → Add to Home Screen; one-tap
+    `beforeinstallprompt` where supported). Verified E2E Playwright 14/14
+    (contact mirror fires w/ right category+fields, Netlify path still fires,
+    Refresh pulls a new enquiry into the open inbox, badge updates). Diag test
+    row deleted; `lotg_suggestions` clean.
 - **Content rules:** everything on the page is from his real posts/bio — no
   invented facts. Real talk section carries Lifeline 13 11 14 / Beyond Blue
   1300 22 4636 / 000. Awaiting Saleh: exact wording sign-off, originals of his
