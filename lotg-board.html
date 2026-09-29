@@ -208,6 +208,16 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
 .rc-tap{position:fixed;bottom:52px;color:#888;font-size:11.5px;letter-spacing:.08em;text-transform:uppercase}
 .recapthumbs{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}
 .recapthumbs img{width:52px;height:52px;object-fit:cover;border-radius:8px;border:1px solid var(--line)}
+/* merch gate — the first thing anyone sees, every single open (his ask) */
+.gear{position:fixed;inset:0;z-index:65;background:var(--bg);overflow-y:auto;display:none}
+.gear.open{display:block;animation:fade .32s var(--ease)}
+.gear-wrap{max-width:460px;margin:0 auto;padding:30px 18px calc(34px + env(safe-area-inset-bottom));text-align:center;min-height:100%;display:flex;flex-direction:column;justify-content:center}
+.gearkick{font-family:var(--disp);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--acc2);margin:16px 0 8px}
+[data-theme="retro"] .gearkick{font-family:var(--street);letter-spacing:.06em;text-transform:none;font-size:15px}
+.gear h2{font-family:var(--disp);font-size:30px;line-height:1.08;margin:0 0 12px;letter-spacing:.01em}
+[data-theme="retro"] .gear h2{font-family:var(--street);font-weight:400;font-size:33px}
+.gearsub{color:var(--muted);font-size:14.5px;line-height:1.55;margin:0 0 22px}
+.gear .reelbtn{font-size:15px;padding:17px}
 .intro{position:fixed;inset:0;z-index:60;background:var(--bg);overflow-y:auto;display:none}
 .intro.open{display:block;animation:fade .35s var(--ease)}
 .intro-wrap{max-width:520px;margin:0 auto;padding:22px 16px 46px;text-align:center}
@@ -355,6 +365,8 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
     <div class="arow2" style="margin:8px 0"><input id="nnNotice" type="text" placeholder="Announcement — e.g. Week 4 draw drops Wednesday 26/8" maxlength="90"/></div>
     <div class="arow2" style="margin:8px 0"><input id="nnReel" type="text" placeholder="Full highlight reel link (https://…)" maxlength="300"/></div>
     <div class="arow2" style="margin:8px 0"><input id="nnEmbed" type="text" placeholder="Instagram post/reel to FEATURE on opening (paste the link)" maxlength="300"/></div>
+    <div class="arow2" style="margin:8px 0"><input id="nnGear" type="text" placeholder="🛒 Merch pop-up link — shows FIRST, every open (blank = off)" maxlength="300"/></div>
+    <div class="arow2" style="margin:8px 0"><input id="nnGearTxt" type="text" placeholder="Line under the merch heading (optional)" maxlength="120"/></div>
     <div class="arow2" style="margin:8px 0"><input id="nnMerch" type="text" placeholder="Merch shop link (https://…, blank = off)" maxlength="300"/></div>
     <div class="arow2" style="margin:8px 0"><input id="nnMerchTxt" type="text" placeholder="Merch pitch line — e.g. Support SJ, grab the merch" maxlength="160"/></div>
     <div class="arow2" style="margin:8px 0"><textarea id="nnMotd" placeholder="Message of the night" maxlength="300" style="flex:1;min-height:84px;background:var(--card);border:var(--bw) solid var(--line);border-radius:12px;padding:12px;color:var(--ink);font-family:inherit;font-size:15px;resize:vertical"></textarea></div>
@@ -442,6 +454,17 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
   </div>
 </div>
 
+<div class="gear" id="gearGate">
+  <div class="gear-wrap">
+    <img src="/assets/lotg-logo.jpg" alt="Love of the Game" class="logoimg" style="height:58px;margin:0 auto"/>
+    <div class="gearkick">🛒 Official LOTG gear</div>
+    <h2>Get your merch today</h2>
+    <p class="gearsub" id="gearSub"></p>
+    <a class="reelbtn" id="gearGo" href="#" target="_blank" rel="noopener">Click here 🛒</a>
+    <button class="bigbtn ghost" id="gearSkip" style="margin-top:2px">Proceed to the schedule →</button>
+  </div>
+</div>
+
 <div class="intro" id="intro">
   <button class="rc-x" id="inX" aria-label="Skip to the app">×</button>
   <div class="intro-wrap">
@@ -512,7 +535,7 @@ function fmtTime(mins){
 /* ---------- load ---------- */
 function weekGames(){return state.games.filter(g=>(g.week||1)===state.wk);}
 function cachePaint(){
-  try{const c=JSON.parse(localStorage.getItem('lotg_cache')||'null');if(c){Object.assign(state,{teams:c.teams,games:c.games,wk:c.wk,settings:c.settings||state.settings});renderAll();}}catch(e){}
+  try{const c=JSON.parse(localStorage.getItem('lotg_cache')||'null');if(c){Object.assign(state,{teams:c.teams,games:c.games,wk:c.wk,settings:c.settings||state.settings});renderAll();renderGear();}}catch(e){}
 }
 async function loadAll(){
   const [teams,games,adm]=await Promise.all([
@@ -525,7 +548,7 @@ async function loadAll(){
   state.tn=Math.max(1,...state.games.map(g=>g.tournament||1));
   state.settings={start:"7:15 PM",...(adm?.[0]?.settings||{})};
   try{localStorage.setItem('lotg_cache',JSON.stringify({teams:state.teams,games:state.games,wk:state.wk,settings:state.settings}))}catch(e){}
-  renderAll();renderIntro();
+  renderAll();renderGear();renderIntro();
 }
 
 /* ---------- render ---------- */
@@ -1012,6 +1035,23 @@ function igEmbed(u){
   const base=m[0].replace('://instagram.com','://www.instagram.com');
   return `<div class="igembed"><iframe src="${base}/embed/captioned/" title="Instagram" loading="lazy" allowfullscreen allow="autoplay; encrypted-media"></iframe><a class="reelbtn" href="${base}/" target="_blank" rel="noopener">📸 Watch it on Instagram ↗</a></div>`;
 }
+/* The merch gate. No 3-hour suppression and no admin skip — he asked for it
+   in front of everyone, every time the link is opened. Once per page load. */
+let gearSeen=false;
+function renderGear(){
+  const el=$('#gearGate');if(!el||gearSeen)return;
+  const u=(state.settings.gearUrl||'').trim();
+  if(!/^https?:\/\//.test(u)){el.classList.remove('open');return;}
+  $('#gearGo').href=u;
+  const sub=(state.settings.gearTxt||'').trim();
+  $('#gearSub').textContent=sub;
+  $('#gearSub').style.display=sub?'':'none';
+  el.classList.add('open');window.scrollTo(0,0);
+}
+function closeGear(){gearSeen=true;$('#gearGate').classList.remove('open');}
+$('#gearSkip').onclick=closeGear;
+$('#gearGo').onclick=()=>setTimeout(closeGear,120);  // shop opens in a new tab; step aside behind it
+
 let introSig='',introPrev=false;
 function renderIntro(){
   const el=$('#intro');
@@ -1119,6 +1159,8 @@ function renderRecapAdmin(){
   if($('#nnNotice')&&document.activeElement?.id!=='nnNotice')$('#nnNotice').value=state.settings.notice||'';
   if($('#nnReel')&&document.activeElement?.id!=='nnReel')$('#nnReel').value=state.settings.reelUrl||'';
   if($('#nnEmbed')&&document.activeElement?.id!=='nnEmbed')$('#nnEmbed').value=state.settings.introEmbed||'';
+  if($('#nnGear')&&document.activeElement?.id!=='nnGear')$('#nnGear').value=state.settings.gearUrl||'';
+  if($('#nnGearTxt')&&document.activeElement?.id!=='nnGearTxt')$('#nnGearTxt').value=state.settings.gearTxt||'';
   if($('#nnMerch')&&document.activeElement?.id!=='nnMerch')$('#nnMerch').value=state.settings.merchUrl||'';
   if($('#nnMerchTxt')&&document.activeElement?.id!=='nnMerchTxt')$('#nnMerchTxt').value=state.settings.merchTxt||'';
   if($('#nnMotd')&&document.activeElement?.id!=='nnMotd')$('#nnMotd').value=state.settings.motd||MOTD_DEFAULT;
@@ -1218,6 +1260,10 @@ $('#nnSave').onclick=async()=>{
   notice?st.notice=notice:delete st.notice;
   if(reel&&!/^https?:\/\//.test(reel)){toast('Reel link needs to start with https://');return;}
   reel?st.reelUrl=reel:delete st.reelUrl;
+  const gear=($('#nnGear')?.value||'').trim(),gearTxt=($('#nnGearTxt')?.value||'').trim();
+  if(gear&&!/^https?:\/\//.test(gear)){toast('Merch link needs to start with https://');return;}
+  gear?st.gearUrl=gear:delete st.gearUrl;
+  gearTxt?st.gearTxt=gearTxt:delete st.gearTxt;
   const embed=$('#nnEmbed').value.trim();
   if(embed&&!igEmbed(embed)){toast('Feature link needs to be an Instagram post/reel link');return;}
   embed?st.introEmbed=embed:delete st.introEmbed;
