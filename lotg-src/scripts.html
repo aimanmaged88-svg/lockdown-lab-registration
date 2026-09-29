@@ -81,6 +81,19 @@
       e.preventDefault(); if(!f.checkValidity()){ f.reportValidity(); return; }
       var btn=document.getElementById('cSend'); btn.disabled=true; btn.textContent='Sending…'; box.classList.remove('err');
       if(!live){ setTimeout(function(){ box.classList.add('sent'); },500); return; }
+      // Mirror this inquiry into SJ's private dashboard inbox, tagged by reason so he can
+      // filter it. Fire-and-forget — the email-to-info@ path (Netlify Forms, below) is untouched.
+      try{
+        var mfd=new FormData(f), about=(mfd.get('about')||'').trim();
+        var CAT={'The Next Play \u2014 for my school':'Next Play','Book an event or call-out':'Event booking','Sponsorship & partnerships':'Sponsorship','Media, interviews & coverage':'Media','Share my story':'Story','Something else':'General'};
+        var ln=[]; var msg=(mfd.get('message')||'').trim(); if(msg) ln.push(msg);
+        if(about) ln.push('\u2014 '+about);
+        var ph=(mfd.get('phone')||'').trim(); if(ph) ln.push('Phone: '+ph);
+        var og=(mfd.get('organisation')||'').trim(); if(og) ln.push('School / org: '+og);
+        var dt=(mfd.get('dates')||'').trim(); if(dt) ln.push('Preferred dates: '+dt);
+        if(window.lotgApi) window.lotgApi({action:'submit', device:window.lotgDev(), ua:(navigator.userAgent||'').slice(0,200),
+          kind:(CAT[about]||'General'), body:ln.join('\n'), name:(mfd.get('name')||'').trim(), contact:(mfd.get('email')||'').trim()});
+      }catch(_e){}
       fetch('/',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams(new FormData(f)).toString()})
         .then(function(r){ if(!r.ok) throw new Error(r.status); box.classList.add('sent'); })
         .catch(function(){ box.classList.add('err'); btn.disabled=false; btn.textContent='Send it'; });

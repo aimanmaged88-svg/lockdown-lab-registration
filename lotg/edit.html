@@ -78,6 +78,38 @@
   .edrow .rm:hover{color:var(--bad)}
   .edadd{display:flex;gap:8px}.edadd input{flex:1 1 auto}
   .edadd .up{white-space:nowrap}
+  /* dashboard shell + inbox */
+  .hd{position:sticky;top:0;z-index:20;background:var(--ink)}
+  .hd .bar{position:static}
+  .tabnav{display:flex;background:rgba(9,9,11,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--line2)}
+  .tabnav button{flex:1;background:none;border:0;border-bottom:2px solid transparent;color:var(--ash);font-family:var(--disp);font-weight:800;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;padding:13px 6px;cursor:pointer;min-height:46px}
+  .tabnav button.on{color:var(--chalk);border-bottom-color:var(--gold)}
+  .tabnav .badge{display:inline-block;min-width:17px;padding:1px 5px;margin-left:5px;border-radius:99px;background:var(--gold);color:#17130A;font-size:10px;font-weight:800;font-family:var(--disp)}
+  .ibhead{margin:0 0 14px}
+  .ibhead h2{font-family:var(--disp);font-weight:900;font-size:22px;margin:0 0 4px}
+  .stseg{display:flex;gap:6px;margin:0 0 12px}
+  .stseg button{flex:1;background:rgba(242,239,230,.03);border:1px solid var(--line);color:var(--ash);border-radius:8px;font-family:var(--disp);font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:10px 6px;cursor:pointer;min-height:42px}
+  .stseg button.on{color:var(--chalk);border-color:var(--gold);background:rgba(226,180,78,.08)}
+  .stseg button i{font-style:normal;opacity:.7;margin-left:3px}
+  .chips{display:flex;gap:7px;overflow-x:auto;padding:0 0 4px;margin:0 0 14px;-webkit-overflow-scrolling:touch}
+  .chips button{flex:0 0 auto;background:rgba(242,239,230,.03);border:1px solid var(--line);color:var(--chalk2);border-radius:99px;font-size:12.5px;padding:7px 12px;cursor:pointer;white-space:nowrap;min-height:34px}
+  .chips button.on{background:var(--chalk);color:var(--ink);border-color:var(--chalk);font-weight:600}
+  .chips button i{font-style:normal;opacity:.55;margin-left:4px}
+  .msgs{display:flex;flex-direction:column;gap:10px}
+  .msg{background:linear-gradient(180deg,var(--court2),var(--court));border:1px solid var(--line);border-radius:10px;padding:14px 15px}
+  .mtop{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:7px}
+  .cat{font-family:var(--disp);font-weight:800;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);border:1px solid rgba(226,180,78,.35);border-radius:99px;padding:3px 9px}
+  .ago{font-size:11.5px;color:var(--dim);white-space:nowrap}
+  .who{font-size:14px;color:var(--chalk);margin-bottom:6px;word-break:break-word}
+  .who a{color:var(--gold)}
+  .mbody{font-size:13.5px;line-height:1.5;color:var(--chalk2);white-space:pre-wrap;word-break:break-word}
+  .mact{display:flex;gap:7px;flex-wrap:wrap;margin-top:11px}
+  .mact button{background:rgba(242,239,230,.04);border:1px solid var(--line);color:var(--chalk2);border-radius:7px;font-family:var(--disp);font-weight:700;font-size:11px;letter-spacing:.04em;padding:9px 12px;cursor:pointer;min-height:38px}
+  .mact button:hover{border-color:var(--gold);color:var(--chalk)}
+  .mact button.ap{background:rgba(143,227,176,.1);border-color:rgba(143,227,176,.4);color:var(--ok)}
+  .mact button.del{margin-left:auto;color:var(--dim)}
+  .mact button.del:hover{color:var(--bad);border-color:rgba(233,166,166,.5)}
+  .ibempty{text-align:center;color:var(--dim);font-size:14px;padding:40px 10px;border:1px dashed var(--line);border-radius:10px}
   [hidden]{display:none!important}
 </style>
 </head>
@@ -100,6 +132,9 @@ window.EDIT_MANIFEST = [{"key": "top.t1", "section": "Top / Hero", "type": "text
   function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
   function toast(msg,bad){ toastEl.textContent=msg; toastEl.className='toast on'+(bad?' bad':''); clearTimeout(tt); tt=setTimeout(function(){toastEl.className='toast';},2600); }
   function cur(k){ return (k in overrides)?overrides[k]:(defaults[k]||''); }
+  var INBOX="https://ymuwuhvqqftgpxwhzoub.supabase.co/functions/v1/lotg-inbox";
+  function ibapi(p){ return fetch(INBOX,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+ANON,"apikey":ANON},body:JSON.stringify(p)})
+    .then(function(r){ return r.json().catch(function(){return{};}).then(function(j){ return {ok:r.ok,status:r.status,j:j}; }); }); }
 
   // ---------- auth ----------
   function fail(){ app.innerHTML='<div class="wrap" style="text-align:center;color:var(--bad);padding-top:14vh">Could not reach the editor. Check your connection and reload.</div>'; }
@@ -147,50 +182,125 @@ window.EDIT_MANIFEST = [{"key": "top.t1", "section": "Top / Hero", "type": "text
     em.focus();
   }
 
-  // ---------- dashboard ----------
-  function groups(){ var g=[], seen={}; MAN.forEach(function(m){ if(!(m.section in seen)){ seen[m.section]=g.length; g.push({name:m.section, items:[]}); } g[seen[m.section]].items.push(m); }); return g; }
+  // ---------- dashboard shell ----------
+  var ME='', VIEW='inbox';
   function dash(email){
-    dirty={};
-    var html='<div class="bar"><b>Love of the <span>Game</span> · Editor</b><div class="r">'
-      + '<a class="ib" href="/" target="_blank" rel="noopener">View site</a>'
-      + '<button class="ib" id="logout">Log out</button></div></div>'
-      + '<div class="wrap">'
-      + '<p class="lead">Change any wording, or replace any photo by uploading from your phone. Hit <b>Save</b> and it goes live. Signed in as '+esc(email)+'.</p>';
+    ME=email; dirty={};
+    app.innerHTML =
+      '<header class="hd"><div class="bar"><b>Love of the <span>Game</span> · Desk</b>'
+        +'<div class="r"><a class="ib" href="/" target="_blank" rel="noopener">View site</a><button class="ib" id="logout">Log out</button></div></div>'
+        +'<div class="tabnav">'
+          +'<button data-v="inbox" class="on">Inbox <span class="badge" id="ibBadge" hidden>0</span></button>'
+          +'<button data-v="edit">Edit site</button>'
+          +'<button data-v="team">Team</button>'
+        +'</div></header>'
+      +'<div class="wrap" id="view"></div>'
+      +'<div class="savebar" id="savebar" style="display:none"><button class="btn ghost" id="discard" style="flex:.5">Discard</button><button class="btn" id="saveall">Save changes</button></div>';
+    document.getElementById('logout').onclick=function(){ api({action:'logout',token:token}); setTok(''); boot(); };
+    document.querySelector('.tabnav').addEventListener('click',function(e){ var b=e.target.closest('button[data-v]'); if(b) show(b.getAttribute('data-v')); });
+    document.getElementById('saveall').onclick=saveAll;
+    document.getElementById('discard').onclick=function(){ dirty={}; renderEdit(document.getElementById('view')); refreshBar(); };
+    show('inbox');
+    loadInbox();
+  }
+  function show(v){
+    VIEW=v;
+    [].forEach.call(document.querySelectorAll('.tabnav button'),function(b){ b.classList.toggle('on', b.getAttribute('data-v')===v); });
+    var host=document.getElementById('view'), sb=document.getElementById('savebar');
+    try{ window.scrollTo(0,0); }catch(e){}
+    if(v==='edit'){ sb.style.display=''; renderEdit(host); refreshBar(); }
+    else { sb.style.display='none'; sb.classList.remove('on'); if(v==='inbox'){ renderInbox(host); loadInbox(); } else renderTeam(host); }
+  }
+
+  // ---------- inbox ----------
+  var IBDATA={items:[],counts:{pending:0,approved:0,declined:0}}, IBST='pending', IBCAT='all', ibBusy=false, ibLoaded=false;
+  var STLABEL={pending:'New',approved:'Handled',declined:'Archived'};
+  function ago(iso){ try{ var s=(Date.now()-new Date(iso).getTime())/1000; if(s<60)return'just now'; if(s<3600)return Math.floor(s/60)+'m ago'; if(s<86400)return Math.floor(s/3600)+'h ago'; if(s<604800)return Math.floor(s/86400)+'d ago'; return new Date(iso).toLocaleDateString(); }catch(e){ return ''; } }
+  function contactLink(c){ c=(c||'').trim(); if(!c) return ''; if(c.indexOf('@')>0) return '<a href="mailto:'+esc(c)+'">'+esc(c)+'</a>'; if(/^[+(]?[\d][\d\s()+-]{5,}$/.test(c)) return '<a href="tel:'+esc(c.replace(/[^\d+]/g,''))+'">'+esc(c)+'</a>'; return esc(c); }
+  function setBadge(){ var b=document.getElementById('ibBadge'); if(!b) return; var n=IBDATA.counts.pending||0; b.textContent=n; b.hidden=!n; }
+  function loadInbox(){
+    ibapi({action:'admin_list',token:token}).then(function(r){
+      if(r.ok&&r.j&&r.j.ok){ IBDATA={items:r.j.items||[],counts:r.j.counts||{pending:0,approved:0,declined:0}}; ibLoaded=true; setBadge(); if(VIEW==='inbox') renderInbox(document.getElementById('view')); }
+      else if(r.status===401){ setTok(''); boot(); }
+      else if(VIEW==='inbox'){ var h=document.getElementById('view'); if(h && !ibLoaded) h.innerHTML='<div class="ibempty">Couldn’t load the inbox — try again.</div>'; }
+    }).catch(function(){ if(VIEW==='inbox'){ var h=document.getElementById('view'); if(h && !ibLoaded) h.innerHTML='<div class="ibempty">Couldn’t reach the inbox.</div>'; } });
+  }
+  function renderInbox(host){
+    if(!host) return;
+    var head='<div class="ibhead"><h2>Inbox</h2><p class="lead">Every inquiry and suggestion from the site — filter by reason, mark them handled as you go.</p></div>';
+    if(!ibLoaded){ host.innerHTML=head+'<div class="ibempty">Loading…</div>'; return; }
+    var st=IBST;
+    var inSt=(IBDATA.items||[]).filter(function(it){ return it.status===st; });
+    var cats={}; inSt.forEach(function(it){ var k=it.kind||'Other'; cats[k]=(cats[k]||0)+1; });
+    var catKeys=Object.keys(cats).sort();
+    if(IBCAT!=='all' && !cats[IBCAT]) IBCAT='all';
+    var shown=inSt.filter(function(it){ return IBCAT==='all' || (it.kind||'Other')===IBCAT; });
+    var h=head;
+    h+='<div class="stseg">';
+    ['pending','approved','declined'].forEach(function(s){ h+='<button data-st="'+s+'" class="'+(s===st?'on':'')+'">'+STLABEL[s]+' <i>'+(IBDATA.counts[s]||0)+'</i></button>'; });
+    h+='</div>';
+    h+='<div class="chips"><button data-cat="all" class="'+(IBCAT==='all'?'on':'')+'">All <i>'+inSt.length+'</i></button>';
+    catKeys.forEach(function(k){ h+='<button data-cat="'+esc(k)+'" class="'+(IBCAT===k?'on':'')+'">'+esc(k)+' <i>'+cats[k]+'</i></button>'; });
+    h+='</div>';
+    if(!shown.length){ h+='<div class="ibempty">Nothing '+STLABEL[st].toLowerCase()+' here'+(IBCAT!=='all'?' in “'+esc(IBCAT)+'”':'')+'.</div>'; }
+    else { h+='<div class="msgs">'+shown.map(msgCard).join('')+'</div>'; }
+    host.innerHTML=h;
+    host.querySelector('.stseg').addEventListener('click',function(e){ var b=e.target.closest('button[data-st]'); if(!b) return; IBST=b.getAttribute('data-st'); IBCAT='all'; renderInbox(host); });
+    host.querySelector('.chips').addEventListener('click',function(e){ var b=e.target.closest('button[data-cat]'); if(!b) return; IBCAT=b.getAttribute('data-cat'); renderInbox(host); });
+    var mg=host.querySelector('.msgs'); if(mg) mg.addEventListener('click',function(e){ var b=e.target.closest('button[data-act]'); if(!b) return; var card=e.target.closest('.msg'); if(!card) return; var id=card.getAttribute('data-id'), a=b.getAttribute('data-act'); if(a==='del') ibdel(id); else ibset(id,a); });
+  }
+  function msgCard(it){
+    var who=[]; if((it.name||'').trim()) who.push('<b>'+esc(it.name.trim())+'</b>'); var cl=contactLink(it.contact); if(cl) who.push(cl);
+    var acts='';
+    if(it.status==='pending'){ acts='<button data-act="approved" class="ap">Mark handled</button><button data-act="declined">Archive</button>'; }
+    else if(it.status==='approved'){ acts='<button data-act="pending">↩ New</button><button data-act="declined">Archive</button>'; }
+    else { acts='<button data-act="pending">↩ New</button>'; }
+    acts+='<button data-act="del" class="del" aria-label="Delete">✕</button>';
+    return '<div class="msg" data-id="'+esc(it.id)+'">'
+      +'<div class="mtop"><span class="cat">'+esc(it.kind||'Other')+'</span><span class="ago">'+esc(ago(it.created_at))+'</span></div>'
+      +(who.length?'<div class="who">'+who.join(' · ')+'</div>':'')
+      +'<div class="mbody">'+esc(it.body||'')+'</div>'
+      +'<div class="mact">'+acts+'</div></div>';
+  }
+  function ibset(id,status){ if(ibBusy) return; ibBusy=true;
+    ibapi({action:'admin_set',token:token,id:id,status:status}).then(function(r){ ibBusy=false;
+      if(r.ok&&r.j&&r.j.ok){ IBDATA={items:r.j.items||[],counts:r.j.counts||IBDATA.counts}; setBadge(); renderInbox(document.getElementById('view')); toast('Moved to '+(STLABEL[status]||status)); }
+      else if(r.status===401){ setTok(''); boot(); } else toast('Could not update.',true);
+    }).catch(function(){ ibBusy=false; toast('Could not reach the inbox.',true); });
+  }
+  function ibdel(id){ if(ibBusy) return; if(!confirm('Delete this for good?')) return; ibBusy=true;
+    ibapi({action:'admin_del',token:token,id:id}).then(function(r){ ibBusy=false;
+      if(r.ok&&r.j&&r.j.ok){ IBDATA={items:r.j.items||[],counts:r.j.counts||IBDATA.counts}; setBadge(); renderInbox(document.getElementById('view')); toast('Deleted'); }
+      else if(r.status===401){ setTok(''); boot(); } else toast('Could not delete.',true);
+    }).catch(function(){ ibBusy=false; toast('Could not reach the inbox.',true); });
+  }
+
+  // ---------- edit site ----------
+  function groups(){ var g=[], seen={}; MAN.forEach(function(m){ if(!(m.section in seen)){ seen[m.section]=g.length; g.push({name:m.section, items:[]}); } g[seen[m.section]].items.push(m); }); return g; }
+  function renderEdit(host){
+    var h='<p class="lead">Change any wording, or replace any photo — hit <b>Save</b> and it’s live. Signed in as '+esc(ME)+'.</p>';
     groups().forEach(function(g){
-      html+='<div class="sec"><h3>'+esc(g.name)+'</h3>';
+      h+='<div class="sec"><h3>'+esc(g.name)+'</h3>';
       g.items.forEach(function(m){
         if(m.type==='image'){
-          html+='<div class="row img" data-k="'+esc(m.key)+'"><div class="th"><img id="th-'+esc(m.key)+'" src="'+esc(cur(m.key)||m.default||'')+'" alt="" loading="lazy"></div>'
+          h+='<div class="row img" data-k="'+esc(m.key)+'"><div class="th"><img id="th-'+esc(m.key)+'" src="'+esc(cur(m.key)||m.default||'')+'" alt="" loading="lazy"></div>'
             +'<div class="ic"><div class="lbl">'+esc(m.label)+'</div>'
             +'<label class="up">Replace photo<input type="file" accept="image/*" data-img="'+esc(m.key)+'" hidden></label>'
             +'<div class="hint">JPG/PNG, straight off your phone is fine.</div></div></div>';
         } else {
           var v=cur(m.key), big=(m.type==='long'||(v&&v.length>60));
-          html+='<div class="row"><div class="lbl">'+esc(m.label)+'</div>'
+          h+='<div class="row"><div class="lbl">'+esc(m.label)+'</div>'
             +(big?'<textarea data-t="'+esc(m.key)+'">'+esc(v)+'</textarea>':'<input data-t="'+esc(m.key)+'" value="'+esc(v)+'">')+'</div>';
         }
       });
-      html+='</div>';
+      h+='</div>';
     });
-    html+='<div class="sec" id="editorsSec"><h3>Who can edit</h3>'
-      + '<p class="ednote">Anyone here can change the site. Invite a teammate by email — they set their own password the first time they open the editor link. Send them <b>this same page</b>.</p>'
-      + '<div id="edList" class="edlist"><div class="hint">Loading…</div></div>'
-      + '<div class="edadd"><input id="edEmail" type="email" inputmode="email" autocomplete="off" placeholder="teammate@email.com"><button class="up" id="edAdd">Invite</button></div>'
-      + '<p class="err" id="edErr" style="min-height:0;margin-top:8px"></p></div>';
-    html+='</div><div class="savebar" id="savebar"><button class="btn ghost" id="discard" style="flex:.5">Discard</button><button class="btn" id="saveall">Save changes</button></div>';
-    app.innerHTML=html;
-    document.getElementById('logout').onclick=function(){ api({action:'logout',token:token}); setTok(''); boot(); };
-    wireEditors();
-    // text edits
-    [].forEach.call(app.querySelectorAll('[data-t]'),function(el){ el.addEventListener('input',function(){ var k=el.getAttribute('data-t'); if(el.value===cur(k)){ delete dirty[k]; } else { dirty[k]=el.value; } refreshBar(); });
+    host.innerHTML=h;
+    [].forEach.call(host.querySelectorAll('[data-t]'),function(el){ el.addEventListener('input',function(){ var k=el.getAttribute('data-t'); if(el.value===cur(k)){ delete dirty[k]; } else { dirty[k]=el.value; } refreshBar(); });
       if(el.tagName==='TEXTAREA'){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,360)+'px'; el.addEventListener('input',function(){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,360)+'px'; }); } });
-    // image uploads
-    [].forEach.call(app.querySelectorAll('[data-img]'),function(inp){ inp.addEventListener('change',function(){ var f=inp.files&&inp.files[0]; if(f) uploadImg(inp.getAttribute('data-img'),f); inp.value=''; }); });
-    document.getElementById('saveall').onclick=saveAll;
-    document.getElementById('discard').onclick=function(){ dash(email); };
-    refreshBar();
+    [].forEach.call(host.querySelectorAll('[data-img]'),function(inp){ inp.addEventListener('change',function(){ var f=inp.files&&inp.files[0]; if(f) uploadImg(inp.getAttribute('data-img'),f); inp.value=''; }); });
   }
-  function refreshBar(){ var n=Object.keys(dirty).length; var bar=document.getElementById('savebar'); if(!bar) return; bar.classList.toggle('on',n>0); var b=document.getElementById('saveall'); if(b) b.textContent = n? ('Save changes ('+n+')') : 'Save changes'; }
+  function refreshBar(){ var n=Object.keys(dirty).length; var bar=document.getElementById('savebar'); if(!bar) return; bar.classList.toggle('on',VIEW==='edit'&&n>0); var b=document.getElementById('saveall'); if(b) b.textContent = n? ('Save changes ('+n+')') : 'Save changes'; }
   function saveAll(){
     var items={}; Object.keys(dirty).forEach(function(k){ items[k]=dirty[k]; });
     if(!Object.keys(items).length){ toast('Nothing to save yet.'); return; }
@@ -203,10 +313,7 @@ window.EDIT_MANIFEST = [{"key": "top.t1", "section": "Top / Hero", "type": "text
   }
   function uploadImg(key,file){
     toast('Uploading photo…');
-    downscale(file,1600,0.86).then(function(dataUrl){
-      var ct='image/jpeg';
-      return api({action:'img',token:token,key:key,contentType:ct,data:dataUrl});
-    }).then(function(r){
+    downscale(file,1600,0.86).then(function(dataUrl){ return api({action:'img',token:token,key:key,contentType:'image/jpeg',data:dataUrl}); }).then(function(r){
       if(r.ok&&r.j&&r.j.ok&&r.j.url){ overrides[key]=r.j.url; var th=document.getElementById('th-'+key); if(th) th.src=r.j.url+'?t='+Date.now(); toast('Photo updated — it’s live.'); }
       else if(r.status===401){ toast('Signed out — log in again.',true); setTok(''); boot(); }
       else toast((r.j&&r.j.error)||'Upload failed.',true);
@@ -219,7 +326,14 @@ window.EDIT_MANIFEST = [{"key": "top.t1", "section": "Top / Hero", "type": "text
     img.onerror=function(){ URL.revokeObjectURL(url); reject(new Error('img')); }; img.src=url;
   }); }
 
-  // ---------- editors (who can edit) ----------
+  // ---------- team (who can edit) ----------
+  function renderTeam(host){
+    host.innerHTML='<div class="ibhead"><h2>Team</h2><p class="lead">Everyone here can open this desk — read the inbox and edit the site. Invite by email; they set their own password the first time they open the link.</p></div>'
+      +'<div id="edList" class="edlist"><div class="hint">Loading…</div></div>'
+      +'<div class="edadd"><input id="edEmail" type="email" inputmode="email" autocomplete="off" placeholder="teammate@email.com"><button class="up" id="edAdd">Invite</button></div>'
+      +'<p class="err" id="edErr" style="min-height:0;margin-top:8px"></p>';
+    wireEditors();
+  }
   function edRow(e){
     return '<div class="edrow"><span class="em">'+esc(e.email)+'</span>'
       + (e.me?'<span class="mechip">you</span>':'')
@@ -232,12 +346,12 @@ window.EDIT_MANIFEST = [{"key": "top.t1", "section": "Top / Hero", "type": "text
     el.innerHTML = (list&&list.length)? list.map(edRow).join('') : '<div class="hint">No editors yet.</div>';
     [].forEach.call(el.querySelectorAll('[data-rm]'),function(btn){ btn.onclick=function(){
       var em=btn.getAttribute('data-rm');
-      if(!confirm('Remove '+em+'? They won’t be able to edit anymore.')) return;
+      if(!confirm('Remove '+em+'? They won’t be able to open the desk anymore.')) return;
       api({action:'editor_del',token:token,email:em}).then(function(r){
         if(r.ok&&r.j&&r.j.ok){ paintEditors(r.j.editors); toast('Removed '+em); }
         else if(r.status===401){ toast('Signed out — log in again.',true); setTok(''); boot(); }
         else toast((r.j&&r.j.error)||'Could not remove.',true);
-      }).catch(function(){ toast('Could not reach the editor.',true); });
+      }).catch(function(){ toast('Could not reach the desk.',true); });
     }; });
   }
   function wireEditors(){
@@ -249,10 +363,10 @@ window.EDIT_MANIFEST = [{"key": "top.t1", "section": "Top / Hero", "type": "text
       addBtn.disabled=true;
       api({action:'editor_add',token:token,email:e}).then(function(r){
         addBtn.disabled=false;
-        if(r.ok&&r.j&&r.j.ok){ emIn.value=''; paintEditors(r.j.editors); toast('Invited '+e+' — send them the editor link.'); }
+        if(r.ok&&r.j&&r.j.ok){ emIn.value=''; paintEditors(r.j.editors); toast('Invited '+e+' — send them the desk link.'); }
         else if(r.status===401){ toast('Signed out — log in again.',true); setTok(''); boot(); }
         else errEl.textContent=(r.j&&r.j.error)||'Could not invite.';
-      }).catch(function(){ addBtn.disabled=false; errEl.textContent='Could not reach the editor.'; });
+      }).catch(function(){ addBtn.disabled=false; errEl.textContent='Could not reach the desk.'; });
     }
     addBtn.onclick=add; emIn.addEventListener('keydown',function(ev){ if(ev.key==='Enter') add(); });
     api({action:'editors_list',token:token}).then(function(r){ if(r.ok&&r.j&&r.j.ok) paintEditors(r.j.editors); else { var el=document.getElementById('edList'); if(el) el.innerHTML='<div class="hint">Couldn’t load editors.</div>'; } }).catch(function(){});
