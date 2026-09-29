@@ -300,19 +300,40 @@ events=f'''<section class="sec events" id="events">
 # listed here — until then PRODUCTS is empty and the grid simply doesn't render.
 #   {"name":"LOTG Hoodie","price":"$89","img":"hoodie.jpg","url":"https://strongwillsports.com.au/…"}
 import re
-PRODUCTS=[]
+# The range, in the store's own order (LOTG-001..011). Names/colours/prices/turnarounds read
+# off the store; `slug` = the exact product deep-link (#/product/<slug>) where it was seen —
+# the rest link to the range grid rather than a guessed URL. Photos: lotg-src/shop/*.jpg
+# (cut from Saleh's screen recording of the store — swap for real product shots any time,
+# they're CMS-editable in the dashboard). PRICE "" = not shown on the store page we saw.
+PRODUCTS=[
+ {"code":"LOTG-001","name":"Heavyweight Hoodie","sub":"Black","price":"$80","days":"10–12 business days","img":"hoodie-black.jpg"},
+ {"code":"LOTG-002","name":"Heavyweight Hoodie","sub":"Bone","price":"$80","days":"10–12 business days","img":"hoodie-bone.jpg","slug":"lotg-hoodie-bone"},
+ {"code":"LOTG-003","name":"Love of the Game Shorts","sub":"Black","price":"$40","days":"10–15 business days","img":"shorts-black.jpg","slug":"lotg-shorts-1"},
+ {"code":"LOTG-004","name":"Love of the Game Shorts","sub":"White Pinstripe","price":"$40","days":"10–15 business days","img":"shorts-white.jpg"},
+ {"code":"LOTG-005","name":"LOTG Bucket Hat","sub":"Black","price":"$35","days":"10–17 business days","img":"bucket-hat-black.jpg"},
+ {"code":"LOTG-006","name":"LOTG Bucket Hat","sub":"White","price":"$35","days":"10–17 business days","img":"bucket-hat-white.jpg","slug":"lotg-bucket-hat-white"},
+ {"code":"LOTG-007","name":"Personalised Jersey","sub":"Black · your name &amp; number","price":"","days":"10–15 business days","img":"jersey-black.jpg"},
+ {"code":"LOTG-008","name":"Personalised Jersey","sub":"Black / White · your name &amp; number","price":"","days":"10–15 business days","img":"jersey-set.jpg"},
+ {"code":"LOTG-009","name":"The Baseball Jacket","sub":"Black · limited pre-order","price":"$99","days":"20–25 business days after the drop closes","img":"jacket.jpg","slug":"lotg-jacket","tag":"Limited drop"},
+ {"code":"LOTG-010","name":"Court Backpack","sub":"Black","price":"$69","days":"10–17 business days","img":"court-backpack.jpg"},
+ {"code":"LOTG-011","name":"Everyday Laptop Backpack","sub":"Black","price":"$60","days":"10–17 business days","img":"laptop-backpack.jpg","slug":"lotg-backpack-swb54"},
+]
 SHOP_DIR=sp/"shop"
 def product_card(p):
-    slug=re.sub(r'[^a-z0-9]+','-',p["name"].lower()).strip('-')
+    slug=re.sub(r'[^a-z0-9]+','-',(p["code"]+"-"+p["name"]).lower()).strip('-')
     im=Image.open(SHOP_DIR/p["img"]); im.thumbnail((900,1125),Image.LANCZOS)
-    src=emit(im.convert("RGB"),"shop-"+slug,88)
-    return f'''      <a class="pcard" href="{p.get("url") or SHOP}" target="_blank" rel="noopener">
-        <div class="pimg"><img src="{src}" alt="{p["name"]}" loading="lazy" decoding="async"></div>
-        <div class="pmeta"><h4>{p["name"]}</h4><span class="price">{p.get("price","")}</span></div>
-        <span class="pgo">Shop →</span>
+    src=emit(im.convert("RGB"),"shop-"+slug,86)
+    exact=bool(p.get("slug")); href=(SHOP+"#/product/"+p["slug"]) if exact else SHOP
+    price=f'<span class="price">{p["price"]}</span>' if p.get("price") else '<span class="price soft">Price on the store</span>'
+    tag=f'<span class="ptag">{p["tag"]}</span>' if p.get("tag") else ''
+    return f'''      <a class="pcard{'' if exact else ' range'}" href="{href}" target="_blank" rel="noopener">
+        <div class="pimg">{tag}<img src="{src}" alt="{p["name"]} — {p["sub"]}" loading="lazy" decoding="async"></div>
+        <div class="pmeta"><div><h4>{p["name"]}</h4><span class="psub">{p["sub"]}</span></div>{price}</div>
+        <span class="pdays">{p["days"]}{'' if p.get("tag") else ' · made to order'}</span>
+        <span class="pgo">{'Shop →' if exact else 'See it in the range →'}</span>
       </a>'''
-grid=('<div class="shop-grid rv">\n'+'\n'.join(product_card(p) for p in PRODUCTS)+'\n    </div>\n'
-      f'    <p class="shop-more rv"><a class="btn btn-ghost" href="{SHOP}" target="_blank" rel="noopener">See the full range</a></p>') if PRODUCTS else ''
+grid=('<div class="shop-grid rv"><div class="sg-head"><h3>The range.</h3><span>11 pieces · tap any piece to open it on the store</span></div><div class="sg">\n'+'\n'.join(product_card(p) for p in PRODUCTS)+'\n    </div></div>\n'
+      f'    <p class="shop-more rv"><a class="btn btn-gold" href="{SHOP}" target="_blank" rel="noopener">Shop the full range</a></p>') if PRODUCTS else ''
 MQ=''.join(f'<span>{t}</span><i></i>' for t in ["The Love of the Game collection","With Strong Will Sports","Rep the game","Your journey, your story"])
 shop=f'''<section class="sec shop" id="shop">
   <div class="shop-stage" aria-hidden="true">
@@ -332,14 +353,17 @@ shop=f'''<section class="sec shop" id="shop">
       <div class="sf-body">
         <span class="sf-tag">The LOTG collection</span>
         <h3>Wear the community.</h3>
-        <p>The full Love of the Game range lives on the Strong Will Sports store — browse it, pick your piece, and checkout and shipping are handled there.</p>
+        <p>Eleven pieces — heavyweight hoodies, shorts, bucket hats, personalised jerseys, backpacks and the limited-drop Baseball Jacket. Every piece is made to order, and every sale gives back.</p>
         <div class="cta">
           <a class="btn btn-gold" href="{SHOP}" target="_blank" rel="noopener">Enter the store</a>
           <a class="btn btn-ghost" href="{IG}" target="_blank" rel="noopener">See it on Instagram</a>
         </div>
         <div class="sf-notes">
-          <span><i></i>Checkout &amp; shipping by Strong Will Sports</span>
-          <a href="#contact" data-about="Something else"><i></i>Questions about the range? Get in touch</a>
+          <span><i></i>Est. 2024</span>
+          <span><i></i>11 pieces in the range</span>
+          <span><i></i>100% made to order</span>
+          <span><i></i>Every sale gives back</span>
+          <span><i></i>Secure card checkout on the store</span>
         </div>
       </div>
     </div>

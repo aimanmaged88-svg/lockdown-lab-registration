@@ -322,7 +322,20 @@
   .pgo{position:absolute;top:12px;right:12px;font-family:var(--disp);font-weight:700;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;
     color:#17130A;background:var(--gold);padding:6px 9px;border-radius:2px;opacity:0;transform:translateY(-4px);transition:opacity .3s,transform .3s}
   .pcard:hover .pgo{opacity:1;transform:none}
-  .shop-more{text-align:center;margin:26px 0 0}
+  .shop-more{text-align:center;margin:30px 0 0}
+  .sg-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px 20px;margin:0 0 16px}
+  .sg-head h3{font-family:var(--disp);font-weight:900;font-size:clamp(24px,3vw,38px);letter-spacing:-.03em;margin:0}
+  .sg-head span{color:var(--ash);font-size:13px;letter-spacing:.02em}
+  .sg{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
+  .shop-grid{display:block}
+  .pimg{position:relative;background:#F3F3F1}
+  .ptag{position:absolute;top:10px;left:10px;z-index:2;font-family:var(--disp);font-weight:700;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--chalk);background:#0A0A0C;padding:6px 9px;border-radius:2px}
+  .pmeta{align-items:flex-start;padding:14px 14px 4px}
+  .pmeta h4{font-size:14.5px;line-height:1.2}
+  .psub{display:block;color:var(--ash);font-size:12.5px;margin-top:3px}
+  .pmeta .price.soft{color:var(--ash);font-weight:600;font-size:11.5px}
+  .pdays{display:block;padding:0 14px 14px;color:var(--ash-dim);font-size:11px;letter-spacing:.04em;text-transform:uppercase}
+  @media (max-width:600px){ .sg{grid-template-columns:1fr 1fr;gap:10px} .pmeta{padding:12px 11px 2px} .pdays{padding:0 11px 12px} .pmeta h4{font-size:13.5px} }
   .tailor{margin:14px 0 0;color:var(--gold-2);font-size:clamp(14.5px,1.4vw,16.5px);line-height:1.55;font-weight:400;max-width:58ch}
   @media (max-width:820px){
     .storefront{grid-template-columns:1fr;gap:22px;text-align:center}
@@ -807,18 +820,89 @@
       <div class="sf-body">
         <span class="sf-tag" data-ed="shop.t3">The LOTG collection</span>
         <h3 data-ed="shop.h2">Wear the community.</h3>
-        <p data-ed="shop.t4">The full Love of the Game range lives on the Strong Will Sports store — browse it, pick your piece, and checkout and shipping are handled there.</p>
+        <p data-ed="shop.t4">Eleven pieces — heavyweight hoodies, shorts, bucket hats, personalised jerseys, backpacks and the limited-drop Baseball Jacket. Every piece is made to order, and every sale gives back.</p>
         <div class="cta">
           <a class="btn btn-gold" data-ed="shop.t5" href="https://strongwillsports.com.au/lotg/" rel="noopener" target="_blank">Enter the store</a>
           <a class="btn btn-ghost" data-ed="shop.t6" href="https://www.instagram.com/loveofthegameaus" rel="noopener" target="_blank">See it on Instagram</a>
         </div>
         <div class="sf-notes">
-          <span><i></i>Checkout &amp; shipping by Strong Will Sports</span>
-          <a data-about="Something else" href="#contact"><i></i>Questions about the range? Get in touch</a>
+          <span><i></i>Est. 2024</span>
+          <span><i></i>11 pieces in the range</span>
+          <span><i></i>100% made to order</span>
+          <span><i></i>Every sale gives back</span>
+          <span><i></i>Secure card checkout on the store</span>
         </div>
       </div>
     </div>
-    
+    <div class="shop-grid rv"><div class="sg-head"><h3 data-ed="shop.h3">The range.</h3><span>11 pieces · tap any piece to open it on the store</span></div><div class="sg">
+      <a class="pcard range" href="https://strongwillsports.com.au/lotg/" rel="noopener" target="_blank">
+        <div class="pimg"><img alt="Heavyweight Hoodie — Black" data-edimg="shop.img1" decoding="async" loading="lazy" src="assets/shop-lotg-001-heavyweight-hoodie.webp"/></div>
+        <div class="pmeta"><div><h4 data-ed="shop.h4">Heavyweight Hoodie</h4><span class="psub">Black</span></div><span class="price" data-ed="shop.t7">$80</span></div>
+        <span class="pdays">10–12 business days · made to order</span>
+        <span class="pgo">See it in the range →</span>
+      </a>
+      <a class="pcard" href="https://strongwillsports.com.au/lotg/#/product/lotg-hoodie-bone" rel="noopener" target="_blank">
+        <div class="pimg"><img alt="Heavyweight Hoodie — Bone" data-edimg="shop.img2" decoding="async" loading="lazy" src="assets/shop-lotg-002-heavyweight-hoodie.webp"/></div>
+        <div class="pmeta"><div><h4 data-ed="shop.h5">Heavyweight Hoodie</h4><span class="psub">Bone</span></div><span class="price" data-ed="shop.t8">$80</span></div>
+        <span class="pdays">10–12 business days · made to order</span>
+        <span class="pgo">Shop →</span>
+      </a>
+      <a class="pcard" href="https://strongwillsports.com.au/lotg/#/product/lotg-shorts-1" rel="noopener" target="_blank">
+        <div class="pimg"><img alt="Love of the Game Shorts — Black" data-edimg="shop.img3" decoding="async" loading="lazy" src="assets/shop-lotg-003-love-of-the-game-shorts.webp"/></div>
+        <div class="pmeta"><div><h4 data-ed="shop.h6">Love of the Game Shorts</h4><span class="psub">Black</span></div><span class="price" data-ed="shop.t9">$40</span></div>
+        <span class="pdays">10–15 business days · made to order</span>
+        <span class="pgo">Shop →</span>
+      </a>
+      <a class="pcard range" href="https://strongwillsports.com.au/lotg/" rel="noopener" target="_blank">
+        <div class="pimg"><img alt="Love of the Game Shorts — White Pinstripe" data-edimg="shop.img4" decoding="async" loading="lazy" src="assets/shop-lotg-004-love-of-the-game-shorts.webp"/></div>
+        <div class="pmeta"><div><h4 data-ed="shop.h7">Love of the Game Shorts</h4><span class="psub">White Pinstripe</span></div><span class="price" data-ed="shop.t10">$40</span></div>
+        <span class="pdays">10–15 business days · made to order</span>
+        <span class="pgo">See it in the range →</span>
+      </a>
+      <a class="pcard range" href="https://strongwillsports.com.au/lotg/" rel="noopener" target="_blank">
+        <div class="pimg"><img alt="LOTG Bucket Hat — Black" data-edimg="shop.img5" decoding="async" loading="lazy" src="assets/shop-lotg-005-lotg-bucket-hat.webp"/></div>
+        <div class="pmeta"><div><h4 data-ed="shop.h8">LOTG Bucket Hat</h4><span class="psub">Black</span></div><span class="price" data-ed="shop.t11">$35</span></div>
+        <span class="pdays">10–17 business days · made to order</span>
+        <span class="pgo">See it in the range →</span>
+      </a>
+      <a class="pcard" href="https://strongwillsports.com.au/lotg/#/product/lotg-bucket-hat-white" rel="noopener" target="_blank">
+        <div class="pimg"><img alt="LOTG Bucket Hat — White" data-edimg="shop.img6" decoding="async" loading="lazy" src="assets/shop-lotg-006-lotg-bucket-hat.webp"/></div>
+        <div class="pmeta"><div><h4 data-ed="shop.h9">LOTG Bucket Hat</h4><span class="psub">White</span></div><span class="price" data-ed="shop.t12">$35</span></div>
+        <span class="pdays">10–17 business days · made to order</span>
+        <span class="pgo">Shop →</span>
+      </a>
+      <a class="pcard range" href="https://strongwillsports.com.au/lotg/" rel="noopener" target="_blank">
+        <div class="pimg"><img alt="Personalised Jersey — Black · your name &amp; number" data-edimg="shop.img7" decoding="async" loading="lazy" src="assets/shop-lotg-007-personalised-jersey.webp"/></div>
+        <div class="pmeta"><div><h4 data-ed="shop.h10">Personalised Jersey</h4><span class="psub">Black · your name &amp; number</span></div><span class="price soft" data-ed="shop.t13">Price on the store</span></div>
+        <span class="pdays">10–15 business days · made to order</span>
+        <span class="pgo">See it in the range →</span>
+      </a>
+      <a class="pcard range" href="https://strongwillsports.com.au/lotg/" rel="noopener" target="_blank">
+        <div class="pimg"><img alt="Personalised Jersey — Black / White · your name &amp; number" data-edimg="shop.img8" decoding="async" loading="lazy" src="assets/shop-lotg-008-personalised-jersey.webp"/></div>
+        <div class="pmeta"><div><h4 data-ed="shop.h11">Personalised Jersey</h4><span class="psub">Black / White · your name &amp; number</span></div><span class="price soft" data-ed="shop.t14">Price on the store</span></div>
+        <span class="pdays">10–15 business days · made to order</span>
+        <span class="pgo">See it in the range →</span>
+      </a>
+      <a class="pcard" href="https://strongwillsports.com.au/lotg/#/product/lotg-jacket" rel="noopener" target="_blank">
+        <div class="pimg"><span class="ptag">Limited drop</span><img alt="The Baseball Jacket — Black · limited pre-order" data-edimg="shop.img9" decoding="async" loading="lazy" src="assets/shop-lotg-009-the-baseball-jacket.webp"/></div>
+        <div class="pmeta"><div><h4 data-ed="shop.h12">The Baseball Jacket</h4><span class="psub">Black · limited pre-order</span></div><span class="price" data-ed="shop.t15">$99</span></div>
+        <span class="pdays">20–25 business days after the drop closes</span>
+        <span class="pgo">Shop →</span>
+      </a>
+      <a class="pcard range" href="https://strongwillsports.com.au/lotg/" rel="noopener" target="_blank">
+        <div class="pimg"><img alt="Court Backpack — Black" data-edimg="shop.img10" decoding="async" loading="lazy" src="assets/shop-lotg-010-court-backpack.webp"/></div>
+        <div class="pmeta"><div><h4 data-ed="shop.h13">Court Backpack</h4><span class="psub">Black</span></div><span class="price" data-ed="shop.t16">$69</span></div>
+        <span class="pdays">10–17 business days · made to order</span>
+        <span class="pgo">See it in the range →</span>
+      </a>
+      <a class="pcard" href="https://strongwillsports.com.au/lotg/#/product/lotg-backpack-swb54" rel="noopener" target="_blank">
+        <div class="pimg"><img alt="Everyday Laptop Backpack — Black" data-edimg="shop.img11" decoding="async" loading="lazy" src="assets/shop-lotg-011-everyday-laptop-backpack.webp"/></div>
+        <div class="pmeta"><div><h4 data-ed="shop.h14">Everyday Laptop Backpack</h4><span class="psub">Black</span></div><span class="price" data-ed="shop.t17">$60</span></div>
+        <span class="pdays">10–17 business days · made to order</span>
+        <span class="pgo">Shop →</span>
+      </a>
+    </div></div>
+    <p class="shop-more rv"><a class="btn btn-gold" data-ed="shop.t18" href="https://strongwillsports.com.au/lotg/" rel="noopener" target="_blank">Shop the full range</a></p>
   </div>
 </section>
 <section class="sec about" id="about">

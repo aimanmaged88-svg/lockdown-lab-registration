@@ -1470,9 +1470,50 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
     risk of juvenile justice intervention and homelessness) before the
     delivered-beside-the-student paragraph. Manifest 173→176. Verified: built
     clean (order/nav/cue/copy grep'd, fbclid=0, no grid markup while PRODUCTS
-    empty), Playwright program+shop desktop+phone. **To light the product grid:
-    get Saleh's product photos + names + prices (or store screenshots), drop
-    photos in `lotg-src/shop/`, fill PRODUCTS, rebuild.**
+    empty), Playwright program+shop desktop+phone.
+  - **THE RANGE — real product grid LIT (2026-09-29, Aiman sent a Drive screen
+    recording of the store + "listen to my voice": "put up a few of these
+    photos of the merchandise… get this whole page up there with links to all
+    these… whenever they click it they go straight onto these pages").**
+    Recording = `Screen Recording 2026-09-29 192339.mp4` (37s, 1870×860, AAC
+    narration) — pulled via the public Drive link (`drive.google.com/uc?export=
+    download&id=…`), decoded with `imageio-ffmpeg` (Playwright's bundled ffmpeg
+    has no H.264), narration transcribed locally with `faster-whisper` (small,
+    int8 — pip-installed; ElevenLabs transcribe was the unused fallback), frames
+    read by eye. **KEY FIND: the store is a hash-routed SPA** — the browser
+    status bar in the frames leaked exact product deep-links of the form
+    `https://strongwillsports.com.au/lotg/#/product/<slug>`. Slugs SEEN (used
+    verbatim): `lotg-hoodie-bone` (002), `lotg-shorts-1` (003 black shorts),
+    `lotg-bucket-hat-white` (006), `lotg-jacket` (009), `lotg-backpack-swb54`
+    (011 Everyday Laptop Backpack). The other 6 cards link to the range
+    (`/lotg/`) — NEVER a guessed slug (bot-wall = can't verify; dead links are
+    worse than one extra tap). The store's real facts, now on the section:
+    EST. 2024 · 11 PIECES IN THE RANGE · 100% MADE TO ORDER · EVERY SALE GIVES
+    BACK · secure card checkout; nav "THE RANGE / HOW IT WORKS". `PRODUCTS`
+    (build.py, store order LOTG-001…011): Heavyweight Hoodie Black $80 /
+    Bone $80 (10–12 bd), Love of the Game Shorts Black $40 / White Pinstripe $40
+    (10–15 bd), LOTG Bucket Hat Black $35 / White $35 (10–17 bd), Personalised
+    Jersey Black / Black-White (PRICE NOT SHOWN on the page we saw → card says
+    "Price on the store"; 10–15 bd), **The Baseball Jacket $99 incl. GST**
+    (LIMITED DROP, limited pre-order, 20–25 bd after the drop closes; the store
+    showed "1/25 pre-orders · closes 30 Sept 2026" — NOT baked in, it's
+    time-sensitive), Court Backpack $69, Everyday Laptop Backpack $60 (10–17
+    bd). **Photos = cuts from the recording's frames** (`lotg-src/shop/*.jpg`,
+    900×1125 on the tile's own grey; cursor inpainted where it sat near a
+    product; white-on-white items use fixed boxes, no auto-trim) → emitted as
+    `assets/shop-lotg-0NN-<name>.webp`. They're `.pcard img` → **CMS-swappable
+    from the dashboard**, so real product shots drop in without a rebuild.
+    Grid = `.shop-grid` → `.sg-head` ("The range." + "11 pieces · tap any piece
+    to open it on the store") + `.sg` auto-fill 210px (2-col ≤600px) of
+    `.pcard` (4:5 `.pimg` on #F3F3F1, optional `.ptag` "Limited drop", h4 name,
+    `.psub` colour, gold `.price` or `.price.soft`, `.pdays` turnaround
+    "· made to order" except the pre-order jacket, hover `.pgo` "Shop →" /
+    "See it in the range →" for range-linked cards) + gold "Shop the full
+    range". Manifest 176→211. Verified: 11 pcards, 5 exact deep-links, 0
+    fbclid, Playwright desktop (5-up) + phone (2-up) with images awaited.
+    **Still wanted from SJ/Saleh:** the 6 missing product deep-links (hover
+    each product on the store, copy the `#/product/…` URL), the two jersey
+    prices, and real product photos to replace the frame cuts.
 - **Content rules:** everything on the page is from his real posts/bio — no
   invented facts. Real talk section carries Lifeline 13 11 14 / Beyond Blue
   1300 22 4636 / 000. Awaiting Saleh: exact wording sign-off, originals of his
