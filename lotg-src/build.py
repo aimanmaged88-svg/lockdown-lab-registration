@@ -516,6 +516,18 @@ if MODE=="deploy":
         d.rounded_rectangle((0,0,size-1,size-1),radius=r,fill=(9,9,11,255))
         m=mk.resize((int(size*0.72),int(size*0.72)),Image.LANCZOS); im.alpha_composite(m,((size-m.width)//2,(size-m.height)//2))
         im.save(OUT/name)
+    # PWA "add to home screen" icons for SJ's dashboard — gold mark on near-black (distinct desk app)
+    goldm=Image.new("RGBA",mk.size,(226,180,78,255)); goldm.putalpha(mk.getchannel("A"))
+    for size,name in [(180,"desk-180.png"),(192,"desk-192.png"),(512,"desk-512.png")]:
+        im=Image.new("RGBA",(size,size),(9,9,11,255))
+        m=goldm.resize((int(size*0.58),int(size*0.58)),Image.LANCZOS); im.alpha_composite(m,((size-m.width)//2,(size-m.height)//2))
+        im.convert("RGB").save(OUT/name)
+    (OUT/"edit.webmanifest").write_text(json.dumps({
+        "name":"Love of the Game \u2014 Desk","short_name":"LOTG Desk","start_url":"/edit.html","scope":"/",
+        "display":"standalone","orientation":"portrait","background_color":"#09090B","theme_color":"#09090B",
+        "icons":[{"src":"/desk-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
+                 {"src":"/desk-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}]
+    }, ensure_ascii=False))
     # OG social card 1200x630: crest on black with a gold hairline
     og=Image.new("RGB",(1200,630),(9,9,11)); cr=Image.open(REPO/"assets"/"lotg-original.png").convert("RGBA")
     cr=cr.resize((720,int(720*cr.height/cr.width)),Image.LANCZOS); og.paste(cr,((1200-cr.width)//2,(630-cr.height)//2-10),cr)

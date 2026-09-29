@@ -1,9 +1,16 @@
 <!doctype html><html lang="en"><head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Love of the Game — Editor</title>
+<title>Love of the Game — Desk</title>
 <meta name="robots" content="noindex">
 <link rel="icon" type="image/png" href="favicon.png">
+<link rel="manifest" href="edit.webmanifest">
+<link rel="apple-touch-icon" href="desk-180.png">
+<meta name="theme-color" content="#09090B">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="LOTG Desk">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;700;800;900&family=Hanken+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -86,7 +93,11 @@
   .tabnav button.on{color:var(--chalk);border-bottom-color:var(--gold)}
   .tabnav .badge{display:inline-block;min-width:17px;padding:1px 5px;margin-left:5px;border-radius:99px;background:var(--gold);color:#17130A;font-size:10px;font-weight:800;font-family:var(--disp)}
   .ibhead{margin:0 0 14px}
+  .ibhrow{display:flex;align-items:center;justify-content:space-between;gap:10px}
   .ibhead h2{font-family:var(--disp);font-weight:900;font-size:22px;margin:0 0 4px}
+  .ibref{background:rgba(242,239,230,.03);border:1px solid var(--line);color:var(--ash);border-radius:8px;font-family:var(--disp);font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:8px 12px;cursor:pointer;min-height:38px;white-space:nowrap}
+  .ibref:hover{color:var(--chalk);border-color:var(--gold)}
+  .ibref[disabled]{opacity:.5;cursor:default}
   .stseg{display:flex;gap:6px;margin:0 0 12px}
   .stseg button{flex:1;background:rgba(242,239,230,.03);border:1px solid var(--line);color:var(--ash);border-radius:8px;font-family:var(--disp);font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:10px 6px;cursor:pointer;min-height:42px}
   .stseg button.on{color:var(--chalk);border-color:var(--gold);background:rgba(226,180,78,.08)}
@@ -110,6 +121,11 @@
   .mact button.del{margin-left:auto;color:var(--dim)}
   .mact button.del:hover{color:var(--bad);border-color:rgba(233,166,166,.5)}
   .ibempty{text-align:center;color:var(--dim);font-size:14px;padding:40px 10px;border:1px dashed var(--line);border-radius:10px}
+  .ibar{display:flex;align-items:center;gap:10px;background:rgba(226,180,78,.1);border-bottom:1px solid rgba(226,180,78,.28);color:var(--chalk2);font-size:13px;line-height:1.4;padding:10px clamp(14px,4vw,26px)}
+  .ibar b{color:var(--gold);font-weight:600}
+  .ibar #ibarTxt{flex:1 1 auto}
+  .ibarBtn{flex:0 0 auto;background:var(--gold);color:#17130A;border:0;border-radius:6px;font-family:var(--disp);font-weight:800;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:9px 13px;cursor:pointer;min-height:36px}
+  .ibarX{flex:0 0 auto;background:none;border:0;color:var(--ash);cursor:pointer;font-size:15px;line-height:1;padding:6px}
   [hidden]{display:none!important}
 </style>
 </head>
@@ -124,6 +140,8 @@ window.EDIT_MANIFEST = [{"key": "top.t1", "section": "Top / Hero", "type": "text
   var EDGE=window.EDIT_EDGE, ANON=window.EDIT_ANON, MAN=window.EDIT_MANIFEST||[];
   var app=document.getElementById('app'), toastEl=document.getElementById('toast'), tt=null;
   var token=null, overrides={}, dirty={}, defaults={};
+  var deferredPrompt=null;
+  window.addEventListener('beforeinstallprompt', function(e){ e.preventDefault(); deferredPrompt=e; refreshInstallBar(); });
   MAN.forEach(function(m){ defaults[m.key]=m.default||''; });
   function api(p){ return fetch(EDGE,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+ANON,'apikey':ANON},body:JSON.stringify(p)})
     .then(function(r){ return r.json().catch(function(){return{};}).then(function(j){ return {ok:r.ok,status:r.status,j:j}; }); }); }
@@ -194,6 +212,7 @@ window.EDIT_MANIFEST = [{"key": "top.t1", "section": "Top / Hero", "type": "text
           +'<button data-v="edit">Edit site</button>'
           +'<button data-v="team">Team</button>'
         +'</div></header>'
+      +'<div class="ibar" id="ibar" hidden><span id="ibarTxt"></span><button class="ibarBtn" id="ibarGo" hidden>Install</button><button class="ibarX" id="ibarX" aria-label="Dismiss">✕</button></div>'
       +'<div class="wrap" id="view"></div>'
       +'<div class="savebar" id="savebar" style="display:none"><button class="btn ghost" id="discard" style="flex:.5">Discard</button><button class="btn" id="saveall">Save changes</button></div>';
     document.getElementById('logout').onclick=function(){ api({action:'logout',token:token}); setTok(''); boot(); };
@@ -202,6 +221,8 @@ window.EDIT_MANIFEST = [{"key": "top.t1", "section": "Top / Hero", "type": "text
     document.getElementById('discard').onclick=function(){ dirty={}; renderEdit(document.getElementById('view')); refreshBar(); };
     show('inbox');
     loadInbox();
+    startInboxPoll();
+    refreshInstallBar();
   }
   function show(v){
     VIEW=v;
@@ -218,17 +239,30 @@ window.EDIT_MANIFEST = [{"key": "top.t1", "section": "Top / Hero", "type": "text
   function ago(iso){ try{ var s=(Date.now()-new Date(iso).getTime())/1000; if(s<60)return'just now'; if(s<3600)return Math.floor(s/60)+'m ago'; if(s<86400)return Math.floor(s/3600)+'h ago'; if(s<604800)return Math.floor(s/86400)+'d ago'; return new Date(iso).toLocaleDateString(); }catch(e){ return ''; } }
   function contactLink(c){ c=(c||'').trim(); if(!c) return ''; if(c.indexOf('@')>0) return '<a href="mailto:'+esc(c)+'">'+esc(c)+'</a>'; if(/^[+(]?[\d][\d\s()+-]{5,}$/.test(c)) return '<a href="tel:'+esc(c.replace(/[^\d+]/g,''))+'">'+esc(c)+'</a>'; return esc(c); }
   function setBadge(){ var b=document.getElementById('ibBadge'); if(!b) return; var n=IBDATA.counts.pending||0; b.textContent=n; b.hidden=!n; }
-  function loadInbox(){
+  var IBSIG='';
+  function ibSig(d){ try{ return (d.counts.pending||0)+'/'+(d.counts.approved||0)+'/'+(d.counts.declined||0)+'|'+(d.items||[]).map(function(it){ return it.id+':'+it.status; }).join(','); }catch(e){ return String(Math.random()); } }
+  // Loads the inbox and (only when the data actually changed, or on first load / an
+  // explicit refresh) repaints — so the 20s poll never yanks the view out from under him.
+  function loadInbox(force){
     ibapi({action:'admin_list',token:token}).then(function(r){
-      if(r.ok&&r.j&&r.j.ok){ IBDATA={items:r.j.items||[],counts:r.j.counts||{pending:0,approved:0,declined:0}}; ibLoaded=true; setBadge(); if(VIEW==='inbox') renderInbox(document.getElementById('view')); }
+      if(r.ok&&r.j&&r.j.ok){
+        var nd={items:r.j.items||[],counts:r.j.counts||{pending:0,approved:0,declined:0}};
+        var sig=ibSig(nd), changed=(sig!==IBSIG), first=!ibLoaded;
+        IBDATA=nd; IBSIG=sig; ibLoaded=true; setBadge();
+        if(VIEW==='inbox' && (changed||first||force)) renderInbox(document.getElementById('view'));
+      }
       else if(r.status===401){ setTok(''); boot(); }
       else if(VIEW==='inbox'){ var h=document.getElementById('view'); if(h && !ibLoaded) h.innerHTML='<div class="ibempty">Couldn’t load the inbox — try again.</div>'; }
     }).catch(function(){ if(VIEW==='inbox'){ var h=document.getElementById('view'); if(h && !ibLoaded) h.innerHTML='<div class="ibempty">Couldn’t reach the inbox.</div>'; } });
   }
+  var IBPOLL=null;
+  function startInboxPoll(){ if(IBPOLL) return; IBPOLL=setInterval(function(){ if(token && document.visibilityState!=='hidden') loadInbox(); },20000); }
+  document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='visible' && token) loadInbox(); });
+  window.addEventListener('focus',function(){ if(token) loadInbox(); });
   function renderInbox(host){
     if(!host) return;
-    var head='<div class="ibhead"><h2>Inbox</h2><p class="lead">Every inquiry and suggestion from the site — filter by reason, mark them handled as you go.</p></div>';
-    if(!ibLoaded){ host.innerHTML=head+'<div class="ibempty">Loading…</div>'; return; }
+    var head='<div class="ibhead"><div class="ibhrow"><h2>Inbox</h2><button class="ibref" id="ibRef">↻ Refresh</button></div><p class="lead">Every inquiry and suggestion from the site — filter by reason, mark them handled as you go. New ones land here on their own.</p></div>';
+    if(!ibLoaded){ host.innerHTML=head+'<div class="ibempty">Loading…</div>'; wireRef(host); return; }
     var st=IBST;
     var inSt=(IBDATA.items||[]).filter(function(it){ return it.status===st; });
     var cats={}; inSt.forEach(function(it){ var k=it.kind||'Other'; cats[k]=(cats[k]||0)+1; });
@@ -245,10 +279,12 @@ window.EDIT_MANIFEST = [{"key": "top.t1", "section": "Top / Hero", "type": "text
     if(!shown.length){ h+='<div class="ibempty">Nothing '+STLABEL[st].toLowerCase()+' here'+(IBCAT!=='all'?' in “'+esc(IBCAT)+'”':'')+'.</div>'; }
     else { h+='<div class="msgs">'+shown.map(msgCard).join('')+'</div>'; }
     host.innerHTML=h;
+    wireRef(host);
     host.querySelector('.stseg').addEventListener('click',function(e){ var b=e.target.closest('button[data-st]'); if(!b) return; IBST=b.getAttribute('data-st'); IBCAT='all'; renderInbox(host); });
     host.querySelector('.chips').addEventListener('click',function(e){ var b=e.target.closest('button[data-cat]'); if(!b) return; IBCAT=b.getAttribute('data-cat'); renderInbox(host); });
     var mg=host.querySelector('.msgs'); if(mg) mg.addEventListener('click',function(e){ var b=e.target.closest('button[data-act]'); if(!b) return; var card=e.target.closest('.msg'); if(!card) return; var id=card.getAttribute('data-id'), a=b.getAttribute('data-act'); if(a==='del') ibdel(id); else ibset(id,a); });
   }
+  function wireRef(host){ var rf=host.querySelector('#ibRef'); if(!rf) return; rf.addEventListener('click',function(){ rf.disabled=true; rf.textContent='Checking…'; loadInbox(true); setTimeout(function(){ var b=document.getElementById('ibRef'); if(b){ b.disabled=false; b.textContent='↻ Refresh'; } },700); }); }
   function msgCard(it){
     var who=[]; if((it.name||'').trim()) who.push('<b>'+esc(it.name.trim())+'</b>'); var cl=contactLink(it.contact); if(cl) who.push(cl);
     var acts='';
@@ -264,13 +300,13 @@ window.EDIT_MANIFEST = [{"key": "top.t1", "section": "Top / Hero", "type": "text
   }
   function ibset(id,status){ if(ibBusy) return; ibBusy=true;
     ibapi({action:'admin_set',token:token,id:id,status:status}).then(function(r){ ibBusy=false;
-      if(r.ok&&r.j&&r.j.ok){ IBDATA={items:r.j.items||[],counts:r.j.counts||IBDATA.counts}; setBadge(); renderInbox(document.getElementById('view')); toast('Moved to '+(STLABEL[status]||status)); }
+      if(r.ok&&r.j&&r.j.ok){ IBDATA={items:r.j.items||[],counts:r.j.counts||IBDATA.counts}; IBSIG=ibSig(IBDATA); setBadge(); renderInbox(document.getElementById('view')); toast('Moved to '+(STLABEL[status]||status)); }
       else if(r.status===401){ setTok(''); boot(); } else toast('Could not update.',true);
     }).catch(function(){ ibBusy=false; toast('Could not reach the inbox.',true); });
   }
   function ibdel(id){ if(ibBusy) return; if(!confirm('Delete this for good?')) return; ibBusy=true;
     ibapi({action:'admin_del',token:token,id:id}).then(function(r){ ibBusy=false;
-      if(r.ok&&r.j&&r.j.ok){ IBDATA={items:r.j.items||[],counts:r.j.counts||IBDATA.counts}; setBadge(); renderInbox(document.getElementById('view')); toast('Deleted'); }
+      if(r.ok&&r.j&&r.j.ok){ IBDATA={items:r.j.items||[],counts:r.j.counts||IBDATA.counts}; IBSIG=ibSig(IBDATA); setBadge(); renderInbox(document.getElementById('view')); toast('Deleted'); }
       else if(r.status===401){ setTok(''); boot(); } else toast('Could not delete.',true);
     }).catch(function(){ ibBusy=false; toast('Could not reach the inbox.',true); });
   }
@@ -370,6 +406,21 @@ window.EDIT_MANIFEST = [{"key": "top.t1", "section": "Top / Hero", "type": "text
     }
     addBtn.onclick=add; emIn.addEventListener('keydown',function(ev){ if(ev.key==='Enter') add(); });
     api({action:'editors_list',token:token}).then(function(r){ if(r.ok&&r.j&&r.j.ok) paintEditors(r.j.editors); else { var el=document.getElementById('edList'); if(el) el.innerHTML='<div class="hint">Couldn’t load editors.</div>'; } }).catch(function(){});
+  }
+
+  function refreshInstallBar(){
+    var bar=document.getElementById('ibar'); if(!bar) return;
+    var standalone=(window.matchMedia && matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone===true;
+    var dismissed=false; try{ dismissed=localStorage.getItem('lotg_desk_hideinstall')==='1'; }catch(e){}
+    if(standalone || dismissed){ bar.hidden=true; return; }
+    var txt=document.getElementById('ibarTxt'), go=document.getElementById('ibarGo');
+    var ios=/iPad|iPhone|iPod/.test(navigator.userAgent||'');
+    if(deferredPrompt){ txt.innerHTML='<b>Add this desk to your home screen</b> — one tap, no browser bars.'; go.hidden=false; }
+    else if(ios){ txt.innerHTML='<b>Save this as an app:</b> tap the Share button, then \u201CAdd to Home Screen\u201D.'; go.hidden=true; }
+    else { txt.innerHTML='<b>Save this as an app:</b> open your browser menu, then \u201CAdd to Home screen\u201D.'; go.hidden=true; }
+    bar.hidden=false;
+    go.onclick=function(){ if(!deferredPrompt) return; deferredPrompt.prompt(); deferredPrompt.userChoice.then(function(){ deferredPrompt=null; bar.hidden=true; }); };
+    document.getElementById('ibarX').onclick=function(){ try{ localStorage.setItem('lotg_desk_hideinstall','1'); }catch(e){} bar.hidden=true; };
   }
 
   boot();
