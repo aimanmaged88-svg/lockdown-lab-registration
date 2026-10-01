@@ -1,6 +1,11 @@
 <!doctype html><html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Zetland Mosque — Prayer Times</title>
+<link rel="manifest" href="mosque.webmanifest">
+<meta name="theme-color" content="#4aa3c7">
+<link rel="apple-touch-icon" href="assets/mosque-icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Masjid">
 <style>
 :root{--blue:#4aa3c7}
 body{margin:0;background:#eef0f3;color:#1c1e22;font:16px/1.5 system-ui,sans-serif;display:flex;justify-content:center}
@@ -33,7 +38,22 @@ a.btn,button.btn{display:block;width:100%;box-sizing:border-box;text-align:cente
 .dn:last-child{border-bottom:0}
 .dn small{color:#889;display:block}
 .dn button{background:#eef3f6;color:#2a7da1;border:0;border-radius:8px;padding:7px 12px;font-weight:700;cursor:pointer;font-family:inherit}
-</style></head><body><div class="wrap">
+#gear{position:fixed;top:12px;right:12px;z-index:5;background:#fff;border:0;border-radius:50%;width:42px;height:42px;font-size:19px;cursor:pointer;box-shadow:0 1px 6px rgba(0,0,0,.14)}
+#sheet{display:none;position:fixed;inset:0;background:rgba(20,24,30,.45);z-index:9;padding:16px;align-items:flex-end;justify-content:center}
+#sheet.open{display:flex}
+.sh{background:#fff;border-radius:16px;padding:18px;max-width:420px;width:100%;max-height:84vh;overflow:auto;box-sizing:border-box}
+.sh h3{margin:0 0 4px;font-size:17px}
+.srow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #eceef1}
+.srow small{color:#889;display:block}
+.lang{display:inline-block;background:#eef3f6;color:#2a7da1;border-radius:20px;padding:4px 12px;font-weight:700;font-size:13px;margin:6px 4px 0 0}
+.stp{background:#eef3f6;color:#2a7da1;border:0;border-radius:8px;width:34px;height:34px;font-weight:700;font-size:17px;cursor:pointer;font-family:inherit}
+input.tgl{width:46px;height:26px;appearance:none;-webkit-appearance:none;background:#d7dbe1;border-radius:20px;position:relative;cursor:pointer;transition:.2s;flex:none}
+input.tgl:checked{background:var(--blue)}
+input.tgl::after{content:"";position:absolute;top:3px;left:3px;width:20px;height:20px;border-radius:50%;background:#fff;transition:.2s}
+input.tgl:checked::after{left:23px}
+.walkout{margin-top:10px;font-size:14px;color:#445;line-height:1.45}
+.walkout b{color:#1c7a4d}
+</style></head><body><button id="gear" aria-label="Settings">⚙️</button><div class="wrap">
 <h1>🕌 Zetland Mosque</h1>
 <div class="sub" id="today"></div>
 <div class="cd"><small id="cdLbl"></small><b id="cdVal">…</b></div>
@@ -41,11 +61,20 @@ a.btn,button.btn{display:block;width:100%;box-sizing:border-box;text-align:cente
 <tbody id="tb"></tbody></table>
 <div class="card"><div class="loc"><span class="pin">📍</span><div><b>Zetland Mosque</b><small>932 Bourke St, Zetland NSW 2017</small></div></div>
 <a class="btn" href="https://www.google.com/maps/dir/?api=1&destination=Zetland+Mosque,+932+Bourke+St,+Zetland+NSW+2017" target="_blank" rel="noopener">🗺️ Get directions</a>
-<a class="btn ghost" href="tel:0293196733">📞 Call the masjid — (02) 9319 6733</a></div>
+<a class="btn ghost" href="tel:0293196733">📞 Call the masjid — (02) 9319 6733</a>
+<button class="btn ghost" id="walkBtn">🚶 How far's the walk?</button><div class="walkout" id="walkOut"></div></div>
 <div class="card"><h2>📅 What's on at the masjid</h2><div id="events"></div></div>
 <div class="card"><h2>💚 Support the masjid</h2><div id="donate"></div></div>
 <div class="foot">Zetland, Sydney · calibrated to the masjid board</div>
 </div>
+<div id="sheet"><div class="sh">
+<h3>⚙️ Settings</h3>
+<div class="srow"><div><b>🔔 Adhan notifications</b><small>A ping at each Adhan — and when it's time to leave (walk + wudu)</small></div><input type="checkbox" class="tgl" id="ntfTgl"></div>
+<div class="srow"><div><b>🧼 Wudu buffer</b><small>Minutes added before Iqamah</small></div><div style="display:flex;align-items:center;gap:10px"><button class="stp" data-d="-1">−</button><b id="wuduVal"></b><button class="stp" data-d="1">＋</button></div></div>
+<div class="srow" style="display:block;border-bottom:0"><b>🗣️ Languages at this masjid</b><br><span id="langs"></span></div>
+<div id="iosHint" style="display:none;color:#889;font-size:13px;margin-top:6px">On iPhone: tap Share → <b>Add to Home Screen</b> first — notifications only work from the installed app.</div>
+<button class="btn" id="shClose">Done</button>
+</div></div>
 <script>
 // Edit events here: [when, title, detail]
 const EVENTS=[["Every Friday","Jumu'ah","Adhan 12:15 · Iqamah 1:00pm"]];
@@ -56,6 +85,10 @@ const DONATE={
  bsb:"", acc:"",          // bank transfer
  accname:"Zetland Mosque" // account name shown with bank details
 };
+// ===== Mosque info — edit languages to what's actually spoken/khutbah'd here =====
+const M={name:"Zetland Mosque",lat:-33.9064,lon:151.2080,langs:["English","Arabic"]};
+let T=null,T2=null,NTIMERS=[],SWREG=null;
+const wudu=()=>+(localStorage.mq_wudu||10);
 // Iqamah = Adhan + offset (minutes), as on the masjid board
 const IQ={Fajr:20,Dhuhr:15,Asr:10,Maghrib:5,Isha:10};
 const Q="latitude=-33.9064&longitude=151.2080&method=99&methodSettings=18,null,90%20min&tune=0,0,0,5,9,1,0,1,0";
@@ -71,7 +104,7 @@ document.getElementById('events').innerHTML=EVENTS.map(e=>`<div class="ev"><b>${
  document.getElementById('donate').innerHTML=h;})();
 const now=new Date(),tom=new Date(now.getTime()+864e5);
 Promise.all([fmt(now),fmt(tom)].map(d=>fetch(`https://api.aladhan.com/v1/timings/${d}?${Q}`).then(r=>r.json()))).then(([a,b])=>{
- const t=a.data.timings,t2=b.data.timings,hij=a.data.date.hijri;
+ const t=a.data.timings,t2=b.data.timings,hij=a.data.date.hijri;T=t;T2=t2;
  document.getElementById('today').textContent=a.data.date.readable+' · '+hij.day+' '+hij.month.en+' '+hij.year+' AH';
  const cur=now.getHours()*60+now.getMinutes();
  const mins=x=>+x.slice(0,2)*60+ +x.slice(3,5);
@@ -84,6 +117,63 @@ Promise.all([fmt(now),fmt(tom)].map(d=>fetch(`https://api.aladhan.com/v1/timings
  const tick=()=>{const n=new Date(),c=n.getHours()*60+n.getMinutes(),d=tgt-c;if(d<0)return location.reload();
   document.getElementById('cdLbl').textContent=(nx||'Fajr')+' Adhan in';
   document.getElementById('cdVal').textContent=(d>=60?Math.floor(d/60)+'h ':'')+(d%60)+'min'};
- tick();setInterval(tick,30000);
+ tick();setInterval(tick,30000);schedNotifs();autoWalk();
 }).catch(()=>{document.getElementById('cdVal').textContent='offline'});
+
+// ===== Walk + leave-by (straight-line ×1.3 route factor, 4.8 km/h) =====
+const hav=(a,b,c,d)=>{const r=Math.PI/180,x=Math.sin((c-a)*r/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin((d-b)*r/2)**2;return 12742*Math.asin(Math.sqrt(x))};
+function nextIqamah(){const P=['Fajr','Dhuhr','Asr','Maghrib','Isha'],c=new Date().getHours()*60+new Date().getMinutes();
+ for(const p of P){const iq=plus(T[p],IQ[p]);if(+iq.slice(0,2)*60+ +iq.slice(3,5)>c)return[p,iq,0]}
+ return['Fajr',plus(T2.Fajr,IQ.Fajr),1]}
+function doWalk(){const o=document.getElementById('walkOut');o.textContent='Locating…';
+ navigator.geolocation.getCurrentPosition(p=>{
+  const km=hav(p.coords.latitude,p.coords.longitude,M.lat,M.lon);
+  const w=Math.max(1,Math.round(km*1.3/4.8*60));localStorage.mq_walk=w;
+  if(!T){o.textContent='~'+w+' min walk ('+km.toFixed(1)+' km)';return}
+  const[pr,iq,tmw]=nextIqamah(),need=w+wudu();
+  let lv=+iq.slice(0,2)*60+ +iq.slice(3,5)-need+(tmw?1440:0);
+  const nowM=new Date().getHours()*60+new Date().getMinutes();
+  const lvs=('0'+Math.floor(lv%1440/60)).slice(-2)+':'+('0'+lv%60).slice(-2);
+  o.innerHTML=km.toFixed(1)+' km away · ~'+w+' min walk + '+wudu()+' min wudu<br>'+
+   (lv<=nowM?'<b>Leave now</b>':'<b>Leave by '+lvs+'</b>')+' to make '+pr+' Iqamah '+iq+(tmw?' (tomorrow)':'');
+  schedNotifs();
+ },()=>{o.textContent='Couldn’t get your location — allow location access and try again.'},{enableHighAccuracy:true,timeout:10000});}
+document.getElementById('walkBtn').onclick=doWalk;
+function autoWalk(){try{navigator.permissions.query({name:'geolocation'}).then(r=>{if(r.state==='granted')doWalk()})}catch(e){}}
+
+// ===== Adhan + leave-by notifications (fire while the app is open/installed) =====
+function note(ti,bo){const o={body:bo,icon:'assets/mosque-icon-192.png',vibrate:[260,90,260]};
+ if(SWREG)SWREG.showNotification(ti,o).catch(()=>{});else try{new Notification(ti,o)}catch(e){}}
+function schedNotifs(){NTIMERS.forEach(clearTimeout);NTIMERS=[];
+ if(localStorage.mq_ntf!=='1'||!('Notification'in window)||Notification.permission!=='granted'||!T)return;
+ const mid=new Date();mid.setHours(0,0,0,0);
+ const at=hm=>mid.getTime()+(+hm.slice(0,2)*60+ +hm.slice(3,5))*60000,now=Date.now(),w=+localStorage.mq_walk||0;
+ ['Fajr','Dhuhr','Asr','Maghrib','Isha'].forEach(p=>{
+  const iq=plus(T[p],IQ[p]),a=at(T[p]);
+  if(a>now)NTIMERS.push(setTimeout(()=>note('🕌 '+p+' Adhan — '+T[p],'Iqamah '+iq+' · '+M.name),a-now));
+  if(w){const l=at(iq)-(w+wudu())*60000;
+   if(l>now)NTIMERS.push(setTimeout(()=>note('🚶 Time to leave for '+p,w+' min walk + '+wudu()+' min wudu → Iqamah '+iq),l-now));}});}
+function enableNtf(cb){
+ if(!('Notification'in window)){document.getElementById('iosHint').style.display='block';cb(false);return}
+ Notification.requestPermission().then(pm=>{
+  if(pm!=='granted'){cb(false);return}
+  localStorage.mq_ntf='1';
+  const done=()=>{note('🔔 Notifications on','A ping at each Adhan — and when it’s time to leave.');schedNotifs();cb(true)};
+  if('serviceWorker'in navigator)navigator.serviceWorker.register('mosque-sw.js',{scope:'./mosque-push/'}).then(r=>{SWREG=r;done()}).catch(done);
+  else done()});}
+
+// ===== Settings sheet =====
+const DAY=new Date().toDateString();
+const sheet=document.getElementById('sheet'),tgl=document.getElementById('ntfTgl');
+document.getElementById('gear').onclick=()=>sheet.classList.add('open');
+document.getElementById('shClose').onclick=()=>sheet.classList.remove('open');
+sheet.onclick=e=>{if(e.target===sheet)sheet.classList.remove('open')};
+document.getElementById('langs').innerHTML=M.langs.map(l=>'<span class="lang">'+l+'</span>').join('');
+const wv=document.getElementById('wuduVal'),pw=()=>wv.textContent=wudu()+'m';pw();
+document.querySelectorAll('.stp').forEach(b=>b.onclick=()=>{localStorage.mq_wudu=Math.min(30,Math.max(0,wudu()+ +b.dataset.d));pw();schedNotifs()});
+tgl.checked=localStorage.mq_ntf==='1'&&'Notification'in window&&Notification.permission==='granted';
+tgl.onchange=()=>{if(tgl.checked)enableNtf(ok=>tgl.checked=ok);else{localStorage.mq_ntf='0';schedNotifs()}};
+try{navigator.serviceWorker.getRegistration('./mosque-push/').then(r=>{if(r)SWREG=r}).catch(()=>{})}catch(e){}
+if(/iPhone|iPad/.test(navigator.userAgent)&&!matchMedia('(display-mode: standalone)').matches)document.getElementById('iosHint').style.display='block';
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){if(new Date().toDateString()!==DAY)location.reload();else schedNotifs()}});
 </script></body></html>
