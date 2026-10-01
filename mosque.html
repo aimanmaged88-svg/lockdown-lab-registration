@@ -24,24 +24,51 @@ h2{font-size:14px;margin:0 0 6px;color:#667}
 .foot{color:#99a;font-size:12px;text-align:center;margin-top:16px}
 h1{font-size:22px;margin:0;text-align:center}
 .sub{color:#889;font-size:13px;text-align:center;margin-bottom:4px}
+a.btn,button.btn{display:block;width:100%;box-sizing:border-box;text-align:center;background:var(--blue);color:#fff;text-decoration:none;font-weight:700;font-size:15px;padding:12px;border:0;border-radius:10px;margin-top:10px;cursor:pointer;font-family:inherit}
+.btn.ghost{background:#eef3f6;color:#2a7da1}
+.loc{display:flex;gap:10px;align-items:center}
+.loc .pin{font-size:26px}
+.loc b{display:block}.loc small{color:#889}
+.dn{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid #eceef1}
+.dn:last-child{border-bottom:0}
+.dn small{color:#889;display:block}
+.dn button{background:#eef3f6;color:#2a7da1;border:0;border-radius:8px;padding:7px 12px;font-weight:700;cursor:pointer;font-family:inherit}
 </style></head><body><div class="wrap">
 <h1>🕌 Zetland Mosque</h1>
 <div class="sub" id="today"></div>
 <div class="cd"><small id="cdLbl"></small><b id="cdVal">…</b></div>
 <table><thead><tr><th>Salah</th><th>Adhan</th><th>Iqamah</th><th>Tmrw.</th></tr></thead>
 <tbody id="tb"></tbody></table>
-<div class="card"><h2>📅 Upcoming events</h2><div id="events"></div></div>
+<div class="card"><div class="loc"><span class="pin">📍</span><div><b>Zetland Mosque</b><small>932 Bourke St, Zetland NSW 2017</small></div></div>
+<a class="btn" href="https://www.google.com/maps/dir/?api=1&destination=Zetland+Mosque,+932+Bourke+St,+Zetland+NSW+2017" target="_blank" rel="noopener">🗺️ Get directions</a>
+<a class="btn ghost" href="tel:0293196733">📞 Call the masjid — (02) 9319 6733</a></div>
+<div class="card"><h2>📅 What's on at the masjid</h2><div id="events"></div></div>
+<div class="card"><h2>💚 Support the masjid</h2><div id="donate"></div></div>
 <div class="foot">Zetland, Sydney · calibrated to the masjid board</div>
 </div>
 <script>
 // Edit events here: [when, title, detail]
 const EVENTS=[["Every Friday","Jumu'ah","Adhan 12:15 · Iqamah 1:00pm"]];
+// ===== DONATIONS — fill in the masjid's REAL details, leave "" to hide a row =====
+const DONATE={
+ link:"",                 // their online donation page (Stripe/PayPal/LaunchGood url)
+ payid:"",                // e.g. an ABN or email PayID
+ bsb:"", acc:"",          // bank transfer
+ accname:"Zetland Mosque" // account name shown with bank details
+};
 // Iqamah = Adhan + offset (minutes), as on the masjid board
 const IQ={Fajr:20,Dhuhr:15,Asr:10,Maghrib:5,Isha:10};
 const Q="latitude=-33.9064&longitude=151.2080&method=99&methodSettings=18,null,90%20min&tune=0,0,0,5,9,1,0,1,0";
 const fmt=d=>('0'+d.getDate()).slice(-2)+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+d.getFullYear();
 const plus=(t,m)=>{let[h,mi]=t.split(':').map(Number);mi+=m;h=(h+Math.floor(mi/60))%24;mi%=60;return('0'+h).slice(-2)+':'+('0'+mi).slice(-2)};
 document.getElementById('events').innerHTML=EVENTS.map(e=>`<div class="ev"><b>${e[1]}</b><small>${e[0]}${e[2]?" · "+e[2]:""}</small></div>`).join('')||'<div class="ev"><small>No events listed yet.</small></div>';
+(function(){const D=DONATE,rows=[],cp=(t)=>navigator.clipboard.writeText(t).then(()=>alert('Copied: '+t));window._cp=cp;
+ if(D.payid)rows.push(`<div class="dn"><div><b>PayID</b><small>${D.payid}</small></div><button onclick="_cp('${D.payid}')">Copy</button></div>`);
+ if(D.bsb&&D.acc)rows.push(`<div class="dn"><div><b>Bank transfer</b><small>${D.accname} · BSB ${D.bsb} · Acc ${D.acc}</small></div><button onclick="_cp('BSB ${D.bsb} Acc ${D.acc}')">Copy</button></div>`);
+ let h=rows.join('');
+ if(D.link)h+=`<a class="btn" href="${D.link}" target="_blank" rel="noopener">💳 Donate online</a>`;
+ if(!h)h='<div class="dn"><small>Donation details coming soon — in the meantime you can give in person at the masjid, or call (02) 9319 6733.</small></div>';
+ document.getElementById('donate').innerHTML=h;})();
 const now=new Date(),tom=new Date(now.getTime()+864e5);
 Promise.all([fmt(now),fmt(tom)].map(d=>fetch(`https://api.aladhan.com/v1/timings/${d}?${Q}`).then(r=>r.json()))).then(([a,b])=>{
  const t=a.data.timings,t2=b.data.timings,hij=a.data.date.hijri;
