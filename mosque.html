@@ -2,44 +2,61 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Zetland Mosque — Prayer Times</title>
 <style>
-body{margin:0;background:#0a0a0c;color:#f2f2f2;font:16px/1.5 system-ui,sans-serif;display:flex;justify-content:center}
-.wrap{max-width:420px;width:100%;padding:28px 18px}
-h1{font-size:26px;margin:0}
-.sub{color:#9aa;font-size:13px;margin:4px 0 22px}
-.card{background:#141418;border:1px solid #26262c;border-radius:14px;padding:16px 18px;margin-bottom:16px}
-.row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #1e1e24}
-.row:last-child{border-bottom:0}
-.row b{font-weight:600}
-.row.next{color:#6fe3a5}
-h2{font-size:15px;margin:0 0 8px;color:#bbc}
-.ev{padding:8px 0;border-bottom:1px solid #1e1e24}
-.ev:last-child{border-bottom:0}
-.ev small{color:#9aa;display:block}
-.foot{color:#667;font-size:12px;text-align:center;margin-top:18px}
+:root{--blue:#4aa3c7}
+body{margin:0;background:#eef0f3;color:#1c1e22;font:16px/1.5 system-ui,sans-serif;display:flex;justify-content:center}
+.wrap{max-width:460px;width:100%;padding:24px 16px}
+.cd{text-align:center;margin:10px 0 24px}
+.cd small{color:var(--blue);font-weight:700;font-size:15px;display:block}
+.cd b{color:var(--blue);font-size:52px;font-weight:800;letter-spacing:-1px}
+table{width:100%;border-collapse:collapse;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 6px rgba(0,0,0,.07)}
+th,td{padding:11px 12px;text-align:right}
+th:first-child,td:first-child{text-align:left}
+th{background:#e2e5ea;font-size:13px;color:#555}
+tr{border-bottom:1px solid #eceef1}
+td.ad{font-weight:700}
+td,th{font-variant-numeric:tabular-nums}
+tr.hl td{color:var(--blue);font-weight:700}
+tr.sep td{border-top:2px solid #dfe2e7}
+.card{background:#fff;border-radius:14px;padding:14px 16px;margin-top:16px;box-shadow:0 1px 6px rgba(0,0,0,.07)}
+h2{font-size:14px;margin:0 0 6px;color:#667}
+.ev{padding:7px 0;border-bottom:1px solid #eceef1}.ev:last-child{border-bottom:0}
+.ev small{color:#889;display:block}
+.foot{color:#99a;font-size:12px;text-align:center;margin-top:16px}
+h1{font-size:22px;margin:0;text-align:center}
+.sub{color:#889;font-size:13px;text-align:center;margin-bottom:4px}
 </style></head><body><div class="wrap">
 <h1>🕌 Zetland Mosque</h1>
-<div class="sub" id="today">Loading…</div>
-<div class="card" id="times">Loading prayer times…</div>
+<div class="sub" id="today"></div>
+<div class="cd"><small id="cdLbl"></small><b id="cdVal">…</b></div>
+<table><thead><tr><th>Salah</th><th>Adhan</th><th>Iqamah</th><th>Tmrw.</th></tr></thead>
+<tbody id="tb"></tbody></table>
 <div class="card"><h2>📅 Upcoming events</h2><div id="events"></div></div>
-<div class="foot">Times for Zetland, Sydney · aladhan.com</div>
+<div class="foot">Zetland, Sydney · calibrated to the masjid board</div>
 </div>
 <script>
-// Edit this list to add/change events: [date shown, title, detail]
-const EVENTS=[
- ["Every Friday","Jumu'ah prayer","Khutbah before Dhuhr — arrive early"],
-];
-const E=document.getElementById('events');
-E.innerHTML=EVENTS.map(e=>`<div class="ev"><b>${e[1]}</b><small>${e[0]}${e[2]?" · "+e[2]:""}</small></div>`).join('')||'<div class="ev"><small>No events listed yet.</small></div>';
-
-fetch('https://api.aladhan.com/v1/timings?latitude=-33.9064&longitude=151.2080&method=3')
-.then(r=>r.json()).then(d=>{
- const t=d.data.timings, date=d.data.date.readable, hij=d.data.date.hijri;
- document.getElementById('today').textContent=date+' · '+hij.day+' '+hij.month.en+' '+hij.year+' AH';
- const order=[['Fajr','Fajr'],['Sunrise','Sunrise'],['Dhuhr','Dhuhr'],['Asr','Asr'],['Maghrib','Maghrib'],['Isha','Isha']];
- const now=new Date(), cur=now.getHours()*60+now.getMinutes();
- let nextIdx=-1;
- order.forEach((o,i)=>{const[m,h]=[+t[o[0]].slice(3,5),+t[o[0]].slice(0,2)];if(nextIdx<0&&o[0]!=='Sunrise'&&h*60+m>cur)nextIdx=i;});
- document.getElementById('times').innerHTML=order.map((o,i)=>
-  `<div class="row${i===nextIdx?' next':''}"><b>${o[1]}${i===nextIdx?' · next':''}</b><span>${t[o[0]]}</span></div>`).join('');
-}).catch(()=>{document.getElementById('times').textContent='Couldn’t load times — check your connection.'});
+// Edit events here: [when, title, detail]
+const EVENTS=[["Every Friday","Jumu'ah","Adhan 12:15 · Iqamah 1:00pm"]];
+// Iqamah = Adhan + offset (minutes), as on the masjid board
+const IQ={Fajr:20,Dhuhr:15,Asr:10,Maghrib:5,Isha:10};
+const Q="latitude=-33.9064&longitude=151.2080&method=99&methodSettings=18,null,90%20min&tune=0,0,0,5,9,1,0,1,0";
+const fmt=d=>('0'+d.getDate()).slice(-2)+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+d.getFullYear();
+const plus=(t,m)=>{let[h,mi]=t.split(':').map(Number);mi+=m;h=(h+Math.floor(mi/60))%24;mi%=60;return('0'+h).slice(-2)+':'+('0'+mi).slice(-2)};
+document.getElementById('events').innerHTML=EVENTS.map(e=>`<div class="ev"><b>${e[1]}</b><small>${e[0]}${e[2]?" · "+e[2]:""}</small></div>`).join('')||'<div class="ev"><small>No events listed yet.</small></div>';
+const now=new Date(),tom=new Date(now.getTime()+864e5);
+Promise.all([fmt(now),fmt(tom)].map(d=>fetch(`https://api.aladhan.com/v1/timings/${d}?${Q}`).then(r=>r.json()))).then(([a,b])=>{
+ const t=a.data.timings,t2=b.data.timings,hij=a.data.date.hijri;
+ document.getElementById('today').textContent=a.data.date.readable+' · '+hij.day+' '+hij.month.en+' '+hij.year+' AH';
+ const cur=now.getHours()*60+now.getMinutes();
+ const mins=x=>+x.slice(0,2)*60+ +x.slice(3,5);
+ const P=['Fajr','Dhuhr','Asr','Maghrib','Isha'];
+ let nx=P.find(p=>mins(t[p])>cur);
+ const rows=P.map(p=>[p,t[p],plus(t[p],IQ[p]),t2[p],p===nx?'hl':'']);
+ rows.push(['Shurooq',t.Sunrise,'—',t2.Sunrise,'sep'],["Jumu'ah",'12:15','13:00','','']);
+ document.getElementById('tb').innerHTML=rows.map(r=>`<tr class="${r[4]}"><td>${r[0]}</td><td class="ad">${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join('');
+ const tgt=nx?mins(t[nx]):mins(t2.Fajr)+1440;
+ const tick=()=>{const n=new Date(),c=n.getHours()*60+n.getMinutes(),d=tgt-c;if(d<0)return location.reload();
+  document.getElementById('cdLbl').textContent=(nx||'Fajr')+' Adhan in';
+  document.getElementById('cdVal').textContent=(d>=60?Math.floor(d/60)+'h ':'')+(d%60)+'min'};
+ tick();setInterval(tick,30000);
+}).catch(()=>{document.getElementById('cdVal').textContent='offline'});
 </script></body></html>
