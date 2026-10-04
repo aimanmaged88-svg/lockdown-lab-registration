@@ -891,6 +891,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
         <div class="grid2">
           <div>
             <h2>📨 The door — who wants in</h2>
+            <button class="btn btn-v" id="vfAll" style="display:none;margin:0 0 10px">✓ Verify everyone waiting</button>
             <div id="inbox"></div>
           </div>
           <div>
@@ -1347,6 +1348,25 @@ async function load(){
     const pending=ps.filter(p=>!p.verified&&!p.banned&&!reqIds.has(p.id));
     $('#pending').innerHTML=pending.length?pending.map(p=>row(p,true)).join(''):'<div class="empty">Nobody else waiting.</div>';
     $('#all').innerHTML=ps.length?ps.map(p=>row(p,false)).join(''):'<div class="empty">Nobody yet — send the crew the link 📲</div>';
+    const vfa=$('#vfAll');
+    if(vfa){
+      vfa.style.display=inbox.length>1?'':'none';
+      vfa.textContent='✓ Verify everyone waiting ('+inbox.length+')';
+      vfa.onclick=async()=>{
+        if(!confirm('Verify all '+inbox.length+' hoopers waiting?\n\nThey all get the ✓ and full access — they can call runs and post clips. You can still remove anyone\'s ✓ afterwards.'))return;
+        vfa.disabled=true;let done=0;
+        try{
+          for(let i=0;i<30;i++){
+            const r=await api({action:'admin_verify_all'});
+            done+=r.verified||0;
+            if(!r.left)break;
+            vfa.textContent='Verifying… '+done+' done, '+r.left+' left';
+          }
+          toast('Verified '+done+' hoopers ✓');
+        }catch(e){toast(e.message,1)}
+        vfa.disabled=false;load();
+      };
+    }
     document.querySelectorAll('[data-verify]').forEach(b=>b.onclick=()=>act({action:'admin_verify',pid:b.dataset.verify},'Verified ✓ — they get full access'));
     document.querySelectorAll('[data-unverify]').forEach(b=>b.onclick=()=>act({action:'admin_verify',pid:b.dataset.unverify,on:false},'Verification removed'));
     document.querySelectorAll('[data-ban]').forEach(b=>b.onclick=()=>{

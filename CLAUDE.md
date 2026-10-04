@@ -461,6 +461,32 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   reel1/reel2/story1/carousel3.html + cry.js; render `cryrender.mjs`+`crymix.py`
   via `buildvid.sh`, carousel `carcap3.mjs`. Kit filenames unchanged so
   launch.html auto-serves the new versions.
+- **LAUNCH-READY: claim-your-number at signup + push throttle + bulk verify
+  (edge v34, 2026-10-04, Aiman: "do what you think is appropriate for me to
+  launch it today").** Load-tested the live stack first: 100 concurrent
+  `courts_meta` reads = 100/100 OK; **40 concurrent `register` writes = 40/40 OK
+  with 40 UNIQUE player_num** (the guarded `player_num=is.null` PATCH +
+  read-back holds under concurrency). Latency degrades ~2.7x at 50 concurrent
+  but nothing errors. **THE GAP FOUND:** register assigned a RANDOM 1000-9999
+  number, so the whole "the number you screenshot IS your number" promise was
+  undeliverable — a 40-signup sample came out 1148-9903 with ZERO in the 1-1000
+  range, and fixing it by hand meant 1,000 desk edits. Fixes shipped:
+  (1) **`register` accepts `num`** (1-9999) — claims it only when the row has no
+  number yet AND nobody else holds it (pre-check + guarded PATCH + read-back);
+  a taken number or a lost race falls back to the random jersey and returns
+  **`num_taken:true`**. App: `#pfNum` field on the sign-up sheet ("the follower
+  number from your screenshot"), prefilled on edit, validated 1-9999, sent as
+  `player.num`; on `num_taken` the toast says "#312 is already taken — you're
+  Player #N for now, DM us your screenshot".
+  (2) **Coach push THROTTLED** — `verify_request` pushed every coach=true
+  account on EVERY signup (1,000 signups = 1,000 pushes). Now one push per 5
+  min max via `oc_settings.last_verify_push`, titled "📨 N hoopers want the ✓".
+  (3) **`admin_verify_all`** (coach auth) verifies everyone in the inbox, capped
+  200/call, returns {verified,left}; desk gained `#vfAll` "Verify everyone
+  waiting (N)" button that loops until `left` is 0, behind a confirm.
+  NOTE: 40 `zzload_dev_*` load-test rows were left in oc_players — the SQL
+  delete was declined by the permission prompt; must be removed before launch.
+
 - **Phone-switch code keeper sheet (2026-08-18, Aiman asked).** Profile → 🔑 no
   longer just toasts: opens `#shCode` — big tap-to-copy code, "you're Player
   #NNNN" line, **📤 Send it to myself** (navigator.share, clipboard fallback)

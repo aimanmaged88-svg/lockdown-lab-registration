@@ -1649,6 +1649,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   <div class="fld" id="igFld"><label>Instagram handle</label><div class="igwrap"><span class="at">@</span><input class="inp" id="pfIg" maxlength="30" autocapitalize="none" placeholder="yourhandle"></div></div>
   <div class="fld" id="ttFld" style="display:none"><label>TikTok handle</label><div class="igwrap"><span class="at">@</span><input class="inp" id="pfTiktok" maxlength="30" autocapitalize="none" placeholder="yourhandle"></div></div>
   <div class="fld" id="emFld" style="display:none"><label>Email (Gmail / Apple ID / any real inbox)</label><input class="inp" id="pfEmail" type="email" autocapitalize="none" placeholder="you@gmail.com"></div>
+  <div class="fld"><label>Your number</label><input class="inp" id="pfNum" type="tel" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="e.g. 312"><p class="fine" style="margin:6px 2px 0">The follower number from your screenshot — it's yours for life. Leave it blank and we'll hand you one.</p></div>
   <div class="fld"><label>Mobile number</label><input class="inp" id="pfPhone" type="tel" inputmode="tel" maxlength="17" autocomplete="tel" placeholder="0412 345 678"><p class="fine" style="margin:6px 2px 0">Only the coach sees this — never shown on the courts or your card. It's how you get back in if you switch phones.</p></div>
   <div class="commit">
     <b>🚧 This is a beta — and you're building it</b>
@@ -2257,7 +2258,7 @@ function setIdMode(m){
 document.querySelectorAll('#idPick button').forEach(b=>b.onclick=()=>setIdMode(b.dataset.id));
 function openMyEdit(){
   if(OCP){
-    $('#pfName').value=OCP.name;$('#pfIg').value=OCP.ig||'';$('#pfTiktok').value=OCP.tiktok||'';$('#pfEmail').value=OCP.email||'';$('#pfPhone').value=OCP.phone||'';
+    $('#pfName').value=OCP.name;$('#pfIg').value=OCP.ig||'';$('#pfTiktok').value=OCP.tiktok||'';$('#pfEmail').value=OCP.email||'';$('#pfPhone').value=OCP.phone||'';if($('#pfNum'))$('#pfNum').value=OCP.num||'';
     setIdMode(OCP.ig?'ig':(OCP.tiktok?'tiktok':(OCP.email?'email':'ig')));
     openEdit();
   }else if(termsOk())openGate();
@@ -2275,6 +2276,9 @@ $('#pfSave').onclick=async()=>{
   const tiktok=idMode==='tiktok'?handle($('#pfTiktok').value):'';
   const email=idMode==='email'?$('#pfEmail').value.trim().toLowerCase().slice(0,120):'';
   const phone=auPhone($('#pfPhone').value);
+  const numRaw=($('#pfNum')?$('#pfNum').value:'').replace(/[^0-9]/g,'');
+  const num=numRaw?parseInt(numRaw,10):null;
+  if(num!==null&&(!(num>=1)||num>9999)){toast('That number looks off — 1 to 9999',1);$('#pfNum').focus();return}
   const invite=($('#pfInvite')?$('#pfInvite').value:'').toUpperCase().replace(/[^A-Z0-9]/g,'');
   if(INVITE_ONLY&&!OCP&&!invite){toast('Enter the invite code the coach sent you',1);$('#pfInvite').focus();return}
   if(!name){toast('Put a name on it',1);return}
@@ -2285,7 +2289,7 @@ $('#pfSave').onclick=async()=>{
   const id=(OCP&&OCP.id)||crypto.randomUUID();
   const b=$('#pfSave'); b.disabled=true; b.textContent='Signing in…';
   try{
-    const d=await api({action:'register',accept:true,invite,player:{id,name,ig,tiktok,email,phone,invite}});
+    const d=await api({action:'register',accept:true,invite,player:{id,name,ig,tiktok,email,phone,invite,num}});
     const fresh=!OCP;
     if(invite)rememberInvite(invite);
     OCP={id,name,ig,tiktok,email,phone,invite,vf:!!d.verified,code:d.verify_code||'',num:d.player_num??null};
@@ -2297,7 +2301,8 @@ $('#pfSave').onclick=async()=>{
     if(fresh&&!OCP.vf)api({action:'verify_request',player:{id:OCP.id},text:'auto: new signup — check my page and verify me'}).catch(()=>{});
     $('#shProfile').classList.remove('gate');
     closeSheet('shProfile');
-    toast(fresh?('Welcome to Certified Hooper — you\'re Player #'+(OCP.num??'?')+'. Now get your ✓ 🏀'):'Saved 🏀');
+    if(fresh&&d.num_taken)toast('#'+num+' is already taken — you\'re Player #'+(OCP.num??'?')+' for now. DM us your screenshot and we\'ll sort it.',1,7000);
+    else toast(fresh?('Welcome to Certified Hooper — you\'re Player #'+(OCP.num??'?')+'. Now get your ✓ 🏀'):'Saved 🏀');
     if(afterProfile){const f=afterProfile;afterProfile=null;f();}
   }catch(e){
     if(e.code==='needinvite'||e.code==='badinvite'||e.code==='usedinvite'){

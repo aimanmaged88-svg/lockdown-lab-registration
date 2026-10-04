@@ -509,9 +509,29 @@ Deno.serve(async (req: Request) => {
           await db(`oc_players?id=eq.${encodeURIComponent(id)}`, { method: "PATCH", body: JSON.stringify({ verified: true, coach: true }) });
           verified = true;
         }
-        // Every hooper gets a random unique 4-digit player number — their public
-        // ID in the app ("Player #4358"), worn on the card like a jersey.
+        // THE FIRST 1,000: a hooper claims the number they screenshotted when they
+        // followed — that number is theirs for life. Only ever claimed on a row
+        // that has no number yet, and only if nobody else already holds it; a
+        // lost race or a taken number falls back to a random jersey and sets
+        // num_taken so the app can tell them to DM their screenshot.
         let player_num = cur?.[0]?.player_num ?? null;
+        let num_taken = false;
+        const wantRaw = Number((p.num ?? b.num) as number);
+        const want = Number.isFinite(wantRaw) ? Math.floor(wantRaw) : NaN;
+        if (player_num == null && want >= 1 && want <= 9999) {
+          const held = await db(`oc_players?player_num=eq.${want}&id=neq.${encodeURIComponent(id)}&select=id`);
+          if (held?.length) {
+            num_taken = true;
+          } else {
+            try {
+              await db(`oc_players?id=eq.${encodeURIComponent(id)}&player_num=is.null`, { method: "PATCH", body: JSON.stringify({ player_num: want }) });
+              const chk = await db(`oc_players?id=eq.${encodeURIComponent(id)}&select=player_num`);
+              player_num = chk?.[0]?.player_num ?? null;
+              if (player_num !== want) { player_num = null; num_taken = true; }
+            } catch (_e) { num_taken = true; }
+          }
+        }
+        // No claim, or the claim was gone — fall back to a random 4-digit jersey.
         for (let i = 0; i < 30 && player_num == null; i++) {
           const cand = 1000 + Math.floor(Math.random() * 9000);
           try {
@@ -520,7 +540,7 @@ Deno.serve(async (req: Request) => {
             player_num = chk?.[0]?.player_num ?? null;
           } catch (_e) { /* number taken — roll again */ }
         }
-        return J({ ok: true, player: { id, name, ig, tiktok }, verified, verify_code, player_num });
+        return J({ ok: true, player: { id, name, ig, tiktok }, verified, verify_code, player_num, num_taken });
       }
 
       // Log back in on a NEW phone: handle/email + the account's 5-digit code
@@ -1105,12 +1125,27 @@ Deno.serve(async (req: Request) => {
           method: "POST", headers: { Prefer: "resolution=merge-duplicates" },
           body: JSON.stringify({ player_id: player.id, name: player.name, ig: player.ig, email: rows?.[0]?.email || "", text: str(b.text, 300), created_at: new Date().toISOString() }),
         });
-        // Buzz the coach's phone(s): every account flagged coach=true gets a
-        // push pointing straight at the desk. Best-effort — never blocks.
+        // Buzz the coach's phone(s) — THROTTLED to one push per 5 minutes. At
+        // launch a thousand people sign up at once; one push each would make the
+        // phone unusable. The held push says how many are waiting instead.
         try {
-          const coaches = await db(`oc_players?coach=is.true&select=id`) || [];
-          const pids = coaches.map((c: { id: string }) => c.id).filter((id: string) => id !== player.id);
-          if (pids.length) await sendHH(pids, { title: `📨 ${player.name} wants the ✓`, body: `${player.ig ? "@" + player.ig : "New signup"} — check their page, tap verify`, tag: "hh-desk", url: "/hoopsheaven-desk.html" });
+          const nowMs = Date.now();
+          const lastRow = await db(`oc_settings?key=eq.last_verify_push&select=value`);
+          const lastMs = Number(lastRow?.[0]?.value || 0);
+          if (!(lastMs && nowMs - lastMs < 300000)) {
+            await db(`oc_settings?on_conflict=key`, {
+              method: "POST", headers: { Prefer: "resolution=merge-duplicates" },
+              body: JSON.stringify({ key: "last_verify_push", value: String(nowMs) }),
+            });
+            const coaches = await db(`oc_players?coach=is.true&select=id`) || [];
+            const pids = coaches.map((c: { id: string }) => c.id).filter((id: string) => id !== player.id);
+            const waiting = (await db(`oc_inbox?select=player_id`) || []).length;
+            if (pids.length) await sendHH(pids, {
+              title: waiting > 1 ? `📨 ${waiting} hoopers want the ✓` : `📨 ${player.name} wants the ✓`,
+              body: waiting > 1 ? "Open the desk to verify them" : `${player.ig ? "@" + player.ig : "New signup"} — check their page, tap verify`,
+              tag: "hh-desk", url: "/hoopsheaven-desk.html",
+            });
+          }
         } catch (_e) { /* best-effort */ }
         return J({ ok: true });
       }
@@ -1521,6 +1556,22 @@ Deno.serve(async (req: Request) => {
           try { await sendHH([pid], { title: "✓ You're Certified", body: "Full access unlocked — call runs, add courts & post clips 🏀", tag: "hh-verify", url: "/hoopsheaven.html" }); } catch (_e) { /* best-effort */ }
         }
         return J({ ok: true });
+      }
+
+      // Verify everyone currently waiting, in one tap. Capped per call so a
+      // launch-day queue can't time the function out — the desk just calls it
+      // again until `left` is 0. No per-player push here: a thousand at once
+      // would be a flood.
+      case "admin_verify_all": {
+        if (!await coachAuth(b.user, b.pin)) return J({ error: "wrong login" }, 401);
+        const rows = await db(`oc_inbox?select=player_id&limit=200`) || [];
+        const ids = rows.map((r: { player_id: string }) => r.player_id).filter(Boolean);
+        for (const pid of ids) {
+          await db(`oc_players?id=eq.${encodeURIComponent(pid)}`, { method: "PATCH", body: JSON.stringify({ verified: true }) });
+          await db(`oc_inbox?player_id=eq.${encodeURIComponent(pid)}`, { method: "DELETE" });
+        }
+        const left = (await db(`oc_inbox?select=player_id`) || []).length;
+        return J({ ok: true, verified: ids.length, left });
       }
 
       case "admin_inbox_done": {
