@@ -1260,3 +1260,23 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   Verified E2E via scratchpad/deskcoach-light.mjs + coach-light2.mjs (temp
   coach minted → dashboard shot → deleted). Masters: admin-base.html,
   coach-base.html.
+
+## Taste of Tuscany — ordering-app pitch demo (2026-10-04)
+
+- Aiman sent tasteoftuscany.com.au + its DeliverIT ordering site (Italian
+  restaurant, 314 Pennant Hills Rd Carlingford, est. 1997, owner-chef George
+  Kiss) and picked "pitch demo — rebuild their ordering app" = first real
+  prospect for the white-label template play. **demos/tuscany/index.html**
+  (+ img/ 118 webp thumbs pulled from their CloudFront CDN) — single-file
+  concept PWA, clearly ribboned "Concept preview · no real orders", not
+  affiliated: real scraped menu (164 items/17 cats, parsed from the
+  server-rendered DeliverIT page incl. prices, sizes, veg flags, pickup-only
+  deals), pickup/delivery modes, deals carousel, Wednesday $15 banner, search
+  + scrollspy rail, item sheet (sizes/notes/qty), Half&Half builder (dearer
+  half), cart w/ promo TUSCANY10 + $6 delivery fee free-over-$40, demo
+  checkout (no payment) → animated order tracker, Club Tuscany 8-stamp
+  loyalty card, pitch sheet (ⓘ = why self-owned beats DeliverIT, for George),
+  light/dark (Bodoni Moda + Archivo, basil green / tomato red). Authored
+  artifact-style (no doctype — the Artifact platform wraps it; wrap before
+  serving elsewhere). Published as a private artifact for the pitch; NOT
+  wired to Netlify/main. Menu scraper lived in session scratchpad only.

@@ -1,0 +1,692 @@
+<title>Taste of Tuscany Concept</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..800;1,6..96,400..800&family=Archivo:ital,wght@0,400..800;1,400..800&display=swap">
+<style>
+/* Layout: app-shell ordering UI — sticky header + category rail, sectioned menu list, bottom sheets, floating cart bar. */
+:root{
+  --bg:#FAF7F0; --card:#FFFFFF; --ink:#221D15; --mut:#6F6758; --line:#E8E1D2; --chip:#F1ECDF;
+  --grn:#1E4D33; --grn-soft:#E7EEE6; --on-grn:#F7F3E8; --red:#B5362A; --red-soft:#F6E7E2;
+  --gold:#96762A; --gold-soft:#F3EBD7; --scrim:rgba(24,19,12,.52); --lift:0 10px 30px rgba(34,29,21,.10);
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#161310; --card:#201C17; --ink:#F0EAE0; --mut:#A79C8B; --line:#332D24; --chip:#282319;
+  --grn:#2F6B47; --grn-soft:#20301F; --on-grn:#F2EEE3; --red:#D8584A; --red-soft:#3A221C;
+  --gold:#D0A848; --gold-soft:#332A14; --scrim:rgba(0,0,0,.6); --lift:0 10px 30px rgba(0,0,0,.45);
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#161310; --card:#201C17; --ink:#F0EAE0; --mut:#A79C8B; --line:#332D24; --chip:#282319;
+  --grn:#2F6B47; --grn-soft:#20301F; --on-grn:#F2EEE3; --red:#D8584A; --red-soft:#3A221C;
+  --gold:#D0A848; --gold-soft:#332A14; --scrim:rgba(0,0,0,.6); --lift:0 10px 30px rgba(0,0,0,.45);
+  color-scheme:dark;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font:400 15.5px/1.5 "Archivo",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+input,textarea,select{font:inherit;color:inherit}
+img{max-width:100%;display:block}
+.disp{font-family:"Bodoni Moda",Georgia,serif}
+:focus-visible{outline:2px solid var(--grn);outline-offset:2px;border-radius:6px}
+.wrap{max-width:760px;margin:0 auto;padding-inline:16px}
+
+/* ribbon */
+.ribbon{background:var(--ink);color:var(--bg);text-align:center;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;padding:7px 16px}
+.ribbon b{color:var(--gold)}
+
+/* header */
+header{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.hrow{display:flex;align-items:center;gap:10px;padding-block:10px}
+.brand{flex:1;min-width:0}
+.brand .eyebrow{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand h1{font-size:clamp(21px,5.6vw,26px);font-weight:600;font-style:italic;letter-spacing:.01em;line-height:1.1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hbtn{width:38px;height:38px;flex:0 0 auto;border-radius:50%;border:1px solid var(--line);background:var(--card);display:grid;place-items:center;font-size:16px}
+.clubchip{flex:0 0 auto;display:flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--gold-soft);color:var(--gold);border-radius:999px;padding:8px 12px;font-size:12.5px;font-weight:700}
+
+/* mode segment */
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:6px;background:var(--chip);border:1px solid var(--line);border-radius:14px;padding:5px;margin-block:12px 4px}
+.mode{border-radius:10px;padding:8px 6px;text-align:center;color:var(--mut)}
+.mode b{display:block;font-size:14px;color:inherit}
+.mode span{font-size:11.5px}
+.mode.on{background:var(--grn);color:var(--on-grn);box-shadow:var(--lift)}
+
+/* tricolore rule */
+.tric{display:flex;height:3px;border-radius:2px;overflow:hidden;margin-block:14px 0}
+.tric i{flex:1}.tric i:nth-child(1){background:var(--grn)}.tric i:nth-child(2){background:var(--line)}.tric i:nth-child(3){background:var(--red)}
+
+/* deals carousel */
+.deals{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding-block:12px 4px;scrollbar-width:none}
+.deals::-webkit-scrollbar{display:none}
+.deal{scroll-snap-align:start;flex:0 0 236px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;text-align:left;display:flex;flex-direction:column;gap:4px}
+.deal .tag{align-self:flex-start;font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--red);background:var(--red-soft);border-radius:6px;padding:3px 7px}
+.deal b{font-size:15px;line-height:1.25}
+.deal .dp{margin-top:auto;padding-top:6px;font-weight:800;font-size:16px}
+.deal .dp small{font-weight:600;color:var(--mut);font-size:11.5px}
+
+/* wednesday banner */
+.wed{display:flex;gap:12px;align-items:center;background:var(--grn-soft);border:1px solid color-mix(in srgb,var(--grn) 30%,transparent);border-radius:14px;padding:12px 14px;margin-block:10px}
+.wed .wday{font-family:"Bodoni Moda",Georgia,serif;font-style:italic;font-weight:700;font-size:18px;color:var(--grn);flex:0 0 auto}
+:root[data-theme="dark"] .wed .wday{color:var(--gold)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .wed .wday{color:var(--gold)}}
+.wed p{font-size:13px;color:var(--mut)}
+.wed p b{color:var(--ink)}
+
+/* search + rail */
+.railwrap{position:sticky;top:calc(env(safe-area-inset-top,0px) + 59px);z-index:30;background:var(--bg);padding-block:8px 0;border-bottom:1px solid var(--line)}
+.search{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 12px}
+.search input{flex:1;min-width:0;border:0;background:none;outline:none;font-size:14.5px}
+.search input::placeholder{color:var(--mut)}
+.rail{display:flex;gap:7px;overflow-x:auto;padding-block:10px;scrollbar-width:none}
+.rail::-webkit-scrollbar{display:none}
+.rchip{flex:0 0 auto;border:1px solid var(--line);background:var(--card);border-radius:999px;padding:7px 13px;font-size:13px;font-weight:600;color:var(--mut);white-space:nowrap}
+.rchip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+
+/* sections */
+.sect{padding-block:20px 6px;scroll-margin-top:calc(env(safe-area-inset-top,0px) + 132px)}
+.sect h2{font-family:"Bodoni Moda",Georgia,serif;font-weight:700;font-size:23px;letter-spacing:.01em;display:flex;align-items:baseline;gap:8px}
+.sect h2 small{font:600 11px/1 "Archivo",system-ui,sans-serif;letter-spacing:.14em;color:var(--mut)}
+.rows{display:flex;flex-direction:column}
+.row{display:flex;gap:12px;padding-block:15px;border-bottom:1px solid var(--line);text-align:left;align-items:stretch;width:100%}
+.row:last-child{border-bottom:0}
+.rtxt{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}
+.rname{font-weight:700;font-size:15px;line-height:1.3;display:flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+.rdesc{font-size:13px;color:var(--mut);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.rprice{margin-top:auto;padding-top:4px;font-weight:700;font-size:14px}
+.rprice small{color:var(--mut);font-weight:600;font-size:11.5px}
+.rthumb{flex:0 0 auto;width:96px;position:relative}
+.rthumb img{width:96px;height:88px;object-fit:cover;border-radius:12px;background:var(--chip)}
+.radd{position:absolute;right:-5px;bottom:-5px;width:30px;height:30px;border-radius:50%;background:var(--card);border:1px solid var(--line);box-shadow:var(--lift);display:grid;place-items:center;font-weight:800;font-size:16px;color:var(--grn)}
+.row.noimg .radd2{align-self:center;flex:0 0 auto;width:30px;height:30px;border-radius:50%;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;font-weight:800;color:var(--grn)}
+.vleaf{flex:0 0 auto;font-size:10px;font-weight:800;color:var(--grn);background:var(--grn-soft);border-radius:5px;padding:2px 5px;letter-spacing:.05em}
+:root[data-theme="dark"] .vleaf{color:#9ecfae}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .vleaf{color:#9ecfae}}
+.pochip{flex:0 0 auto;font-size:10px;font-weight:700;color:var(--red);background:var(--red-soft);border-radius:5px;padding:2px 6px;letter-spacing:.06em;text-transform:uppercase}
+.row.dis{opacity:.45}
+
+/* half & half card */
+.hhcard{width:100%;text-align:left;background:var(--card);border:1px dashed color-mix(in srgb,var(--ink) 30%,transparent);border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px;margin-block:14px}
+.hhicon{flex:0 0 46px;width:46px;height:46px;border-radius:50%;background:conic-gradient(var(--grn) 0 50%, var(--red) 50% 100%);opacity:.85}
+.hhcard b{font-size:16px}
+.hhcard p{font-size:12.5px;color:var(--mut)}
+
+/* cart bar */
+.cartbar{position:fixed;left:0;right:0;bottom:0;z-index:45;padding:0 16px calc(14px + env(safe-area-inset-bottom,0px));pointer-events:none}
+.cartbar button{pointer-events:auto;width:100%;max-width:728px;margin-inline:auto;display:flex;align-items:center;gap:10px;background:var(--grn);color:var(--on-grn);border-radius:16px;padding:15px 18px;font-weight:700;font-size:15px;box-shadow:var(--lift)}
+.cartbar .n{background:color-mix(in srgb,var(--on-grn) 22%,transparent);border-radius:8px;padding:2px 9px;font-size:13px}
+.cartbar .t{margin-left:auto;font-variant-numeric:tabular-nums}
+
+/* sheets */
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:50;opacity:0;pointer-events:none;transition:opacity .22s}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:55;background:var(--bg);border-radius:22px 22px 0 0;max-height:88dvh;display:flex;flex-direction:column;transform:translateY(104%);transition:transform .3s cubic-bezier(.32,.72,.26,1);box-shadow:0 -14px 50px rgba(0,0,0,.25)}
+.sheet.on{transform:none}
+.sheet .grab{flex:0 0 auto;padding:10px 0 2px;display:grid;place-items:center}
+.sheet .grab i{width:38px;height:4px;border-radius:2px;background:var(--line)}
+.sbody{overflow-y:auto;padding:8px 18px calc(20px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
+.sheet .big{font-family:"Bodoni Moda",Georgia,serif;font-weight:700;font-size:24px;line-height:1.15;text-wrap:balance}
+.sheet .shero{width:calc(100% + 36px);margin:-8px -18px 0;height:190px;object-fit:cover}
+.sdesc{color:var(--mut);font-size:14px}
+.optrow{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--card)}
+.optrow.on{border-color:var(--grn);background:var(--grn-soft)}
+.optrow .op{margin-left:auto;font-weight:700;font-variant-numeric:tabular-nums}
+.optrow .dot{width:17px;height:17px;border-radius:50%;border:2px solid var(--line);flex:0 0 auto}
+.optrow.on .dot{border-color:var(--grn);background:var(--grn);box-shadow:inset 0 0 0 3px var(--card)}
+.lbl{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+.note{width:100%;border:1.5px solid var(--line);background:var(--card);border-radius:12px;padding:11px 13px;font-size:14px;resize:none}
+.qtyrow{display:flex;align-items:center;gap:14px}
+.qbtn{width:40px;height:40px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);font-size:19px;font-weight:700;display:grid;place-items:center}
+.qn{font-weight:800;font-size:17px;min-width:24px;text-align:center;font-variant-numeric:tabular-nums}
+.cta{width:100%;background:var(--grn);color:var(--on-grn);border-radius:14px;padding:16px;font-weight:700;font-size:15.5px;display:flex;gap:10px;justify-content:center;align-items:center}
+.cta[disabled]{opacity:.45;cursor:not-allowed}
+.cta .cp{margin-left:auto;font-variant-numeric:tabular-nums}
+.ghost{width:100%;border:1.5px solid var(--line);background:var(--card);border-radius:14px;padding:13px;font-weight:600;font-size:14px}
+
+/* cart lines */
+.cline{display:flex;gap:11px;align-items:flex-start;padding-block:12px;border-bottom:1px solid var(--line)}
+.cline:last-child{border-bottom:0}
+.cline img{width:52px;height:50px;object-fit:cover;border-radius:10px;flex:0 0 auto;background:var(--chip)}
+.cmain{flex:1;min-width:0}
+.cmain b{font-size:14px;line-height:1.3;display:block}
+.cmain small{color:var(--mut);font-size:12px}
+.cqty{display:flex;align-items:center;gap:8px;flex:0 0 auto}
+.cqty button{width:27px;height:27px;border-radius:9px;border:1px solid var(--line);background:var(--card);font-weight:700}
+.cqty span{font-weight:700;min-width:16px;text-align:center;font-size:13.5px;font-variant-numeric:tabular-nums}
+.cprice{flex:0 0 auto;font-weight:700;font-size:13.5px;min-width:52px;text-align:right;font-variant-numeric:tabular-nums}
+.totrow{display:flex;justify-content:space-between;font-size:14px;color:var(--mut)}
+.totrow.grand{color:var(--ink);font-weight:800;font-size:17px;border-top:1px solid var(--line);padding-top:10px}
+.totrow b{font-variant-numeric:tabular-nums}
+.promo{display:flex;gap:8px}
+.promo input{flex:1;min-width:0;border:1.5px solid var(--line);background:var(--card);border-radius:12px;padding:11px 13px;font-size:14px;text-transform:uppercase}
+.promo button{flex:0 0 auto;border:1.5px solid var(--line);border-radius:12px;padding:0 16px;font-weight:700;background:var(--card)}
+.freebie{background:var(--gold-soft);border:1px solid color-mix(in srgb,var(--gold) 40%,transparent);border-radius:12px;padding:10px 13px;font-size:13px;color:var(--ink)}
+
+/* checkout */
+.fld{display:flex;flex-direction:column;gap:5px}
+.fld input{border:1.5px solid var(--line);background:var(--card);border-radius:12px;padding:12px 13px;font-size:15px}
+.payseg{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
+.pay{border:1.5px solid var(--line);background:var(--card);border-radius:12px;padding:11px 6px;font-weight:600;font-size:13px;text-align:center}
+.pay.on{border-color:var(--grn);background:var(--grn-soft)}
+.demonote{background:var(--chip);border-radius:12px;padding:10px 13px;font-size:12.5px;color:var(--mut);text-align:center}
+
+/* confirmation */
+.confirm{position:fixed;inset:0;z-index:60;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:24px;text-align:center}
+.confirm.on{display:flex}
+.bigtick{width:74px;height:74px;border-radius:50%;background:var(--grn);color:var(--on-grn);display:grid;place-items:center;font-size:34px;animation:pop .5s cubic-bezier(.3,1.6,.5,1)}
+@keyframes pop{from{transform:scale(.4);opacity:0}}
+.ordno{font-family:"Bodoni Moda",Georgia,serif;font-weight:700;font-size:30px}
+.steps{display:flex;flex-direction:column;gap:0;margin-block:14px;text-align:left;width:min(300px,100%)}
+.step{display:flex;gap:12px;align-items:center;padding-block:9px;color:var(--mut);font-weight:600;font-size:14.5px}
+.step i{width:12px;height:12px;border-radius:50%;border:2.5px solid var(--line);flex:0 0 auto;transition:all .3s}
+.step.done{color:var(--ink)}
+.step.done i{background:var(--grn);border-color:var(--grn)}
+.step.now{color:var(--grn)}
+.step.now i{border-color:var(--grn);animation:pulse 1.2s infinite}
+:root[data-theme="dark"] .step.now{color:#9ecfae}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .step.now{color:#9ecfae}}
+@keyframes pulse{50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--grn) 22%,transparent)}}
+.stamped{background:var(--gold-soft);border:1px solid color-mix(in srgb,var(--gold) 40%,transparent);border-radius:14px;padding:12px 16px;font-size:13.5px;max-width:320px}
+
+/* club */
+.stampgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.stamp{aspect-ratio:1;border-radius:50%;border:2px dashed var(--line);display:grid;place-items:center;font-size:21px;color:var(--line)}
+.stamp.got{border:2px solid var(--gold);background:var(--gold-soft);color:var(--gold)}
+
+/* about / pitch */
+.pit{display:flex;gap:11px;align-items:flex-start;padding-block:9px}
+.pit i{flex:0 0 auto;width:26px;height:26px;border-radius:8px;background:var(--grn-soft);color:var(--grn);display:grid;place-items:center;font-style:normal;font-size:13px}
+:root[data-theme="dark"] .pit i{color:#9ecfae}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .pit i{color:#9ecfae}}
+.pit b{display:block;font-size:14px}
+.pit p{font-size:12.5px;color:var(--mut)}
+
+/* footer */
+footer{padding-block:34px 120px;color:var(--mut);font-size:13px;display:flex;flex-direction:column;gap:5px}
+footer .fb{font-family:"Bodoni Moda",Georgia,serif;font-style:italic;font-weight:600;font-size:17px;color:var(--ink)}
+footer .copyable{user-select:all}
+
+/* toast */
+.toast{position:fixed;left:50%;bottom:calc(92px + env(safe-area-inset-bottom,0px));transform:translate(-50%,16px);background:var(--ink);color:var(--bg);border-radius:12px;padding:11px 17px;font-size:13.5px;font-weight:600;opacity:0;transition:all .25s;z-index:70;pointer-events:none;max-width:88vw;text-align:center}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+
+/* hh builder */
+.hhcols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hhcol{min-width:0}
+.hhlist{border:1.5px solid var(--line);border-radius:12px;background:var(--card);max-height:235px;overflow-y:auto}
+.hhopt{display:block;width:100%;text-align:left;padding:9px 11px;font-size:12.5px;border-bottom:1px solid var(--line)}
+.hhopt:last-child{border-bottom:0}
+.hhopt.on{background:var(--grn-soft);font-weight:700}
+.hhopt small{display:block;color:var(--mut);font-size:11px}
+.hhhead{position:sticky;top:0;background:var(--chip);font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:var(--mut);padding:5px 11px}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+@media (min-width:760px){
+  .sheet{left:50%;right:auto;width:560px;transform:translate(-50%,104%)}
+  .sheet.on{transform:translate(-50%,0)}
+}
+</style>
+
+<div class="ribbon">Concept preview · <b>no real orders</b></div>
+
+<header><div class="wrap hrow">
+  <div class="brand">
+    <div class="eyebrow">Ristorante · Carlingford · Est. 1997</div>
+    <h1 class="disp">Taste of Tuscany</h1>
+  </div>
+  <button class="clubchip" id="clubBtn" aria-label="Club Tuscany stamps">🍕 <span id="clubN">0</span>/8</button>
+  <button class="hbtn" id="themeBtn" aria-label="Switch theme">◐</button>
+  <button class="hbtn" id="aboutBtn" aria-label="About this concept">ⓘ</button>
+</div></header>
+
+<main class="wrap">
+  <div class="modes" role="tablist">
+    <button class="mode on" data-mode="pickup" role="tab"><b>Pickup</b><span>ready in ~20 min</span></button>
+    <button class="mode" data-mode="delivery" role="tab"><b>Delivery</b><span>4:30 – 9:00 pm</span></button>
+  </div>
+
+  <div class="deals" id="dealRow"></div>
+
+  <div class="wed"><div class="wday" id="wedDay">Wednesdays</div>
+    <p><b>Any large pizza from $15</b>, pickup only. Gourmet +$1 · seafood +$7.</p>
+  </div>
+
+  <div class="tric"><i></i><i></i><i></i></div>
+
+  <div class="railwrap">
+    <div class="search">🔍<input id="q" type="search" placeholder="Search the menu…" aria-label="Search the menu"></div>
+    <div class="rail" id="rail"></div>
+  </div>
+
+  <div id="menu"></div>
+
+  <footer>
+    <div class="fb">Buon appetito.</div>
+    <div>314 Pennant Hills Road, Carlingford NSW 2118</div>
+    <div>Pickup 11:30 am – 8:30 pm · Delivery 4:30 – 9:00 pm</div>
+    <div><span class="copyable">02 9872 1022</span> · <span class="copyable">0451 374 566</span></div>
+    <div style="margin-top:10px;font-size:11.5px">This page is a design concept prepared as a proposal for Taste of Tuscany. It is not affiliated with or operated by the restaurant, and it takes no real orders. Menu and prices from the public menu, Oct 2026.</div>
+  </footer>
+</main>
+
+<div class="cartbar"><button id="cartBar" hidden><span class="n" id="cbN">0</span> View your order <span class="t" id="cbT">$0.00</span></button></div>
+
+<div class="scrim" id="scrim"></div>
+
+<section class="sheet" id="shItem" aria-label="Dish details"><div class="grab"><i></i></div><div class="sbody" id="itemBody"></div></section>
+<section class="sheet" id="shCart" aria-label="Your order"><div class="grab"><i></i></div><div class="sbody" id="cartBody"></div></section>
+<section class="sheet" id="shCheckout" aria-label="Checkout"><div class="grab"><i></i></div><div class="sbody" id="coBody"></div></section>
+<section class="sheet" id="shClub" aria-label="Club Tuscany"><div class="grab"><i></i></div><div class="sbody" id="clubBody"></div></section>
+<section class="sheet" id="shAbout" aria-label="About this concept"><div class="grab"><i></i></div><div class="sbody" id="aboutBody"></div></section>
+<section class="sheet" id="shHH" aria-label="Half and half builder"><div class="grab"><i></i></div><div class="sbody" id="hhBody"></div></section>
+
+<div class="confirm" id="confirm"></div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+const MENU = [{"c":"Deals","it":[{"id":"i0","n":"Footy Deal","d":"3 large traditional pizzas.","img":"Capriciossa.webp","v":false,"po":true,"fr":false,"o":[{"l":"","p":45}]},{"id":"i1","n":"Gourmet Meal Deal","d":"","img":"marinara_pasta.webp","v":false,"po":true,"fr":false,"o":[{"l":"","p":85}]},{"id":"i2","n":"Traditional Meal Deal","d":"","img":"Bolognese_pasta.webp","v":false,"po":true,"fr":false,"o":[{"l":"","p":65}]},{"id":"i3","n":"2 Large Traditional Pizzas","d":"","img":"superame.webp","v":false,"po":false,"fr":true,"o":[{"l":"","p":38}]},{"id":"i4","n":"2 Large Gourmet or Vegetarian Pizzas","d":"","img":"Tandori.webp","v":false,"po":false,"fr":true,"o":[{"l":"","p":41.9}]},{"id":"i5","n":"2 Large Seafood Pizzas","d":"","img":"Trinidad.webp","v":false,"po":false,"fr":true,"o":[{"l":"","p":47.9}]},{"id":"i6","n":"2 Traditional or Vegetarian Pastas","d":"","img":"Lasagna.webp","v":false,"po":false,"fr":true,"o":[{"l":"","p":41.9}]},{"id":"i7","n":"Large Traditional Pizza + Pasta","d":"Any large traditional pizza with a traditional or vegetarian pasta.","img":"Four_season.webp","v":false,"po":false,"fr":true,"o":[{"l":"","p":40.9}]},{"id":"i8","n":"Triple P","d":"","img":"Popeye.webp","v":false,"po":true,"fr":false,"o":[{"l":"","p":60}]}]},{"c":"Monthly Specials","it":[{"id":"i9","n":"BBQ Baby Back Pork Ribs","d":"Bone-tender BBQ baby back pork ribs served with chips.","img":"BBQ_RIBS_2.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":39.9}]},{"id":"i10","n":"Grill Chicken Breast","d":"Grill Chicken Breast Served with steamed vegetables","img":"GrilleChickenBreastsu_y.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":28.9}]},{"id":"i11","n":"Grill Veal Medallions","d":"","img":"","v":false,"po":false,"fr":false,"o":[{"l":"","p":34.9}]}]},{"c":"Traditional Pizzas","it":[{"id":"i12","n":"Alex Special","d":"Cabanossi and pineapple on a Napolitana sauce base, topped with mozzarella cheese.","img":"","v":false,"po":false,"fr":false,"o":[{"l":"Small","p":14},{"l":"Large","p":19.9}]},{"id":"i13","n":"Ayers Rock","d":"Ham, onions and egg, drizzled with touch of garlic, oregano on a Napolitana sauce base, topped with mozzarella cheese.","img":"Ayes_rock.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":19.9},{"l":"Small","p":14}]},{"id":"i14","n":"Bolognese","d":"Extra beef And cheese In our special homemade Bolognese sauce.","img":"Bolognes.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":19.9},{"l":"Small","p":14}]},{"id":"i15","n":"Cabanossi","d":"Sliced Cabanossi drizzled with touch of garlic , oregano on a Napolitana sauce base, topped with mozzarella cheese.","img":"","v":false,"po":false,"fr":false,"o":[{"l":"Small","p":14},{"l":"Large","p":19.9}]},{"id":"i16","n":"Caprice","d":"Ham, mushrooms, olives and anchovies drizzled with touch of garlic, oregano on a Napolitana sauce base, topped with mozzarella cheese.","img":"caprice.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":20.9},{"l":"Small","p":14}]},{"id":"i17","n":"Capriciossa","d":"Pepperoni, mushrooms, capsicum, onions drizzled with touch of garlic, oregano on a Napolitana sauce base, topped with mozzarella cheese.","img":"Capriciossa.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":20.9},{"l":"Small","p":14}]},{"id":"i18","n":"Carlinford Special","d":"Pepperoni, mushrooms, prawns and pineapple, drizzled with touch of garlic, oregano on a Napolitana sauce base, topped with mozzarella cheese.","img":"Carlo_sp.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":20.9},{"l":"Small","p":14}]},{"id":"i19","n":"Chicken Italia","d":"BBQ chicken, mushrooms , onions and capsicum on a BBQ sauce base, topped with mozzarella cheese.","img":"chicken_italian.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":19.9},{"l":"Small","p":14}]},{"id":"i20","n":"Four Seasons","d":"Ham, mushroom, sliced prawns and capsicum drizzled with touch of garlic, oregano on a Napolitana sauce base, topped with mozzarella cheese.","img":"Four_season.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":19.9},{"l":"Small","p":14}]},{"id":"i21","n":"Freds Special","d":"Bacon, eggs and mushroom, drizzled with touch of garlic, oregano on a Napolitana sauce base, topped with mozzarella cheese.","img":"Fred_sp.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":19.9},{"l":"Small","p":14}]},{"id":"i22","n":"Margherita","d":"Mozzarella cheese, tomatoes and a touch of basil pesto drizzled with touch of garlic, oregano on a Napolitana sauce base, topped with mozzarella cheese.","img":"Margirta.webp","v":true,"po":false,"fr":false,"o":[{"l":"Large","p":19.9},{"l":"Small","p":14}]},{"id":"i23","n":"Marinara","d":"Anchovies, Seafood Flakes And Prawns drizzled with touch of garlic, oregano on a Napolitana sauce base, topped with mozzarella cheese.","img":"Marinara.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":20.9},{"l":"Small","p":14.9}]},{"id":"i24","n":"Meat Lovers","d":"Pepperoni, ham, bacon and cabanossi, drizzled with touch of garlic , oregano topped with mozzarella on a BBQ sauce Base.","img":"Meatlover_2.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":21.9},{"l":"Small","p":14.9}]},{"id":"i25","n":"Mexican","d":"Sliced Pepperoni, capsicum drizzled with touch of garlic, oregano on a Napolitana and chilli sauce base, topped with mozzarella cheese.","img":"Mexican.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":19.9},{"l":"Small","p":14}]},{"id":"i26","n":"Mushroom","d":"Mushrooms with bocconcini cheese, drizzled with touch of garlic, oregano on a Napolitana sauce base, topped with cheese mozzarella cheese.","img":"Mushroom.webp","v":true,"po":false,"fr":false,"o":[{"l":"Large","p":19.9},{"l":"Small","p":14}]},{"id":"i27","n":"Pepperoni","d":"Sliced Pepperoni drizzled with touch of garlic , oregano on a Napolitana sauce base, topped with mozzarella cheese.","img":"Pepproni.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":19.9},{"l":"Small","p":14}]},{"id":"i28","n":"Potatoes","d":"Oven roasted potatoes drizzled with touch of garlic, oregano on a Napolitana sauce base, topped with cheese mozzarella cheese.","img":"Potato.webp","v":true,"po":false,"fr":false,"o":[{"l":"Large","p":19.9},{"l":"Small","p":14}]},{"id":"i29","n":"Sorento","d":"Cabanossi, mushrooms, capsicum and olives, drizzled with touch of garlic, oregano on a Napolitana sauce base, topped with mozzarella cheese.","img":"","v":false,"po":false,"fr":false,"o":[{"l":"Small","p":14},{"l":"Large","p":21.9}]},{"id":"i30","n":"Supreme","d":"Pepperoni, bacon, ham, cabanossi, mushrooms, capsicum, onions, pineapple and Kalamata olives, drizzled with touch of garlic, oregano on a Napolitana sauce base, topped with mozzarella cheese.","img":"superame.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":20.9},{"l":"Small","p":14}]},{"id":"i31","n":"Sweet and Sour","d":"Prawns, onions and pineapple drizzled with touch of garlic, oregano on a Napolitana sauce base, topped with mozzarella cheese.","img":"Sweet_and_Sour.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":20.9},{"l":"Small","p":14}]},{"id":"i32","n":"Tropical","d":"Ham and pineapple on a Napolitana sauce base, topped with mozzarella cheese.","img":"Tropical.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":19.9},{"l":"Small","p":14}]},{"id":"i33","n":"Tuscany","d":"Bacon, avocado, asparagus, and olives, drizzled with touch of garlic, oregano on a Napolitana sauce base, topped with mozzarella cheese.","img":"Tascany.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":20.9},{"l":"Small","p":14}]},{"id":"i34","n":"Vegetarian","d":"Mushrooms, capsicum, onions and pineapple drizzled with touch of garlic ,oregano on a Napolitana sauce base, topped with mozzarella cheese.","img":"Vegetiran_webuse.webp","v":true,"po":false,"fr":false,"o":[{"l":"Large","p":19.9},{"l":"Small","p":14}]},{"id":"i35","n":"Wanita","d":"Bacon, mushrooms, capsicum, onions and pineapple drizzled with touch of garlic, oregano on a Napolitana sauce base, topped with mozzarella cheese.","img":"Wanita.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":20.9},{"l":"Small","p":14}]},{"id":"i36","n":"Sauce and Cheese","d":"A simple classic made with our house-made Napolitana sauce, premium mozzarella, and a sprinkle of oregano, baked on our freshly prepared pizza base.","img":"Sauce_and_Cheese.jpg","v":true,"po":false,"fr":false,"o":[{"l":"Small","p":14},{"l":"Large","p":19.9}]}]},{"c":"Gourmet Pizzas","it":[{"id":"i37","n":"Davinci","d":"Italian sausage, mushrooms and fresh tomato, drizzled with touch of garlic, oregano on a Napolitana sauce base, topped with mozzarella cheese.","img":"Davici.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":21.9},{"l":"Small","p":15}]},{"id":"i38","n":"Kampot","d":"Marinated satay chicken and fire roasted capsicum on a thai satay sauce base.","img":"Kampot.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":21.9},{"l":"Small","p":15}]},{"id":"i39","n":"Kyobe","d":"Teriyaki Chicken, Fire Roasted Capsicum, Sesame Seeds On Teriyaki Base Topped With Snow Peas.","img":"Kobe.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":21.9},{"l":"Small","p":15}]},{"id":"i40","n":"Lamb","d":"Lamb, Roasted Capsicum, Spanish Onions, Topped With Sour Cream And Mint Jelly.","img":"Lamb.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":21.9},{"l":"Small","p":15}]},{"id":"i41","n":"Lamb Tikka","d":"Tandoori Lamb, Eggplant, Spanish Onions Topped With Sour Cream And Spicy Mango Chutney And Chives.","img":"Lamb_Tikka.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":21.9},{"l":"Small","p":15}]},{"id":"i42","n":"Last Minute","d":"Pesto Base, Chicken, Avocado, Bacon, Potatoes And Broccoli.","img":"last_mins.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":21.9},{"l":"Small","p":15}]},{"id":"i43","n":"Meatball","d":"Homemade meatballs, onions, fire roasted capsicum, drizzled with touch of garlic, oregano on a Napolitana sauce base, topped with mozzarella cheese.","img":"Meatballs.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":21.9},{"l":"Small","p":15}]},{"id":"i44","n":"Meatball and Chirizo","d":"Chorizo, Meatballs, Caramelized Onions, Topped With Sour Cream And Sweet Chilli.","img":"meatball_chrizor.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":21.9},{"l":"Small","p":15}]},{"id":"i45","n":"Mediterian Lamb","d":"Pesto Base, Lamb, Caramilised Onions, Roma Tomotoes, Eggplant, Fetta And Olives.","img":"Meditrtian_Lamb.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":21.9},{"l":"Small","p":15}]},{"id":"i46","n":"Peri Peri Chicken","d":"Peri Peri Chicken, Roma Tomatoes, Roasted Capsicum, Spanish Onions, Bocconcini.","img":"periperi.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":21.9},{"l":"Small","p":15}]},{"id":"i47","n":"Rosemary","d":"Chicken, Potatoes And Rosemary On A Pesto Base.","img":"rosemary.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":21.9},{"l":"Small","p":15}]},{"id":"i48","n":"Sicilian","d":"Spicy Italian sausage, Spanish Onions, fire roasted capsicum and olives,drizzled with touch of garlic, oregano on a Napolitana sauce base, topped with mozzarella cheese.","img":"Sicilian.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":21.9},{"l":"Small","p":15}]},{"id":"i49","n":"Tandoori","d":"Tandoori Chicken, Spanish Onions, Capsicum, Topped With Sour Cream And Mint Jelly.","img":"Tandori.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":21.9},{"l":"Small","p":15}]}]},{"c":"Vegetarian Gourmet","it":[{"id":"i50","n":"Africana","d":"Marinated eggplant, roasted sliced potatoes, mushrooms, on a napolitana base topped with mozzarella cheese","img":"Africana.webp","v":true,"po":false,"fr":false,"o":[{"l":"Small","p":15},{"l":"Large","p":21.9}]},{"id":"i51","n":"Algiers","d":"Fire Roasted Capsicum, Eggplant, Artichokes, Roasted Garlic, Blue Vein Cheese And Herbs On A Napolitana Base.","img":"Algies.webp","v":true,"po":false,"fr":false,"o":[{"l":"Large","p":21.9},{"l":"Small","p":15}]},{"id":"i52","n":"Conga","d":"Fetta Cheese, Artichoke Hearts, Fire Roasted Capsicum, Sundried Tomatoes And Olives, Topped With Cheese On A Napolitana Base.","img":"Conga.webp","v":true,"po":false,"fr":false,"o":[{"l":"Large","p":21.9},{"l":"Small","p":15}]},{"id":"i53","n":"Farm Vegi","d":"Carrots, Shallots, Bean Sprouts, Mushrooms, Diced Tomatoes, Spanish Onions, Fire Roasted Capsicum,Garlic And Herbs On A Napolitana Base.","img":"Farm_veges.webp","v":true,"po":false,"fr":false,"o":[{"l":"Large","p":21.9},{"l":"Small","p":15}]},{"id":"i54","n":"Formaggi","d":"Napolitana Base With Goat Cheese,Ricotta,Mozzarella Cheese And Parmesan Cheese.","img":"Formaggi.webp","v":true,"po":false,"fr":false,"o":[{"l":"Large","p":21.9},{"l":"Small","p":15}]},{"id":"i55","n":"Matador","d":"Spanish Onion, Diced Tomatoes, Olives And Crumbled Fetta Cheese On A Pesto Base, Drizzled With Olive Oil And Oregano.","img":"Madotr.webp","v":true,"po":false,"fr":false,"o":[{"l":"Large","p":21.9},{"l":"Small","p":15}]},{"id":"i56","n":"Oslo","d":"Pesto Base, Sundried Tomato, Ricotta And Chilli Flakes.","img":"Oslo.webp","v":true,"po":false,"fr":false,"o":[{"l":"Large","p":21.9},{"l":"Small","p":15}]},{"id":"i57","n":"Popeye","d":"Pesto Base With Spanish Onions, Fresh Tomato, Baby Spinach And Ricotta Cheese, Drizzled With Garlic.","img":"Popeye.webp","v":true,"po":false,"fr":false,"o":[{"l":"Large","p":21.9},{"l":"Small","p":15}]},{"id":"i58","n":"San Remo","d":"Pesto Base, Eggplant, Artichokes, Baby Spinach, Roasted Capsicum, Mushrooms, Bocconcini.","img":"San_Remo.webp","v":true,"po":false,"fr":false,"o":[{"l":"Large","p":21.9},{"l":"Small","p":15}]}]},{"c":"Seafood Pizzas","it":[{"id":"i59","n":"Bangkok","d":"King Prawns And Tasmanian Scallops Served On A Satay Base, Topped With Snow Peas And Sesame Seeds.","img":"Bangkok.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":27.9},{"l":"Small","p":18.9}]},{"id":"i60","n":"Crocker Special","d":"King Prawns Marinated In Garlic With Fresh Tomatoes, Basil, Topped With Mozzarella Cheese And Parmesan Cheese.","img":"Crocker_sp.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":27.9},{"l":"Small","p":18.9}]},{"id":"i61","n":"Egino","d":"King Prawns, Tasmanian Scallops And Octopus On A Napolitana Base With Parmesan Cheese And Oregano.","img":"Egino_2.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":27.9},{"l":"Small","p":18.9}]},{"id":"i62","n":"Michael Angelo","d":"Smoked Salmon, Spanish Onions And Capers Topped With Sour Cream, Black And Red Caviar And Garnished With Shallots.","img":"Micheal_Angleo.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":27.9},{"l":"Small","p":18.9}]},{"id":"i63","n":"Garlic Prawn and Chorizo","d":"Marinated King prawns, Chorizo, capsicum, caramelised onion on a napolitana sauce base topped with mozzarella cheese, oregano and touch of garlic.","img":"Garlic_Prawns_and_Chorizo.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":27.9},{"l":"Small","p":18.9}]},{"id":"i64","n":"Pago","d":"King Prawns, Sundried Tomatoes And Ricotta Cheese On A Pesto Base With A Touch Of Chilli.","img":"pago.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":27.9},{"l":"Small","p":18.9}]},{"id":"i65","n":"Prawn Kilpatrick","d":"Marinated Garlic King Prawns, Bacon On A BBQ Sauce Base Garnished With Shallots And Sesame Seeds Topped With Mozarella Cheese.","img":"ppKpartirk.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":27.9},{"l":"Small","p":18.9}]},{"id":"i66","n":"Trinidad","d":"King Prawns, Sundried Tomatoes, Spanish Onions, Romano Cheese And Roasted Garlic On A Napolitana Base.","img":"Trinidad.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":27.9},{"l":"Small","p":18.9}]}]},{"c":"Pasta","it":[{"id":"i67","n":"Aglio Olio with Prawns","d":"Juicy prawns with olive oil, garlic, chilli, and shallots — a simple yet bold pasta bursting with Mediterranean flavour (I)","img":"","v":false,"po":false,"fr":false,"o":[{"l":"","p":29.9}]},{"id":"i68","n":"Anabella","d":"Succulent sliced chicken breast combined with shallots and fire-roasted capsicum, simmered in a napolitana sauce with a delicate touch of chilli.","img":"Anabela.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":25.9}]},{"id":"i69","n":"Arrabbiata","d":"Crispy bacon and caramelised onions tossed in a rich Napolitana sauce with a touch of chilli and shallots.","img":"","v":false,"po":false,"fr":false,"o":[{"l":"","p":22.9}]},{"id":"i70","n":"Bolognese","d":"Home made tasty bolognese sauce.","img":"Bolognese_pasta.webp","v":false,"po":false,"fr":false,"o":[{"l":"Small","p":17.9},{"l":"Large","p":22.9}]},{"id":"i71","n":"Bortolli","d":"Calamari, olive oil, shallots, garlic, chilli, Napolitana sauce and red wine (I)","img":"","v":false,"po":false,"fr":false,"o":[{"l":"","p":28.9}]},{"id":"i72","n":"Boscaiola","d":"Bacon, mushrooms and a touch of garlic in a cream sauce.","img":"Bosciola.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":22.9}]},{"id":"i73","n":"Carbonara","d":"Bacon, egg and touch of garlic in a creamy parmasen cheese sauce.","img":"Carbonara_2_pasta.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":22.9}]},{"id":"i74","n":"Con Broccli","d":"Fresh broccoli tossed with sun-dried tomatoes, fire-roasted capsicum, Spanish onions, toasted pine nuts, extra virgin olive oil, and finished with shaved Parmesan cheese.","img":"conbrocoly.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":24.9}]},{"id":"i75","n":"Cauliflower Lasagna","d":"Layers of tender roasted cauliflower and delicate pasta sheets, smothered in a rich, velvety béchamel and house-made cream sauce, finished with melted mozzarella and parmesan, and oven-baked to a golden, bubbling perfection.","img":"cauliflower_lasagna_slice_website.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":19.9}]},{"id":"i76","n":"Diablo","d":"Fresh King Prawns marinated in garlic, chilli and Napolitana sauce (I)","img":"Diablo_Prawns.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":29.9}]},{"id":"i77","n":"Florentino","d":"Fried garlic, spinach, pine nuts, ricotta cheese, basil pesto and parmesan cheese,with cream.","img":"","v":false,"po":false,"fr":false,"o":[{"l":"","p":24.9}]},{"id":"i78","n":"Gennovessa","d":"Sundried tomatoes, pesto, garlic, eggplant in a napolitana sauce.","img":"","v":true,"po":false,"fr":false,"o":[{"l":"","p":22.9}]},{"id":"i79","n":"Lasagna","d":"Homemade layers of pasta served with rich meat and cheese sauce.","img":"Lasagna.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":21.9}]},{"id":"i80","n":"Marinara","d":"A mixture of seafood in a spicy napolitana sauce (M)","img":"marinara_pasta.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":29.9}]},{"id":"i81","n":"Meatballs","d":"Home made meatballs (beef &veal mince), cooked with red wine, garlic, tomatoes and fresh herbs, served with spaghetti.","img":"Meat_balls_pasta_2.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":24.9}]},{"id":"i82","n":"Pesto","d":"Basil pesto, tomato salsa and a touch of garlic.","img":"","v":false,"po":false,"fr":false,"o":[{"l":"","p":21.9}]},{"id":"i83","n":"Napolitana","d":"Traditional tomato based sauce with fresh basil.","img":"Napolitana_pasta_2.webp","v":false,"po":false,"fr":false,"o":[{"l":"Large","p":19.9},{"l":"Small","p":15.9}]},{"id":"i84","n":"Piselli","d":"King prawns, olive oil, onions, garlic in a cream sauce and touch of napolitana sauce(I)","img":"","v":false,"po":false,"fr":false,"o":[{"l":"","p":29.9}]},{"id":"i85","n":"Port Pouri","d":"Bacon, chicken breast, seafood flakes, avocado, and asparagus in a cream sauce (I)","img":"","v":false,"po":false,"fr":false,"o":[{"l":"","p":25.9}]},{"id":"i86","n":"Prawn & Bacon Linguine","d":"Linguine pasta served with bacon, sliced tiger prawns, cracked black pepper, garlic, parsley, olive oil and Parmesan cheese (I)","img":"","v":false,"po":false,"fr":false,"o":[{"l":"","p":29.9}]},{"id":"i87","n":"Puttanesca","d":"Olives, capers, chilli , shallots, anchovies in Napolitana sauce.","img":"Putanesca.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":22.9}]},{"id":"i88","n":"Salmone","d":"Canadian smoked salmon, capers, napolitana sauce and a touch of cream garnished with sour cream(A)","img":"","v":false,"po":false,"fr":false,"o":[{"l":"","p":27.9}]},{"id":"i89","n":"Vegeterian","d":"A hearty vegetarian medley of fire-roasted capsicum, sundried tomatoes, mushrooms, and spinach in a napolitana sauce enriched with pesto, garlic, and a splash of red wine.","img":"","v":true,"po":false,"fr":false,"o":[{"l":"","p":22.9}]}]},{"c":"Risotto","it":[{"id":"i90","n":"Chicken+bacon Risotto","d":"Chicken breast, bacon, onion, mushrooms and garlic cooked in Napolitana and basil pesto sauce.","img":"Chicken_And_Bacon_Rissoto.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":26.9}]},{"id":"i91","n":"Prawn+bacon Risotto","d":"King prawns, bacon, onion, mushrooms, basil pesto and garlic cooked in red wine and Napolitana sauce (I)","img":"prawn_and_bacon_risotto.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":31.9}]},{"id":"i92","n":"Seafood Risotto","d":"Medley of seafood, mushrooms, garlic and chilli cooked in red wine, basil pesto and Napolitana sauce (M)","img":"seafood_risotto.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":31.9}]},{"id":"i93","n":"Vegeterian Risotto","d":"Sundried tomatoes, Spanish onions, fire roasted capsicum, mushrooms and spinach, cooked in Napolitana and basil pesto sauce.","img":"Vegeterian_Rissoto.webp","v":true,"po":false,"fr":false,"o":[{"l":"","p":24.9}]},{"id":"i94","n":"Chicken and Asparagus Risotto","d":"","img":"","v":false,"po":false,"fr":false,"o":[{"l":"","p":26.9}]}]},{"c":"Seafood Mains","it":[{"id":"i95","n":"Atlantic Salmon + Salad","d":"Grilled salmon fillet with a brush of butter and served with garden salad (A)","img":"salmone_fillet_11.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":35.9}]},{"id":"i96","n":"Barramundi + Italian Salad","d":"Grilled fresh barramundi fillet, served with lemon and garden salad (A)","img":"baramundi.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":32.9}]},{"id":"i97","n":"Calamari Fritti+ Italian Salad","d":"Tender calamari rings lightly coated with homemade breadcrumbs and herbs then gently fried, served with lemon, tartare sauce, chips and an Italian salad (I)","img":"calamary_1.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":28.9}]},{"id":"i98","n":"Chilli Prwns","d":"King prawns pan fried in chilli, red wine and Napolitana sauce, served on a bed of mushroom risotto(I)","img":"Chilli_prawns.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":32.9}]},{"id":"i99","n":"Gamberoni","d":"King prawns and green peppercorns sauteed in brandy and cream, served on a bed of mushroom risotto (I)","img":"","v":false,"po":false,"fr":false,"o":[{"l":"","p":32.9}]},{"id":"i100","n":"Prawn Cutlets + Italian Salad","d":"King prawns lightly coated with homemade breadcrumbs, served with lemon, tartare sauce and an Italian salad and chips (I)","img":"Prawn_Cutlets.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":31.9}]},{"id":"i101","n":"Seafood Basket + Italian Salad","d":"Mixture of fresh king prawns and calamari rings, lightly coated with homemade breadcrumbs and herbs then gently fried, served with tartare sauce, lemon, chips and garden salad (I)","img":"seafood_BT.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":31.9}]}]},{"c":"Veal","it":[{"id":"i102","n":"Funghetti Veal","d":"Veal medallions with mushrooms, a touch of garlic, white wine and cream sauce served with vegetables.","img":"Veal_Funghy.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":34.9}]},{"id":"i103","n":"Marsala Vitello","d":"Veal medallions cooked in a cream and marsala wine sauce.","img":"Veal_Marsala.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":34.9}]},{"id":"i104","n":"Mexicana Veal","d":"Veal medallions, fire roasted capsicum, onion and pepperoni cooked in a red wine and Napolitana sauce","img":"Veal_Mexican.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":34.9}]},{"id":"i105","n":"Mustardo Vitello","d":"Veal medallions cooked in a white wine and cream sauce with a touch of French mustard.","img":"Veal_Mustardo.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":34.9}]},{"id":"i106","n":"Parmigiana Vitello","d":"Veal medallions layered with grilled eggplant, Napolitana sauce and mozzarella cheese.","img":"Vitelo_Parmigana.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":34.9}]},{"id":"i107","n":"Pizzaiola Vitello","d":"Veal medallions with fresh herbs, garlic, olives and a red wine sauce served with vegetables.","img":"","v":false,"po":false,"fr":false,"o":[{"l":"","p":34.9}]},{"id":"i108","n":"Royale Veal","d":"Veal medallions cooked in a red wine and Napolitana sauce, topped with king prawns and mozzarella cheese (I)","img":"","v":false,"po":false,"fr":false,"o":[{"l":"","p":36.9}]},{"id":"i109","n":"Schnitzel Veal","d":"Tender veal fillets lightly coated with homemade breadcrumbs and fried, topped with napolitana sauce and mozzarella cheese .","img":"","v":false,"po":false,"fr":false,"o":[{"l":"","p":32.9}]},{"id":"i110","n":"Valdostore Veal","d":"Veal medallions layered with Napolitana sauce, ham and mozzarella cheese.","img":"","v":false,"po":false,"fr":false,"o":[{"l":"","p":34.9}]}]},{"c":"Chicken","it":[{"id":"i111","n":"Alfredo Chicken","d":"Grilled chicken breast with ham, mushroom, garlic and white wine in cream sauce served with vegetables.","img":"","v":false,"po":false,"fr":false,"o":[{"l":"","p":29.9}]},{"id":"i112","n":"Boscaiola Chicken","d":"Grilled chicken breast, bacon, mushrooms and garlic cooked in a white wine and cream sauce.","img":"Chcken_Bosciola.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":29.9}]},{"id":"i113","n":"Diavola Chicken","d":"Grilled chicken breast cooked in chilli, garlic, red wine and Napolitana sauce.","img":"","v":false,"po":false,"fr":false,"o":[{"l":"","p":28.9}]},{"id":"i114","n":"Monte Carlo Chicken","d":"Grilled chicken breast cooked in a white wine and cream sauce, topped with smoked salmon, asparagus and mozzarella cheese (A)","img":"","v":false,"po":false,"fr":false,"o":[{"l":"","p":31.9}]},{"id":"i115","n":"Pimontera Chicken","d":"Grilled chicken breast topped with sundried tomatoes, Napolitana sauce and mozzarella cheese","img":"","v":false,"po":false,"fr":false,"o":[{"l":"","p":28.9}]},{"id":"i116","n":"Princess Chicken","d":"Grilled chicken breast and bacon cooked in a white wine and cream sauce, topped with fresh avocado","img":"Chicken_Princes.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":32.9}]},{"id":"i117","n":"San Giovanni Chicken","d":"Grilled chicken breast cooked in red wine, garlic and Napolitana sauce, topped with king prawns and mozzarella cheese (I)","img":"","v":false,"po":false,"fr":false,"o":[{"l":"","p":33.9}]},{"id":"i118","n":"Savoia Chicken","d":"Grilled chicken breast with mushrooms, mustard, white wine and cream sauce served with vegetables.","img":"","v":false,"po":false,"fr":false,"o":[{"l":"","p":28.9}]},{"id":"i119","n":"Schnitzel Chicken","d":"Chicken breast lightly coated with homemade breadcrumbs and fried, topped with Napolitana sauce and mozzarella cheese.","img":"chicken_snitzzel.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":28.9}]},{"id":"i120","n":"Supreme Chicken","d":"Pan fried chicken breast with Spanish onions, mushrooms, fire roasted capsicum, and green peppercorns, in a brandy and cream sauce.","img":"","v":false,"po":false,"fr":false,"o":[{"l":"","p":28.9}]},{"id":"i121","n":"Tuscany Chicken","d":"Grilled chicken breast, Spanish onion and green peppercorns with a touch of brandy cooked in cream sauce.","img":"Chicken_Tuscany.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":28.9}]}]},{"c":"Salads","it":[{"id":"i122","n":"Caesar Salad","d":"Tender chilled cos lettuce leaves are tossed with home made croutons, crispy bacon and our special Caesar dressing.","img":"_DSC5320.webp","v":true,"po":false,"fr":false,"o":[{"l":"","p":14.9}]},{"id":"i123","n":"Chick Caesar Salad","d":"Tender chilled cos lettuce leaves are tossed with home made croutons, crispy bacon and our special Caesar dressing , topped with grilled chicken breast.","img":"_DSC4781.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":18.9}]},{"id":"i124","n":"Greek Salad","d":"Mixture of crisp lettuce tossed with ripe tomatoes, fresh cucumber and kalamata olives, fetta and Italian dressing.","img":"Greek_Salad.webp","v":true,"po":false,"fr":false,"o":[{"l":"","p":12.9}]},{"id":"i125","n":"Italian Salad","d":"Mixture of crisp lettuce leaves tossed with tomato, cucumber and kalamata olives, drizzled with Italian dressing.","img":"Italian_Salad.webp","v":true,"po":false,"fr":false,"o":[{"l":"","p":12.9}]},{"id":"i126","n":"Rocket Salad","d":"ROCKET LEAVES WITH SPANISH ONIONS, GOATS CHEESE, WALNUTS AND PEAR TOSSED WITH HONEY AND BALSAMIC DRESSING.","img":"Rocket_Salad.webp","v":true,"po":false,"fr":false,"o":[{"l":"","p":17.9}]},{"id":"i127","n":"Roman Salad","d":"Bocconcini with roma tomatos and fresh basil drizzled wih olives oil and balsamic vinaigrette.","img":"Roma_Salad.webp","v":true,"po":false,"fr":false,"o":[{"l":"","p":15.9}]}]},{"c":"Kids","it":[{"id":"i128","n":"Kids Nuggets & Chips","d":"pieces of Chicken breast fillet lightly coated with homemade bread crumbs and then gently fried, served with chips","img":"NUGGETS_AND_CHIPS_2.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":14.9}]},{"id":"i129","n":"Fish and Chips","d":"pieces of Barramundi fillet lightly coated with homemade bread crumbs and then gently fried, served with chips (A)","img":"Fish_and_chips_2.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":14.9}]},{"id":"i130","n":"Chips","d":"","img":"CHIPS_2.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":7.5}]}]},{"c":"Sides","it":[{"id":"i131","n":"Chips","d":"","img":"CHIPS_2.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":7.5}]},{"id":"i132","n":"Large Tub Vegies","d":"","img":"STEAM_VEGETABLES_2.webp","v":true,"po":false,"fr":false,"o":[{"l":"","p":8}]},{"id":"i133","n":"Small Tub Vegies","d":"","img":"STEAM_VEGETABLES_2.webp","v":true,"po":false,"fr":false,"o":[{"l":"","p":6}]},{"id":"i134","n":"Potato Wedges","d":"","img":"POTATO_WEDGES_2.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":9.9}]}]},{"c":"Breads","it":[{"id":"i135","n":"Garlic Bread","d":"Freshly baked bread infused with aromatic garlic.","img":"Garlic_Bread.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":5.9}]},{"id":"i136","n":"Herb Bread","d":"Freshly baked bread infused with aromatic herbs.","img":"Herb_Bread.webp","v":true,"po":false,"fr":false,"o":[{"l":"","p":5.9}]},{"id":"i137","n":"Garlic Focaccia Small","d":"","img":"Garlic.webp","v":true,"po":false,"fr":false,"o":[{"l":"","p":10.9}]},{"id":"i138","n":"Herb Focaccia Small","d":"","img":"herb_foccacia.webp","v":true,"po":false,"fr":false,"o":[{"l":"","p":10.9}]},{"id":"i139","n":"Olive Herb Foc Small","d":"","img":"","v":true,"po":false,"fr":false,"o":[{"l":"","p":12.9}]},{"id":"i140","n":"Bruschetta Foccacia Small","d":"Pesto base, topped with tomato, basil, garlic and touch of oil.","img":"Bruschetta_focc_2.webp","v":true,"po":false,"fr":false,"o":[{"l":"","p":15.9}]},{"id":"i141","n":"Herb Focaccia Large","d":"","img":"herb_foccacia.webp","v":true,"po":false,"fr":false,"o":[{"l":"","p":14.9}]},{"id":"i142","n":"Olive Herb Foca Large","d":"","img":"","v":true,"po":false,"fr":false,"o":[{"l":"","p":16.9}]},{"id":"i143","n":"Garlic Focaccia Large","d":"","img":"Garlic.webp","v":true,"po":false,"fr":false,"o":[{"l":"","p":14.9}]}]},{"c":"Desserts","it":[{"id":"i144","n":"Choc Canoli Small","d":"","img":"Canoli.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":3.9}]},{"id":"i145","n":"Canoli Vanilla Small","d":"","img":"Canoli.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":3.9}]},{"id":"i146","n":"Canoli Sample Pack 4 Pieces","d":"cannoli SAMPLE PACK 4 pieces","img":"Canoli.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":14}]},{"id":"i147","n":"Canoli Ricotta Small","d":"","img":"Canoli_2.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":3.9}]},{"id":"i148","n":"Nutella Calzoni","d":"Nutella calzoni, filled with banana, topped with melted chocolate and finished with strawberry.","img":"","v":false,"po":false,"fr":false,"o":[{"l":"","p":13.9}]},{"id":"i149","n":"Profiterolls","d":"PROFITEROLLS","img":"Profiteroles.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":9.5}]},{"id":"i150","n":"Gelato Tub 750ml","d":"GELATO TUB 750ml","img":"Gelato_2.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":16.9}]},{"id":"i151","n":"Tiramisu","d":"TIRAMISU","img":"Tiramisu_2.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":9.5}]}]},{"c":"Drinks","it":[{"id":"i152","n":"Coke 1.25L Bottle","d":"","img":"Coca_Cola.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":5.5}]},{"id":"i153","n":"Hala Sparkling Rose Water 345ml","d":"Inspired by the rich flavours and culture of the Middle East, it blends tradition and innovation to capture the essence of roses in a delicious sparkling beverage, bringing you a taste of paradise. Each sip is an exotic journey, floral, vibrant and refreshingly unique. We say it’s time to stop and smell the roses… and have a HALA.","img":"IMG_0823.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":6}]},{"id":"i154","n":"San Pellegrino Chinotto Italian Sparkling Drink Glass 200ml","d":"A true ‘cult drink’, Sanpellegrino Chinotto is a beverage with a taste that is entirely its own. Born in the ‘50s, Chinotto is made from extracts of zesty sun-ripened chinotto oranges that get their distinct flavour from the unique conditions of the Mediterranean land. A deep brown colour with a light carbonation that rolls off the tongue, every sip is a journey to the south of Italy with the iconic Chinotto. It is full of the exquisite aroma from chinotto essential oils that plays joyfully with the scent of orange blossom flowers, whilst its full-bodied taste balances sweet and bitter with smooth hints of cinnamon and rhubarb between the mix of 20 different herbs. INGREDIENTS: Water, Sugar, Carbon Dioxide, Flavours, Colour (Caramel IV), Acidity Regulator (Citric Acid, Sodium Citrate), Antioxidant (Ascorbic Acid), Salt","img":"IMG_0821.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":3.9}]},{"id":"i155","n":"Coke Zero 1.25L Bottle","d":"COKE ZERO 1.25L BOTTLE","img":"Coca_cola_Zero.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":5.5}]},{"id":"i156","n":"Diet Coke 1.25L Bottle","d":"DIET COKE 1.25L BOTTLE","img":"Diet_Coca_cola.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":5.5}]},{"id":"i157","n":"Fanta 1.25L Bottle","d":"FANTA 1.25L BOTTLE","img":"Fenta.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":5.5}]},{"id":"i158","n":"Lemon Sprite 1.25L Bottle","d":"LEMON SPRITE 1.25L BOTTLE","img":"Sprite_Lemon.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":5.5}]},{"id":"i159","n":"Sprite 1.25L Bottle","d":"SPRITE 1.25L BOTTLE","img":"SPRITE.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":5.5}]},{"id":"i160","n":"Mineral Water","d":"MINERAL WATER","img":"Mineral_water.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":4.5}]},{"id":"i161","n":"Sprite Can","d":"","img":"IMG_0820.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":3.3}]},{"id":"i162","n":"Coke Can","d":"","img":"IMG_0817.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":3.3}]},{"id":"i163","n":"Diet Coke Can","d":"","img":"IMG_0818.webp","v":false,"po":false,"fr":false,"o":[{"l":"","p":3.3}]}]}];
+const HHPOOL = [{"n":"Alex Special","p":14,"c":"Traditional Pizzas"},{"n":"Ayers Rock","p":19.9,"c":"Traditional Pizzas"},{"n":"Bolognese","p":19.9,"c":"Traditional Pizzas"},{"n":"Cabanossi","p":14,"c":"Traditional Pizzas"},{"n":"Caprice","p":20.9,"c":"Traditional Pizzas"},{"n":"Capriciossa","p":20.9,"c":"Traditional Pizzas"},{"n":"Carlinford Special","p":20.9,"c":"Traditional Pizzas"},{"n":"Chicken Italia","p":19.9,"c":"Traditional Pizzas"},{"n":"Four Seasons","p":19.9,"c":"Traditional Pizzas"},{"n":"Freds Special","p":19.9,"c":"Traditional Pizzas"},{"n":"Margherita","p":19.9,"c":"Traditional Pizzas"},{"n":"Marinara","p":20.9,"c":"Traditional Pizzas"},{"n":"Meat Lovers","p":21.9,"c":"Traditional Pizzas"},{"n":"Mexican","p":19.9,"c":"Traditional Pizzas"},{"n":"Mushroom","p":19.9,"c":"Traditional Pizzas"},{"n":"Pepperoni","p":19.9,"c":"Traditional Pizzas"},{"n":"Potatoes","p":19.9,"c":"Traditional Pizzas"},{"n":"Sorento","p":14,"c":"Traditional Pizzas"},{"n":"Supreme","p":20.9,"c":"Traditional Pizzas"},{"n":"Sweet and Sour","p":20.9,"c":"Traditional Pizzas"},{"n":"Tropical","p":19.9,"c":"Traditional Pizzas"},{"n":"Tuscany","p":20.9,"c":"Traditional Pizzas"},{"n":"Vegetarian","p":19.9,"c":"Traditional Pizzas"},{"n":"Wanita","p":20.9,"c":"Traditional Pizzas"},{"n":"Sauce and Cheese","p":14,"c":"Traditional Pizzas"},{"n":"Davinci","p":21.9,"c":"Gourmet Pizzas"},{"n":"Kampot","p":21.9,"c":"Gourmet Pizzas"},{"n":"Kyobe","p":21.9,"c":"Gourmet Pizzas"},{"n":"Lamb","p":21.9,"c":"Gourmet Pizzas"},{"n":"Lamb Tikka","p":21.9,"c":"Gourmet Pizzas"},{"n":"Last Minute","p":21.9,"c":"Gourmet Pizzas"},{"n":"Meatball","p":21.9,"c":"Gourmet Pizzas"},{"n":"Meatball and Chirizo","p":21.9,"c":"Gourmet Pizzas"},{"n":"Mediterian Lamb","p":21.9,"c":"Gourmet Pizzas"},{"n":"Peri Peri Chicken","p":21.9,"c":"Gourmet Pizzas"},{"n":"Rosemary","p":21.9,"c":"Gourmet Pizzas"},{"n":"Sicilian","p":21.9,"c":"Gourmet Pizzas"},{"n":"Tandoori","p":21.9,"c":"Gourmet Pizzas"},{"n":"Africana","p":15,"c":"Vegetarian Gourmet Pizzas"},{"n":"Algiers","p":21.9,"c":"Vegetarian Gourmet Pizzas"},{"n":"Conga","p":21.9,"c":"Vegetarian Gourmet Pizzas"},{"n":"Farm Vegi","p":21.9,"c":"Vegetarian Gourmet Pizzas"},{"n":"Formaggi","p":21.9,"c":"Vegetarian Gourmet Pizzas"},{"n":"Matador","p":21.9,"c":"Vegetarian Gourmet Pizzas"},{"n":"Oslo","p":21.9,"c":"Vegetarian Gourmet Pizzas"},{"n":"Popeye","p":21.9,"c":"Vegetarian Gourmet Pizzas"},{"n":"San Remo","p":21.9,"c":"Vegetarian Gourmet Pizzas"},{"n":"Bangkok","p":27.9,"c":"Seafood Pizzas"},{"n":"Crocker Special","p":27.9,"c":"Seafood Pizzas"},{"n":"Egino","p":27.9,"c":"Seafood Pizzas"},{"n":"Michael Angelo","p":27.9,"c":"Seafood Pizzas"},{"n":"Garlic Prawn and Chorizo","p":27.9,"c":"Seafood Pizzas"},{"n":"Pago","p":27.9,"c":"Seafood Pizzas"},{"n":"Prawn Kilpatrick","p":27.9,"c":"Seafood Pizzas"},{"n":"Trinidad","p":27.9,"c":"Seafood Pizzas"}];
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const fmt = n => '$' + n.toFixed(2);
+const store = {
+  get(k,d){ try{ const v = localStorage.getItem(k); return v==null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ---------- state ---------- */
+let mode = store.get('tt_mode','pickup');
+let cart = store.get('tt_cart',[]);
+let stamps = store.get('tt_stamps',0);
+let promo = null;
+const byId = {};
+MENU.forEach(c => c.it.forEach(i => byId[i.id] = i));
+
+/* ---------- theme ---------- */
+const savedTheme = store.get('tt_theme','');
+if (savedTheme) document.documentElement.dataset.theme = savedTheme;
+$('#themeBtn').onclick = () => {
+  const cur = document.documentElement.dataset.theme ||
+    (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  document.documentElement.dataset.theme = next;
+  store.set('tt_theme', next);
+};
+
+/* ---------- mode ---------- */
+function setMode(m){
+  mode = m; store.set('tt_mode', m);
+  $$('.mode').forEach(b => b.classList.toggle('on', b.dataset.mode === m));
+  paintMenu($('#q').value);
+  paintCartBar();
+}
+$$('.mode').forEach(b => b.onclick = () => setMode(b.dataset.mode));
+
+/* ---------- menu paint ---------- */
+function priceLabel(it){
+  if (it.o.length > 1){
+    const lo = Math.min(...it.o.map(o=>o.p));
+    return fmt(lo).replace('.00','') + ' <small>/ ' + fmt(Math.max(...it.o.map(o=>o.p))).replace('.00','') + '</small>';
+  }
+  return (it.fr ? '<small>from </small>' : '') + fmt(it.o[0].p).replace('.00','');
+}
+function rowHTML(it){
+  const dis = (mode === 'delivery' && it.po) ? ' dis' : '';
+  const badges = (it.v ? '<span class="vleaf">V</span>' : '') + (it.po ? '<span class="pochip">Pickup only</span>' : '');
+  if (it.img){
+    return `<button class="row${dis}" data-item="${it.id}">
+      <span class="rtxt"><span class="rname">${esc(it.n)} ${badges}</span>
+      ${it.d ? `<span class="rdesc">${esc(it.d)}</span>` : ''}
+      <span class="rprice">${priceLabel(it)}</span></span>
+      <span class="rthumb"><img loading="lazy" src="img/${it.img}" alt=""><span class="radd">+</span></span>
+    </button>`;
+  }
+  return `<button class="row noimg${dis}" data-item="${it.id}">
+    <span class="rtxt"><span class="rname">${esc(it.n)} ${badges}</span>
+    ${it.d ? `<span class="rdesc">${esc(it.d)}</span>` : ''}
+    <span class="rprice">${priceLabel(it)}</span></span>
+    <span class="radd2">+</span>
+  </button>`;
+}
+function paintMenu(filter){
+  const f = (filter||'').trim().toLowerCase();
+  let html = '';
+  MENU.forEach((c,ci) => {
+    const items = c.it.filter(i => !f || (i.n + ' ' + i.d).toLowerCase().includes(f));
+    if (!items.length) return;
+    html += `<section class="sect" id="sect-${ci}" data-ci="${ci}">
+      <h2>${esc(c.c)} <small>${items.length}</small></h2>
+      <div class="rows">${items.map(rowHTML).join('')}</div>
+      ${c.c === 'Seafood Pizzas' ? hhCardHTML() : ''}
+    </section>`;
+  });
+  $('#menu').innerHTML = html || '<p style="padding-block:40px;color:var(--mut);text-align:center">Nothing matches. Try "pollo", "gamberi", or just "pizza".</p>';
+  paintRail(f);
+  watchSections();
+}
+function hhCardHTML(){
+  return `<button class="hhcard" id="hhOpen"><span class="hhicon"></span>
+    <span style="flex:1;min-width:0"><b>Build a Half &amp; Half</b>
+    <p>Two large pizzas on one base. Priced at the dearer half.</p></span>
+    <span style="font-weight:800;color:var(--grn)">›</span></button>`;
+}
+function paintRail(f){
+  $('#rail').innerHTML = MENU.map((c,ci) => {
+    const n = c.it.filter(i => !f || (i.n + ' ' + i.d).toLowerCase().includes(f)).length;
+    return n ? `<button class="rchip" data-to="sect-${ci}">${esc(c.c)}</button>` : '';
+  }).join('');
+}
+let spy;
+function watchSections(){
+  if (spy) spy.disconnect();
+  spy = new IntersectionObserver(es => {
+    es.forEach(e => { if (e.isIntersecting){
+      const id = e.target.id;
+      $$('.rchip').forEach(ch => ch.classList.toggle('on', ch.dataset.to === id));
+      const on = $('.rchip.on'); if (on) on.scrollIntoView({block:'nearest', inline:'nearest', behavior:'smooth'});
+    }});
+  }, {rootMargin:'-140px 0px -62% 0px'});
+  $$('.sect').forEach(s => spy.observe(s));
+}
+
+/* ---------- deals carousel ---------- */
+function paintDeals(){
+  const deals = (MENU.find(c => c.c === 'Deals') || {it:[]}).it;
+  $('#dealRow').innerHTML = deals.map(d => `<button class="deal" data-item="${d.id}">
+    <span class="tag">${d.po ? 'Pickup only' : 'Deal'}</span>
+    <b>${esc(d.n)}</b>
+    ${d.d ? `<span style="font-size:12px;color:var(--mut)">${esc(d.d)}</span>` : ''}
+    <span class="dp">${d.fr ? '<small>from </small>' : ''}${fmt(d.o[0].p).replace('.00','')}</span>
+  </button>`).join('');
+}
+
+/* ---------- sheets ---------- */
+let openSheetEl = null;
+function openSheet(id){
+  closeSheet();
+  openSheetEl = $(id);
+  openSheetEl.classList.add('on');
+  $('#scrim').classList.add('on');
+}
+function closeSheet(){
+  if (openSheetEl) openSheetEl.classList.remove('on');
+  openSheetEl = null;
+  $('#scrim').classList.remove('on');
+}
+$('#scrim').onclick = closeSheet;
+
+/* ---------- item sheet ---------- */
+let sel = { it:null, oi:0, qty:1 };
+function openItem(id){
+  const it = byId[id]; if (!it) return;
+  sel = { it, oi:0, qty:1 };
+  const blocked = mode === 'delivery' && it.po;
+  $('#itemBody').innerHTML = `
+    ${it.img ? `<img class="shero" src="img/${it.img}" alt="">` : ''}
+    <div>
+      <div class="big">${esc(it.n)}</div>
+      ${it.po ? '<span class="pochip" style="display:inline-block;margin-top:6px">Pickup only</span>' : ''}
+      ${it.v ? '<span class="vleaf" style="display:inline-block;margin-top:6px">Vegetarian</span>' : ''}
+    </div>
+    ${it.d ? `<p class="sdesc">${esc(it.d)}</p>` : ''}
+    ${it.o.length > 1 ? `<div><div class="lbl" style="margin-bottom:7px">Choose a size</div>
+      <div style="display:flex;flex-direction:column;gap:7px">${it.o.map((o,i) =>
+        `<button class="optrow${i===0?' on':''}" data-oi="${i}"><span class="dot"></span>${esc(o.l || 'Standard')}<span class="op">${fmt(o.p)}</span></button>`
+      ).join('')}</div></div>` : ''}
+    <div><div class="lbl" style="margin-bottom:7px">Anything we should know?</div>
+      <textarea class="note" id="itNote" rows="2" placeholder="No olives, extra chilli, cut in squares…"></textarea></div>
+    <div class="qtyrow">
+      <button class="qbtn" id="qMinus">−</button><span class="qn" id="qN">1</span><button class="qbtn" id="qPlus">+</button>
+      <span style="flex:1"></span>
+    </div>
+    ${blocked
+      ? `<button class="cta" disabled>Pickup only — switch to pickup to order</button>
+         <button class="ghost" id="swapPickup">Switch to pickup</button>`
+      : `<button class="cta" id="addBtn">Add to order <span class="cp" id="addP"></span></button>`}
+  `;
+  const paintP = () => { const p = $('#addP'); if (p) p.textContent = fmt(sel.it.o[sel.oi].p * sel.qty); };
+  $$('#itemBody .optrow').forEach(b => b.onclick = () => {
+    sel.oi = +b.dataset.oi;
+    $$('#itemBody .optrow').forEach(x => x.classList.toggle('on', x === b));
+    paintP();
+  });
+  $('#qMinus').onclick = () => { sel.qty = Math.max(1, sel.qty - 1); $('#qN').textContent = sel.qty; paintP(); };
+  $('#qPlus').onclick = () => { sel.qty = Math.min(20, sel.qty + 1); $('#qN').textContent = sel.qty; paintP(); };
+  const add = $('#addBtn');
+  if (add) add.onclick = () => {
+    const o = sel.it.o[sel.oi];
+    cart.push({ id: sel.it.id, n: sel.it.n, l: o.l, u: o.p, q: sel.qty, note: $('#itNote').value.trim(), img: sel.it.img, po: !!sel.it.po });
+    saveCart(); closeSheet();
+    toast(`${sel.it.n} added`);
+  };
+  const swap = $('#swapPickup');
+  if (swap) swap.onclick = () => { setMode('pickup'); closeSheet(); toast('Switched to pickup'); };
+  paintP();
+  openSheet('#shItem');
+  $('#shItem .sbody').scrollTop = 0;
+}
+
+/* ---------- half & half ---------- */
+let hh = { a:null, b:null };
+function openHH(){
+  hh = { a:null, b:null };
+  const groups = {};
+  HHPOOL.forEach((p,i) => { (groups[p.c] = groups[p.c] || []).push({...p, i}); });
+  const listHTML = side => Object.entries(groups).map(([g, arr]) =>
+    `<div class="hhhead">${esc(g.replace(' Pizzas','').replace('Vegetarian Gourmet','Veg gourmet'))}</div>` +
+    arr.map(p => `<button class="hhopt" data-side="${side}" data-i="${p.i}">${esc(p.n)}<small>${fmt(p.p)} large</small></button>`).join('')
+  ).join('');
+  $('#hhBody').innerHTML = `
+    <div class="big">Half &amp; Half</div>
+    <p class="sdesc">Pick a pizza for each half. One large base, priced at the dearer half.</p>
+    <div class="hhcols">
+      <div class="hhcol"><div class="lbl" style="margin-bottom:6px">Left half</div><div class="hhlist">${listHTML('a')}</div></div>
+      <div class="hhcol"><div class="lbl" style="margin-bottom:6px">Right half</div><div class="hhlist">${listHTML('b')}</div></div>
+    </div>
+    <button class="cta" id="hhAdd" disabled>Pick both halves</button>
+  `;
+  $$('#hhBody .hhopt').forEach(b => b.onclick = () => {
+    hh[b.dataset.side] = +b.dataset.i;
+    $$(`#hhBody .hhopt[data-side="${b.dataset.side}"]`).forEach(x => x.classList.toggle('on', x === b));
+    const btn = $('#hhAdd');
+    if (hh.a != null && hh.b != null){
+      const price = Math.max(HHPOOL[hh.a].p, HHPOOL[hh.b].p);
+      btn.disabled = false;
+      btn.innerHTML = `Add to order <span class="cp">${fmt(price)}</span>`;
+    }
+  });
+  $('#hhAdd').onclick = () => {
+    if (hh.a == null || hh.b == null) return;
+    const A = HHPOOL[hh.a], B = HHPOOL[hh.b];
+    cart.push({ id:'hh', n:'Half & Half', l:`${A.n} / ${B.n}`, u: Math.max(A.p, B.p), q:1, note:'', img:'', po:false });
+    saveCart(); closeSheet(); toast('Half & half added');
+  };
+  openSheet('#shHH');
+}
+
+/* ---------- cart ---------- */
+function saveCart(){ store.set('tt_cart', cart); paintCartBar(); }
+function cartCount(){ return cart.reduce((a,l) => a + l.q, 0); }
+function subtotal(){ return cart.reduce((a,l) => a + l.u * l.q, 0); }
+function discount(){ return promo ? subtotal() * 0.10 : 0; }
+function deliveryFee(){ return (mode === 'delivery' && cart.length) ? (subtotal() - discount() >= 40 ? 0 : 6) : 0; }
+function total(){ return subtotal() - discount() + deliveryFee(); }
+function paintCartBar(){
+  const bar = $('#cartBar');
+  bar.hidden = !cart.length;
+  $('#cbN').textContent = cartCount();
+  $('#cbT').textContent = fmt(total());
+}
+function openCart(){
+  if (!cart.length){ toast('Your order is empty'); return; }
+  const poBlocked = mode === 'delivery' && cart.some(l => l.po);
+  $('#cartBody').innerHTML = `
+    <div class="big">Your order</div>
+    <p class="sdesc">${mode === 'pickup' ? 'Pickup at 314 Pennant Hills Rd · ready in about 20 minutes.' : 'Delivery this evening, 4:30 – 9:00 pm.'}</p>
+    <div>${cart.map((l,i) => `<div class="cline">
+      ${l.img ? `<img src="img/${l.img}" alt="">` : ''}
+      <div class="cmain"><b>${esc(l.n)}</b><small>${esc(l.l || '')}${l.note ? ' · “' + esc(l.note) + '”' : ''}${l.po ? ' · pickup only' : ''}</small></div>
+      <div class="cqty"><button data-dec="${i}">−</button><span>${l.q}</span><button data-inc="${i}">+</button></div>
+      <div class="cprice">${fmt(l.u * l.q)}</div>
+    </div>`).join('')}</div>
+    <div class="promo">
+      <input id="promoIn" placeholder="Promo code" value="${promo ? 'TUSCANY10' : ''}" ${promo ? 'disabled' : ''}>
+      <button id="promoBtn">${promo ? 'Applied ✓' : 'Apply'}</button>
+    </div>
+    ${stamps >= 8 ? '<div class="freebie">🏆 Your stamp card is full — a free large traditional pizza is waiting. Mention it at pickup. (Demo)</div>' : ''}
+    <div style="display:flex;flex-direction:column;gap:7px">
+      <div class="totrow"><span>Subtotal</span><b>${fmt(subtotal())}</b></div>
+      ${promo ? `<div class="totrow"><span>TUSCANY10 (10% off)</span><b>−${fmt(discount())}</b></div>` : ''}
+      ${mode === 'delivery' ? `<div class="totrow"><span>Delivery${deliveryFee() === 0 ? ' (free over $40)' : ''}</span><b>${deliveryFee() ? fmt(deliveryFee()) : 'Free'}</b></div>` : ''}
+      <div class="totrow grand"><span>Total</span><b>${fmt(total())}</b></div>
+    </div>
+    ${poBlocked ? '<div class="demonote">Some items are pickup only. Switch to pickup, or remove them to deliver.</div>' : ''}
+    <button class="cta" id="toCheckout" ${poBlocked ? 'disabled' : ''}>Checkout <span class="cp">${fmt(total())}</span></button>
+  `;
+  $$('#cartBody [data-inc]').forEach(b => b.onclick = () => { cart[+b.dataset.inc].q = Math.min(20, cart[+b.dataset.inc].q + 1); saveCart(); openCart(); });
+  $$('#cartBody [data-dec]').forEach(b => b.onclick = () => {
+    const i = +b.dataset.dec;
+    cart[i].q -= 1;
+    if (cart[i].q <= 0) cart.splice(i,1);
+    saveCart();
+    cart.length ? openCart() : closeSheet();
+  });
+  $('#promoBtn').onclick = () => {
+    if (promo) return;
+    const v = $('#promoIn').value.trim().toUpperCase();
+    if (v === 'TUSCANY10'){ promo = true; toast('10% off applied'); openCart(); }
+    else toast('Try TUSCANY10 (demo code)');
+  };
+  $('#toCheckout').onclick = openCheckout;
+  openSheet('#shCart');
+}
+$('#cartBar').onclick = openCart;
+
+/* ---------- checkout ---------- */
+let payMethod = 'Card';
+function openCheckout(){
+  $('#coBody').innerHTML = `
+    <div class="big">${mode === 'pickup' ? 'Pickup details' : 'Delivery details'}</div>
+    <div class="fld"><span class="lbl">Name</span><input id="coName" autocomplete="name" placeholder="Your name"></div>
+    <div class="fld"><span class="lbl">Mobile</span><input id="coPhone" inputmode="tel" autocomplete="tel" placeholder="04xx xxx xxx"></div>
+    ${mode === 'delivery' ? '<div class="fld"><span class="lbl">Address</span><input id="coAddr" autocomplete="street-address" placeholder="Street address, suburb"></div>' : ''}
+    <div><div class="lbl" style="margin-bottom:7px">Pay with</div>
+      <div class="payseg">
+        ${['Card','Apple Pay','At counter'].map(p => `<button class="pay${p === payMethod ? ' on' : ''}" data-pay="${p}">${p}</button>`).join('')}
+      </div></div>
+    <div class="demonote">Concept demo — nothing is sent and no payment is taken.</div>
+    <button class="cta" id="placeBtn">Place ${mode} order <span class="cp">${fmt(total())}</span></button>
+  `;
+  $$('#coBody .pay').forEach(b => b.onclick = () => {
+    payMethod = b.dataset.pay;
+    $$('#coBody .pay').forEach(x => x.classList.toggle('on', x === b));
+  });
+  $('#placeBtn').onclick = () => {
+    const name = $('#coName').value.trim();
+    if (!name){ toast('Add your name so the kitchen knows'); $('#coName').focus(); return; }
+    placeOrder(name);
+  };
+  openSheet('#shCheckout');
+}
+function placeOrder(name){
+  const no = 'TT-' + Math.floor(1000 + Math.random() * 9000);
+  const isPickup = mode === 'pickup';
+  stamps = Math.min(8, stamps + 1);
+  store.set('tt_stamps', stamps);
+  cart = []; promo = null; saveCart();
+  closeSheet();
+  paintClubChip();
+  const steps = isPickup
+    ? ['Order received','In the kitchen','In the wood-fired oven','Ready for pickup']
+    : ['Order received','In the kitchen','In the wood-fired oven','Out for delivery'];
+  $('#confirm').innerHTML = `
+    <div class="bigtick">✓</div>
+    <div class="lbl">Demo order placed</div>
+    <div class="ordno disp">${no}</div>
+    <p class="sdesc">Grazie, ${esc(name)}. ${isPickup ? 'We’ll see you at 314 Pennant Hills Rd in about 20 minutes.' : 'Your order is on its way this evening.'}</p>
+    <div class="steps">${steps.map((s,i) => `<div class="step" data-si="${i}"><i></i>${s}</div>`).join('')}</div>
+    <div class="stamped">🍕 Stamp ${stamps} of 8 added to your Club Tuscany card${stamps >= 8 ? ' — next large traditional pizza is on the house!' : '.'}</div>
+    <button class="ghost" id="confDone" style="max-width:300px">Back to the menu</button>
+  `;
+  $('#confirm').classList.add('on');
+  $('#confDone').onclick = () => $('#confirm').classList.remove('on');
+  const stepEls = $$('#confirm .step');
+  let si = 0;
+  const tick = () => {
+    stepEls.forEach((el,i) => {
+      el.classList.toggle('done', i < si);
+      el.classList.toggle('now', i === si);
+    });
+    si++;
+    if (si <= stepEls.length) setTimeout(tick, 1600);
+  };
+  tick();
+}
+
+/* ---------- club ---------- */
+function paintClubChip(){ $('#clubN').textContent = stamps; }
+function openClub(){
+  $('#clubBody').innerHTML = `
+    <div class="big">Club Tuscany</div>
+    <p class="sdesc">Every order stamps your card. Eight stamps and your next large traditional pizza is on the house. Your card lives on your phone — no paper to lose.</p>
+    <div class="stampgrid">${Array.from({length:8}, (_,i) =>
+      `<div class="stamp${i < stamps ? ' got' : ''}">${i < stamps ? '🍕' : i + 1}</div>`).join('')}</div>
+    ${stamps >= 8
+      ? '<div class="freebie">🏆 Card full — your free pizza is waiting. (Demo: tap below to reset.)</div><button class="ghost" id="resetStamps">Redeem &amp; start a new card</button>'
+      : `<p class="sdesc">${8 - stamps} to go. In the real build, stamps sync to the kitchen so staff can verify in one tap.</p>`}
+  `;
+  const r = $('#resetStamps');
+  if (r) r.onclick = () => { stamps = 0; store.set('tt_stamps',0); paintClubChip(); toast('Enjoy the free pizza 🍕'); openClub(); };
+  openSheet('#shClub');
+}
+$('#clubBtn').onclick = openClub;
+
+/* ---------- about / pitch ---------- */
+function openAbout(){
+  $('#aboutBody').innerHTML = `
+    <div class="big">About this concept</div>
+    <p class="sdesc">A working preview of what Taste of Tuscany’s own ordering app could feel like — same menu, same prices, but built around the restaurant instead of a third-party template.</p>
+    <div>
+      <div class="pit"><i>1</i><div><b>Yours, not a template</b><p>Your name, your colours, your photography. Installs to the home screen like an app — no store, no download step.</p></div></div>
+      <div class="pit"><i>2</i><div><b>No per-order platform fees</b><p>Orders go straight to the kitchen. The margin on every pizza stays in the restaurant.</p></div></div>
+      <div class="pit"><i>3</i><div><b>Loyalty that lives on the phone</b><p>The stamp card is built in, so regulars come back direct instead of through an aggregator.</p></div></div>
+      <div class="pit"><i>4</i><div><b>Your customers stay yours</b><p>Names, order history and favourites belong to the restaurant — ready for a Wednesday-special push notification.</p></div></div>
+      <div class="pit"><i>5</i><div><b>Everything in this demo works</b><p>Browse, search, half &amp; half, cart, promo codes, checkout flow, order tracking, stamps. Only the kitchen hookup is left out.</p></div></div>
+    </div>
+    <div class="demonote">Prepared as a proposal for the Taste of Tuscany team. Not affiliated with the restaurant. No real orders, no payments, no customer data collected.</div>
+  `;
+  openSheet('#shAbout');
+}
+$('#aboutBtn').onclick = openAbout;
+
+/* ---------- toast ---------- */
+let toastT;
+function toast(msg){
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('on');
+  clearTimeout(toastT);
+  toastT = setTimeout(() => t.classList.remove('on'), 2200);
+}
+
+/* ---------- wiring ---------- */
+document.addEventListener('click', e => {
+  const r = e.target.closest('[data-item]');
+  if (r){ openItem(r.dataset.item); return; }
+  if (e.target.closest('#hhOpen')){ openHH(); return; }
+  const chip = e.target.closest('.rchip');
+  if (chip){
+    const el = document.getElementById(chip.dataset.to);
+    if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  }
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape'){ closeSheet(); } });
+let qT;
+$('#q').addEventListener('input', () => { clearTimeout(qT); qT = setTimeout(() => paintMenu($('#q').value), 160); });
+
+if (new Date().getDay() === 3) $('#wedDay').textContent = 'Tonight';
+setMode(mode);
+paintDeals();
+paintClubChip();
+</script>
