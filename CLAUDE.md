@@ -484,8 +484,30 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   (3) **`admin_verify_all`** (coach auth) verifies everyone in the inbox, capped
   200/call, returns {verified,left}; desk gained `#vfAll` "Verify everyone
   waiting (N)" button that loops until `left` is 0, behind a confirm.
-  NOTE: 40 `zzload_dev_*` load-test rows were left in oc_players — the SQL
-  delete was declined by the permission prompt; must be removed before launch.
+  (4) **Sign-up gate now FAILS OPEN** — `INVITE_ONLY` defaulted to `true` and was
+  only cleared after a successful `invite_status` round-trip, so one flaky call
+  on a cold boot showed every new hooper an "Invite code / Beta testers only"
+  box they had no code for, and `pfSave` refused to submit. Default is now
+  `false`; the SERVER stays authoritative (a `needinvite` reply still flips it
+  back to `true`, repaints the field and renders the error on `#invHint` —
+  both directions re-tested). (5) Stale **beta copy retired** now that
+  community.html says "the app is built": sign-up subtitle "You're in the beta"
+  → "You're one of the first", and the two 🚧 rules → "This one's built by the
+  community" / "You're early — and you're building it".
+  **DEPLOYED + LIVE** (edge v34 = the `admin_verify_all` probe answers
+  `wrong login` instead of `unknown action`); live E2E 3/3 — claim 312 →
+  `player_num:312`, second claim of 312 → `num_taken:true` + random 8927
+  fallback, out-of-range 0 → ignored + random. Pushed branch + main (ff) →
+  Netlify auto-deployed, `#pfNum` + `#vfAll` confirmed served.
+  **Launch watchdog Routine** trig_01Svrq52cFbfmu4bCRgQFdZN — hourly at :08,
+  fresh session, curl-only (app page + community.html + `courts_meta`), silent
+  when healthy, one push "🚨 CERTIFIED HOOPER IS DOWN" after 2 retries.
+  NOTE: **40 `zzload_dev_*` load-test rows are still in oc_players** — the SQL
+  delete is blocked by the permission classifier (Cloud Storage Mass Delete),
+  so Aiman must clear them: `delete from oc_players where id like
+  'zzload_dev_%';` or the desk's 🗑 per row. NOT urgent — verified none of them
+  holds a number in the 1-1000 range, so no real hooper's number is blocked;
+  they only pollute the desk roster + player count.
 
 - **Phone-switch code keeper sheet (2026-08-18, Aiman asked).** Profile → 🔑 no
   longer just toasts: opens `#shCode` — big tap-to-copy code, "you're Player

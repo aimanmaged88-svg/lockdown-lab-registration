@@ -1624,7 +1624,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   <div class="rule"><span class="ic">🙌</span><span><b>Good vibes only — non-negotiable.</b> This is a hype house. Everyone's welcome, every level, every body. Encourage, don't gatekeep. If someone's new or still finding their game, you build them up. That's the culture here.</span></div>
   <div class="rule"><span class="ic">⭐</span><span><b>Ratings are to hype, never to hurt.</b> Player ratings exist to celebrate hoopers — not to tear anyone down. Low scores never show as a number, and the coach reads every rating and comment before it appears. Rate the run, respect the person.</span></div>
   <div class="rule"><span class="ic">🧊</span><span><b>Zero tolerance on bad behaviour.</b> Disrespect, threats, abuse, discrimination, tearing people down — in the app or at a run — and you're gone. Banned indefinitely. One strike is enough.</span></div>
-  <div class="rule"><span class="ic">🚧</span><span><b>This is a beta, built by the community.</b> Call your runs, check in when you're there, fix a court when something's off, tell us when it breaks. It only gets better if we put into it — bad info wastes everyone's trip.</span></div>
+  <div class="rule"><span class="ic">🚧</span><span><b>This one's built by the community.</b> Call your runs, check in when you're there, fix a court when something's off, tell us when it breaks. It only gets better if we put into it — bad info wastes everyone's trip.</span></div>
   <div class="rule"><span class="ic">🪪</span><span><b>Real accounts only.</b> Sign in with your Instagram — or a real email (Gmail, Apple ID, whatever) if you don't have IG. Burner and fake accounts get removed on sight.</span></div>
   <div class="rule"><span class="ic">🔨</span><span><b>Bans stick.</b> Break the rules and your handle, your email and your device are all blocked. A new account won't save you.</span></div>
   <div class="rule"><span class="ic">🧹</span><span>We can remove any run, clip or account at any time to protect the community.</span></div>
@@ -1652,7 +1652,7 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
   <div class="fld"><label>Your number</label><input class="inp" id="pfNum" type="tel" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="e.g. 312"><p class="fine" style="margin:6px 2px 0">The follower number from your screenshot — it's yours for life. Leave it blank and we'll hand you one.</p></div>
   <div class="fld"><label>Mobile number</label><input class="inp" id="pfPhone" type="tel" inputmode="tel" maxlength="17" autocomplete="tel" placeholder="0412 345 678"><p class="fine" style="margin:6px 2px 0">Only the coach sees this — never shown on the courts or your card. It's how you get back in if you switch phones.</p></div>
   <div class="commit">
-    <b>🚧 This is a beta — and you're building it</b>
+    <b>🚧 You're early — and you're building it</b>
     <p>Nothing here works unless the community puts into it. Call your runs, check in when you're there, flag a broken rim, tell us when something breaks. <b>Good info in, good runs out</b> — that's the whole deal, and it's how every run we run stays worth pulling up to.</p>
   </div>
   <button class="btn btn-v btn-block" id="pfSave">Lock it in</button>
@@ -2203,7 +2203,7 @@ $('#lgGo').onclick=async()=>{
 };
 
 // closed testing: the coach's link carries the code (?invite=ABC123)
-let INVITE_ONLY=true;
+let INVITE_ONLY=false;
 function inviteFromUrl(){
   try{const q=new URLSearchParams(location.search);return (q.get('invite')||q.get('code')||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8);}catch(e){return ''}
 }
@@ -2229,7 +2229,7 @@ function openGate(){
   paintInviteField();
   $('#pfLogin').style.display='';
   $('#pfTitle').textContent='Create your account';
-  $('#pfSub').innerHTML='<b style="color:var(--volt)">You\'re in the beta.</b> This is built by the hoopers using it — you\'re here to play, break it, and tell us what\'s wrong. Your <b style="color:var(--volt)">@</b> is your jersey; no Instagram, use a real email.';
+  $('#pfSub').innerHTML='<b style="color:var(--volt)">You\'re one of the first.</b> This is built by the hoopers using it — you\'re here to play, call your runs, and tell us what\'s wrong. Your <b style="color:var(--volt)">@</b> is your jersey; no Instagram, use a real email.';
   $('#pfSave').textContent='Create my account 🏀';
   openSheet('shProfile');
   setTimeout(()=>$('#pfName').focus(),300);
