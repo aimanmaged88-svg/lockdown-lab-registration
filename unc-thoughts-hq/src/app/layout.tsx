@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { Sidebar, MobileHeader, BottomTabs } from "@/components/nav";
 import { RegisterSW } from "@/components/register-sw";
+import { MainShell } from "@/components/main-shell";
 
 export const metadata: Metadata = {
   title: "UNC Thoughts HQ",
@@ -33,8 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Sidebar />
           <div className="flex-1 min-w-0">
             <MobileHeader />
-            {/* bottom padding clears the phone tab bar */}
-            <main className="mx-auto max-w-app px-4 py-6 pb-24 md:px-8 md:py-8 lg:pb-8">{children}</main>
+            <MainShell>{children}</MainShell>
           </div>
         </div>
         <BottomTabs />

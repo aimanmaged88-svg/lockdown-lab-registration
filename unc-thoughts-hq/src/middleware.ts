@@ -10,6 +10,7 @@ import { NextRequest, NextResponse } from "next/server";
 const PUBLIC_PREFIXES = [
   "/member",
   "/unlock",
+  "/coaching",     // public expression-of-interest form (the admin list is NOT public)
   "/api/voice",       // member voice notes (cookie-scoped inside the route)
   "/api/admin",       // AUTH_SECRET-guarded
   "/api/notify",      // AUTH_SECRET-guarded

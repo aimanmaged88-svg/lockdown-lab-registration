@@ -5,7 +5,7 @@ import { cn } from "@/lib/cn";
 import { Logo } from "./logo";
 import {
   CalendarDays, Home, Users, Settings, Menu, X, Brain, PenSquare, Inbox,
-  Lightbulb, Instagram, Wallet,
+  Lightbulb, Instagram, Wallet, ClipboardList,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -19,6 +19,7 @@ const NAV = [
   { href: "/topics", label: "Topics", icon: Lightbulb },
   { href: "/instagram", label: "Instagram", icon: Instagram },
   { href: "/sessions", label: "Sessions & $", icon: Wallet },
+  { href: "/registrations", label: "Registrations", icon: ClipboardList },
   { href: "/compose", label: "Compose", icon: PenSquare },
   { href: "/calendar", label: "Calendar", icon: CalendarDays },
   { href: "/community", label: "Community", icon: Users },
@@ -36,7 +37,7 @@ const TABS = [
 
 export function BottomTabs() {
   const path = usePathname();
-  if (path.startsWith("/member") || path.startsWith("/unlock")) return null;
+  if (path.startsWith("/member") || path.startsWith("/unlock") || path.startsWith("/coaching")) return null;
   return (
     <nav
       aria-label="Quick"
@@ -94,7 +95,7 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
 
 export function Sidebar() {
   const path = usePathname();
-  if (path.startsWith("/member") || path.startsWith("/unlock")) return null; // member area + lock screen: no desk chrome
+  if (path.startsWith("/member") || path.startsWith("/unlock") || path.startsWith("/coaching")) return null; // member area + lock screen: no desk chrome
   return (
     <aside className="hidden lg:flex w-60 shrink-0 flex-col gap-6 border-r border-ink-line px-4 py-6 sticky top-0 h-screen">
       <Link href="/" className="flex items-center gap-2 px-1">
@@ -112,7 +113,7 @@ export function Sidebar() {
 export function MobileHeader() {
   const [open, setOpen] = useState(false);
   const path = usePathname();
-  if (path.startsWith("/member") || path.startsWith("/unlock")) return null;
+  if (path.startsWith("/member") || path.startsWith("/unlock") || path.startsWith("/coaching")) return null;
   return (
     <>
       <header className="lg:hidden sticky top-0 z-30 flex items-center justify-between border-b border-ink-line bg-ink/95 backdrop-blur px-4 py-3">

@@ -112,3 +112,181 @@ html, body {
 
 /* Off-white "light" surface used sparingly for print/exports if needed. */
 ::selection { background: #c7402e; color: #fff; }
+
+/* ── UNC'S THOUGHTS — coaching expression of interest ────────────────────────
+   Deliberately outside the app's theme: pure black and white, no accent, no
+   rounded softness. Scoped under .eoi so nothing here leaks into the desk. */
+.eoi {
+  --paper: #ffffff;
+  --ink: #000000;
+  --line: rgba(255, 255, 255, 0.24);
+  --line-strong: rgba(255, 255, 255, 0.55);
+  --muted: #a6a6a6;
+  --field: #0d0d0d;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-sans);
+  min-height: 100vh;
+}
+.eoi-wrap { max-width: 36rem; margin: 0 auto; padding: 2.25rem 1.25rem 4rem; }
+@media (min-width: 768px) { .eoi-wrap { padding: 3.5rem 1.5rem 5rem; } }
+
+.eoi-brand {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.26em;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+.eoi h1 {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  line-height: 0.98;
+  font-size: clamp(2.1rem, 9vw, 3.1rem);
+  margin: 0.75rem 0 0;
+  text-wrap: balance;
+  color: var(--paper);
+}
+.eoi-intro { color: #d4d4d4; font-size: 0.975rem; line-height: 1.6; margin-top: 1rem; max-width: 34rem; }
+.eoi-rule { height: 2px; background: var(--paper); margin: 2rem 0; }
+
+.eoi-legend {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--muted);
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 1.25rem;
+  display: block;
+  width: 100%;
+}
+.eoi-field { display: block; margin-bottom: 1.15rem; }
+.eoi-label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.45rem;
+  color: var(--paper);
+}
+.eoi-opt { color: var(--muted); font-weight: 400; }
+
+.eoi-input,
+.eoi-area {
+  width: 100%;
+  background: var(--field);
+  color: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 0;
+  padding: 0.85rem 0.9rem;
+  font: inherit;
+  font-size: 1rem; /* 16px keeps iOS from zooming the page on focus */
+  -webkit-appearance: none;
+  appearance: none;
+}
+.eoi-area { min-height: 7rem; resize: vertical; line-height: 1.55; }
+.eoi-input:focus-visible,
+.eoi-area:focus-visible,
+.eoi-choice:focus-within,
+.eoi-btn:focus-visible {
+  outline: 2px solid var(--paper);
+  outline-offset: 2px;
+}
+.eoi-input::placeholder, .eoi-area::placeholder { color: #6e6e6e; }
+
+/* Radio + checkbox rows read as pressable blocks, not tiny dots. */
+.eoi-choices { display: grid; gap: 0.5rem; }
+@media (min-width: 480px) { .eoi-choices.two { grid-template-columns: 1fr 1fr; } }
+.eoi-choice {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  border: 1px solid var(--line);
+  padding: 0.8rem 0.9rem;
+  cursor: pointer;
+  font-size: 0.95rem;
+  background: var(--field);
+  transition: background-color 0.12s, border-color 0.12s;
+}
+.eoi-choice:hover { border-color: var(--line-strong); }
+.eoi-choice input { position: absolute; opacity: 0; width: 0; height: 0; }
+.eoi-box {
+  width: 1.05rem; height: 1.05rem; flex: 0 0 auto;
+  border: 1.5px solid var(--line-strong);
+  display: grid; place-items: center;
+}
+.eoi-box.round { border-radius: 50%; }
+.eoi-choice.on { background: var(--paper); color: var(--ink); border-color: var(--paper); font-weight: 600; }
+.eoi-choice.on .eoi-box { border-color: var(--ink); background: var(--ink); }
+.eoi-choice.on .eoi-box::after {
+  content: ""; width: 0.42rem; height: 0.42rem; background: var(--paper);
+}
+.eoi-choice.on .eoi-box.round::after { border-radius: 50%; }
+
+/* Errors have to read without colour, so they get a solid bar and weight. */
+.eoi-err {
+  border-left: 3px solid var(--paper);
+  padding-left: 0.65rem;
+  margin-top: 0.45rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--paper);
+}
+.eoi-input.bad, .eoi-area.bad { border-color: var(--paper); border-width: 2px; }
+
+.eoi-btn {
+  width: 100%;
+  background: var(--paper);
+  color: var(--ink);
+  border: 2px solid var(--paper);
+  padding: 1.05rem 1rem;
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 0;
+}
+.eoi-btn:hover:not(:disabled) { background: #e6e6e6; border-color: #e6e6e6; }
+.eoi-btn:disabled { background: transparent; color: var(--muted); border-color: var(--line); cursor: not-allowed; }
+.eoi-btn.ghost { background: transparent; color: var(--paper); border-color: var(--paper); }
+.eoi-btn.ghost:hover { background: var(--paper); color: var(--ink); }
+
+.eoi-note { color: var(--muted); font-size: 0.78rem; line-height: 1.55; margin-top: 1.1rem; }
+.eoi-sign { font-family: var(--font-display); text-transform: uppercase; letter-spacing: 0.2em; font-size: 0.8rem; color: var(--muted); }
+
+/* Thank-you screen */
+.eoi-done { padding: 1rem 0 4rem; }
+.eoi-done h2 {
+  font-family: var(--font-display); text-transform: uppercase; font-weight: 700;
+  font-size: clamp(1.9rem, 8vw, 2.8rem); line-height: 1.02; margin: 0; color: var(--paper);
+  text-wrap: balance;
+}
+.eoi-done p { color: #d4d4d4; margin-top: 1.1rem; font-size: 1rem; line-height: 1.6; }
+
+/* Admin table */
+.eoi-stat { border: 1px solid var(--line); padding: 1rem; }
+.eoi-stat b { font-family: var(--font-display); font-size: 2rem; font-weight: 700; display: block; line-height: 1; }
+.eoi-stat span { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); display: block; margin-top: 0.4rem; }
+.eoi-scroll { overflow-x: auto; border: 1px solid var(--line); }
+.eoi-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; white-space: nowrap; }
+.eoi-table th {
+  text-align: left; font-family: var(--font-display); text-transform: uppercase;
+  letter-spacing: 0.1em; font-size: 0.68rem; font-weight: 600; color: var(--muted);
+  padding: 0.7rem 0.8rem; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--ink);
+}
+.eoi-table td { padding: 0.75rem 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.1); vertical-align: top; }
+.eoi-table tr:last-child td { border-bottom: 0; }
+.eoi-table .wrap { white-space: normal; min-width: 14rem; }
+.eoi-tag { border: 1px solid var(--line-strong); padding: 0.12rem 0.4rem; font-size: 0.7rem; margin-right: 0.25rem; display: inline-block; }
+
+@media (prefers-reduced-motion: reduce) {
+  .eoi * { transition-duration: 0.001ms !important; }
+}

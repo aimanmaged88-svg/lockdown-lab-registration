@@ -877,3 +877,42 @@ model Setting {
 
   @@unique([orgId, key])
 }
+
+
+// Expression of interest in UNC's Thoughts online coaching. A standing list he
+// can call when spots open — no account, no payment, just a name and a way to
+// reach them. Email and mobile are normalised so the same person can't land on
+// the list twice.
+model CoachingInterest {
+  id        String   @id @default(cuid())
+  orgId     String
+  createdAt DateTime @default(now())
+
+  fullName String
+  age      Int
+
+  // Only collected (and only required) when the player is under 18.
+  guardianName  String?
+  guardianPhone String?
+
+  mobile     String
+  mobileNorm String // 04xxxxxxxx — what duplicates are judged on
+  email      String
+  emailNorm  String // lowercased + trimmed
+
+  instagram String?
+  suburb    String?
+
+  level    String // Beginner | Social | Club | Rep | Senior
+  position String // Guard | Wing | Big | Not sure
+
+  interest   String // json array: Group sessions | One-on-ones | Both
+  focus      String // json array of what they want to work on
+  focusOther String?
+  bestTime   String // Weekday evenings | Weekends | Flexible
+  notes      String?
+
+  @@unique([orgId, emailNorm])
+  @@unique([orgId, mobileNorm])
+  @@index([orgId, createdAt])
+}
