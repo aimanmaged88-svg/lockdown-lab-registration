@@ -11,13 +11,26 @@ export const revalidate = 600;
 // The Library: every question UNC has approved for everyone — categorised,
 // searchable, always anonymous. The community's questions become the
 // community's knowledge. That's the whole point.
+type Row = { id: string; text: string; pillar: string | null; problem: string | null; answerText: string | null; answeredAt: Date | null; createdAt: Date };
+
+// This page is prerendered, so a database that can't answer would otherwise
+// fail the whole build — and with it every deploy. It renders its own empty
+// state instead, and the next revalidation picks the answers back up.
+async function load(): Promise<Row[]> {
+  try {
+    const orgId = await getOrgId();
+    return await prisma.communityQuestion.findMany({
+      where: { orgId, status: "answered", inLibrary: true, answerText: { not: null } },
+      orderBy: { answeredAt: "desc" },
+      take: 300,
+    });
+  } catch {
+    return [];
+  }
+}
+
 export default async function LibraryPage() {
-  const orgId = await getOrgId();
-  const rows = await prisma.communityQuestion.findMany({
-    where: { orgId, status: "answered", inLibrary: true, answerText: { not: null } },
-    orderBy: { answeredAt: "desc" },
-    take: 300,
-  });
+  const rows = await load();
   return (
     <div className="space-y-5">
       <div>
