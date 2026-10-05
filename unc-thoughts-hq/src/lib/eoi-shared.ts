@@ -2,6 +2,15 @@
 // public form, the server action and the admin table. Kept out of
 // eoi-actions.ts because a "use server" file may only export async functions.
 
+// ── Where a registration goes ───────────────────────────────────────────────
+// The app's own Supabase database is paused (free plan, two-active-project
+// limit), so registrations are landing in Netlify Forms instead — it needs no
+// database and the public page works today. Flip this to "db" the moment the
+// database is back and the server action takes over again; nothing else
+// changes, including the URL people have been given.
+export const SINK: "netlify" | "db" = "netlify";
+export const NETLIFY_FORM = "coaching-eoi";
+
 export const LEVELS = ["Beginner", "Social", "Club", "Rep", "Senior"] as const;
 export const POSITIONS = ["Guard", "Wing", "Big", "Not sure"] as const;
 export const INTERESTS = ["Group sessions", "One-on-ones", "Both"] as const;

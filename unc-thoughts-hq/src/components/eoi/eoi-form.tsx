@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { submitInterest } from "@/lib/eoi-actions";
 import {
-  LEVELS, POSITIONS, INTERESTS, FOCUS, TIMES,
+  LEVELS, POSITIONS, INTERESTS, FOCUS, TIMES, SINK, NETLIFY_FORM,
   checkInterest, isMinor, type InterestInput,
 } from "@/lib/eoi-shared";
 
@@ -26,6 +26,44 @@ function Choice({
       <span>{label}</span>
     </label>
   );
+}
+
+// While the database is paused, a registration goes to Netlify Forms — same
+// page, same fields, and he reads them in Netlify instead of the desk.
+async function sendToNetlify(
+  f: InterestInput,
+): Promise<{ ok: true } | { ok: false; errors: Record<string, string> }> {
+  const minor = isMinor(Number(f.age));
+  const body = new URLSearchParams({
+    "form-name": NETLIFY_FORM,
+    fullName: f.fullName.trim(),
+    age: f.age.trim(),
+    guardianName: minor ? f.guardianName.trim() : "",
+    guardianPhone: minor ? f.guardianPhone.trim() : "",
+    mobile: f.mobile.trim(),
+    email: f.email.trim(),
+    instagram: f.instagram.trim().replace(/^@+/, ""),
+    suburb: f.suburb.trim(),
+    level: f.level,
+    position: f.position,
+    interest: f.interest.join(", "),
+    focus: f.focus
+      .map((x) => (x === "Other" && f.focusOther.trim() ? `Other: ${f.focusOther.trim()}` : x))
+      .join(", "),
+    focusOther: f.focus.includes("Other") ? f.focusOther.trim() : "",
+    bestTime: f.bestTime,
+    notes: f.notes.trim(),
+    website: "", // honeypot — a bot filling this in gets the submission dropped
+  });
+  const res = await fetch("/__forms.html", {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: body.toString(),
+  });
+  if (!res.ok) {
+    return { ok: false, errors: { form: "That didn't send. Check your connection and try again." } };
+  }
+  return { ok: true };
 }
 
 export function EoiForm() {
@@ -58,7 +96,7 @@ export function EoiForm() {
     }
     setBusy(true);
     try {
-      const res = await submitInterest(f);
+      const res = SINK === "netlify" ? await sendToNetlify(f) : await submitInterest(f);
       if (res.ok) {
         setDone(true);
         window.scrollTo({ top: 0, behavior: "smooth" });
