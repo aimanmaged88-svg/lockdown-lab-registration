@@ -28,6 +28,11 @@ function Choice({
   );
 }
 
+// Never lose someone who turned up. If the save can't go through, send them
+// to the DM rather than telling them to try again later.
+const CANT_SAVE =
+  "That didn't save — it's on our end, not yours. Send UNC a DM on Instagram @uncthoughts with your name and he'll put you on the list himself.";
+
 // While the database is paused, a registration goes to Netlify Forms — same
 // page, same fields, and he reads them in Netlify instead of the desk.
 async function sendToNetlify(
@@ -60,9 +65,7 @@ async function sendToNetlify(
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: body.toString(),
   });
-  if (!res.ok) {
-    return { ok: false, errors: { form: "That didn't send. Check your connection and try again." } };
-  }
+  if (!res.ok) return { ok: false, errors: { form: CANT_SAVE } };
   return { ok: true };
 }
 
@@ -103,7 +106,7 @@ export function EoiForm() {
       }
       else setErrors(res.errors);
     } catch {
-      setErrors({ form: "That didn't send. Check your connection and try again." });
+      setErrors({ form: CANT_SAVE });
     } finally {
       setBusy(false);
     }
