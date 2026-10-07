@@ -611,6 +611,35 @@ header{gap:8px}
 .dentry p{font-size:13px;color:var(--muted);white-space:pre-wrap}
 /* fuel pills: junk reads red when selected */
 .pill.bad.sel{background:linear-gradient(180deg,#ff7a6e,var(--bad));color:#2a0300;box-shadow:0 6px 18px -8px rgba(255,69,58,.55)}
+/* targets */
+.goalrow{border:1px solid var(--line2);border-radius:14px;background:rgba(0,0,0,.25);padding:12px 13px;margin-bottom:8px}
+.lightmode .goalrow{background:#F5F7FA}
+.goalrow.done{opacity:.55}
+.goalrow .gh{display:flex;align-items:baseline;gap:8px}
+.goalrow .gh b{font-size:14px;flex:1;line-height:1.25}
+.goalrow .gby{font-family:var(--fm);font-size:9px;letter-spacing:1px;text-transform:uppercase;color:var(--dim);white-space:nowrap}
+.goalrow .gwhy{font-size:12.5px;color:var(--muted);margin:3px 0 0}
+.gbarrow{display:flex;align-items:center;gap:9px;margin-top:9px}
+.gbar{flex:1;height:7px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden}
+.lightmode .gbar{background:rgba(16,18,27,.10)}
+.gbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--accent),var(--accent-hi));transition:width .5s cubic-bezier(.22,1.2,.36,1)}
+.goalrow.done .gbar i{background:var(--good)}
+.gpct{font-family:var(--fm);font-size:10px;color:var(--muted);min-width:36px;text-align:right}
+.gacts{display:flex;gap:7px;margin-top:10px}
+.gbtn{flex:1;font-family:var(--fm);font-size:10px;letter-spacing:.7px;text-transform:uppercase;color:var(--text);background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:10px;padding:9px 5px;cursor:pointer;transition:transform .12s;white-space:nowrap}
+.lightmode .gbtn{background:#fff}
+.gbtn:active{transform:scale(.96)}
+.gbtn.win{color:#140800;background:linear-gradient(180deg,var(--accent-hi),var(--accent));border-color:transparent;font-weight:700}
+.gbtn.x{flex:0 0 40px;color:var(--dim)}
+/* game journal */
+.statmini{display:flex;gap:8px;margin-top:4px}
+.statmini label{flex:1;display:flex;flex-direction:column;gap:5px;font-family:var(--fm);font-size:8.5px;letter-spacing:1.2px;text-transform:uppercase;color:var(--dim)}
+.statmini input{padding:10px 6px;text-align:center}
+.gres{font-family:var(--fm);font-size:9px;letter-spacing:1px;padding:3px 8px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
+.gres.W{color:var(--good);border-color:var(--good-soft);background:var(--good-soft)}
+.gres.L{color:var(--bad);border-color:rgba(255,69,58,.25);background:rgba(255,69,58,.12)}
+.grate{margin-left:auto;font-family:var(--fm);font-size:11.5px;color:var(--accent);white-space:nowrap}
+.gline{font-family:var(--fm);font-size:10px;letter-spacing:.6px;color:var(--muted);margin-top:6px}
 /* ============ the door: single + batch code sections ============ */
 .doorseg{border:1px solid var(--line2);border-radius:14px;background:rgba(0,0,0,.2);padding:11px 12px}
 .seghd{display:block;font-family:var(--fm);font-size:9px;letter-spacing:1.4px;text-transform:uppercase;color:var(--accent);margin-bottom:8px}
@@ -925,6 +954,52 @@ body.rmode *{animation:none!important;transition:none!important}
           <div class="checkwrap" id="ciCheck"><svg viewBox="0 0 56 56"><circle cx="28" cy="28" r="24"/><path d="M17 29 l7 7 l15-16"/></svg></div>
           <p style="color:var(--muted);font-size:13.5px;text-align:center">Logged for today. Profile updated. Come back tomorrow — keep the streak alive.</p>
         </div>
+      </div>
+
+      <div class="card" id="goalCard" style="margin-top:16px">
+        <span class="cl">🎯 Where you're headed · coach sees these</span>
+        <h3>My Targets</h3>
+        <div id="goalList"></div>
+        <div id="goalForm" style="display:none;margin-top:10px">
+          <div class="flbl" style="margin-top:4px">The target</div>
+          <input id="gTitle" maxlength="80" placeholder="e.g. Make the rep squad · 10 makes a day · Start varsity">
+          <div class="flbl">Why it matters (optional)</div>
+          <input id="gWhy" maxlength="200" placeholder="The reason you'll remember on the hard days">
+          <div class="flbl">By when? (optional)</div>
+          <input id="gBy" maxlength="24" placeholder="e.g. Dec 2026 · end of season">
+          <button class="btn btn-p btn-block" id="gSave" style="margin-top:12px">Put It On The Board 🎯</button>
+        </div>
+        <button class="btn btn-g btn-block" id="gAdd" style="margin-top:10px">＋ Set a target</button>
+      </div>
+
+      <div class="card" id="gameCard" style="margin-top:16px">
+        <span class="cl">🏀 Your game file · log every game you play</span>
+        <h3>Game Journal</h3>
+        <div id="gjForm" style="display:none">
+          <div class="flbl" style="margin-top:4px">Who'd you play?</div>
+          <input id="gjOpp" maxlength="50" placeholder="Opponent / event — e.g. Newtown U16s">
+          <div class="flbl">When?</div>
+          <div class="pills" id="gjWhen"><span class="pill sel">Today</span><span class="pill">Yesterday</span></div>
+          <div class="flbl">Result</div>
+          <div class="pills" id="gjRes"><span class="pill" data-r="W">Won</span><span class="pill" data-r="L">Lost</span><span class="pill" data-r="D">Draw</span></div>
+          <div class="flbl">Score (optional)</div>
+          <input id="gjScore" maxlength="20" placeholder="e.g. 52–47">
+          <div class="slider" style="margin-top:14px"><label>Rate your game <b id="vGj">7</b>/10</label><input type="range" id="rGj" min="1" max="10" value="7"></div>
+          <div class="flbl">Your line (optional)</div>
+          <div class="statmini">
+            <label>PTS<input id="gjPts" type="number" inputmode="numeric" min="0" max="200" placeholder="–"></label>
+            <label>REB<input id="gjReb" type="number" inputmode="numeric" min="0" max="99" placeholder="–"></label>
+            <label>AST<input id="gjAst" type="number" inputmode="numeric" min="0" max="99" placeholder="–"></label>
+          </div>
+          <div class="flbl">What went well</div>
+          <textarea id="gjWell" placeholder="Own your wins. What worked out there?"></textarea>
+          <div class="flbl">What to work on</div>
+          <textarea id="gjWork" placeholder="Be honest — this becomes your training plan."></textarea>
+          <div class="sharerow on" id="gjShare"><span class="swtch"></span><span>Let coach see this one <b style="color:var(--dim)">· off = locked, just you</b></span></div>
+          <button class="btn btn-p btn-block" id="gjSave" style="margin-top:14px">Log The Game · +35 XP</button>
+        </div>
+        <button class="btn btn-g btn-block" id="gjOpen" style="margin-top:4px">＋ Log a game</button>
+        <div id="gameList" style="margin-top:12px"></div>
       </div>
 
       <div class="card" id="hwCard" style="display:none">
@@ -2033,7 +2108,7 @@ body.rmode *{animation:none!important;transition:none!important}
     $('#aiList').innerHTML=PST.ai.map(([k,t])=>'<li class="'+(k==='◆'?'intel':'')+'"><span class="k">'+k+'</span><span>'+esc(t)+'</span></li>').join('');
     renderFeed(PST.posts);
     renderThread(PST.messages);
-    renderMind(); renderFuel(); renderDiary(); renderInvites(); renderCoachPanel(); renderCoachQ();
+    renderMind(); renderFuel(); renderDiary(); renderGoals(); renderGames(); renderInvites(); renderCoachPanel(); renderCoachQ();
   }
   /* absorb a fresh state + fire level-up if it crossed a threshold */
   function absorb(r){ const oldL=PST?lvl(PST.profile.xp).n:1; PST=r.state; renderPlayer(true); const nl=lvl(PST.profile.xp); if(nl.n>oldL) setTimeout(()=>levelUpShow(nl.n,nl.name),600); }
@@ -2142,6 +2217,90 @@ body.rmode *{animation:none!important;transition:none!important}
   function renderDiary(){
     const list=(PST&&PST.diary)||[];
     $('#diaryList').innerHTML=list.slice(0,6).map(e=>'<div class="dentry"><span class="t">'+e.d+'</span><p>'+esc((e.data||{}).text||'')+'</p></div>').join('');
+  }
+
+  /* ---------- HOME: targets ---------- */
+  $('#gAdd').addEventListener('click',()=>{ const f=$('#goalForm'); const open=f.style.display==='block'; f.style.display=open?'none':'block'; $('#gAdd').textContent=open?'＋ Set a target':'Never mind'; if(!open)$('#gTitle').focus(); S.pill(); });
+  $('#gSave').addEventListener('click',async()=>{
+    const title=$('#gTitle').value.trim(); if(title.length<3){ toast('Name the target first.',true); return; }
+    busy($('#gSave'),1);
+    try{
+      const r=await api({action:'goal_add',pid:sess.pid,pin:sess.pin,title,why:$('#gWhy').value.trim(),by:$('#gBy').value.trim()});
+      $('#gTitle').value=''; $('#gWhy').value=''; $('#gBy').value='';
+      $('#goalForm').style.display='none'; $('#gAdd').textContent='＋ Set a target';
+      absorb(r); toast('On the board 🎯'); haptic(15); S.pill();
+    }catch(e){ toast(e.message,true); }
+    busy($('#gSave'),0,'Put It On The Board 🎯');
+  });
+  async function goalUpd(gid,body,okMsg,anchor){
+    try{ const r=await api({action:'goal_update',pid:sess.pid,pin:sess.pin,gid,...body}); absorb(r);
+      if(r.gained&&anchor){ burst(false); stylePop('+'+r.gained+' XP',anchor); }
+      if(okMsg) toast(okMsg);
+    }catch(e){ toast(e.message,true); }
+  }
+  function renderGoals(){
+    const list=(PST&&PST.goals)||[];
+    const live=list.filter(g=>!(g.data||{}).done), done=list.filter(g=>(g.data||{}).done);
+    $('#goalList').innerHTML=(live.length||done.length)?
+      live.map(g=>{ const d=g.data||{};
+        return '<div class="goalrow">'
+          +'<div class="gh"><b>'+esc(d.title||'')+'</b>'+(d.by?'<span class="gby">by '+esc(d.by)+'</span>':'')+'</div>'
+          +(d.why?'<p class="gwhy">'+esc(d.why)+'</p>':'')
+          +'<div class="gbarrow"><div class="gbar"><i style="width:'+(d.progress||0)+'%"></i></div><span class="gpct">'+(d.progress||0)+'%</span></div>'
+          +'<div class="gacts"><button class="gbtn" data-gstep="'+g.id+'">＋ Closer · +10%</button><button class="gbtn win" data-gdone="'+g.id+'">Hit it ✓ +60 XP</button><button class="gbtn x" data-gdel="'+g.id+'" title="Remove">✕</button></div>'
+          +'</div>'; }).join('')
+      +done.slice(0,3).map(g=>{ const d=g.data||{};
+        return '<div class="goalrow done"><div class="gh"><b>✓ '+esc(d.title||'')+'</b><span class="gby">hit '+esc(d.done_d||'')+'</span></div>'
+          +'<div class="gbarrow"><div class="gbar"><i style="width:100%"></i></div><span class="gpct">100%</span></div></div>'; }).join('')
+      :'<p style="color:var(--dim);font-size:13px">Nothing on the board yet. Where are you trying to get to? Write it down — that\'s how it starts.</p>';
+    $('#goalList').querySelectorAll('[data-gstep]').forEach(b=>b.onclick=()=>{ const g=list.find(x=>String(x.id)===String(b.dataset.gstep)); const cur=((g||{}).data||{}).progress||0; haptic(10); S.pill(); goalUpd(b.dataset.gstep,{progress:Math.min(100,cur+10)}); });
+    $('#goalList').querySelectorAll('[data-gdone]').forEach(b=>b.onclick=()=>{ haptic([0,30,40,30]); goalUpd(b.dataset.gdone,{done:true},'Target HIT 🏆 That\'s how it\'s done.',b); });
+    $('#goalList').querySelectorAll('[data-gdel]').forEach(b=>b.onclick=async()=>{ if(!confirm('Take this target off the board?')) return; try{ const r=await api({action:'goal_del',pid:sess.pid,pin:sess.pin,gid:b.dataset.gdel}); absorb(r); toast('Off the board'); }catch(e){ toast(e.message,true); } });
+  }
+
+  /* ---------- HOME: game journal ---------- */
+  $('#gjOpen').addEventListener('click',()=>{ const f=$('#gjForm'); const open=f.style.display==='block'; f.style.display=open?'none':'block'; $('#gjOpen').textContent=open?'＋ Log a game':'Never mind'; if(!open)$('#gjOpp').focus(); S.pill(); });
+  singleSel('#gjWhen'); singleSel('#gjRes');
+  $('#rGj').addEventListener('input',e=>$('#vGj').textContent=e.target.value);
+  $('#gjShare').addEventListener('click',()=>{ $('#gjShare').classList.toggle('on'); S.pill(); });
+  function gjReset(){
+    ['#gjOpp','#gjScore','#gjWell','#gjWork','#gjPts','#gjReb','#gjAst'].forEach(s=>$(s).value='');
+    $('#rGj').value=7; $('#vGj').textContent='7';
+    document.querySelectorAll('#gjRes .pill').forEach(x=>x.classList.remove('sel'));
+    document.querySelectorAll('#gjWhen .pill').forEach((x,i)=>x.classList.toggle('sel',i===0));
+    $('#gjShare').classList.add('on');
+  }
+  $('#gjSave').addEventListener('click',async()=>{
+    const btn=$('#gjSave');
+    const opp=$('#gjOpp').value.trim(), well=$('#gjWell').value.trim(), work=$('#gjWork').value.trim();
+    if(!opp&&!well&&!work){ toast('Give the game a name — who\'d you play?',true); return; }
+    const resEl=document.querySelector('#gjRes .pill.sel');
+    const yd=(document.querySelector('#gjWhen .pill.sel')||{}).textContent==='Yesterday';
+    const body={action:'game',pid:sess.pid,pin:sess.pin,opp,result:resEl?resEl.dataset.r:'',score:$('#gjScore').value.trim(),rating:+$('#rGj').value,pts:$('#gjPts').value,reb:$('#gjReb').value,ast:$('#gjAst').value,well,work,share_coach:$('#gjShare').classList.contains('on')};
+    if(yd) body.d=new Date(Date.now()-864e5).toLocaleDateString('en-CA',{timeZone:'Australia/Sydney'});
+    busy(btn,1);
+    try{
+      const r=await api(body);
+      gjReset(); $('#gjForm').style.display='none'; $('#gjOpen').textContent='＋ Log a game';
+      absorb(r); S.checkin(); haptic([0,30,40,30]); if(r.gained) stylePop('+'+r.gained+' XP',$('#gjOpen'));
+      toast(r.gained?'Game in the file · +'+r.gained+' XP 🏀':'Game in the file 🏀');
+    }catch(e){ toast(e.message,true); }
+    busy(btn,0,'Log The Game · +35 XP');
+  });
+  const GJ_RES={W:'Won',L:'Lost',D:'Draw'};
+  function renderGames(){
+    const list=(PST&&PST.games)||[];
+    $('#gameList').innerHTML=list.length?list.slice(0,8).map(g=>{ const d=g.data||{};
+      const line=[d.pts!=null?d.pts+' pts':'',d.reb!=null?d.reb+' reb':'',d.ast!=null?d.ast+' ast':''].filter(Boolean).join(' · ');
+      return '<div class="mentry"><div class="mh"><span class="tg">'+esc(d.opp||'Game')+'</span>'
+        +(d.result?'<span class="gres '+d.result+'">'+(GJ_RES[d.result]||'')+(d.score?' '+esc(d.score):'')+'</span>':'')
+        +(g.share_coach?'':'<span class="chip">🔒</span>')
+        +'<span class="grate">'+(d.rating||'–')+'/10</span></div>'
+        +'<div class="gline">'+esc(g.d||'')+(line?' · '+line:'')+'</div>'
+        +(d.well?'<div class="plan"><b>Went well</b>'+esc(d.well)+'</div>':'')
+        +(d.work?'<div class="plan"><b>Work on</b>'+esc(d.work)+'</div>':'')
+        +'</div>';
+    }).join(''):'<p style="color:var(--dim);font-size:13px">No games in the file yet. Next one you play — log it while it\'s fresh.</p>';
   }
 
   /* ---------- FUEL ---------- */

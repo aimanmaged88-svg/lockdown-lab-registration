@@ -789,7 +789,7 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
   }
   /* ===== Athlete Command Center — the full file, Athlete-OS style ===== */
   let AD={pid:null,nm:'',cd:null,tab:'overview'};
-  const AD_TABS=[['overview','Overview'],['checkins','Check-ins'],['injuries','Injuries'],['mind','Mind'],['fuel','Fuel'],['homework','Homework'],['scouting','Scouting'],['comms','Comms']];
+  const AD_TABS=[['overview','Overview'],['checkins','Check-ins'],['games','Games'],['goals','Targets'],['injuries','Injuries'],['mind','Mind'],['fuel','Fuel'],['homework','Homework'],['scouting','Scouting'],['comms','Comms']];
   const INJ_SEV={niggle:'Niggle',moderate:'Moderate',serious:'Serious'}, INJ_ST={active:'Active',managing:'Managing',cleared:'Cleared'};
   async function openAthlete(pid,nm){
     AD={pid,nm:nm||'Athlete',cd:null,tab:'overview'};
@@ -843,6 +843,27 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
         '<div class="ci"><div class="cih"><span>'+esc(x.d)+'</span><span>⚡'+(x.energy||0)+' · 💪'+(x.conf||0)+' · '+(x.mins||0)+'min</span></div>'
         +(Array.isArray(x.focus)&&x.focus.length?'<div class="tags">'+x.focus.map(f=>'<span class="tag">'+esc(f)+'</span>').join('')+'</div>':'')
         +(x.note?'<div class="note">“'+esc(x.note)+'”</div>':'')+'</div>').join('')+'</div>';
+    }
+    if(tab==='games'){
+      const gg=cd.games||[];
+      if(!gg.length) return '<div class="adcard"><p class="empty">No games in their file yet — they log them in the app (ones marked “just me” stay private).</p></div>';
+      const GR={W:'Won',L:'Lost',D:'Draw'};
+      return gg.map(j=>{const d=j.data||{};
+        const line=[d.pts!=null?d.pts+' pts':'',d.reb!=null?d.reb+' reb':'',d.ast!=null?d.ast+' ast':''].filter(Boolean).join(' · ');
+        return '<div class="adcard"><div class="adcl">🏀 '+esc(j.d||'')+' · '+esc(d.opp||'Game')+(d.result?' · '+(GR[d.result]||'')+(d.score?' '+esc(d.score):''):'')+'<span class="n">'+(d.rating||'–')+'/10</span></div>'
+          +(line?'<div class="note">'+esc(line)+'</div>':'')
+          +(d.well?'<div class="note"><b>Went well:</b> '+esc(d.well)+'</div>':'')
+          +(d.work?'<div class="note"><b>Work on:</b> '+esc(d.work)+'</div>':'')+'</div>';}).join('');
+    }
+    if(tab==='goals'){
+      const gl=cd.goals||[];
+      if(!gl.length) return '<div class="adcard"><p class="empty">No targets on their board yet — they set them on the app Home tab.</p></div>';
+      return gl.map(j=>{const d=j.data||{};
+        return '<div class="adcard"><div class="adcl">'+(d.done?'🏆 HIT':'🎯')+' '+esc(d.title||'')+'<span class="n">'+(d.done?'done '+esc(d.done_d||''):(d.progress||0)+'%')+'</span></div>'
+          +'<div class="mrow"><span class="lb">Progress</span>'+adBar(d.done?100:(d.progress||0),100)+'<span class="vv">'+(d.done?100:(d.progress||0))+'%</span></div>'
+          +(d.why?'<div class="note"><b>Why:</b> '+esc(d.why)+'</div>':'')
+          +(d.by?'<div class="note"><b>By:</b> '+esc(d.by)+'</div>':'')
+          +'<div class="note" style="opacity:.7">set '+esc(j.d||'')+'</div></div>';}).join('');
     }
     if(tab==='injuries'){
       const inj=cd.injuries||[];
@@ -1098,6 +1119,7 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
   /* Newest = highest id. Add a new entry (bump the id) and every coach's desk
      badges the Guide tab + pings them the next time it's open. */
   const NEWS=[
+    {id:39,d:'7 Oct',t:'Targets 🎯 + Game Journal 🏀 — built for your 1-on-1 athletes',body:'Two big pieces for coaching a player long-term (made with your new young hooper in mind). TARGETS: every player can now put goals on the board on their Home tab — the target, why it matters, by when — then nudge progress toward 100% and smash the “Hit it” button (+60 XP, confetti). You see every target and its progress in their file (new Targets tab in the athlete drawer). GAME JOURNAL: after every game they play, they log it — opponent, result + score, rate-your-game out of 10, their line (pts/reb/ast), what went well and what to work on. Their last games + ratings feed the AI profile, and everything they share lands in a new Games tab in their file — so before a session you can read exactly how their week went. To get a new athlete in: Door tab → mint an invite code → send the link to their mum. Their check-ins, Mind logs, Fuel, diary, targets and games all flow to this desk from day one.'},
     {id:38,d:'30 Jul',t:'Heaven: launch-day polish + installable',body:'Gave Hoops Heaven a proper going-over for showing off: a subtle court-line texture behind the home screen (character, not a flat page), a live stat row up top (“971 free courts · Sydney-wide”, and it flips to “N playing now” once people check in), smoother tab transitions and press feedback, crisp font rendering, and a warm “Be the first to call a run” prompt so an empty board still pulls people in. It’s also now installable — Add to Home Screen gives it a real orange app icon and opens full-screen like a native app. Clean slate is untouched; ready to share today.'},
     {id:37,d:'30 Jul',t:'Heaven: real ratings ⭐, real fonts, add your own courts',body:'Three big ones. RATINGS ARE REAL: players rate any court 1–5 stars with an optional review; averages show on court pages, home cards, search and the map — and your desk shows every review per court with a one-tap Remove for junk. FONTS: the whole product (app, desk, QR posters) now runs on proper licensed type — Anton for the big headers, Barlow Condensed for labels, Permanent Marker for the “Your game.” accents — no more generic look. ADD COURTS: your desk’s Courts section has ➕ Add a court — name, suburb, paste “lat, lon” from Google Maps, indoor/lights — and it’s instantly live in the app, the search, the map and the QR poster printer. Your added courts carry a YOURS tag and only you can delete them.'},
     {id:36,d:'30 Jul',t:'HOOPS HEAVEN 2.0 — the redesign 🟠',body:'The app got the full glow-up from your mockup: new orange look (“Good courts. Real hoopers. Your game.”), bottom tab bar (Home / Map / Runs / Saved / Profile), a search-first home with NEARBY COURTS photo cards and live “N here” badges, and a real MAP of Sydney with all 971 courts as pins — tap any pin → court card → view court. Court pages got photo heroes, amenity tiles (outdoor/surface/hoops/lights), live-activity avatars and big Directions / I’m Here buttons. Players can 🔖 save courts. Default colour is now Blaze orange — the colour picker still lets everyone choose (Volt included). Skipped on purpose: star ratings + court condition (no review system behind them yet — no fake numbers).'},

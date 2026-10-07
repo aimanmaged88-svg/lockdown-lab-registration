@@ -189,22 +189,34 @@ function buildAI(p: any, checkins: any[], intel: any[], journal: any[]) {
     out.push(aw >= 6 ? ["⬢", `Hydration averaging ${Math.round(aw)}/8 — legs will thank you in the fourth.`]
       : ["⬢", `Water averaging ${Math.round(aw)}/8. Cramps guard nobody — keep the bottle moving.`]);
   }
+  const games = journal.filter(j => j.kind === "game");
+  if (games.length) {
+    const rs = games.slice(0, 3).map((g: any) => +g.data?.rating || 0).filter((x: number) => x > 0);
+    if (rs.length) {
+      const avg = Math.round(rs.reduce((a: number, x: number) => a + x, 0) / rs.length * 10) / 10;
+      out.push(["★", `Game file: ${games.length} game${games.length > 1 ? "s" : ""} logged, last ${rs.length} averaging ${avg}/10. ${avg >= 7 ? "Keep stacking tape." : "Your work-ons ARE the training plan — bring them to practice."}`]);
+    }
+  }
+  const liveGoals = journal.filter(j => j.kind === "goal" && j.data && !j.data.done);
+  if (liveGoals.length) out.push(["◎", `${liveGoals.length} target${liveGoals.length > 1 ? "s" : ""} on the board. Every check-in is a brick toward them.`]);
   intel.slice(-2).forEach(n => out.push(["◆", "Pattern detected: " + n.text]));
   return out;
 }
 
 async function playerState(p: any) {
-  const [checkins, hw, posts, msgs, intel, journal, invites, coachq, runs, sessions] = await Promise.all([
+  const [checkins, hw, posts, msgs, intel, journal, invites, coachq, runs, sessions, goals, games] = await Promise.all([
     db(`ll_checkins?player_id=eq.${p.id}&select=d,energy,conf,mins,focus,note&order=d.desc&limit=14`),
     db(`ll_homework?player_id=eq.${p.id}&select=id,text,done,created_at&order=created_at.desc&limit=10`),
     db(`ll_posts?select=id,author_name,is_coach,text,likes,created_at&order=created_at.desc&limit=30`),
     db(`ll_messages?player_id=eq.${p.id}&select=id,from_coach,text,created_at&order=created_at.asc&limit=100`),
     db(`ll_intel?player_id=eq.${p.id}&select=text,created_at&order=created_at.asc`),
-    db(`ll_journal?player_id=eq.${p.id}&select=id,kind,d,data,share_coach,created_at&order=created_at.desc&limit=40`),
+    db(`ll_journal?player_id=eq.${p.id}&select=id,kind,d,data,share_coach,created_at&order=created_at.desc&limit=60`),
     db(`ll_invites?player_id=eq.${p.id}&select=id,friend_name,status,code,code_at,used_by,created_at&order=created_at.desc&limit=10`),
     db(`ll_coach_q?player_id=eq.${p.id}&select=id,coach,question,answer,answered_at,created_at&order=created_at.desc&limit=20`),
     activeRuns(),
     upcomingSessions(),
+    db(`ll_journal?player_id=eq.${p.id}&kind=eq.goal&select=id,d,data,created_at&order=created_at.desc&limit=20`),
+    db(`ll_journal?player_id=eq.${p.id}&kind=eq.game&select=id,d,data,share_coach,created_at&order=d.desc,created_at.desc&limit=20`),
   ]);
   const today = sydToday();
   return {
@@ -213,6 +225,7 @@ async function playerState(p: any) {
     mind: journal.filter((j: any) => j.kind === "mind").slice(0, 10),
     diary: journal.filter((j: any) => j.kind === "diary").slice(0, 10),
     fuel_today: journal.find((j: any) => j.kind === "fuel" && j.d === today) || null,
+    goals, games,
     invites, coachq, runs, sessions,
     awards: Array.isArray(p.awards) ? p.awards : [],
     injuries: Array.isArray(p.injuries) ? p.injuries : [],
@@ -377,7 +390,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    if (["state", "checkin", "post", "like", "msg", "mind", "diary", "fuel", "pref", "invite_req", "askcoach", "run_add", "push_sub_p"].includes(a)) {
+    if (["state", "checkin", "post", "like", "msg", "mind", "diary", "fuel", "pref", "invite_req", "askcoach", "run_add", "push_sub_p", "game", "goal_add", "goal_update", "goal_del"].includes(a)) {
       const p = await auth(b.pid, b.pin);
       if (!p) return J({ error: "unauthorized" }, 401);
       if (p.status === "pending") {
@@ -470,6 +483,54 @@ Deno.serve(async (req) => {
         await db("ll_journal", { method: "POST", body: JSON.stringify({ player_id: p.id, kind: "diary", d: today, data: { text }, share_coach: false }) });
         let gained = 0;
         if (!(already?.length)) { gained = 15; await db(`ll_players?id=eq.${p.id}`, { method: "PATCH", body: JSON.stringify({ xp: p.xp + 15 }) }); }
+        return J({ ok: true, gained, state: await playerState(await getPlayer(p.id)) });
+      }
+
+      if (a === "game") {
+        // Game journal: one entry per game played — the "how good was it" file.
+        const d = /^\d{4}-\d{2}-\d{2}$/.test(String(b.d || "")) ? String(b.d) : today;
+        const num = (v: unknown, max: number) => (v === undefined || v === null || v === "") ? null : Math.max(0, Math.min(max, parseInt(String(v), 10) || 0));
+        const data: any = {
+          opp: priv(b.opp, 50), comp: priv(b.comp, 30),
+          result: ["W", "L", "D"].includes(b.result) ? b.result : "",
+          score: priv(b.score, 20),
+          rating: Math.max(1, Math.min(10, +b.rating || 5)),
+          pts: num(b.pts, 200), reb: num(b.reb, 99), ast: num(b.ast, 99),
+          well: clean(b.well || "", 400), work: clean(b.work || "", 400),
+        };
+        if (!data.opp && !data.well && !data.work) return J({ error: "Give the game a name — who’d you play?" }, 400);
+        await db("ll_journal", { method: "POST", body: JSON.stringify({ player_id: p.id, kind: "game", d, data, share_coach: b.share_coach !== false }) });
+        const sameDay = await db(`ll_journal?player_id=eq.${p.id}&kind=eq.game&d=eq.${d}&select=id`);
+        let gained = 0;
+        if ((sameDay?.length || 0) <= 2) { gained = 35; const fresh = await getPlayer(p.id); await db(`ll_players?id=eq.${p.id}`, { method: "PATCH", body: JSON.stringify({ xp: fresh.xp + 35 }) }); }
+        return J({ ok: true, gained, state: await playerState(await getPlayer(p.id)) });
+      }
+
+      if (a === "goal_add") {
+        const title = priv(b.title, 80);
+        if (title.length < 3) return J({ error: "Name the target — what are you chasing?" }, 400);
+        const open = await db(`ll_journal?player_id=eq.${p.id}&kind=eq.goal&data->>done=eq.false&select=id`);
+        if ((open?.length || 0) >= 8) return J({ error: "8 live targets already. Knock one down before you stack more." }, 429);
+        const data = { title, why: priv(b.why, 200), by: priv(b.by, 24), progress: 0, done: false };
+        await db("ll_journal", { method: "POST", body: JSON.stringify({ player_id: p.id, kind: "goal", d: today, data, share_coach: true }) });
+        return J({ ok: true, state: await playerState(p) });
+      }
+
+      if (a === "goal_update" || a === "goal_del") {
+        const gid = String(b.gid || "").toLowerCase();
+        if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/.test(gid)) return J({ error: "no goal" }, 404);
+        if (a === "goal_del") {
+          await db(`ll_journal?id=eq.${gid}&player_id=eq.${p.id}&kind=eq.goal`, { method: "DELETE" });
+          return J({ ok: true, state: await playerState(p) });
+        }
+        const row = (await db(`ll_journal?id=eq.${gid}&player_id=eq.${p.id}&kind=eq.goal&select=id,data`))?.[0];
+        if (!row) return J({ error: "no goal" }, 404);
+        const data: any = { ...(row.data || {}) };
+        if (b.progress !== undefined) data.progress = Math.max(0, Math.min(100, parseInt(b.progress, 10) || 0));
+        let gained = 0;
+        if (b.done === true && !data.done) { data.done = true; data.done_d = today; data.progress = 100; gained = 60; }
+        await db(`ll_journal?id=eq.${row.id}`, { method: "PATCH", body: JSON.stringify({ data }) });
+        if (gained) { const fresh = await getPlayer(p.id); await db(`ll_players?id=eq.${p.id}`, { method: "PATCH", body: JSON.stringify({ xp: fresh.xp + gained }) }); }
         return J({ ok: true, gained, state: await playerState(await getPlayer(p.id)) });
       }
 
@@ -791,16 +852,19 @@ Deno.serve(async (req) => {
       if (a === "cdetail") {
         const p = await getPlayer(b.pid);
         if (!p) return J({ error: "no player" }, 404);
-        const [checkins, intel, msgs, hw, journal] = await Promise.all([
+        const [checkins, intel, msgs, hw, journal, goals, games] = await Promise.all([
           db(`ll_checkins?player_id=eq.${p.id}&select=d,energy,conf,mins,focus,note&order=d.desc&limit=14`),
           db(`ll_intel?player_id=eq.${p.id}&select=id,text,created_at&order=created_at.asc`),
           db(`ll_messages?player_id=eq.${p.id}&select=id,from_coach,text,created_at&order=created_at.asc&limit=100`),
           db(`ll_homework?player_id=eq.${p.id}&select=id,text,done&order=created_at.desc&limit=10`),
-          db(`ll_journal?player_id=eq.${p.id}&share_coach=eq.true&select=kind,d,data,created_at&order=created_at.desc&limit=15`),
+          db(`ll_journal?player_id=eq.${p.id}&share_coach=eq.true&kind=in.(mind,fuel)&select=kind,d,data,created_at&order=created_at.desc&limit=15`),
+          db(`ll_journal?player_id=eq.${p.id}&kind=eq.goal&select=id,d,data,created_at&order=created_at.desc&limit=20`),
+          db(`ll_journal?player_id=eq.${p.id}&kind=eq.game&share_coach=eq.true&select=d,data,created_at&order=d.desc,created_at.desc&limit=20`),
         ]);
         return J({ ok: true, profile: publicProfile(p), contact: p.contact || null, checkins, intel, messages: msgs, homework: hw, awards: Array.isArray(p.awards) ? p.awards : [], injuries: Array.isArray(p.injuries) ? p.injuries : [],
           shared_mind: journal.filter((j: any) => j.kind === "mind"),
-          fuel: journal.filter((j: any) => j.kind === "fuel").slice(0, 7) });
+          fuel: journal.filter((j: any) => j.kind === "fuel").slice(0, 7),
+          goals, games });
       }
       if (a === "intel_add") {
         const text = String(b.text || "").trim().slice(0, 300);
