@@ -15,6 +15,38 @@ redeploying). Before deploying, make sure your branch contains main's extras
 Keeping main in sync with the live state is the only durable protection.
 Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
 
+## Targets + Game Journal — the 1-on-1 athlete kit (2026-10-07)
+
+- **Why:** a mother reached out for 1-on-1 coaching of her young son
+  (IG unspokenword88); Aiman asked for "an app for him" — daily accountability,
+  mental health, nutrition, goals/targets, diary, journaling his games. The Lab
+  app already did check-ins/Mind/Fuel/diary/streaks/coach desk, so the two
+  missing pieces were built INTO app.html instead of a separate app; the kid
+  gets in via a normal Lab invite (desk → Door → mint code → send to the mum).
+- **Edge app-api v28** (deployed via subagent, SHA-256 byte-identical, VAPID
+  intact; v27 was the same minus a gid-validation fix). New player actions on
+  `ll_journal` (NO new tables — new kinds `goal` + `game`, constraint widened by
+  migration `lab_journal_goal_game_kinds`, mirrored in supabase/migrations/):
+  `goal_add` {title,why,by} (cap 8 live, share_coach always true),
+  `goal_update` {gid,progress 0-100|done:true} (+60 XP once on done; gid must be
+  a UUID), `goal_del`, `game` {opp,comp,result W/L/D,score,rating 1-10,
+  pts/reb/ast,well,work,d(today|past date),share_coach default true} (+35 XP,
+  XP capped 2 games/date). playerState + cdetail return `goals`+`games`
+  (cdetail games filter share_coach=true — private games NEVER reach the desk;
+  its old journal query now kind=in.(mind,fuel)). buildAI gains a game-file
+  line (avg of last 3 ratings) + live-targets line.
+- **app.html Home**: 🎯 My Targets card (add goal w/ why+deadline, progress bar,
+  "＋ Closer +10%", "Hit it ✓ +60 XP" w/ confetti, ✕ remove, done goals shown
+  struck w/ green bar) + 🏀 Game Journal card (opponent, Today/Yesterday,
+  Won/Lost/Draw pills, score, rate-your-game slider, PTS/REB/AST minis,
+  went-well / work-on, share-with-coach toggle like Mind's). Entries reuse
+  .mentry style. sw.js lll-v8.
+- **admin.html**: athlete drawer gained **Games** + **Targets** tabs (from
+  cdetail). NEWS id:39.
+- Verified: live backend E2E 14/14 (temp player, deleted after), Playwright
+  app smoke 9/9 + desk drawer 4/4 (stubbed API). Frontend on branch
+  ccr-46cef84f-xipu1t — NOT merged to main yet (merge = auto-deploy, his call).
+
 ## Badge economy + Money desk (2026-07-19)
 
 - **Money desk** — SHIPPED in admin.html (sidebar 💰 Money). Live calc:
