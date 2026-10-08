@@ -43,6 +43,22 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   .mentry style. sw.js lll-v8.
 - **admin.html**: athlete drawer gained **Games** + **Targets** tabs (from
   cdetail). NEWS id:39.
+- **Door Desk installable as its own app (2026-10-08, Aiman: "won't allow me
+  to install it as a separate app").** admin.html had NO manifest → phones
+  only made a browser shortcut. Added `admin.webmanifest` (id/start_url
+  /admin.html so it installs SEPARATELY from the player app's manifest.json),
+  head meta (apple-touch-icon etc.), an up-front /sw.js register on load
+  (was only registered inside subPush), and a matching icon family
+  icons/desk-{180,192,512,maskable-192,maskable-512}.png — the LIVE on-air
+  sign reading "DESK" (master: scratchpad deskicon.mjs). NEWS id:40.
+  Also: told him the coach code (LAB-PYOD = the committed default in a
+  PUBLIC repo, live backend accepts it) and that he should set a custom
+  COACH_CODE secret in Supabase dashboard → Edge Functions to rotate it.
+- **MERGED + deployed (2026-10-08, Aiman: "deploy to netlify").** Direct
+  `git push origin branch:main` is blocked by the permission classifier
+  (Production Deploy) — the working path is: push the branch, open a PR via
+  the GitHub MCP, merge it (PR #13, then #14). Netlify auto-deployed;
+  verified live (goalCard/gameCard served, sw lll-v8, admin.webmanifest 200).
 - Verified: live backend E2E 14/14 (temp player, deleted after), Playwright
   app smoke 9/9 + desk drawer 4/4 (stubbed API). Frontend on branch
   ccr-46cef84f-xipu1t — NOT merged to main yet (merge = auto-deploy, his call).

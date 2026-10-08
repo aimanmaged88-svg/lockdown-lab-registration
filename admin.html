@@ -7,6 +7,12 @@
 <meta name="robots" content="noindex" />
 <meta name="theme-color" content="#050506" />
 <link rel="icon" type="image/png" href="/favicon.png" />
+<link rel="manifest" href="/admin.webmanifest" />
+<link rel="apple-touch-icon" href="/icons/desk-180.png" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="Door Desk" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 <style>
 /* ===== Bundled fonts: Bebas Neue (display) + Manrope (body) ===== */
 
@@ -955,6 +961,8 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
       render();
     }catch(e){ $('#lastUpd').textContent='retrying…'; }
   }
+  /* SW registered up-front so the desk installs as its own app (and push stays armed) */
+  addEventListener('load',()=>{ try{ if('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(()=>{}); }catch(e){} });
   /* true push: phone/desktop buzzes even with everything closed */
   const VAPID_PUB='BIyZs-g6WqeAhyk4NQsAZ7rq-AoyWOTptKUZkE5z-hvvn61vVW9F1Ord5VbySnizrNu9OrLD4kOE0SMRzbcZRgI';
   function vapidBytes(s){ const pad='='.repeat((4-s.length%4)%4); const b=atob((s+pad).replace(/-/g,'+').replace(/_/g,'/')); return Uint8Array.from(b,c=>c.charCodeAt(0)); }
@@ -1119,6 +1127,7 @@ textarea:disabled,input:disabled{opacity:.6;cursor:not-allowed}
   /* Newest = highest id. Add a new entry (bump the id) and every coach's desk
      badges the Guide tab + pings them the next time it's open. */
   const NEWS=[
+    {id:40,d:'8 Oct',t:'Install the desk as its own app 📲',body:'The Door Desk is now a proper installable app, separate from the player app. On your phone open certifiedhooper.netlify.app/admin.html in Chrome → tap ⋮ → “Install app” (or “Add to Home screen”) — you get a DESK icon next to the LIVE one, it opens full-screen with no browser bar, and push pings keep landing. Same on desktop Chrome: the install icon in the address bar.'},
     {id:39,d:'7 Oct',t:'Targets 🎯 + Game Journal 🏀 — built for your 1-on-1 athletes',body:'Two big pieces for coaching a player long-term (made with your new young hooper in mind). TARGETS: every player can now put goals on the board on their Home tab — the target, why it matters, by when — then nudge progress toward 100% and smash the “Hit it” button (+60 XP, confetti). You see every target and its progress in their file (new Targets tab in the athlete drawer). GAME JOURNAL: after every game they play, they log it — opponent, result + score, rate-your-game out of 10, their line (pts/reb/ast), what went well and what to work on. Their last games + ratings feed the AI profile, and everything they share lands in a new Games tab in their file — so before a session you can read exactly how their week went. To get a new athlete in: Door tab → mint an invite code → send the link to their mum. Their check-ins, Mind logs, Fuel, diary, targets and games all flow to this desk from day one.'},
     {id:38,d:'30 Jul',t:'Heaven: launch-day polish + installable',body:'Gave Hoops Heaven a proper going-over for showing off: a subtle court-line texture behind the home screen (character, not a flat page), a live stat row up top (“971 free courts · Sydney-wide”, and it flips to “N playing now” once people check in), smoother tab transitions and press feedback, crisp font rendering, and a warm “Be the first to call a run” prompt so an empty board still pulls people in. It’s also now installable — Add to Home Screen gives it a real orange app icon and opens full-screen like a native app. Clean slate is untouched; ready to share today.'},
     {id:37,d:'30 Jul',t:'Heaven: real ratings ⭐, real fonts, add your own courts',body:'Three big ones. RATINGS ARE REAL: players rate any court 1–5 stars with an optional review; averages show on court pages, home cards, search and the map — and your desk shows every review per court with a one-tap Remove for junk. FONTS: the whole product (app, desk, QR posters) now runs on proper licensed type — Anton for the big headers, Barlow Condensed for labels, Permanent Marker for the “Your game.” accents — no more generic look. ADD COURTS: your desk’s Courts section has ➕ Add a court — name, suburb, paste “lat, lon” from Google Maps, indoor/lights — and it’s instantly live in the app, the search, the map and the QR poster printer. Your added courts carry a YOURS tag and only you can delete them.'},
