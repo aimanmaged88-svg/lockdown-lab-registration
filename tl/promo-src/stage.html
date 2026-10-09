@@ -1,0 +1,44 @@
+<!doctype html><html><head><meta charset="utf-8"><title>stage</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#E9C46A;--bone:#F3EBDD}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1080px;height:1921px;overflow:hidden;background:#000;color:var(--bone);font-family:Inter,system-ui,sans-serif}
+body::before{content:"";position:absolute;inset:0;background:radial-gradient(900px 702px at 50% 20%,rgba(233,196,106,.16),transparent 60%),radial-gradient(702px 594px at 50% 95%,rgba(233,196,106,.08),transparent 60%),#07070a}
+.grain{position:absolute;inset:0;opacity:.05;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");pointer-events:none}
+#cap{position:absolute;left:0;right:0;top:72px;text-align:center;padding:0 65px;opacity:0;transform:translateY(14px);transition:opacity .45s ease,transform .45s ease}
+#cap.on{opacity:1;transform:none}
+#cap .k{font-family:Cinzel,serif;font-weight:700;font-size:25px;letter-spacing:.34em;color:var(--gold);text-transform:uppercase}
+#cap .t{font-family:Cinzel,serif;font-weight:700;font-size:49px;line-height:1.12;margin-top:13px;color:#fff;letter-spacing:.02em}
+#cap .s{font-size:27px;line-height:1.35;color:rgba(243,235,221,.78);margin-top:13px;font-weight:500}
+#phone{position:absolute;left:50%;top:353px;width:734px;height:1552px;transform:translateX(-50%) translateY(61px);opacity:0;transition:opacity .7s ease,transform .7s cubic-bezier(.2,.8,.2,1)}
+#phone.on{opacity:1;transform:translateX(-50%)}
+#phone .bez{position:absolute;inset:0;border-radius:94px;background:#121214;box-shadow:0 0 0 2px #2a2a2e,0 0 0 4px rgba(233,196,106,.35),0 61px 126px rgba(0,0,0,.7),inset 0 0 0 2px rgba(255,255,255,.08)}
+#phone .scr{position:absolute;left:16px;top:16px;width:663px;height:1436px;border-radius:79px;overflow:hidden;background:#000}
+#phone iframe{position:absolute;left:0;top:0;width:663px;height:1436px;border:0;background:#000;display:block}
+#phone #ph2{display:none}
+#card{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 90px;background:#050507;opacity:0;visibility:hidden;pointer-events:none;transition:opacity .5s ease,visibility 0s linear .5s;z-index:10}
+#card.on{opacity:1;visibility:visible;pointer-events:auto;transition:opacity .5s ease,visibility 0s}
+#card img{width:421px;height:421px;border-radius:50%;box-shadow:0 0 0 5px rgba(233,196,106,.25),0 0 144px rgba(233,196,106,.25);margin-bottom:61px;transform:scale(.9);opacity:0;transition:all .9s cubic-bezier(.2,.8,.2,1)}
+#card.on img{transform:none;opacity:1}
+#card .k{font-family:Cinzel,serif;font-size:31px;letter-spacing:.4em;color:var(--gold);text-transform:uppercase;opacity:0;transform:translateY(16px);transition:all .7s ease .25s}
+#card .t{font-family:Cinzel,serif;font-weight:900;font-size:92px;line-height:1.06;color:#fff;margin-top:25px;opacity:0;transform:translateY(20px);transition:all .8s ease .4s;letter-spacing:.03em}
+#card .s{font-size:36px;color:rgba(243,235,221,.8);margin-top:34px;line-height:1.4;opacity:0;transform:translateY(20px);transition:all .8s ease .6s;max-width:864px}
+#card .u{font-family:Cinzel,serif;font-size:31px;letter-spacing:.14em;color:var(--gold);margin-top:61px;opacity:0;transition:all .8s ease .85s}
+#card.on .k,#card.on .t,#card.on .s,#card.on .u{opacity:1;transform:none}
+#card .line{width:119px;height:4px;background:var(--gold);margin:40px auto 0;opacity:0;transition:all .8s ease .5s;transform:scaleX(0)}
+#card.on .line{opacity:1;transform:none}
+</style></head><body>
+<div class="grain"></div>
+<div id="cap"><div class="k"></div><div class="t"></div><div class="s"></div></div>
+<div id="phone"><div class="bez"></div><div class="scr"><iframe id="ph1" src="about:blank" allow="geolocation *"></iframe><iframe id="ph2" src="about:blank" allow="geolocation *"></iframe></div></div>
+<div id="card"><img src="logo.png" alt=""><div class="k"></div><div class="t"></div><div class="line"></div><div class="s"></div><div class="u"></div></div>
+<script>
+const $=s=>document.querySelector(s);
+window.cap=(k,t,s)=>{const c=$('#cap');c.classList.remove('on');setTimeout(()=>{c.querySelector('.k').textContent=k||'';c.querySelector('.t').textContent=t||'';c.querySelector('.s').textContent=s||'';c.classList.add('on')},380)};
+window.capOff=()=>$('#cap').classList.remove('on');
+window.card=(o)=>{const c=$('#card');c.querySelector('img').style.display=o.logo===false?'none':'';c.querySelector('.k').textContent=o.k||'';c.querySelector('.t').textContent=o.t||'';c.querySelector('.s').textContent=o.s||'';c.querySelector('.u').textContent=o.u||'';c.querySelector('.line').style.display=o.t?'':'none';c.classList.add('on')};
+window.cardOff=()=>$('#card').classList.remove('on');
+window.phone=(on)=>$('#phone').classList.toggle('on',on!==false);
+window.swap=(n)=>{$('#ph1').style.display=n===2?'none':'block';$('#ph2').style.display=n===2?'block':'none'};
+</script></body></html>

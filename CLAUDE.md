@@ -141,6 +141,39 @@ editable… put money in, put money out… very simple")
   Playwright 2-user GPS test 13/13 (scratchpad tlloc.mjs), test retreat
   deleted.
 
+## Traditional Legacies PROMO VIDEO (2026-10-10, Aiman: "make me a teaser…
+show it live, put Muhammad, Ahmed in there… so I can sell it to him")
+- **Deliverable:** `tl/promo.mp4` (1080×1920, 1:53, h264+aac, 13.7MB), also
+  served at **https://traditional-legacies.netlify.app/promo.mp4**. It is the
+  REAL app recorded live against the live tl-api: intro card → Muhammad joins
+  with the code → Today → Schedule → Chat (types, Ahmed + Hamza reply live) →
+  Meetups (I'm in) → Brothers map with 11 live pins → "The Leader's Desk"
+  card → leader login → Share/QR → Announce → add a schedule item → People →
+  Today → outro. Captions per section, phone frame, SFX from assets/sfx.
+- **Demo retreat left LIVE for him to show Yousof:** code **F8MKUE**, leader
+  PIN **1446**, "Gili Air Retreat · October" (Oct 8–15), leader "Yousof
+  (Brother Dib)", 11 brothers (Ahmed/Omar/Bilal/Hamza/Ibrahim/Khalid/Zayd/
+  Musa/Abdullah/Tariq/Muhammad), 23 schedule items, chat, 2 meetups, live
+  pins around Gili Air (pins expire from `state` after 24 h — re-run
+  `seed.mjs` logic or `loc_set` to refresh). Delete via leader_login +
+  retreat_delete when done.
+- **Pipeline** (`tl/promo-src/`, run from a scratch folder with playwright):
+  `seed.mjs` seeds the retreat (exports api/seed; tokens cached in demo.json,
+  `REUSE=1` reuses + `resetDemo()` strips earlier takes' Muhammads/posts);
+  `promo.mjs` = Playwright 1080×1920 recordVideo of `stage.html` (phone bezel,
+  two cross-origin iframes :4581 member / :4582 leader so localStorage
+  sessions stay separate, caption + card overlays, tap ripple injected,
+  app zoomed ×1.7 via `documentElement.style.zoom`), logs `events.json`;
+  `deflash.py` removes the ~0.35 s dark frames the headless screencast emits
+  on every DOM re-render under CSS zoom (hold last good frame); `encode.py`
+  speeds 1.2× + mixes SFX cues from events.json. GOTCHAS: Playwright clicks
+  break inside a `transform:scale()` iframe (use zoom); an iframe rule with
+  `display:block` out-specifies `#ph2{display:none}` → hidden phone paints
+  black on top (use `#phone #ph2`); `--run-all-compositor-stages-before-draw`
+  / `channel:'chromium'` render OOPIFs black; `let` globals (S, LMAP) need
+  `typeof` guards in waitForFunction; geolocation needs the iframe
+  `allow="geolocation *"` + per-origin grantPermissions.
+
 ## Liquid-glass pass on BOTH apps (2026-10-10, Aiman: "premium, liquid glass")
 - A `/* LIQUID GLASS */` CSS block appended to each `<style>` (lombok/index.html
   + tl/index.html) + a `.orbs` div (4 blurred drifting colour orbs, brand
