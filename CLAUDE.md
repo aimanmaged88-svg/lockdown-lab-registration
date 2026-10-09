@@ -73,6 +73,57 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
 - Prices in the pack are rough 2026 guides, labelled as such. POI names come
   from OpenStreetMap (ODbL) — attribution shown on the map.
 
+## Traditional Legacies — retreat companion for Yousof "Brother Dib" (2026-10-10)
+
+- **Why:** Aiman: "make another Netlify version of this… for Traditional
+  Legacies (@traditional_legacies, 159K, Sydney; men's/couples retreats to
+  Gili Air/Meno/Lombok — archery, freediving, horses; traditionallegacies.
+  com.au). The leader takes ~20 people every couple of months → chat,
+  meetups, daily schedule the leader inputs, leader dashboard + login."
+- **LIVE: https://traditional-legacies.netlify.app** — own Netlify site (id
+  `67df91ff-dab0-47b0-8d6c-07a6ff67e2cb`), deployed the same way as the
+  Lombok app (MCP `deploy-site` token + npx from a standalone folder =
+  `tl/*` + netlify.toml). Source `tl/` (index.html single file, logo.png +
+  hero.jpg pulled from their Wix site, icons from the logo, manifest, sw).
+  Brand: black / bone / gold-crescent (#E9C46A), Cinzel display (Google
+  Fonts), tagline "Strength. Purpose. Legacy."
+- **Backend: Supabase edge fn `tl-api` v1** (verify_jwt on, anon key as
+  Bearer+apikey; source supabase/functions/tl-api/index.ts). Migration
+  `traditional_legacies_v1`: tl_retreats (code 6-char, leader_pin_hash =
+  sha256 `tl:<code>:<pin>:legacy`), tl_members (role leader|member,
+  removed), tl_tokens (per-device token → member), tl_schedule (day, t,
+  title, details, place, kind), tl_posts (kind msg|announce|sys),
+  tl_meetups + tl_rsvp. RLS on, no policies. Actions: public
+  retreat_create / leader_login (500 ms delay) / join (cap 60) /
+  retreat_peek; authed state (single poll payload) / post / post_del /
+  me_edit / leave / meetup_add / meetup_cancel / rsvp; leader retreat_edit
+  / pin_set / schedule_add|edit|del|copy_day / member_remove / member_edit
+  / retreat_delete (confirm DELETE). No AI.
+- **App flow:** entry = Join (code+name+emoji mark+bio; `?join=CODE` link
+  prefills + peeks the retreat) / Leader login (code+PIN) / New retreat
+  (leader). Tabs Today (countdown or Day N, latest announcement, up next,
+  today's plan, meetups, brotherhood) · Schedule (day chips; leader ＋Add /
+  ✏️ edit, kinds prayer/archery/freedive/horse/swim/boat/meal/talk/workout/
+  free/travel) · Chat (5 s poll on tab, 20 s elsewhere; 📣 announce mode
+  for leader; unread dot; Notification API when hidden) · Meetups (create,
+  I'm in / can't, cancel) · Brothers · Leader (Share code+QR+link,
+  Schedule copy-day, Announce, People remove, Retreat details, Security
+  PIN + delete, "Create another retreat"). Session = localStorage
+  `tl_session` {token,code}; 401 → logged out.
+- Verified: API E2E 29/30 (the one "fail" = my rate-limit check too slow)
+  + Playwright two-user flow 22/22 against live backend (test retreats
+  deleted via API; SQL deletes get blocked by the permission classifier —
+  use leader_login + retreat_delete instead). Nothing seeded for the real
+  leader yet — he creates his own retreat + PIN from the app.
+
+## Lombok app extras (2026-10-10)
+- Today tab gained **✅ To do in Lombok** (S.todos, link-aware; seeded once
+  via S.seeds with Aiman's Facebook reel "10 moves to feel more ALIVE"
+  mobility flow) and **🏀 Jump Higher · 14 days** (S.jump {start,done,base,
+  retest}; JUMP[14] = strength A/B, plyo A/B, upper, rest, primer, retest;
+  tick exercises per day, full-plan sheet with baseline/retest cm). Both in
+  contextReport() so the AI knows them. Test: scratchpad test3.mjs 11/11.
+
 ## Targets + Game Journal — the 1-on-1 athlete kit (2026-10-07)
 
 - **Why:** a mother reached out for 1-on-1 coaching of her young son
