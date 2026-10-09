@@ -457,7 +457,7 @@ function renderLoc(){const tog=$('#locTog');tog.classList.toggle('on',locOn());
     const pop=`<b>${esc(m.name)}</b><span style="color:var(--muted);font-size:12px">${m.role==='leader'?'Leader · ':''}${fmtAgo(l.at)}${l.acc?' · ±'+Math.round(l.acc)+' m':''}</span><div class="pa"><a href="https://www.google.com/maps/dir/?api=1&destination=${l.lat},${l.lon}&travelmode=walking" target="_blank" rel="noopener"><button>🧭 Walk there</button></a></div>`;
     if(LMARKS[l.member_id]){LMARKS[l.member_id].setLatLng([l.lat,l.lon]).setIcon(ico).setPopupContent(pop)}else{LMARKS[l.member_id]=L.marker([l.lat,l.lon],{icon:ico}).addTo(LMAP).bindPopup(pop)}seen.add(l.member_id)}
   for(const id of Object.keys(LMARKS))if(!seen.has(id)){LMARKS[id].remove();delete LMARKS[id]}
-  if(!renderLoc.fitted&&locs.length){fitAll();renderLoc.fitted=true}}
+  const n=Object.keys(LMARKS).length;if(n&&n!==renderLoc.lastN){fitAll();renderLoc.lastN=n}}
 function fitAll(){const pts=Object.values(LMARKS).map(m=>m.getLatLng());if(!pts.length){toast('No one is sharing yet');return}if(pts.length===1)LMAP.setView(pts[0],16);else LMAP.fitBounds(L.latLngBounds(pts).pad(.25))}
 async function pushLoc(pos,force){const {latitude:lat,longitude:lon,accuracy:acc}=pos.coords;myPos=[lat,lon];const moved=!locLastPos||Math.hypot((lat-locLastPos[0])*111000,(lon-locLastPos[1])*111000*Math.cos(lat*Math.PI/180))>25;
   if(!force&&!moved&&Date.now()-locLast<60000)return;if(!force&&!moved&&Date.now()-locLast<60000)return;locLast=Date.now();locLastPos=[lat,lon];
