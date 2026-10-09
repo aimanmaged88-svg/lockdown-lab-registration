@@ -1,12 +1,23 @@
-// Lombok Companion service worker — app shell works fully offline (no signal on a beach).
-const C = 'lombok-v1';
-const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-180.png'];
-self.addEventListener('install', e => { e.waitUntil(caches.open(C).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
-self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== C).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
+// Travel Companion service worker — app shell + map library + viewed map tiles work offline.
+const C = 'lombok-v2';
+const TILES = 'lombok-tiles';
+const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './icon-180.png',
+  'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js', 'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css'];
+self.addEventListener('install', e => { e.waitUntil(caches.open(C).then(c => Promise.allSettled(SHELL.map(u => c.add(u)))).then(() => self.skipWaiting())); });
+self.addEventListener('activate', e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== C && k !== TILES).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
 self.addEventListener('fetch', e => {
   const u = new URL(e.request.url);
-  if (e.request.method !== 'GET' || u.origin !== location.origin) return;           // API + rate fetches go straight to the network
-  if (u.pathname.startsWith('/api/')) return;
+  if (e.request.method !== 'GET') return;
+  if (u.pathname.startsWith('/api/') || u.hostname.includes('er-api') || u.hostname.includes('nominatim')) return; // live data: straight to network
+  if (u.hostname === 'tile.openstreetmap.org') {                                                                   // tiles: cache-first (saved maps work offline)
+    e.respondWith(caches.open(TILES).then(c => c.match(e.request).then(m => m || fetch(e.request).then(r => { if (r.ok) c.put(e.request, r.clone()); return r; }))));
+    return;
+  }
+  if (u.hostname === 'unpkg.com') {                                                                                // leaflet: cache-first
+    e.respondWith(caches.open(C).then(c => c.match(e.request).then(m => m || fetch(e.request).then(r => { if (r.ok) c.put(e.request, r.clone()); return r; }))));
+    return;
+  }
+  if (u.origin !== location.origin) return;
   e.respondWith(
     fetch(e.request).then(r => { const cp = r.clone(); caches.open(C).then(c => c.put(e.request, cp)); return r; })
       .catch(() => caches.match(e.request).then(m => m || caches.match('./index.html')))

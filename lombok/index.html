@@ -3,16 +3,17 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,maximum-scale=1">
-<title>Lombok Companion</title>
-<meta name="description" content="Aiman's Lombok travel-money companion: daily allowance, projections, spend log and an AI travel buddy.">
+<title>Travel Companion</title>
+<meta name="description" content="Your whole trip in one app: money, daily allowance, projections, map and day planner, translator, journal with photos, and an AI travel buddy.">
 <meta name="theme-color" content="#0B1020">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Lombok">
+<meta name="apple-mobile-web-app-title" content="Companion">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
 <style>
 :root{
   --bg:#0B1020;--bg2:#0F1629;--card:#141C33;--card2:#1B2443;--line:rgba(255,255,255,.08);--line2:rgba(255,255,255,.14);
@@ -35,7 +36,7 @@ h1,h2,h3{margin:0;font-weight:800;letter-spacing:-.01em}
 .hdr .day em{font-style:normal;color:var(--coral)}
 .ibtn{width:42px;height:42px;border-radius:14px;background:var(--card);border:1px solid var(--line);display:grid;place-items:center;font-size:18px;transition:transform .15s var(--ease)}
 .ibtn:active{transform:scale(.92)}
-.card{background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)) ,var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.card{background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0)),var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin-bottom:12px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
 .card h3{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-bottom:10px;font-weight:800}
 .hero{position:relative;overflow:hidden;padding:20px 18px 18px}
 .hero::after{content:"";position:absolute;inset:auto -40px -60px auto;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(255,122,89,.35),transparent 65%);pointer-events:none}
@@ -100,9 +101,9 @@ select.inp{appearance:none;-webkit-appearance:none}
 .cat{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:14px;padding:10px 4px;text-align:center;font-size:11px;font-weight:700;color:var(--muted)}
 .cat .e{font-size:20px;display:block;margin-bottom:3px}
 .cat.on{border-color:var(--coral);color:var(--text);background:rgba(255,122,89,.14)}
-.nav{position:fixed;left:0;right:0;bottom:0;padding:8px 12px calc(8px + var(--sab));background:rgba(11,16,32,.85);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid var(--line);z-index:30}
-.nav .in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
-.nav button{padding:8px 4px;border-radius:14px;color:var(--dim);font-size:11px;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color .2s}
+.nav{position:fixed;left:0;right:0;bottom:0;padding:8px 6px calc(8px + var(--sab));background:rgba(11,16,32,.85);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid var(--line);z-index:30}
+.nav .in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(6,1fr);gap:2px}
+.nav button{padding:8px 2px;border-radius:14px;color:var(--dim);font-size:10px;font-weight:800;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color .2s}
 .nav button .e{font-size:20px;line-height:1;transition:transform .2s var(--ease)}
 .nav button.on{color:var(--coral)}
 .nav button.on .e{transform:translateY(-2px) scale(1.12)}
@@ -121,6 +122,7 @@ select.inp{appearance:none;-webkit-appearance:none}
 .chips{display:flex;gap:8px;overflow-x:auto;padding:4px 0 8px;scrollbar-width:none;-ms-overflow-style:none}
 .chips::-webkit-scrollbar{display:none}
 .chip{flex:none;padding:9px 13px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid var(--line2);font-size:13px;font-weight:700;color:var(--text)}
+.chip.on{background:rgba(255,122,89,.2);border-color:var(--coral)}
 .chip:active{background:rgba(255,122,89,.2)}
 .ask{position:sticky;bottom:calc(86px + var(--sab));display:flex;gap:8px;background:var(--bg);padding:8px 0 4px}
 .ask input{flex:1}
@@ -154,7 +156,7 @@ select.inp{appearance:none;-webkit-appearance:none}
 .toast{position:fixed;left:50%;transform:translateX(-50%) translateY(20px);bottom:calc(100px + var(--sab));background:#0a0f1f;border:1px solid var(--line2);color:var(--text);padding:11px 16px;border-radius:14px;font-size:14px;font-weight:700;opacity:0;transition:all .3s var(--ease);z-index:60;pointer-events:none;max-width:90%;text-align:center}
 .toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 .setup{padding:20px 0}
-.setup h1{font-size:34px;line-height:1.05;margin-bottom:6px}
+.setup h1{font-size:30px;line-height:1.05;margin-bottom:6px}
 .setup .lead{color:var(--muted);margin-bottom:12px}
 .tag{font-size:11px;color:var(--coral);text-transform:uppercase;letter-spacing:.16em;font-weight:900;margin-bottom:10px}
 .kv{display:flex;justify-content:space-between;padding:8px 0;border-top:1px solid var(--line);font-size:14px}
@@ -173,6 +175,74 @@ select.inp{appearance:none;-webkit-appearance:none}
 .rate .inp{flex:1}
 .off{display:none;font-size:11px;color:var(--sun);font-weight:800;text-transform:uppercase;letter-spacing:.1em;margin-left:8px}
 body.offline .off{display:inline}
+.back{display:inline-flex;align-items:center;gap:6px;color:var(--aqua);font-weight:800;font-size:14px;padding:4px 0 12px}
+/* map */
+#map{height:min(62vh,520px);border-radius:16px;overflow:hidden;border:1px solid var(--line2);background:#0e1a2b}
+.leaflet-container{background:#0e1a2b;font:inherit}
+.leaflet-tile{filter:brightness(.78) saturate(.85)}
+.pm{width:34px;height:34px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);background:var(--card2);border:2px solid var(--coral);display:grid;place-items:center;box-shadow:0 4px 12px rgba(0,0,0,.5)}
+.pm span{transform:rotate(45deg);font-size:17px;line-height:1}
+.pm.c-food{border-color:#FF7A59}.pm.c-cafe{border-color:#FFC857}.pm.c-bar{border-color:#d55181}.pm.c-dive{border-color:#2DD4BF}.pm.c-beach{border-color:#3987e5}.pm.c-stay{border-color:#9085e9}.pm.c-money{border-color:#3DDC97}.pm.c-health{border-color:#FF5C7A}.pm.c-wellness{border-color:#e87ba4}.pm.c-boat{border-color:#5bc0eb}.pm.c-mine{border-color:#fff;background:var(--coral)}.pm.c-planned{box-shadow:0 0 0 4px rgba(255,200,87,.45),0 4px 12px rgba(0,0,0,.5)}
+.leaflet-popup-content-wrapper{background:var(--bg2);color:var(--text);border:1px solid var(--line2);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.leaflet-popup-tip{background:var(--bg2)}
+.leaflet-popup-content{margin:12px 14px;font-size:14px;line-height:1.4}
+.leaflet-popup-content b{font-size:15px;display:block}
+.leaflet-popup-content .pa{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.leaflet-popup-content .pa button{padding:7px 10px;border-radius:9px;background:rgba(255,255,255,.08);border:1px solid var(--line2);font-size:12px;font-weight:800;color:var(--text)}
+.leaflet-popup-content .pa button.p{background:var(--coral);color:#1a0b06;border-color:transparent}
+.leaflet-popup-close-button{color:var(--muted)!important}
+.leaflet-control-attribution{background:rgba(11,16,32,.7)!important;color:var(--dim)!important;font-size:9px!important}
+.leaflet-control-attribution a{color:var(--muted)!important}
+.leaflet-bar a{background:var(--card2)!important;color:var(--text)!important;border-color:var(--line2)!important}
+.dsel{display:flex;gap:6px;overflow-x:auto;padding:4px 0 8px;scrollbar-width:none}
+.dsel::-webkit-scrollbar{display:none}
+.dsel button{flex:none;min-width:52px;padding:8px 6px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--line);text-align:center;font-size:11px;font-weight:800;color:var(--muted);line-height:1.2}
+.dsel button b{display:block;font-size:15px;color:var(--text)}
+.dsel button.on{border-color:var(--coral);background:rgba(255,122,89,.16);color:var(--text)}
+.dsel button.has::after{content:"";display:block;width:5px;height:5px;border-radius:50%;background:var(--sun);margin:3px auto 0}
+.pl{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.pl:first-child{border-top:0}
+.pl .e{font-size:20px;width:28px;text-align:center;flex:none}
+.pl .m{flex:1;min-width:0}.pl .m b{display:block;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pl .m span{font-size:12px;color:var(--muted)}
+.pl .rm{color:var(--dim);font-size:16px;padding:6px}
+.pl .ord{display:flex;flex-direction:column;gap:2px}.pl .ord button{font-size:11px;color:var(--dim);padding:0 6px;line-height:1}
+/* translate */
+.tr{background:rgba(0,0,0,.25);border:1px solid var(--line2);border-radius:16px;padding:12px}
+.tr textarea{width:100%;background:none;border:0;outline:0;font-size:18px;min-height:64px;resize:none;color:var(--text)}
+.tr .lab{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;font-weight:800;display:flex;justify-content:space-between;align-items:center}
+.tr.out{border-color:rgba(45,212,191,.4);background:rgba(45,212,191,.06)}
+.tr .big2{font-size:24px;font-weight:800;line-height:1.3;margin-top:4px;white-space:pre-wrap}
+.tr .pr{font-size:14px;color:var(--aqua);margin-top:6px;font-style:italic}
+.tr .nt{font-size:12px;color:var(--muted);margin-top:6px}
+.ph{display:flex;align-items:center;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.ph:first-child{border-top:0}
+.ph .m{flex:1;min-width:0}
+.ph .m b{display:block;font-size:15px}
+.ph .m .id{font-size:16px;color:var(--aqua);font-weight:800}
+.ph .m .pr{font-size:12px;color:var(--muted);font-style:italic}
+.ph .sp{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid var(--line2);display:grid;place-items:center;font-size:17px;flex:none}
+.bigshow{position:fixed;inset:0;background:#fff;color:#111;z-index:80;display:none;align-items:center;justify-content:center;padding:30px;text-align:center;font-size:40px;font-weight:900;line-height:1.2}
+.bigshow.on{display:flex}
+.bigshow small{position:absolute;bottom:30px;left:0;right:0;font-size:14px;font-weight:600;color:#666}
+/* journal */
+.je{padding:12px 0;border-top:1px solid var(--line)}
+.je:first-child{border-top:0}
+.je .t{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.je .t b{font-size:16px}
+.je .t span{font-size:12px;color:var(--muted);white-space:nowrap}
+.je p{margin:6px 0 0;font-size:14px;color:var(--text);white-space:pre-wrap;line-height:1.5}
+.je .meta{font-size:12px;color:var(--muted);margin-top:6px}
+.je .ph2{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}
+.je .ph2 img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px;background:#000}
+.moods{display:flex;gap:6px}
+.moods button{flex:1;font-size:24px;padding:8px 0;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid var(--line)}
+.moods button.on{border-color:var(--coral);background:rgba(255,122,89,.16)}
+.photos{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.photos img{width:72px;height:72px;object-fit:cover;border-radius:10px}
+.photos .add{width:72px;height:72px;border-radius:10px;border:1px dashed var(--line2);display:grid;place-items:center;color:var(--muted);font-size:22px}
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:85;display:none;align-items:center;justify-content:center}
+.lightbox.on{display:flex}
+.lightbox img{max-width:100%;max-height:100%;object-fit:contain}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -180,33 +250,29 @@ body.offline .off{display:inline}
 <div class="wrap">
   <div class="hdr">
     <div>
-      <div class="ttl">🌴 Lombok · <span id="hDates">10–24 Oct</span><span class="off">offline</span></div>
-      <div class="day" id="hDay">Day <em>1</em> of 15</div>
+      <div class="ttl"><span id="hDest">🌴 Trip</span> · <span id="hDates">—</span><span class="off">offline</span></div>
+      <div class="day" id="hDay">Day <em>1</em></div>
     </div>
-    <div class="row">
-      <button class="ibtn" id="btnSettings" title="Settings">⚙️</button>
-    </div>
+    <div class="row"><button class="ibtn" id="btnSettings" title="Settings">⚙️</button></div>
   </div>
 
   <!-- ============ TODAY ============ -->
   <section class="view on" id="v-today">
     <div class="card hero">
-      <div class="row sb">
-        <h3 style="margin:0">Left in the pot</h3>
-        <span class="pill" id="paceP">—</span>
-      </div>
+      <div class="row sb"><h3 style="margin:0">Left in the pot</h3><span class="pill" id="paceP">—</span></div>
       <div class="big" id="potLeft" style="margin-top:10px">$0</div>
-      <div class="sub" id="potLeftIdr">Rp 0</div>
+      <div class="sub" id="potLeftIdr">—</div>
       <div class="grid2" style="margin-top:14px">
-        <div class="stat"><div class="l">Safe to spend today</div><div class="v" id="allowToday">$0</div><div class="n" id="allowTodayIdr">Rp 0</div></div>
+        <div class="stat"><div class="l">Safe to spend today</div><div class="v" id="allowToday">$0</div><div class="n" id="allowTodayIdr">—</div></div>
         <div class="stat"><div class="l">Spent today</div><div class="v" id="spentToday">$0</div><div class="n" id="leftToday">—</div></div>
       </div>
       <div class="bar"><i id="todayBar" style="width:0%"></i></div>
       <div class="grid3" style="margin-top:12px">
-        <div class="stat"><div class="l">Days left</div><div class="v sm" id="daysLeft">15</div></div>
-        <div class="stat"><div class="l">Avg / day</div><div class="v sm" id="avgDay">$0</div></div>
-        <div class="stat"><div class="l">On the <span id="endDayLbl">24th</span></div><div class="v sm" id="endProj">$0</div></div>
+        <div class="stat"><div class="l">Days left</div><div class="v sm" id="daysLeft">—</div></div>
+        <div class="stat"><div class="l">Avg / day</div><div class="v sm" id="avgDay">—</div></div>
+        <div class="stat"><div class="l">On the <span id="endDayLbl">—</span></div><div class="v sm" id="endProj">—</div></div>
       </div>
+      <div style="margin-top:12px"><button class="btn ghost" id="goPlan">📈 Projections, day budgets & committed costs</button></div>
     </div>
 
     <div class="card">
@@ -214,10 +280,15 @@ body.offline .off{display:inline}
       <div class="brief" id="brief">…</div>
     </div>
 
+    <div class="card" id="todayPlanCard">
+      <div class="row sb"><h3>📍 Today's plan</h3><button class="link" id="goMapToday">Map →</button></div>
+      <div id="todayPlan"></div>
+    </div>
+
     <div class="card">
       <h3>⚡ Quick add</h3>
       <div class="quick" id="quick"></div>
-      <div class="note">Tap to log at the typical Lombok price — adjust the amount in the sheet. All prices are rough 2026 guides.</div>
+      <div class="note" id="quickNote">Tap to log at a typical local price — adjust the amount in the sheet.</div>
     </div>
 
     <div class="card">
@@ -228,53 +299,15 @@ body.offline .off{display:inline}
     <div class="card">
       <h3>💵 Cash in pocket</h3>
       <div class="row sb">
-        <div><div class="big" style="font-size:30px" id="cashIdr">Rp 0</div><div class="sub" id="cashAud">≈ $0</div></div>
+        <div><div class="big" style="font-size:30px" id="cashIdr">—</div><div class="sub" id="cashAud">—</div></div>
         <button class="btn aqua sm" id="atmBtn">🏧 Cash in</button>
       </div>
     </div>
   </section>
 
-  <!-- ============ LOG ============ -->
-  <section class="view" id="v-log">
-    <div class="card">
-      <div class="seg" id="txType">
-        <button data-t="spend" class="on">Spend</button>
-        <button data-t="atm">Cash in</button>
-        <button data-t="in">Add money</button>
-      </div>
-      <label class="f">Amount</label>
-      <div class="amt">
-        <b id="amtCur">Rp</b>
-        <input id="amt" inputmode="decimal" placeholder="0">
-        <div class="cv" id="amtCv">≈ $0</div>
-        <button class="btn ghost sm" id="curSwap">IDR ⇄ AUD</button>
-      </div>
-      <div id="spendFields">
-        <label class="f">Category</label>
-        <div class="cats" id="cats"></div>
-        <label class="f">Paid with</label>
-        <div class="seg" id="payWith"><button data-p="cash" class="on">💵 Cash</button><button data-p="card">💳 Card</button></div>
-      </div>
-      <div id="atmFields" style="display:none">
-        <label class="f">Fee (IDR) — ATMs charge Rp 25–50k + your bank's fee · put 0 for a money changer or cash you brought</label>
-        <input class="inp" id="atmFee" inputmode="numeric" placeholder="e.g. 30000" value="30000">
-        <div class="note">ATM withdrawals, money-changer swaps and the rupiah you brought from home all go here — they move money into your pocket. Only the fee counts as spending; cash spends draw the pocket down.</div>
-      </div>
-      <div id="inFields" style="display:none">
-        <div class="note" style="margin-top:12px">Adds to your trip budget — a top-up from savings, a refund, money someone gave you.</div>
-      </div>
-      <label class="f">Note (optional)</label>
-      <input class="inp" id="note" placeholder="Nasi goreng at the warung by the beach">
-      <label class="f">Date</label>
-      <input class="inp" id="txDate" type="date">
-      <div style="height:14px"></div>
-      <button class="btn" id="txSave">Save</button>
-    </div>
-    <div id="logList"></div>
-  </section>
-
-  <!-- ============ PLAN ============ -->
+  <!-- ============ PLAN (money) ============ -->
   <section class="view" id="v-plan">
+    <button class="back" id="planBack">← Today</button>
     <div class="card">
       <h3>📈 Where your money's heading</h3>
       <div class="viz" id="viz"></div>
@@ -283,9 +316,7 @@ body.offline .off{display:inline}
     </div>
     <div class="card">
       <h3>🔮 How much will I have on…</h3>
-      <div class="row">
-        <select class="inp" id="askDate"></select>
-      </div>
+      <select class="inp" id="askDate"></select>
       <div class="grid2" style="margin-top:10px">
         <div class="stat"><div class="l">On plan</div><div class="v" id="askPlan">$0</div><div class="n">end of that day</div></div>
         <div class="stat"><div class="l">At your pace</div><div class="v" id="askPace">$0</div><div class="n" id="askPaceN">end of that day</div></div>
@@ -294,22 +325,107 @@ body.offline .off{display:inline}
     </div>
     <div class="card">
       <h3>📅 Day by day</h3>
-      <div class="note" style="margin:0 0 8px">Tap a budget to override it for that day (big days like Gili boats or Rinjani). Blank = evenly spread.</div>
+      <div class="note" style="margin:0 0 8px">Tap a budget to override it for that day (boat trips, treks, big nights). Blank = evenly spread.</div>
       <table class="table" id="dayTable"></table>
     </div>
-    <div class="card">
-      <h3>🍱 Where it's going</h3>
-      <div id="catBars"></div>
-    </div>
+    <div class="card"><h3>🍱 Where it's going</h3><div id="catBars"></div></div>
     <div class="card">
       <div class="row sb"><h3>🔒 Committed costs</h3><button class="link" id="addFixed">+ Add</button></div>
-      <div class="note" style="margin:0 0 8px">Money already locked in (flights, booked stays, Rinjani deposit, visa). Taken off the top before the daily allowance.</div>
+      <div class="note" style="margin:0 0 8px">Money already locked in (flights, booked stays, deposits, visa). Taken off the top before the daily allowance.</div>
       <div id="fixedList"></div>
     </div>
+    <div class="card" id="guideCard"><h3>🗺️ Spots worth knowing</h3><div id="guide"></div></div>
+  </section>
+
+  <!-- ============ LOG ============ -->
+  <section class="view" id="v-log">
     <div class="card">
-      <h3>🗺️ The 14-day flow (a suggestion, not a rule)</h3>
-      <div id="itin"></div>
+      <div class="seg" id="txType"><button data-t="spend" class="on">Spend</button><button data-t="atm">Cash in</button><button data-t="in">Add money</button></div>
+      <label class="f">Amount</label>
+      <div class="amt">
+        <b id="amtCur">Rp</b>
+        <input id="amt" inputmode="decimal" placeholder="0">
+        <div class="cv" id="amtCv">≈ $0</div>
+        <button class="btn ghost sm" id="curSwap">⇄</button>
+      </div>
+      <div id="spendFields">
+        <label class="f">Category</label>
+        <div class="cats" id="cats"></div>
+        <label class="f">Paid with</label>
+        <div class="seg" id="payWith"><button data-p="cash" class="on">💵 Cash</button><button data-p="card">💳 Card</button></div>
+      </div>
+      <div id="atmFields" style="display:none">
+        <label class="f">Fee (local) — ATMs often charge a fee · put 0 for a money changer or cash you brought</label>
+        <input class="inp" id="atmFee" inputmode="numeric" placeholder="0" value="0">
+        <div class="note">ATM withdrawals, money-changer swaps and cash you brought from home all go here — they move money into your pocket. Only the fee counts as spending; cash spends draw the pocket down.</div>
+      </div>
+      <div id="inFields" style="display:none"><div class="note" style="margin-top:12px">Adds to your trip budget — a top-up from savings, a refund, money someone gave you.</div></div>
+      <label class="f">Note (optional)</label>
+      <input class="inp" id="note" placeholder="What was it?">
+      <label class="f">Date</label>
+      <input class="inp" id="txDate" type="date">
+      <div style="height:14px"></div>
+      <button class="btn" id="txSave">Save</button>
     </div>
+    <div id="logList"></div>
+  </section>
+
+  <!-- ============ MAP + DAY PLANNER ============ -->
+  <section class="view" id="v-map">
+    <div class="chips" id="mapChips"></div>
+    <div id="map"></div>
+    <div class="row" style="margin:8px 0 12px;gap:8px">
+      <button class="btn ghost sm" id="locBtn">📍 Me</button>
+      <button class="btn ghost sm" id="pinBtn">➕ Pin</button>
+      <button class="btn ghost sm" id="offMap">⬇︎ Offline</button>
+      <input class="inp" id="mapQ" placeholder="Search places" style="padding:9px 12px;font-size:14px;flex:1;min-width:0">
+    </div>
+    <div class="card">
+      <h3>🗓️ Plan your days</h3>
+      <div class="dsel" id="dsel"></div>
+      <div id="dayPlanBox"></div>
+    </div>
+    <div class="card" id="islandCard">
+      <h3>🏝️ Know the island</h3>
+      <div id="islandGuide"></div>
+    </div>
+  </section>
+
+  <!-- ============ TRANSLATE ============ -->
+  <section class="view" id="v-tr">
+    <div class="card">
+      <div class="row sb" style="margin-bottom:8px"><h3 style="margin:0" id="trHead">English → Indonesian</h3><button class="link" id="trSwap">⇄ Swap</button></div>
+      <div class="tr">
+        <div class="lab"><span id="trFrom">English</span><button class="link" id="trMic">🎤 Speak</button></div>
+        <textarea id="trIn" placeholder="Type or dictate… e.g. Can I get this without chilli?"></textarea>
+      </div>
+      <div style="height:8px"></div>
+      <button class="btn" id="trGo">Translate</button>
+      <div style="height:8px"></div>
+      <div class="tr out" id="trOutBox" style="display:none">
+        <div class="lab"><span id="trTo">Indonesian</span><span><button class="link" id="trSay">🔊 Say it</button> · <button class="link" id="trShow">📱 Show them</button> · <button class="link" id="trCopy">Copy</button></span></div>
+        <div class="big2" id="trOut"></div>
+        <div class="pr" id="trPr"></div>
+        <div class="nt" id="trNt"></div>
+      </div>
+      <div class="note">Live translation uses the AI (needs signal). The phrasebook below works offline. 🔊 uses your phone's Indonesian voice if it has one.</div>
+    </div>
+    <div class="card">
+      <h3>📖 Phrasebook</h3>
+      <input class="inp" id="phQ" placeholder="Search: thank you, spicy, how much…" style="margin-bottom:8px">
+      <div class="chips" id="phCats"></div>
+      <div id="phList"></div>
+    </div>
+  </section>
+
+  <!-- ============ JOURNAL ============ -->
+  <section class="view" id="v-journal">
+    <div class="card">
+      <div class="row sb"><h3>📓 Trip journal</h3><div class="row"><button class="link" id="jExport">📖 Export story</button></div></div>
+      <button class="btn" id="jNew">✍️ New entry</button>
+      <div class="note">Photos stay on this phone (not uploaded anywhere). Export builds a single page with everything — share it or keep it forever.</div>
+    </div>
+    <div id="jList"></div>
   </section>
 
   <!-- ============ COMPANION ============ -->
@@ -326,79 +442,106 @@ body.offline .off{display:inline}
 <nav class="nav"><div class="in">
   <button data-v="today" class="on"><span class="e">🌅</span>Today</button>
   <button data-v="log"><span class="e">✍️</span>Log</button>
-  <button data-v="plan"><span class="e">📈</span>Plan</button>
-  <button data-v="ai"><span class="e">🧭</span>Companion</button>
+  <button data-v="map"><span class="e">🗺️</span>Map</button>
+  <button data-v="tr"><span class="e">🗣️</span>Translate</button>
+  <button data-v="journal"><span class="e">📓</span>Journal</button>
+  <button data-v="ai"><span class="e">🧭</span>Chat</button>
 </div></nav>
 
 <!-- ============ SETUP / SETTINGS ============ -->
 <div class="overlay" id="ovSetup">
   <div class="sheet setup">
-    <div class="tag">Lombok · 14 days</div>
-    <h1 id="setupH">Let's set up the trip money.</h1>
-    <p class="lead" id="setupLead">Give me your numbers once — then I'll tell you what's safe to spend every single day, and where you'll land on the 24th.</p>
+    <div class="tag">Travel Companion</div>
+    <h1 id="setupH">Put your whole trip in here.</h1>
+    <p class="lead" id="setupLead">Money, map, translator, journal and an AI buddy. Give me the basics once.</p>
     <label class="f">Your name</label>
     <input class="inp" id="sName" placeholder="Aiman">
-    <label class="f">Total spending money for the trip (AUD)</label>
-    <input class="inp" id="sBudget" inputmode="decimal" placeholder="e.g. 2500">
-    <label class="f">Safety buffer to keep untouched (AUD)</label>
-    <input class="inp" id="sBuffer" inputmode="decimal" placeholder="e.g. 200">
+    <label class="f">Destination</label>
+    <input class="inp" id="sDest" placeholder="Gili Air, Lombok, Indonesia">
     <div class="grid2">
       <div><label class="f">Fly out</label><input class="inp" id="sStart" type="date"></div>
       <div><label class="f">Home</label><input class="inp" id="sEnd" type="date"></div>
     </div>
-    <label class="f">Exchange rate · 1 AUD = ? IDR</label>
+    <div class="grid2">
+      <div><label class="f">Home currency</label><input class="inp" id="sHome" placeholder="AUD" maxlength="3" style="text-transform:uppercase"></div>
+      <div><label class="f">Local currency</label><input class="inp" id="sLocal" placeholder="IDR" maxlength="3" style="text-transform:uppercase"></div>
+    </div>
+    <label class="f">Total spending money (<span id="sHomeLbl">AUD</span>)</label>
+    <input class="inp" id="sBudget" inputmode="decimal" placeholder="e.g. 2500">
+    <label class="f">Safety buffer to keep untouched</label>
+    <input class="inp" id="sBuffer" inputmode="decimal" placeholder="e.g. 200">
+    <label class="f">Exchange rate · 1 <span id="sRateLbl">AUD</span> = ? <span id="sRateLbl2">IDR</span></label>
     <div class="rate"><input class="inp" id="sRate" inputmode="decimal"><button class="btn ghost sm" id="rateLive">↻ Live</button></div>
     <div class="note" id="rateNote">Live mid-market rate. Set your own if your card gives a different one.</div>
+    <label class="f">Translator language</label>
+    <select class="inp" id="sLang"></select>
     <div style="height:16px"></div>
     <button class="btn" id="sSave">Let's go 🌴</button>
     <div id="settingsExtra" style="display:none">
       <div style="height:18px"></div>
-      <div class="grid2">
-        <button class="btn ghost" id="exportBtn">⬇︎ Backup</button>
-        <button class="btn ghost" id="importBtn">⬆︎ Restore</button>
-      </div>
+      <div class="grid2"><button class="btn ghost" id="exportBtn">⬇︎ Backup</button><button class="btn ghost" id="importBtn">⬆︎ Restore</button></div>
       <input type="file" id="importFile" accept="application/json" style="display:none">
       <div style="height:10px"></div>
       <button class="btn danger" id="resetBtn">Wipe everything</button>
-      <div class="note">Data lives on this phone only. Backup before switching phones. <span id="aiStatus"></span></div>
+      <div class="note">Data lives on this phone only (photos too). Backup before switching phones — the backup includes photos. <span id="aiStatus"></span></div>
     </div>
   </div>
 </div>
 
-<!-- edit tx sheet -->
-<div class="overlay" id="ovTx">
-  <div class="sheet">
-    <div class="hd"><h2 id="txEdH">Edit</h2><button class="x" data-close="ovTx">✕</button></div>
-    <label class="f">Amount (IDR)</label>
-    <input class="inp" id="eIdr" inputmode="numeric">
-    <label class="f">Amount (AUD)</label>
-    <input class="inp" id="eAud" inputmode="decimal">
-    <div id="eCatWrap"><label class="f">Category</label><select class="inp" id="eCat"></select></div>
-    <label class="f">Note</label>
-    <input class="inp" id="eNote">
-    <label class="f">Date</label>
-    <input class="inp" id="eDate" type="date">
-    <div style="height:14px"></div>
-    <div class="grid2"><button class="btn danger" id="eDel">Delete</button><button class="btn" id="eSave">Save</button></div>
-  </div>
-</div>
+<div class="overlay" id="ovTx"><div class="sheet">
+  <div class="hd"><h2 id="txEdH">Edit</h2><button class="x" data-close="ovTx">✕</button></div>
+  <label class="f">Amount (<span class="lcur">local</span>)</label><input class="inp" id="eIdr" inputmode="numeric">
+  <label class="f">Amount (<span class="hcur">home</span>)</label><input class="inp" id="eAud" inputmode="decimal">
+  <div id="eCatWrap"><label class="f">Category</label><select class="inp" id="eCat"></select></div>
+  <label class="f">Note</label><input class="inp" id="eNote">
+  <label class="f">Date</label><input class="inp" id="eDate" type="date">
+  <div style="height:14px"></div>
+  <div class="grid2"><button class="btn danger" id="eDel">Delete</button><button class="btn" id="eSave">Save</button></div>
+</div></div>
 
-<!-- fixed cost sheet -->
-<div class="overlay" id="ovFixed">
-  <div class="sheet">
-    <div class="hd"><h2>Committed cost</h2><button class="x" data-close="ovFixed">✕</button></div>
-    <label class="f">What</label>
-    <input class="inp" id="fxName" placeholder="Rinjani trek · Gili boats · Visa on arrival">
-    <label class="f">Amount (AUD)</label>
-    <input class="inp" id="fxAmt" inputmode="decimal" placeholder="e.g. 250">
-    <div class="note">Tip: visa on arrival is Rp 500k (≈ $40). If you'll pay something here in-trip, log that payment under the “Committed” category so it isn't double-counted.</div>
-    <div style="height:14px"></div>
-    <button class="btn" id="fxSave">Add</button>
-  </div>
-</div>
+<div class="overlay" id="ovFixed"><div class="sheet">
+  <div class="hd"><h2>Committed cost</h2><button class="x" data-close="ovFixed">✕</button></div>
+  <label class="f">What</label><input class="inp" id="fxName" placeholder="Boat tickets · Dive course · Visa on arrival">
+  <label class="f">Amount (<span class="hcur">home</span>)</label><input class="inp" id="fxAmt" inputmode="decimal" placeholder="e.g. 250">
+  <div class="note">If you pay something here in-trip, log that payment under the “Committed” category so it isn't double-counted.</div>
+  <div style="height:14px"></div><button class="btn" id="fxSave">Add</button>
+</div></div>
 
+<div class="overlay" id="ovPin"><div class="sheet">
+  <div class="hd"><h2>Drop a pin</h2><button class="x" data-close="ovPin">✕</button></div>
+  <label class="f">Name</label><input class="inp" id="pinName" placeholder="My villa · Turtle spot · Best nasi goreng">
+  <label class="f">Type</label><select class="inp" id="pinCat"></select>
+  <label class="f">Note</label><input class="inp" id="pinNote" placeholder="optional">
+  <div class="note" id="pinWhere"></div>
+  <div style="height:14px"></div><button class="btn" id="pinSave">Pin it</button>
+</div></div>
+
+<div class="overlay" id="ovAddDay"><div class="sheet">
+  <div class="hd"><h2 id="addDayH">Add to a day</h2><button class="x" data-close="ovAddDay">✕</button></div>
+  <div class="dsel" id="dsel2" style="flex-wrap:wrap"></div>
+</div></div>
+
+<div class="overlay" id="ovJ"><div class="sheet">
+  <div class="hd"><h2 id="jH">New entry</h2><button class="x" data-close="ovJ">✕</button></div>
+  <div class="row sb"><label class="f" style="margin:0">Date</label><button class="link" id="jAi">✨ Write it for me</button></div>
+  <input class="inp" id="jDate" type="date" style="margin-top:6px">
+  <label class="f">Title</label><input class="inp" id="jTitle" placeholder="Turtles before breakfast">
+  <label class="f">How was it?</label>
+  <div class="moods" id="jMoods"><button data-m="🤩">🤩</button><button data-m="😊" class="on">😊</button><button data-m="😌">😌</button><button data-m="😮‍💨">😮‍💨</button><button data-m="🤕">🤕</button></div>
+  <label class="f">Where</label><select class="inp" id="jPlace"></select>
+  <label class="f">What happened</label><textarea class="inp" id="jText" placeholder="Who you met, what you ate, what you'd tell a mate…" style="min-height:120px"></textarea>
+  <label class="f">Photos</label>
+  <div class="photos" id="jPhotos"><button class="add" id="jAddPhoto">＋</button></div>
+  <input type="file" id="jFile" accept="image/*" multiple style="display:none">
+  <div style="height:14px"></div>
+  <div class="grid2"><button class="btn danger" id="jDel" style="display:none">Delete</button><button class="btn" id="jSave">Save entry</button></div>
+</div></div>
+
+<div class="bigshow" id="bigshow"><div id="bigTxt"></div><small>tap anywhere to close</small></div>
+<div class="lightbox" id="lightbox"><img id="lbImg" alt=""></div>
 <div class="toast" id="toast"></div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
 /* ===================== DATA ===================== */
 const KEY='lombok_v1';
@@ -408,44 +551,89 @@ const CATS=[
  ['shopping','🛍️','Shopping'],['health','💊','Health'],['fees','🏧','Fees'],['prepaid','🔒','Committed'],['other','✨','Other']
 ];
 const CATN=Object.fromEntries(CATS.map(c=>[c[0],c]));
-const QUICK=[
+const CURSYM={AUD:'$',USD:'$',NZD:'$',SGD:'$',CAD:'$',HKD:'$',EUR:'€',GBP:'£',JPY:'¥',CNY:'¥',IDR:'Rp',THB:'฿',VND:'₫',MYR:'RM',PHP:'₱',KRW:'₩',INR:'₹',TRY:'₺',AED:'د.إ',MXN:'$',BRL:'R$',ZAR:'R',CHF:'Fr',LKR:'Rs',EGP:'E£',MAD:'MAD',FJD:'$'};
+const LANGS=[['id','Indonesian','id-ID'],['ms','Malay','ms-MY'],['th','Thai','th-TH'],['vi','Vietnamese','vi-VN'],['ja','Japanese','ja-JP'],['ko','Korean','ko-KR'],['zh','Chinese (Mandarin)','zh-CN'],['tl','Filipino','fil-PH'],['hi','Hindi','hi-IN'],['ar','Arabic','ar-SA'],['tr','Turkish','tr-TR'],['el','Greek','el-GR'],['it','Italian','it-IT'],['es','Spanish','es-ES'],['fr','French','fr-FR'],['pt','Portuguese','pt-BR'],['de','German','de-DE'],['nl','Dutch','nl-NL'],['sw','Swahili','sw-KE']];
+/* ---- Indonesia / Lombok destination pack ---- */
+const QUICK_ID=[
  ['Warung meal','🍜','food',35000],['Cafe meal','🥗','food',110000],['Coffee','☕','coffee',30000],['Water/snack','🥤','food',12000],
- ['Bintang','🍺','drinks',40000],['Scooter day','🛵','transport',85000],['Petrol fill','⛽','fuel',40000],['Grab ride','🚕','transport',30000],
- ['Snorkel trip','🤿','activity',200000],['Gili boat','⛵','boat',40000],['Massage','💆','health',150000],['Night stay','🛏️','stay',350000]
+ ['Bintang','🍺','drinks',45000],['Scooter day','🛵','transport',85000],['Petrol fill','⛽','fuel',40000],['Grab ride','🚕','transport',30000],
+ ['Snorkel trip','🤿','activity',175000],['Island boat','⛵','boat',40000],['Massage','💆','health',150000],['Bike day','🚲','transport',60000]
 ];
-const GUIDE=[
- ['🏄','Kuta Lombok (south)','Your base for the beaches: Tanjung Aan, Seger, Mawun, Selong Belanak. Chilled surf-town, warungs everywhere, good cafes. Merese Hill for sunrise/sunset.','Scooter Rp75–100k/day · surf lesson Rp300–400k · beach parking Rp10–20k'],
- ['🌸','Pink Beach (Tangsi)','South-east tip, 1.5–2 h from Kuta by scooter on rough road, or a boat day-trip. Go early, snorkel off the beach.','Boat trip Rp300–450k per boat (split it) · entry Rp10–20k'],
- ['🌾','Tetebatu','Rice terraces, monkey forest, Benang Stokel + Benang Kelambu waterfalls on the way. Slow, green, cheap. Homestays with rice-field views.','Waterfalls Rp30–50k + local guide Rp50–100k · homestay Rp200–350k'],
- ['🌋','Mount Rinjani','3,726 m volcano. Crater-rim trek 2D/1N from Senaru or Sembalun — book a registered operator, it is tough but unforgettable. If not trekking: Senaru waterfalls (Sendang Gile, Tiu Kelep).','2D/1N trek Rp2.5–3.5M all-in · waterfalls Rp50k + guide'],
- ['🏝️','Gili Trawangan','The party island. Bike loop, sunset swings, night market food, snorkel trips with turtles. No motorbikes, no police — keep your wits.','Public boat from Bangsal Rp20–40k · fast boat Rp85–150k · snorkel trip Rp150–250k · bike Rp50–80k/day'],
- ['🐢','Gili Air & Gili Meno','Air = the sweet spot (vibe + calm). Meno = quiet, turtles off the east beach, underwater statues. Island-hop boats run every morning.','Hopping boat Rp35–50k · snorkel gear Rp50k · beach warungs Rp40–80k'],
- ['🌅','Senggigi & Malimbu','West-coast strip near the Gili boats. Malimbu/Nipah viewpoints for sunsets over Agung. Good stopover night before/after the Gilis.','Taxi Mataram→Senggigi Rp100–150k · dinner Rp60–150k'],
- ['🧵','Sasak culture','Sade village (traditional houses, buffalo-dung floors), Sukarara weaving village, Banyumulek pottery. Near Kuta/Praya — an easy half day on the way to the airport.','Donation Rp20–50k · a sarong Rp150–400k (haggle kindly)'],
- ['🤿','Sekotong (south-west)','Secret Gilis: Gili Nanggu, Gili Kedis, Gili Sudak — empty beaches, day-boat from Tawun. Best for a quiet reset.','Boat Rp300–400k per boat · snorkel Rp50k'],
+const QUICK_GEN=[['Meal','🍽️','food',0],['Coffee','☕','coffee',0],['Drinks','🍻','drinks',0],['Snack','🥤','food',0],['Taxi','🚕','transport',0],['Transit','🚌','transport',0],['Activity','🎟️','activity',0],['Stay','🛏️','stay',0],['Shopping','🛍️','shopping',0],['Fuel','⛽','fuel',0],['Health','💊','health',0],['Other','✨','other',0]];
+const GUIDE_ID=[
+ ['🏝️','Gili Air','Your base. Small enough to walk around in 90 minutes, no cars — bikes, feet and horse carts (skip the carts). East coast = sunrise + calm snorkelling from the beach (turtles). West coast = sunset bars. Harbour on the south-east corner.','Bike Rp50–70k/day · snorkel gear Rp50k · beach warung Rp40–80k · 3-island snorkel trip Rp150–200k'],
+ ['🐢','Gili Meno','The quiet one, 10 min by hopping boat. Turtle beach on the east side, the underwater Nest statues off the west, a salt lake in the middle. Go early, come back for lunch.','Hopping boat Rp35–50k each way · statues snorkel from the beach free'],
+ ['🎉','Gili Trawangan','The big party island. Bike loop, sunset swings, night market at the harbour for cheap seafood. Good for one big night, not for sleeping.','Hopping boat Rp35–50k · night market plate Rp30–60k · bike Rp50–80k'],
+ ['⛴️','Bangsal harbour (Lombok)','The mainland gateway. Public boat Gili Air ⇄ Bangsal Rp15–25k (leaves when full, mornings best); charter Rp250–350k. Taxi Bangsal ⇄ airport ~Rp350–450k or shared shuttle Rp150–200k.','Keep Rp 500k cash for the last run — ATMs on Gili Air run dry'],
+ ['🏄','Kuta Lombok (south)','Beach-hopping base if you do a mainland trip: Tanjung Aan, Seger, Mawun, Selong Belanak surf lessons, Merese Hill sunset.','Scooter Rp75–100k/day · surf lesson Rp300–400k · 2 h from Bangsal by car'],
+ ['🌋','Mount Rinjani','3,726 m volcano. Crater-rim trek 2D/1N from Senaru or Sembalun with a registered operator. Not trekking? Senaru waterfalls (Sendang Gile, Tiu Kelep).','2D/1N trek Rp2.5–3.5M all-in · waterfalls Rp50k + guide'],
+ ['🌸','Pink Beach (Tangsi)','South-east tip of Lombok, boat day-trip or long scooter ride. Early start, snorkel off the beach.','Boat trip Rp300–450k per boat (split it) · entry Rp10–20k'],
+ ['🌾','Tetebatu','Rice terraces, monkey forest, Benang Stokel + Benang Kelambu waterfalls. Cheapest, greenest day on Lombok.','Waterfalls Rp30–50k + guide Rp50–100k · homestay Rp200–350k'],
+ ['🧵','Sasak culture','Sade village (traditional houses), Sukarara weaving, Banyumulek pottery — near Praya, on the way to the airport.','Donation Rp20–50k · a sarong Rp150–400k (haggle kindly)'],
 ];
-const ITIN=[
- ['Land at LOP → Kuta Lombok','Taxi/Grab to Kuta (~Rp150–250k), buy a SIM at the airport (Rp100–150k, 20–30GB), sunset at Kuta beach, warung dinner.',null],
- ['Kuta beaches','Scooter day: Tanjung Aan, Seger, Merese Hill at sunset. Easy on the wallet.',null],
- ['Selong Belanak + Mawun','Surf lesson morning (Rp300–400k), Mawun for the afternoon. Keep cash for parking + beach warungs.',null],
- ['Pink Beach day','Early start. Scooter + beach entry, or share a boat. Bring water + sunscreen.',null],
- ['Kuta → Tetebatu','Benang Stokel/Kelambu waterfalls on the way. Homestay with the rice fields.',null],
- ['Tetebatu slow day','Rice-terrace walk, monkey forest, local lunch. Cheapest day of the trip.',null],
- ['Rinjani (or Senaru waterfalls)','Trek day 1 if you booked it (the big committed cost) — otherwise Sendang Gile + Tiu Kelep.',null],
- ['Rinjani day 2 → Senggigi','Summit/rim morning, descend, recovery night in Senggigi.',null],
- ['Bangsal → Gili Trawangan','Public boat is Rp20–40k. Bike loop, sunset side, night market.',null],
- ['Gili T snorkel day','Turtles, statues at Meno on a 3-island trip (Rp150–250k). Nights are pricier here.',null],
- ['Gili Air','Hop over (Rp35–50k). Chill day, best sunset beers on the west side.',null],
- ['Gili Meno or back to Senggigi','Turtle beach at Meno, or head back via Bangsal. Malimbu viewpoint.',null],
- ['Sasak villages → Kuta','Sade + Sukarara on the way south. Souvenirs here, not at the airport.',null],
- ['Last full day','Massage (Rp100–200k), favourite beach, final warung feast. Keep airport cash aside.',null],
- ['Fly home','Airport Rp150–250k from Kuta. Spend the leftover rupiah on snacks, not on an airport exchange counter.',null],
+const ITIN_ID=[
+ ['Land at LOP → Bangsal → Gili Air','Taxi/shuttle to Bangsal (~Rp350–450k taxi, Rp150–200k shared), buy a SIM at the airport (Rp100–150k, 20–30GB), public boat across (Rp15–25k, last ones ~4pm). Sunset beer on the west side.'],
+ ['Settle in · east-coast snorkel','Rent a bike (Rp50–70k), do the loop, snorkel straight off the east beach — turtles graze the seagrass in the morning. Warung dinner.'],
+ ['3-island snorkel trip','Boat trip Air → Meno (statues, turtles) → Trawangan (Rp150–200k, 10am–3pm). Pack reef-safe sunscreen + water.'],
+ ['Slow day','Yoga or a dive intro, long lunch, book a massage (Rp100–200k). Journal it.'],
+ ['Gili Meno morning','Hopping boat over (Rp35–50k), turtle beach, salt lake walk, back for lunch. Sunset on the west side.'],
+ ['Gili Trawangan night','Hop over mid-afternoon, bike loop, sunset swings, night market dinner (Rp30–60k plates). Boat back next morning or stay one night.'],
+ ['Back to Air · reset','Cheap day: beach, book, warung. Let the budget breathe.'],
+ ['Dive or freedive day','Fun dive Rp500–650k, discover scuba ~Rp1.2M. Or a kayak/SUP morning.'],
+ ['Lombok mainland day trip (optional)','Early boat to Bangsal, driver for the day (Rp600–800k split) → Senaru waterfalls or Kuta beaches. Big-day override in Plan.'],
+ ['Sunrise swim · island loop walk','Walk the whole island before the heat (90 min), breakfast on the east side, sunset on the west.'],
+ ['Snorkel the north-east','The reef off the north-east is the best shore snorkel on the island — go at high tide, watch the current.'],
+ ['Do-nothing day','Hammock, coconuts (Rp20–30k), massage. Cheapest day of the trip.'],
+ ['Favourites day','Go back to whatever you loved most. Buy small gifts here, not at the airport.'],
+ ['Last full day','Massage, final sunset, settle any tabs. Keep Rp 500k+ cash for tomorrow\'s boat + taxi.'],
+ ['Boat → Bangsal → airport → home','Morning public boat (be at the harbour by 8), taxi to LOP (~2 h). Spend leftover rupiah on snacks, not at the airport exchange.'],
 ];
-const DEFAULTS={v:1,name:'Aiman',start:'2026-10-10',end:'2026-10-24',budget:0,buffer:150,rate:12443,rateAuto:true,rateAt:0,fixed:[],dayPlan:{},tx:[],chat:[],setup:false};
+const ISLAND_ID=[
+ ['🧭','Getting around','No cars or scooters. Walk (90 min loop), hire a bike (Rp50–70k/day — sand patches on the north side), or cidomo horse carts (animal-welfare concerns, most travellers skip them).'],
+ ['🌅','East vs west','Sunrise and the calmest water on the east coast (snorkel from the beach, turtles). Sunset bars line the west — get there by 5:30pm.'],
+ ['🐢','Turtles','Best early morning off the east beach and the north-east point at higher tide. Don\'t touch, don\'t chase, no flash.'],
+ ['🏧','Cash & ATMs','A couple of ATMs near the harbour that often run dry or charge Rp 50k+. Bring cash from Lombok. Most places take cash; cards sometimes with 3% added.'],
+ ['🥥','Food & drink','Warung meals Rp30–60k, western Rp80–150k, Bintang Rp40–50k, fresh coconut Rp20–30k, smoothie bowls Rp60–90k. Tap water isn\'t drinkable — refill stations exist.'],
+ ['🕌','Respect','Mostly Muslim Sasak community. Cover up away from the beach, keep it quiet during prayer calls, no public drunkenness in the village. Friday midday is prayer time.'],
+ ['🌊','Boats','Public boats to Bangsal run mornings (Rp15–25k, leave when full). Island-hopping boat ~9am and ~4pm (Rp35–50k). Fast boats to Bali from the harbour.'],
+ ['🆘','Emergency','112 for emergencies. Clinics on the island for basics; serious stuff → mainland (Siloam Hospital Mataram). Keep travel insurance details in your journal.'],
+];
+const PHRASES_ID=[
+ ['Basics',[['Hello','Halo','HAH-loh'],['Good morning','Selamat pagi','suh-LAH-mat PAH-gee'],['Good afternoon','Selamat siang','suh-LAH-mat see-AHNG'],['Good evening','Selamat malam','suh-LAH-mat MAH-lam'],['Thank you (very much)','Terima kasih (banyak)','tuh-REE-mah KAH-see (BAH-nyak)'],['You\'re welcome','Sama-sama','SAH-mah SAH-mah'],['Yes / No','Ya / Tidak','yah / TEE-dak'],['Please (asking for help)','Tolong','TOH-long'],['Go ahead / please (offering)','Silakan','see-LAH-kan'],['Sorry','Maaf','mah-AHF'],['Excuse me','Permisi','pur-MEE-see'],['How are you?','Apa kabar?','AH-pah KAH-bar'],['Good / fine','Baik','BAH-ik'],['My name is…','Nama saya…','NAH-mah SAH-yah'],['I\'m from Australia','Saya dari Australia','SAH-yah DAH-ree'],['I don\'t understand','Saya tidak mengerti','SAH-yah TEE-dak muhng-UR-tee'],['Do you speak English?','Bisa bahasa Inggris?','BEE-sah bah-HAH-sah ING-gris'],['Slowly, please','Pelan-pelan','puh-LAHN puh-LAHN'],['No worries','Tidak apa-apa','TEE-dak AH-pah AH-pah'],['See you later','Sampai jumpa','SAHM-pie JOOM-pah'],['Sir / Ma\'am (respectful)','Pak / Bu','pahk / boo'],['Mate (young man)','Mas','mahs']]],
+ ['Eating',[['I\'d like…','Saya mau…','SAH-yah MAH-oo'],['The menu, please','Minta menu','MIN-tah MEH-noo'],['Water','Air (minum)','AH-eer MEE-noom'],['Not spicy, please','Tidak pedas','TEE-dak puh-DAHS'],['A little spicy','Sedikit pedas','suh-DEE-kit puh-DAHS'],['Delicious!','Enak!','eh-NAHK'],['The bill, please','Minta bon','MIN-tah bohn'],['No sugar','Tanpa gula','TAHN-pah GOO-lah'],['No meat','Tanpa daging','TAHN-pah DAH-ging'],['Chicken / fish / rice','Ayam / ikan / nasi','AH-yam / EE-kan / NAH-see'],['Fried noodles','Mie goreng','mee GOH-reng'],['Coffee / tea','Kopi / teh','KOH-pee / teh'],['Beer','Bir','beer'],['Young coconut','Kelapa muda','kuh-LAH-pah MOO-dah'],['Takeaway','Bungkus','BOONG-koos'],['Is it halal?','Halal?','hah-LAHL'],['Cheers','Bersulang','bur-SOO-lang']]],
+ ['Money & haggling',[['How much is this?','Berapa harganya?','buh-RAH-pah har-GAH-nyah'],['Too expensive','Terlalu mahal','tur-LAH-loo MAH-hal'],['Can you go lower?','Bisa kurang?','BEE-sah KOO-rang'],['Cheaper?','Lebih murah?','luh-BEE MOO-rah'],['I\'ll take it','Saya ambil','SAH-yah AHM-bil'],['Just looking','Lihat-lihat saja','LEE-hat LEE-hat SAH-jah'],['Discount','Diskon','DIS-kon'],['Cash / card','Tunai / kartu','TOO-nye / KAR-too'],['Small change','Uang kecil','OO-ang kuh-CHEEL'],['Receipt','Struk','strook'],['Fifty thousand','Lima puluh ribu','LEE-mah POO-loo REE-boo']]],
+ ['Boats & getting around',[['Where is…?','Di mana…?','dee MAH-nah'],['Harbour','Pelabuhan','puh-LAH-boo-han'],['Boat','Perahu / kapal','puh-RAH-hoo / KAH-pal'],['Public boat','Kapal umum','KAH-pal OO-moom'],['What time does it leave?','Jam berapa berangkat?','jahm buh-RAH-pah buh-RANG-kat'],['Ticket','Tiket','TEE-ket'],['To the airport','Ke bandara','kuh ban-DAH-rah'],['Bicycle','Sepeda','suh-PEH-dah'],['Scooter','Motor','MOH-tor'],['Rent','Sewa','SEH-wah'],['Petrol','Bensin','BEN-sin'],['Helmet','Helm','helm'],['Stop here','Berhenti di sini','bur-HEN-tee dee SEE-nee'],['Left / right / straight','Kiri / kanan / lurus','KEE-ree / KAH-nan / LOO-roos'],['Near / far','Dekat / jauh','duh-KAT / JAH-ooh'],['Beach','Pantai','PAHN-tie']]],
+ ['Island life',[['Snorkelling','Snorkeling','snorkeling'],['Turtle','Penyu','puh-NYOO'],['Sunset','Matahari terbenam','mah-tah-HAH-ree tur-buh-NAM'],['Swim','Berenang','buh-ruh-NANG'],['Mask / fins','Masker / kaki katak','MAHS-ker / KAH-kee KAH-tak'],['Low tide / high tide','Surut / pasang','SOO-root / PAH-sang'],['Careful!','Hati-hati!','HAH-tee HAH-tee'],['Beautiful','Indah','IN-dah'],['Hot (weather)','Panas','PAH-nas'],['Rain','Hujan','HOO-jan'],['Mosque','Masjid','MAHS-jid'],['Prayer time','Waktu salat','WAHK-too sah-LAHT']]],
+ ['Emergency',[['Help!','Tolong!','TOH-long'],['I need a doctor','Saya perlu dokter','SAH-yah pur-LOO DOK-ter'],['Hospital','Rumah sakit','ROO-mah SAH-kit'],['Pharmacy','Apotek','ah-POH-tek'],['I\'m sick','Saya sakit','SAH-yah SAH-kit'],['Stomach ache','Sakit perut','SAH-kit puh-ROOT'],['Headache','Sakit kepala','SAH-kit kuh-PAH-lah'],['Allergy','Alergi','ah-LER-gee'],['Police','Polisi','poh-LEE-see'],['Emergency number','112','one one two'],['Call…','Telepon…','TEH-leh-pon'],['Mosquito','Nyamuk','NYAH-mook'],['Sunscreen','Tabir surya','TAH-beer SOOR-yah']]],
+ ['Numbers & time',[['1 2 3 4 5','satu dua tiga empat lima','SAH-too DOO-ah TEE-gah uhm-PAHT LEE-mah'],['6 7 8 9 10','enam tujuh delapan sembilan sepuluh','uh-NAHM TOO-jooh duh-LAH-pan suhm-BEE-lan suh-POO-looh'],['20 / 50 / 100','dua puluh / lima puluh / seratus','DOO-ah POO-looh / LEE-mah POO-looh / suh-RAH-toos'],['1,000 / 10,000','seribu / sepuluh ribu','suh-REE-boo / suh-POO-looh REE-boo'],['100,000 / 1 million','seratus ribu / satu juta','suh-RAH-toos REE-boo / SAH-too JOO-tah'],['Today / tomorrow / yesterday','Hari ini / besok / kemarin','HAH-ree EE-nee / BEH-sok / kuh-MAH-rin'],['Now / later','Sekarang / nanti','suh-KAH-rang / NAHN-tee'],['What time?','Jam berapa?','jahm buh-RAH-pah'],['Open / closed','Buka / tutup','BOO-kah / TOO-toop'],['Morning / night','Pagi / malam','PAH-gee / MAH-lam']]],
+];
+const PIN_CATS=[['mine','📌','My pin'],['stay','🛏️','Where I\'m staying'],['food','🍜','Food'],['cafe','☕','Cafe'],['bar','🍹','Bar / sunset'],['dive','🤿','Snorkel / dive'],['beach','🏖️','Beach'],['boat','⛵','Boat'],['money','🏧','ATM / money'],['health','💊','Health'],['wellness','💆','Spa / yoga'],['shop','🛍️','Shop'],['sight','📸','Sight']];
+const CATE=Object.fromEntries(PIN_CATS.map(c=>[c[0],c[1]]));CATE.culture='🕌';CATE.bike='🚲';
+const POIS=[{"n":"Pachamama Organic Cafe & Restaurant","la":-8.35316,"lo":116.08517,"c":"food","cu":"organic"},{"n":"Manta Dive Restaurant","la":-8.36219,"lo":116.0874,"c":"food"},{"n":"Raja Restaurant and Bar","la":-8.3598,"lo":116.0874,"c":"food"},{"n":"Tyrell Restaurant","la":-8.36278,"lo":116.08211,"c":"food"},{"n":"Ings Garden Restaurant","la":-8.36097,"lo":116.07839,"c":"food","cu":"burger, sandwich, grill, tea, local, cof"},{"n":"Villa Karang Restaurant","la":-8.36399,"lo":116.08106,"c":"food"},{"n":"H&R restaurant","la":-8.3591,"lo":116.08083,"c":"food"},{"n":"Salabose Restaurant","la":-8.36229,"lo":116.077,"c":"food"},{"n":"Warung Sunny","la":-8.35563,"lo":116.08225,"c":"food","cu":"indonesian, pancake, international"},{"n":"The Garden Cafe","la":-8.36456,"lo":116.08556,"c":"food"},{"n":"Martabak & Terang Bulan","la":-8.36209,"lo":116.08366,"c":"food"},{"n":"Bunga Warung","la":-8.36242,"lo":116.08539,"c":"food"},{"n":"Streetfood places, go here!!","la":-8.36216,"lo":116.08365,"c":"food"},{"n":"Classico","la":-8.36185,"lo":116.08243,"c":"food","cu":"pizza"},{"n":"Warung Nelly","la":-8.36129,"lo":116.08299,"c":"food"},{"n":"Waterfront","la":-8.36206,"lo":116.08738,"c":"food"},{"n":"Lemon Grass","la":-8.36245,"lo":116.08344,"c":"food"},{"n":"Musa","la":-8.35765,"lo":116.08364,"c":"food"},{"n":"Segar Resto","la":-8.35744,"lo":116.08723,"c":"food"},{"n":"Burger Lady","la":-8.35854,"lo":116.08373,"c":"food","cu":"burger, crepe, indonesian, mexican, sand"},{"n":"Kenzo Cafe and Bar","la":-8.35853,"lo":116.0837,"c":"food","cu":"indonesian, italian_pizza"},{"n":"Shendy's Café","la":-8.35949,"lo":116.08485,"c":"food"},{"n":"eazy gili waroeng","la":-8.36138,"lo":116.08353,"c":"food","cu":"indonesian"},{"n":"Shark Bites","la":-8.36239,"lo":116.08329,"c":"food"},{"n":"Warung Sasak","la":-8.36155,"lo":116.08406,"c":"food"},{"n":"Wiwin Café","la":-8.35901,"lo":116.08676,"c":"food"},{"n":"Lookdown Kitchen","la":-8.3587,"lo":116.08298,"c":"food"},{"n":"Waroeng Seafood and Steak","la":-8.36137,"lo":116.08348,"c":"food","cu":"indonesian, pizza, asian"},{"n":"Ruby's Cafe","la":-8.36187,"lo":116.0848,"c":"food","cu":"indonesian, asian"},{"n":"Biba Beach Cafe","la":-8.35923,"lo":116.0874,"c":"food"},{"n":"Chill Out","la":-8.3637,"lo":116.0875,"c":"food"},{"n":"Raja Rasa","la":-8.3598,"lo":116.08348,"c":"food","cu":"indonesian"},{"n":"Warung Sasak","la":-8.35894,"lo":116.08737,"c":"food"},{"n":"Le cirque","la":-8.36321,"lo":116.08743,"c":"food"},{"n":"D Las Resto","la":-8.36285,"lo":116.08333,"c":"food"},{"n":"Warung Padang Sumatra","la":-8.36035,"lo":116.08363,"c":"food"},{"n":"Unzip","la":-8.36176,"lo":116.08733,"c":"food"},{"n":"Munchies Cafe","la":-8.35964,"lo":116.08739,"c":"food"},{"n":"The 9 Musas","la":-8.35548,"lo":116.0816,"c":"food"},{"n":"Allora","la":-8.35572,"lo":116.08354,"c":"food"},{"n":"Warung Nelayan","la":-8.35238,"lo":116.08331,"c":"food"},{"n":"Diva Cafe","la":-8.35251,"lo":116.0866,"c":"food"},{"n":"Bambu Beach Kitchen","la":-8.35306,"lo":116.08669,"c":"food"},{"n":"The Mexican Kitchen","la":-8.35254,"lo":116.08653,"c":"food","cu":"mexican"},{"n":"The Family Café","la":-8.35523,"lo":116.08338,"c":"food"},{"n":"Pituq - Resto, Café & Shop","la":-8.35551,"lo":116.08374,"c":"food"},{"n":"Le Bistro","la":-8.35232,"lo":116.08649,"c":"food","cu":"burger, indonesian, ice_cream, french"},{"n":"Youpy cafe","la":-8.35221,"lo":116.08647,"c":"food"},{"n":"Lalapan grill and fried","la":-8.36221,"lo":116.08364,"c":"food"},{"n":"Pockets & Pints","la":-8.36033,"lo":116.08357,"c":"food"},{"n":"Gecko Cafe","la":-8.36251,"lo":116.08298,"c":"cafe"},{"n":"Sunrise Cafe","la":-8.36308,"lo":116.08749,"c":"cafe"},{"n":"The Play Cafe","la":-8.35496,"lo":116.08125,"c":"cafe"},{"n":"Bollata Cafe","la":-8.35116,"lo":116.08151,"c":"cafe"},{"n":"Good Earth Café","la":-8.35764,"lo":116.08475,"c":"cafe"},{"n":"Barefoot Blondie","la":-8.3631,"lo":116.08327,"c":"cafe","cu":"breakfast, coffee_shop"},{"n":"Il Gelato Damonte","la":-8.36295,"lo":116.08319,"c":"cafe"},{"n":"Scooperific","la":-8.36192,"lo":116.08733,"c":"cafe"},{"n":"Harmony Beach House","la":-8.35061,"lo":116.08317,"c":"cafe"},{"n":"Gili Coffee Roasters","la":-8.35772,"lo":116.08158,"c":"cafe","cu":"coffee_shop, breakfast"},{"n":"Gili Bliss Café","la":-8.35932,"lo":116.08078,"c":"cafe"},{"n":"Kopi Susu","la":-8.36205,"lo":116.08348,"c":"cafe","cu":"breakfast, coffee_shop, crepe, deli, fin"},{"n":"Ikhsari Warung","la":-8.36175,"lo":116.08426,"c":"cafe","cu":"asian"},{"n":"Ruby's Pies","la":-8.3628,"lo":116.08321,"c":"cafe"},{"n":"Nusa Indah","la":-8.35219,"lo":116.07956,"c":"cafe"},{"n":"Gili Medical Care","la":-8.36321,"lo":116.08321,"c":"health"},{"n":"Nusa Medical Clinic","la":-8.36113,"lo":116.08452,"c":"health"},{"n":"Blue Island Medical Centre","la":-8.36356,"lo":116.08454,"c":"health"},{"n":"GAM Gili Air Medika","la":-8.35931,"lo":116.08465,"c":"health"},{"n":"Puskesdes Gili Air","la":-8.36192,"lo":116.08502,"c":"health"},{"n":"Puskesmas Pembantu Gili Air","la":-8.36115,"lo":116.08253,"c":"health"},{"n":"The Elf","la":-8.35312,"lo":116.08151,"c":"health"},{"n":"Spa Lombok Indah","la":-8.35059,"lo":116.08393,"c":"wellness"},{"n":"The Little Spa","la":-8.35073,"lo":116.08247,"c":"wellness"},{"n":"Gili Air Garden Spa","la":-8.35407,"lo":116.08547,"c":"wellness"},{"n":"Spa Bulan Madu","la":-8.36045,"lo":116.08725,"c":"wellness"},{"n":"Zone Spa","la":-8.36153,"lo":116.08355,"c":"wellness"},{"n":"Spa Jueis Tintin (no-frills)","la":-8.35058,"lo":116.08325,"c":"wellness"},{"n":"Spa Bulan Madu","la":-8.36031,"lo":116.08705,"c":"wellness"},{"n":"Harmony Spa","la":-8.35069,"lo":116.08319,"c":"wellness"},{"n":"The Natural Spa","la":-8.36255,"lo":116.08344,"c":"wellness"},{"n":"Ceria Spa","la":-8.36221,"lo":116.08087,"c":"wellness"},{"n":"Organic Spa","la":-8.36355,"lo":116.0779,"c":"wellness"},{"n":"Jasmine Spa","la":-8.36219,"lo":116.0769,"c":"wellness"},{"n":"Massage","la":-8.36281,"lo":116.0772,"c":"wellness"},{"n":"sunset 2","la":-8.35723,"lo":116.07485,"c":"sight"},{"n":"The Next Dimension","la":-8.35352,"lo":116.07794,"c":"sight"},{"n":"Gili Land Hotel","la":-8.35835,"lo":116.08466,"c":"stay"},{"n":"B52 Hotel and Villa - Gili Air","la":-8.36096,"lo":116.08369,"c":"stay"},{"n":"The Amelya Hotel and Villa Gili Air","la":-8.36097,"lo":116.08385,"c":"stay"},{"n":"Hotel Gili Air","la":-8.35075,"lo":116.08506,"c":"stay"},{"n":"Hotel Ombak Paradise","la":-8.36421,"lo":116.07914,"c":"stay"},{"n":"Happy Homestay","la":-8.36107,"lo":116.08232,"c":"stay"},{"n":"Blue Marine Dive Resort","la":-8.35316,"lo":116.08656,"c":"stay"},{"n":"Kaluku Gili Resort","la":-8.35366,"lo":116.08658,"c":"stay"},{"n":"Color Cottage","la":-8.35401,"lo":116.0858,"c":"stay"},{"n":"Ajik Homestay","la":-8.35495,"lo":116.08358,"c":"stay"},{"n":"Light House Villa","la":-8.36248,"lo":116.08222,"c":"stay"},{"n":"Azila Homestay","la":-8.35606,"lo":116.08343,"c":"stay"},{"n":"Gili Kolanta Indah Bungalows","la":-8.35883,"lo":116.08445,"c":"stay"},{"n":"Tipsea Turtle","la":-8.35312,"lo":116.08628,"c":"stay"},{"n":"Villa Saïa","la":-8.35856,"lo":116.08342,"c":"stay"},{"n":"OMALA Village Gili Air","la":-8.36266,"lo":116.08362,"c":"stay"},{"n":"Ardi Beltza Bungalows","la":-8.35171,"lo":116.08174,"c":"stay"},{"n":"Gili Holiday","la":-8.36107,"lo":116.08444,"c":"stay"},{"n":"Villa Nangka","la":-8.35687,"lo":116.08414,"c":"stay"},{"n":"Gili Air Hostel","la":-8.36235,"lo":116.08343,"c":"stay"},{"n":"Harmony's House","la":-8.36106,"lo":116.08313,"c":"stay"},{"n":"Santigi Homestay","la":-8.3611,"lo":116.08479,"c":"stay"},{"n":"Melbao Homestay","la":-8.36208,"lo":116.08228,"c":"stay"},{"n":"Hello lumbung homestay","la":-8.3613,"lo":116.08165,"c":"stay"},{"n":"Musa villas & bungalows","la":-8.35239,"lo":116.08175,"c":"stay"},{"n":"Biba Beach Village","la":-8.35924,"lo":116.08718,"c":"stay"},{"n":"3 Angels Homestay","la":-8.36067,"lo":116.08516,"c":"stay"},{"n":"Aladdin homestay","la":-8.36221,"lo":116.08224,"c":"stay"},{"n":"L'Archipel","la":-8.35856,"lo":116.0847,"c":"stay"},{"n":"Firda Homestay","la":-8.36182,"lo":116.08231,"c":"stay"},{"n":"Mirna Homestay","la":-8.35685,"lo":116.08284,"c":"stay"},{"n":"Goodtimes Homestay","la":-8.35711,"lo":116.07959,"c":"stay"},{"n":"Royal Regantris Villa Karang","la":-8.36371,"lo":116.08119,"c":"stay"},{"n":"Begadang Backpacker","la":-8.35589,"lo":116.07866,"c":"stay"},{"n":"Dolcemare resort","la":-8.36178,"lo":116.07789,"c":"stay"},{"n":"Elephant House and Bungalows","la":-8.36298,"lo":116.07854,"c":"stay"},{"n":"Gili Buana Hostel","la":-8.35684,"lo":116.07813,"c":"stay"},{"n":"Blue Marlin Dive Gili Air","la":-8.3547,"lo":116.07722,"c":"stay"},{"n":"Kelapa Gading Bungalow","la":-8.35466,"lo":116.07922,"c":"stay"},{"n":"Pondok Pantai Bungalows","la":-8.35447,"lo":116.07776,"c":"stay"},{"n":"Mola Resort","la":-8.3631,"lo":116.07757,"c":"stay"},{"n":"Bintang beach 2 bungalows","la":-8.3517,"lo":116.08065,"c":"stay"},{"n":"Beranda Ecolodge","la":-8.35857,"lo":116.08096,"c":"stay"},{"n":"Sunrise","la":-8.36305,"lo":116.08723,"c":"stay"},{"n":"Lumbung Gefe","la":-8.35949,"lo":116.08578,"c":"stay"},{"n":"Ali-Baba Bungalow","la":-8.35272,"lo":116.08655,"c":"stay"},{"n":"Rival Village","la":-8.36245,"lo":116.08482,"c":"stay"},{"n":"Scallywags Mango Retreat","la":-8.3617,"lo":116.08481,"c":"stay"},{"n":"Smugglers Hideaway","la":-8.36163,"lo":116.08225,"c":"stay"},{"n":"Unzipp Villa","la":-8.36176,"lo":116.08701,"c":"stay"},{"n":"Family Bungalow","la":-8.35844,"lo":116.08445,"c":"stay"},{"n":"Black Sweet Bungalow","la":-8.35855,"lo":116.08356,"c":"stay"},{"n":"Sister Bungalow","la":-8.36162,"lo":116.08309,"c":"stay"},{"n":"BAGUS BUNGALOW","la":-8.35643,"lo":116.08359,"c":"stay"},{"n":"Toro-Toro Bungalow","la":-8.35918,"lo":116.08487,"c":"stay"},{"n":"WP Bungalow","la":-8.35801,"lo":116.08521,"c":"stay"},{"n":"SCANDINAVIA BUNGALOW","la":-8.35629,"lo":116.08354,"c":"stay"},{"n":"Goodtimes Bungalow","la":-8.35712,"lo":116.07955,"c":"stay"},{"n":"Sari Gili Bungalow","la":-8.36154,"lo":116.08127,"c":"stay"},{"n":"Bintang Beach Bungalow","la":-8.35174,"lo":116.08105,"c":"stay"},{"n":"Waroeng Ibu Atun & Bungalows","la":-8.36151,"lo":116.08176,"c":"stay"},{"n":"Public Boat Ticket Office","la":-8.36374,"lo":116.08317,"c":"boat"},{"n":"Ganggari Fast Boat","la":-8.36301,"lo":116.08328,"c":"boat"},{"n":"Star Bar","la":-8.35277,"lo":116.08665,"c":"bar"},{"n":"Sailing Bar","la":-8.3589,"lo":116.08725,"c":"bar"},{"n":"Bintang Tiga Bungalows & Bar","la":-8.35119,"lo":116.08167,"c":"bar"},{"n":"The Little Bar","la":-8.35067,"lo":116.08263,"c":"bar"},{"n":"Bambu Beach Bar","la":-8.35313,"lo":116.08677,"c":"bar"},{"n":"Darkside Bar","la":-8.35879,"lo":116.08719,"c":"bar"},{"n":"Gili Bliss Healthy Juice Bar & Cafe","la":-8.36308,"lo":116.08325,"c":"bar"},{"n":"Freedom Bar","la":-8.36339,"lo":116.0875,"c":"bar"},{"n":"Ugem bar","la":-8.35639,"lo":116.08724,"c":"bar"},{"n":"Gusung Indah Bar","la":-8.3521,"lo":116.08636,"c":"bar"},{"n":"Cheeky Monkey Beach Bar","la":-8.36202,"lo":116.07659,"c":"bar"},{"n":"Bunga Bar and Restaurant","la":-8.35334,"lo":116.07827,"c":"bar"},{"n":"Tiki bar","la":-8.36254,"lo":116.0769,"c":"bar"},{"n":"Space bar 🍄","la":-8.35555,"lo":116.0788,"c":"bar"},{"n":"Lucky's Bar and Restaurant","la":-8.36298,"lo":116.07735,"c":"bar"},{"n":"The Beach Club","la":-8.36467,"lo":116.08681,"c":"bar"},{"n":"Legend Restaurant","la":-8.3505,"lo":116.08358,"c":"bar"},{"n":"La Siesta Gili Air. Bungalows & Cusine","la":-8.35446,"lo":116.08234,"c":"bar"},{"n":"I am bagus","la":-8.36242,"lo":116.08342,"c":"bar","cu":"barbecue, american, indonesian, french, "},{"n":"Lombok Indah","la":-8.35055,"lo":116.08414,"c":"bar"},{"n":"Smile","la":-8.36191,"lo":116.07676,"c":"bar"},{"n":"Pura Vida","la":-8.35129,"lo":116.08123,"c":"bar"},{"n":"NoName","la":-8.36055,"lo":116.07614,"c":"bar"},{"n":"Safaris","la":-8.36374,"lo":116.07792,"c":"bar"},{"n":"La Bohème","la":-8.35195,"lo":116.08022,"c":"bar"},{"n":"BNI","la":-8.35995,"lo":116.0872,"c":"money"},{"n":"Bank Mandiri","la":-8.36327,"lo":116.08315,"c":"money"},{"n":"CIMB Niaga","la":-8.36409,"lo":116.08487,"c":"money"},{"n":"Jalan Pantai","la":-8.36416,"lo":116.08501,"c":"money"},{"n":"Sunset Boulevard","la":-8.36083,"lo":116.08115,"c":"shop"},{"n":"H2O Yoga and Meditation Center","la":-8.35738,"lo":116.08448,"c":"wellness"},{"n":"Flowers and Fire Yoga Garden","la":-8.36006,"lo":116.08366,"c":"wellness"},{"n":"H2O Yoga and Meditation Center","la":-8.35717,"lo":116.08449,"c":"wellness"},{"n":"Warung Polong","la":-8.36222,"lo":116.08336,"c":"food"},{"n":"Warung Air Bakso","la":-8.35661,"lo":116.08354,"c":"food"},{"n":"Mamaa Warung","la":-8.36088,"lo":116.08161,"c":"food"},{"n":"Warung Bambu","la":-8.36205,"lo":116.08331,"c":"food"},{"n":"Warung Lalapan Saba","la":-8.3613,"lo":116.08728,"c":"food"},{"n":"Wulan Warung","la":-8.361,"lo":116.08346,"c":"food"},{"n":"Basra Warung","la":-8.36313,"lo":116.08418,"c":"food"},{"n":"Warung Kampung","la":-8.3619,"lo":116.0844,"c":"food","cu":"indonesian"},{"n":"Warung Gili","la":-8.36189,"lo":116.08487,"c":"food"},{"n":"Warung Farida","la":-8.36158,"lo":116.08341,"c":"food"},{"n":"Warung Seribu Dua","la":-8.36105,"lo":116.08419,"c":"food","cu":"indonesian"},{"n":"Warung Aladdin","la":-8.36229,"lo":116.08247,"c":"food","cu":"indonesian"},{"n":"Warung Sasak","la":-8.36155,"lo":116.08406,"c":"food"},{"n":"Gili Air Clinic Center","la":-8.35427,"lo":116.08507,"c":"health"},{"n":"Island Clinic Center","la":-8.36223,"lo":116.08331,"c":"health"},{"n":"Gili Air Lagoon Resort","la":-8.36404,"lo":116.08603,"c":"stay"},{"n":"Divino Resort","la":-8.36267,"lo":116.0825,"c":"stay"},{"n":"Ocean 5","la":-8.36326,"lo":116.08296,"c":"stay"},{"n":"Turtle Beach Hotel","la":-8.35946,"lo":116.08719,"c":"sight"},{"n":"Turtle garden","la":-8.35967,"lo":116.08439,"c":"sight"},{"n":"Turtle Point","la":-8.35479,"lo":116.08722,"c":"sight"},{"n":"Laundry","la":-8.3617,"lo":116.08172,"c":"shop"},{"n":"Gili Air Laundry","la":-8.36285,"lo":116.08198,"c":"shop"},{"n":"Jalan Pantai","la":-8.35587,"lo":116.08709,"c":"shop"},{"n":"Il Baretto","la":-8.35522,"lo":116.07851,"c":"cafe"},{"n":"Il Gelato Damonte","la":-8.36295,"lo":116.08319,"c":"cafe"},{"n":"Han's reef - dive site","la":-8.34893,"lo":116.08612,"c":"dive"},{"n":"Manta Dive Accomodation","la":-8.36223,"lo":116.0871,"c":"dive"},{"n":"3W Dive Center","la":-8.36027,"lo":116.08722,"c":"dive"},{"n":"Gili Pilih dive center","la":-8.36184,"lo":116.0835,"c":"dive"},{"n":"Manta Dive","la":-8.3622,"lo":116.08724,"c":"dive"},{"n":"Blue Marlin Dive Gili Air","la":-8.35444,"lo":116.07724,"c":"dive"},{"n":"gili islands divers / free dive gili air","la":-8.35534,"lo":116.07608,"c":"dive"},{"n":"Sunset Boulevard","la":-8.36083,"lo":116.08115,"c":"shop"},{"n":"Harbor Gili Air","la":-8.36418,"lo":116.08295,"c":"boat"},{"n":"Warung Seribu Dua","la":-8.36105,"lo":116.08419,"c":"food","cu":"indonesian"},{"n":"Warung Sasak","la":-8.36155,"lo":116.08406,"c":"food"}];
+const GILI={la:-8.3577,lo:116.0812,bb:[[-8.3685,116.0715],[-8.3465,116.0905]]};
+
+const DEFAULTS={v:2,name:'Aiman',dest:'Gili Air, Lombok, Indonesia',home:'AUD',local:'IDR',lang:'id',start:'2026-10-10',end:'2026-10-24',budget:0,buffer:150,rate:12443,rateAuto:true,rateAt:0,fixed:[],dayPlan:{},tx:[],chat:[],plans:{},pins:[],journal:[],setup:false,mapOff:false};
 let S=load();
-function load(){try{const j=JSON.parse(localStorage.getItem(KEY));if(j&&j.v===1)return Object.assign({},DEFAULTS,j)}catch(e){}return JSON.parse(JSON.stringify(DEFAULTS))}
+function load(){try{const j=JSON.parse(localStorage.getItem(KEY));if(j&&(j.v===1||j.v===2)){const s=Object.assign({},DEFAULTS,j);s.v=2;return s}}catch(e){}return JSON.parse(JSON.stringify(DEFAULTS))}
 function save(){localStorage.setItem(KEY,JSON.stringify(S))}
 const uid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36);
+const isID=()=>/indonesia|lombok|gili|bali|java|sumatra|flores|komodo|jakarta|yogya/i.test(S.dest||'')||S.local==='IDR';
+const isGili=()=>/gili|lombok/i.test(S.dest||'');
+const QUICK=()=>isID()?QUICK_ID:QUICK_GEN;
+const ITIN=()=>isID()?ITIN_ID:[];
+const GUIDE=()=>isID()?GUIDE_ID:[];
+
+/* ===================== PHOTO STORE (IndexedDB) ===================== */
+const DB={db:null,open(){return new Promise((res,rej)=>{if(this.db)return res(this.db);const r=indexedDB.open('companion',1);r.onupgradeneeded=()=>r.result.createObjectStore('photos');r.onsuccess=()=>{this.db=r.result;res(this.db)};r.onerror=()=>rej(r.error)})},
+ async put(id,blob){const db=await this.open();return new Promise((res,rej)=>{const t=db.transaction('photos','readwrite');t.objectStore('photos').put(blob,id);t.oncomplete=res;t.onerror=()=>rej(t.error)})},
+ async get(id){const db=await this.open();return new Promise((res,rej)=>{const r=db.transaction('photos').objectStore('photos').get(id);r.onsuccess=()=>res(r.result||null);r.onerror=()=>rej(r.error)})},
+ async del(id){const db=await this.open();return new Promise((res)=>{const t=db.transaction('photos','readwrite');t.objectStore('photos').delete(id);t.oncomplete=res;t.onerror=res})},
+ async keys(){const db=await this.open();return new Promise((res)=>{const r=db.transaction('photos').objectStore('photos').getAllKeys();r.onsuccess=()=>res(r.result||[]);r.onerror=()=>res([])})}};
+const URLS={};
+async function photoUrl(id){if(URLS[id])return URLS[id];const b=await DB.get(id);if(!b)return '';URLS[id]=URL.createObjectURL(b);return URLS[id]}
+function downscale(file,max=1400,q=.82){return new Promise(res=>{const img=new Image();const u=URL.createObjectURL(file);img.onload=()=>{const r=Math.min(1,max/Math.max(img.width,img.height));const c=document.createElement('canvas');c.width=Math.round(img.width*r);c.height=Math.round(img.height*r);c.getContext('2d').drawImage(img,0,0,c.width,c.height);c.toBlob(b=>{URL.revokeObjectURL(u);res(b)},'image/jpeg',q)};img.onerror=()=>res(null);img.src=u})}
+const blobToB64=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(b)});
+function b64ToBlob(d){const [h,b]=d.split(',');const m=h.match(/:(.*?);/)[1];const s=atob(b);const a=new Uint8Array(s.length);for(let i=0;i<s.length;i++)a[i]=s.charCodeAt(i);return new Blob([a],{type:m})}
 
 /* ===================== HELPERS ===================== */
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
@@ -454,13 +642,18 @@ function addDays(k,n){const d=new Date(k+'T12:00:00');d.setDate(d.getDate()+n);r
 function dayDiff(a,b){return Math.round((new Date(b+'T12:00:00')-new Date(a+'T12:00:00'))/86400000)}
 function fmtD(k,short){const d=new Date(k+'T12:00:00');return d.toLocaleDateString('en-AU',short?{weekday:'short',day:'numeric'}:{weekday:'short',day:'numeric',month:'short'})}
 function ord(n){const s=['th','st','nd','rd'],v=n%100;return n+(s[(v-20)%10]||s[v]||s[0])}
-function aud(n,dec){const neg=n<0;n=Math.abs(n);const s=dec?n.toFixed(2):Math.round(n).toLocaleString('en-AU');return (neg?'−':'')+'$'+s}
-function idr(n){const neg=n<0;n=Math.abs(n);let s;if(n>=1e6)s=(n/1e6).toFixed(n>=1e7?1:2).replace(/\.?0+$/,'')+'M';else if(n>=1000)s=Math.round(n/1000)+'k';else s=Math.round(n).toString();return (neg?'−':'')+'Rp '+s}
-function idrFull(n){return 'Rp '+Math.round(n).toLocaleString('en-AU')}
+const hsym=()=>CURSYM[S.home]||(S.home+' '), lsym=()=>CURSYM[S.local]||(S.local+' ');
+const bigLocal=()=>S.rate>=200;
+function aud(n,dec){const neg=n<0;n=Math.abs(n);const s=dec?n.toFixed(2):Math.round(n).toLocaleString('en-AU');return (neg?'−':'')+hsym()+s}
+function idr(n){const neg=n<0;n=Math.abs(n);let s;if(bigLocal()){if(n>=1e6)s=(n/1e6).toFixed(n>=1e7?1:2).replace(/\.?0+$/,'')+'M';else if(n>=1000)s=Math.round(n/1000)+'k';else s=Math.round(n).toString()}else s=n.toFixed(2);return (neg?'−':'')+lsym()+s}
+function idrFull(n){return lsym()+(bigLocal()?Math.round(n).toLocaleString('en-AU'):n.toFixed(2))}
 const toAud=i=>i/S.rate, toIdr=a=>a*S.rate;
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),2200)}
-function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
 function md(s){return esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')}
+function langRow(){return LANGS.find(l=>l[0]===S.lang)||LANGS[0]}
+function allPlaces(){return POIS.map((p,i)=>Object.assign({id:'p'+i},p)).concat(S.pins)}
+function placeById(id){return allPlaces().find(p=>p.id===id)}
 
 /* ===================== FINANCE ENGINE ===================== */
 function calc(T){
@@ -479,13 +672,11 @@ function calc(T){
   const pre=T<S.start, post=T>S.end;
   const cur=pre?S.start:(post?S.end:T);
   const idx=days.indexOf(cur);
-  const future=days.slice(idx);               // today..end
+  const future=days.slice(idx);
   const daysLeft=future.length;
-  // allowance: overrides fixed, rest spread
   const ovSum=future.filter(k=>S.dayPlan[k]!=null).reduce((a,k)=>a+S.dayPlan[k],0);
   const freeDays=future.filter(k=>S.dayPlan[k]==null).length;
-  const base=freeDays?Math.max(0,(remaining+ (pre?0:spentOf(cur)) - ovSum))/freeDays:0;
-  // note: allowance for today is computed from remaining BEFORE today's spend so it doesn't shrink as you spend today
+  const base=freeDays?Math.max(0,(remaining+(pre?0:spentOf(cur))-ovSum))/freeDays:0;
   const allow=k=>S.dayPlan[k]!=null?S.dayPlan[k]:base;
   const spentToday=pre?0:spentOf(cur);
   const allowToday=allow(cur);
@@ -493,21 +684,12 @@ function calc(T){
   const past=days.slice(0,idx);
   const completed=past.length;
   const spentPast=past.reduce((a,k)=>a+spentOf(k),0);
-  let avg;
-  if(completed>0)avg=spentPast/completed;else avg=spentToday;
-  const paceRef=(remaining+spentToday)/daysLeft; // what an even split looks like from today
-  // projections (end-of-day balances)
-  const plan={},pace={};
-  let bp=remaining,bc=remaining;
-  future.forEach((k,i)=>{
-    if(i===0){bp-=Math.max(0,allowToday-spentToday);bc-=Math.max(0,(completed>0?avg:spentToday)-spentToday)}
-    else{bp-=allow(k);bc-=avg}
-    plan[k]=bp;pace[k]=bc;
-  });
+  const avg=completed>0?spentPast/completed:spentToday;
+  const paceRef=(remaining+spentToday)/daysLeft;
+  const plan={},pace={};let bp=remaining,bc=remaining;
+  future.forEach((k,i)=>{if(i===0){bp-=Math.max(0,allowToday-spentToday);bc-=Math.max(0,(completed>0?avg:spentToday)-spentToday)}else{bp-=allow(k);bc-=avg}plan[k]=bp;pace[k]=bc});
   const endPlan=plan[S.end],endPace=pace[S.end];
-  // cash
   const cashIdr=S.tx.filter(t=>t.type==='atm').reduce((a,t)=>a+t.idr,0)-S.tx.filter(t=>t.type==='spend'&&t.pay==='cash').reduce((a,t)=>a+t.idr,0);
-  // categories
   const cats={};spendTx.forEach(t=>{cats[t.cat]=(cats[t.cat]||0)+t.aud});feeTx.forEach(t=>{cats.fees=(cats.fees||0)+toAud(t.fee||0)});
   let status='on';const ratio=paceRef>0?avg/paceRef:0;
   if(completed===0)status=spentToday>allowToday?'over':'on';else if(ratio>1.08)status='over';else if(ratio<.85)status='under';
@@ -515,43 +697,42 @@ function calc(T){
 }
 
 /* ===================== COMPANION BRAIN (local, offline) ===================== */
+function planText(k){const p=S.plans[k];if(!p)return '';const pl=(p.places||[]).map(id=>placeById(id)).filter(Boolean).map(x=>x.n);return [p.title,pl.length?pl.join(' → '):'',p.note].filter(Boolean).join(' · ')}
 function brief(c){
-  const name=S.name||'mate';
-  const hr=new Date().getHours();
-  const greet=hr<11?'Morning':hr<17?'Arvo':'Evening';
+  const name=S.name||'mate';const hr=new Date().getHours();const greet=hr<11?'Morning':hr<17?'Arvo':'Evening';
   if(!S.budget)return `Set your budget in ⚙️ and I'll start doing the maths for you.`;
-  if(c.pre){const h=Math.max(0,Math.round((new Date(S.start+'T08:00:00')-Date.now())/36e5));return `${greet} ${name}. Wheels up in about **${h} hours**. Your pot is **${aud(c.pot)}** after the ${aud(S.buffer)} buffer${c.fixedSum?` and ${aud(c.fixedSum)} committed`:''} — that's **${aud(c.base)} a day** (${idr(toIdr(c.base))}) across ${c.n} days.\n\nTonight: passport, cards, a bit of AUD cash to swap at a proper money changer (not the airport counter), and download offline maps. First stop tomorrow is a SIM at LOP, then Kuta.\n\n${ITIN[0]?'**Day 1:** '+ITIN[0][0]+' — '+ITIN[0][1]:''}`}
-  if(c.post)return `Welcome home ${name} 🏠. You landed with **${aud(c.remaining)}** of the pot left${c.remaining>=0?' — buffer untouched. Clean trip.':', which ate '+aud(-c.remaining)+' of your buffer.'} Total spent: ${aud(c.spentTotal)} over ${c.n} days (${aud(c.spentTotal/c.n)}/day).`;
-  const dayNo=c.idx+1;
-  const lines=[];
+  const it=ITIN();
+  if(c.pre){const h=Math.max(0,Math.round((new Date(S.start+'T08:00:00')-Date.now())/36e5));return `${greet} ${name}. Wheels up in about **${h} hours**. Your pot is **${aud(c.pot)}** after the ${aud(S.buffer)} buffer${c.fixedSum?` and ${aud(c.fixedSum)} committed`:''} — that's **${aud(c.base)} a day** (${idr(toIdr(c.base))}) across ${c.n} days.\n\nTonight: passport, cards, some cash to swap at a proper money changer (not the airport counter), and tap ⬇︎ Offline on the Map tab while you've got wifi so the island map works with no signal.\n\n${it[0]?'**Day 1:** '+it[0][0]+' — '+it[0][1]:''}`}
+  if(c.post)return `Welcome home ${name} 🏠. You landed with **${aud(c.remaining)}** of the pot left${c.remaining>=0?' — buffer untouched. Clean trip.':', which ate '+aud(-c.remaining)+' of your buffer.'} Total spent: ${aud(c.spentTotal)} over ${c.n} days (${aud(c.spentTotal/c.n)}/day). Export your journal story and keep it.`;
+  const dayNo=c.idx+1;const lines=[];
   lines.push(`${greet} ${name}. **Day ${dayNo} of ${c.n}** — ${c.daysLeft} day${c.daysLeft>1?'s':''} to go.`);
   lines.push(`Pot: **${aud(c.remaining)}** (${idr(toIdr(c.remaining))}). Safe today: **${aud(c.allowToday)}** ≈ ${idr(toIdr(c.allowToday))}.`);
   if(c.spentToday>0){
     if(c.leftToday>=0)lines.push(`You've spent ${aud(c.spentToday)} so far — **${aud(c.leftToday)}** (${idr(toIdr(c.leftToday))}) still in play.`);
-    else lines.push(`You're **${aud(-c.leftToday)} over** today's number. Not a drama — tomorrow's allowance will re-spread to **${aud(Math.max(0,(c.remaining-ovFuture(c))/(Math.max(1,c.daysLeft-1))))}**. Cheap day tomorrow: warungs + beach, no boats.`);
+    else lines.push(`You're **${aud(-c.leftToday)} over** today's number. Not a drama — tomorrow re-spreads to about **${aud(Math.max(0,(c.remaining-ovFuture(c))/(Math.max(1,c.daysLeft-1))))}**. Cheap day tomorrow: warungs + beach, no boats.`);
   }
   if(c.completed>0){
-    const d=c.avg-c.paceRef;
-    if(c.status==='over')lines.push(`Pace check: you're averaging **${aud(c.avg)}/day** vs ${aud(c.paceRef)} needed. Keep that up and you'd land on the ${ord(+S.end.slice(-2))} with **${aud(c.endPace)}** — ${c.endPace<0?'into the buffer by '+aud(-c.endPace):'tight but alive'}. One cheap day resets it.`);
-    else if(c.status==='under')lines.push(`Pace check: averaging **${aud(c.avg)}/day**, under the ${aud(c.paceRef)} line. At this pace you finish with **${aud(c.endPace)}** spare — that's a Rinjani/boat day you can say yes to.`);
-    else lines.push(`Pace check: **${aud(c.avg)}/day**, bang on. At this pace you land with about **${aud(c.endPace)}** left on top of the buffer.`);
+    if(c.status==='over')lines.push(`Pace check: averaging **${aud(c.avg)}/day** vs ${aud(c.paceRef)} needed. Keep that up and you'd land on the ${ord(+S.end.slice(-2))} with **${aud(c.endPace)}** — ${c.endPace<0?'into the buffer by '+aud(-c.endPace):'tight but alive'}. One cheap day resets it.`);
+    else if(c.status==='under')lines.push(`Pace check: **${aud(c.avg)}/day**, under the ${aud(c.paceRef)} line. At this pace you finish with **${aud(c.endPace)}** spare — that's a dive or a boat day you can say yes to.`);
+    else lines.push(`Pace check: **${aud(c.avg)}/day**, bang on. At this pace you land with about **${aud(c.endPace)}** on top of the buffer.`);
   }
-  const it=ITIN[Math.min(c.idx,ITIN.length-1)];
-  if(it)lines.push(`**Today's idea:** ${it[0]} — ${it[1]}`);
-  const cashA=toAud(c.cashIdr);
-  if(c.cashIdr<0)lines.push(`💵 Pocket shows ${idr(c.cashIdr)} — log the rupiah you brought or swapped under **Cash in** and I'll track it properly.`);
-  else if(c.cashIdr<150000&&S.tx.some(t=>t.type==='atm'))lines.push(`💵 Cash is low (${idr(c.cashIdr)}). Hit a BCA/Mandiri ATM in a bank branch, pull Rp 2–2.5M at once to save on fees.`);
-  else if(c.cashIdr>0)lines.push(`💵 Cash in pocket ≈ ${idr(c.cashIdr)} (${aud(cashA)}).`);
+  const pt=planText(c.cur);
+  if(pt)lines.push(`**Today's plan:** ${pt}`);
+  else if(it[c.idx])lines.push(`**Today's idea:** ${it[c.idx][0]} — ${it[c.idx][1]}`);
+  if(c.cashIdr<0)lines.push(`💵 Pocket shows ${idr(c.cashIdr)} — log the cash you brought or swapped under **Cash in** and I'll track it properly.`);
+  else if(c.cashIdr<toIdr(12)&&S.tx.some(t=>t.type==='atm'))lines.push(`💵 Cash is low (${idr(c.cashIdr)}). ${isID()?'ATMs on the island run dry — pull Rp 2–2.5M at a bank ATM on the mainland when you can.':'Top up at a bank ATM when you pass one.'}`);
+  else if(c.cashIdr>0)lines.push(`💵 Cash in pocket ≈ ${idr(c.cashIdr)} (${aud(toAud(c.cashIdr))}).`);
+  if(!S.journal.some(j=>j.d===c.cur)&&hr>=17)lines.push(`📓 No journal entry today yet — two lines before bed is enough.`);
   return lines.join('\n\n');
 }
 function ovFuture(c){return c.days.slice(c.idx+1).filter(k=>S.dayPlan[k]!=null).reduce((a,k)=>a+S.dayPlan[k],0)}
 function parseDateQ(q){
   const c=calc();
-  let m=q.match(/\b(\d{1,2})(st|nd|rd|th)?\b(?:\s*(?:of\s*)?(oct|october|nov|november))?/i);
   if(/tomorrow/i.test(q))return addDays(c.cur,1);
   if(/day after/i.test(q))return addDays(c.cur,2);
   if(/end|last day|home|finish/i.test(q))return S.end;
-  if(m){const d=+m[1];if(d>=1&&d<=31){const mo=S.end.slice(0,7);let k=mo+'-'+String(d).padStart(2,'0');if(k<S.start)k=S.start.slice(0,7)+'-'+String(d).padStart(2,'0');if(c.days.includes(k))return k}}
+  const m=q.match(/\b(\d{1,2})(st|nd|rd|th)?\b/);
+  if(m){const d=+m[1];if(d>=1&&d<=31){let k=S.end.slice(0,7)+'-'+String(d).padStart(2,'0');if(k<S.start)k=S.start.slice(0,7)+'-'+String(d).padStart(2,'0');if(c.days.includes(k))return k}}
   const w=q.match(/\bin\s+(\d+)\s+days?/i);if(w)return addDays(c.cur,+w[1]);
   return null;
 }
@@ -560,50 +741,56 @@ function localAnswer(q){
   if(!S.budget)return 'Set your budget first (⚙️ top right) and I can start crunching.';
   const dk=parseDateQ(q);
   if(dk&&/(have|left|balance|much|by|on the|remain)/.test(L)){
-    const p=c.plan[dk]??c.remaining,pc=c.pace[dk]??c.remaining;
-    return `**${fmtD(dk)}** (end of day):\n• On plan: **${aud(p)}** (${idr(toIdr(p))})\n• At your current pace (${aud(c.avg)}/day): **${aud(pc)}**\n\nThat's ${dayDiff(c.cur,dk)} day${dayDiff(c.cur,dk)===1?'':'s'} from now, with ${c.daysLeft-dayDiff(c.cur,dk)-1} day${c.daysLeft-dayDiff(c.cur,dk)-1===1?'':'s'} still to fund after it. Your ${aud(S.buffer)} buffer sits on top of both numbers.`;
+    const p=c.plan[dk]??c.remaining,pc=c.pace[dk]??c.remaining;const dd=dayDiff(c.cur,dk);const after=c.daysLeft-dd-1;
+    return `**${fmtD(dk)}** (end of day):\n• On plan: **${aud(p)}** (${idr(toIdr(p))})\n• At your current pace (${aud(c.avg)}/day): **${aud(pc)}**\n\nThat's ${dd} day${dd===1?'':'s'} from now, with ${after} day${after===1?'':'s'} still to fund after it. Your ${aud(S.buffer)} buffer sits on top of both numbers.`;
   }
   if(/(left|remain|balance|pot|how much (do i|have))/.test(L)&&!/today/.test(L))return `**${aud(c.remaining)}** left in the pot (${idr(toIdr(c.remaining))}), plus your ${aud(S.buffer)} buffer untouched. Spent so far: ${aud(c.spentTotal)} over ${c.completed} full day${c.completed===1?'':'s'}${c.spentToday?` + ${aud(c.spentToday)} today`:''}.`;
-  if(/(today|spend now|safe|allowance|can i spend)/.test(L))return `Safe today: **${aud(c.allowToday)}** (${idr(toIdr(c.allowToday))}). Spent ${aud(c.spentToday)} → **${aud(c.leftToday)}** ${c.leftToday>=0?'still in play':'over, so tomorrow re-spreads a little lower'}.`;
+  if(/(today|spend now|safe|allowance|can i spend)/.test(L)&&!/(do|plan|where)/.test(L))return `Safe today: **${aud(c.allowToday)}** (${idr(toIdr(c.allowToday))}). Spent ${aud(c.spentToday)} → **${aud(c.leftToday)}** ${c.leftToday>=0?'still in play':'over, so tomorrow re-spreads a little lower'}.`;
   if(/(pace|track|doing|on target|average|avg)/.test(L))return c.completed?`Average **${aud(c.avg)}/day** vs ${aud(c.paceRef)} needed from here. Status: **${c.status==='over'?'over pace':c.status==='under'?'under pace':'on track'}**. Land on the ${ord(+S.end.slice(-2))} with about **${aud(c.endPace)}** at this pace, or ${aud(c.endPlan)} on plan.`:`First day — no pace yet. Spend today and I'll have a read on you tomorrow.`;
-  if(/(cash|atm|withdraw)/.test(L))return `Cash in pocket ≈ **${idr(c.cashIdr)}** (${aud(toAud(c.cashIdr))}). ATM tips: use bank-branch ATMs (BCA, Mandiri, BNI), decline the ATM's conversion ("without conversion" = your bank's better rate), pull Rp 2–2.5M at once to save fees, and log it here under ATM so the pocket count stays right.`;
-  if(/(gili)/.test(L))return `**Gilis:** public boat from Bangsal Rp20–40k (fast boat Rp85–150k). Trawangan = party + bikes + sunset swings; Air = the sweet spot; Meno = quiet + turtles. Snorkel trip Rp150–250k, bike Rp50–80k/day. Nights cost more there (Rp400k–1M), so budget a Gili day at about **${aud(c.base*1.4)}** and set it as an override in Plan.`;
-  if(/(rinjani|trek|volcano)/.test(L))return `**Rinjani:** crater-rim 2D/1N from Senaru or Sembalun, Rp2.5–3.5M (≈ ${aud(toAud(3e6))}) all-in with a registered operator. ${c.fixedSum?'Check it\'s in your committed costs if you already paid a deposit.':'If you do it, add it as a committed cost so your daily allowance recalculates honestly.'} Not trekking? Sendang Gile + Tiu Kelep waterfalls at Senaru are Rp50k + a guide.`;
-  if(/(eat|food|warung|dinner|lunch|breakfast)/.test(L))return `Warung meal Rp25–45k (nasi goreng, ayam taliwang, plecing kangkung — the Lombok classics). Cafe/western Rp80–150k. Bintang Rp35–50k, coffee Rp25–40k. Eat where the locals eat and a day's food is under **${aud(toAud(150000))}**.`;
-  if(/(scooter|bike|transport|taxi|grab|airport)/.test(L))return `Scooter Rp75–100k/day (less by the week), petrol ~Rp10–13k/L (a fill is ~Rp40–50k). Grab/Gojek works around Mataram/Senggigi/Kuta for short rides Rp15–40k; airport→Kuta taxi Rp150–250k. Always wear the helmet — the police checkpoints near Kuta are real.`;
-  if(/(where|go|do|plan|tomorrow|itinerary|next|suggest|idea)/.test(L)){const k=/tomorrow/.test(L)?Math.min(c.idx+1,ITIN.length-1):c.idx;const it=ITIN[Math.max(0,k)];return `**${/tomorrow/.test(L)?'Tomorrow':'Today'} (Day ${k+1}):** ${it[0]} — ${it[1]}\n\nAllowance for it: **${aud(c.allow(c.days[k]||c.cur))}**. Want more? Ask me about Kuta, Pink Beach, Tetebatu, Rinjani, the Gilis, Senggigi, Sekotong or the Sasak villages.`}
-  if(/(tip|haggl|scam|safe|money changer|exchange)/.test(L))return `Money rules for Lombok: 1) Use authorised money changers (green PT sign) or bank ATMs — never the street "best rate" guys. 2) Decline ATM conversion. 3) Haggle kindly at markets, never at warungs. 4) Carry small notes (Rp 2k/5k/10k) for parking and temples. 5) Keep Rp 300k cash aside for the last airport run.`;
-  const spot=GUIDE.find(g=>L.includes(g[1].toLowerCase().split(' ')[0]));
-  if(spot)return `**${spot[1]}** — ${spot[2]}\n\n💰 ${spot[3]}`;
-  return `Here's where you stand: **${aud(c.remaining)}** in the pot, **${aud(c.allowToday)}** safe today, ${c.daysLeft} days left. Ask me "how much will I have on the 18th", "what should I do tomorrow", "where's my money going", or about any spot — Kuta, Gilis, Rinjani, Tetebatu, Pink Beach.`;
+  if(/(cash|atm|withdraw)/.test(L))return `Cash in pocket ≈ **${idr(c.cashIdr)}** (${aud(toAud(c.cashIdr))}). ATM tips: use bank ATMs, decline the ATM's own conversion ("without conversion" = your bank's better rate), withdraw bigger amounts less often to save fees, and log it under Cash in so the pocket count stays right.`;
+  if(/(where|go|do|plan|tomorrow|itinerary|next|suggest|idea)/.test(L)){const k=/tomorrow/.test(L)?Math.min(c.idx+1,c.n-1):c.idx;const dk2=c.days[Math.max(0,k)];const pt=planText(dk2);const it=ITIN()[Math.max(0,k)];return `**${/tomorrow/.test(L)?'Tomorrow':'Today'} (Day ${k+1}):** ${pt||(it?it[0]+' — '+it[1]:'nothing planned yet — open the Map tab, tap places and add them to the day.')}\n\nAllowance for it: **${aud(c.allow(dk2||c.cur))}**.${isID()?' Ask me about the Gilis, Bangsal boats, Kuta, Rinjani or the Sasak villages.':''}`}
+  if(isID()){
+    if(/(gili|meno|trawangan)/.test(L))return `**Gilis:** hopping boat between islands Rp35–50k (~9am and ~4pm), public boat to Bangsal Rp15–25k mornings. Meno = turtles + statues + quiet; Trawangan = bikes, sunset swings, night market; Air = the sweet spot. Snorkel trip Rp150–200k. Budget a Gili day at about **${aud(c.base*1.4)}** and set it as an override in Plan.`;
+    if(/(rinjani|trek|volcano)/.test(L))return `**Rinjani:** crater-rim 2D/1N from Senaru or Sembalun, Rp2.5–3.5M (≈ ${aud(toAud(3e6))}) all-in with a registered operator. Add it as a committed cost so the daily allowance recalculates honestly. Not trekking? Sendang Gile + Tiu Kelep waterfalls at Senaru, Rp50k + a guide.`;
+    if(/(eat|food|warung|dinner|lunch|breakfast)/.test(L))return `Warung meal Rp25–45k (nasi goreng, ayam taliwang, plecing kangkung — the Lombok classics). Cafe/western Rp80–150k. Bintang Rp40–50k, coffee Rp25–40k, coconut Rp20–30k. Eat where the locals eat and a day's food is under **${aud(toAud(150000))}**. Say "tidak pedas" if you can't handle the chilli.`;
+    if(/(scooter|bike|transport|taxi|grab|airport|boat|bangsal)/.test(L))return `Gili Air has no motor vehicles — bike Rp50–70k/day or walk (90-min loop). Public boat to Bangsal Rp15–25k (mornings, leaves when full), charter Rp250–350k. Bangsal ⇄ airport taxi ~Rp350–450k, shared shuttle Rp150–200k. On the mainland: scooter Rp75–100k/day, petrol ~Rp12k/L, Grab works around Mataram/Senggigi/Kuta.`;
+    if(/(tip|haggl|scam|money changer|exchange)/.test(L))return `Money rules: 1) authorised money changers (green PT sign) or bank ATMs — never the street "best rate" guys. 2) Decline ATM conversion. 3) Haggle kindly at markets, never at warungs. 4) Carry small notes (Rp 2k/5k/10k). 5) Keep Rp 500k cash for the last boat + taxi.`;
+    const spot=GUIDE_ID.find(g=>L.includes(g[1].toLowerCase().split(' ')[0]));
+    if(spot)return `**${spot[1]}** — ${spot[2]}\n\n💰 ${spot[3]}`;
+  }
+  return `Here's where you stand: **${aud(c.remaining)}** in the pot, **${aud(c.allowToday)}** safe today, ${c.daysLeft} days left. Ask me "how much will I have on the 18th", "what should I do tomorrow", "where's my money going", or about any spot.`;
 }
 function contextReport(){
   const c=calc();
   const catLines=Object.entries(c.cats).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`${CATN[k]?CATN[k][2]:k} ${aud(v)}`).join(', ')||'nothing yet';
-  const dayLines=c.days.map((k,i)=>`${k} (day ${i+1})${k===c.cur?' <TODAY>':''}: ${k<=c.cur?'spent '+aud(c.spentOf(k)):'allow '+aud(c.allow(k))}${S.dayPlan[k]!=null?' [override]':''}${c.plan[k]!=null?' → plan-end '+aud(c.plan[k])+' / pace-end '+aud(c.pace[k]):''}`).join('\n');
+  const dayLines=c.days.map((k,i)=>`${k} (day ${i+1})${k===c.cur?' <TODAY>':''}: ${k<=c.cur?'spent '+aud(c.spentOf(k)):'allow '+aud(c.allow(k))}${S.dayPlan[k]!=null?' [override]':''}${c.plan[k]!=null?' → plan-end '+aud(c.plan[k])+' / pace-end '+aud(c.pace[k]):''}${planText(k)?' | PLAN: '+planText(k):''}`).join('\n');
   const recent=S.tx.slice(-25).map(t=>`${t.d} ${t.type}${t.cat?' '+t.cat:''} ${idrFull(t.idr)} (${aud(t.aud,true)}) ${t.pay||''} ${t.note||''}`).join('\n')||'none';
   const fixed=S.fixed.map(f=>`${f.name} ${aud(f.amt)}`).join(', ')||'none';
-  return `TRAVELLER: ${S.name}. Trip: Lombok, Indonesia, ${S.start} to ${S.end} (${c.n} days). Today: ${c.T} (${c.pre?'PRE-TRIP':c.post?'TRIP OVER':'day '+(c.idx+1)+' of '+c.n}). Local time now: ${new Date().toLocaleString('en-AU')}.
-RATE: 1 AUD = ${S.rate} IDR.
+  const jr=S.journal.slice(-6).map(j=>`${j.d} ${j.mood||''} ${j.title||''}: ${(j.text||'').slice(0,240)}`).join('\n')||'none';
+  const pins=S.pins.map(p=>`${p.n} (${p.c})${p.note?' — '+p.note:''}`).join('; ')||'none';
+  return `TRAVELLER: ${S.name}. Trip: ${S.dest}, ${S.start} to ${S.end} (${c.n} days). Today: ${c.T} (${c.pre?'PRE-TRIP':c.post?'TRIP OVER':'day '+(c.idx+1)+' of '+c.n}). Local time now: ${new Date().toLocaleString('en-AU')}.
+CURRENCIES: home ${S.home}, local ${S.local}. RATE: 1 ${S.home} = ${S.rate} ${S.local}.
 BUDGET: total ${aud(S.budget)} + top-ups ${aud(c.topups)} = ${aud(c.budgetEff)}. Buffer kept aside ${aud(S.buffer)}. Committed costs ${aud(c.fixedSum)} (${fixed}). Spendable pot ${aud(c.pot)}.
 NOW: spent total ${aud(c.spentTotal)}; remaining pot ${aud(c.remaining)} (${idrFull(toIdr(c.remaining))}); days left incl today ${c.daysLeft}; allowance today ${aud(c.allowToday)} (${idrFull(toIdr(c.allowToday))}); spent today ${aud(c.spentToday)}; left today ${aud(c.leftToday)}; average per completed day ${aud(c.avg)} over ${c.completed} days; even-split needed ${aud(c.paceRef)}/day; status ${c.status}.
 PROJECTION end of trip: on plan ${aud(c.endPlan)}, at current pace ${aud(c.endPace)} (both exclude the buffer).
 CASH IN POCKET: ${idrFull(c.cashIdr)} (${aud(toAud(c.cashIdr))}).
 BY CATEGORY: ${catLines}.
-DAY TABLE:\n${dayLines}
+DAY TABLE (with the traveller's own day plans where set):\n${dayLines}
 RECENT ENTRIES:\n${recent}
-SUGGESTED 14-DAY FLOW (day: title — notes):\n${ITIN.map((it,i)=>`day ${i+1} ${c.days[i]||''}: ${it[0]} — ${it[1]}`).join('\n')}
-LOMBOK GUIDE (rough 2026 prices):\n${GUIDE.map(g=>`${g[1]}: ${g[2]} Costs: ${g[3]}`).join('\n')}`;
+JOURNAL (latest):\n${jr}
+TRAVELLER'S OWN MAP PINS: ${pins}
+${isID()?`SUGGESTED FLOW (day: title — notes):\n${ITIN_ID.map((it,i)=>`day ${i+1} ${c.days[i]||''}: ${it[0]} — ${it[1]}`).join('\n')}\nGUIDE (rough 2026 prices):\n${GUIDE_ID.map(g=>`${g[1]}: ${g[2]} Costs: ${g[3]}`).join('\n')}\nISLAND NOTES:\n${ISLAND_ID.map(g=>g[1]+': '+g[2]).join('\n')}\nMAP PLACES ON GILI AIR (name|type): ${POIS.filter(p=>p.c!=='stay').slice(0,160).map(p=>p.n+'|'+p.c).join('; ')}`:''}`;
 }
 
 /* ===================== RENDER ===================== */
 let view='today';
-function setView(v){view=v;$$('.view').forEach(e=>e.classList.toggle('on',e.id==='v-'+v));$$('.nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));window.scrollTo({top:0});if(v==='ai')setTimeout(()=>{const ch=$('#chat');ch.scrollIntoView({block:'end'})},50);if(v==='plan')renderPlan()}
+function setView(v){view=v;$$('.view').forEach(e=>e.classList.toggle('on',e.id==='v-'+v));$$('.nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));window.scrollTo({top:0});if(v==='ai')setTimeout(()=>{const ch=$('#chat');ch.lastElementChild&&ch.lastElementChild.scrollIntoView({block:'end'})},50);if(v==='plan')renderPlan();if(v==='map')initMap();if(v==='journal')renderJournal();if(v==='tr')renderPhrases()}
 function render(){
   const c=calc();
+  $('#hDest').textContent='🌴 '+(S.dest||'Trip').split(',')[0];
   $('#hDates').textContent=`${fmtD(S.start,true).split(' ')[1]}–${fmtD(S.end,true).split(' ')[1]} ${new Date(S.end+'T12:00:00').toLocaleDateString('en-AU',{month:'short'})}`;
   $('#hDay').innerHTML=c.pre?`Flies out <em>${fmtD(S.start)}</em>`:c.post?`Home 🏠 <em>trip done</em>`:`Day <em>${c.idx+1}</em> of ${c.n}`;
-  $('#potLeft').innerHTML=aud(c.remaining)+`<small>AUD</small>`;
+  $('#potLeft').innerHTML=aud(c.remaining)+`<small>${S.home}</small>`;
   $('#potLeftIdr').textContent=idrFull(toIdr(c.remaining))+' · buffer '+aud(S.buffer)+' kept aside';
   $('#allowToday').textContent=aud(c.allowToday);$('#allowTodayIdr').textContent=idrFull(toIdr(c.allowToday));
   $('#spentToday').textContent=aud(c.spentToday);
@@ -616,19 +803,21 @@ function render(){
   $('#endProj').className='v sm '+((c.completed?c.endPace:c.endPlan)<0?'ov':'');
   const p=$('#paceP');const st=c.completed===0&&!c.pre?{t:'Day one',k:'info'}:c.pre?{t:'Pre-trip',k:'info'}:c.status==='over'?{t:'Over pace',k:'bad'}:c.status==='under'?{t:'Under pace',k:'good'}:{t:'On track',k:'good'};p.textContent=st.t;p.className='pill '+st.k;
   $('#brief').innerHTML=md(brief(c));
-  // quick
-  $('#quick').innerHTML=QUICK.map((q,i)=>`<button class="qk" data-q="${i}"><div class="e">${q[1]}</div><div class="t">${q[0]}</div><div class="p">${idr(q[3])}</div></button>`).join('');
-  // today list
+  const Q=QUICK();$('#quick').innerHTML=Q.map((q,i)=>`<button class="qk" data-q="${i}"><div class="e">${q[1]}</div><div class="t">${q[0]}</div><div class="p">${q[3]?idr(q[3]):'&nbsp;'}</div></button>`).join('');
+  $('#quickNote').textContent=isID()?'Tap to log at a typical price — adjust the amount in the sheet. Prices are rough 2026 guides.':'Tap a category to start a spend.';
   const tl=S.tx.filter(t=>t.d===c.cur).sort((a,b)=>b.ts-a.ts);
   $('#todayList').innerHTML=tl.length?tl.map(txRow).join(''):'<div class="tiny">Nothing logged today yet. Quick-add above or hit Log.</div>';
-  $('#cashIdr').textContent=idrFull(c.cashIdr);$('#cashAud').textContent='≈ '+aud(toAud(c.cashIdr))+' · cash in (ATM/changer/brought) minus cash spends';
-  document.title=`Lombok · ${aud(c.remaining)} left`;
+  $('#cashIdr').textContent=idrFull(c.cashIdr);$('#cashAud').textContent='≈ '+aud(toAud(c.cashIdr))+' · cash in minus cash spends';
+  const pk=c.cur;const pl=S.plans[pk];const it=ITIN()[c.idx];
+  $('#todayPlan').innerHTML=pl&&((pl.places||[]).length||pl.title||pl.note)?placeListHTML(pk,false):(it?`<div class="tiny"><b style="color:var(--text)">Idea: ${esc(it[0])}</b><br>${esc(it[1])}<br><span style="color:var(--aqua)">Open the Map tab and tap places to build the real plan.</span></div>`:'<div class="tiny">Nothing planned. Open the Map tab and add places to today.</div>');
+  $$('.hcur').forEach(e=>e.textContent=S.home);$$('.lcur').forEach(e=>e.textContent=S.local);
+  document.title=`${(S.dest||'Trip').split(',')[0]} · ${aud(c.remaining)} left`;
   renderLog();
   if(view==='plan')renderPlan();
 }
 function txRow(t){
   const cat=t.type==='atm'?['atm','🏧','Cash in']:t.type==='in'?['in','💰','Money in']:(CATN[t.cat]||CATN.other);
-  const sub=t.type==='atm'?`cash out${t.fee?' · fee '+idr(t.fee):''}`:(t.note||cat[2])+(t.pay?' · '+t.pay:'');
+  const sub=t.type==='atm'?`cash in${t.fee?' · fee '+idr(t.fee):''}`:(t.note||cat[2])+(t.pay?' · '+t.pay:'');
   const cls=t.type==='in'?'a in':'a';
   const amt=t.type==='in'?'+'+aud(t.aud,true):t.type==='atm'?idr(t.idr):'−'+aud(t.aud,true);
   const sub2=t.type==='atm'?aud(t.aud):idrFull(t.idr);
@@ -641,45 +830,33 @@ function renderLog(){
 }
 function renderPlan(){
   const c=calc();
-  // chart
-  const W=520,H=230,pl=44,pr=12,pt=14,pb=30;
-  const keys=c.days;const vals=[];
-  keys.forEach(k=>{if(c.plan[k]!=null){vals.push(c.plan[k],c.pace[k])}});
-  vals.push(c.pot,0,-S.buffer);
-  const past=keys.filter(k=>k<c.cur);let run=c.pot;const hist={};past.forEach(k=>{run-=c.spentOf(k);hist[k]=run});
-  Object.values(hist).forEach(v=>vals.push(v));
+  const W=520,H=230,pl=44,pr=12,pt=14,pb=30;const keys=c.days;const vals=[];
+  keys.forEach(k=>{if(c.plan[k]!=null){vals.push(c.plan[k],c.pace[k])}});vals.push(c.pot,0,-S.buffer);
+  const past=keys.filter(k=>k<c.cur);let run=c.pot;const hist={};past.forEach(k=>{run-=c.spentOf(k);hist[k]=run});Object.values(hist).forEach(v=>vals.push(v));
   const mn=Math.min(...vals),mx=Math.max(...vals);const span=(mx-mn)||1;
   const X=i=>pl+i*(W-pl-pr)/Math.max(1,keys.length-1), Y=v=>pt+(mx-v)/span*(H-pt-pb);
   const line=(obj,color,dash)=>{const pts=keys.map((k,i)=>obj[k]!=null?[X(i),Y(obj[k])]:null).filter(Boolean);if(pts.length<2)return'';return `<path d="M${pts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join('L')}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" ${dash?'stroke-dasharray="5 4"':''}/>`};
-  // history line from pot through past days to today's start
-  const histObj=Object.assign({},hist);const startObj={};startObj[keys[0]]=c.pot;
-  let histPath='';{const pts=[[X(0)-0,Y(c.pot)]];past.forEach((k,i)=>pts.push([X(i),Y(hist[k])]));if(!c.pre){pts.push([X(c.idx),Y(c.remaining)])}
-    // shift: the start point should be at x of day0 but value pot; past day i end-of-day at X(i) — fine visually
-    histPath=pts.length>1?`<path d="M${pts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join('L')}" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`:''}
+  let histPath='';{const pts=[[X(0),Y(c.pot)]];past.forEach((k,i)=>pts.push([X(i),Y(hist[k])]));if(!c.pre)pts.push([X(c.idx),Y(c.remaining)]);histPath=pts.length>1?`<path d="M${pts.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join('L')}" fill="none" stroke="var(--text)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>`:''}
   const ticks=[];for(let i=0;i<=4;i++){const v=mn+span*i/4;ticks.push(`<g><line x1="${pl}" x2="${W-pr}" y1="${Y(v)}" y2="${Y(v)}" stroke="rgba(255,255,255,.07)"/><text x="${pl-6}" y="${Y(v)+4}" text-anchor="end" font-size="10" fill="var(--muted)">${aud(v)}</text></g>`)}
   const xl=keys.map((k,i)=>(i%2===0||i===keys.length-1)?`<text x="${X(i)}" y="${H-10}" text-anchor="middle" font-size="10" fill="${k===c.cur?'var(--coral)':'var(--muted)'}" font-weight="${k===c.cur?'800':'400'}">${+k.slice(-2)}</text>`:'').join('');
   const todayLine=c.pre||c.post?'':`<line x1="${X(c.idx)}" x2="${X(c.idx)}" y1="${pt}" y2="${H-pb}" stroke="var(--coral)" stroke-dasharray="3 3" opacity=".7"/>`;
   const zero=`<line x1="${pl}" x2="${W-pr}" y1="${Y(0)}" y2="${Y(0)}" stroke="var(--sun)" stroke-width="1.5" opacity=".8"/>`;
   const dots=keys.map((k,i)=>`<circle data-i="${i}" cx="${X(i)}" cy="${Y(c.plan[k]??hist[k]??c.pot)}" r="12" fill="transparent"/>`).join('');
-  $('#viz').innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Projected balance by day">${ticks.join('')}${zero}${todayLine}${histPath}${line(c.plan,'var(--plan)')}${line(c.pace,'var(--pace)',true)}${dots}</svg><div class="tip" id="vtip"></div>`;
-  $('#vizNote').textContent=c.pre?`Plan line spends ${aud(c.base)}/day and lands on $0 with your ${aud(S.buffer)} buffer intact.`:`White = what's actually happened. Blue = spend today's allowance each day and land at $0 (buffer intact). Orange = keep averaging ${aud(c.avg)}/day → ${aud(c.endPace)} on the ${ord(+S.end.slice(-2))}. Yellow line = $0 (buffer starts below it).`;
+  $('#viz').innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Projected balance by day">${ticks.join('')}${zero}${todayLine}${xl}${histPath}${line(c.plan,'var(--plan)')}${line(c.pace,'var(--pace)',true)}${dots}</svg><div class="tip" id="vtip"></div>`;
+  $('#vizNote').textContent=c.pre?`Plan line spends ${aud(c.base)}/day and lands on zero with your ${aud(S.buffer)} buffer intact.`:`White = what's actually happened. Blue = spend today's allowance each day and land at zero (buffer intact). Orange = keep averaging ${aud(c.avg)}/day → ${aud(c.endPace)} on the ${ord(+S.end.slice(-2))}. Yellow line = zero (buffer starts below it).`;
   const tip=$('#vtip');
-  $('#viz').onmousemove=$('#viz').ontouchstart=e=>{const t=e.target.closest('circle');if(!t){tip.style.display='none';return}const i=+t.dataset.i,k=keys[i];const r=$('#viz').getBoundingClientRect();const pe=e.touches?e.touches[0]:e;tip.style.display='block';tip.innerHTML=`<b>${fmtD(k)}</b>${k<c.cur?`<br>spent ${aud(c.spentOf(k))} · end ${aud(hist[k])}`:`<br>plan ${aud(c.plan[k])} · pace ${aud(c.pace[k])}<br>allowance ${aud(c.allow(k))}`}`;const x=Math.min(r.width-150,Math.max(0,pe.clientX-r.left-60));tip.style.left=x+'px';tip.style.top='0px'};
+  $('#viz').onmousemove=$('#viz').ontouchstart=e=>{const t=e.target.closest('circle');if(!t){tip.style.display='none';return}const i=+t.dataset.i,k=keys[i];const r=$('#viz').getBoundingClientRect();const pe=e.touches?e.touches[0]:e;tip.style.display='block';tip.innerHTML=`<b>${fmtD(k)}</b>${k<c.cur?`<br>spent ${aud(c.spentOf(k))} · end ${aud(hist[k])}`:`<br>plan ${aud(c.plan[k])} · pace ${aud(c.pace[k])}<br>allowance ${aud(c.allow(k))}`}`;tip.style.left=Math.min(r.width-150,Math.max(0,pe.clientX-r.left-60))+'px';tip.style.top='0px'};
   $('#viz').onmouseleave=()=>tip.style.display='none';
-  // ask date
   const sel=$('#askDate');const prev=sel.value;sel.innerHTML=c.days.filter(k=>k>=c.cur).map(k=>`<option value="${k}">${fmtD(k)}${k===c.cur?' (today)':''}${k===S.end?' — fly home':''}</option>`).join('');
   if(prev&&c.days.includes(prev)&&prev>=c.cur)sel.value=prev;else sel.value=S.end;
   renderAsk();
-  // day table
   $('#dayTable').innerHTML=`<tr><th>Day</th><th class="r">Budget</th><th class="r">Spent</th><th class="r">Left</th></tr>`+c.days.map((k,i)=>{const sp=c.spentOf(k);const al=c.allow(k);const isPast=k<c.cur,isT=k===c.cur;const left=al-sp;return `<tr class="${isT?'today':isPast?'past':''}"><td>${i+1} · ${fmtD(k,true)}</td><td class="r"><input data-k="${k}" value="${S.dayPlan[k]!=null?Math.round(S.dayPlan[k]):''}" placeholder="${Math.round(al)}" inputmode="numeric"></td><td class="r">${isPast||isT?aud(sp):'—'}</td><td class="r ${isPast||isT?(left<0?'ov':'un'):''}">${isPast||isT?aud(left):'—'}</td></tr>`}).join('');
   $$('#dayTable input').forEach(inp=>inp.onchange=()=>{const v=parseFloat(inp.value);if(isNaN(v)||inp.value==='')delete S.dayPlan[inp.dataset.k];else S.dayPlan[inp.dataset.k]=Math.max(0,v);save();render();renderPlan();toast('Day budget updated')});
-  // cats
   const tot=Object.values(c.cats).reduce((a,b)=>a+b,0);
-  $('#catBars').innerHTML=tot?Object.entries(c.cats).sort((a,b)=>b[1]-a[1]).map(([k,v])=>{const cc=CATN[k]||CATN.other;return `<div class="cb"><div class="k">${cc[1]} ${cc[2]}</div><div class="b"><i style="width:${v/tot*100}%"></i></div><div class="v">${aud(v)}</div></div>`}).join('')+`<div class="note">Total ${aud(tot)} · ${aud(tot/Math.max(1,c.completed+(c.spentToday?1:0)))}/day across days with spending.</div>`:'<div class="tiny">Log a few spends and the breakdown appears here.</div>';
-  // fixed
+  $('#catBars').innerHTML=tot?Object.entries(c.cats).sort((a,b)=>b[1]-a[1]).map(([k,v])=>{const cc=CATN[k]||CATN.other;return `<div class="cb"><div class="k">${cc[1]} ${cc[2]}</div><div class="b"><i style="width:${v/tot*100}%"></i></div><div class="v">${aud(v)}</div></div>`}).join('')+`<div class="note">Total ${aud(tot)}.</div>`:'<div class="tiny">Log a few spends and the breakdown appears here.</div>';
   $('#fixedList').innerHTML=S.fixed.length?S.fixed.map(f=>`<div class="kv"><span>${esc(f.name)}</span><b>${aud(f.amt)} <button class="link" data-fx="${f.id}" style="margin-left:8px;color:var(--danger)">✕</button></b></div>`).join('')+`<div class="kv"><span>Total committed</span><b>${aud(c.fixedSum)}</b></div>`:'<div class="tiny">Nothing committed yet.</div>';
-  // itin
-  $('#itin').innerHTML=ITIN.map((it,i)=>`<div class="plc"><div class="e">${i+1}</div><div><b>${esc(it[0])} <span class="tiny">· ${c.days[i]?fmtD(c.days[i],true):''}</span></b><p>${esc(it[1])}</p></div></div>`).join('')+'<div class="dayh" style="margin-top:16px"><b>Spots worth knowing</b></div>'+GUIDE.map(g=>`<div class="plc"><div class="e">${g[0]}</div><div><b>${g[1]}</b><p>${g[2]}</p><div class="c">💰 ${g[3]}</div></div></div>`).join('');
+  const G=GUIDE();$('#guideCard').style.display=G.length?'':'none';
+  $('#guide').innerHTML=G.map(g=>`<div class="plc"><div class="e">${g[0]}</div><div><b>${g[1]}</b><p>${g[2]}</p><div class="c">💰 ${g[3]}</div></div></div>`).join('');
 }
 function renderAsk(){
   const c=calc();const k=$('#askDate').value||S.end;
@@ -691,34 +868,181 @@ function renderAsk(){
 }
 
 /* ===================== LOG FORM ===================== */
-let F={type:'spend',cur:'IDR',cat:'food',pay:'cash'};
+let F={type:'spend',cur:'L',cat:'food',pay:'cash'};
 function renderCats(){$('#cats').innerHTML=CATS.map(c=>`<button class="cat ${F.cat===c[0]?'on':''}" data-c="${c[0]}"><span class="e">${c[1]}</span>${c[2]}</button>`).join('')}
-function amtVals(){const v=parseFloat(($('#amt').value||'').replace(/[^0-9.]/g,''))||0;return F.cur==='IDR'?{idr:v,aud:toAud(v)}:{idr:toIdr(v),aud:v}}
-function updCv(){const a=amtVals();$('#amtCv').textContent=F.cur==='IDR'?'≈ '+aud(a.aud,true):'≈ '+idrFull(a.idr)}
-function setType(t){F.type=t;$$('#txType button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));$('#spendFields').style.display=t==='spend'?'':'none';$('#atmFields').style.display=t==='atm'?'':'none';$('#inFields').style.display=t==='in'?'':'none';if(t==='in'&&F.cur==='IDR')setCur('AUD');if(t==='atm'&&F.cur==='AUD')setCur('IDR');$('#txSave').textContent=t==='spend'?'Save spend':t==='atm'?'Save cash in':'Add money'}
-function setCur(c){F.cur=c;$('#amtCur').textContent=c==='IDR'?'Rp':'$';$('#amt').placeholder=c==='IDR'?'35000':'10';updCv()}
+function amtVals(){const v=parseFloat(($('#amt').value||'').replace(/[^0-9.]/g,''))||0;return F.cur==='L'?{idr:v,aud:toAud(v)}:{idr:toIdr(v),aud:v}}
+function updCv(){const a=amtVals();$('#amtCv').textContent=F.cur==='L'?'≈ '+aud(a.aud,true):'≈ '+idrFull(a.idr)}
+function setType(t){F.type=t;$$('#txType button').forEach(b=>b.classList.toggle('on',b.dataset.t===t));$('#spendFields').style.display=t==='spend'?'':'none';$('#atmFields').style.display=t==='atm'?'':'none';$('#inFields').style.display=t==='in'?'':'none';if(t==='in'&&F.cur==='L')setCur('H');if(t==='atm'&&F.cur==='H')setCur('L');$('#txSave').textContent=t==='spend'?'Save spend':t==='atm'?'Save cash in':'Add money'}
+function setCur(c){F.cur=c;$('#amtCur').textContent=c==='L'?lsym().trim():hsym().trim();$('#amt').placeholder=c==='L'?(bigLocal()?'35000':'10'):'10';updCv()}
 function saveTx(){
   const a=amtVals();if(!a.idr||a.idr<=0){toast('Put an amount in');$('#amt').focus();return}
   const d=$('#txDate').value||todayKey();
-  const t={id:uid(),ts:Date.now(),d,type:F.type,idr:Math.round(a.idr),aud:+a.aud.toFixed(2),note:$('#note').value.trim()};
+  const t={id:uid(),ts:Date.now(),d,type:F.type,idr:+a.idr.toFixed(bigLocal()?0:2),aud:+a.aud.toFixed(2),note:$('#note').value.trim()};
   if(F.type==='spend'){t.cat=F.cat;t.pay=F.pay}
-  if(F.type==='atm'){t.fee=Math.round(parseFloat($('#atmFee').value)||0)}
-  S.tx.push(t);save();
-  $('#amt').value='';$('#note').value='';updCv();
+  if(F.type==='atm'){t.fee=parseFloat($('#atmFee').value)||0}
+  S.tx.push(t);save();$('#amt').value='';$('#note').value='';updCv();
   const c=calc();
   toast(F.type==='spend'?`Logged ${aud(t.aud,true)} · ${c.leftToday>=0?aud(c.leftToday)+' left today':aud(-c.leftToday)+' over today'}`:F.type==='atm'?`Pocket +${idr(t.idr)}`:`Budget +${aud(t.aud)}`);
   render();if(navigator.vibrate)navigator.vibrate(12);
 }
-function quickAdd(i){const q=QUICK[i];setView('log');setType('spend');setCur('IDR');$('#amt').value=q[3];F.cat=q[2];renderCats();$('#note').value=q[0];F.pay='cash';$$('#payWith button').forEach(b=>b.classList.toggle('on',b.dataset.p==='cash'));$('#txDate').value=todayKey();updCv();$('#amt').focus();$('#amt').select()}
+function quickAdd(i){const q=QUICK()[i];setView('log');setType('spend');setCur('L');$('#amt').value=q[3]||'';F.cat=q[2];renderCats();$('#note').value=q[3]?q[0]:'';F.pay='cash';$$('#payWith button').forEach(b=>b.classList.toggle('on',b.dataset.p==='cash'));$('#txDate').value=todayKey();updCv();$('#amt').focus();$('#amt').select()}
 function openEdit(id){const t=S.tx.find(x=>x.id===id);if(!t)return;$('#ovTx').dataset.id=id;$('#txEdH').textContent=t.type==='atm'?'Cash in':t.type==='in'?'Money in':'Edit spend';$('#eIdr').value=t.idr;$('#eAud').value=t.aud;$('#eNote').value=t.note||'';$('#eDate').value=t.d;$('#eCatWrap').style.display=t.type==='spend'?'':'none';$('#eCat').innerHTML=CATS.map(c=>`<option value="${c[0]}" ${t.cat===c[0]?'selected':''}>${c[1]} ${c[2]}</option>`).join('');$('#ovTx').classList.add('on')}
 
+/* ===================== MAP + DAY PLANNER ===================== */
+let MAP=null,MARKS=[],mapFilter='all',selDay=null,pendingPlace=null,meMark=null,pendingPin=null;
+const MAPCATS=[['all','All'],['food','🍜 Food'],['cafe','☕ Cafe'],['bar','🍹 Bars'],['dive','🤿 Snorkel/dive'],['beach','🏖️ Beach'],['stay','🛏️ Stays'],['money','🏧 Money'],['health','💊 Health'],['wellness','💆 Spa/yoga'],['boat','⛵ Boats'],['shop','🛍️ Shops'],['mine','📌 My pins'],['planned','🗓️ Planned']];
+function plannedIds(){const s=new Set();Object.values(S.plans).forEach(p=>(p.places||[]).forEach(id=>s.add(id)));return s}
+function initMap(){
+  if(!window.L){toast('Map library needs signal the first time');return}
+  if(!MAP){
+    const center=isGili()?[GILI.la,GILI.lo]:(S.mapCenter||[GILI.la,GILI.lo]);
+    MAP=L.map('map',{zoomControl:true,attributionControl:true}).setView(center,isGili()?15:13);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(MAP);
+    MAP.on('click',e=>{pendingPin=e.latlng});
+    MAP.on('contextmenu',e=>{openPin(e.latlng)});
+    if(!isGili()&&!S.mapCenter)geocodeDest();
+    setTimeout(()=>MAP.invalidateSize(),200);
+  }else setTimeout(()=>MAP.invalidateSize(),50);
+  $('#mapChips').innerHTML=MAPCATS.map(c=>`<button class="chip ${mapFilter===c[0]?'on':''}" data-mf="${c[0]}">${c[1]}</button>`).join('');
+  drawMarkers();renderDays();
+  $('#islandCard').style.display=isGili()?'':'none';
+  $('#islandGuide').innerHTML=ISLAND_ID.map(g=>`<div class="plc"><div class="e">${g[0]}</div><div><b>${g[1]}</b><p>${g[2]}</p></div></div>`).join('');
+}
+async function geocodeDest(){try{const r=await fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&q='+encodeURIComponent(S.dest));const j=await r.json();if(j[0]){S.mapCenter=[+j[0].lat,+j[0].lon];save();MAP.setView(S.mapCenter,13)}}catch(e){}}
+function drawMarkers(){
+  if(!MAP)return;MARKS.forEach(m=>m.remove());MARKS=[];
+  const q=($('#mapQ').value||'').toLowerCase();const planned=plannedIds();
+  allPlaces().forEach(p=>{
+    if(!isGili()&&!p.id.startsWith('m'))return;
+    if(mapFilter==='planned'&&!planned.has(p.id))return;
+    if(mapFilter==='all'&&p.c==='stay'&&!q&&!planned.has(p.id))return;
+    if(mapFilter!=='all'&&mapFilter!=='planned'&&p.c!==mapFilter)return;
+    if(q&&!p.n.toLowerCase().includes(q))return;
+    const ico=L.divIcon({className:'',html:`<div class="pm c-${p.c}${planned.has(p.id)?' c-planned':''}"><span>${CATE[p.c]||'📍'}</span></div>`,iconSize:[34,34],iconAnchor:[17,34],popupAnchor:[0,-30]});
+    const m=L.marker([p.la,p.lo],{icon:ico}).addTo(MAP);
+    m.bindPopup(()=>popupHTML(p));
+    MARKS.push(m);
+  });
+}
+function popupHTML(p){const c=calc();const day=S.plans[selDay||c.cur];const inDay=day&&(day.places||[]).includes(p.id);
+  return `<b>${esc(p.n)}</b><span style="color:var(--muted);font-size:12px">${CATE[p.c]||'📍'} ${esc((PIN_CATS.find(x=>x[0]===p.c)||[])[2]||p.c)}${p.cu?' · '+esc(p.cu):''}${p.note?' · '+esc(p.note):''}</span><div class="pa"><button class="p" data-addday="${p.id}">${inDay?'✓ In the plan':'＋ Add to a day'}</button><button data-jhere="${p.id}">📓 Journal</button><a href="https://www.google.com/maps/dir/?api=1&destination=${p.la},${p.lo}&travelmode=walking" target="_blank" rel="noopener"><button>🧭 Go</button></a>${p.id.startsWith('m')?`<button data-delpin="${p.id}">🗑</button>`:''}</div>`}
+function openPin(ll){pendingPin=ll;$('#pinName').value='';$('#pinNote').value='';$('#pinCat').innerHTML=PIN_CATS.map(c=>`<option value="${c[0]}">${c[1]} ${c[2]}</option>`).join('');$('#pinWhere').textContent=`At ${ll.lat.toFixed(5)}, ${ll.lng.toFixed(5)}`;$('#ovPin').classList.add('on')}
+function renderDays(){
+  const c=calc();if(!selDay||!c.days.includes(selDay))selDay=c.cur;
+  $('#dsel').innerHTML=c.days.map((k,i)=>`<button data-d="${k}" class="${k===selDay?'on':''} ${S.plans[k]&&((S.plans[k].places||[]).length||S.plans[k].title)?'has':''}"><b>${+k.slice(-2)}</b>${fmtD(k,true).split(' ')[0]}${k===c.cur?' ·':''}</button>`).join('');
+  const p=S.plans[selDay]||{};const i=c.days.indexOf(selDay);const it=ITIN()[i];
+  $('#dayPlanBox').innerHTML=`<div class="row sb" style="margin:6px 0"><b>Day ${i+1} · ${fmtD(selDay)}</b><span class="tiny">budget ${aud(c.allow(selDay))}</span></div>
+  <input class="inp" id="dpTitle" placeholder="${esc(it?it[0]:'What\'s the plan?')}" value="${esc(p.title||'')}" style="margin-bottom:8px">
+  ${placeListHTML(selDay,true)}
+  <textarea class="inp" id="dpNote" placeholder="${esc(it?it[1]:'Notes, bookings, times…')}" style="margin-top:8px;min-height:56px">${esc(p.note||'')}</textarea>
+  <div class="row" style="margin-top:8px;gap:8px">${it&&!p.title?`<button class="btn ghost sm" id="dpUseIdea">Use the suggested idea</button>`:''}<button class="btn ghost sm" id="dpClear">Clear day</button></div>
+  <div class="note">Tap any pin on the map → “Add to a day”. Reorder with ▲▼.</div>`;
+  $('#dpTitle').onchange=()=>{S.plans[selDay]=Object.assign({},S.plans[selDay]||{},{title:$('#dpTitle').value.trim()});save();renderDays();render()};
+  $('#dpNote').onchange=()=>{S.plans[selDay]=Object.assign({},S.plans[selDay]||{},{note:$('#dpNote').value.trim()});save();render()};
+  const u=$('#dpUseIdea');if(u)u.onclick=()=>{S.plans[selDay]=Object.assign({},S.plans[selDay]||{},{title:it[0],note:it[1]});save();renderDays();render()};
+  $('#dpClear').onclick=()=>{if(confirm('Clear this day\'s plan?')){delete S.plans[selDay];save();renderDays();drawMarkers();render()}};
+}
+function placeListHTML(k,editable){const p=S.plans[k]||{};const ids=p.places||[];
+  if(!ids.length&&!p.title&&!p.note)return editable?'<div class="tiny">No places yet — tap pins on the map.</div>':'';
+  const head=!editable&&p.title?`<div style="font-weight:800;margin-bottom:4px">${esc(p.title)}</div>`:'';
+  const body=ids.map((id,i)=>{const pl=placeById(id);if(!pl)return '';return `<div class="pl"><div class="e">${CATE[pl.c]||'📍'}</div><div class="m"><b>${esc(pl.n)}</b><span>${esc((PIN_CATS.find(x=>x[0]===pl.c)||[])[2]||pl.c)}${pl.note?' · '+esc(pl.note):''}</span></div>${editable?`<div class="ord"><button data-mv="${k}|${i}|-1">▲</button><button data-mv="${k}|${i}|1">▼</button></div><button class="rm" data-rmp="${k}|${id}">✕</button>`:`<a href="https://www.google.com/maps/dir/?api=1&destination=${pl.la},${pl.lo}&travelmode=walking" target="_blank" rel="noopener" class="link" style="font-size:12px">Go</a>`}</div>`}).join('');
+  const note=!editable&&p.note?`<div class="tiny" style="margin-top:6px">${esc(p.note)}</div>`:'';
+  return head+body+note;
+}
+function addToDay(k,id){const p=S.plans[k]=S.plans[k]||{};p.places=p.places||[];if(!p.places.includes(id))p.places.push(id);save();selDay=k;renderDays();drawMarkers();render();toast(`Added to Day ${calc().days.indexOf(k)+1}`);MAP&&MAP.closePopup()}
+function locate(){if(!navigator.geolocation){toast('No location on this device');return}navigator.geolocation.getCurrentPosition(pos=>{const ll=[pos.coords.latitude,pos.coords.longitude];if(meMark)meMark.remove();meMark=L.circleMarker(ll,{radius:9,color:'#fff',weight:2,fillColor:'#2DD4BF',fillOpacity:1}).addTo(MAP);MAP.setView(ll,Math.max(MAP.getZoom(),16))},()=>toast('Location blocked'),{enableHighAccuracy:true,timeout:8000})}
+async function saveMapOffline(){
+  if(!MAP)return;const b=isGili()?L.latLngBounds(GILI.bb):MAP.getBounds().pad(.3);const urls=[];
+  for(let z=13;z<=17;z++){const n=2**z;const x1=Math.floor((b.getWest()+180)/360*n),x2=Math.floor((b.getEast()+180)/360*n);const ty=lat=>Math.floor((1-Math.log(Math.tan(lat*Math.PI/180)+1/Math.cos(lat*Math.PI/180))/Math.PI)/2*n);const y1=ty(b.getNorth()),y2=ty(b.getSouth());for(let x=x1;x<=x2;x++)for(let y=y1;y<=y2;y++)urls.push(`https://tile.openstreetmap.org/${z}/${x}/${y}.png`)}
+  if(urls.length>400){toast('Area too big — zoom in to a smaller spot first');return}
+  toast(`Saving ${urls.length} map tiles…`);const cache=await caches.open('lombok-tiles');let ok=0;
+  for(const u of urls){try{const r=await fetch(u,{mode:'cors'});if(r.ok){await cache.put(u,r.clone());ok++}}catch(e){}}
+  S.mapOff=true;save();toast(`Map saved offline (${ok}/${urls.length} tiles)`);
+}
+
+/* ===================== TRANSLATE ===================== */
+let trDir='to';
+let phCat=0;
+function trLabels(){const l=langRow();$('#trHead').textContent=trDir==='to'?`English → ${l[1]}`:`${l[1]} → English`;$('#trFrom').textContent=trDir==='to'?'English':l[1];$('#trTo').textContent=trDir==='to'?l[1]:'English'}
+async function translate(){
+  const t=$('#trIn').value.trim();if(!t)return;const l=langRow();
+  $('#trGo').disabled=true;$('#trGo').textContent='Translating…';
+  let res=null;
+  if(S.lang==='id'){const norm=x=>x.toLowerCase().replace(/\(.*?\)/g,'').replace(/[^a-z ]/g,'').replace(/\s+/g,' ').trim();const L=norm(t);const alts=x=>[norm(x),...x.split('/').map(norm)];for(const [,rows] of PHRASES_ID)for(const r of rows){if(!res&&trDir==='to'&&alts(r[0]).includes(L))res={t:r[1],p:r[2],n:'From the phrasebook'};if(!res&&trDir==='from'&&alts(r[1]).includes(L))res={t:r[0],p:'',n:'From the phrasebook'}}}
+  if(!res){try{const r=await fetch('/api/ai',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({mode:'translate',text:t,from:trDir==='to'?'English':l[1],to:trDir==='to'?l[1]:'English'})});const j=await r.json();if(r.ok&&j.t)res=j;else res={t:'',p:'',n:'Live translation unavailable right now — try the phrasebook below.'}}catch(e){res={t:'',p:'',n:'No signal — the phrasebook below works offline.'}}}
+  $('#trGo').disabled=false;$('#trGo').textContent='Translate';
+  $('#trOutBox').style.display='';$('#trOut').textContent=res.t||'—';$('#trPr').textContent=res.p||'';$('#trNt').textContent=res.n||'';
+}
+function speak(text,lang){if(!('speechSynthesis' in window)){toast('No speech on this phone');return}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang=lang||langRow()[2];u.rate=.85;const vs=speechSynthesis.getVoices();const v=vs.find(x=>x.lang&&x.lang.toLowerCase().startsWith((u.lang||'').toLowerCase().slice(0,2)));if(v)u.voice=v;speechSynthesis.speak(u)}
+function renderPhrases(){
+  trLabels();
+  if(S.lang!=='id'){$('#phCats').innerHTML='';$('#phList').innerHTML=`<div class="tiny">The built-in offline phrasebook is Indonesian. For ${langRow()[1]}, use the live translator above — ask it for "the 20 phrases I need for a trip" and it'll give you a list.</div>`;return}
+  const q=($('#phQ').value||'').toLowerCase().trim();
+  $('#phCats').innerHTML=PHRASES_ID.map((c,i)=>`<button class="chip ${i===phCat&&!q?'on':''}" data-pc="${i}">${c[0]}</button>`).join('');
+  const rows=q?PHRASES_ID.flatMap(c=>c[1]).filter(r=>r[0].toLowerCase().includes(q)||r[1].toLowerCase().includes(q)):PHRASES_ID[phCat][1];
+  $('#phList').innerHTML=rows.map(r=>`<div class="ph"><div class="m" data-show="${esc(r[1])}"><b>${esc(r[0])}</b><div class="id">${esc(r[1])}</div><div class="pr">${esc(r[2])}</div></div><button class="sp" data-say="${esc(r[1])}">🔊</button></div>`).join('')||'<div class="tiny">No match — try the live translator above.</div>';
+}
+
+/* ===================== JOURNAL ===================== */
+let J={id:null,photos:[],mood:'😊'};
+async function renderJournal(){
+  const c=calc();const list=S.journal.slice().sort((a,b)=>b.d.localeCompare(a.d)||b.ts-a.ts);
+  if(!list.length){$('#jList').innerHTML='<div class="card tiny">No entries yet. Hit ✍️ New entry — or “✨ Write it for me” and the AI drafts today from your spends and plan.</div>';return}
+  const groups={};list.forEach(j=>{(groups[j.d]=groups[j.d]||[]).push(j)});
+  let html='';
+  for(const k of Object.keys(groups)){const i=c.days.indexOf(k);html+=`<div class="dayh"><b>${fmtD(k)}${i>=0?' · Day '+(i+1):''}</b><span>${aud(c.spentOf(k))} spent</span></div><div class="card">`;
+    for(const j of groups[k]){const pl=j.place?placeById(j.place):null;html+=`<div class="je" data-jid="${j.id}"><div class="t"><b>${esc(j.mood||'')} ${esc(j.title||'Untitled')}</b><span>${new Date(j.ts).toLocaleTimeString('en-AU',{hour:'numeric',minute:'2-digit'})}</span></div>${j.text?`<p>${esc(j.text)}</p>`:''}${pl?`<div class="meta">📍 ${esc(pl.n)}</div>`:''}${(j.photos||[]).length?`<div class="ph2">${j.photos.map(id=>`<img data-pid="${id}" alt="">`).join('')}</div>`:''}</div>`}
+    html+='</div>'}
+  $('#jList').innerHTML=html;
+  for(const img of $$('#jList img[data-pid]')){img.src=await photoUrl(img.dataset.pid)}
+}
+function openJournal(id){
+  const c=calc();J={id:null,photos:[],mood:'😊'};
+  $('#jPlace').innerHTML='<option value="">—</option>'+allPlaces().filter(p=>isGili()||p.id.startsWith('m')).sort((a,b)=>a.n.localeCompare(b.n)).map(p=>`<option value="${p.id}">${CATE[p.c]||'📍'} ${esc(p.n)}</option>`).join('');
+  if(id){const j=S.journal.find(x=>x.id===id);if(j){J={id:j.id,photos:(j.photos||[]).slice(),mood:j.mood||'😊'};$('#jDate').value=j.d;$('#jTitle').value=j.title||'';$('#jText').value=j.text||'';$('#jPlace').value=j.place||'';$('#jH').textContent='Edit entry';$('#jDel').style.display=''}}
+  else{$('#jDate').value=c.post?S.end:c.pre?S.start:todayKey();$('#jTitle').value='';$('#jText').value='';const tp=S.plans[$('#jDate').value];$('#jPlace').value=tp&&tp.places&&tp.places[0]||'';$('#jH').textContent='New entry';$('#jDel').style.display='none'}
+  $$('#jMoods button').forEach(b=>b.classList.toggle('on',b.dataset.m===J.mood));
+  renderJPhotos();$('#ovJ').classList.add('on');
+}
+async function renderJPhotos(){const box=$('#jPhotos');box.querySelectorAll('img').forEach(i=>i.remove());for(const id of J.photos){const img=document.createElement('img');img.src=await photoUrl(id);img.dataset.pid=id;img.title='tap to remove';img.onclick=()=>{if(confirm('Remove this photo?')){J.photos=J.photos.filter(x=>x!==id);renderJPhotos()}};box.insertBefore(img,$('#jAddPhoto'))}}
+async function addPhotos(files){for(const f of files){const b=await downscale(f);if(!b)continue;const id='ph_'+uid();await DB.put(id,b);J.photos.push(id)}renderJPhotos();toast(`${files.length} photo${files.length>1?'s':''} added`)}
+function saveJournal(){
+  const d=$('#jDate').value||todayKey();const title=$('#jTitle').value.trim(),text=$('#jText').value.trim();
+  if(!title&&!text&&!J.photos.length){toast('Write something or add a photo');return}
+  if(J.id){const j=S.journal.find(x=>x.id===J.id);Object.assign(j,{d,title,text,mood:J.mood,place:$('#jPlace').value,photos:J.photos.slice()})}
+  else S.journal.push({id:uid(),ts:Date.now(),d,title,text,mood:J.mood,place:$('#jPlace').value,photos:J.photos.slice()});
+  save();$('#ovJ').classList.remove('on');renderJournal();render();toast('Saved to your journal');
+}
+async function aiJournal(){
+  const d=$('#jDate').value||todayKey();const c=calc();const i=c.days.indexOf(d);
+  const tx=S.tx.filter(t=>t.d===d).map(t=>`${t.type} ${t.cat||''} ${idrFull(t.idr)} ${t.note||''}`).join('; ')||'no spends logged';
+  const pl=placeById($('#jPlace').value);const facts=`Date ${d} (day ${i+1} of ${c.n}) in ${S.dest}. Mood ${J.mood}. Plan for the day: ${planText(d)||'none set'}. Place: ${pl?pl.n:'not set'}. Spends: ${tx}. Notes typed so far: ${$('#jText').value.trim()||'none'}. Title so far: ${$('#jTitle').value.trim()||'none'}.`;
+  $('#jAi').textContent='✨ Writing…';
+  try{const r=await fetch('/api/ai',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({mode:'journal',facts,name:S.name})});const j=await r.json();if(r.ok&&j.text){const [first,...rest]=j.text.split('\n');if(!$('#jTitle').value.trim()&&first.length<70){$('#jTitle').value=first.replace(/^\*+|\*+$/g,'').replace(/^#+\s*/,'').trim();$('#jText').value=rest.join('\n').trim()}else $('#jText').value=j.text.trim();toast('Drafted — edit it so it sounds like you')}else toast('AI not reachable right now')}catch(e){toast('No signal for the AI')}
+  $('#jAi').textContent='✨ Write it for me';
+}
+async function exportStory(){
+  const c=calc();const list=S.journal.slice().sort((a,b)=>a.d.localeCompare(b.d)||a.ts-b.ts);
+  toast('Building your story…');
+  let body='';
+  for(const k of c.days){const es=list.filter(j=>j.d===k);const i=c.days.indexOf(k);const pt=planText(k);const sp=c.spentOf(k);
+    if(!es.length&&!pt&&!sp)continue;
+    body+=`<section><h2>Day ${i+1} <small>${fmtD(k)}</small></h2>${pt?`<p class="plan">📍 ${esc(pt)}</p>`:''}${sp?`<p class="money">${aud(sp)} spent · budget ${aud(c.allow(k))}</p>`:''}`;
+    for(const j of es){const pl=j.place?placeById(j.place):null;let ph='';for(const id of (j.photos||[])){const b=await DB.get(id);if(b)ph+=`<img src="${await blobToB64(b)}" alt="">`}body+=`<article><h3>${esc(j.mood||'')} ${esc(j.title||'')}</h3>${pl?`<p class="where">📍 ${esc(pl.n)}</p>`:''}${j.text?`<p>${esc(j.text).replace(/\n/g,'<br>')}</p>`:''}${ph?`<div class="g">${ph}</div>`:''}</article>`}
+    body+='</section>'}
+  const html=`<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(S.dest)} — ${esc(S.name)}'s trip</title><style>body{font:17px/1.6 -apple-system,Georgia,serif;max-width:720px;margin:0 auto;padding:28px 20px;background:#faf7f2;color:#1b1b1b}h1{font-size:40px;line-height:1.05;margin:0}h1+p{color:#666;margin:8px 0 30px}h2{font-size:22px;margin:36px 0 6px;border-top:2px solid #e6dfd3;padding-top:18px}h2 small{color:#888;font-weight:400;font-size:15px;margin-left:8px}h3{font-size:19px;margin:16px 0 4px}.plan,.money,.where{color:#7a6a55;font-size:14px;margin:2px 0}.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px;margin:10px 0}.g img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:10px}.sum{background:#fff;border:1px solid #e6dfd3;border-radius:14px;padding:16px 18px;margin:0 0 10px}.sum b{display:block;font-size:24px}footer{color:#999;font-size:13px;margin-top:40px}</style></head><body><h1>${esc((S.dest||'').split(',')[0])}</h1><p>${fmtD(S.start)} – ${fmtD(S.end)} · ${c.n} days · ${esc(S.name)}</p><div class="sum"><b>${aud(c.spentTotal)} spent</b> of a ${aud(c.budgetEff)} budget · ${aud(c.spentTotal/Math.max(1,c.completed+(c.spentToday?1:0)))} a day · ${S.journal.length} journal entries · ${S.journal.reduce((a,j)=>a+(j.photos||[]).length,0)} photos</div>${body}<footer>Made with Travel Companion.</footer></body></html>`;
+  const blob=new Blob([html],{type:'text/html'});const file=new File([blob],`${(S.dest||'trip').split(',')[0].replace(/\s+/g,'-').toLowerCase()}-story.html`,{type:'text/html'});
+  if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:'My trip story'});return}catch(e){}}
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=file.name;a.click();toast('Story downloaded');
+}
+
 /* ===================== CHAT ===================== */
-const CHIPS=['Morning brief','What can I spend today?','How much will I have on the 18th?','What should I do tomorrow?','Where\'s my money going?','Plan a cheap day','Tell me about the Gilis','ATM & cash tips'];
-let aiOnline=null; // null unknown, true gateway ok, false fallback
+const CHIPS=['Morning brief','What can I spend today?','Plan tomorrow for me','How much will I have on the 18th?','Where\'s my money going?','Plan a cheap day','Best snorkel spots?','ATM & cash tips'];
+let aiOnline=null;
 function renderChat(){
   $('#chips').innerHTML=CHIPS.map(c=>`<button class="chip">${c}</button>`).join('');
   const ch=$('#chat');
-  if(!S.chat.length){S.chat.push({r:'ai',t:`Hey ${S.name||'mate'} 👋 I'm your Lombok companion. I know your budget, every spend you log, and the island. Ask me anything — numbers, plans, where to eat, whether you can afford the boat.`,src:'local'})}
+  if(!S.chat.length){S.chat.push({r:'ai',t:`Hey ${S.name||'mate'} 👋 I'm your companion for ${(S.dest||'the trip').split(',')[0]}. I know your budget, every spend you log, your day plans, your journal and the place. Ask me anything — numbers, plans, where to eat, whether you can afford the boat.`,src:'local'})}
   ch.innerHTML=S.chat.map(m=>`<div class="msg ${m.r==='me'?'me':'ai'}">${md(m.t)}${m.r==='ai'?`<span class="src">${m.src==='claude'?'Claude · live':'Offline brain'}</span>`:''}</div>`).join('');
   ch.lastElementChild&&ch.lastElementChild.scrollIntoView({block:'end'});
 }
@@ -729,82 +1053,113 @@ async function ask(q){
   let ans=null,src='local';
   if(/^morning brief$/i.test(q)){ans=brief(calc());}
   else if(navigator.onLine!==false){
-    try{
-      const ctrl=new AbortController();const to=setTimeout(()=>ctrl.abort(),40000);
+    try{const ctrl=new AbortController();const to=setTimeout(()=>ctrl.abort(),45000);
       const hist=S.chat.slice(-12).filter(m=>m.t).map(m=>({role:m.r==='me'?'user':'assistant',content:m.t}));
-      const r=await fetch('/api/ai',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({messages:hist,context:contextReport()}),signal:ctrl.signal});
-      clearTimeout(to);
-      const j=await r.json().catch(()=>({}));
-      if(r.ok&&j.text){ans=j.text;src='claude';aiOnline=true}else{aiOnline=false;console.warn('ai fallback',j)}
+      const r=await fetch('/api/ai',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({messages:hist,context:contextReport()}),signal:ctrl.signal});clearTimeout(to);
+      const j=await r.json().catch(()=>({}));if(r.ok&&j.text){ans=j.text;src='claude';aiOnline=true}else{aiOnline=false}
     }catch(e){aiOnline=false}
   }
   if(!ans){ans=localAnswer(q);if(aiOnline===false&&navigator.onLine!==false)ans+='\n\n_(The live AI isn\'t reachable right now — this is the built-in brain. Your numbers are exact; the chat gets richer when Claude is back.)_'}
-  ty.remove();
-  S.chat.push({r:'ai',t:ans,src});save();renderChat();
+  ty.remove();S.chat.push({r:'ai',t:ans,src});save();renderChat();
 }
 
 /* ===================== SETTINGS ===================== */
 function openSetup(edit){
-  $('#sName').value=S.name||'';$('#sBudget').value=S.budget||'';$('#sBuffer').value=S.buffer;$('#sStart').value=S.start;$('#sEnd').value=S.end;$('#sRate').value=S.rate;
-  $('#setupH').textContent=edit?'Settings':"Let's set up the trip money.";
-  $('#setupLead').style.display=edit?'none':'';
-  $('#sSave').textContent=edit?'Save':"Let's go 🌴";
-  $('#settingsExtra').style.display=edit?'':'none';
+  $('#sName').value=S.name||'';$('#sDest').value=S.dest||'';$('#sBudget').value=S.budget||'';$('#sBuffer').value=S.buffer;$('#sStart').value=S.start;$('#sEnd').value=S.end;$('#sRate').value=S.rate;$('#sHome').value=S.home;$('#sLocal').value=S.local;
+  $('#sLang').innerHTML=LANGS.map(l=>`<option value="${l[0]}" ${l[0]===S.lang?'selected':''}>${l[1]}</option>`).join('');
+  $('#sHomeLbl').textContent=S.home;$('#sRateLbl').textContent=S.home;$('#sRateLbl2').textContent=S.local;
+  $('#setupH').textContent=edit?'Settings':'Put your whole trip in here.';$('#setupLead').style.display=edit?'none':'';
+  $('#sSave').textContent=edit?'Save':"Let's go 🌴";$('#settingsExtra').style.display=edit?'':'none';
   $('#aiStatus').textContent=aiOnline===true?'AI: live ✓':aiOnline===false?'AI: offline brain (live AI unreachable)':'';
   $('#rateNote').textContent=S.rateAt?`Last live rate ${new Date(S.rateAt).toLocaleString('en-AU')}. Set your own if your card gives a different one.`:'Live mid-market rate. Set your own if your card gives a different one.';
   $('#ovSetup').classList.add('on');
 }
-async function fetchRate(silent){
-  try{const r=await fetch('https://open.er-api.com/v6/latest/AUD',{cache:'no-store'});const j=await r.json();const v=j&&j.rates&&j.rates.IDR;if(v){if($('#ovSetup').classList.contains('on'))$('#sRate').value=Math.round(v);if(S.rateAuto){S.rate=Math.round(v)}S.rateAt=Date.now();save();if(!silent)toast('Live rate: 1 AUD = '+Math.round(v).toLocaleString()+' IDR');render();return v}}catch(e){}
+async function fetchRate(silent,home,local){
+  home=(home||S.home).toUpperCase();local=(local||S.local).toUpperCase();
+  try{const r=await fetch('https://open.er-api.com/v6/latest/'+home,{cache:'no-store'});const j=await r.json();const v=j&&j.rates&&j.rates[local];if(v){const rv=v>=100?Math.round(v):+v.toFixed(4);if($('#ovSetup').classList.contains('on'))$('#sRate').value=rv;if(S.rateAuto&&home===S.home&&local===S.local){S.rate=rv}S.rateAt=Date.now();save();if(!silent)toast(`Live rate: 1 ${home} = ${rv.toLocaleString()} ${local}`);render();return v}}catch(e){}
   if(!silent)toast('Couldn\'t fetch a live rate');return null;
 }
 function saveSetup(){
   const b=parseFloat($('#sBudget').value);if(!(b>0)){toast('Budget first — how much are you taking?');$('#sBudget').focus();return}
-  S.name=$('#sName').value.trim()||'Aiman';S.budget=b;S.buffer=Math.max(0,parseFloat($('#sBuffer').value)||0);
+  S.name=$('#sName').value.trim()||'Traveller';S.dest=$('#sDest').value.trim()||'My trip';S.budget=b;S.buffer=Math.max(0,parseFloat($('#sBuffer').value)||0);
+  const h=($('#sHome').value||'AUD').toUpperCase().slice(0,3),l=($('#sLocal').value||'IDR').toUpperCase().slice(0,3);const curChanged=h!==S.home||l!==S.local;S.home=h;S.local=l;S.lang=$('#sLang').value||'id';
   const st=$('#sStart').value,en=$('#sEnd').value;if(st&&en&&st<=en){S.start=st;S.end=en}
-  const r=parseFloat($('#sRate').value);if(r>1000){if(Math.round(r)!==S.rate){S.rateAuto=false}S.rate=Math.round(r)}
+  const r=parseFloat($('#sRate').value);if(r>0){if(r!==S.rate)S.rateAuto=false;S.rate=r}
   if(!S.setup){S.setup=true;S.chat=[]}
-  save();$('#ovSetup').classList.remove('on');render();renderChat();toast('Locked in 🌴');
+  if(curChanged){S.rateAuto=true;fetchRate(true)}
+  save();$('#ovSetup').classList.remove('on');render();renderChat();if(MAP){MAP.remove();MAP=null}toast('Locked in 🌴');
 }
+async function backup(){const photos={};for(const id of await DB.keys()){const b=await DB.get(id);if(b)photos[id]=await blobToB64(b)}const out=Object.assign({},S,{_photos:photos});const b=new Blob([JSON.stringify(out)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='companion-backup-'+todayKey()+'.json';a.click();toast('Backup downloaded (with photos)')}
+async function restore(file){try{const j=JSON.parse(await file.text());if(!(j&&(j.v===1||j.v===2)&&Array.isArray(j.tx))){toast('Not a Companion backup');return}const ph=j._photos||{};delete j._photos;for(const [id,d] of Object.entries(ph))await DB.put(id,b64ToBlob(d));S=Object.assign({},DEFAULTS,j);S.v=2;save();$('#ovSetup').classList.remove('on');render();renderChat();toast('Restored')}catch(e){toast('Could not read that file')}}
 
 /* ===================== WIRING ===================== */
 function init(){
-  $('#txDate').value=todayKey();renderCats();setType('spend');setCur('IDR');
+  $('#txDate').value=todayKey();renderCats();setType('spend');setCur('L');
   $$('.nav button').forEach(b=>b.onclick=()=>setView(b.dataset.v));
-  $('#btnSettings').onclick=()=>openSetup(true);
-  $('#sSave').onclick=saveSetup;$('#rateLive').onclick=()=>fetchRate(false);
-  $('#briefMore').onclick=()=>setView('ai');$('#goLog').onclick=()=>setView('log');
+  $('#btnSettings').onclick=()=>openSetup(true);$('#sSave').onclick=saveSetup;
+  $('#rateLive').onclick=()=>fetchRate(false,$('#sHome').value,$('#sLocal').value);
+  $('#sHome').oninput=()=>{$('#sHomeLbl').textContent=$('#sHome').value.toUpperCase()||'—';$('#sRateLbl').textContent=$('#sHome').value.toUpperCase()||'—'};$('#sLocal').oninput=()=>{$('#sRateLbl2').textContent=$('#sLocal').value.toUpperCase()||'—'};
+  $('#briefMore').onclick=()=>setView('ai');$('#goLog').onclick=()=>setView('log');$('#goPlan').onclick=()=>setView('plan');$('#planBack').onclick=()=>setView('today');$('#goMapToday').onclick=()=>{selDay=calc().cur;setView('map')};
   $('#atmBtn').onclick=()=>{setView('log');setType('atm');$('#amt').focus()};
   $('#quick').onclick=e=>{const b=e.target.closest('[data-q]');if(b)quickAdd(+b.dataset.q)};
   $('#txType').onclick=e=>{const b=e.target.closest('button');if(b)setType(b.dataset.t)};
-  $('#curSwap').onclick=()=>{const a=amtVals();setCur(F.cur==='IDR'?'AUD':'IDR');if(a.idr)$('#amt').value=F.cur==='IDR'?Math.round(a.idr):+a.aud.toFixed(2);updCv()};
+  $('#curSwap').onclick=()=>{const a=amtVals();setCur(F.cur==='L'?'H':'L');if(a.idr)$('#amt').value=F.cur==='L'?(bigLocal()?Math.round(a.idr):+a.idr.toFixed(2)):+a.aud.toFixed(2);updCv()};
   $('#amt').oninput=updCv;$('#amt').onkeydown=e=>{if(e.key==='Enter')saveTx()};
   $('#cats').onclick=e=>{const b=e.target.closest('[data-c]');if(b){F.cat=b.dataset.c;renderCats()}};
   $('#payWith').onclick=e=>{const b=e.target.closest('button');if(b){F.pay=b.dataset.p;$$('#payWith button').forEach(x=>x.classList.toggle('on',x===b))}};
   $('#txSave').onclick=saveTx;
-  document.body.addEventListener('click',e=>{const row=e.target.closest('.tx[data-id]');if(row)openEdit(row.dataset.id);const x=e.target.closest('[data-close]');if(x)$('#'+x.dataset.close).classList.remove('on');const fx=e.target.closest('[data-fx]');if(fx){S.fixed=S.fixed.filter(f=>f.id!==fx.dataset.fx);save();render();renderPlan()}});
-  $$('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o&&o.id!=='ovSetup')o.classList.remove('on');if(e.target===o&&o.id==='ovSetup'&&S.setup)o.classList.remove('on')}));
+  document.body.addEventListener('click',e=>{
+    const row=e.target.closest('.tx[data-id]');if(row)openEdit(row.dataset.id);
+    const x=e.target.closest('[data-close]');if(x)$('#'+x.dataset.close).classList.remove('on');
+    const fx=e.target.closest('[data-fx]');if(fx){S.fixed=S.fixed.filter(f=>f.id!==fx.dataset.fx);save();render();renderPlan()}
+    const mf=e.target.closest('[data-mf]');if(mf){mapFilter=mf.dataset.mf;$$('#mapChips .chip').forEach(c=>c.classList.toggle('on',c.dataset.mf===mapFilter));drawMarkers()}
+    const ad=e.target.closest('[data-addday]');if(ad){pendingPlace=ad.dataset.addday;const c=calc();$('#addDayH').textContent='Add '+((placeById(pendingPlace)||{}).n||'')+' to…';$('#dsel2').innerHTML=c.days.map((k,i)=>`<button data-d2="${k}" class="${k===c.cur?'on':''}"><b>${+k.slice(-2)}</b>Day ${i+1}</button>`).join('');$('#ovAddDay').classList.add('on')}
+    const d2=e.target.closest('[data-d2]');if(d2&&pendingPlace){$('#ovAddDay').classList.remove('on');addToDay(d2.dataset.d2,pendingPlace);pendingPlace=null}
+    const dd=e.target.closest('#dsel [data-d]');if(dd){selDay=dd.dataset.d;renderDays()}
+    const rm=e.target.closest('[data-rmp]');if(rm){const [k,id]=rm.dataset.rmp.split('|');S.plans[k].places=(S.plans[k].places||[]).filter(x=>x!==id);save();renderDays();drawMarkers();render()}
+    const mv=e.target.closest('[data-mv]');if(mv){const [k,i,d]=mv.dataset.mv.split('|');const arr=S.plans[k].places;const j=+i+ +d;if(j>=0&&j<arr.length){[arr[+i],arr[j]]=[arr[j],arr[+i]];save();renderDays()}}
+    const dp=e.target.closest('[data-delpin]');if(dp){S.pins=S.pins.filter(p=>p.id!==dp.dataset.delpin);Object.values(S.plans).forEach(p=>{p.places=(p.places||[]).filter(x=>x!==dp.dataset.delpin)});save();MAP.closePopup();drawMarkers();renderDays()}
+    const jh=e.target.closest('[data-jhere]');if(jh){MAP.closePopup();openJournal(null);$('#jPlace').value=jh.dataset.jhere}
+    const pc=e.target.closest('[data-pc]');if(pc){phCat=+pc.dataset.pc;$('#phQ').value='';renderPhrases()}
+    const say=e.target.closest('[data-say]');if(say)speak(say.dataset.say);
+    const sh=e.target.closest('[data-show]');if(sh){$('#bigTxt').textContent=sh.dataset.show;$('#bigshow').classList.add('on')}
+    const je=e.target.closest('.je[data-jid]');if(je&&!e.target.closest('img'))openJournal(je.dataset.jid);
+    const pim=e.target.closest('#jList img[data-pid]');if(pim){$('#lbImg').src=pim.src;$('#lightbox').classList.add('on')}
+  });
+  $$('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o&&(o.id!=='ovSetup'||S.setup))o.classList.remove('on')}));
   $('#eIdr').oninput=()=>{$('#eAud').value=(+toAud(parseFloat($('#eIdr').value)||0)).toFixed(2)};
-  $('#eAud').oninput=()=>{$('#eIdr').value=Math.round(toIdr(parseFloat($('#eAud').value)||0))};
-  $('#eSave').onclick=()=>{const t=S.tx.find(x=>x.id===$('#ovTx').dataset.id);if(!t)return;t.idr=Math.round(parseFloat($('#eIdr').value)||0);t.aud=+(parseFloat($('#eAud').value)||0).toFixed(2);t.note=$('#eNote').value.trim();t.d=$('#eDate').value||t.d;if(t.type==='spend')t.cat=$('#eCat').value;save();$('#ovTx').classList.remove('on');render();toast('Updated')};
+  $('#eAud').oninput=()=>{$('#eIdr').value=bigLocal()?Math.round(toIdr(parseFloat($('#eAud').value)||0)):+toIdr(parseFloat($('#eAud').value)||0).toFixed(2)};
+  $('#eSave').onclick=()=>{const t=S.tx.find(x=>x.id===$('#ovTx').dataset.id);if(!t)return;t.idr=parseFloat($('#eIdr').value)||0;t.aud=+(parseFloat($('#eAud').value)||0).toFixed(2);t.note=$('#eNote').value.trim();t.d=$('#eDate').value||t.d;if(t.type==='spend')t.cat=$('#eCat').value;save();$('#ovTx').classList.remove('on');render();toast('Updated')};
   $('#eDel').onclick=()=>{S.tx=S.tx.filter(x=>x.id!==$('#ovTx').dataset.id);save();$('#ovTx').classList.remove('on');render();toast('Deleted')};
   $('#addFixed').onclick=()=>{$('#fxName').value='';$('#fxAmt').value='';$('#ovFixed').classList.add('on')};
   $('#fxSave').onclick=()=>{const n=$('#fxName').value.trim(),a=parseFloat($('#fxAmt').value);if(!n||!(a>0)){toast('Name + amount');return}S.fixed.push({id:uid(),name:n,amt:a});save();$('#ovFixed').classList.remove('on');render();renderPlan();toast('Committed cost added')};
   $('#askDate').onchange=renderAsk;
+  $('#locBtn').onclick=locate;$('#offMap').onclick=saveMapOffline;$('#mapQ').oninput=drawMarkers;
+  $('#pinBtn').onclick=()=>{if(!MAP)return;openPin(pendingPin||MAP.getCenter());toast(pendingPin?'Pin at the spot you tapped':'Pin at map centre — tap the map first to choose a spot')};
+  $('#pinSave').onclick=()=>{const n=$('#pinName').value.trim();if(!n){toast('Give it a name');return}S.pins.push({id:'m'+uid(),n,la:pendingPin.lat,lo:pendingPin.lng,c:$('#pinCat').value,note:$('#pinNote').value.trim()});save();$('#ovPin').classList.remove('on');drawMarkers();toast('Pinned')};
+  $('#trGo').onclick=translate;$('#trIn').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();translate()}};
+  $('#trSwap').onclick=()=>{trDir=trDir==='to'?'from':'to';trLabels();const o=$('#trOut').textContent;if(o&&o!=='—'){$('#trIn').value=o;$('#trOutBox').style.display='none'}};
+  $('#trSay').onclick=()=>speak($('#trOut').textContent,trDir==='to'?langRow()[2]:'en-AU');
+  $('#trShow').onclick=()=>{$('#bigTxt').textContent=$('#trOut').textContent;$('#bigshow').classList.add('on')};
+  $('#trCopy').onclick=()=>{navigator.clipboard&&navigator.clipboard.writeText($('#trOut').textContent);toast('Copied')};
+  $('#trMic').onclick=()=>{const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){toast('Dictation not supported here — type it');return}const r=new SR();r.lang=trDir==='to'?'en-AU':langRow()[2];r.onresult=ev=>{$('#trIn').value=ev.results[0][0].transcript;translate()};r.onerror=()=>toast('Didn\'t catch that');r.start();toast('Listening…')};
+  $('#phQ').oninput=renderPhrases;
+  $('#bigshow').onclick=()=>$('#bigshow').classList.remove('on');$('#lightbox').onclick=()=>$('#lightbox').classList.remove('on');
+  $('#jNew').onclick=()=>openJournal(null);$('#jSave').onclick=saveJournal;$('#jAi').onclick=aiJournal;$('#jExport').onclick=exportStory;
+  $('#jAddPhoto').onclick=()=>$('#jFile').click();$('#jFile').onchange=e=>{addPhotos([...e.target.files]);e.target.value=''};
+  $('#jMoods').onclick=e=>{const b=e.target.closest('[data-m]');if(b){J.mood=b.dataset.m;$$('#jMoods button').forEach(x=>x.classList.toggle('on',x===b))}};
+  $('#jDel').onclick=()=>{if(!J.id)return;if(confirm('Delete this entry?')){const j=S.journal.find(x=>x.id===J.id);(j.photos||[]).forEach(id=>DB.del(id));S.journal=S.journal.filter(x=>x.id!==J.id);save();$('#ovJ').classList.remove('on');renderJournal();render()}};
   $('#chips').onclick=e=>{const b=e.target.closest('.chip');if(b)ask(b.textContent)};
-  $('#send').onclick=()=>{const q=$('#q').value;$('#q').value='';ask(q)};
-  $('#q').onkeydown=e=>{if(e.key==='Enter'){$('#send').click()}};
-  $('#exportBtn').onclick=()=>{const b=new Blob([JSON.stringify(S,null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='lombok-backup-'+todayKey()+'.json';a.click();toast('Backup downloaded')};
-  $('#importBtn').onclick=()=>$('#importFile').click();
-  $('#importFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();rd.onload=()=>{try{const j=JSON.parse(rd.result);if(j&&j.v===1&&Array.isArray(j.tx)){S=Object.assign({},DEFAULTS,j);save();$('#ovSetup').classList.remove('on');render();renderChat();toast('Restored')}else toast('Not a Lombok backup')}catch(x){toast('Could not read that file')}};rd.readAsText(f)};
-  $('#resetBtn').onclick=()=>{if(confirm('Wipe every entry and setting on this phone?')){localStorage.removeItem(KEY);S=JSON.parse(JSON.stringify(DEFAULTS));$('#ovSetup').classList.remove('on');render();renderChat();openSetup(false)}};
-  window.addEventListener('online',()=>{document.body.classList.remove('offline')});window.addEventListener('offline',()=>document.body.classList.add('offline'));if(navigator.onLine===false)document.body.classList.add('offline');
+  $('#send').onclick=()=>{const q=$('#q').value;$('#q').value='';ask(q)};$('#q').onkeydown=e=>{if(e.key==='Enter')$('#send').click()};
+  $('#exportBtn').onclick=backup;$('#importBtn').onclick=()=>$('#importFile').click();$('#importFile').onchange=e=>{const f=e.target.files[0];if(f)restore(f)};
+  $('#resetBtn').onclick=async()=>{if(confirm('Wipe every entry, plan, photo and setting on this phone?')){localStorage.removeItem(KEY);for(const id of await DB.keys())await DB.del(id);S=JSON.parse(JSON.stringify(DEFAULTS));$('#ovSetup').classList.remove('on');render();renderChat();openSetup(false)}};
+  window.addEventListener('online',()=>document.body.classList.remove('offline'));window.addEventListener('offline',()=>document.body.classList.add('offline'));if(navigator.onLine===false)document.body.classList.add('offline');
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)render()});
+  if('speechSynthesis' in window)speechSynthesis.getVoices();
   render();renderChat();
   if(!S.setup)openSetup(false);
-  if(navigator.onLine!==false&&(S.rateAuto&&Date.now()-S.rateAt>12*36e5))fetchRate(true);
+  if(navigator.onLine!==false&&S.rateAuto&&Date.now()-S.rateAt>12*36e5)fetchRate(true);
   if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
-  // AI reachability probe (cheap GET)
   fetch('/api/ai',{method:'GET'}).then(r=>r.json()).then(j=>{aiOnline=!!j.ok}).catch(()=>{aiOnline=false});
 }
 init();
