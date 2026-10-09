@@ -15,39 +15,63 @@ redeploying). Before deploying, make sure your branch contains main's extras
 Keeping main in sync with the live state is the only durable protection.
 Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
 
-## Lombok Companion — Aiman's travel-money app (2026-10-09)
+## Travel Companion (was "Lombok Companion") — Aiman's trip app (2026-10-09/10)
 
-- **Why:** Aiman flies to Lombok 10 Oct 2026 08:00, home 24 Oct (14 nights);
-  asked for a Netlify app to track trip finances, daily allowance, "how much
-  will I have by day X", plus an AI travel companion.
+- **Why:** Aiman flies to Lombok 10 Oct 2026 08:00, home 24 Oct, staying on
+  **Gili Air**. Asked (1) a Netlify app for trip money + daily allowance +
+  "how much by day X" + AI companion, then (2) a built-in Indonesian
+  translator, a Gili Air map to plan days from, a journal to document the
+  trip, and "make it a traveller's app anyone can use". Both shipped.
 - **LIVE: https://lombok-companion.netlify.app** — its OWN Netlify site
   (id `568dfc4e-ecbf-40f2-b0b7-cd9d510f44ae`, team aimanmaged88), NOT the
-  certifiedhooper site, so no Git-CD clobber risk. Manual deploy via the
-  Netlify MCP `deploy-site` op (returns an `npx @netlify/mcp … --site-id`
-  command) run from a standalone folder = `lombok/*` + `netlify/functions/
-  lombok-ai.mjs` + a tiny netlify.toml (publish ".", functions dir, no-cache on
-  sw.js/index.html). Source of truth in repo: `lombok/` + the function.
-- **App** (`lombok/index.html`, single file, localStorage `lombok_v1`, SW
-  `lombok-v1`, manifest, palm/sunset icons): setup sheet (budget AUD, buffer,
-  dates default 10–24 Oct, live AUD→IDR rate via open.er-api.com, manual
-  override locks it). Engine `calc()`: pot = budget + top-ups − buffer −
-  committed; allowance today = (remaining + spent today − future overrides) /
-  free remaining days (re-spreads daily); pace = avg of COMPLETED days;
-  projections plan vs pace per date; cash in pocket = cash-in (ATM/changer/
-  brought) − cash spends, fee counts as spend. Tabs: Today (hero, companion
-  brief, quick-add Lombok prices, cash), Log (IDR⇄AUD, 13 cats, cash/card,
-  cash-in w/ fee, add money), Plan (SVG chart plan/pace/history, pick-a-date,
-  day table with per-day overrides, category bars, committed costs, 14-day
-  itinerary + spot guide), Companion (chat). Backup/restore JSON in settings.
-- **AI:** `netlify/functions/lombok-ai.mjs` at `/api/ai` → Anthropic via
-  **Netlify AI Gateway** (no key; billed in Netlify credits on his Pro team);
-  model chain claude-sonnet-5-5 → sonnet-4-5 → haiku-5-5 → haiku-4-5. Client
-  sends `contextReport()` (full finance state + itinerary + guide) as system
-  context. GET `/api/ai` = health probe. If the function fails/offline the app
-  answers with the built-in `localAnswer()` brain (exact numbers, keyword
-  routing) and says so. Verified live: gateway ok:true, chat answered with
-  claude-sonnet-5-5, SW registered, rate fetched.
-- Prices in QUICK/GUIDE/ITIN are rough 2026 guides, labelled as such.
+  certifiedhooper site, so no Git-CD clobber risk. Deploy = Netlify MCP
+  `deploy-site` op (returns a one-shot `npx @netlify/mcp … --site-id
+  --proxy-path <token>` command; token expires in ~minutes, re-request if
+  401) run from a standalone folder = `lombok/*` + `netlify/functions/
+  lombok-ai.mjs` + tiny netlify.toml (publish ".", functions dir, esbuild,
+  no-cache on sw.js/index.html). Source of truth in repo: `lombok/` + the
+  function (branch claude/travel-finance-companion-h5dvm3, not merged —
+  nothing on main depends on it).
+- **App** (`lombok/index.html` single file ~130KB, localStorage `lombok_v1`
+  state v2 (v1 migrates), photos in IndexedDB `companion/photos`, SW
+  `lombok-v2` + tile cache `lombok-tiles`, Leaflet 1.9.4 from unpkg cached
+  by the SW). Setup: name, destination, dates, home + local currency (live
+  rate for ANY pair via open.er-api.com, manual override locks it), budget,
+  buffer, translator language. **Destination pack** = Indonesia/Gili content
+  (quick-add prices, guide, 15-day suggested flow, island notes, 220 real
+  Gili Air POIs from OSM/Nominatim, Indonesian phrasebook) switches on when
+  dest matches Indonesia/Lombok/Gili or local=IDR; otherwise generic
+  quick-adds, map geocodes the destination, phrasebook says use live AI.
+- **Tabs:** Today (pot hero, companion brief, today's plan, quick-add, cash
+  in pocket; → Plan sub-view: chart plan/pace/history, pick-a-date, per-day
+  budget overrides, categories, committed costs, spots guide) · Log (local⇄
+  home amounts, 13 cats, cash/card, Cash in w/ fee, Add money) · Map
+  (filter chips, search, 📍Me, ➕Pin custom places, ⬇︎Offline saves z13–17
+  tiles for the island, popup → "Add to a day"/Journal/Go (Google Maps
+  walking link); day planner per trip day with title/places/notes/reorder,
+  "Use the suggested idea"; Know-the-island card) · Translate (live AI
+  translate any language w/ pronunciation + note, swap, 🎤 dictation,
+  🔊 speechSynthesis id-ID, 📱 "Show them" full-screen, offline phrasebook
+  7 categories + search; exact phrasebook hits answer offline) · Journal
+  (entries: date/title/mood/place/text/photos downscaled 1400px, ✨ "Write
+  it for me" AI draft from the day's facts, lightbox, 📖 Export story =
+  single HTML w/ embedded photos via share sheet/download) · Chat.
+- **Finance engine** `calc()`: pot = budget + top-ups − buffer − committed;
+  allowance today = (remaining + spent today − future overrides) / free
+  remaining days (re-spreads daily); pace = avg of COMPLETED days; plan vs
+  pace projections per date; cash pocket = cash-in − cash spends, fee = spend.
+- **AI:** `netlify/functions/lombok-ai.mjs` at `/api/ai` via **Netlify AI
+  Gateway** (no key; Netlify credits on his Pro team). Modes: chat (system +
+  `contextReport()` = full state incl. day plans, journal, pins, pack data),
+  `translate` {text,from,to} → JSON {t,p,n}, `journal` {facts,name} → text.
+  Model chain claude-sonnet-5-5 → sonnet-4-5 → haiku-5-5 → haiku-4-5 (retries
+  on 404/429/5xx). GET = health probe. Offline/unreachable → `localAnswer()`
+  brain. Verified live 2026-10-10: translate + journal + chat all answered
+  (sonnet-5-5), gateway ok:true.
+- Backup JSON includes photos (base64). Playwright suites: scratchpad
+  test2.mjs (40 checks, stubbed API) + live2.mjs (live site).
+- Prices in the pack are rough 2026 guides, labelled as such. POI names come
+  from OpenStreetMap (ODbL) — attribution shown on the map.
 
 ## Targets + Game Journal — the 1-on-1 athlete kit (2026-10-07)
 
