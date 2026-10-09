@@ -115,6 +115,17 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   deleted via API; SQL deletes get blocked by the permission classifier —
   use leader_login + retreat_delete instead). Nothing seeded for the real
   leader yet — he creates his own retreat + PIN from the app.
+- **Live location (edge v2, 2026-10-10, Aiman: "so Yusuf can keep tabs").**
+  Migration `traditional_legacies_locations` → `tl_loc` (member_id pk, lat,
+  lon, acc, at). Actions `loc_set` (upsert) / `loc_off`; `state` returns
+  `locs` (last 24 h); leave/member_remove clear it. App: Brothers tab opens
+  with a Leaflet/OSM map (`#lmap`, avatar pins + first name, blue ring = me,
+  faded = >30 min stale, popup last-seen + "Walk there"), ⤢ Everyone / 📍 Me,
+  and a per-phone opt-in toggle (`tl_loc_share` localStorage) → watchPosition
+  pushes on >25 m move or every 60 s **only while the app is open** (web
+  can't background-track — told Aiman). sw tl-v2 caches Leaflet + tiles.
+  Playwright 2-user GPS test 13/13 (scratchpad tlloc.mjs), test retreat
+  deleted.
 
 ## Lombok app extras (2026-10-10)
 - Today tab gained **✅ To do in Lombok** (S.todos, link-aware; seeded once
