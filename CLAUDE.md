@@ -87,6 +87,24 @@ editable… put money in, put money out… very simple")
   the typed figure). Any entry in Log is still tap-to-edit. Hint line under
   the pot says so. test4.mjs 12/12, deployed + verified live.
 
+## Lombok app — DESKTOP layout (2026-10-10, Aiman: "make a desktop version")
+- `/* DESKTOP */` block at the end of lombok/index.html `<style>`:
+  `@media(min-width:1000px)` turns the bottom nav pill into a fixed 232px LEFT
+  sidebar (vertical buttons + "Travel Companion" brand via `.nav .in::before`),
+  body padding-left 232, `.wrap` 1180 (1320 at ≥1400). Views: Today + Plan =
+  CSS multi-column masonry (`columns:2`, 3 at ≥1400; hero/quick-money/back/
+  chart `column-span:all`, `.card{break-inside:avoid}`); Log = `#v-log.on`
+  grid 440px sticky form | list; Map = `#v-map.on` grid areas chips/map+ctl |
+  planner+island, `#map` height calc(100vh − 230px); Translate = 2 columns;
+  Journal = 2 CSS columns with `.dayh{break-after:avoid}`; Chat capped 860px,
+  `.ask` sits at the bottom; sheets become centred dialogs (`.overlay{align-
+  items:center}`, `.sheet` 620px rounded); toast offset for the sidebar.
+  GOTCHA: grid rules MUST be scoped to `#v-x.on` — a bare `#v-log{display:
+  grid}` out-specifies `.view{display:none}` and shows every view at once.
+  Verified 1440×900 screenshots of all 7 views + sheet (scratchpad wide2.mjs,
+  no h-overflow); deployed to lombok-companion.netlify.app. Phone layout
+  untouched (media query only).
+
 ## Traditional Legacies — retreat companion for Yousof "Brother Dib" (2026-10-10)
 
 - **Why:** Aiman: "make another Netlify version of this… for Traditional

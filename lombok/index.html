@@ -309,6 +309,55 @@ body{background:radial-gradient(1200px 700px at 85% -15%,rgba(255,122,89,.22),tr
 .nav button.on{color:var(--coral)}
 .btn.aqua{color:#042b27}
 
+
+/* ===================== DESKTOP ===================== */
+@media (min-width:1000px){
+  body{padding-left:232px;padding-bottom:40px}
+  .wrap{max-width:1180px;padding:26px 36px 0}
+  .hdr{padding:4px 0 18px}
+  .hdr .day{font-size:28px}
+  .nav{top:0;bottom:0;right:auto;width:232px;padding:26px 14px;border-top:0;border-right:1px solid var(--line);background:rgba(11,16,32,.72)}
+  .nav .in{max-width:none;display:flex;flex-direction:column;gap:4px}
+  .nav .in::before{content:"Travel Companion";display:block;font-size:11px;letter-spacing:.22em;text-transform:uppercase;font-weight:800;color:var(--coral);padding:6px 14px 16px}
+  .nav button{flex-direction:row;justify-content:flex-start;gap:12px;font-size:14px;padding:12px 14px;border-radius:14px;text-align:left}
+  .nav button .e{font-size:19px;width:24px;text-align:center}
+  .nav button.on{background:rgba(255,255,255,.07)}
+  .card{break-inside:avoid;margin-bottom:16px}
+  #v-today,#v-plan{columns:2;column-gap:16px}
+  #v-today .hero,#v-today .qm,#v-plan .back,#v-plan>.card:first-of-type{column-span:all}
+  #v-today .hero{margin-bottom:16px}
+  .big{font-size:56px}
+  .qm{margin-bottom:16px}
+  .qm button{padding:18px 20px;font-size:17px}
+  .quick{grid-template-columns:repeat(4,1fr)}
+  #v-log.on{display:grid;grid-template-columns:440px minmax(0,1fr);gap:20px;align-items:start}
+  #v-log>.card{position:sticky;top:24px}
+  #v-map.on{display:grid;grid-template-columns:minmax(0,1fr) 420px;grid-template-areas:"chips chips" "map plan" "ctl plan" "x island";gap:0 20px;align-items:start}
+  #mapChips{grid-area:chips}
+  #map{grid-area:map;height:calc(100vh - 230px);min-height:460px}
+  #v-map>.row{grid-area:ctl}
+  #v-map>.card:nth-of-type(1){grid-area:plan;margin-top:0}
+  #islandCard{grid-area:island}
+  #v-tr.on{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:start}
+  .viz svg{width:100%;max-height:380px;display:block}
+  #v-journal>.card{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+  #v-journal>.card .row.sb{flex:1 1 100%}
+  #jList{columns:2;column-gap:16px}
+  #jList .dayh{break-after:avoid;break-inside:avoid}
+  #jList>.card{break-inside:avoid}
+  #v-ai{max-width:860px}
+  .chat{min-height:calc(100vh - 300px)}
+  .ask{bottom:0;padding:12px 0 16px}
+  .overlay{align-items:center}
+  .sheet{border-radius:24px;max-height:86vh;max-width:620px;padding-bottom:20px;box-shadow:0 40px 100px rgba(0,0,0,.6)}
+  .toast{bottom:28px;left:calc(50% + 116px)}
+  .chips{flex-wrap:wrap}
+}
+@media (min-width:1400px){
+  .wrap{max-width:1320px}
+  #v-today{columns:3}
+  #v-log{grid-template-columns:460px minmax(0,1fr)}
+}
 </style>
 </head>
 <body>
