@@ -127,6 +127,17 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   Playwright 2-user GPS test 13/13 (scratchpad tlloc.mjs), test retreat
   deleted.
 
+## Liquid-glass pass on BOTH apps (2026-10-10, Aiman: "premium, liquid glass")
+- A `/* LIQUID GLASS */` CSS block appended to each `<style>` (lombok/index.html
+  + tl/index.html) + a `.orbs` div (4 blurred drifting colour orbs, brand
+  colours per app) right after `<body>`. Cards/sheets/stats/chips/inputs/nav
+  pill/buttons get translucent gradient fills + `backdrop-filter: blur(22–34px)
+  saturate(170%)` + inset specular highlight + `::before` radial sheen; nav is
+  a floating rounded pill; sheets get a grab handle. Nav/toast/sheet carry a
+  solid base tint so text never bleeds through where blur is weak.
+  `prefers-reduced-motion` stops the orbs, `prefers-reduced-transparency`
+  drops the blur. Structure/JS untouched — tests still pass.
+
 ## Lombok app extras (2026-10-10)
 - Today tab gained **✅ To do in Lombok** (S.todos, link-aware; seeded once
   via S.seeds with Aiman's Facebook reel "10 moves to feel more ALIVE"
