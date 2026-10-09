@@ -141,6 +141,33 @@ editable… put money in, put money out… very simple")
   Playwright 2-user GPS test 13/13 (scratchpad tlloc.mjs), test retreat
   deleted.
 
+## Traditional Legacies LEADER DESK — desktop version (2026-10-10, Aiman: "make
+me a desktop version now so I can manage everything")
+- **LIVE: https://traditional-legacies.netlify.app/desk.html** (`tl/desk.html`,
+  single file, same tl-api + anon key, same `tl_session` localStorage key as
+  the phone app, leader-only: a member session is bounced back to login).
+  Login = code + PIN (or create a new retreat). Sidebar shell (≥900px; stacks
+  on narrow): **Overview** (Day N hero, 6 stat tiles, today's plan w/ ✏️,
+  latest announcement, meetups, newest brothers) · **Schedule** = week grid,
+  one column per retreat day (`.week` h-scroll, today highlighted, click an
+  item → right-hand sticky editor, ＋Add per day, ⧉ copy-day via
+  schedule_copy_day) · **Announce** (composer + history w/ delete) · **Chat**
+  (full-height thread, delete any post, 📣 announce mode, Enter to send) ·
+  **Meetups** (upcoming w/ names of who's in + cancel, past, create form) ·
+  **Brothers** (table: avatar/name/bio/joined/last-seen-on-map/role; Rename
+  via member_edit name, **Make co-leader / Make member** via member_edit
+  role, Remove) · **Live map** (full-size Leaflet, pins + "Last seen" list,
+  click → focus, Fit everyone; the desk never pushes its own location) ·
+  **Share** (big code, QR via api.qrserver, join link → index.html?join=CODE,
+  copy, print) · **Settings** (retreat_edit, pin_set, create another, delete
+  w/ typed DELETE). Polls 5 s on chat / 12 s elsewhere; chat nav dot on new
+  posts. Phone app Leader → Share tab gained a "💻 Manage it on a computer"
+  card linking desk.html.
+- Verified: Playwright 16/16 against the live demo retreat (login, stats,
+  8-day grid, add→edit→delete item, announcements, chat, meetups, 12-row
+  table, map pins, share code/QR link, settings prefill, session survives
+  reload, no h-overflow at 800px) — `tl/promo-src/desktest.mjs`.
+
 ## Traditional Legacies PROMO VIDEO (2026-10-10, Aiman: "make me a teaser…
 show it live, put Muhammad, Ahmed in there… so I can sell it to him")
 - **Deliverable:** `tl/promo.mp4` (1080×1920, 1:53, h264+aac, 13.7MB), also
