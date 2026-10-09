@@ -54,6 +54,8 @@ async function stateFor(me: any) {
     sel(`tl_posts?retreat_id=eq.${rid}&select=id,member_id,kind,text,created_at&order=created_at.desc&limit=120`),
     sel(`tl_meetups?retreat_id=eq.${rid}&cancelled=eq.false&select=id,creator_id,title,place,at,note,created_at&order=at.asc`),
   ]);
+  const since = new Date(Date.now() - 24 * 3600e3).toISOString();
+  const locs = await sel(`tl_loc?retreat_id=eq.${rid}&at=gte.${encodeURIComponent(since)}&select=member_id,lat,lon,acc,at`);
   let rs: any[] = [];
   if (meetups.length) {
     const ids = meetups.map((m: any) => m.id).join(",");
@@ -61,7 +63,7 @@ async function stateFor(me: any) {
   }
   for (const m of meetups) { m.in = rs.filter((r) => r.meetup_id === m.id && r.status === "in").map((r) => r.member_id); m.out = rs.filter((r) => r.meetup_id === m.id && r.status === "out").map((r) => r.member_id); }
   const leader = members.find((m: any) => m.role === "leader");
-  return { retreat, me: { id: me.id, name: me.name, role: me.role, avatar: me.avatar, bio: me.bio, phone: me.phone }, members, leader: leader ? { id: leader.id, name: leader.name, avatar: leader.avatar } : null, schedule, posts: posts.reverse(), meetups, now: new Date().toISOString() };
+  return { retreat, me: { id: me.id, name: me.name, role: me.role, avatar: me.avatar, bio: me.bio, phone: me.phone }, members, leader: leader ? { id: leader.id, name: leader.name, avatar: leader.avatar } : null, schedule, posts: posts.reverse(), meetups, locs, now: new Date().toISOString() };
 }
 
 Deno.serve(async (req) => {
@@ -136,7 +138,7 @@ Deno.serve(async (req) => {
       const row: any = {}; if (b.name != null) row.name = str(b.name, 40) || me.name; if (b.avatar != null) row.avatar = str(b.avatar, 4); if (b.bio != null) row.bio = str(b.bio, 160); if (b.phone != null) row.phone = str(b.phone, 30);
       await upd(`tl_members?id=eq.${me.id}`, row); return J({ ok: true });
     }
-    if (a === "leave") { await upd(`tl_members?id=eq.${me.id}`, { removed: true }); await del(`tl_tokens?member_id=eq.${me.id}`); return J({ ok: true }); }
+    if (a === "leave") { await upd(`tl_members?id=eq.${me.id}`, { removed: true }); await del(`tl_tokens?member_id=eq.${me.id}`); await del(`tl_loc?member_id=eq.${me.id}`); return J({ ok: true }); }
     if (a === "meetup_add") {
       const title = str(b.title, 80), at = str(b.at, 40); if (!title || isNaN(Date.parse(at))) return bad("title + time needed");
       const m = (await ins("tl_meetups", { retreat_id: rid, creator_id: me.id, title, place: str(b.place, 80), at: new Date(at).toISOString(), note: str(b.note, 300) }))[0];
@@ -157,6 +159,13 @@ Deno.serve(async (req) => {
       return J({ ok: true });
     }
 
+    if (a === "loc_set") {
+      const lat = Number(b.lat), lon = Number(b.lon), acc = Math.min(5000, Math.max(0, Number(b.acc) || 0));
+      if (!isFinite(lat) || !isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) return bad("bad coords");
+      await q("tl_loc", { method: "POST", headers: { Prefer: "resolution=merge-duplicates" }, body: JSON.stringify({ member_id: me.id, retreat_id: rid, lat, lon, acc, at: new Date().toISOString() }) });
+      return J({ ok: true });
+    }
+    if (a === "loc_off") { await del(`tl_loc?member_id=eq.${me.id}`); return J({ ok: true }); }
     /* ---------- leader ---------- */
     if (a === "retreat_edit") { const e = needLeader(); if (e) return e;
       const row: any = {}; for (const k of ["name", "tagline", "location"]) if (b[k] != null) row[k] = str(b[k], 80); if (b.welcome != null) row.welcome = str(b.welcome, 1200);
@@ -175,7 +184,7 @@ Deno.serve(async (req) => {
       const items = await sel(`tl_schedule?retreat_id=eq.${rid}&day=eq.${from}&select=t,title,details,place,kind`);
       if (items.length) await ins("tl_schedule", items.map((i: any) => ({ ...i, retreat_id: rid, day: to }))); return J({ copied: items.length }); }
     if (a === "member_remove") { const e = needLeader(); if (e) return e; if (!uuid(b.id) || b.id === me.id) return bad("id");
-      await upd(`tl_members?id=eq.${b.id}&retreat_id=eq.${rid}`, { removed: true }); await del(`tl_tokens?member_id=eq.${b.id}`); return J({ ok: true }); }
+      await upd(`tl_members?id=eq.${b.id}&retreat_id=eq.${rid}`, { removed: true }); await del(`tl_tokens?member_id=eq.${b.id}`); await del(`tl_loc?member_id=eq.${b.id}`); return J({ ok: true }); }
     if (a === "member_edit") { const e = needLeader(); if (e) return e; if (!uuid(b.id)) return bad("id");
       const row: any = {}; if (b.name != null) row.name = str(b.name, 40); if (b.role === "leader" || b.role === "member") row.role = b.role;
       if (row.name === "") delete row.name; await upd(`tl_members?id=eq.${b.id}&retreat_id=eq.${rid}`, row); return J({ ok: true }); }

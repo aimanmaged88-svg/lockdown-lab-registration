@@ -18,6 +18,7 @@
 <link rel="icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Inter:wght@400;600;800&display=swap">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
 <style>
 :root{--bg:#070707;--bg2:#0E0E0F;--card:#141414;--card2:#1C1C1D;--line:rgba(243,239,230,.09);--line2:rgba(243,239,230,.18);
  --text:#F3EFE6;--muted:#A8A196;--dim:#6E685E;--gold:#E9C46A;--gold2:#F6DA8E;--sea:#2C8C9E;--good:#7BD389;--danger:#E36A6A;
@@ -168,6 +169,22 @@ select.inp{appearance:none;-webkit-appearance:none}
 .lsec{display:none}.lsec.on{display:block}
 .off{display:none;color:var(--gold);font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:800}
 body.offline .off{display:inline}
+/* live map */
+#lmap{height:300px;border-radius:16px;overflow:hidden;border:1px solid var(--line2);background:#0e0e0f;margin-bottom:10px}
+.leaflet-container{background:#0e0e0f;font:inherit}
+.leaflet-tile{filter:grayscale(.55) brightness(.62) contrast(1.05)}
+.lp{display:flex;flex-direction:column;align-items:center;transform:translateY(-4px)}
+.lp .a{width:38px;height:38px;border-radius:50%;background:var(--card2);border:2px solid var(--gold);display:grid;place-items:center;font-size:19px;box-shadow:0 4px 14px rgba(0,0,0,.6);font-family:var(--disp);font-weight:700;color:var(--gold)}
+.lp .n{margin-top:3px;font-size:10px;font-weight:800;background:rgba(7,7,7,.85);color:var(--text);padding:2px 7px;border-radius:999px;white-space:nowrap;border:1px solid var(--line2)}
+.lp.me .a{border-color:#7fd0df}.lp.stale .a{opacity:.45;border-color:var(--dim)}.lp.stale .n{opacity:.6}
+.leaflet-control-attribution{background:rgba(7,7,7,.7)!important;color:var(--dim)!important;font-size:9px!important}
+.leaflet-control-attribution a{color:var(--muted)!important}
+.leaflet-bar a{background:var(--card2)!important;color:var(--text)!important;border-color:var(--line2)!important}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0}
+.sw .k{font-size:14px;font-weight:800}.sw .k span{display:block;font-size:12px;color:var(--muted);font-weight:400}
+.tog{width:52px;height:30px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid var(--line2);position:relative;flex:none;transition:background .2s}
+.tog::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:var(--muted);transition:transform .2s var(--ease),background .2s}
+.tog.on{background:rgba(233,196,106,.35);border-color:var(--gold)}.tog.on::after{transform:translateX(22px);background:var(--gold)}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -247,6 +264,12 @@ body.offline .off{display:inline}
   </section>
 
   <section class="view" id="v-bro">
+    <div class="card">
+      <div class="row sb"><h3>📍 Where everyone is</h3><span class="tiny" id="locCount"></span></div>
+      <div id="lmap"></div>
+      <div class="row" style="gap:8px;margin-bottom:6px"><button class="btn ghost sm" id="locFit">⤢ Everyone</button><button class="btn ghost sm" id="locMe">📍 Me</button></div>
+      <div class="sw"><div class="k">Share my live location<span id="locHint">Only while the app is open. Everyone on this retreat can see your pin.</span></div><button class="tog" id="locTog" aria-label="Share my location"></button></div>
+    </div>
     <div class="card"><div id="broLead"></div><h3 id="broH">Brothers</h3><div id="broList"></div></div>
   </section>
 
@@ -320,6 +343,7 @@ body.offline .off{display:inline}
 <div class="overlay" id="ovBro"><div class="sheet"><div class="hd"><h2 id="bH">Brother</h2><button class="x" data-close="ovBro">✕</button></div><div id="bBody"></div></div></div>
 <div class="toast" id="toast"></div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
 <script>
 const API='https://ymuwuhvqqftgpxwhzoub.supabase.co/functions/v1/tl-api';
 const KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltdXd1aHZxcWZ0Z3B4d2h6b3ViIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM2NjUyMzgsImV4cCI6MjA5OTI0MTIzOH0.sOkWQpulWj_ZSqMNSV7YP55T70UFSm2mP5e5xapQyQo';
@@ -368,12 +392,12 @@ async function doCreate(){const b={action:'retreat_create',name:$('#cName').valu
   if(!b.name||!b.start||!b.end){toast('Name + dates');return}if(!/^\d{4,8}$/.test(b.pin)){toast('PIN: 4–8 digits');return}
   $('#cGo').disabled=true;try{const j=await api(b);enter(j);setView('lead');toast('Retreat created — share the code')}catch(e){toast(e.message)}$('#cGo').disabled=false}
 function enter(j){apply(j);history.replaceState(null,'',location.pathname);document.body.classList.remove('entry');$('#entry').style.display='none';$('#entryBg').style.display='none';$('#app').style.display='';$('#nav').style.display='';startPoll()}
-function logout(msg){SES=null;S=null;localStorage.removeItem(SK);clearInterval(pollT);showEntry();if(msg)toast(msg)}
+function logout(msg){stopLoc(false);if(LMAP){LMAP.remove();LMAP=null;LMARKS={}}SES=null;S=null;localStorage.removeItem(SK);clearInterval(pollT);showEntry();if(msg)toast(msg)}
 
 /* ===================== RENDER ===================== */
 function setView(v){view=v;$$('.view').forEach(e=>e.classList.toggle('on',e.id==='v-'+v));$$('.nav button').forEach(b=>b.classList.toggle('on',b.dataset.v===v));window.scrollTo({top:0});
   if(v==='chat'){unread=0;$('[data-v=chat]').classList.remove('new');setTimeout(()=>{const c=$('#chat');c.lastElementChild&&c.lastElementChild.scrollIntoView({block:'end'})},30)}
-  if(v==='lead')renderLead();poll(true)}
+  if(v==='lead')renderLead();if(v==='bro')renderLoc();poll(true)}
 function renderAll(){if(!S)return;renderHdr();renderToday();renderSched();renderChat();renderMu();renderBro();if(view==='lead')renderLead();$('#navLead').style.display=isLeader()?'':'none';$('#nav').classList.toggle('l',isLeader());$('#anTog').style.display=isLeader()?'':'none';$('#sAdd').style.display=isLeader()?'':'none';$('#meBtn').textContent=av(S.me)}
 function renderHdr(){const r=S.retreat;$('#hName').textContent=r.name;const T=todayKey(),ds=days(),i=ds.indexOf(T);
   $('#hDay').textContent=T<r.start_date?`Starts ${fmtD(r.start_date,{day:'numeric',month:'short'})}`:T>r.end_date?'Retreat complete':`Day ${i+1} of ${ds.length}`;document.title=r.name+' · Traditional Legacies'}
@@ -411,7 +435,7 @@ function muHTML(m){const me=S.me.id;const inn=m.in.map(mem).filter(Boolean);cons
 function renderMu(){const now=Date.now();const up=S.meetups.filter(m=>new Date(m.at)>now-36e5),past=S.meetups.filter(m=>new Date(m.at)<=now-36e5).reverse();
   $('#muList').innerHTML=up.length?up.map(muHTML).join(''):'<div class="tiny">Nothing set up yet. Be the first.</div>';$('#muPastCard').style.display=past.length?'':'none';$('#muPast').innerHTML=past.slice(0,10).map(muHTML).join('')}
 function broHTML(m,lead){return `<div class="br ${lead?'lead':''}" data-bro="${m.id}"><div class="av">${av(m)}</div><div class="m"><b>${esc(m.name)}${m.id===S.me.id?' (you)':''}</b><span>${lead?'Retreat leader':esc(m.bio||'')}</span></div>${lead?'<span class="pill">Leader</span>':''}</div>`}
-function renderBro(){const lead=S.members.filter(m=>m.role==='leader'),rest=S.members.filter(m=>m.role!=='leader');$('#broLead').innerHTML=lead.map(m=>broHTML(m,true)).join('');$('#broH').textContent=`${rest.length} brother${rest.length===1?'':'s'}`;$('#broList').innerHTML=rest.map(m=>broHTML(m)).join('')||'<div class="tiny">No one has joined yet. Share the code.</div>'}
+function renderBro(){if(view==='bro')renderLoc();const lead=S.members.filter(m=>m.role==='leader'),rest=S.members.filter(m=>m.role!=='leader');$('#broLead').innerHTML=lead.map(m=>broHTML(m,true)).join('');$('#broH').textContent=`${rest.length} brother${rest.length===1?'':'s'}`;$('#broList').innerHTML=rest.map(m=>broHTML(m)).join('')||'<div class="tiny">No one has joined yet. Share the code.</div>'}
 function renderLead(){if(!isLeader())return;const r=S.retreat;$$('#lTabs button').forEach(b=>b.classList.toggle('on',b.dataset.l===ltab));$$('.lsec').forEach(e=>e.classList.toggle('on',e.id==='l-'+ltab));
   const link=location.origin+location.pathname+'?join='+r.code;$('#lCodeBig').textContent=r.code;$('#lQr').src='https://api.qrserver.com/v1/create-qr-code/?size=320x320&margin=0&data='+encodeURIComponent(link);
   const ds=days();$('#cpFrom').innerHTML=$('#cpTo').innerHTML=ds.map((k,i)=>`<option value="${k}">Day ${i+1} · ${fmtD(k)}</option>`).join('');if(ds[1])$('#cpTo').value=ds[1];
@@ -419,12 +443,37 @@ function renderLead(){if(!isLeader())return;const r=S.retreat;$$('#lTabs button'
   $('#lPeopleH').textContent=`${S.members.length} people`;$('#lPeople').innerHTML=S.members.map(m=>`<div class="br"><div class="av">${av(m)}</div><div class="m"><b>${esc(m.name)}</b><span>${m.role==='leader'?'Leader':esc(m.bio||'joined '+ago(m.joined_at)+' ago')}</span></div>${m.id!==S.me.id?`<button class="btn danger sm" data-rm="${m.id}">Remove</button>`:''}</div>`).join('');
   if(document.activeElement&&document.activeElement.closest('#l-retreat'))return;$('#rName').value=r.name;$('#rTag').value=r.tagline||'';$('#rStart').value=r.start_date;$('#rEnd').value=r.end_date;$('#rLoc').value=r.location||'';$('#rWelcome').value=r.welcome||''}
 
+/* ===================== LIVE LOCATION ===================== */
+let LMAP=null,LMARKS={},locWatch=null,locLast=0,locLastPos=null,myPos=null;
+const locOn=()=>localStorage.getItem('tl_loc_share')==='1';
+function fmtAgo(iso){const s=(Date.now()-new Date(iso))/1000;if(s<90)return 'just now';if(s<3600)return Math.floor(s/60)+' min ago';if(s<86400)return Math.floor(s/3600)+' h ago';return Math.floor(s/86400)+' d ago'}
+function initLMap(){if(!window.L||LMAP||!document.getElementById('lmap'))return;LMAP=L.map('lmap',{zoomControl:true}).setView([-8.3577,116.0812],14);L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(LMAP);setTimeout(()=>LMAP.invalidateSize(),150)}
+function renderLoc(){const tog=$('#locTog');tog.classList.toggle('on',locOn());
+  const locs=(S.locs||[]).filter(l=>mem(l.member_id));$('#locCount').textContent=locs.length?`${locs.length} of ${S.members.length} sharing`:'nobody sharing yet';
+  if(!window.L){$('#lmap').innerHTML='<div class="tiny" style="padding:16px">Map needs signal the first time it loads.</div>';return}
+  initLMap();if(!LMAP)return;setTimeout(()=>LMAP.invalidateSize(),50);
+  const seen=new Set();
+  for(const l of locs){const m=mem(l.member_id);const stale=Date.now()-new Date(l.at)>30*60e3;const ico=L.divIcon({className:'',html:`<div class="lp ${l.member_id===S.me.id?'me':''} ${stale?'stale':''}"><div class="a">${av(m)}</div><div class="n">${esc(m.name.split(' ')[0])}</div></div>`,iconSize:[60,60],iconAnchor:[30,56],popupAnchor:[0,-50]});
+    const pop=`<b>${esc(m.name)}</b><span style="color:var(--muted);font-size:12px">${m.role==='leader'?'Leader · ':''}${fmtAgo(l.at)}${l.acc?' · ±'+Math.round(l.acc)+' m':''}</span><div class="pa"><a href="https://www.google.com/maps/dir/?api=1&destination=${l.lat},${l.lon}&travelmode=walking" target="_blank" rel="noopener"><button>🧭 Walk there</button></a></div>`;
+    if(LMARKS[l.member_id]){LMARKS[l.member_id].setLatLng([l.lat,l.lon]).setIcon(ico).setPopupContent(pop)}else{LMARKS[l.member_id]=L.marker([l.lat,l.lon],{icon:ico}).addTo(LMAP).bindPopup(pop)}seen.add(l.member_id)}
+  for(const id of Object.keys(LMARKS))if(!seen.has(id)){LMARKS[id].remove();delete LMARKS[id]}
+  if(!renderLoc.fitted&&locs.length){fitAll();renderLoc.fitted=true}}
+function fitAll(){const pts=Object.values(LMARKS).map(m=>m.getLatLng());if(!pts.length){toast('No one is sharing yet');return}if(pts.length===1)LMAP.setView(pts[0],16);else LMAP.fitBounds(L.latLngBounds(pts).pad(.25))}
+async function pushLoc(pos,force){const {latitude:lat,longitude:lon,accuracy:acc}=pos.coords;myPos=[lat,lon];const moved=!locLastPos||Math.hypot((lat-locLastPos[0])*111000,(lon-locLastPos[1])*111000*Math.cos(lat*Math.PI/180))>25;
+  if(!force&&!moved&&Date.now()-locLast<60000)return;if(!force&&!moved&&Date.now()-locLast<60000)return;locLast=Date.now();locLastPos=[lat,lon];
+  try{await api({action:'loc_set',lat,lon,acc});S.locs=(S.locs||[]).filter(l=>l.member_id!==S.me.id).concat([{member_id:S.me.id,lat,lon,acc,at:new Date().toISOString()}]);if(view==='bro')renderLoc()}catch(e){}}
+function startLoc(){if(!navigator.geolocation){toast('No location on this phone');return}if(locWatch!=null)return;
+  locWatch=navigator.geolocation.watchPosition(p=>pushLoc(p,false),err=>{if(err.code===1){localStorage.setItem('tl_loc_share','0');stopLoc(false);toast('Location blocked — allow it in your phone settings');renderLoc()}},{enableHighAccuracy:true,maximumAge:15000,timeout:20000});
+  navigator.geolocation.getCurrentPosition(p=>pushLoc(p,true),()=>{},{enableHighAccuracy:true,timeout:15000})}
+async function stopLoc(tellServer){if(locWatch!=null){navigator.geolocation.clearWatch(locWatch);locWatch=null}locLastPos=null;if(tellServer){try{await api({action:'loc_off'})}catch(e){}S.locs=(S.locs||[]).filter(l=>l.member_id!==S.me.id)}}
+function toggleLoc(){if(locOn()){localStorage.setItem('tl_loc_share','0');stopLoc(true).then(renderLoc);toast('Location sharing off')}else{localStorage.setItem('tl_loc_share','1');startLoc();renderLoc();toast('Sharing your location with the retreat')}}
+
 /* ===================== ACTIONS ===================== */
 async function poll(force){if(!SES||document.hidden&&!force)return;try{const j=await api({action:'state'});const prevLast=S&&S.posts.length?S.posts[S.posts.length-1].id:null;const prevN=S?S.posts.length:0;S=Object.assign({},S,j);
   const newPosts=S.posts.filter(p=>!prevLast||p.created_at>(S.posts.find(x=>x.id===prevLast)||{}).created_at);
   if(prevLast&&newPosts.length&&view!=='chat'){const fromOthers=newPosts.filter(p=>p.member_id!==S.me.id&&p.kind!=='sys');if(fromOthers.length){unread+=fromOthers.length;$('[data-v=chat]').classList.add('new');const an=fromOthers.find(p=>p.kind==='announce');if(an)toast('📣 '+an.text.slice(0,80));if(document.hidden&&'Notification' in window&&Notification.permission==='granted'){try{new Notification(an?'📣 Announcement':'💬 '+((mem(fromOthers[0].member_id)||{}).name||'Brother'),{body:fromOthers[0].text.slice(0,120),icon:'icon-192.png'})}catch(e){}}}}
   renderAll()}catch(e){}}
-function startPoll(){clearInterval(pollT);pollT=setInterval(()=>poll(false),view==='chat'?5000:20000)}
+function startPoll(){if(locOn())startLoc();clearInterval(pollT);pollT=setInterval(()=>poll(false),view==='chat'?5000:20000)}
 async function send(){const t=$('#q').value.trim();if(!t)return;$('#q').value='';$('#q').style.height='';const kind=anMode&&isLeader()?'announce':'msg';
   S.posts.push({id:'tmp',member_id:S.me.id,kind,text:t,created_at:new Date().toISOString()});renderChat();
   try{await api({action:'post',text:t,kind});if(anMode){anMode=false;$('#anTog').classList.remove('on')}await poll(true)}catch(e){toast(e.message);S.posts=S.posts.filter(p=>p.id!=='tmp');renderChat()}}
@@ -458,6 +507,7 @@ function init(){
   $('#meSave').onclick=async()=>{try{await api({action:'me_edit',name:$('#meName').value.trim(),avatar:meAv,bio:$('#meBio').value.trim(),phone:$('#mePhone').value.trim()});$('#ovMe').classList.remove('on');await poll(true);toast('Saved')}catch(e){toast(e.message)}};
   $('#meOut').onclick=async()=>{if(!confirm(isLeader()?'Log out of the leader desk on this phone?':'Leave this retreat on this phone? You can join again with the code.'))return;try{if(!isLeader())await api({action:'leave'})}catch(e){}$('#ovMe').classList.remove('on');logout('Signed out')};
   let deferred=null;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();deferred=e});$('#meInstall').onclick=()=>{if(deferred){deferred.prompt();deferred=null}else toast(/iphone|ipad/i.test(navigator.userAgent)?'Tap Share → Add to Home Screen':'Use your browser menu → Add to Home screen')};
+  $('#locTog').onclick=toggleLoc;$('#locFit').onclick=fitAll;$('#locMe').onclick=()=>{if(myPos&&LMAP)LMAP.setView(myPos,17);else if(!locOn())toast('Turn on sharing first');else toast('Waiting for a GPS fix…')};
   $('#lTabs').onclick=e=>{const b=e.target.closest('[data-l]');if(b){ltab=b.dataset.l;renderLead()}};
   $('#lCopy').onclick=()=>{const l=location.origin+location.pathname+'?join='+S.retreat.code;navigator.clipboard&&navigator.clipboard.writeText(l);toast('Link copied')};
   $('#lShare').onclick=async()=>{const l=location.origin+location.pathname+'?join='+S.retreat.code;const text=`${S.retreat.name} — join the retreat app. Code ${S.retreat.code}\n${l}`;if(navigator.share){try{await navigator.share({title:S.retreat.name,text,url:l})}catch(e){}}else{navigator.clipboard&&navigator.clipboard.writeText(text);toast('Copied — paste it in the group')}};
