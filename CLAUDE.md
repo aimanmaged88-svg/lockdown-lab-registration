@@ -15,6 +15,40 @@ redeploying). Before deploying, make sure your branch contains main's extras
 Keeping main in sync with the live state is the only durable protection.
 Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
 
+## Lombok Companion — Aiman's travel-money app (2026-10-09)
+
+- **Why:** Aiman flies to Lombok 10 Oct 2026 08:00, home 24 Oct (14 nights);
+  asked for a Netlify app to track trip finances, daily allowance, "how much
+  will I have by day X", plus an AI travel companion.
+- **LIVE: https://lombok-companion.netlify.app** — its OWN Netlify site
+  (id `568dfc4e-ecbf-40f2-b0b7-cd9d510f44ae`, team aimanmaged88), NOT the
+  certifiedhooper site, so no Git-CD clobber risk. Manual deploy via the
+  Netlify MCP `deploy-site` op (returns an `npx @netlify/mcp … --site-id`
+  command) run from a standalone folder = `lombok/*` + `netlify/functions/
+  lombok-ai.mjs` + a tiny netlify.toml (publish ".", functions dir, no-cache on
+  sw.js/index.html). Source of truth in repo: `lombok/` + the function.
+- **App** (`lombok/index.html`, single file, localStorage `lombok_v1`, SW
+  `lombok-v1`, manifest, palm/sunset icons): setup sheet (budget AUD, buffer,
+  dates default 10–24 Oct, live AUD→IDR rate via open.er-api.com, manual
+  override locks it). Engine `calc()`: pot = budget + top-ups − buffer −
+  committed; allowance today = (remaining + spent today − future overrides) /
+  free remaining days (re-spreads daily); pace = avg of COMPLETED days;
+  projections plan vs pace per date; cash in pocket = cash-in (ATM/changer/
+  brought) − cash spends, fee counts as spend. Tabs: Today (hero, companion
+  brief, quick-add Lombok prices, cash), Log (IDR⇄AUD, 13 cats, cash/card,
+  cash-in w/ fee, add money), Plan (SVG chart plan/pace/history, pick-a-date,
+  day table with per-day overrides, category bars, committed costs, 14-day
+  itinerary + spot guide), Companion (chat). Backup/restore JSON in settings.
+- **AI:** `netlify/functions/lombok-ai.mjs` at `/api/ai` → Anthropic via
+  **Netlify AI Gateway** (no key; billed in Netlify credits on his Pro team);
+  model chain claude-sonnet-5-5 → sonnet-4-5 → haiku-5-5 → haiku-4-5. Client
+  sends `contextReport()` (full finance state + itinerary + guide) as system
+  context. GET `/api/ai` = health probe. If the function fails/offline the app
+  answers with the built-in `localAnswer()` brain (exact numbers, keyword
+  routing) and says so. Verified live: gateway ok:true, chat answered with
+  claude-sonnet-5-5, SW registered, rate fetched.
+- Prices in QUICK/GUIDE/ITIN are rough 2026 guides, labelled as such.
+
 ## Targets + Game Journal — the 1-on-1 athlete kit (2026-10-07)
 
 - **Why:** a mother reached out for 1-on-1 coaching of her young son
