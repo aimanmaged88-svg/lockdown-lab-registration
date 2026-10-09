@@ -2,7 +2,7 @@
 // Runs on Netlify Functions and talks to Anthropic through Netlify's AI Gateway,
 // which injects ANTHROPIC_API_KEY + ANTHROPIC_BASE_URL at runtime (no key to manage).
 
-const MODELS = ["claude-sonnet-5-5", "claude-sonnet-4-5", "claude-haiku-5-5", "claude-haiku-4-5"];
+const MODELS = ["claude-sonnet-4-5", "claude-sonnet-5-5", "claude-haiku-5-5", "claude-haiku-4-5"];
 
 const CHAT_SYSTEM = `You are the travel companion inside "Travel Companion", a personal trip app (money, map + day plans, translator, journal). You talk to the traveller directly — casual, direct, warm, Aussie-friendly if they're Australian. They asked you to be "full in depth, my travel companion".
 
@@ -25,7 +25,7 @@ function json(body, status = 200) {
   return new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json", "cache-control": "no-store" } });
 }
 
-async function callClaude(base, key, system, messages, max_tokens) {
+async function callClaude(base, key, system, messages, max_tokens, minLen = 0) {
   let lastErr = null;
   for (const model of MODELS) {
     try {
@@ -37,8 +37,8 @@ async function callClaude(base, key, system, messages, max_tokens) {
       const j = await r.json().catch(() => ({}));
       if (r.ok) {
         const text = (j.content || []).filter((c) => c.type === "text").map((c) => c.text).join("\n").trim();
-        if (text) return { text, model };
-        lastErr = "empty reply";
+        if (text && text.length >= minLen) return { text, model, stop: j.stop_reason };
+        lastErr = text ? "reply too short" : "empty reply";
         continue;
       }
       lastErr = j?.error?.message || `HTTP ${r.status}`;
@@ -100,9 +100,9 @@ export default async (req) => {
   if (clean.length && clean[0].role !== "user") clean.shift();
   if (!clean.length) return json({ error: "need a user message" }, 400);
   const system = [{ type: "text", text: CHAT_SYSTEM }, { type: "text", text: "CONTEXT (live app state):\n" + context }];
-  const r = await callClaude(base, key, system, clean, 900);
+  const r = await callClaude(base, key, system, clean, 900, 60);
   if (r.error) return json({ error: r.error }, 502);
-  return json({ text: r.text, model: r.model });
+  return json({ text: r.text, model: r.model, stop: r.stop });
 };
 
 export const config = { path: "/api/ai", method: ["GET", "POST"] };

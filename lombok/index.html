@@ -650,7 +650,7 @@ function idrFull(n){return lsym()+(bigLocal()?Math.round(n).toLocaleString('en-A
 const toAud=i=>i/S.rate, toIdr=a=>a*S.rate;
 function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),2200)}
 function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
-function md(s){return esc(s).replace(/\*\*(.+?)\*\*/g,'<b>$1</b>')}
+function md(s){return esc(s).split('\n').map(l=>{const h=l.match(/^#{1,4}\s+(.*)$/);if(h)return '<b>'+h[1]+'</b>';return l.replace(/^\s*[-*]\s+/,'• ')}).join('\n').replace(/\*\*(.+?)\*\*/g,'<b>$1</b>').replace(/\n{3,}/g,'\n\n')}
 function langRow(){return LANGS.find(l=>l[0]===S.lang)||LANGS[0]}
 function allPlaces(){return POIS.map((p,i)=>Object.assign({id:'p'+i},p)).concat(S.pins)}
 function placeById(id){return allPlaces().find(p=>p.id===id)}
