@@ -73,6 +73,20 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
 - Prices in the pack are rough 2026 guides, labelled as such. POI names come
   from OpenStreetMap (ODbL) — attribution shown on the map.
 
+## Lombok app — Quick money in/out + Fix my numbers (2026-10-10, Aiman: "very
+editable… put money in, put money out… very simple")
+- Today tab now opens with two big buttons `#qmOut` **− Spent** / `#qmIn`
+  **＋ Money in** → `#ovQuick` sheet: Rp/$ toggle (`#qCur`, defaults Rp for
+  spends, $ for money-in), big amount, category chips, cash/card, and for
+  money-in a kind picker (Top-up = `in` / Cash out of ATM = `atm` + fee). One
+  tap saves (`saveQuick()` → S.tx + render).
+- Tapping the big "left" number (`#potLeft`) opens `#ovPot` **Fix my numbers**:
+  type what you actually have left, budget, buffer, cash in pocket →
+  `savePot()` writes correcting entries ("Cash count fix" FIRST — a cash
+  shortfall is a cash spend — then "Balance fix" so remaining lands exactly on
+  the typed figure). Any entry in Log is still tap-to-edit. Hint line under
+  the pot says so. test4.mjs 12/12, deployed + verified live.
+
 ## Traditional Legacies — retreat companion for Yousof "Brother Dib" (2026-10-10)
 
 - **Why:** Aiman: "make another Netlify version of this… for Traditional

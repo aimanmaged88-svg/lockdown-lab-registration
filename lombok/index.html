@@ -243,6 +243,25 @@ body.offline .off{display:inline}
 .lightbox{position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:85;display:none;align-items:center;justify-content:center}
 .lightbox.on{display:flex}
 .lightbox img{max-width:100%;max-height:100%;object-fit:contain}
+.qm{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 0 12px}
+.qm button{padding:18px 12px;border-radius:18px;font-size:18px;font-weight:900;display:flex;flex-direction:column;align-items:center;gap:4px;letter-spacing:-.01em}
+.qm button span{font-size:11px;font-weight:700;opacity:.8;letter-spacing:.08em;text-transform:uppercase}
+.qm .out{background:linear-gradient(135deg,rgba(255,122,89,.95),rgba(255,92,122,.9));color:#1a0b06;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 12px 28px rgba(255,100,100,.25)}
+.qm .in{background:linear-gradient(135deg,rgba(61,220,151,.95),rgba(45,212,191,.9));color:#042b27;box-shadow:inset 0 1px 0 rgba(255,255,255,.5),0 12px 28px rgba(45,212,191,.25)}
+.qm button:active{transform:scale(.97)}
+.bigin{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:18px}
+.bigin b{font-size:26px;color:var(--muted)}
+.bigin input{flex:1;background:none;border:0;outline:0;font-size:44px;font-weight:900;min-width:0;letter-spacing:-.03em;text-align:right}
+.curp{display:flex;gap:6px}
+.curp button{padding:8px 14px;border-radius:999px;font-weight:800;font-size:13px;background:rgba(255,255,255,.06);border:1px solid var(--line2)}
+.curp button.on{background:rgba(255,122,89,.22);border-color:var(--coral);color:var(--text)}
+.qcat{display:flex;gap:8px;overflow-x:auto;padding:4px 0;scrollbar-width:none}.qcat::-webkit-scrollbar{display:none}
+.qcat button{flex:none;padding:9px 12px;border-radius:999px;font-size:13px;font-weight:800;background:rgba(255,255,255,.06);border:1px solid var(--line2)}
+.qcat button.on{background:rgba(255,122,89,.22);border-color:var(--coral)}
+.opt{display:flex;gap:12px;align-items:center;padding:12px;border-radius:14px;border:1px solid var(--line2);margin-top:8px;background:rgba(255,255,255,.04)}
+.opt.on{border-color:var(--aqua);background:rgba(45,212,191,.12)}
+.opt .e{font-size:22px}.opt b{display:block;font-size:14px}.opt span{font-size:12px;color:var(--muted)}
+#potLeft{cursor:pointer}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 /* ===================== LIQUID GLASS ===================== */
 .orbs{position:fixed;inset:0;z-index:-1;overflow:hidden;pointer-events:none}
@@ -308,7 +327,7 @@ body{background:radial-gradient(1200px 700px at 85% -15%,rgba(255,122,89,.22),tr
     <div class="card hero">
       <div class="row sb"><h3 style="margin:0">Left in the pot</h3><span class="pill" id="paceP">—</span></div>
       <div class="big" id="potLeft" style="margin-top:10px">$0</div>
-      <div class="sub" id="potLeftIdr">—</div>
+      <div class="sub" id="potLeftIdr">—</div><div class="tiny" style="margin-top:4px">Tap the number to fix it · tap any entry to edit it</div>
       <div class="grid2" style="margin-top:14px">
         <div class="stat"><div class="l">Safe to spend today</div><div class="v" id="allowToday">$0</div><div class="n" id="allowTodayIdr">—</div></div>
         <div class="stat"><div class="l">Spent today</div><div class="v" id="spentToday">$0</div><div class="n" id="leftToday">—</div></div>
@@ -322,6 +341,7 @@ body{background:radial-gradient(1200px 700px at 85% -15%,rgba(255,122,89,.22),tr
       <div style="margin-top:12px"><button class="btn ghost" id="goPlan">📈 Projections, day budgets & committed costs</button></div>
     </div>
 
+    <div class="qm"><button class="out" id="qmOut">➖ Money out<span>spent something</span></button><button class="in" id="qmIn">➕ Money in<span>top-up or cash out</span></button></div>
     <div class="card">
       <div class="row sb"><h3>🧭 Your companion says</h3><button class="link" id="briefMore">Chat →</button></div>
       <div class="brief" id="brief">…</div>
@@ -603,6 +623,31 @@ body{background:radial-gradient(1200px 700px at 85% -15%,rgba(255,122,89,.22),tr
   <div class="note" style="margin:0 0 10px">Measure: standing reach (flat feet, arm up) vs the highest point you touch on a max jump. The difference is your vertical. Same wall, same chalk, same shoes both times.</div>
   <div id="jumpAll"></div>
   <div style="height:12px"></div><button class="btn danger" id="jumpReset">Reset the program</button>
+</div></div>
+<div class="overlay" id="ovQuick"><div class="sheet">
+  <div class="hd"><h2 id="qH">Money out</h2><button class="x" data-close="ovQuick">✕</button></div>
+  <div class="row sb"><div class="curp" id="qCur"><button data-c="L" class="on">Rp</button><button data-c="H">$</button></div><span class="tiny" id="qCv"></span></div>
+  <div class="bigin" style="margin-top:10px"><b id="qSym">Rp</b><input id="qAmt" inputmode="decimal" placeholder="0" autocomplete="off"></div>
+  <div id="qOutFields">
+    <label class="f">What for</label><div class="qcat" id="qCats"></div>
+    <label class="f">Paid with</label><div class="seg" id="qPay"><button data-p="cash" class="on">💵 Cash</button><button data-p="card">💳 Card</button></div>
+  </div>
+  <div id="qInFields" style="display:none">
+    <div class="opt on" data-k="in"><div class="e">💰</div><div><b>More money for the trip</b><span>Adds to your budget — a top-up, a refund, money someone gave you</span></div></div>
+    <div class="opt" data-k="atm"><div class="e">🏧</div><div><b>Cash I took out</b><span>ATM or money changer — moves money into your pocket, doesn't change the budget</span></div></div>
+    <div id="qFeeWrap" style="display:none"><label class="f">ATM fee (Rp)</label><input class="inp" id="qFee" inputmode="numeric" placeholder="0"></div>
+  </div>
+  <label class="f">Note (optional)</label><input class="inp" id="qNote" placeholder="Nasi goreng · boat · SIM card">
+  <div style="height:14px"></div><button class="btn" id="qSave">Save</button>
+  <div class="note">Need a different date or more detail? Use the Log tab.</div>
+</div></div>
+<div class="overlay" id="ovPot"><div class="sheet">
+  <div class="hd"><h2>Fix my numbers</h2><button class="x" data-close="ovPot">✕</button></div>
+  <label class="f">What I actually have left right now (<span class="hcur">AUD</span>)</label><input class="inp" id="pLeft" inputmode="decimal" placeholder="e.g. 1480" style="font-size:24px;font-weight:900">
+  <div class="note" style="margin-top:4px">Type the real number and I'll add one “balance fix” entry so everything matches. Allowance and projections recalculate instantly.</div>
+  <div class="grid2" style="margin-top:12px"><div><label class="f">Total trip money</label><input class="inp" id="pBudget" inputmode="decimal"></div><div><label class="f">Buffer</label><input class="inp" id="pBuffer" inputmode="decimal"></div></div>
+  <label class="f">Cash in pocket right now (<span class="lcur">IDR</span>)</label><input class="inp" id="pCash" inputmode="numeric" placeholder="leave blank to keep">
+  <div style="height:14px"></div><button class="btn" id="pSave">Save</button>
 </div></div>
 <div class="bigshow" id="bigshow"><div id="bigTxt"></div><small>tap anywhere to close</small></div>
 <div class="lightbox" id="lightbox"><img id="lbImg" alt=""></div>
@@ -1192,6 +1237,31 @@ function saveSetup(){
 async function backup(){const photos={};for(const id of await DB.keys()){const b=await DB.get(id);if(b)photos[id]=await blobToB64(b)}const out=Object.assign({},S,{_photos:photos});const b=new Blob([JSON.stringify(out)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='companion-backup-'+todayKey()+'.json';a.click();toast('Backup downloaded (with photos)')}
 async function restore(file){try{const j=JSON.parse(await file.text());if(!(j&&(j.v===1||j.v===2)&&Array.isArray(j.tx))){toast('Not a Companion backup');return}const ph=j._photos||{};delete j._photos;for(const [id,d] of Object.entries(ph))await DB.put(id,b64ToBlob(d));S=Object.assign({},DEFAULTS,j);S.v=2;save();$('#ovSetup').classList.remove('on');render();renderChat();toast('Restored')}catch(e){toast('Could not read that file')}}
 
+/* ===================== QUICK MONEY + FIX NUMBERS ===================== */
+let Q={mode:'out',cur:'L',cat:'food',pay:'cash',kind:'in'};
+const QCATS=[['food','🍜 Food'],['coffee','☕ Coffee'],['drinks','🍻 Drinks'],['transport','🛵 Transport'],['activity','🤿 Activity'],['boat','⛵ Boat'],['stay','🛏️ Stay'],['shopping','🛍️ Shopping'],['health','💊 Health'],['other','✨ Other']];
+function qSym(){return Q.cur==='L'?lsym().trim():hsym().trim()}
+function qVals(){const v=parseFloat(($('#qAmt').value||'').replace(/[^0-9.]/g,''))||0;return Q.cur==='L'?{idr:v,aud:toAud(v)}:{idr:toIdr(v),aud:v}}
+function qUpd(){const a=qVals();$('#qSym').textContent=qSym();$('#qCv').textContent=a.idr?(Q.cur==='L'?'≈ '+aud(a.aud,true):'≈ '+idrFull(a.idr)):'';$$('#qCur button').forEach(b=>b.classList.toggle('on',b.dataset.c===Q.cur))}
+function openQuick(mode){Q.mode=mode;Q.cur=mode==='in'?'H':'L';if(mode==='in')Q.kind='in';$('#qH').textContent=mode==='out'?'Money out':'Money in';$('#qAmt').value='';$('#qNote').value='';$('#qFee').value='';
+  $('#qOutFields').style.display=mode==='out'?'':'none';$('#qInFields').style.display=mode==='in'?'':'none';
+  $('#qCats').innerHTML=QCATS.map(c=>`<button data-qc="${c[0]}" class="${Q.cat===c[0]?'on':''}">${c[1]}</button>`).join('');
+  $$('#qInFields .opt').forEach(o=>o.classList.toggle('on',o.dataset.k===Q.kind));$('#qFeeWrap').style.display=Q.kind==='atm'?'':'none';
+  $('#qSave').textContent=mode==='out'?'Save spend':'Add it';qUpd();$('#ovQuick').classList.add('on');setTimeout(()=>$('#qAmt').focus(),120)}
+function saveQuick(){const a=qVals();if(!a.idr){toast('Type the amount');$('#qAmt').focus();return}
+  const t={id:uid(),ts:Date.now(),d:todayKey(),idr:+a.idr.toFixed(bigLocal()?0:2),aud:+a.aud.toFixed(2),note:$('#qNote').value.trim()};
+  if(Q.mode==='out'){t.type='spend';t.cat=Q.cat;t.pay=Q.pay}else if(Q.kind==='atm'){t.type='atm';t.fee=parseFloat($('#qFee').value)||0}else{t.type='in'}
+  S.tx.push(t);save();$('#ovQuick').classList.remove('on');render();if(navigator.vibrate)navigator.vibrate(12);
+  const c=calc();toast(t.type==='spend'?`−${aud(t.aud,true)} · ${c.leftToday>=0?aud(c.leftToday)+' left today':aud(-c.leftToday)+' over today'}`:t.type==='atm'?`Pocket +${idr(t.idr)}`:`Budget +${aud(t.aud)} · pot now ${aud(c.remaining)}`)}
+function openPot(){const c=calc();$('#pLeft').value=Math.round(c.remaining);$('#pBudget').value=S.budget;$('#pBuffer').value=S.buffer;$('#pCash').value='';$('#ovPot').classList.add('on');setTimeout(()=>{$('#pLeft').focus();$('#pLeft').select()},120)}
+function savePot(){const b=parseFloat($('#pBudget').value),bf=parseFloat($('#pBuffer').value);if(b>0)S.budget=b;if(bf>=0)S.buffer=bf;
+  // cash count first (a cash shortfall is a spend and moves the pot), then the pot fix lands exactly on what was typed
+  const cash=parseFloat($('#pCash').value);if(!isNaN(cash)){const cur=calc().cashIdr;const d=cash-cur;if(Math.abs(d)>=1){const t={id:uid(),ts:Date.now(),d:todayKey(),note:'Cash count fix',idr:Math.abs(d),aud:+toAud(Math.abs(d)).toFixed(2)};if(d>0){t.type='atm';t.fee=0}else{t.type='spend';t.cat='other';t.pay='cash'}S.tx.push(t)}}
+  const want=parseFloat($('#pLeft').value);const c=calc();
+  if(!isNaN(want)&&Math.abs(want-c.remaining)>=0.5){const diff=want-c.remaining;const t={id:uid(),ts:Date.now(),d:todayKey(),note:'Balance fix',idr:+toIdr(Math.abs(diff)).toFixed(bigLocal()?0:2),aud:+Math.abs(diff).toFixed(2)};
+    if(diff>0)t.type='in';else{t.type='spend';t.cat='other';t.pay='card'}S.tx.push(t)}
+  save();$('#ovPot').classList.remove('on');render();toast('Numbers fixed')}
+
 /* ===================== WIRING ===================== */
 function init(){
   $('#txDate').value=todayKey();renderCats();setType('spend');setCur('L');
@@ -1257,6 +1327,13 @@ function init(){
   $('#jumpFull').onclick=()=>{renderJumpAll();$('#ovJump').classList.add('on')};
   $('#jBase').onchange=()=>{S.jump.base=$('#jBase').value.trim();save();renderJump()};$('#jRetest').onchange=()=>{S.jump.retest=$('#jRetest').value.trim();save();renderJump()};
   $('#jumpReset').onclick=()=>{if(confirm('Reset the Jump Higher program?')){S.jump={start:null,done:{},base:'',retest:''};save();$('#ovJump').classList.remove('on');renderJump()}};
+  $('#qmOut').onclick=()=>openQuick('out');$('#qmIn').onclick=()=>openQuick('in');$('#potLeft').onclick=openPot;$('#pSave').onclick=savePot;
+  $('#qCur').onclick=e=>{const b=e.target.closest('[data-c]');if(b){const a=qVals();Q.cur=b.dataset.c;if(a.idr)$('#qAmt').value=Q.cur==='L'?(bigLocal()?Math.round(a.idr):+a.idr.toFixed(2)):+a.aud.toFixed(2);qUpd()}};
+  $('#qAmt').oninput=qUpd;$('#qAmt').onkeydown=e=>{if(e.key==='Enter')saveQuick()};
+  $('#qCats').onclick=e=>{const b=e.target.closest('[data-qc]');if(b){Q.cat=b.dataset.qc;$$('#qCats button').forEach(x=>x.classList.toggle('on',x===b))}};
+  $('#qPay').onclick=e=>{const b=e.target.closest('button');if(b){Q.pay=b.dataset.p;$$('#qPay button').forEach(x=>x.classList.toggle('on',x===b))}};
+  $('#qInFields').onclick=e=>{const o=e.target.closest('.opt');if(o){Q.kind=o.dataset.k;$$('#qInFields .opt').forEach(x=>x.classList.toggle('on',x===o));$('#qFeeWrap').style.display=Q.kind==='atm'?'':'none';if(Q.kind==='atm'&&Q.cur==='H'){Q.cur='L';qUpd()}}};
+  $('#qSave').onclick=saveQuick;
   $('#chips').onclick=e=>{const b=e.target.closest('.chip');if(b)ask(b.textContent)};
   $('#send').onclick=()=>{const q=$('#q').value;$('#q').value='';ask(q)};$('#q').onkeydown=e=>{if(e.key==='Enter')$('#send').click()};
   $('#exportBtn').onclick=backup;$('#importBtn').onclick=()=>$('#importFile').click();$('#importFile').onchange=e=>{const f=e.target.files[0];if(f)restore(f)};
