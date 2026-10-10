@@ -87,6 +87,40 @@ editable… put money in, put money out… very simple")
   the typed figure). Any entry in Log is still tap-to-edit. Hint line under
   the pot says so. test4.mjs 12/12, deployed + verified live.
 
+## Lombok app — LIVE CONVERSATION + money reset / expected money (2026-10-10,
+Aiman: "easy back and forth… communicate live and openly… delete all the funds
+and money stuff, I'll input it manually… I have projected funds coming in")
+- **💬 Talk back & forth** = `#ovTalk` full-screen overlay (button `#trTalk` at
+  the top of the Translate tab). Two big mic buttons: **🎤 Me speaks English**
+  (SpeechRecognition en-AU → `trCore(text,'to')` → bubble shows the LOCAL
+  translation big + pronunciation + "You said: …", auto-spoken in the local
+  voice) and **🎤 Them speaks <lang>** (SR in `langRow()[2]` → English bubble,
+  auto-spoken en-AU). Type fallback row (`#tkIn` + Them/Me). 🔊 Auto toggle,
+  🔄 Flip (rotates their bubbles + their mic 180° so they can read across the
+  table), Clear, tap a bubble to re-speak. Turns persist in `S.talk` (last
+  60). `trCore(t,dir)` was factored out of `translate()` (phrasebook exact
+  hit first, then `/api/ai` mode translate). Tap-to-talk only — no hands-free
+  continuous listening (browser SR is one utterance per start).
+- **One-time money wipe:** `load()` sets `seeds.moneyReset1` and clears
+  tx/fixed/budget/dayPlan/incoming for any already-set-up state (`MONEY_RESET`
+  — declared BEFORE `let S=load()`, TDZ bit me), then init opens **`#ovMoney`
+  "Set up your money"**: cash on me (local) + bank/card funds (home) + buffer
+  + **Expected money coming in** rows (`S.incoming` [{id,label,aud,d,sure}],
+  "count now" chip). `saveMoney()`: budget = bank + toAud(cash), writes a
+  "Cash on me" atm/spend fix so the pocket matches, saves incoming. `#mWipe`
+  = wipe money again (journal/plans/pins kept). Reachable from the hero
+  ("💰 set up my money"), Fix-my-numbers (`#pMoney`) and Plan → Expected
+  money card (`#incEdit`).
+- **calc():** `incLanded` (sure OR d ≤ today) joins `budgetEff`; `incPending`
+  is added to plan/pace on its date (`bp+=arrive` in the future loop) so the
+  chart + "on the 21st" jump when it lands but today's allowance stays
+  conservative. Hero line `#potInc` ("＋ $200 counted in · ＋ $500 still to
+  land (Tue 13 Oct)"), Plan card `#incList`, contextReport has an EXPECTED
+  MONEY line so the AI knows. Tests: `tl/promo-src/lombok-money-talk-test.mjs`
+  18/18 (wipe once, sheet, budget math, cash pocket, pending vs landed,
+  projection jump, talk me/them turns with stubbed API, flip, persist,
+  classic translate, no re-wipe on reload); desktop regression still 6/6.
+
 ## Lombok app — DESKTOP layout (2026-10-10, Aiman: "make a desktop version")
 - `/* DESKTOP */` block at the end of lombok/index.html `<style>`:
   `@media(min-width:1000px)` turns the bottom nav pill into a fixed 232px LEFT

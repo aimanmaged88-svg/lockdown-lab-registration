@@ -358,6 +358,42 @@ body{background:radial-gradient(1200px 700px at 85% -15%,rgba(255,122,89,.22),tr
   #v-today{columns:3}
   #v-log{grid-template-columns:460px minmax(0,1fr)}
 }
+
+/* ===================== TALK (live back-and-forth) ===================== */
+#ovTalk{position:fixed;inset:0;background:var(--bg);z-index:56;display:none;flex-direction:column}
+#ovTalk.on{display:flex}
+#ovTalk .th{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:calc(10px + var(--sat)) 14px 10px;border-bottom:1px solid var(--line)}
+#ovTalk .th b{font-size:15px}
+#ovTalk .th .tiny{display:block}
+.tlog{flex:1;overflow-y:auto;padding:14px 14px 10px;display:flex;flex-direction:column;gap:10px}
+.tb{max-width:86%;padding:12px 14px;border-radius:18px;border:1px solid var(--line2);background:var(--card);cursor:pointer;animation:rise .25s var(--ease)}
+.tb .o{font-size:13px;color:var(--muted);margin-top:4px}
+.tb .t{font-size:22px;font-weight:800;line-height:1.25;white-space:pre-wrap}
+.tb .p{font-size:12px;color:var(--aqua);margin-top:3px;font-style:italic}
+.tb.me{align-self:flex-end;background:linear-gradient(135deg,rgba(255,122,89,.28),rgba(255,122,89,.1));border-color:rgba(255,122,89,.45)}
+.tb.them{align-self:flex-start;background:linear-gradient(135deg,rgba(45,212,191,.25),rgba(45,212,191,.08));border-color:rgba(45,212,191,.4)}
+.tb.wait .t{color:var(--muted);font-weight:600}
+#ovTalk.flip .tb.them,#ovTalk.flip #tkThem{transform:rotate(180deg)}
+.tkbtns{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px 14px 0}
+.tkbtns button{border-radius:18px;padding:18px 10px;font-weight:900;font-size:16px;border:1px solid var(--line2);display:flex;flex-direction:column;align-items:center;gap:4px;transition:transform .15s var(--ease)}
+.tkbtns button span{font-size:11px;font-weight:700;opacity:.8;letter-spacing:.08em;text-transform:uppercase}
+.tkbtns button:active{transform:scale(.97)}
+#tkMe{background:linear-gradient(135deg,rgba(255,122,89,.35),rgba(255,122,89,.15))}
+#tkThem{background:linear-gradient(135deg,rgba(45,212,191,.32),rgba(45,212,191,.12))}
+.tkbtns button.live{box-shadow:0 0 0 3px rgba(255,255,255,.25),0 0 30px rgba(255,255,255,.2);animation:pulse 1s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 8px rgba(255,255,255,.08)}}
+.tktype{display:flex;gap:8px;padding:10px 14px calc(14px + var(--sab))}
+.tktype input{flex:1;min-width:0}
+.tktype button{border-radius:12px;padding:0 14px;font-weight:800;border:1px solid var(--line2);background:var(--card)}
+.tkopts{display:flex;gap:6px;align-items:center}
+.tkopts button{font-size:12px;font-weight:800;border:1px solid var(--line2);border-radius:999px;padding:5px 10px;color:var(--muted);background:var(--card)}
+.tkopts button.on{color:var(--text);border-color:var(--aqua);background:rgba(45,212,191,.15)}
+@media (min-width:1000px){#ovTalk{left:232px}.tlog{padding:20px 40px}.tb{max-width:70%}.tkbtns,.tktype{padding-left:40px;padding-right:40px}}
+.incrow{display:grid;grid-template-columns:1.3fr .8fr 1fr auto auto;gap:6px;align-items:center;margin-bottom:6px}
+.incrow input{padding:9px 10px;font-size:14px}
+.incrow .chk{font-size:11px;font-weight:800;color:var(--muted);border:1px solid var(--line2);border-radius:999px;padding:6px 8px;white-space:nowrap}
+.incrow .chk.on{color:var(--text);border-color:var(--mint,#34d399);background:rgba(52,211,153,.15)}
+.incrow .x{color:var(--muted);font-size:18px;padding:4px 6px}
 </style>
 </head>
 <body>
@@ -376,7 +412,7 @@ body{background:radial-gradient(1200px 700px at 85% -15%,rgba(255,122,89,.22),tr
     <div class="card hero">
       <div class="row sb"><h3 style="margin:0">Left in the pot</h3><span class="pill" id="paceP">—</span></div>
       <div class="big" id="potLeft" style="margin-top:10px">$0</div>
-      <div class="sub" id="potLeftIdr">—</div><div class="tiny" style="margin-top:4px">Tap the number to fix it · tap any entry to edit it</div>
+      <div class="sub" id="potLeftIdr">—</div><div class="tiny" id="potInc" style="margin-top:6px;color:var(--mint,#34d399);display:none"></div><div class="tiny" style="margin-top:4px">Tap the number to fix it · tap any entry to edit it · <button class="link" id="moneySetup" style="font-size:12px">💰 set up my money</button></div>
       <div class="grid2" style="margin-top:14px">
         <div class="stat"><div class="l">Safe to spend today</div><div class="v" id="allowToday">$0</div><div class="n" id="allowTodayIdr">—</div></div>
         <div class="stat"><div class="l">Spent today</div><div class="v" id="spentToday">$0</div><div class="n" id="leftToday">—</div></div>
@@ -456,6 +492,7 @@ body{background:radial-gradient(1200px 700px at 85% -15%,rgba(255,122,89,.22),tr
       <div class="note" style="margin:0 0 8px">Tap a budget to override it for that day (boat trips, treks, big nights). Blank = evenly spread.</div>
       <table class="table" id="dayTable"></table>
     </div>
+    <div class="card"><div class="row sb"><h3>💸 Expected money coming in</h3><button class="link" id="incEdit">Edit →</button></div><div class="note" style="margin:0 0 8px">Money you're expecting. Counted on the day it lands (or straight away if you tick "count now") — projections jump on that date.</div><div id="incList"></div></div>
     <div class="card"><h3>🍱 Where it's going</h3><div id="catBars"></div></div>
     <div class="card">
       <div class="row sb"><h3>🔒 Committed costs</h3><button class="link" id="addFixed">+ Add</button></div>
@@ -522,6 +559,7 @@ body{background:radial-gradient(1200px 700px at 85% -15%,rgba(255,122,89,.22),tr
   <!-- ============ TRANSLATE ============ -->
   <section class="view" id="v-tr">
     <div class="card">
+      <button class="btn aqua" id="trTalk" style="margin-bottom:12px">💬 Talk back &amp; forth — live conversation</button>
       <div class="row sb" style="margin-bottom:8px"><h3 style="margin:0" id="trHead">English → Indonesian</h3><button class="link" id="trSwap">⇄ Swap</button></div>
       <div class="tr">
         <div class="lab"><span id="trFrom">English</span><button class="link" id="trMic">🎤 Speak</button></div>
@@ -697,7 +735,29 @@ body{background:radial-gradient(1200px 700px at 85% -15%,rgba(255,122,89,.22),tr
   <div class="grid2" style="margin-top:12px"><div><label class="f">Total trip money</label><input class="inp" id="pBudget" inputmode="decimal"></div><div><label class="f">Buffer</label><input class="inp" id="pBuffer" inputmode="decimal"></div></div>
   <label class="f">Cash in pocket right now (<span class="lcur">IDR</span>)</label><input class="inp" id="pCash" inputmode="numeric" placeholder="leave blank to keep">
   <div style="height:14px"></div><button class="btn" id="pSave">Save</button>
+  <div style="height:8px"></div><button class="btn ghost" id="pMoney">💰 Set up / reset all my money</button>
 </div></div>
+
+<div class="overlay" id="ovMoney"><div class="sheet">
+  <div class="hd"><h2>Set up your money</h2><button class="x" data-close="ovMoney">✕</button></div>
+  <div class="note" style="margin:0 0 10px">Three numbers and you're done. Everything else (allowance per day, projections) comes from these.</div>
+  <label class="f">Cash on me right now (<span class="lcur">IDR</span>)</label><input class="inp" id="mCash" inputmode="numeric" placeholder="e.g. 2500000" style="font-size:22px;font-weight:900">
+  <label class="f">Money in the bank / on the card for this trip (<span class="hcur">AUD</span>)</label><input class="inp" id="mBank" inputmode="decimal" placeholder="e.g. 1200" style="font-size:22px;font-weight:900">
+  <label class="f">Buffer to keep untouched (<span class="hcur">AUD</span>)</label><input class="inp" id="mBuffer" inputmode="decimal" placeholder="e.g. 150">
+  <label class="f">Expected money coming in</label>
+  <div id="incRows"></div>
+  <button class="btn ghost sm" id="incAdd">＋ Add expected money</button>
+  <div class="note">Tick <b>count now</b> if it's certain and you want it in today's allowance. Leave it unticked and it only counts from the date it lands.</div>
+  <div style="height:14px"></div><button class="btn" id="mSave">Save my money</button>
+  <div style="height:8px"></div><button class="btn ghost" id="mWipe" style="color:var(--coral)">🗑 Wipe all money entries &amp; start clean</button>
+</div></div>
+
+<div id="ovTalk">
+  <div class="th"><div><b>💬 Live conversation</b><span class="tiny" id="tkLangs">English ⇄ Indonesian · tap a bubble to hear it again</span></div><div class="tkopts"><button id="tkAuto" class="on" title="Speak translations out loud">🔊 Auto</button><button id="tkFlip" title="Flip their side so they can read it across the table">🔄 Flip</button><button id="tkClear">Clear</button><button id="tkClose">✕</button></div></div>
+  <div class="tlog" id="tlog"></div>
+  <div class="tkbtns"><button id="tkThem">🎤 Them<span id="tkThemL">speaks Indonesian</span></button><button id="tkMe">🎤 Me<span>speaks English</span></button></div>
+  <div class="tktype"><input class="inp" id="tkIn" placeholder="…or type it" autocomplete="off"><button id="tkSendThem" title="Send as them">Them</button><button id="tkSendMe" title="Send as me">Me</button></div>
+</div>
 <div class="bigshow" id="bigshow"><div id="bigTxt"></div><small>tap anywhere to close</small></div>
 <div class="lightbox" id="lightbox"><img id="lbImg" alt=""></div>
 <div class="toast" id="toast"></div>
@@ -773,9 +833,12 @@ const CATE=Object.fromEntries(PIN_CATS.map(c=>[c[0],c[1]]));CATE.culture='🕌';
 const POIS=[{"n":"Pachamama Organic Cafe & Restaurant","la":-8.35316,"lo":116.08517,"c":"food","cu":"organic"},{"n":"Manta Dive Restaurant","la":-8.36219,"lo":116.0874,"c":"food"},{"n":"Raja Restaurant and Bar","la":-8.3598,"lo":116.0874,"c":"food"},{"n":"Tyrell Restaurant","la":-8.36278,"lo":116.08211,"c":"food"},{"n":"Ings Garden Restaurant","la":-8.36097,"lo":116.07839,"c":"food","cu":"burger, sandwich, grill, tea, local, cof"},{"n":"Villa Karang Restaurant","la":-8.36399,"lo":116.08106,"c":"food"},{"n":"H&R restaurant","la":-8.3591,"lo":116.08083,"c":"food"},{"n":"Salabose Restaurant","la":-8.36229,"lo":116.077,"c":"food"},{"n":"Warung Sunny","la":-8.35563,"lo":116.08225,"c":"food","cu":"indonesian, pancake, international"},{"n":"The Garden Cafe","la":-8.36456,"lo":116.08556,"c":"food"},{"n":"Martabak & Terang Bulan","la":-8.36209,"lo":116.08366,"c":"food"},{"n":"Bunga Warung","la":-8.36242,"lo":116.08539,"c":"food"},{"n":"Streetfood places, go here!!","la":-8.36216,"lo":116.08365,"c":"food"},{"n":"Classico","la":-8.36185,"lo":116.08243,"c":"food","cu":"pizza"},{"n":"Warung Nelly","la":-8.36129,"lo":116.08299,"c":"food"},{"n":"Waterfront","la":-8.36206,"lo":116.08738,"c":"food"},{"n":"Lemon Grass","la":-8.36245,"lo":116.08344,"c":"food"},{"n":"Musa","la":-8.35765,"lo":116.08364,"c":"food"},{"n":"Segar Resto","la":-8.35744,"lo":116.08723,"c":"food"},{"n":"Burger Lady","la":-8.35854,"lo":116.08373,"c":"food","cu":"burger, crepe, indonesian, mexican, sand"},{"n":"Kenzo Cafe and Bar","la":-8.35853,"lo":116.0837,"c":"food","cu":"indonesian, italian_pizza"},{"n":"Shendy's Café","la":-8.35949,"lo":116.08485,"c":"food"},{"n":"eazy gili waroeng","la":-8.36138,"lo":116.08353,"c":"food","cu":"indonesian"},{"n":"Shark Bites","la":-8.36239,"lo":116.08329,"c":"food"},{"n":"Warung Sasak","la":-8.36155,"lo":116.08406,"c":"food"},{"n":"Wiwin Café","la":-8.35901,"lo":116.08676,"c":"food"},{"n":"Lookdown Kitchen","la":-8.3587,"lo":116.08298,"c":"food"},{"n":"Waroeng Seafood and Steak","la":-8.36137,"lo":116.08348,"c":"food","cu":"indonesian, pizza, asian"},{"n":"Ruby's Cafe","la":-8.36187,"lo":116.0848,"c":"food","cu":"indonesian, asian"},{"n":"Biba Beach Cafe","la":-8.35923,"lo":116.0874,"c":"food"},{"n":"Chill Out","la":-8.3637,"lo":116.0875,"c":"food"},{"n":"Raja Rasa","la":-8.3598,"lo":116.08348,"c":"food","cu":"indonesian"},{"n":"Warung Sasak","la":-8.35894,"lo":116.08737,"c":"food"},{"n":"Le cirque","la":-8.36321,"lo":116.08743,"c":"food"},{"n":"D Las Resto","la":-8.36285,"lo":116.08333,"c":"food"},{"n":"Warung Padang Sumatra","la":-8.36035,"lo":116.08363,"c":"food"},{"n":"Unzip","la":-8.36176,"lo":116.08733,"c":"food"},{"n":"Munchies Cafe","la":-8.35964,"lo":116.08739,"c":"food"},{"n":"The 9 Musas","la":-8.35548,"lo":116.0816,"c":"food"},{"n":"Allora","la":-8.35572,"lo":116.08354,"c":"food"},{"n":"Warung Nelayan","la":-8.35238,"lo":116.08331,"c":"food"},{"n":"Diva Cafe","la":-8.35251,"lo":116.0866,"c":"food"},{"n":"Bambu Beach Kitchen","la":-8.35306,"lo":116.08669,"c":"food"},{"n":"The Mexican Kitchen","la":-8.35254,"lo":116.08653,"c":"food","cu":"mexican"},{"n":"The Family Café","la":-8.35523,"lo":116.08338,"c":"food"},{"n":"Pituq - Resto, Café & Shop","la":-8.35551,"lo":116.08374,"c":"food"},{"n":"Le Bistro","la":-8.35232,"lo":116.08649,"c":"food","cu":"burger, indonesian, ice_cream, french"},{"n":"Youpy cafe","la":-8.35221,"lo":116.08647,"c":"food"},{"n":"Lalapan grill and fried","la":-8.36221,"lo":116.08364,"c":"food"},{"n":"Pockets & Pints","la":-8.36033,"lo":116.08357,"c":"food"},{"n":"Gecko Cafe","la":-8.36251,"lo":116.08298,"c":"cafe"},{"n":"Sunrise Cafe","la":-8.36308,"lo":116.08749,"c":"cafe"},{"n":"The Play Cafe","la":-8.35496,"lo":116.08125,"c":"cafe"},{"n":"Bollata Cafe","la":-8.35116,"lo":116.08151,"c":"cafe"},{"n":"Good Earth Café","la":-8.35764,"lo":116.08475,"c":"cafe"},{"n":"Barefoot Blondie","la":-8.3631,"lo":116.08327,"c":"cafe","cu":"breakfast, coffee_shop"},{"n":"Il Gelato Damonte","la":-8.36295,"lo":116.08319,"c":"cafe"},{"n":"Scooperific","la":-8.36192,"lo":116.08733,"c":"cafe"},{"n":"Harmony Beach House","la":-8.35061,"lo":116.08317,"c":"cafe"},{"n":"Gili Coffee Roasters","la":-8.35772,"lo":116.08158,"c":"cafe","cu":"coffee_shop, breakfast"},{"n":"Gili Bliss Café","la":-8.35932,"lo":116.08078,"c":"cafe"},{"n":"Kopi Susu","la":-8.36205,"lo":116.08348,"c":"cafe","cu":"breakfast, coffee_shop, crepe, deli, fin"},{"n":"Ikhsari Warung","la":-8.36175,"lo":116.08426,"c":"cafe","cu":"asian"},{"n":"Ruby's Pies","la":-8.3628,"lo":116.08321,"c":"cafe"},{"n":"Nusa Indah","la":-8.35219,"lo":116.07956,"c":"cafe"},{"n":"Gili Medical Care","la":-8.36321,"lo":116.08321,"c":"health"},{"n":"Nusa Medical Clinic","la":-8.36113,"lo":116.08452,"c":"health"},{"n":"Blue Island Medical Centre","la":-8.36356,"lo":116.08454,"c":"health"},{"n":"GAM Gili Air Medika","la":-8.35931,"lo":116.08465,"c":"health"},{"n":"Puskesdes Gili Air","la":-8.36192,"lo":116.08502,"c":"health"},{"n":"Puskesmas Pembantu Gili Air","la":-8.36115,"lo":116.08253,"c":"health"},{"n":"The Elf","la":-8.35312,"lo":116.08151,"c":"health"},{"n":"Spa Lombok Indah","la":-8.35059,"lo":116.08393,"c":"wellness"},{"n":"The Little Spa","la":-8.35073,"lo":116.08247,"c":"wellness"},{"n":"Gili Air Garden Spa","la":-8.35407,"lo":116.08547,"c":"wellness"},{"n":"Spa Bulan Madu","la":-8.36045,"lo":116.08725,"c":"wellness"},{"n":"Zone Spa","la":-8.36153,"lo":116.08355,"c":"wellness"},{"n":"Spa Jueis Tintin (no-frills)","la":-8.35058,"lo":116.08325,"c":"wellness"},{"n":"Spa Bulan Madu","la":-8.36031,"lo":116.08705,"c":"wellness"},{"n":"Harmony Spa","la":-8.35069,"lo":116.08319,"c":"wellness"},{"n":"The Natural Spa","la":-8.36255,"lo":116.08344,"c":"wellness"},{"n":"Ceria Spa","la":-8.36221,"lo":116.08087,"c":"wellness"},{"n":"Organic Spa","la":-8.36355,"lo":116.0779,"c":"wellness"},{"n":"Jasmine Spa","la":-8.36219,"lo":116.0769,"c":"wellness"},{"n":"Massage","la":-8.36281,"lo":116.0772,"c":"wellness"},{"n":"sunset 2","la":-8.35723,"lo":116.07485,"c":"sight"},{"n":"The Next Dimension","la":-8.35352,"lo":116.07794,"c":"sight"},{"n":"Gili Land Hotel","la":-8.35835,"lo":116.08466,"c":"stay"},{"n":"B52 Hotel and Villa - Gili Air","la":-8.36096,"lo":116.08369,"c":"stay"},{"n":"The Amelya Hotel and Villa Gili Air","la":-8.36097,"lo":116.08385,"c":"stay"},{"n":"Hotel Gili Air","la":-8.35075,"lo":116.08506,"c":"stay"},{"n":"Hotel Ombak Paradise","la":-8.36421,"lo":116.07914,"c":"stay"},{"n":"Happy Homestay","la":-8.36107,"lo":116.08232,"c":"stay"},{"n":"Blue Marine Dive Resort","la":-8.35316,"lo":116.08656,"c":"stay"},{"n":"Kaluku Gili Resort","la":-8.35366,"lo":116.08658,"c":"stay"},{"n":"Color Cottage","la":-8.35401,"lo":116.0858,"c":"stay"},{"n":"Ajik Homestay","la":-8.35495,"lo":116.08358,"c":"stay"},{"n":"Light House Villa","la":-8.36248,"lo":116.08222,"c":"stay"},{"n":"Azila Homestay","la":-8.35606,"lo":116.08343,"c":"stay"},{"n":"Gili Kolanta Indah Bungalows","la":-8.35883,"lo":116.08445,"c":"stay"},{"n":"Tipsea Turtle","la":-8.35312,"lo":116.08628,"c":"stay"},{"n":"Villa Saïa","la":-8.35856,"lo":116.08342,"c":"stay"},{"n":"OMALA Village Gili Air","la":-8.36266,"lo":116.08362,"c":"stay"},{"n":"Ardi Beltza Bungalows","la":-8.35171,"lo":116.08174,"c":"stay"},{"n":"Gili Holiday","la":-8.36107,"lo":116.08444,"c":"stay"},{"n":"Villa Nangka","la":-8.35687,"lo":116.08414,"c":"stay"},{"n":"Gili Air Hostel","la":-8.36235,"lo":116.08343,"c":"stay"},{"n":"Harmony's House","la":-8.36106,"lo":116.08313,"c":"stay"},{"n":"Santigi Homestay","la":-8.3611,"lo":116.08479,"c":"stay"},{"n":"Melbao Homestay","la":-8.36208,"lo":116.08228,"c":"stay"},{"n":"Hello lumbung homestay","la":-8.3613,"lo":116.08165,"c":"stay"},{"n":"Musa villas & bungalows","la":-8.35239,"lo":116.08175,"c":"stay"},{"n":"Biba Beach Village","la":-8.35924,"lo":116.08718,"c":"stay"},{"n":"3 Angels Homestay","la":-8.36067,"lo":116.08516,"c":"stay"},{"n":"Aladdin homestay","la":-8.36221,"lo":116.08224,"c":"stay"},{"n":"L'Archipel","la":-8.35856,"lo":116.0847,"c":"stay"},{"n":"Firda Homestay","la":-8.36182,"lo":116.08231,"c":"stay"},{"n":"Mirna Homestay","la":-8.35685,"lo":116.08284,"c":"stay"},{"n":"Goodtimes Homestay","la":-8.35711,"lo":116.07959,"c":"stay"},{"n":"Royal Regantris Villa Karang","la":-8.36371,"lo":116.08119,"c":"stay"},{"n":"Begadang Backpacker","la":-8.35589,"lo":116.07866,"c":"stay"},{"n":"Dolcemare resort","la":-8.36178,"lo":116.07789,"c":"stay"},{"n":"Elephant House and Bungalows","la":-8.36298,"lo":116.07854,"c":"stay"},{"n":"Gili Buana Hostel","la":-8.35684,"lo":116.07813,"c":"stay"},{"n":"Blue Marlin Dive Gili Air","la":-8.3547,"lo":116.07722,"c":"stay"},{"n":"Kelapa Gading Bungalow","la":-8.35466,"lo":116.07922,"c":"stay"},{"n":"Pondok Pantai Bungalows","la":-8.35447,"lo":116.07776,"c":"stay"},{"n":"Mola Resort","la":-8.3631,"lo":116.07757,"c":"stay"},{"n":"Bintang beach 2 bungalows","la":-8.3517,"lo":116.08065,"c":"stay"},{"n":"Beranda Ecolodge","la":-8.35857,"lo":116.08096,"c":"stay"},{"n":"Sunrise","la":-8.36305,"lo":116.08723,"c":"stay"},{"n":"Lumbung Gefe","la":-8.35949,"lo":116.08578,"c":"stay"},{"n":"Ali-Baba Bungalow","la":-8.35272,"lo":116.08655,"c":"stay"},{"n":"Rival Village","la":-8.36245,"lo":116.08482,"c":"stay"},{"n":"Scallywags Mango Retreat","la":-8.3617,"lo":116.08481,"c":"stay"},{"n":"Smugglers Hideaway","la":-8.36163,"lo":116.08225,"c":"stay"},{"n":"Unzipp Villa","la":-8.36176,"lo":116.08701,"c":"stay"},{"n":"Family Bungalow","la":-8.35844,"lo":116.08445,"c":"stay"},{"n":"Black Sweet Bungalow","la":-8.35855,"lo":116.08356,"c":"stay"},{"n":"Sister Bungalow","la":-8.36162,"lo":116.08309,"c":"stay"},{"n":"BAGUS BUNGALOW","la":-8.35643,"lo":116.08359,"c":"stay"},{"n":"Toro-Toro Bungalow","la":-8.35918,"lo":116.08487,"c":"stay"},{"n":"WP Bungalow","la":-8.35801,"lo":116.08521,"c":"stay"},{"n":"SCANDINAVIA BUNGALOW","la":-8.35629,"lo":116.08354,"c":"stay"},{"n":"Goodtimes Bungalow","la":-8.35712,"lo":116.07955,"c":"stay"},{"n":"Sari Gili Bungalow","la":-8.36154,"lo":116.08127,"c":"stay"},{"n":"Bintang Beach Bungalow","la":-8.35174,"lo":116.08105,"c":"stay"},{"n":"Waroeng Ibu Atun & Bungalows","la":-8.36151,"lo":116.08176,"c":"stay"},{"n":"Public Boat Ticket Office","la":-8.36374,"lo":116.08317,"c":"boat"},{"n":"Ganggari Fast Boat","la":-8.36301,"lo":116.08328,"c":"boat"},{"n":"Star Bar","la":-8.35277,"lo":116.08665,"c":"bar"},{"n":"Sailing Bar","la":-8.3589,"lo":116.08725,"c":"bar"},{"n":"Bintang Tiga Bungalows & Bar","la":-8.35119,"lo":116.08167,"c":"bar"},{"n":"The Little Bar","la":-8.35067,"lo":116.08263,"c":"bar"},{"n":"Bambu Beach Bar","la":-8.35313,"lo":116.08677,"c":"bar"},{"n":"Darkside Bar","la":-8.35879,"lo":116.08719,"c":"bar"},{"n":"Gili Bliss Healthy Juice Bar & Cafe","la":-8.36308,"lo":116.08325,"c":"bar"},{"n":"Freedom Bar","la":-8.36339,"lo":116.0875,"c":"bar"},{"n":"Ugem bar","la":-8.35639,"lo":116.08724,"c":"bar"},{"n":"Gusung Indah Bar","la":-8.3521,"lo":116.08636,"c":"bar"},{"n":"Cheeky Monkey Beach Bar","la":-8.36202,"lo":116.07659,"c":"bar"},{"n":"Bunga Bar and Restaurant","la":-8.35334,"lo":116.07827,"c":"bar"},{"n":"Tiki bar","la":-8.36254,"lo":116.0769,"c":"bar"},{"n":"Space bar 🍄","la":-8.35555,"lo":116.0788,"c":"bar"},{"n":"Lucky's Bar and Restaurant","la":-8.36298,"lo":116.07735,"c":"bar"},{"n":"The Beach Club","la":-8.36467,"lo":116.08681,"c":"bar"},{"n":"Legend Restaurant","la":-8.3505,"lo":116.08358,"c":"bar"},{"n":"La Siesta Gili Air. Bungalows & Cusine","la":-8.35446,"lo":116.08234,"c":"bar"},{"n":"I am bagus","la":-8.36242,"lo":116.08342,"c":"bar","cu":"barbecue, american, indonesian, french, "},{"n":"Lombok Indah","la":-8.35055,"lo":116.08414,"c":"bar"},{"n":"Smile","la":-8.36191,"lo":116.07676,"c":"bar"},{"n":"Pura Vida","la":-8.35129,"lo":116.08123,"c":"bar"},{"n":"NoName","la":-8.36055,"lo":116.07614,"c":"bar"},{"n":"Safaris","la":-8.36374,"lo":116.07792,"c":"bar"},{"n":"La Bohème","la":-8.35195,"lo":116.08022,"c":"bar"},{"n":"BNI","la":-8.35995,"lo":116.0872,"c":"money"},{"n":"Bank Mandiri","la":-8.36327,"lo":116.08315,"c":"money"},{"n":"CIMB Niaga","la":-8.36409,"lo":116.08487,"c":"money"},{"n":"Jalan Pantai","la":-8.36416,"lo":116.08501,"c":"money"},{"n":"Sunset Boulevard","la":-8.36083,"lo":116.08115,"c":"shop"},{"n":"H2O Yoga and Meditation Center","la":-8.35738,"lo":116.08448,"c":"wellness"},{"n":"Flowers and Fire Yoga Garden","la":-8.36006,"lo":116.08366,"c":"wellness"},{"n":"H2O Yoga and Meditation Center","la":-8.35717,"lo":116.08449,"c":"wellness"},{"n":"Warung Polong","la":-8.36222,"lo":116.08336,"c":"food"},{"n":"Warung Air Bakso","la":-8.35661,"lo":116.08354,"c":"food"},{"n":"Mamaa Warung","la":-8.36088,"lo":116.08161,"c":"food"},{"n":"Warung Bambu","la":-8.36205,"lo":116.08331,"c":"food"},{"n":"Warung Lalapan Saba","la":-8.3613,"lo":116.08728,"c":"food"},{"n":"Wulan Warung","la":-8.361,"lo":116.08346,"c":"food"},{"n":"Basra Warung","la":-8.36313,"lo":116.08418,"c":"food"},{"n":"Warung Kampung","la":-8.3619,"lo":116.0844,"c":"food","cu":"indonesian"},{"n":"Warung Gili","la":-8.36189,"lo":116.08487,"c":"food"},{"n":"Warung Farida","la":-8.36158,"lo":116.08341,"c":"food"},{"n":"Warung Seribu Dua","la":-8.36105,"lo":116.08419,"c":"food","cu":"indonesian"},{"n":"Warung Aladdin","la":-8.36229,"lo":116.08247,"c":"food","cu":"indonesian"},{"n":"Warung Sasak","la":-8.36155,"lo":116.08406,"c":"food"},{"n":"Gili Air Clinic Center","la":-8.35427,"lo":116.08507,"c":"health"},{"n":"Island Clinic Center","la":-8.36223,"lo":116.08331,"c":"health"},{"n":"Gili Air Lagoon Resort","la":-8.36404,"lo":116.08603,"c":"stay"},{"n":"Divino Resort","la":-8.36267,"lo":116.0825,"c":"stay"},{"n":"Ocean 5","la":-8.36326,"lo":116.08296,"c":"stay"},{"n":"Turtle Beach Hotel","la":-8.35946,"lo":116.08719,"c":"sight"},{"n":"Turtle garden","la":-8.35967,"lo":116.08439,"c":"sight"},{"n":"Turtle Point","la":-8.35479,"lo":116.08722,"c":"sight"},{"n":"Laundry","la":-8.3617,"lo":116.08172,"c":"shop"},{"n":"Gili Air Laundry","la":-8.36285,"lo":116.08198,"c":"shop"},{"n":"Jalan Pantai","la":-8.35587,"lo":116.08709,"c":"shop"},{"n":"Il Baretto","la":-8.35522,"lo":116.07851,"c":"cafe"},{"n":"Il Gelato Damonte","la":-8.36295,"lo":116.08319,"c":"cafe"},{"n":"Han's reef - dive site","la":-8.34893,"lo":116.08612,"c":"dive"},{"n":"Manta Dive Accomodation","la":-8.36223,"lo":116.0871,"c":"dive"},{"n":"3W Dive Center","la":-8.36027,"lo":116.08722,"c":"dive"},{"n":"Gili Pilih dive center","la":-8.36184,"lo":116.0835,"c":"dive"},{"n":"Manta Dive","la":-8.3622,"lo":116.08724,"c":"dive"},{"n":"Blue Marlin Dive Gili Air","la":-8.35444,"lo":116.07724,"c":"dive"},{"n":"gili islands divers / free dive gili air","la":-8.35534,"lo":116.07608,"c":"dive"},{"n":"Sunset Boulevard","la":-8.36083,"lo":116.08115,"c":"shop"},{"n":"Harbor Gili Air","la":-8.36418,"lo":116.08295,"c":"boat"},{"n":"Warung Seribu Dua","la":-8.36105,"lo":116.08419,"c":"food","cu":"indonesian"},{"n":"Warung Sasak","la":-8.36155,"lo":116.08406,"c":"food"}];
 const GILI={la:-8.3577,lo:116.0812,bb:[[-8.3685,116.0715],[-8.3465,116.0905]]};
 
-const DEFAULTS={v:2,name:'Aiman',dest:'Gili Air, Lombok, Indonesia',home:'AUD',local:'IDR',lang:'id',start:'2026-10-10',end:'2026-10-24',budget:0,buffer:150,rate:12443,rateAuto:true,rateAt:0,fixed:[],dayPlan:{},tx:[],chat:[],plans:{},pins:[],journal:[],setup:false,mapOff:false,todos:[],jump:{start:null,done:{},base:'',retest:''},seeds:{}};
+const DEFAULTS={v:2,name:'Aiman',dest:'Gili Air, Lombok, Indonesia',home:'AUD',local:'IDR',lang:'id',start:'2026-10-10',end:'2026-10-24',budget:0,buffer:150,rate:12443,rateAuto:true,rateAt:0,fixed:[],dayPlan:{},tx:[],chat:[],plans:{},pins:[],journal:[],setup:false,mapOff:false,todos:[],jump:{start:null,done:{},base:'',retest:''},seeds:{},incoming:[],talk:[]};
+let MONEY_RESET=false;
 let S=load();
-function load(){try{const j=JSON.parse(localStorage.getItem(KEY));if(j&&(j.v===1||j.v===2)){const s=Object.assign({},DEFAULTS,j);s.v=2;return s}}catch(e){}return JSON.parse(JSON.stringify(DEFAULTS))}
+function load(){try{const j=JSON.parse(localStorage.getItem(KEY));if(j&&(j.v===1||j.v===2)){const s=Object.assign({},DEFAULTS,j);s.v=2;s.seeds=s.seeds||{};
+  if(s.setup&&!s.seeds.moneyReset1){s.seeds.moneyReset1=true;s.tx=[];s.fixed=[];s.budget=0;s.dayPlan={};s.incoming=[];MONEY_RESET=true}
+  return s}}catch(e){}return JSON.parse(JSON.stringify(DEFAULTS))}
 function save(){localStorage.setItem(KEY,JSON.stringify(S))}
 const uid=()=>Math.random().toString(36).slice(2,10)+Date.now().toString(36);
 const isID=()=>/indonesia|lombok|gili|bali|java|sumatra|flores|komodo|jakarta|yogya/i.test(S.dest||'')||S.local==='IDR';
@@ -827,7 +890,8 @@ function calc(T){
   const feeTx=S.tx.filter(t=>t.type==='atm');
   const spentOf=k=>spendTx.filter(t=>t.d===k).reduce((a,t)=>a+t.aud,0)+feeTx.filter(t=>t.d===k).reduce((a,t)=>a+toAud(t.fee||0),0);
   const spentTotal=days.reduce((a,k)=>a+spentOf(k),0)+spendTx.filter(t=>t.d<S.start||t.d>S.end).reduce((a,t)=>a+t.aud,0);
-  const budgetEff=S.budget+topups;
+  const incAll=S.incoming||[];const incLanded=incAll.filter(i=>i.sure||i.d<=T).reduce((a,i)=>a+i.aud,0);const incPending=incAll.filter(i=>!(i.sure||i.d<=T));
+  const budgetEff=S.budget+topups+incLanded;
   const pot=budgetEff-S.buffer-fixedSum;
   const remaining=pot-spentTotal;
   const pre=T<S.start, post=T>S.end;
@@ -848,13 +912,13 @@ function calc(T){
   const avg=completed>0?spentPast/completed:spentToday;
   const paceRef=(remaining+spentToday)/daysLeft;
   const plan={},pace={};let bp=remaining,bc=remaining;
-  future.forEach((k,i)=>{if(i===0){bp-=Math.max(0,allowToday-spentToday);bc-=Math.max(0,(completed>0?avg:spentToday)-spentToday)}else{bp-=allow(k);bc-=avg}plan[k]=bp;pace[k]=bc});
+  future.forEach((k,i)=>{const arrive=incPending.filter(x=>x.d===k).reduce((a,x)=>a+x.aud,0);bp+=arrive;bc+=arrive;if(i===0){bp-=Math.max(0,allowToday-spentToday);bc-=Math.max(0,(completed>0?avg:spentToday)-spentToday)}else{bp-=allow(k);bc-=avg}plan[k]=bp;pace[k]=bc});
   const endPlan=plan[S.end],endPace=pace[S.end];
   const cashIdr=S.tx.filter(t=>t.type==='atm').reduce((a,t)=>a+t.idr,0)-S.tx.filter(t=>t.type==='spend'&&t.pay==='cash').reduce((a,t)=>a+t.idr,0);
   const cats={};spendTx.forEach(t=>{cats[t.cat]=(cats[t.cat]||0)+t.aud});feeTx.forEach(t=>{cats.fees=(cats.fees||0)+toAud(t.fee||0)});
   let status='on';const ratio=paceRef>0?avg/paceRef:0;
   if(completed===0)status=spentToday>allowToday?'over':'on';else if(ratio>1.08)status='over';else if(ratio<.85)status='under';
-  return {T,days,n,cur,idx,pre,post,daysLeft,completed,topups,fixedSum,budgetEff,pot,remaining,spentTotal,spentToday,allowToday,leftToday,base,avg,paceRef,plan,pace,endPlan,endPace,cashIdr,cats,status,allow,spentOf};
+  return {T,days,n,cur,idx,pre,post,daysLeft,completed,topups,fixedSum,budgetEff,pot,remaining,spentTotal,spentToday,allowToday,leftToday,base,avg,paceRef,plan,pace,endPlan,endPace,cashIdr,cats,status,allow,spentOf,incLanded,incPending,incAll};
 }
 
 /* ===================== COMPANION BRAIN (local, offline) ===================== */
@@ -931,7 +995,7 @@ function contextReport(){
   const pins=S.pins.map(p=>`${p.n} (${p.c})${p.note?' — '+p.note:''}`).join('; ')||'none';
   return `TRAVELLER: ${S.name}. Trip: ${S.dest}, ${S.start} to ${S.end} (${c.n} days). Today: ${c.T} (${c.pre?'PRE-TRIP':c.post?'TRIP OVER':'day '+(c.idx+1)+' of '+c.n}). Local time now: ${new Date().toLocaleString('en-AU')}.
 CURRENCIES: home ${S.home}, local ${S.local}. RATE: 1 ${S.home} = ${S.rate} ${S.local}.
-BUDGET: total ${aud(S.budget)} + top-ups ${aud(c.topups)} = ${aud(c.budgetEff)}. Buffer kept aside ${aud(S.buffer)}. Committed costs ${aud(c.fixedSum)} (${fixed}). Spendable pot ${aud(c.pot)}.
+BUDGET: total ${aud(S.budget)} + top-ups ${aud(c.topups)} + expected money already counted ${aud(c.incLanded)} = ${aud(c.budgetEff)}. EXPECTED MONEY STILL TO LAND (not counted until the date): ${c.incPending.map(i=>`${i.label||'money'} ${aud(i.aud)} on ${i.d}`).join('; ')||'none'}. Buffer kept aside ${aud(S.buffer)}. Committed costs ${aud(c.fixedSum)} (${fixed}). Spendable pot ${aud(c.pot)}.
 NOW: spent total ${aud(c.spentTotal)}; remaining pot ${aud(c.remaining)} (${idrFull(toIdr(c.remaining))}); days left incl today ${c.daysLeft}; allowance today ${aud(c.allowToday)} (${idrFull(toIdr(c.allowToday))}); spent today ${aud(c.spentToday)}; left today ${aud(c.leftToday)}; average per completed day ${aud(c.avg)} over ${c.completed} days; even-split needed ${aud(c.paceRef)}/day; status ${c.status}.
 PROJECTION end of trip: on plan ${aud(c.endPlan)}, at current pace ${aud(c.endPace)} (both exclude the buffer).
 CASH IN POCKET: ${idrFull(c.cashIdr)} (${aud(toAud(c.cashIdr))}).
@@ -985,6 +1049,8 @@ function render(){
   $('#hDay').innerHTML=c.pre?`Flies out <em>${fmtD(S.start)}</em>`:c.post?`Home 🏠 <em>trip done</em>`:`Day <em>${c.idx+1}</em> of ${c.n}`;
   $('#potLeft').innerHTML=aud(c.remaining)+`<small>${S.home}</small>`;
   $('#potLeftIdr').textContent=idrFull(toIdr(c.remaining))+' · buffer '+aud(S.buffer)+' kept aside';
+  const pendSum=c.incPending.reduce((a,i)=>a+i.aud,0);const incEl=$('#potInc');if(pendSum>0||c.incLanded>0){incEl.style.display='';incEl.textContent=(c.incLanded>0?`＋ ${aud(c.incLanded)} expected money counted in`:'')+(c.incLanded>0&&pendSum>0?' · ':'')+(pendSum>0?`＋ ${aud(pendSum)} still to land (${c.incPending.map(i=>fmtD(i.d)).join(', ')}) — projections jump then`:'')}else incEl.style.display='none';
+  $('#incList').innerHTML=c.incAll.length?c.incAll.slice().sort((a,b)=>a.d.localeCompare(b.d)).map(i=>`<div class="row sb" style="padding:8px 0;border-top:1px solid var(--line)"><div><b>${esc(i.label||'Expected money')}</b><div class="tiny">${fmtD(i.d)} · ${i.sure||i.d<=c.T?'counted in':'counts when it lands'}</div></div><b style="color:var(--mint,#34d399)">+${aud(i.aud)}</b></div>`).join(''):'<div class="tiny">Nothing expected yet. Tap Edit to add money you know is coming.</div>';
   $('#allowToday').textContent=aud(c.allowToday);$('#allowTodayIdr').textContent=idrFull(toIdr(c.allowToday));
   $('#spentToday').textContent=aud(c.spentToday);
   $('#leftToday').textContent=c.leftToday>=0?aud(c.leftToday)+' still in play':aud(-c.leftToday)+' over';
@@ -1158,15 +1224,35 @@ async function saveMapOffline(){
 let trDir='to';
 let phCat=0;
 function trLabels(){const l=langRow();$('#trHead').textContent=trDir==='to'?`English → ${l[1]}`:`${l[1]} → English`;$('#trFrom').textContent=trDir==='to'?'English':l[1];$('#trTo').textContent=trDir==='to'?l[1]:'English'}
+async function trCore(t,dir){const l=langRow();let res=null;
+  if(S.lang==='id'){const norm=x=>x.toLowerCase().replace(/\(.*?\)/g,'').replace(/[^a-z ]/g,'').replace(/\s+/g,' ').trim();const L=norm(t);const alts=x=>[norm(x),...x.split('/').map(norm)];for(const [,rows] of PHRASES_ID)for(const r of rows){if(!res&&dir==='to'&&alts(r[0]).includes(L))res={t:r[1],p:r[2],n:'From the phrasebook'};if(!res&&dir==='from'&&alts(r[1]).includes(L))res={t:r[0],p:'',n:'From the phrasebook'}}}
+  if(!res){try{const r=await fetch('/api/ai',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({mode:'translate',text:t,from:dir==='to'?'English':l[1],to:dir==='to'?l[1]:'English'})});const j=await r.json();if(r.ok&&j.t)res=j;else res={t:'',p:'',n:'Live translation unavailable right now — try the phrasebook.'}}catch(e){res={t:'',p:'',n:'No signal — the phrasebook works offline.'}}}
+  return res}
 async function translate(){
   const t=$('#trIn').value.trim();if(!t)return;const l=langRow();
   $('#trGo').disabled=true;$('#trGo').textContent='Translating…';
-  let res=null;
-  if(S.lang==='id'){const norm=x=>x.toLowerCase().replace(/\(.*?\)/g,'').replace(/[^a-z ]/g,'').replace(/\s+/g,' ').trim();const L=norm(t);const alts=x=>[norm(x),...x.split('/').map(norm)];for(const [,rows] of PHRASES_ID)for(const r of rows){if(!res&&trDir==='to'&&alts(r[0]).includes(L))res={t:r[1],p:r[2],n:'From the phrasebook'};if(!res&&trDir==='from'&&alts(r[1]).includes(L))res={t:r[0],p:'',n:'From the phrasebook'}}}
+  let res=await trCore(t,trDir);
+  if(false){const norm=x=>x.toLowerCase().replace(/\(.*?\)/g,'').replace(/[^a-z ]/g,'').replace(/\s+/g,' ').trim();const L=norm(t);const alts=x=>[norm(x),...x.split('/').map(norm)];for(const [,rows] of PHRASES_ID)for(const r of rows){if(!res&&trDir==='to'&&alts(r[0]).includes(L))res={t:r[1],p:r[2],n:'From the phrasebook'};if(!res&&trDir==='from'&&alts(r[1]).includes(L))res={t:r[0],p:'',n:'From the phrasebook'}}}
   if(!res){try{const r=await fetch('/api/ai',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({mode:'translate',text:t,from:trDir==='to'?'English':l[1],to:trDir==='to'?l[1]:'English'})});const j=await r.json();if(r.ok&&j.t)res=j;else res={t:'',p:'',n:'Live translation unavailable right now — try the phrasebook below.'}}catch(e){res={t:'',p:'',n:'No signal — the phrasebook below works offline.'}}}
   $('#trGo').disabled=false;$('#trGo').textContent='Translate';
   $('#trOutBox').style.display='';$('#trOut').textContent=res.t||'—';$('#trPr').textContent=res.p||'';$('#trNt').textContent=res.n||'';
 }
+/* ---- live conversation ---- */
+let tkAuto=true,tkRec=null;
+function tkLang(){return langRow()}
+function openTalk(){$('#tkLangs').textContent=`English ⇄ ${tkLang()[1]} · tap a bubble to hear it again`;$('#tkThemL').textContent='speaks '+tkLang()[1];S.talk=S.talk||[];renderTalk();$('#ovTalk').classList.add('on');setTimeout(()=>{const l=$('#tlog');l.scrollTop=l.scrollHeight},50)}
+function renderTalk(){const l=$('#tlog');l.innerHTML=(S.talk||[]).map(x=>`<div class="tb ${x.who} ${x.t?'':'wait'}" data-tk="${x.id}"><div class="t">${esc(x.t||'Translating…')}</div>${x.p?`<div class="p">${esc(x.p)}</div>`:''}<div class="o">${x.who==='me'?'You said':'They said'}: ${esc(x.o)}</div></div>`).join('')||`<div class="tiny" style="text-align:center;margin:auto;padding:30px">Tap <b>🎤 Me</b>, say it in English — it shows up in ${esc(tkLang()[1])} and is read out loud.<br>Hand them the phone (or flip it), they tap <b>🎤 Them</b> and answer. That's it.</div>`;l.scrollTop=l.scrollHeight}
+async function talkTurn(who,text){text=(text||'').trim();if(!text)return;S.talk=S.talk||[];const x={id:uid(),who,o:text,t:'',p:''};S.talk.push(x);if(S.talk.length>60)S.talk=S.talk.slice(-60);renderTalk();
+  const res=await trCore(text,who==='me'?'to':'from');x.t=res.t||'(couldn\'t translate — '+(res.n||'try again')+')';x.p=who==='me'?(res.p||''):'';save();renderTalk();
+  if(tkAuto&&res.t)speak(res.t,who==='me'?tkLang()[2]:'en-AU')}
+function talkListen(who){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){toast('No dictation in this browser — type it below');$('#tkIn').focus();return}
+  if(tkRec){try{tkRec.stop()}catch(e){}tkRec=null;$$('.tkbtns button').forEach(b=>b.classList.remove('live'));return}
+  speechSynthesis&&speechSynthesis.cancel();const r=new SR();tkRec=r;r.lang=who==='me'?'en-AU':tkLang()[2];r.interimResults=false;r.maxAlternatives=1;
+  const btn=$(who==='me'?'#tkMe':'#tkThem');btn.classList.add('live');
+  r.onresult=ev=>{const t=ev.results[0][0].transcript;talkTurn(who,t)};
+  r.onerror=e=>{if(e.error!=='aborted')toast(e.error==='not-allowed'?'Allow the microphone in your browser settings':'Didn\'t catch that — try again')};
+  r.onend=()=>{btn.classList.remove('live');tkRec=null};
+  try{r.start()}catch(e){btn.classList.remove('live');tkRec=null;toast('Mic busy — try again')}}
 function speak(text,lang){if(!('speechSynthesis' in window)){toast('No speech on this phone');return}speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.lang=lang||langRow()[2];u.rate=.85;const vs=speechSynthesis.getVoices();const v=vs.find(x=>x.lang&&x.lang.toLowerCase().startsWith((u.lang||'').toLowerCase().slice(0,2)));if(v)u.voice=v;speechSynthesis.speak(u)}
 function renderPhrases(){
   trLabels();
@@ -1302,6 +1388,15 @@ function saveQuick(){const a=qVals();if(!a.idr){toast('Type the amount');$('#qAm
   if(Q.mode==='out'){t.type='spend';t.cat=Q.cat;t.pay=Q.pay}else if(Q.kind==='atm'){t.type='atm';t.fee=parseFloat($('#qFee').value)||0}else{t.type='in'}
   S.tx.push(t);save();$('#ovQuick').classList.remove('on');render();if(navigator.vibrate)navigator.vibrate(12);
   const c=calc();toast(t.type==='spend'?`−${aud(t.aud,true)} · ${c.leftToday>=0?aud(c.leftToday)+' left today':aud(-c.leftToday)+' over today'}`:t.type==='atm'?`Pocket +${idr(t.idr)}`:`Budget +${aud(t.aud)} · pot now ${aud(c.remaining)}`)}
+function incRowsHTML(){return (S.incoming||[]).map(i=>`<div class="incrow" data-inc="${i.id}"><input class="inp" data-k="label" value="${esc(i.label||'')}" placeholder="From who / what"><input class="inp" data-k="aud" inputmode="decimal" value="${i.aud||''}" placeholder="${S.home}"><input class="inp" data-k="d" type="date" value="${i.d||''}"><button class="chk ${i.sure?'on':''}" data-k="sure">count now</button><button class="x" data-k="del">✕</button></div>`).join('')}
+function readIncRows(){return $$('#incRows .incrow').map(r=>({id:r.dataset.inc,label:r.querySelector('[data-k=label]').value.trim(),aud:parseFloat(r.querySelector('[data-k=aud]').value)||0,d:r.querySelector('[data-k=d]').value||todayKey(),sure:r.querySelector('[data-k=sure]').classList.contains('on')})).filter(i=>i.aud>0)}
+function openMoney(){const c=calc();$('#mCash').value=Math.round(c.cashIdr)||'';$('#mBank').value=S.budget>0?+(S.budget-toAud(Math.max(0,c.cashIdr))).toFixed(2):'';$('#mBuffer').value=S.buffer;$('#incRows').innerHTML=incRowsHTML();$('#ovPot').classList.remove('on');$('#ovMoney').classList.add('on');setTimeout(()=>$('#mCash').focus(),100)}
+function saveMoney(){const cash=parseFloat($('#mCash').value)||0,bank=parseFloat($('#mBank').value)||0,buf=parseFloat($('#mBuffer').value);
+  S.incoming=readIncRows();if(!isNaN(buf)&&buf>=0)S.buffer=buf;
+  S.budget=+(bank+toAud(cash)).toFixed(2);
+  const cur=calc().cashIdr;const d=cash-cur;if(Math.abs(d)>=1){const t={id:uid(),ts:Date.now(),d:todayKey(),note:'Cash on me',idr:Math.abs(d),aud:+toAud(Math.abs(d)).toFixed(2)};if(d>0){t.type='atm';t.fee=0}else{t.type='spend';t.cat='other';t.pay='cash'}S.tx.push(t)}
+  save();$('#ovMoney').classList.remove('on');render();toast('Money set — allowance recalculated')}
+function wipeMoney(){if(!confirm('Wipe every money entry, committed cost and expected amount? Journal, plans and pins stay.'))return;S.tx=[];S.fixed=[];S.budget=0;S.dayPlan={};S.incoming=[];save();$('#mCash').value='';$('#mBank').value='';$('#incRows').innerHTML='';render();toast('Clean slate — enter what you have')}
 function openPot(){const c=calc();$('#pLeft').value=Math.round(c.remaining);$('#pBudget').value=S.budget;$('#pBuffer').value=S.buffer;$('#pCash').value='';$('#ovPot').classList.add('on');setTimeout(()=>{$('#pLeft').focus();$('#pLeft').select()},120)}
 function savePot(){const b=parseFloat($('#pBudget').value),bf=parseFloat($('#pBuffer').value);if(b>0)S.budget=b;if(bf>=0)S.buffer=bf;
   // cash count first (a cash shortfall is a spend and moves the pot), then the pot fix lands exactly on what was typed
@@ -1356,6 +1451,13 @@ function init(){
   $('#locBtn').onclick=locate;$('#offMap').onclick=saveMapOffline;$('#mapQ').oninput=drawMarkers;
   $('#pinBtn').onclick=()=>{if(!MAP)return;openPin(pendingPin||MAP.getCenter());toast(pendingPin?'Pin at the spot you tapped':'Pin at map centre — tap the map first to choose a spot')};
   $('#pinSave').onclick=()=>{const n=$('#pinName').value.trim();if(!n){toast('Give it a name');return}S.pins.push({id:'m'+uid(),n,la:pendingPin.lat,lo:pendingPin.lng,c:$('#pinCat').value,note:$('#pinNote').value.trim()});save();$('#ovPin').classList.remove('on');drawMarkers();toast('Pinned')};
+  $('#trTalk').onclick=openTalk;$('#tkClose').onclick=()=>{if(tkRec){try{tkRec.stop()}catch(e){}}$('#ovTalk').classList.remove('on')};$('#tkMe').onclick=()=>talkListen('me');$('#tkThem').onclick=()=>talkListen('them');
+  $('#tkAuto').onclick=()=>{tkAuto=!tkAuto;$('#tkAuto').classList.toggle('on',tkAuto)};$('#tkFlip').onclick=()=>{$('#ovTalk').classList.toggle('flip');$('#tkFlip').classList.toggle('on')};$('#tkClear').onclick=()=>{S.talk=[];save();renderTalk()};
+  $('#tkSendMe').onclick=()=>{talkTurn('me',$('#tkIn').value);$('#tkIn').value=''};$('#tkSendThem').onclick=()=>{talkTurn('them',$('#tkIn').value);$('#tkIn').value=''};$('#tkIn').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();$('#tkSendMe').click()}};
+  $('#tlog').onclick=e=>{const b=e.target.closest('[data-tk]');if(!b)return;const x=(S.talk||[]).find(t=>t.id===b.dataset.tk);if(x&&x.t)speak(x.t,x.who==='me'?tkLang()[2]:'en-AU')};
+  $('#moneySetup').onclick=openMoney;$('#pMoney').onclick=openMoney;$('#incEdit').onclick=openMoney;$('#mSave').onclick=saveMoney;$('#mWipe').onclick=wipeMoney;
+  $('#incAdd').onclick=()=>{S.incoming=readIncRows();S.incoming.push({id:uid(),label:'',aud:0,d:todayKey(),sure:false});$('#incRows').innerHTML=incRowsHTML();const last=$$('#incRows .incrow').pop();last&&last.querySelector('[data-k=label]').focus()};
+  $('#incRows').onclick=e=>{const b=e.target.closest('button');if(!b)return;const row=b.closest('.incrow');if(b.dataset.k==='sure')b.classList.toggle('on');if(b.dataset.k==='del')row.remove()};
   $('#trGo').onclick=translate;$('#trIn').onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();translate()}};
   $('#trSwap').onclick=()=>{trDir=trDir==='to'?'from':'to';trLabels();const o=$('#trOut').textContent;if(o&&o!=='—'){$('#trIn').value=o;$('#trOutBox').style.display='none'}};
   $('#trSay').onclick=()=>speak($('#trOut').textContent,trDir==='to'?langRow()[2]:'en-AU');
@@ -1369,6 +1471,7 @@ function init(){
   $('#jMoods').onclick=e=>{const b=e.target.closest('[data-m]');if(b){J.mood=b.dataset.m;$$('#jMoods button').forEach(x=>x.classList.toggle('on',x===b))}};
   $('#jDel').onclick=()=>{if(!J.id)return;if(confirm('Delete this entry?')){const j=S.journal.find(x=>x.id===J.id);(j.photos||[]).forEach(id=>DB.del(id));S.journal=S.journal.filter(x=>x.id!==J.id);save();$('#ovJ').classList.remove('on');renderJournal();render()}};
   seedTodos();
+  if(MONEY_RESET){save();setTimeout(()=>{openMoney();toast('Money wiped — enter what you actually have')},600)}
   $('#todoAdd').onclick=()=>{const t=$('#todoText').value.trim();if(!t){toast('What do you want to do?');return}let u=$('#todoUrl').value.trim();if(u&&!/^https?:\/\//i.test(u))u='https://'+u;S.todos.unshift({id:uid(),ts:Date.now(),text:t,url:u,done:false});save();$('#todoText').value='';$('#todoUrl').value='';renderTodo();toast('Added')};
   $('#todoText').onkeydown=e=>{if(e.key==='Enter')$('#todoAdd').click()};
   $('#todoList').onclick=e=>{if(e.target.closest('[data-stop]'))return;const del=e.target.closest('[data-tododel]');if(del){S.todos=S.todos.filter(t=>t.id!==del.dataset.tododel);save();renderTodo();return}const row=e.target.closest('[data-todo]');if(row){const t=S.todos.find(x=>x.id===row.dataset.todo);if(t){t.done=!t.done;save();renderTodo();if(t.done&&navigator.vibrate)navigator.vibrate(12)}}};
