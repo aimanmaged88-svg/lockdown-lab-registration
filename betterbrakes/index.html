@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Better Brakes Parramatta</title>
+<title>Better Brakes Better Car Servicing</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="description" content="Brake specialists, log book servicing, rego inspections, mechanical reports and green slips in the Parramatta CBD. Car wash and detailing on site. 87-89 George Street, Parramatta. Call 9633 1858.">
+<meta name="description" content="Auto service centre in North Parramatta: brakes, mechanical, electrical, tyres, batteries, air conditioning, rego inspections and log book servicing. 4.5 stars on Google. 132 Victoria Road, North Parramatta. Call (02) 9630 0065.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Source+Sans+3:ital,wght@0,400;0,600;0,700;1,400&display=swap">
@@ -94,12 +94,20 @@ nav a:hover{opacity:1;background:rgba(255,255,255,.08)}
 .hero .cta .btn-red{font-size:22px;min-height:58px;padding:0 28px}
 .trust{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:34px;padding-top:22px;border-top:1px solid rgba(255,255,255,.12);font-weight:600;font-size:15px;color:var(--steel-muted)}
 .trust span::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--red);margin-right:9px;vertical-align:1px}
+.photo{position:relative;border-radius:10px;overflow:hidden;background:#0b0c0e;box-shadow:0 30px 60px -30px rgba(0,0,0,.8);transform:rotate(-1.2deg)}
+.photo img{width:100%;height:auto;aspect-ratio:1080/820;object-fit:cover}
+.photo .cap{position:absolute;left:0;right:0;bottom:0;padding:34px 16px 12px;background:linear-gradient(transparent,rgba(0,0,0,.72));color:#fff;font-weight:600;font-size:14px;letter-spacing:.02em}
+.rating{position:absolute;top:14px;left:14px;display:inline-flex;align-items:center;gap:8px;background:#fff;color:#15171A;border-radius:6px;padding:8px 12px;font-weight:700;font-size:15px;box-shadow:0 8px 20px rgba(0,0,0,.35);text-decoration:none}
+.rating .stars{color:#F4B400;letter-spacing:-1px;font-size:16px}
+.rating small{font-weight:600;color:#4B4F55}
+.brands{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:center;margin-top:18px;font-family:var(--disp);font-weight:800;font-size:18px;letter-spacing:.08em;text-transform:uppercase;color:var(--steel-muted)}
+.brands .lbl{font-family:var(--body);font-weight:600;font-size:13px;letter-spacing:.04em;text-transform:none}
 .rotor-wrap{position:relative;aspect-ratio:1;max-width:100%;width:min(100%,440px);margin-inline:auto}
 .rotor{width:100%;height:100%;display:block}
 @media(prefers-reduced-motion:no-preference){.rotor .spin{transform-origin:200px 200px;animation:spin 40s linear infinite}}
 @keyframes spin{to{transform:rotate(360deg)}}
 .rotor-tag{position:absolute;left:50%;bottom:-6px;transform:translateX(-50%);background:var(--red);color:var(--red-ink);font-family:var(--disp);font-weight:800;font-size:15px;letter-spacing:.14em;padding:7px 14px;border-radius:4px;white-space:nowrap}
-@media(max-width:860px){.hero .wrap{grid-template-columns:1fr}.rotor-wrap{width:min(100%,300px);order:-1}}
+@media(max-width:860px){.hero .wrap{grid-template-columns:1fr}.photo{transform:none}}
 
 /* services */
 .svc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
@@ -109,13 +117,14 @@ nav a:hover{opacity:1;background:rgba(255,255,255,.08)}
 .svc .ico{width:40px;height:40px;color:var(--red)}
 .svc h3{font-size:26px}
 .svc p{color:var(--ink2);font-size:16px}
-.svc.feature{grid-column:1/-1;background:var(--red);color:var(--red-ink);border-color:var(--red);display:grid;grid-template-columns:1fr auto;align-items:center;gap:20px}
+.svc.feature{grid-column:1/-1;background:var(--red);color:var(--red-ink);border-color:var(--red);display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:24px}
+.svc.feature .rotor-wrap{width:120px;flex:none}
 .svc.feature:hover{transform:none}
 .svc.feature .ico,.svc.feature p{color:var(--red-ink)}
 .svc.feature p{opacity:.92;max-width:60ch}
 .svc.feature h3{font-size:34px}
 .svc.feature .btn{background:var(--red-ink);color:var(--red);border-color:var(--red-ink)}
-@media(max-width:700px){.svc.feature{grid-template-columns:1fr}}
+@media(max-width:760px){.svc.feature{grid-template-columns:1fr}.svc.feature .rotor-wrap{display:none}}
 .extras{margin-top:28px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .extras .lbl{font-family:var(--disp);font-weight:800;letter-spacing:.12em;font-size:14px;text-transform:uppercase;color:var(--ink2);margin-right:6px}
 .chip{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:6px 14px;font-weight:600;font-size:15px}
@@ -170,7 +179,9 @@ tr.best .pkg::after{content:"Most popular";font-family:var(--disp);font-size:12p
 @media(max-width:960px){.step{border-right:0;border-bottom:1px solid rgba(255,255,255,.14)}.step:last-child{border-bottom:0}}
 
 /* offer */
-.offer{display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center;border:2px dashed var(--red);border-radius:8px;padding:22px 26px;background:var(--card)}
+.offer{display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center;border:2px dashed var(--red);border-radius:8px;padding:26px 28px;background:var(--card)}
+.offer .big{font-family:var(--disp);font-weight:900;font-size:clamp(34px,5vw,56px);line-height:.95;text-transform:uppercase;color:var(--ink)}
+.offer .big b{color:var(--red)}
 .offer .stamp{font-family:var(--disp);font-weight:900;font-size:26px;text-transform:uppercase;color:var(--red);transform:rotate(-4deg);border:3px solid var(--red);padding:6px 12px;border-radius:6px;line-height:1}
 .offer h3{font-size:26px}
 .offer p{color:var(--ink2)}
@@ -227,14 +238,14 @@ footer a:hover{text-decoration:underline}
   <div class="wrap">
     <a class="brand" href="#top" aria-label="Better Brakes Parramatta, home">
       <svg class="mark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="17" fill="none" stroke="currentColor" stroke-width="3"/><circle cx="20" cy="20" r="7" fill="#C8102E"/><circle cx="20" cy="6" r="2" fill="currentColor"/><circle cx="33.3" cy="13" r="2" fill="currentColor"/><circle cx="33.3" cy="27" r="2" fill="currentColor"/><circle cx="20" cy="34" r="2" fill="currentColor"/><circle cx="6.7" cy="27" r="2" fill="currentColor"/><circle cx="6.7" cy="13" r="2" fill="currentColor"/></svg>
-      <span>Better Brakes<small>Parramatta CBD</small></span>
+      <span>Better Brakes<small>Better Car Servicing</small></span>
     </a>
     <nav aria-label="Main">
       <a href="#services">Services</a>
       <a href="#deals">Service deals</a>
       <a href="#wash">Car wash</a>
       <a href="#contact">Contact</a>
-      <a class="hdr-call" href="tel:+61296331858"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>9633 1858</a>
+      <a class="hdr-call" href="tel:+61296300065"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>(02) 9630 0065</a>
     </nav>
   </div>
 </header>
@@ -244,22 +255,46 @@ footer a:hover{text-decoration:underline}
 <section class="hero" aria-labelledby="h1">
   <div class="wrap">
     <div>
-      <p class="eyebrow">87–89 George Street · Parramatta CBD</p>
+      <p class="eyebrow">132 Victoria Road · North Parramatta</p>
       <h1 id="h1">Stop<br>better.<br><span class="red">Drive</span> easy.</h1>
-      <p class="lede">Brake specialists and full mechanical servicing in the heart of Parramatta. Drop the car off, we'll call you with a straight quote, and it comes back washed.</p>
+      <p class="lede">Auto service centre on Victoria Road. Mechanical, electrical, tyres and batteries, with brakes the specialty. A fully qualified team, straight quotes, and a 4.5-star record on Google.</p>
       <div class="cta">
-        <a class="btn btn-red" href="tel:+61296331858">Call 9633 1858</a>
+        <a class="btn btn-red" href="tel:+61296300065">Call (02) 9630 0065</a>
         <a class="btn btn-light" href="#contact">Book a service</a>
       </div>
       <div class="trust">
-        <span>Brake inspection &amp; report</span>
-        <span>Rego inspections</span>
-        <span>Log book servicing</span>
+        <span>Brake specialists</span>
+        <span>European cars welcome</span>
+        <span>Log book &amp; rego</span>
         <span>Free quotes</span>
-        <span>Car wash on site</span>
+        <span>Wheelchair-accessible</span>
       </div>
+      <div class="brands"><span class="lbl">Parts and tyres on the shelf</span><span>Bosch</span><span>Pirelli</span><span>Bridgestone</span><span>Goodride</span></div>
     </div>
-    <div class="rotor-wrap" aria-hidden="true">
+    <div class="photo">
+      <img src="assets/shopfront.webp" alt="Better Brakes Better Car Servicing workshop on Victoria Road, North Parramatta, with the sign reading Auto Service Centre, mechanical, electrical, tyres, batteries" width="1080" height="820">
+      <a class="rating" href="https://www.google.com/maps/search/?api=1&query=Better+Brakes+Better+Car+Servicing+132+Victoria+Road+North+Parramatta" target="_blank" rel="noopener"><span class="stars">★★★★★</span>4.5 <small>· 56 Google reviews</small></a>
+      <span class="cap">The workshop, 132 Victoria Road, North Parramatta</span>
+    </div>
+  </div>
+</section>
+
+<section id="services" aria-labelledby="h-svc">
+  <div class="wrap">
+    <div class="sec-head">
+      <p class="eyebrow">What we do</p>
+      <h2 id="h-svc">One workshop. The whole car.</h2>
+      <p class="lede">Brakes are the name on the sign. The bay handles everything else your car needs to pass, run and stay on the road.</p>
+    </div>
+    <div class="svc-grid">
+      <article class="svc feature">
+        <div>
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M18.4 5.6l-1.8 1.8M7.4 16.6l-1.8 1.8"/></svg>
+          <h3>Better Brakes servicing</h3>
+          <p>Pads, disc rotors, fluid, handbrake, European and everyday cars alike. Every brake job starts with a four-wheel inspection and a written report, and the inspection fee is waived when you go ahead with the work.</p>
+        </div>
+        <a class="btn" href="#deals">See the brake deal</a>
+        <div class="rotor-wrap" aria-hidden="true">
       <svg class="rotor" viewBox="0 0 400 400">
         <defs>
           <radialGradient id="g1" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#6b7077"/><stop offset=".55" stop-color="#3a3e43"/><stop offset="1" stop-color="#1c1e21"/></radialGradient>
@@ -294,62 +329,43 @@ footer a:hover{text-decoration:underline}
         <path d="M268 20 a190 190 0 0 1 112 132 l-44 10 a146 146 0 0 0 -86 -101 z" fill="#C8102E"/>
         <path d="M268 20 a190 190 0 0 1 112 132" fill="none" stroke="#8f0a20" stroke-width="3"/>
         <text x="330" y="74" font-family="Big Shoulders Display, Impact, sans-serif" font-weight="900" font-size="22" fill="#fff" transform="rotate(50 330 74)" letter-spacing="2">BETTER</text>
-      </svg>
-      <span class="rotor-tag">INSPECTED · ADJUSTED · ROAD-TESTED</span>
-    </div>
-  </div>
-</section>
-
-<section id="services" aria-labelledby="h-svc">
-  <div class="wrap">
-    <div class="sec-head">
-      <p class="eyebrow">What we do</p>
-      <h2 id="h-svc">One workshop. The whole car.</h2>
-      <p class="lede">Brakes are the name on the door, but the bay handles everything your car needs to pass, run and stay on the road.</p>
-    </div>
-    <div class="svc-grid">
-      <article class="svc feature">
-        <div>
-          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.5"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M18.4 5.6l-1.8 1.8M7.4 16.6l-1.8 1.8"/></svg>
-          <h3>Better Brakes servicing</h3>
-          <p>Pads, disc rotors, fluid, handbrake. Every brake job starts with a four-wheel inspection and a written report, and the inspection fee is waived when you go ahead with the work.</p>
-        </div>
-        <a class="btn" href="#deals">See the brake deal</a>
-      </article>
-      <article class="svc">
-        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v12H4zM4 11h16M8 7V4h8v3"/><path d="M9 15.5l2 2 4-4"/></svg>
-        <h3>Rego inspections</h3>
-        <p>Pink slip inspections done on site in the CBD. If anything needs attention to pass, we tell you exactly what and quote it before touching it.</p>
+      </svg></div>
       </article>
       <article class="svc">
         <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4M9 12h6M9 16h6"/></svg>
-        <h3>Log book servicing</h3>
-        <p>Manufacturer-schedule servicing for new cars, stamped to keep your warranty intact. Minor and major services to suit the kilometres.</p>
+        <h3>Mechanical servicing</h3>
+        <p>Log book servicing for new cars, minor and major services, oil changes, filters, cooling systems and health checks. Stamped to keep your warranty intact.</p>
       </article>
       <article class="svc">
-        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 20h18M5 20V9l7-5 7 5v11"/><path d="M10 20v-6h4v6"/></svg>
-        <h3>All mechanical reports</h3>
-        <p>Pre-purchase checks and condition reports on brakes, steering and suspension. Honest guides to what you're buying or keeping.</p>
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2L4 14h7l-1 8 9-12h-7z"/></svg>
+        <h3>Auto electrical &amp; batteries</h3>
+        <p>Batteries tested and replaced, charging and starting faults traced, lights and wiring sorted. The warning light gets diagnosed, not guessed at.</p>
       </article>
       <article class="svc">
-        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
-        <h3>Green Slip insurance</h3>
-        <p>CTP green slips through QBE, sorted at the counter while the rego inspection is done. One visit, car legal.</p>
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v5M12 16v5M3 12h5M16 12h5"/></svg>
+        <h3>Tyres</h3>
+        <p>Pirelli, Bridgestone and Goodride on the shelf, fitted and balanced while you wait. Puncture repairs and rotations too.</p>
       </article>
       <article class="svc">
-        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17h2l2-6h10l2 6h2M5 17v2h3v-2M16 17v2h3v-2"/><path d="M8 11l1.5-4h5L16 11"/></svg>
-        <h3>Better Car Wash</h3>
-        <p>Wash, polish, interior clean or full detail, right after the service. Wait for it, or leave the car if you work nearby.</p>
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v20M4 6l16 12M4 18L20 6"/><path d="M9 4l3 2 3-2M9 20l3-2 3 2M3 9l3 1-1 3M21 9l-3 1 1 3M3 15l3-1-1-3M21 15l-3-1 1-3"/></svg>
+        <h3>Air conditioning</h3>
+        <p>Re-gas, leak checks and cabin filter replacement so the car blows cold before summer hits Parramatta.</p>
+      </article>
+      <article class="svc">
+        <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16v12H4zM4 11h16M8 7V4h8v3"/><path d="M9 15.5l2 2 4-4"/></svg>
+        <h3>Rego &amp; reports</h3>
+        <p>Pink slip rego inspections, pre-purchase and mechanical condition reports, and QBE green slips at the counter. One visit, car legal.</p>
       </article>
     </div>
     <div class="extras">
       <span class="lbl">Also in the bay</span>
-      <span class="chip">Cooling system flush</span>
-      <span class="chip">A/C re-gas</span>
       <span class="chip">Transmission servicing</span>
       <span class="chip">Clutches</span>
       <span class="chip">Suspension</span>
-      <span class="chip">Tyres</span>
+      <span class="chip">Cooling system flush</span>
+      <span class="chip">Towbar fitting</span>
+      <span class="chip">Air &amp; cabin filters</span>
+      <span class="chip">Car wash &amp; detailing</span>
     </div>
   </div>
 </section>
@@ -435,7 +451,7 @@ footer a:hover{text-decoration:underline}
     <div class="sec-head">
       <p class="eyebrow">Better Car Wash</p>
       <h2 id="h-wash">Picked up clean.</h2>
-      <p class="lede">Hand wash and detailing on the same site as the workshop. Add it to any service, or just drop in. Priced by size: S is a sedan or hatch, M a station wagon, L an SUV or 4WD.</p>
+      <p class="lede">Hand wash and detailing to go with the service. Add it when you book, or just drop in. Priced by size: S is a sedan or hatch, M a station wagon, L an SUV or 4WD.</p>
     </div>
     <div class="board" role="region" aria-label="Car wash price board" tabindex="0">
       <table class="num">
@@ -489,7 +505,7 @@ footer a:hover{text-decoration:underline}
       </div>
       <div class="box">
         <h3>Work nearby?</h3>
-        <p class="muted">Leave the car with us in the morning. We'll service it, wash it and have it ready when you knock off. Or grab a coffee on George Street and wait for a wash.</p>
+        <p class="muted">Leave the car with us in the morning. We'll service it, wash it and have it ready when you knock off. Or wait for a wash and watch the Victoria Road traffic go by.</p>
       </div>
     </div>
   </div>
@@ -503,8 +519,8 @@ footer a:hover{text-decoration:underline}
       <p class="lede">No upsell, no mystery line items. You hear from us before any work that isn't on the card.</p>
     </div>
     <div class="steps">
-      <div class="step"><span class="n">1</span><h3>Call or book</h3><p>Ring 9633 1858 or send the form below. Tell us the car and what it's doing.</p></div>
-      <div class="step"><span class="n">2</span><h3>Drop it off</h3><p>87–89 George Street, Parramatta CBD. Walk to work or the station from here.</p></div>
+      <div class="step"><span class="n">1</span><h3>Call or book</h3><p>Ring (02) 9630 0065 or send the form below. Tell us the car and what it's doing.</p></div>
+      <div class="step"><span class="n">2</span><h3>Drop it off</h3><p>132 Victoria Road, North Parramatta. Wheelchair-accessible car park and entrance. Credit and debit cards accepted.</p></div>
       <div class="step"><span class="n">3</span><h3>We quote first</h3><p>Inspection done, report written. We call with the price before anything extra happens.</p></div>
       <div class="step"><span class="n">4</span><h3>Pick it up washed</h3><p>Add a Better Wash and it comes back cleaner than it left.</p></div>
     </div>
@@ -514,12 +530,12 @@ footer a:hover{text-decoration:underline}
 <section aria-labelledby="h-offer">
   <div class="wrap">
     <div class="offer">
-      <span class="stamp">Offer</span>
+      <span class="stamp">European cars</span>
       <div>
-        <h3 id="h-offer">Special offers, in-store</h3>
-        <p>We run promotions and discounts through the year. Print the current flyer or just mention it at the counter to get the offer on your next visit. Ask what's on when you call.</p>
+        <p class="big" id="h-offer">We beat any European dealership quote <b>by 10%</b></p>
+        <p style="margin-top:10px">Bring your written dealership quote for European car servicing or brake replacement and we'll come in 10% under it. Same job, same parts standard, without the dealership waiting room.</p>
       </div>
-      <a class="btn btn-red" href="tel:+61296331858">Ask what's on</a>
+      <a class="btn btn-red" href="tel:+61296300065">Bring your quote</a>
     </div>
   </div>
 </section>
@@ -534,11 +550,11 @@ footer a:hover{text-decoration:underline}
       <div class="cinfo">
         <div class="crow">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/></svg>
-          <div><div class="k">Phone</div><div class="v big"><a href="tel:+61296331858">9633 1858</a></div><div class="s">Fax 9635 5197</div></div>
+          <div><div class="k">Phone</div><div class="v big"><a href="tel:+61296300065">(02) 9630 0065</a></div><div class="s">The number on the sign: 9630 0065</div></div>
         </div>
         <div class="crow">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s7-6.3 7-12a7 7 0 1 0-14 0c0 5.7 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></svg>
-          <div><div class="k">Workshop</div><div class="v">87–89 George Street<br>Parramatta NSW 2150</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=87-89+George+Street+Parramatta+NSW+2150" target="_blank" rel="noopener">Open in Google Maps →</a></div>
+          <div><div class="k">Workshop</div><div class="v">132 Victoria Road<br>North Parramatta NSW 2151</div><div class="s">Wheelchair-accessible car park and entrance</div><a class="maplink" href="https://www.google.com/maps/search/?api=1&query=132+Victoria+Road+North+Parramatta+NSW+2151" target="_blank" rel="noopener">Open in Google Maps →</a></div>
         </div>
         <div class="crow">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
@@ -550,7 +566,7 @@ footer a:hover{text-decoration:underline}
         </div>
         <div class="crow">
           <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.5 22v-8h2.7l.4-3.2h-3.1V8.8c0-.9.3-1.6 1.6-1.6h1.7V4.4c-.3 0-1.3-.1-2.5-.1-2.5 0-4.1 1.5-4.1 4.2v2.3H7.4V14h2.8v8z"/></svg>
-          <div><div class="k">Facebook</div><div class="v"><a href="https://www.facebook.com/pages/Better-Brakes-Car-Servicing-Car-Wash/715274475157719" target="_blank" rel="noopener">Better Brakes Car Servicing &amp; Car Wash</a></div></div>
+          <div><div class="k">Follow</div><div class="v"><a href="https://www.instagram.com/better_brakes" target="_blank" rel="noopener">@better_brakes</a> on Instagram</div><div class="s"><a href="https://www.facebook.com/pages/Better-Brakes-Car-Servicing-Car-Wash/715274475157719" target="_blank" rel="noopener">Better brakes better car servicing</a> on Facebook</div></div>
         </div>
       </div>
     </div>
@@ -590,7 +606,7 @@ footer a:hover{text-decoration:underline}
       </label>
       <label for="fMsg">Anything we should know?<textarea id="fMsg" name="message" placeholder="Noises, warning lights, preferred day, same-day pick-up…"></textarea></label>
       <button class="btn btn-red" type="submit">Send booking request</button>
-      <p class="fnote">We'll ring you back to confirm a time and quote. Prefer to talk now? Call 9633 1858.</p>
+      <p class="fnote">We'll ring you back to confirm a time and quote. Prefer to talk now? Call (02) 9630 0065.</p>
       <div class="sent" id="sent" role="status" aria-live="polite"></div>
     </form>
   </div>
@@ -600,12 +616,12 @@ footer a:hover{text-decoration:underline}
 
 <footer>
   <div class="wrap">
-    <span>© <span id="yr">2026</span> Better Brakes Automotive · 87–89 George Street, Parramatta NSW 2150</span>
-    <span><a href="tel:+61296331858">9633 1858</a> · <a href="mailto:bbrakes@bigpond.com">bbrakes@bigpond.com</a></span>
+    <span>© <span id="yr">2026</span> Better Brakes Better Car Servicing · 132 Victoria Road, North Parramatta NSW 2151</span>
+    <span><a href="tel:+61296300065">(02) 9630 0065</a> · <a href="mailto:bbrakes@bigpond.com">bbrakes@bigpond.com</a></span>
   </div>
 </footer>
 
-<a class="callbar" href="tel:+61296331858" aria-label="Call Better Brakes on 9633 1858"><span>Call 9633 1858<br><small>87–89 George St, Parramatta</small></span><span>→</span></a>
+<a class="callbar" href="tel:+61296300065" aria-label="Call Better Brakes on 02 9630 0065"><span>Call (02) 9630 0065<br><small>132 Victoria Rd, North Parramatta</small></span><span>→</span></a>
 
 <script>
 (function(){
@@ -623,7 +639,7 @@ footer a:hover{text-decoration:underline}
       return;
     }
     var lines = [
-      'Booking request — Better Brakes Parramatta',
+      'Booking request — Better Brakes Better Car Servicing',
       'Name: '+name,
       'Mobile: '+phone,
       'Car: '+(v('fCar')||'(not given)'),
