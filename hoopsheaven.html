@@ -1934,6 +1934,29 @@ var qrcode=function(){var t=function(t,r){var e=t,n=g[r],o=null,i=0,a=null,u=[],
 //# sourceMappingURL=leaflet.js.map</script>
 <script>
 'use strict';
+/* ===== PREVIEW MODE (branch only) — ?preview shows the Dubai build with
+   bundled courts and NO backend / NO sign-up. Look-only; inert without the
+   ?preview flag, so it is a no-op in normal use. Strip before go-live. ===== */
+(function(){try{
+  if(!/[?&]preview\b/.test(location.search))return;
+  var CPV={"courts":[{"key":"oc_c_b46f77ca","name":"Al Nahda Pond Park","suburb":"Al Nahda","lat":25.28881,"lon":55.38175,"indoor":false,"lit":false,"official":true,"hidden":false,"radius_m":200,"photo_url":"","notes":"Free public park court \u2014 cross-confirmed as a real public court. First-come, first-served.","info":{"cost":"Free"},"here":0,"runs":0,"ratings":null},{"key":"oc_c_b6c87dd1","name":"Abu Hail Park","suburb":"Abu Hail","lat":25.27976,"lon":55.34555,"indoor":false,"lit":false,"official":true,"hidden":false,"radius_m":200,"photo_url":"","notes":"Outdoor court inside Abu Hail Park.","info":{"cost":"Free"},"here":0,"runs":0,"ratings":null},{"key":"oc_c_8301b02b","name":"Azizi Riviera Court","suburb":"Nad Al Sheba","lat":25.17151,"lon":55.29955,"indoor":false,"lit":false,"official":true,"hidden":false,"radius_m":200,"photo_url":"","notes":"Outdoor playground + basketball court by the Nad Al Sheba cycle track.","info":{"cost":"Free"},"here":0,"runs":0,"ratings":null},{"key":"oc_c_f2b26f1b","name":"ENOC Court \u2014 Al Quoz","suburb":"Al Quoz","lat":25.13055,"lon":55.25126,"indoor":false,"lit":false,"official":true,"hidden":false,"radius_m":200,"photo_url":"","notes":"Outdoor court in Al Quoz. Industrial-area court, open play.","info":{"cost":"Free"},"here":0,"runs":0,"ratings":null},{"key":"oc_c_a5893e1d","name":"AKG Court \u2014 Al Quoz 4","suburb":"Al Quoz","lat":25.14227,"lon":55.25362,"indoor":false,"lit":false,"official":true,"hidden":false,"radius_m":200,"photo_url":"","notes":"Outdoor court off Latifa bint Hamdan St, Al Quoz 4.","info":{"cost":"Free"},"here":0,"runs":0,"ratings":null},{"key":"oc_c_b5e5b40c","name":"The Springs 14 Court","suburb":"The Springs","lat":25.05094,"lon":55.17442,"indoor":false,"lit":false,"official":true,"hidden":false,"radius_m":200,"photo_url":"","notes":"Inside The Springs (Emirates Living) \u2014 residents & guests.","info":{"cost":"Residents & guests"},"here":0,"runs":0,"ratings":null},{"key":"oc_c_a31a235d","name":"La Rosa Court \u2014 Villanova","suburb":"Villanova","lat":25.07686,"lon":55.35996,"indoor":false,"lit":false,"official":true,"hidden":false,"radius_m":200,"photo_url":"","notes":"Villanova (Dubailand) community court.","info":{"cost":"Residents & guests"},"here":0,"runs":0,"ratings":null},{"key":"oc_c_cfa981a0","name":"Amaranta Court \u2014 Villanova","suburb":"Villanova","lat":25.07101,"lon":55.36108,"indoor":false,"lit":false,"official":true,"hidden":false,"radius_m":200,"photo_url":"","notes":"Villanova (Dubailand) community court.","info":{"cost":"Residents & guests"},"here":0,"runs":0,"ratings":null},{"key":"oc_c_283cd3af","name":"Mira Oasis 3 Court","suburb":"Mira Oasis","lat":25.01097,"lon":55.30039,"indoor":false,"lit":false,"official":true,"hidden":false,"radius_m":200,"photo_url":"","notes":"Mira Oasis (Reem) community court.","info":{"cost":"Residents & guests"},"here":0,"runs":0,"ratings":null},{"key":"oc_c_1ad722bb","name":"Mira 3 Court","suburb":"Mira","lat":25.00686,"lon":55.30965,"indoor":false,"lit":false,"official":true,"hidden":false,"radius_m":200,"photo_url":"","notes":"Mira (Reem) community court.","info":{"cost":"Residents & guests"},"here":0,"runs":0,"ratings":null}]};
+  try{localStorage.setItem('oc_terms','1');
+    localStorage.setItem('oc_profile',JSON.stringify({id:'preview_device',name:'Preview',ig:'preview',phone:'0501234567',num:1,verified:true}));}catch(e){}
+  var _f=window.fetch.bind(window);
+  window.fetch=function(u,o){try{
+    var url=(typeof u==='string')?u:((u&&u.url)||'');
+    if(url.indexOf('opencourt-api')>-1){
+      var b={};try{b=JSON.parse((o&&o.body)||'{}')}catch(e){}
+      var a=b.action,out={ok:true};
+      if(a==='courts_meta')out=CPV;
+      else if(a==='me')out={id:'preview_device',name:'Preview',ig:'preview',verified:true,num:1,status:'verified'};
+      else if(a==='board')out={runs:[],week:'2026-W44'};
+      else if(a==='leaderboard')out={leaders:[]};
+      else if(a==='court'){var ck=b.court||b.key||b.court_key||'';var cc=null;for(var i=0;i<CPV.courts.length;i++){if(CPV.courts[i].key===ck){cc=CPV.courts[i];break}}if(!cc)cc=CPV.courts[0];out={info:cc,here:[],hereTotal:0,hereExtra:0,reviews:[],rsum:{avg:0,n:0},kotc:[],plays:[],leaders:[]};}
+      return Promise.resolve(new Response(JSON.stringify(out),{status:200,headers:{'content-type':'application/json'}}));
+    }
+  }catch(e){}return _f(u,o);};
+}catch(e){}})();
 /* ================= CERTIFIED HOOPER (codename OpenCourt) ================= */
 const API='https://ymuwuhvqqftgpxwhzoub.supabase.co/functions/v1/opencourt-api';
 // Public anon key — safe in the browser; tables are RLS-locked, all writes go through the edge fn.
