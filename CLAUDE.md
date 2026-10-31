@@ -1260,3 +1260,33 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   Verified E2E via scratchpad/deskcoach-light.mjs + coach-light2.mjs (temp
   coach minted → dashboard shot → deleted). Masters: admin-base.html,
   coach-base.html.
+
+## PIVOT → Hoops City (Dubai) — IN PROGRESS, UNMERGED (2026-10-31)
+
+Aiman: "Turn this into hoops city in Dubai." Chose: **all Dubai, replace Sydney**
++ **rename to Hoops City**. Built on branch `claude/opencourt-564hz5`; **nothing
+touches live** — main (= live Sydney) is deliberately not pushed. Live Sydney
+backend is shared, so oc_courts is NOT mutated yet.
+
+- **Name clash FLAGGED (awaiting his call):** no established "Hoops City" (plural),
+  but "Hoop City" (singular) = an existing AU basketball training app/brand — one
+  letter off, same category. Like the fives.life clash. Wordmark swap held pending
+  his confirm.
+- **Real Dubai courts:** Courts-of-the-World/Bayut were 403/410-blocked; got names
+  but no coords. Pulled REAL pins from OSM (Nominatim) instead → 10 courts
+  (5 public parks/courts incl. Al Nahda Pond Park cross-confirmed, 5 gated-community
+  courts flagged). Seed at `supabase/seed/dubai_courts.sql` — STAGED, amenities left
+  blank (no fabrication), Aiman vets at the desk. NOT applied to live.
+- **hoopsheaven.html — DONE & previewed (branch):** map center [-33.87,151.06]→
+  [25.14,55.28]; UAE phone (auPhone + placeholder 050 123 4567, mirrors edge);
+  timezone Australia/Sydney→Asia/Dubai (SYD const, tnDayLbl, weather URL);
+  copy/labels Sydney→Dubai (eyebrow DUBAI, "DUBAI LIVE", footer, hero, empty states);
+  header wordmark + title/og/meta → Hoops City. E2E screenshots: map sits on Dubai
+  with 10 pins, home = "DUBAI LIVE" + real court names, gate = UAE phone format.
+- **VERIFY_IG** placeholder `hoopscity.ae` — needs his real Dubai handle.
+- **STILL TO DO (staged, needs his go):** edge index.ts (inAus→UAE bounds, phoneClean
+  +61/04→+971/05, sydWeek tz, "Sydney-bounded" comments) — deploy at go-time;
+  body wordmark "Certified Hooper" (brand vs the ✓ "certified" status — needs his
+  call); community.html / launch.html / desk / QR copy; app icons + manifest +
+  share-card canvas; the IG campaign kit (reels/carousel/story are Sydney-mapped,
+  heavy regen); Netlify site rename + domain; OWNER_IGS.
