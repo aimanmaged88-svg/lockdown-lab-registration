@@ -114,15 +114,16 @@ section{scroll-margin-top:140px}
 #tlBtn{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:20;border:0;cursor:pointer;background:var(--fg);color:var(--bg);border-radius:0 14px 14px 0;padding:12px 8px 12px max(8px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 6px 18px rgba(0,0,0,.22)}
 #tlBtn i{display:block;width:12px;height:12px;border-radius:50%}
 #tlBtn span{font-family:var(--disp);font-weight:800;font-size:9px;letter-spacing:.1em;text-transform:uppercase;writing-mode:vertical-rl;transform:rotate(180deg);opacity:.8}
-#tl{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;user-select:none;-webkit-user-select:none;cursor:pointer;transition:background .12s;padding:max(16px,env(safe-area-inset-left,0px))}
+#tl{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-bottom:200px;text-align:center;user-select:none;-webkit-user-select:none;cursor:pointer;transition:background .12s;padding:max(16px,env(safe-area-inset-left,0px))}
 #tl .nm{font-family:var(--disp);font-stretch:85%;font-weight:900;font-size:clamp(56px,20vw,140px);line-height:.95;letter-spacing:.02em}
 #tl .ac{font-family:var(--disp);font-weight:800;font-size:clamp(22px,7vw,44px);margin-top:14px;opacity:.9}
 #tl .hint{position:absolute;top:calc(env(safe-area-inset-top,0px) + 22px);left:64px;right:64px;font-family:var(--disp);font-weight:700;font-size:13px;letter-spacing:.12em;text-transform:uppercase;opacity:.75}
 #tl .x{position:absolute;top:calc(env(safe-area-inset-top,0px) + 10px);right:max(12px,env(safe-area-inset-right,0px));width:44px;height:44px;border-radius:50%;border:0;background:rgba(0,0,0,.35);color:#fff;font-size:22px;cursor:pointer}
-#tl .dots{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 18px);display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;padding:0 16px}
-#tl .dots button{width:46px;height:46px;border-radius:50%;border:3px solid rgba(255,255,255,.85);cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.35);opacity:.95}
-#tl .dots button.off{opacity:.25;filter:grayscale(.6)}
-#tl .dots .more{width:auto;border-radius:999px;padding:0 14px;font-family:var(--disp);font-weight:800;font-size:13px;background:rgba(0,0,0,.4);color:#fff;border-color:rgba(255,255,255,.6)}
+#tl .dots{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 max(14px,env(safe-area-inset-left,0px)) 0 max(14px,env(safe-area-inset-right,0px));max-width:560px;margin:0 auto}
+#tl .dots button{height:64px;border-radius:14px;border:3px solid rgba(255,255,255,.7);cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.35);font-family:var(--disp);font-weight:900;font-size:16px;letter-spacing:.04em;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.45)}
+#tl .dots button.lt{color:#111;text-shadow:none}
+#tl .dots button.sel{border-color:#fff;transform:scale(1.05);box-shadow:0 0 0 3px rgba(0,0,0,.3),0 6px 16px rgba(0,0,0,.4)}
+#tl .dots .more{grid-column:1/-1;height:40px;border-radius:999px;background:rgba(0,0,0,.4);color:#fff;border-color:rgba(255,255,255,.5);font-size:13px;font-weight:800;text-shadow:none}
 #tl.dark{color:#fff}#tl.light{color:#111}#tl.light .x{background:rgba(0,0,0,.18);color:#111}
 .tlOpen{font-family:var(--disp);font-weight:800;font-size:16px;border:0;border-radius:12px;padding:12px 16px;cursor:pointer;background:var(--fg);color:var(--bg);display:inline-flex;align-items:center;gap:8px;margin:4px 0 8px}
 .tlOpen i{width:12px;height:12px;border-radius:50%;display:inline-block}
@@ -421,11 +422,11 @@ section{scroll-margin-top:140px}
            {n:'BLUE',a:'REACH UP HIGH!',c:'#1E63D6',t:'dark'},{n:'PURPLE',a:'TURN AROUND!',c:'#7A2FBF',t:'dark'},{n:'ORANGE',a:'SILLY WALK!',c:'#F2651B',t:'dark'}];
   var tl=$('tl'),tlNm=$('tlNm'),tlAc=$('tlAc'),dots=$('tlDots'),pool=3,cur=0;
   function setCol(i){cur=i;var c=COL[i];tl.style.background=c.c;tl.className=c.t;tlNm.textContent=c.n;tlAc.textContent=c.a;vib(40);
-    var bs=dots.querySelectorAll('button[data-i]');for(var k=0;k<bs.length;k++){bs[k].classList.toggle('off',k>=pool);bs[k].style.borderColor=(k===i)?'#fff':'rgba(255,255,255,.55)';bs[k].style.transform=(k===i)?'scale(1.18)':'';}
-    var m=dots.querySelector('.more');if(m)m.textContent=pool===3?'+ Add colours':'3 colours only';}
+    var bs=dots.querySelectorAll('button[data-i]');for(var k=0;k<bs.length;k++){bs[k].classList.toggle('sel',k===i);}
+    var m=dots.querySelector('.more');if(m)m.textContent=pool===3?'Random tap: 3 colours · tap to use all 6':'Random tap: all 6 colours · tap for 3 only';}
   function nextCol(){var i;do{i=Math.floor(Math.random()*pool);}while(i===cur&&pool>1);setCol(i);}
-  (function(){var h='';for(var i=0;i<COL.length;i++)h+='<button type="button" data-i="'+i+'" style="background:'+COL[i].c+'" aria-label="'+COL[i].n+'"></button>';h+='<button type="button" class="more">+ Add colours</button>';dots.innerHTML=h;})();
-  dots.addEventListener('click',function(e){e.stopPropagation();var b=e.target.closest('button');if(!b)return;if(b.classList.contains('more')){pool=pool===3?6:3;setCol(cur<pool?cur:0);return;}var i=+b.getAttribute('data-i');if(i>=pool){pool=6;}setCol(i);});
+  (function(){var h='';for(var i=0;i<COL.length;i++)h+='<button type="button" data-i="'+i+'" class="'+(COL[i].t==='light'?'lt':'')+'" style="background:'+COL[i].c+'">'+COL[i].n+'</button>';h+='<button type="button" class="more">Random tap: 3 colours</button>';dots.innerHTML=h;})();
+  dots.addEventListener('click',function(e){e.stopPropagation();var b=e.target.closest('button');if(!b)return;if(b.classList.contains('more')){pool=pool===3?6:3;setCol(cur<pool?cur:0);return;}var i=+b.getAttribute('data-i');setCol(i);});
   tl.addEventListener('click',function(e){if(e.target.closest('.x')||e.target.closest('.dots'))return;nextCol();});
   $('tlX').addEventListener('click',function(){tl.hidden=true;document.body.style.overflow='';});
   function openTl(){tl.hidden=false;document.body.style.overflow='hidden';setCol(0);wake();}
