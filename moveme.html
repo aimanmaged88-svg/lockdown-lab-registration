@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#D9402B">
+<title>Move ME Session 1</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..900&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: one tall cue-card column, sticky section tabs on top, SAY lines big, DO notes small and quiet. */
+:root{
+  --bg:#FFFDF8; --card:#FFFFFF; --fg:#1B1A17; --muted:#6B675E; --line:#E6E1D6;
+  --red:#D9402B; --redsoft:#FBE7E2; --go:#1F8A4C; --gosoft:#E2F3E8;
+  --amber:#C98A00; --ambersoft:#FBF0D2;
+  --disp:"Archivo",system-ui,sans-serif; --body:"Atkinson Hyperlegible",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#15140F; --card:#1E1C16; --fg:#F4F0E6; --muted:#A9A396; --line:#33302A;
+  --red:#FF6B52; --redsoft:#3A1F19; --go:#4FCB7E; --gosoft:#17311F;
+  --amber:#F0B33C; --ambersoft:#3A2E0E; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15140F; --card:#1E1C16; --fg:#F4F0E6; --muted:#A9A396; --line:#33302A;
+  --red:#FF6B52; --redsoft:#3A1F19; --go:#4FCB7E; --gosoft:#17311F;
+  --amber:#F0B33C; --ambersoft:#3A2E0E; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:19px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 60px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:680px;margin:0 auto}
+header{padding-block:22px 10px}
+.eyebrow{font-family:var(--disp);font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--red)}
+h1{font-family:var(--disp);font-stretch:85%;font-weight:900;font-size:clamp(34px,9vw,48px);line-height:1;margin:6px 0 8px;text-wrap:balance}
+.sub{color:var(--muted);font-size:16px;margin:0}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:8px;margin-inline:-16px;padding-inline:16px;border-bottom:1px solid var(--line)}
+nav .row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;max-width:680px;margin:0 auto}
+nav .row::-webkit-scrollbar{display:none}
+nav a{flex:0 0 auto;font-family:var(--disp);font-weight:700;font-size:14px;text-decoration:none;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:7px 13px;white-space:nowrap}
+nav a b{color:var(--red);margin-right:4px}
+section{padding-block:28px 6px;scroll-margin-top:70px}
+.shead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;border-bottom:3px solid var(--red);padding-bottom:6px;margin-bottom:14px}
+h2{font-family:var(--disp);font-stretch:85%;font-weight:900;font-size:28px;margin:0;line-height:1.05}
+.time{font-family:var(--disp);font-weight:700;font-size:14px;color:var(--red);white-space:nowrap;font-variant-numeric:tabular-nums}
+.setup{background:var(--ambersoft);border-left:4px solid var(--amber);padding:10px 14px;border-radius:0 10px 10px 0;font-size:16px;margin:0 0 14px}
+.setup ul{margin:6px 0 0;padding-left:20px}
+h3{font-family:var(--disp);font-weight:800;font-size:15px;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin:20px 0 6px}
+.say{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:8px 0;font-size:21px;line-height:1.45}
+.say.big{font-family:var(--disp);font-weight:800;font-size:26px;line-height:1.2}
+.say b{color:var(--red)}
+.do{color:var(--muted);font-style:italic;font-size:16px;margin:6px 4px}
+.key{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.key span{font-family:var(--disp);font-weight:800;font-size:15px;padding:6px 11px;border-radius:8px;background:var(--redsoft)}
+.key .g{background:var(--gosoft)}.key .a{background:var(--ambersoft)}
+.calls{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.calls span{font-family:var(--disp);font-weight:900;font-size:22px;padding:8px 14px;border-radius:10px;background:var(--card);border:1px solid var(--line)}
+.next{background:var(--gosoft);border-left:4px solid var(--go);padding:12px 14px;border-radius:0 10px 10px 0;margin:18px 0 0;font-size:18px}
+.next b{font-family:var(--disp);text-transform:uppercase;font-size:13px;letter-spacing:.1em;color:var(--go);display:block;margin-bottom:4px}
+.note{border:1px dashed var(--line);border-radius:10px;padding:10px 14px;font-size:16px;color:var(--muted);margin:14px 0 0}
+.step{display:grid;grid-template-columns:auto 1fr;gap:8px 12px;align-items:start;margin:12px 0}
+.step .n{font-family:var(--disp);font-weight:900;font-size:22px;color:var(--red);min-width:2ch;font-variant-numeric:tabular-nums}
+.step .t{font-family:var(--disp);font-weight:800;font-size:17px;text-transform:uppercase;letter-spacing:.04em}
+.step .say{margin:4px 0 0;font-size:19px;padding:10px 14px}
+.step .do{margin:4px 4px 0}
+.ol{margin:0;padding-left:20px;font-size:19px}
+.ol li{margin:6px 0}
+footer{margin-top:40px;color:var(--muted);font-size:14px;text-align:center}
+#sw{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);right:max(12px,env(safe-area-inset-right,0px));z-index:20;display:flex;align-items:center;gap:6px;background:var(--fg);color:var(--bg);border-radius:999px;padding:6px 6px 6px 14px;box-shadow:0 4px 16px rgba(0,0,0,.25)}
+#sw .t{font-family:var(--disp);font-weight:900;font-size:22px;font-variant-numeric:tabular-nums;letter-spacing:.02em;min-width:4.2ch}
+#sw button{font-family:var(--disp);font-weight:800;font-size:13px;border:0;border-radius:999px;padding:8px 12px;cursor:pointer;background:var(--go);color:#fff}
+#sw button.pause{background:var(--amber);color:#1B1A17}
+#sw button.rst{background:transparent;color:var(--bg);opacity:.8;padding:8px 8px}
+#sw.on .t{color:var(--go)}
+#sw.over .t{color:var(--red)}
+header{padding-right:170px}
+@media(max-width:420px){header{padding-right:0;padding-top:64px}}
+nav a.now{background:var(--red);border-color:var(--red);color:#fff}
+nav a.now b{color:#fff}
+.plan{width:100%;border-collapse:collapse;margin:10px 0 4px;font-size:17px}
+.plan td{padding:7px 4px;border-bottom:1px solid var(--line)}
+.plan td:first-child{font-family:var(--disp);font-weight:800;color:var(--red);width:4.5em;font-variant-numeric:tabular-nums}
+</style>
+
+
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}</style>
+</head>
+<body>
+<div id="sw" aria-label="Session stopwatch"><span class="t" id="swT">00:00</span><button id="swGo" type="button">Start</button><button id="swR" class="rst" type="button" aria-label="Reset">↺</button></div>
+<div class="wrap">
+<header>
+  <div class="eyebrow">Facilitator cue cards</div>
+  <h1>Move ME<br>Session 1</h1>
+  <p class="sub">30-minute session. No equipment. Boxed text = say it out loud. Grey italics = what you do.</p>
+</header>
+
+<div class="note" style="margin:0 0 6px"><strong style="color:var(--fg)">Golden rule: keep them moving.</strong> Don't spend minutes explaining a game. Demonstrate while you speak and start quickly.</div>
+
+<table class="plan">
+  <tr><td>0:00</td><td>Welcome</td></tr>
+  <tr><td>1:30</td><td>Moving warm-up</td></tr>
+  <tr><td>5:00</td><td>Traffic Lights</td></tr>
+  <tr><td>9:00</td><td>The Floor is Lava</td></tr>
+  <tr><td>13:00</td><td>Keep the games going (see note)</td></tr>
+  <tr><td>25:00</td><td>Cool Down</td></tr>
+  <tr><td>28:00</td><td>Day One Pep Talk</td></tr>
+</table>
+
+<nav><div class="row">
+  <a href="#welcome"><b>0:00</b> Welcome</a>
+  <a href="#warmup"><b>1:30</b> Warm-up</a>
+  <a href="#lights"><b>5:00</b> Traffic Lights</a>
+  <a href="#lava"><b>9:00</b> Floor is Lava</a>
+  <a href="#cool"><b>25:00</b> Cool Down</a>
+  <a href="#pep"><b>28:00</b> Pep Talk</a>
+</div></nav>
+
+<!-- ============ WELCOME ============ -->
+<section id="welcome">
+  <div class="shead"><h2>Welcome</h2><div class="time">0:00 to 1:30</div></div>
+  <p class="setup">Bring the kids together, standing, with space around each of them.</p>
+
+  <div class="say">“Good morning, everyone! Welcome to the very first session of <b>Move ME!</b> For the next month, we're going to start our mornings doing something really simple… <b>MOVING!</b>”</div>
+
+  <div class="say">“You don't have to be good at sport. You don't have to be the fastest. You don't have to be the strongest. And you definitely don't have to be the best at anything. We're just here to have fun.”</div>
+
+  <div class="say">“We're going to play games, go on adventures, try different movements and probably be a little bit silly sometimes! There is really only one thing I want from you. <b>Have fun and keep moving.</b>”</div>
+
+  <div class="say">“If you don't like one way of moving, that's okay. Find another way that works for you. There are no winners or losers here. We're doing this together. Okay… Who is ready for our FIRST Move ME?”</div>
+  <p class="do">Let them respond.</p>
+
+  <div class="say big">“I can't hear you! WHO'S READY?”</div>
+  <p class="do">Let them get louder.</p>
+
+  <div class="say big">“Okay! It is time to MOVE!”</div>
+</section>
+
+<!-- ============ WARM-UP ============ -->
+<section id="warmup">
+  <div class="shead"><h2>Moving Warm-up</h2><div class="time">1:30 to 5:00</div></div>
+  <p class="setup">Kids spread out so they can move safely. You demonstrate everything while you talk. Keep it flowing, barely any stopping between moves.</p>
+
+  <div class="step"><div class="n">1</div><div><div class="t">Reach up</div>
+    <div class="say">“Everyone reach up as HIGH as you can! Right up to the sky! Can you make yourself even taller?”</div>
+    <p class="do">Hold briefly. “And relax.”</p></div></div>
+
+  <div class="step"><div class="n">2</div><div><div class="t">Side reach</div>
+    <div class="say">“Reach over to one side… And now the other. Side… And side.”</div>
+    <p class="do">Repeat a few times.</p></div></div>
+
+  <div class="step"><div class="n">3</div><div><div class="t">Shoulder rolls</div>
+    <div class="say">“Let's wake up those shoulders. Big circles backwards. And now forwards.”</div></div></div>
+
+  <div class="step"><div class="n">4</div><div><div class="t">Gentle body turns</div>
+    <div class="say">“Now turn gently from side to side. Keep those feet comfortable. Side… And side.”</div></div></div>
+
+  <div class="step"><div class="n">5</div><div><div class="t">March</div>
+    <div class="say">“Okay, let's get those feet moving. Start marching! Nice and easy.”</div>
+    <p class="do">After a few seconds: “Can we make that march a little bit quicker?”</p></div></div>
+
+  <div class="step"><div class="n">6</div><div><div class="t">Knees up</div>
+    <div class="say">“Now bring those knees a little higher. You choose how high. Keep moving!”</div></div></div>
+
+  <div class="step"><div class="n">7</div><div><div class="t">Side steps</div>
+    <div class="say">“Now side to side. Step… Together… Step… Together.”</div>
+    <p class="do">Pick up the pace a little.</p></div></div>
+
+  <div class="step"><div class="n">8</div><div><div class="t">Heel kicks</div>
+    <div class="say">“Let's get those feet moving a little faster. Bring your heels back towards you. Keep going!”</div></div></div>
+
+  <div class="step"><div class="n">9</div><div><div class="t">High and low</div>
+    <div class="say">“Now listen carefully! When I say HIGH, reach HIGH! When I say LOW, get LOW! Ready? <b>HIGH! LOW! HIGH! LOW! HIGH! LOW!</b>”</div>
+    <p class="do">Speed the calls up gradually.</p></div></div>
+
+  <div class="step"><div class="n">10</div><div><div class="t">Shake it out</div>
+    <div class="say">“And SHAKE everything out! Shake your arms! Shake your legs! Shake your whole body!”</div></div></div>
+
+  <div class="next"><b>Transition, keep them moving</b>“Okay! We're warmed up. And now we're getting started. Remember… <strong>KEEP MOVING AND HAVE FUN!</strong>”</div>
+</section>
+
+<!-- ============ TRAFFIC LIGHTS ============ -->
+<section id="lights">
+  <div class="shead"><h2>Activity 1<br>Traffic Lights</h2><div class="time">about 4 min</div></div>
+  <p class="setup">Kids spread through the whole space.</p>
+
+  <div class="say">“Everyone start moving around the space. Walk, jog or move however feels good. But listen carefully because I'm controlling the traffic lights! When I say…”</div>
+  <div class="key"><span class="g">GREEN = GO!</span><span class="a">AMBER = SLOW MOTION!</span><span>RED = FREEZE!</span></div>
+  <div class="say big">“Let's try it. GREEN!”</div>
+  <p class="do">Let them move.</p>
+  <div class="say big">“RED!”</div>
+  <p class="do">Pause.</p>
+  <div class="calls"><span>GREEN!</span><span>AMBER!</span><span>RED!</span></div>
+  <p class="do">Keep switching commands for about a minute.</p>
+
+  <h3>After about one minute, add colours</h3>
+  <div class="say">“Okay… That was WAY too easy. We're adding some new colours.”</div>
+  <div class="key"><span>BLUE = reach up HIGH!</span><span>PURPLE = turn around!</span><span>ORANGE = SILLY WALK!</span></div>
+  <p class="do">Demonstrate something ridiculous for the silly walk.</p>
+  <div class="say big">“Ready? GREEN!”</div>
+  <p class="do">Call colours faster and faster. Keep the energy high.</p>
+  <div class="calls"><span>RED!</span><span>PURPLE!</span><span>GREEN!</span><span>AMBER!</span><span>BLUE!</span><span>ORANGE!</span><span>GREEN!</span></div>
+
+  <div class="note">If someone does the wrong action: “Oh no! Wrong colour! Doesn't matter. KEEP MOVING!”</div>
+
+  <div class="next"><b>Transition, finish on green</b>“GREEN! And DON'T STOP! Because we're going straight into our next game!”</div>
+</section>
+
+<!-- ============ FLOOR IS LAVA ============ -->
+<section id="lava">
+  <div class="shead"><h2>Activity 2<br>The Floor is Lava</h2><div class="time">about 4 min</div></div>
+  <div class="setup">Before you start, quickly point out a few safe areas. Outdoors: two opposite ends of the field. Indoors: same thing, or use lines on the floor.
+    <ul><li>Corners</li><li>Lines on the floor</li><li>Walls</li><li>Imaginary islands you name</li></ul></div>
+
+  <div class="say">“Keep moving! But I need to warn you about something… At any moment… The floor could turn into… <b>LAVA!</b> When I shout <b>THE FLOOR IS LAVA!</b> you've got FIVE seconds to reach one of our safe areas. Ready? Keep moving…”</div>
+  <p class="do">Wait a few seconds.</p>
+  <div class="say big">“THE FLOOR IS LAVA! FIVE! FOUR! THREE! TWO! ONE! SAFE!”</div>
+  <p class="do">Straight away:</p>
+  <div class="say">“Okay, the lava's gone. Back out!”</div>
+  <p class="do">They start moving again.</p>
+
+  <h3>Round 2</h3>
+  <div class="say">“Now we're moving with GIANT STEPS!”</div>
+  <p class="do">Let them move, then:</p>
+  <div class="say big">“THE FLOOR IS LAVA! FIVE! FOUR! THREE! TWO! ONE! SAFE!”</div>
+  <div class="say">“Back out! This time… TINY STEPS!”</div>
+
+  <h3>Round 3</h3>
+  <div class="say">“Now SIDEWAYS!”</div>
+  <div class="say big">“THE FLOOR IS LAVA! FIVE! FOUR! THREE! TWO! ONE! SAFE!”</div>
+
+  <h3>Round 4</h3>
+  <div class="say">“Uh-oh… The ground has turned into really sticky MUD! Lift those feet!”</div>
+  <p class="do">Then suddenly:</p>
+  <div class="say big">“THE FLOOR IS LAVA!”</div>
+  <p class="do">Keep going for several rounds. Mix the movement each time.</p>
+
+  <div class="note">Nobody is out for missing a safe zone. Just say: “Quick! Quick! Quick! SAFE! And we're back!”</div>
+
+  <div class="next"><b>Transition</b>“Keep moving! Something else is happening now…”</div>
+
+  <div class="note" style="margin-top:18px"><strong style="color:var(--fg)">13:00 to 25:00.</strong> The pages for this block weren't in what you sent me. If you don't have them, keep the energy up by running more rounds of Traffic Lights and The Floor is Lava with new twists: hopping, backwards, animal walks, tip-toes, a “frozen ocean” instead of lava. Whatever you're doing, stop and go to the Cool Down at 25:00.</div>
+</section>
+
+<!-- ============ COOL DOWN ============ -->
+<section id="cool">
+  <div class="shead"><h2>Cool Down</h2><div class="time">25:00 to 28:00</div></div>
+  <p class="setup"><strong>Wherever you are in the activity, move into the cool down at the final 5-minute mark.</strong> Slow your own voice and pace right down.</p>
+
+  <div class="say">“WOW! Amazing work. Now keep moving… But let's bring everything right down.”</div>
+
+  <div class="step"><div class="n">1</div><div><div class="t">Slow walk</div>
+    <div class="say">“Start walking slowly around the space. Nice and easy.” “Take a big breath IN…”</div>
+    <p class="do">Breathe in with them.</p>
+    <div class="say">“And OUT…”</div>
+    <p class="do">Repeat.</p></div></div>
+
+  <div class="step"><div class="n">2</div><div><div class="t">Gentle march</div>
+    <div class="say">“Now a really gentle march on the spot. Let your breathing slow down.”</div></div></div>
+
+  <div class="step"><div class="n">3</div><div><div class="t">Reach up</div>
+    <div class="say">“Reach both arms up nice and tall. Big breath IN…” “And breathe OUT.”</div></div></div>
+
+  <div class="step"><div class="n">4</div><div><div class="t">Side stretch</div>
+    <div class="say">“Reach over to one side… Hold… And back. Other side… Hold… And back.”</div></div></div>
+
+  <div class="step"><div class="n">5</div><div><div class="t">Shoulders</div>
+    <div class="say">“Roll those shoulders backwards. Nice and slowly.” “And forwards.”</div></div></div>
+
+  <div class="step"><div class="n">6</div><div><div class="t">Shake out</div>
+    <div class="say">“Shake your arms out. Shake your legs. Let everything relax.”</div></div></div>
+
+  <div class="step"><div class="n">7</div><div><div class="t">Final breaths</div>
+    <div class="say">“Stand nice and comfortably. Big breath IN…”</div>
+    <p class="do">Raise arms.</p>
+    <div class="say">“And OUT…”</div>
+    <p class="do">Lower arms. Again:</p>
+    <div class="say">“IN…” “And OUT.” “One last one… IN… And OUT.”</div></div></div>
+
+  <div class="next"><b>Next</b>Bring them in for the Day One Pep Talk.</div>
+</section>
+
+<!-- ============ PEP TALK ============ -->
+<section id="pep">
+  <div class="shead"><h2>Day One<br>Pep Talk</h2><div class="time">28:00 to 30:00</div></div>
+  <p class="setup">Bring the kids together.</p>
+
+  <div class="say">“Guys… <b>YOU WERE AMAZING!</b> That was our very first Move ME session. And look what you just did. You moved. You played. You laughed. You tried different things. And we did it TOGETHER.”</div>
+  <div class="say">“Nobody needed to be the fastest. Nobody needed to be the strongest. Nobody needed to be brilliant at sport. You just needed to get involved and MOVE. And you did exactly that.”</div>
+  <p class="do">Pause.</p>
+
+  <div class="say">“Now… We've got a challenge for you. We're coming back <b>TOMORROW!</b> Who's coming back?”</div>
+  <p class="do">Encourage hands and responses.</p>
+  <div class="say">“Who thinks they can do it again tomorrow?”</div>
+  <p class="do">Respond enthusiastically.</p>
+  <div class="say">“YES!” “And here's the BIG challenge… Who thinks they can keep coming back and do <b>EVERY Move ME SESSION THIS MONTH?</b>”</div>
+  <p class="do">Encourage hands.</p>
+
+  <div class="say">“Look at all those hands! We think you can do it too. And every time you come back, we're going to try something different. More games. More challenges. More adventures. And a LOT more moving.”</div>
+  <div class="say big">“Give yourselves a MASSIVE clap!”</div>
+  <p class="do">Lead the applause.</p>
+
+  <div class="say">“Day One… <b>DONE!</b> You guys were amazing. We can't wait to see you tomorrow! Well done everyone!”</div>
+
+  <div class="next"><b>Hand back</b>“Now I'm going to hand back over to your teachers for the next instructions! See you tomorrow!!”</div>
+</section>
+
+<footer>Move ME, Session 1 cue cards</footer>
+</div>
+<script>
+(function(){
+  var K='moveme_sw1', el=document.getElementById('sw'), T=document.getElementById('swT'),
+      go=document.getElementById('swGo'), rs=document.getElementById('swR');
+  var st={run:false,start:0,acc:0};
+  try{var s=JSON.parse(localStorage.getItem(K)||'null'); if(s&&typeof s.acc==='number') st=s;}catch(e){}
+  function save(){try{localStorage.setItem(K,JSON.stringify(st));}catch(e){}}
+  function ms(){return st.acc+(st.run?Date.now()-st.start:0);}
+  var marks=[[0,'welcome'],[90,'warmup'],[300,'lights'],[540,'lava'],[1500,'cool'],[1680,'pep']];
+  function paint(){
+    var s=Math.floor(ms()/1000), m=Math.floor(s/60), r=s%60;
+    T.textContent=(m<10?'0':'')+m+':'+(r<10?'0':'')+r;
+    el.classList.toggle('on',st.run); el.classList.toggle('over',s>=1800);
+    go.textContent=st.run?'Pause':(st.acc?'Resume':'Start'); go.classList.toggle('pause',st.run);
+    var cur=null; for(var i=0;i<marks.length;i++){ if(s>=marks[i][0]) cur=marks[i][1]; }
+    var links=document.querySelectorAll('nav a'); for(var j=0;j<links.length;j++){ links[j].classList.toggle('now', !!(st.run||st.acc) && links[j].getAttribute('href')==='#'+cur); }
+  }
+  go.addEventListener('click',function(){ if(st.run){st.acc=ms();st.run=false;} else {st.start=Date.now();st.run=true;} save(); paint(); });
+  var held=0; rs.addEventListener('click',function(){ if(!st.run&&!st.acc) return; if(held&&Date.now()-held<2500){ st={run:false,start:0,acc:0}; held=0; save(); paint(); } else { held=Date.now(); T.textContent='tap ↺ again'; setTimeout(paint,2500); } });
+  setInterval(paint,500); paint();
+  if(navigator.wakeLock){ var lock=null; function wl(){ if(st.run&&!lock&&document.visibilityState==='visible'){ navigator.wakeLock.request('screen').then(function(l){lock=l; l.addEventListener('release',function(){lock=null;});}).catch(function(){}); } } go.addEventListener('click',wl); document.addEventListener('visibilitychange',wl); }
+})();
+</script>
+
+</body>
+</html>
