@@ -43,3 +43,10 @@
     X-Frame-Options = "SAMEORIGIN"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
+
+# --- Get the Kids Fit (facilitator cue cards) -----------------------------
+# Was briefly live as moveme.html — keep that link alive.
+[[redirects]]
+  from = "/moveme.html"
+  to = "/kidsfit.html"
+  status = 301

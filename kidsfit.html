@@ -4,24 +4,27 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex">
-<meta name="theme-color" content="#D9402B">
-<title>Move ME Session 1</title>
+<meta name="theme-color" content="#F26522">
+<meta name="apple-mobile-web-app-title" content="Kids Fit">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23F26522'/%3E%3Ccircle cx='32' cy='17' r='6' fill='%23fff'/%3E%3Cpath d='M32 23v15M32 26l-12-9M32 26l12-9M32 38l-9 15M32 38l9 15' stroke='%23fff' stroke-width='5' stroke-linecap='round' fill='none'/%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23F26522'/%3E%3Ccircle cx='32' cy='17' r='6' fill='%23fff'/%3E%3Cpath d='M32 23v15M32 26l-12-9M32 26l12-9M32 38l-9 15M32 38l9 15' stroke='%23fff' stroke-width='5' stroke-linecap='round' fill='none'/%3E%3C/svg%3E">
+<title>Get the Kids Fit Session 1</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..900&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
 <style>
 /* Layout: one tall cue-card column, sticky section tabs on top, SAY lines big, DO notes small and quiet. */
 :root{
-  --bg:#FFFDF8; --card:#FFFFFF; --fg:#1B1A17; --muted:#6B675E; --line:#E6E1D6;
-  --red:#D9402B; --redsoft:#FBE7E2; --go:#1F8A4C; --gosoft:#E2F3E8;
+  --bg:#F7F9FC; --card:#FFFFFF; --fg:#141B2D; --muted:#5E6677; --line:#DDE3EC;
+  --red:#F26522; --redsoft:#FFE9DD; --go:#1F8A4C; --gosoft:#E2F3E8;
   --amber:#C98A00; --ambersoft:#FBF0D2;
   --disp:"Archivo",system-ui,sans-serif; --body:"Atkinson Hyperlegible",system-ui,sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#15140F; --card:#1E1C16; --fg:#F4F0E6; --muted:#A9A396; --line:#33302A;
-  --red:#FF6B52; --redsoft:#3A1F19; --go:#4FCB7E; --gosoft:#17311F;
+  --bg:#0F1420; --card:#171E2E; --fg:#F2F5FA; --muted:#9AA3B5; --line:#2A3345;
+  --red:#FF8A4C; --redsoft:#3A2317; --go:#4FCB7E; --gosoft:#17311F;
   --amber:#F0B33C; --ambersoft:#3A2E0E; color-scheme:dark}}
 :root[data-theme="dark"]{
-  --bg:#15140F; --card:#1E1C16; --fg:#F4F0E6; --muted:#A9A396; --line:#33302A;
-  --red:#FF6B52; --redsoft:#3A1F19; --go:#4FCB7E; --gosoft:#17311F;
+  --bg:#0F1420; --card:#171E2E; --fg:#F2F5FA; --muted:#9AA3B5; --line:#2A3345;
+  --red:#FF8A4C; --redsoft:#3A2317; --go:#4FCB7E; --gosoft:#17311F;
   --amber:#F0B33C; --ambersoft:#3A2E0E; color-scheme:dark}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:19px;line-height:1.5;
@@ -31,6 +34,11 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 header{padding-block:22px 10px}
 .eyebrow{font-family:var(--disp);font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--red)}
 h1{font-family:var(--disp);font-stretch:85%;font-weight:900;font-size:clamp(34px,9vw,48px);line-height:1;margin:6px 0 8px;text-wrap:balance}
+.brand{display:flex;align-items:center;gap:12px;margin:0 0 10px}
+.brand .logo{width:52px;height:52px;flex:0 0 auto}
+.brand .wm{font-family:var(--disp);font-stretch:85%;font-weight:900;font-size:22px;line-height:1;letter-spacing:.01em;text-transform:uppercase}
+.brand .wm b{color:var(--red)}
+.brand .tag{display:block;font-family:var(--body);font-weight:400;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:4px}
 .sub{color:var(--muted);font-size:16px;margin:0}
 nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:8px;margin-inline:-16px;padding-inline:16px;border-bottom:1px solid var(--line)}
 nav .row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;max-width:680px;margin:0 auto}
@@ -144,8 +152,8 @@ section{scroll-margin-top:140px}
 <div id="sw" aria-label="Manual stopwatch"><span class="k">Stopwatch</span><span class="t" id="swT">00:00</span><button id="swGo" type="button">Start</button><button id="swR" class="rst" type="button" aria-label="Reset">↺</button></div>
 <div class="wrap">
 <header>
-  <div class="eyebrow">Facilitator cue cards</div>
-  <h1>Move ME<br>Session 1</h1>
+  <div class="brand"><svg class="logo" viewBox="0 0 64 64" width="64" height="64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="var(--red)"/><circle cx="32" cy="17" r="6" fill="#fff"/><path d="M32 23v15M32 26l-12-9M32 26l12-9M32 38l-9 15M32 38l9 15" stroke="#fff" stroke-width="5" stroke-linecap="round" fill="none"/></svg><div class="wm">Get the<br><b>Kids Fit</b><span class="tag">Facilitator cue cards</span></div></div>
+  <h1>Session 1</h1>
   <p class="sub">20-minute session. No equipment. Boxed text = say it out loud. Grey italics = what you do. Hit <strong>Start</strong> on the session timer as you begin and it will tell you when to move on.</p>
 </header>
 
@@ -175,13 +183,13 @@ section{scroll-margin-top:140px}
   <div class="shead"><h2>Welcome</h2><div class="time">0:00 to 1:30</div></div>
   <p class="setup">Bring the kids together, standing, with space around each of them.</p>
 
-  <div class="say">“Good morning, everyone! Welcome to the very first session of <b>Move ME!</b> For the next month, we're going to start our mornings doing something really simple… <b>MOVING!</b>”</div>
+  <div class="say">“Good morning, everyone! Welcome to the very first session of <b>Get the Kids Fit!</b> For the next month, we're going to start our mornings doing something really simple… <b>MOVING!</b>”</div>
 
   <div class="say">“You don't have to be good at sport. You don't have to be the fastest. You don't have to be the strongest. And you definitely don't have to be the best at anything. We're just here to have fun.”</div>
 
   <div class="say">“We're going to play games, go on adventures, try different movements and probably be a little bit silly sometimes! There is really only one thing I want from you. <b>Have fun and keep moving.</b>”</div>
 
-  <div class="say">“If you don't like one way of moving, that's okay. Find another way that works for you. There are no winners or losers here. We're doing this together. Okay… Who is ready for our FIRST Move ME?”</div>
+  <div class="say">“If you don't like one way of moving, that's okay. Find another way that works for you. There are no winners or losers here. We're doing this together. Okay… Who is ready for our FIRST Get the Kids Fit session?”</div>
   <p class="do">Let them respond.</p>
 
   <div class="say big">“I can't hear you! WHO'S READY?”</div>
@@ -339,7 +347,7 @@ section{scroll-margin-top:140px}
   <div class="shead"><h2>Day One<br>Pep Talk</h2><div class="time">17:00 to 20:00</div></div>
   <p class="setup">Bring the kids together.</p>
 
-  <div class="say">“Guys… <b>YOU WERE AMAZING!</b> That was our very first Move ME session. And look what you just did. You moved. You played. You laughed. You tried different things. And we did it TOGETHER.”</div>
+  <div class="say">“Guys… <b>YOU WERE AMAZING!</b> That was our very first Get the Kids Fit session. And look what you just did. You moved. You played. You laughed. You tried different things. And we did it TOGETHER.”</div>
   <div class="say">“Nobody needed to be the fastest. Nobody needed to be the strongest. Nobody needed to be brilliant at sport. You just needed to get involved and MOVE. And you did exactly that.”</div>
   <p class="do">Pause.</p>
 
@@ -347,7 +355,7 @@ section{scroll-margin-top:140px}
   <p class="do">Encourage hands and responses.</p>
   <div class="say">“Who thinks they can do it again tomorrow?”</div>
   <p class="do">Respond enthusiastically.</p>
-  <div class="say">“YES!” “And here's the BIG challenge… Who thinks they can keep coming back and do <b>EVERY Move ME SESSION THIS MONTH?</b>”</div>
+  <div class="say">“YES!” “And here's the BIG challenge… Who thinks they can keep coming back and do <b>EVERY Get the Kids Fit SESSION THIS MONTH?</b>”</div>
   <p class="do">Encourage hands.</p>
 
   <div class="say">“Look at all those hands! We think you can do it too. And every time you come back, we're going to try something different. More games. More challenges. More adventures. And a LOT more moving.”</div>
@@ -359,7 +367,7 @@ section{scroll-margin-top:140px}
   <div class="next"><b>Hand back</b>“Now I'm going to hand back over to your teachers for the next instructions! See you tomorrow!!”</div>
 </section>
 
-<footer>Move ME, Session 1 cue cards</footer>
+<footer>Get the Kids Fit, Session 1 cue cards</footer>
 </div>
 <script>
 (function(){
