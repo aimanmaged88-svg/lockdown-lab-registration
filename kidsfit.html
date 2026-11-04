@@ -6,10 +6,12 @@
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#0B1321">
 <meta name="apple-mobile-web-app-title" content="Kids Fit">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="icon" href="assets/gtkf-icon-180.png">
 <link rel="apple-touch-icon" href="assets/gtkf-icon-180.png">
 <title>Get the Kids Fit Session 1</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..900&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,400..900;1,14..32,400..700&display=swap">
 <style>
 /* Layout: one tall cue-card column, sticky section tabs on top, SAY lines big, DO notes small and quiet. */
 :root{
@@ -17,15 +19,18 @@
   --red:#0E8FCF; --redsoft:#DDF1FC; --pink:#D9126A; --pinksoft:#FCE1EE; --orange:#E8950F; --navy:#0B1321;
   --go:#1F8A4C; --gosoft:#E2F3E8;
   --amber:#C98A00; --ambersoft:#FBF0D2;
-  --disp:"Archivo",system-ui,sans-serif; --body:"Atkinson Hyperlegible",system-ui,sans-serif;
+  --disp:-apple-system,BlinkMacSystemFont,"SF Pro Display","Inter",system-ui,sans-serif; --body:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter",system-ui,sans-serif;
+  --glass:rgba(255,255,255,.62); --glass2:rgba(255,255,255,.78); --gline:rgba(255,255,255,.75); --gshadow:0 10px 30px rgba(11,19,33,.10),0 1px 2px rgba(11,19,33,.06); --bar:rgba(11,19,33,.74); --barline:rgba(255,255,255,.14);
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0B1321; --card:#141D30; --fg:#F2F5FA; --muted:#9AA3B5; --line:#273246;
-  --red:#20B0E8; --redsoft:#10304A; --pink:#F01878; --pinksoft:#3E1230; --orange:#F8B038; --go:#4FCB7E; --gosoft:#17311F;
+  --red:#20B0E8; --redsoft:#10304A; --pink:#F01878; --pinksoft:#3E1230; --orange:#F8B038;
+  --glass:rgba(20,29,48,.55); --glass2:rgba(20,29,48,.72); --gline:rgba(255,255,255,.10); --gshadow:0 10px 30px rgba(0,0,0,.35),0 1px 2px rgba(0,0,0,.3); --bar:rgba(11,19,33,.66); --barline:rgba(255,255,255,.12); --go:#4FCB7E; --gosoft:#17311F;
   --amber:#F0B33C; --ambersoft:#3A2E0E; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0B1321; --card:#141D30; --fg:#F2F5FA; --muted:#9AA3B5; --line:#273246;
-  --red:#20B0E8; --redsoft:#10304A; --pink:#F01878; --pinksoft:#3E1230; --orange:#F8B038; --go:#4FCB7E; --gosoft:#17311F;
+  --red:#20B0E8; --redsoft:#10304A; --pink:#F01878; --pinksoft:#3E1230; --orange:#F8B038;
+  --glass:rgba(20,29,48,.55); --glass2:rgba(20,29,48,.72); --gline:rgba(255,255,255,.10); --gshadow:0 10px 30px rgba(0,0,0,.35),0 1px 2px rgba(0,0,0,.3); --bar:rgba(11,19,33,.66); --barline:rgba(255,255,255,.12); --go:#4FCB7E; --gosoft:#17311F;
   --amber:#F0B33C; --ambersoft:#3A2E0E; color-scheme:dark}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:19px;line-height:1.5;
@@ -114,9 +119,9 @@ nav a.now b{color:#fff}
 #sw.on .t{color:var(--go)}
 body{padding-top:88px;padding-bottom:90px}
 nav{top:calc(env(safe-area-inset-top,0px) + 74px)}
-section{scroll-margin-top:140px}
+section{scroll-margin-top:150px}
 #ses{min-height:74px}
-@media (prefers-reduced-motion: reduce){#moveOn .mo{animation:none}}
+@media (prefers-reduced-motion: reduce){#moveOn .mo{animation:none}button{transition:none}}
 /* Traffic lights side button + full-screen colour */
 #tlBtn{position:fixed;left:0;top:50%;transform:translateY(-50%);z-index:20;border:0;cursor:pointer;background:var(--fg);color:var(--bg);border-radius:0 14px 14px 0;padding:12px 8px 12px max(8px,env(safe-area-inset-left,0px));display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:0 6px 18px rgba(0,0,0,.22)}
 #tlBtn i{display:block;width:12px;height:12px;border-radius:50%}
@@ -134,12 +139,75 @@ section{scroll-margin-top:140px}
 #tl.dark{color:#fff}#tl.light{color:#111}#tl.light .x{background:rgba(0,0,0,.18);color:#111}
 .tlOpen{font-family:var(--disp);font-weight:800;font-size:16px;border:0;border-radius:12px;padding:12px 16px;cursor:pointer;background:var(--fg);color:var(--bg);display:inline-flex;align-items:center;gap:8px;margin:4px 0 8px}
 .tlOpen i{width:12px;height:12px;border-radius:50%;display:inline-block}
+/* ===== Glass layer ===== */
+.bgfx{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;background:var(--bg)}
+.bgfx i{position:absolute;border-radius:50%;filter:blur(70px);opacity:.55}
+.bgfx .a{width:60vw;height:60vw;max-width:520px;max-height:520px;left:-18vw;top:6vh;background:radial-gradient(circle,#20B0E8,transparent 70%)}
+.bgfx .b{width:60vw;height:60vw;max-width:520px;max-height:520px;right:-22vw;top:42vh;background:radial-gradient(circle,#F01878,transparent 70%);opacity:.35}
+.bgfx .c{width:50vw;height:50vw;max-width:420px;max-height:420px;left:20vw;bottom:-18vh;background:radial-gradient(circle,#F8B038,transparent 70%);opacity:.28}
+:root[data-theme="dark"] .bgfx i,.bgfx.dk i{opacity:.32}
+body{background:transparent;letter-spacing:-.005em}
+body::before{background:transparent}
+h1,h2,h3,.eyebrow,.time,.plan td:first-child,.step .n,.step .t{letter-spacing:-.02em}
+h3,.eyebrow,.brand .tag,#ses .lbl,#sw .k,#tlBtn span,#moveOn b,#tl .hint{letter-spacing:.08em}
+h1{font-weight:800}h2{font-weight:800}
+.shead{border-bottom:0;padding-bottom:0;margin-bottom:14px;position:relative}
+.shead::after{content:"";position:absolute;left:0;right:0;bottom:-8px;height:3px;border-radius:3px;background:linear-gradient(90deg,var(--red),var(--pink) 55%,transparent)}
+/* glass cards */
+.say,.note,.plan,.step .say{background:var(--glass);border:1px solid var(--gline);box-shadow:var(--gshadow);-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);border-radius:20px}
+.say{padding:16px 18px}
+.say.big{background:var(--glass2)}
+.plan{border-collapse:separate;border-spacing:0;overflow:hidden;padding:4px 10px}
+.plan td{border-bottom:1px solid color-mix(in srgb,var(--fg) 8%,transparent);padding:9px 6px}
+.plan tr:last-child td{border-bottom:0}
+.setup{background:color-mix(in srgb,var(--orange) 14%,var(--glass));border:1px solid color-mix(in srgb,var(--orange) 30%,var(--gline));border-left:4px solid var(--orange);border-radius:16px;box-shadow:var(--gshadow);-webkit-backdrop-filter:blur(18px) saturate(160%);backdrop-filter:blur(18px) saturate(160%)}
+.next{background:color-mix(in srgb,var(--go) 12%,var(--glass));border:1px solid color-mix(in srgb,var(--go) 30%,var(--gline));border-left:4px solid var(--go);border-radius:16px;box-shadow:var(--gshadow);-webkit-backdrop-filter:blur(18px) saturate(160%);backdrop-filter:blur(18px) saturate(160%)}
+.note{border-style:solid;border-radius:16px}
+.key span,.calls span{border-radius:999px;border:1px solid var(--gline);box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 4px 12px rgba(11,19,33,.08)}
+.calls span{background:var(--glass2);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px)}
+.brand img{border-radius:18px;box-shadow:0 12px 32px rgba(11,19,33,.28),0 0 0 1px rgba(255,255,255,.08)}
+/* floating glass bar */
+#ses{left:max(10px,env(safe-area-inset-left,0px));right:max(10px,env(safe-area-inset-right,0px));top:calc(env(safe-area-inset-top,0px) + 8px);border-radius:24px;background:var(--bar);border:1px solid var(--barline);-webkit-backdrop-filter:blur(26px) saturate(180%);backdrop-filter:blur(26px) saturate(180%);box-shadow:0 14px 40px rgba(0,0,0,.28),0 1px 0 rgba(255,255,255,.08) inset;padding-left:16px;padding-right:8px;color:#fff;min-height:70px}
+#ses .lbl b{color:#7FDBFF}
+#ses button.rst{color:#fff}
+#ses.on .cd{color:#5CE39A}
+#ses.warn .cd,#ses.on.warn .cd{color:#F8B038}
+#ses.done .cd{color:#FF5FA0}
+body{padding-top:96px}
+nav{top:calc(env(safe-area-inset-top,0px) + 84px);background:transparent;border-bottom:0;padding-block:6px}
+nav::before{content:"";position:absolute;inset:0;background:color-mix(in srgb,var(--bg) 72%,transparent);-webkit-backdrop-filter:blur(20px) saturate(160%);backdrop-filter:blur(20px) saturate(160%);z-index:-1;-webkit-mask:linear-gradient(#000 70%,transparent);mask:linear-gradient(#000 70%,transparent)}
+nav{position:sticky}
+nav a{background:var(--glass2);border:1px solid var(--gline);box-shadow:0 2px 8px rgba(11,19,33,.08);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);padding:8px 14px}
+nav a.now{background:linear-gradient(135deg,var(--pink),#FF4D9A);border-color:transparent;box-shadow:0 6px 18px rgba(240,24,120,.35)}
+#moveOn{top:calc(env(safe-area-inset-top,0px) + 86px)}
+#moveOn .mo{background:linear-gradient(135deg,rgba(240,24,120,.92),rgba(255,77,154,.88));border:1px solid rgba(255,255,255,.35);-webkit-backdrop-filter:blur(20px) saturate(180%);backdrop-filter:blur(20px) saturate(180%);box-shadow:0 16px 40px rgba(240,24,120,.35);border-radius:22px}
+#sw{background:var(--glass2);border:1px solid var(--gline);-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);box-shadow:var(--gshadow)}
+#tlBtn{background:var(--bar);color:#fff;border:1px solid var(--barline);border-left:0;-webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%);box-shadow:0 10px 26px rgba(0,0,0,.25)}
+#tlBtn i{box-shadow:0 0 10px currentColor}
+.tlOpen{border-radius:999px;background:linear-gradient(135deg,var(--red),#4FC3F7);color:#fff;box-shadow:0 8px 22px rgba(32,176,232,.35)}
+/* buttons: Apple press */
+button{-webkit-tap-highlight-color:transparent;transition:transform .18s cubic-bezier(.2,.8,.2,1),box-shadow .18s ease,opacity .18s ease}
+button:active{transform:scale(.95)}
+#ses button,#sw button{box-shadow:0 1px 0 rgba(255,255,255,.25) inset,0 4px 12px rgba(0,0,0,.18)}
+#ses button:not(.rst){background:linear-gradient(135deg,#34C759,#1FA64A)}
+#ses button.pause{background:linear-gradient(135deg,#FFCC33,#F5A623);color:#1B1A17}
+#sw button:not(.rst){background:linear-gradient(135deg,#34C759,#1FA64A)}
+#sw button.pause{background:linear-gradient(135deg,#FFCC33,#F5A623);color:#1B1A17}
+/* lights overlay: glass buttons */
+#tl .dots button{border:1px solid rgba(255,255,255,.55);box-shadow:0 1px 0 rgba(255,255,255,.35) inset,0 8px 22px rgba(0,0,0,.3);border-radius:18px}
+#tl .dots .more{background:rgba(255,255,255,.16);-webkit-backdrop-filter:blur(16px) saturate(160%);backdrop-filter:blur(16px) saturate(160%)}
+#tl .x{background:rgba(255,255,255,.18);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.3)}
+#tl.light .x{background:rgba(0,0,0,.12);color:#111}
+#tl .nm{text-shadow:0 2px 24px rgba(0,0,0,.18)}
+footer{opacity:.8}
+@media (prefers-reduced-transparency: reduce){.say,.note,.plan,.setup,.next,#ses,nav a,#sw,#tlBtn,#moveOn .mo{-webkit-backdrop-filter:none;backdrop-filter:none;background:var(--card)}#ses,#tlBtn{background:var(--navy)}}
 </style>
 
 
 <style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}</style>
 </head>
 <body>
+<div class="bgfx" aria-hidden="true"><i class="a"></i><i class="b"></i><i class="c"></i></div>
 <div id="ses" aria-label="Session timer">
   <div class="l"><span class="lbl" id="sesLbl">Session timer</span><span class="sec" id="sesSec">Tap Start as you say “Good morning”</span><span class="tot" id="sesTot"></span></div>
   <div class="cd" id="sesCd">20:00</div>
