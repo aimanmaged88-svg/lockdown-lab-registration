@@ -1228,6 +1228,34 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
 - v2 ideas discussed: KOTC proper, run chat, POTW weekly archive/all-time
   wall, PWA manifest + install, native app for background geofencing.
 
+## Move ME = "Get the Kids Fit" (UAE kids fitness programme, 2026-10/11)
+
+- When Aiman says "Get the Kids Fit" he means **Move ME** — 20-minute morning
+  movement sessions for school kids in the UAE, run by facilitators ("trainers").
+  Files: `moveme.html` (Session 1 facilitator cue cards: session timer with
+  move-on prompts, manual stopwatch, full-screen Traffic Lights colour screen,
+  six colours GREEN/AMBER/RED + BLUE/PURPLE/ORANGE) and `moveme-toolkit.html`
+  (2026-11-04, Aiman asked: "a new thread for trainers toolkit"). Same design
+  language (Archivo + Atkinson, cream/red cue cards, dark mode via
+  prefers-color-scheme). Linked both ways (moveme.html header + footer).
+- **Trainers Toolkit page** = 5 sections: (1) day-one kit checklist in four
+  zones Signal/Write/Me/Safety, ticks persisted in localStorage `moveme_kit1`,
+  the 5 ★ non-negotiables = whistle, wand, pen, pad, tassels; (2) whistle
+  (pea-less vs electronic, one blast = freeze); (3) **The Wand** — LED colour
+  baton concept in 3 builds (buy an LED baton now / custom Move ME wand with
+  the 6 game colours, USB-C, buzz on change / Bluetooth-synced to the phone's
+  lights screen + wave = next colour) plus a "your phone is the wand" full-
+  screen colour mode (`#wscr`, same COL[] as moveme.html); (4) **the bag** —
+  six rules (whistle pocket OUTSIDE at the top in red, shadow slots, one zone
+  per job, opens flat, sand-proof/heat, Move ME branding) + 3 inline-SVG
+  concepts: A The Sling (chest bag, whistle on the strap), B The Roll (fold-out
+  shadow-slot organiser for any backpack), C The Kit Bag (clamshell backpack,
+  Roll panel built in) — recommendation: Roll first, then Kit Bag, Sling =
+  Season 2; (5) 60-second pack check: five tiles sharing state with the ★
+  items. No backend, no SW, noindex. Branch
+  claude/trainers-toolkit-get-kids-fit-5xsa9n; previous Move ME work merged
+  via PRs #15-#18 (merge to main = Netlify auto-deploy).
+
 ## Parked ideas (Aiman asked to save these)
 
 - **"A.I. MAN" Instagram post** — saved 2026-07-18, for a few weeks out.

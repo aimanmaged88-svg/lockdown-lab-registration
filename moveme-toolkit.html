@@ -1,0 +1,469 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#D9402B">
+<title>Move ME Trainers Toolkit</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,500..900&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Same cue-card language as moveme.html: cream page, red headings, boxed "say" text, quiet grey notes. */
+:root{
+  --bg:#FFFDF8; --card:#FFFFFF; --fg:#1B1A17; --muted:#6B675E; --line:#E6E1D6;
+  --red:#D9402B; --redsoft:#FBE7E2; --go:#1F8A4C; --gosoft:#E2F3E8;
+  --amber:#C98A00; --ambersoft:#FBF0D2; --ink:#2A2824; --canvas:#F3EFE6;
+  --disp:"Archivo",system-ui,sans-serif; --body:"Atkinson Hyperlegible",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#15140F; --card:#1E1C16; --fg:#F4F0E6; --muted:#A9A396; --line:#33302A;
+  --red:#FF6B52; --redsoft:#3A1F19; --go:#4FCB7E; --gosoft:#17311F;
+  --amber:#F0B33C; --ambersoft:#3A2E0E; --ink:#E8E2D4; --canvas:#24221B; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#15140F; --card:#1E1C16; --fg:#F4F0E6; --muted:#A9A396; --line:#33302A;
+  --red:#FF6B52; --redsoft:#3A1F19; --go:#4FCB7E; --gosoft:#17311F;
+  --amber:#F0B33C; --ambersoft:#3A2E0E; --ink:#E8E2D4; --canvas:#24221B; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--body);font-size:19px;line-height:1.5;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 60px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.wrap{max-width:680px;margin:0 auto}
+header{padding-block:22px 10px}
+.eyebrow{font-family:var(--disp);font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--red)}
+h1{font-family:var(--disp);font-stretch:85%;font-weight:900;font-size:clamp(34px,9vw,48px);line-height:1;margin:6px 0 8px;text-wrap:balance}
+.sub{color:var(--muted);font-size:16px;margin:0}
+.sub a{color:var(--red);font-weight:700}
+nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:8px;margin-inline:-16px;padding-inline:16px;border-bottom:1px solid var(--line)}
+nav .row{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;max-width:680px;margin:0 auto}
+nav .row::-webkit-scrollbar{display:none}
+nav a{flex:0 0 auto;font-family:var(--disp);font-weight:700;font-size:14px;text-decoration:none;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:7px 13px;white-space:nowrap}
+nav a b{color:var(--red);margin-right:4px}
+section{padding-block:28px 6px;scroll-margin-top:70px}
+.shead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;border-bottom:3px solid var(--red);padding-bottom:6px;margin-bottom:14px}
+h2{font-family:var(--disp);font-stretch:85%;font-weight:900;font-size:28px;margin:0;line-height:1.05}
+.time{font-family:var(--disp);font-weight:700;font-size:14px;color:var(--red);white-space:nowrap}
+.setup{background:var(--ambersoft);border-left:4px solid var(--amber);padding:10px 14px;border-radius:0 10px 10px 0;font-size:16px;margin:0 0 14px}
+h3{font-family:var(--disp);font-weight:800;font-size:15px;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin:22px 0 8px}
+.say{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:8px 0;font-size:19px;line-height:1.45}
+.say.big{font-family:var(--disp);font-weight:800;font-size:24px;line-height:1.2}
+.say b{color:var(--red)}
+.do{color:var(--muted);font-style:italic;font-size:16px;margin:6px 4px}
+.key{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.key span{font-family:var(--disp);font-weight:800;font-size:15px;padding:6px 11px;border-radius:8px;background:var(--redsoft)}
+.key .g{background:var(--gosoft)}.key .a{background:var(--ambersoft)}
+.next{background:var(--gosoft);border-left:4px solid var(--go);padding:12px 14px;border-radius:0 10px 10px 0;margin:18px 0 0;font-size:18px}
+.next b{font-family:var(--disp);text-transform:uppercase;font-size:13px;letter-spacing:.1em;color:var(--go);display:block;margin-bottom:4px}
+.note{border:1px dashed var(--line);border-radius:10px;padding:10px 14px;font-size:16px;color:var(--muted);margin:14px 0 0}
+.note strong{color:var(--fg)}
+.ol{margin:0;padding-left:20px;font-size:18px}
+.ol li{margin:8px 0}
+.ol li b{font-family:var(--disp)}
+footer{margin-top:40px;color:var(--muted);font-size:14px;text-align:center}
+footer a{color:var(--red);font-weight:700}
+
+/* Kit checklist */
+.kgrp{margin:14px 0 4px}
+.kgrp h3{margin:0 0 6px;display:flex;justify-content:space-between;align-items:baseline}
+.kgrp h3 small{font-size:12px;letter-spacing:.06em;color:var(--muted);font-weight:700}
+.kit{list-style:none;margin:0;padding:0;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.kit li{display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:start;padding:11px 14px;border-top:1px solid var(--line);cursor:pointer;user-select:none;-webkit-user-select:none}
+.kit li:first-child{border-top:0}
+.kit .bx{width:30px;height:30px;border-radius:9px;border:2px solid var(--line);display:grid;place-items:center;font-family:var(--disp);font-weight:900;font-size:17px;color:#fff;margin-top:2px;transition:background .12s,border-color .12s}
+.kit li.on .bx{background:var(--go);border-color:var(--go)}
+.kit .t{font-family:var(--disp);font-weight:800;font-size:18px;line-height:1.2}
+.kit .t em{font-style:normal;color:var(--red);margin-left:4px}
+.kit .d{color:var(--muted);font-size:15px;line-height:1.35}
+.kit li.on .t{text-decoration:line-through;text-decoration-color:var(--go);opacity:.75}
+.kbar{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--fg);color:var(--bg);border-radius:12px;padding:10px 14px;margin:12px 0 6px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 50px);z-index:4;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.kbar .n{font-family:var(--disp);font-weight:900;font-size:22px;font-variant-numeric:tabular-nums}
+.kbar .n small{font-size:13px;font-weight:700;opacity:.75;margin-left:6px;letter-spacing:.06em;text-transform:uppercase}
+.kbar button{font-family:var(--disp);font-weight:800;font-size:13px;border:0;border-radius:999px;padding:8px 12px;cursor:pointer;background:transparent;color:var(--bg);border:1px solid rgba(255,255,255,.35)}
+.kbar.ready{background:var(--go);color:#fff}
+.kbar.ready button{color:#fff}
+
+/* Concept cards */
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:12px 0}
+.card h4{font-family:var(--disp);font-stretch:85%;font-weight:900;font-size:24px;margin:0 0 2px;line-height:1.05}
+.card .tag{display:inline-block;font-family:var(--disp);font-weight:800;font-size:11px;letter-spacing:.12em;text-transform:uppercase;padding:4px 8px;border-radius:6px;background:var(--redsoft);color:var(--red);margin:0 0 8px}
+.card .tag.g{background:var(--gosoft);color:var(--go)}.card .tag.a{background:var(--ambersoft);color:var(--amber)}
+.card p{margin:6px 0;font-size:17px}
+.card ul{margin:6px 0 0;padding-left:20px;font-size:16px}
+.card ul li{margin:4px 0}
+.card .fit{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;font-size:14px}
+.card .fit span{padding:4px 9px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+.card .fit span.y{background:var(--gosoft);border-color:transparent;color:var(--go);font-weight:700}
+.card .fit span.n{background:var(--redsoft);border-color:transparent;color:var(--red);font-weight:700}
+.pick{border:2px solid var(--go)}
+.pick .tag{background:var(--gosoft);color:var(--go)}
+
+/* Bag drawings */
+.fig{background:var(--canvas);border:1px solid var(--line);border-radius:12px;padding:10px;margin:10px 0 6px}
+.fig svg{display:block;width:100%;height:auto;font-family:var(--disp)}
+.fig .cap{font-size:13px;color:var(--muted);margin:6px 2px 0;text-align:center}
+.fig .lbl{font-weight:800;font-size:11px;letter-spacing:.06em;text-transform:uppercase;fill:var(--ink)}
+.fig .lbl.r{fill:var(--red)}
+.fig .ln{stroke:var(--ink);stroke-width:1.2;fill:none;opacity:.7}
+.fig .bag{fill:var(--card);stroke:var(--ink);stroke-width:2.4;stroke-linejoin:round}
+.fig .pk{fill:none;stroke:var(--ink);stroke-width:1.8;stroke-linejoin:round}
+.fig .sh{fill:none;stroke:var(--ink);stroke-width:1.4;stroke-dasharray:4 3;opacity:.75}
+.fig .rd{fill:var(--red);stroke:var(--ink);stroke-width:1.6}
+.fig .rdl{fill:var(--redsoft)}
+.fig .mesh{fill:none;stroke:var(--ink);stroke-width:.8;opacity:.4}
+
+/* Wand on phone (full-screen colour) */
+#wscr{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;padding-bottom:200px;text-align:center;user-select:none;-webkit-user-select:none;cursor:pointer;transition:background .12s;color:#fff}
+#wscr.light{color:#111}
+#wscr .nm{font-family:var(--disp);font-stretch:85%;font-weight:900;font-size:clamp(56px,20vw,140px);line-height:.95;letter-spacing:.02em}
+#wscr .ac{font-family:var(--disp);font-weight:800;font-size:clamp(22px,7vw,44px);margin-top:14px;opacity:.9}
+#wscr .hint{position:absolute;top:calc(env(safe-area-inset-top,0px) + 22px);left:64px;right:64px;font-family:var(--disp);font-weight:700;font-size:13px;letter-spacing:.12em;text-transform:uppercase;opacity:.75}
+#wscr .x{position:absolute;top:calc(env(safe-area-inset-top,0px) + 10px);right:max(12px,env(safe-area-inset-right,0px));width:44px;height:44px;border-radius:50%;border:0;background:rgba(0,0,0,.35);color:#fff;font-size:22px;cursor:pointer}
+#wscr.light .x{background:rgba(0,0,0,.18);color:#111}
+#wscr .dots{position:absolute;left:0;right:0;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);display:grid;grid-template-columns:repeat(3,1fr);gap:10px;padding:0 max(14px,env(safe-area-inset-left,0px)) 0 max(14px,env(safe-area-inset-right,0px));max-width:560px;margin:0 auto}
+#wscr .dots button{height:64px;border-radius:14px;border:3px solid rgba(255,255,255,.7);cursor:pointer;box-shadow:0 3px 12px rgba(0,0,0,.35);font-family:var(--disp);font-weight:900;font-size:16px;letter-spacing:.04em;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.45)}
+#wscr .dots button.lt{color:#111;text-shadow:none}
+#wscr .dots button.sel{border-color:#fff;transform:scale(1.05)}
+.wOpen{font-family:var(--disp);font-weight:800;font-size:16px;border:0;border-radius:12px;padding:12px 16px;cursor:pointer;background:var(--fg);color:var(--bg);display:inline-flex;align-items:center;gap:8px;margin:4px 0 8px}
+.wOpen i{width:12px;height:12px;border-radius:50%;display:inline-block}
+
+/* Pack check: five big tiles */
+.five{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin:12px 0 8px}
+.five button{aspect-ratio:1;min-width:0;overflow:hidden;border-radius:14px;border:2px solid var(--line);background:var(--card);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-family:var(--disp);font-weight:800;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--fg);padding:4px}
+.five button i{font-style:normal;font-size:26px;line-height:1}
+.five button.on{background:var(--go);border-color:var(--go);color:#fff}
+.five button.on i{filter:grayscale(1) brightness(10)}
+.ready{display:none;background:var(--go);color:#fff;border-radius:12px;padding:12px 14px;font-family:var(--disp);font-weight:900;font-size:20px;text-align:center}
+.ready.show{display:block}
+@media (max-width:380px){.five button{font-size:10px}.five button i{font-size:22px}}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}[hidden]{display:none!important}</style>
+</head>
+<body>
+<div id="wscr" class="dark" hidden><div class="hint">Tap anywhere for the next colour</div><button class="x" type="button" id="wX" aria-label="Close">✕</button><div class="nm" id="wNm">GREEN</div><div class="ac" id="wAc">GO!</div><div class="dots" id="wDots"></div></div>
+
+<div class="wrap">
+<header>
+  <div class="eyebrow">Facilitator kit</div>
+  <h1>Move ME<br>Trainers Toolkit</h1>
+  <p class="sub">What a trainer needs in the bag before day one, and how the bag itself should work. Tick the kit as you pack it. The wand and the bag pages are concepts: pick one and we build it. Session script is <a href="moveme.html">here</a>.</p>
+</header>
+
+<div class="note" style="margin:0 0 6px"><strong>Golden rule: the bag thinks, so the trainer doesn't.</strong> Every item has one home, every home is visible, and the whistle is the first thing in and the last thing out.</div>
+
+<nav><div class="row">
+  <a href="#kit"><b>1</b> The kit</a>
+  <a href="#whistle"><b>2</b> Whistle</a>
+  <a href="#wand"><b>3</b> The Wand</a>
+  <a href="#bag"><b>4</b> The bag</a>
+  <a href="#check"><b>5</b> Pack check</a>
+</div></nav>
+
+<!-- ============ KIT ============ -->
+<section id="kit">
+  <div class="shead"><h2>The day-one kit</h2><div class="time">Tick as you pack</div></div>
+  <p class="setup">Items marked <b style="color:var(--red)">★</b> are the five non-negotiables. The session runs with just those five. Everything else makes it smoother.</p>
+
+  <div class="kbar" id="kbar"><div class="n"><span id="kN">0</span> / <span id="kT">0</span><small>packed</small></div><button type="button" id="kReset">Reset for next session</button></div>
+
+  <div class="kgrp"><h3>Signal <small>colours, sound, teams</small></h3>
+  <ul class="kit" id="kitSignal">
+    <li data-k="whistle" data-star><span class="bx">✓</span><div><div class="t">Whistle on a lanyard<em>★</em></div><div class="d">Lives around your neck during the session, in its own pocket in between. One blast = freeze and look at me.</div></div></li>
+    <li data-k="wand" data-star><span class="bx">✓</span><div><div class="t">The Wand<em>★</em></div><div class="d">LED colour baton for Traffic Lights. Green go, amber slow motion, red freeze. Charged the night before.</div></div></li>
+    <li data-k="tassels" data-star><span class="bx">✓</span><div><div class="t">Tags &amp; tassels, two colours<em>★</em></div><div class="d">15 of each. Instant teams, instant “who's it”. Kids clip them on themselves.</div></div></li>
+    <li data-k="markers"><span class="bx">✓</span><div><div class="t">Flat spot markers ×12</div><div class="d">The lava islands. Flat, not cones: nobody trips, and twelve stack to a 2cm disc.</div></div></li>
+    <li data-k="speaker"><span class="bx">✓</span><div><div class="t">Small speaker (optional)</div><div class="d">A countdown track for the cool down and a “go” sound once the wand is synced. Not needed for Session 1.</div></div></li>
+  </ul></div>
+
+  <div class="kgrp"><h3>Write <small>pen, paper, reward</small></h3>
+  <ul class="kit" id="kitWrite">
+    <li data-k="pen" data-star><span class="bx">✓</span><div><div class="t">Pens ×2<em>★</em></div><div class="d">One will walk. The second is the one you'll actually use.</div></div></li>
+    <li data-k="pad" data-star><span class="bx">✓</span><div><div class="t">A5 clipboard + attendance sheet<em>★</em></div><div class="d">Names, who came back on day two, a note on who needed a different way of moving.</div></div></li>
+    <li data-k="cards"><span class="bx">✓</span><div><div class="t">Printed cue cards</div><div class="d">The session script on paper, in a sleeve. For the morning the phone dies at 7:58.</div></div></li>
+    <li data-k="stickers"><span class="bx">✓</span><div><div class="t">Stickers or a stamp</div><div class="d">“Day One, done.” A sticker on the hand on the way out is the cheapest comeback tool there is.</div></div></li>
+  </ul></div>
+
+  <div class="kgrp"><h3>Me <small>the trainer runs on this</small></h3>
+  <ul class="kit" id="kitMe">
+    <li data-k="phone"><span class="bx">✓</span><div><div class="t">Phone with the session script open</div><div class="d">Timer started as you say “Good morning”. Brightness up, notifications off.</div></div></li>
+    <li data-k="power"><span class="bx">✓</span><div><div class="t">Power bank + cable</div><div class="d">Charges the phone and the wand. Same cable for both if the wand is USB-C.</div></div></li>
+    <li data-k="water"><span class="bx">✓</span><div><div class="t">1L water bottle</div><div class="d">You're talking for 20 minutes in the heat. Drink before, not during.</div></div></li>
+    <li data-k="cap"><span class="bx">✓</span><div><div class="t">Cap + small towel</div><div class="d">Outdoor mornings. Kids copy what they see, so wear the cap.</div></div></li>
+  </ul></div>
+
+  <div class="kgrp"><h3>Safety <small>small pouch, always packed</small></h3>
+  <ul class="kit" id="kitSafe">
+    <li data-k="firstaid"><span class="bx">✓</span><div><div class="t">First-aid pouch</div><div class="d">Plasters, wipes, an ice pack that cracks, gloves. The school has the real kit; this covers the first 60 seconds.</div></div></li>
+    <li data-k="sanitiser"><span class="bx">✓</span><div><div class="t">Hand sanitiser</div><div class="d">Before tassels go on, after tassels come off.</div></div></li>
+    <li data-k="sunscreen"><span class="bx">✓</span><div><div class="t">Sunscreen</div><div class="d">For you. The kids are the school's call; you just set the example.</div></div></li>
+  </ul></div>
+
+  <div class="note"><strong>No equipment is still the rule for the kids.</strong> Session 1 is written to run with nothing in their hands. The kit above is for the trainer's hands only.</div>
+</section>
+
+<!-- ============ WHISTLE ============ -->
+<section id="whistle">
+  <div class="shead"><h2>The whistle</h2><div class="time">The one you can't forget</div></div>
+  <p class="setup">Rule of the bag: the whistle has a home on the <b>outside</b>, at the top, next to the zip pull, in a bright red pocket. An empty red pocket shouts at you. A whistle at the bottom of a bag is a whistle at home.</p>
+
+  <h3>Which whistle</h3>
+  <div class="card"><span class="tag g">Buy this week</span><h4>Pea-less whistle on a lanyard</h4>
+    <p>No pea inside, so nothing jams when it's wet or dusty, and it's loud outdoors. One per trainer, never shared.</p></div>
+  <div class="card"><span class="tag a">Nice upgrade</span><h4>Electronic whistle</h4>
+    <p>A button, not a mouth. Three tones, loud enough for a field, hygienic between trainers, and it doesn't need breath you'd rather use for talking. Needs batteries, which is why they're on the kit list.</p></div>
+
+  <h3>How we use it with kids</h3>
+  <div class="key"><span>ONE BLAST = FREEZE, LOOK AT ME</span><span class="a">TWO = COME IN</span><span class="g">NO WHISTLE = KEEP MOVING</span></div>
+  <p class="do">Keep it rare. If the whistle goes every 20 seconds it stops meaning anything. Your voice runs the games, the whistle runs the emergencies and the transitions.</p>
+  <div class="say">“When you hear this <b>[one blast]</b>, you freeze like a statue and your eyes find me. Let's practise. Everyone move!”</div>
+  <p class="do">One blast. Praise the fastest statues. Done, it's learned for the month.</p>
+  <div class="note">In Traffic Lights the whistle is simply <strong>RED</strong>. Blast and wand go red together.</div>
+</section>
+
+<!-- ============ WAND ============ -->
+<section id="wand">
+  <div class="shead"><h2>The Wand</h2><div class="time">Concept</div></div>
+  <p class="setup">A colour baton the trainer holds up. The wand turns green, thirty kids go. Amber, they move in slow motion. Red, they freeze. The game is already in the script; the wand makes it visible from the far side of a field, and it makes the trainer look like they're running the show.</p>
+
+  <button class="wOpen" type="button" data-w><i style="background:#1F8A4C"></i><i style="background:#F2A900"></i><i style="background:#D9402B"></i> Try it: your phone is the wand</button>
+  <p class="do">Full-screen colour, tap for the next one. Until the real wand arrives, hold the phone up.</p>
+
+  <h3>Three builds, pick a lane</h3>
+  <div class="card"><span class="tag g">Build 1 · Buy it this week</span><h4>Any LED baton with a push button</h4>
+    <p>The light-up batons sold for parties and concerts. Look for one where <b>each press holds a colour</b> rather than auto-strobing, and set its order to green, amber, red. Costs little, works on day one.</p>
+    <ul><li>Weak point: daylight. Most are built for the dark. Test it outdoors at 8am before you trust it.</li><li>Keep a spare set of batteries in the Me pouch.</li></ul></div>
+
+  <div class="card pick"><span class="tag">Build 2 · The Move ME Wand</span><h4>Our own baton, six colours only</h4>
+    <p>A moulded wand in Move ME red with a frosted tube so the colour reads from 40 metres in full sun. One big thumb button: press for the next colour, hold for random. Nothing else on it.</p>
+    <ul><li>The six game colours and nothing more: green, amber, red, then blue, purple, orange for the add-on round.</li><li>USB-C rechargeable, one charge lasts a week of sessions, same cable as the phone.</li><li>Soft rubber tip and a wrist strap. It will be waved near faces.</li><li>Buzzes in the hand on each change so the trainer can call the colour without looking down.</li></ul></div>
+
+  <div class="card"><span class="tag a">Build 3 · Synced</span><h4>Wand and phone show the same colour</h4>
+    <p>The wand pairs to the trainer's phone over Bluetooth. Press the wand and the full-screen lights in the session script change with it; tap the phone and the wand follows. A motion sensor turns a <b>wave into the next colour</b>, so the trainer calls colours with their arm, eyes on the kids.</p>
+    <ul><li>Adds the speaker cue: green plays “go”, red plays a horn.</li><li>Session log: how many colour calls, how fast. Pure bragging rights for trainers.</li><li>This is the version that gets a “whoa” from a 7-year-old. It's also the one that needs an engineer, so it's Season 2.</li></ul></div>
+
+  <h3>Amp it up: more ideas, same colour system</h3>
+  <ol class="ol">
+    <li><b>Colour bands for kids.</b> Silicone wristbands in team colours now. Later: LED wristbands that follow the wand, like a stadium show. Thirty wrists turning green at once.</li>
+    <li><b>Lava islands that glow.</b> Flat markers with an LED ring. The wand sets them: green islands are safe, red islands are lava. Floor is Lava, but the floor is alive.</li>
+    <li><b>Sound cues from the speaker.</b> Three sounds mapped to the three colours. Kids learn the sound in one session, so it still works when backs are turned.</li>
+    <li><b>Attendance on the phone.</b> Tap a name as they arrive, and day-two comebacks are counted for you. Feeds the “who's coming back?” pep talk with real numbers.</li>
+  </ol>
+  <div class="note">Every idea here uses the same six colours and the same three actions the script already teaches. New kit, no new rules for the kids.</div>
+</section>
+
+<!-- ============ BAG ============ -->
+<section id="bag">
+  <div class="shead"><h2>The bag</h2><div class="time">3 concepts</div></div>
+  <p class="setup">The job of the bag is to make forgetting impossible. Three concepts below, all built on the same six rules. The drawings are layouts, not final looks: red and cream, big Move ME wordmark, so the kids know the bag means the session is on.</p>
+
+  <h3>The six rules every concept obeys</h3>
+  <ol class="ol">
+    <li><b>Whistle pocket on the outside, at the top.</b> Red, next to the zip pull. First in, last out.</li>
+    <li><b>Shadow slots.</b> Every item sits on its own printed outline. A missing item is a visible gap, not a memory test.</li>
+    <li><b>One zone per job.</b> Signal, Write, Me, Safety. Same four zones as the kit list above.</li>
+    <li><b>Opens flat.</b> Packed on a kitchen table, grabbed from on the ground at the edge of the court.</li>
+    <li><b>Built for here.</b> Sand-proof zips, light outer colour for the heat, wipe-clean lining, a bottle pocket that takes a full litre.</li>
+    <li><b>Looks like the brand.</b> Move ME red, cream, the wordmark big. The bag is the first thing the kids see every morning.</li>
+  </ol>
+
+  <!-- Concept A: Sling -->
+  <div class="card"><span class="tag g">Concept A · The Sling</span><h4>One strap, five things, 20 minutes</h4>
+    <p>A chest sling for the trainer who runs four schools in a morning and walks in with nothing else. The whistle pocket sits on the strap at chest height so the whistle is at your mouth before the bag is even off.</p>
+    <div class="fig">
+      <svg viewBox="0 0 420 300" role="img" aria-label="Sling bag drawing: strap with whistle pocket, body with wand sleeve, pen loop and pad sleeve">
+        <!-- strap -->
+        <path class="bag" d="M300 18 L332 30 L190 190 L160 182 Z"/>
+        <!-- whistle pocket on strap -->
+        <path class="rd" d="M258 62 l30 12 l-22 26 l-30 -12 z"/>
+        <circle cx="270" cy="80" r="5" fill="#fff" stroke="none"/>
+        <!-- body -->
+        <path class="bag" d="M60 150 Q60 128 84 128 L250 128 Q276 128 276 150 L276 236 Q276 262 250 262 L84 262 Q60 262 60 236 Z"/>
+        <!-- wand sleeve (long, along the bottom) -->
+        <rect class="pk" x="78" y="222" width="180" height="24" rx="12"/>
+        <path class="sh" d="M90 234 h152"/>
+        <circle class="sh" cx="246" cy="234" r="7"/>
+        <!-- pad sleeve -->
+        <rect class="pk" x="78" y="144" width="96" height="66" rx="6"/>
+        <path class="sh" d="M90 160 h72 M90 174 h72 M90 188 h50"/>
+        <!-- pen loops -->
+        <rect class="pk" x="186" y="144" width="12" height="40" rx="6"/>
+        <rect class="pk" x="204" y="144" width="12" height="40" rx="6"/>
+        <!-- tassels pocket -->
+        <rect class="pk" x="226" y="144" width="36" height="66" rx="6"/>
+        <path class="sh" d="M234 156 l4 44 M244 156 l0 44 M254 156 l-4 44"/>
+        <!-- zip -->
+        <path class="ln" d="M68 136 L268 136"/>
+        <!-- labels + leaders -->
+        <path class="ln" d="M288 68 L304 58"/><text class="lbl r" x="414" y="52" text-anchor="end">Whistle · on strap</text>
+        <path class="ln" d="M126 177 L40 110"/><text class="lbl" x="6" y="104">A5 pad</text>
+        <path class="ln" d="M198 165 L340 118"/><text class="lbl" x="312" y="114">Pens ×2</text>
+        <path class="ln" d="M244 190 L352 170"/><text class="lbl" x="318" y="166">Tassels</text>
+        <path class="ln" d="M160 236 L120 286"/><text class="lbl" x="86" y="296">Wand sleeve</text>
+        <path class="ln" d="M160 136 L168 122"/><text class="lbl" x="150" y="116">Sand-proof zip</text>
+        <text class="lbl r" x="258" y="257" font-size="10" text-anchor="end">MOVE ME</text>
+      </svg>
+      <div class="cap">Front view. Strap pocket is red; everything else in cream.</div>
+    </div>
+    <div class="fit"><span class="y">Whistle</span><span class="y">Wand</span><span class="y">Pens</span><span class="y">A5 pad</span><span class="y">30 tassels</span><span class="n">Markers</span><span class="n">Water</span></div>
+    <p class="do">Best for: trainers on foot, short sessions, one school after another.</p></div>
+
+  <!-- Concept B: The Roll -->
+  <div class="card"><span class="tag a">Concept B · The Roll</span><h4>A fold-out panel that lives in any bag</h4>
+    <p>Not a bag, the brain of one. A canvas roll with a shadow slot for each item. Unroll it on the floor and the whole kit is laid out like a surgeon's tray; anything missing is an empty outline. Roll it, strap it, drop it in whatever backpack the trainer already owns.</p>
+    <div class="fig">
+      <svg viewBox="0 0 420 300" role="img" aria-label="Roll-out organiser drawing: canvas panel with printed outlines for whistle, wand, pens, pad, tassels and markers">
+        <!-- panel -->
+        <rect class="bag" x="34" y="40" width="352" height="212" rx="10"/>
+        <!-- fold lines -->
+        <path class="ln" d="M151 40 V252 M268 40 V252" stroke-dasharray="6 4"/>
+        <!-- column 1: whistle + pens -->
+        <ellipse class="sh" cx="92" cy="86" rx="22" ry="14"/><path class="sh" d="M114 80 l20 -6 l0 10 l-20 -2"/>
+        <rect class="sh" x="64" y="126" width="56" height="10" rx="5"/>
+        <rect class="sh" x="64" y="144" width="56" height="10" rx="5"/>
+        <rect class="sh" x="56" y="174" width="72" height="56" rx="4"/><path class="sh" d="M66 188 h52 M66 202 h52 M66 216 h36"/>
+        <!-- column 2: wand vertical + tassels -->
+        <rect class="sh" x="198" y="56" width="22" height="150" rx="11"/><circle class="sh" cx="209" cy="70" r="7"/>
+        <path class="sh" d="M168 220 l6 22 M180 220 l0 22 M192 220 l-6 22 M240 220 l6 22 M252 220 l0 22 M264 220 l-6 22"/>
+        <!-- column 3: markers stack + pouches -->
+        <ellipse class="sh" cx="327" cy="80" rx="34" ry="10"/><ellipse class="sh" cx="327" cy="88" rx="34" ry="10"/><ellipse class="sh" cx="327" cy="96" rx="34" ry="10"/>
+        <rect class="pk" x="286" y="130" width="82" height="46" rx="6"/><path class="mesh" d="M286 142 h82 M286 154 h82 M286 166 h82 M300 130 v46 M314 130 v46 M328 130 v46 M342 130 v46 M356 130 v46"/>
+        <rect class="pk" x="286" y="188" width="82" height="46" rx="6"/><path class="mesh" d="M286 200 h82 M286 212 h82 M286 224 h82 M300 188 v46 M314 188 v46 M328 188 v46 M342 188 v46 M356 188 v46"/>
+        <!-- straps -->
+        <rect class="rd" x="386" y="90" width="18" height="40" rx="4"/><rect class="rd" x="386" y="170" width="18" height="40" rx="4"/>
+        <!-- labels -->
+        <text class="lbl r" x="56" y="62">Whistle</text>
+        <text class="lbl" x="62" y="121">Pens</text>
+        <text class="lbl" x="56" y="170">Pad</text>
+        <text class="lbl" x="178" y="52">Wand</text>
+        <text class="lbl" x="170" y="212">Tassels</text>
+        <text class="lbl" x="296" y="60">Markers</text>
+        <text class="lbl" x="294" y="126">First aid</text>
+        <text class="lbl" x="294" y="184">Sanitiser</text>
+        <text class="lbl" x="34" y="272">Folds in thirds · straps hold it shut</text>
+        <text class="lbl r" x="320" y="272" font-size="10">MOVE ME</text>
+      </svg>
+      <div class="cap">Unrolled. Dashed outlines are printed on the canvas; a gap means something's missing.</div>
+    </div>
+    <div class="fit"><span class="y">Every item</span><span class="y">Any backpack</span><span class="y">Cheapest to make</span><span class="n">Not a bag on its own</span></div>
+    <p class="do">Best for: the first ten trainers, before the custom bag exists. Pairs with Concept C later.</p></div>
+
+  <!-- Concept C: The Kit Bag -->
+  <div class="card pick"><span class="tag">Concept C · The Kit Bag</span><h4>The full Move ME backpack, opens like a suitcase</h4>
+    <p>A clamshell backpack. The front panel unzips all the way round and lies flat, so the bag opens into two halves: the Roll's shadow panel is built into one side, mesh pouches for the softer stuff on the other. Whistle pocket sits at the top handle, the wand runs down the spine in its own sleeve, markers slide into a side sleeve, the bottle gets its own pocket.</p>
+    <div class="fig">
+      <svg viewBox="-12 0 444 300" role="img" aria-label="Clamshell backpack drawing, open flat: left half with mesh pouches for tassels, first aid and sanitiser; right half with shadow slots for whistle, wand, pens and pad; side marker sleeve and bottle pocket">
+        <!-- left half -->
+        <path class="bag" d="M24 60 Q24 40 44 40 L196 40 Q206 40 206 50 L206 250 Q206 260 196 260 L44 260 Q24 260 24 240 Z"/>
+        <!-- right half -->
+        <path class="bag" d="M214 50 Q214 40 224 40 L376 40 Q396 40 396 60 L396 240 Q396 260 376 260 L224 260 Q214 260 214 250 Z"/>
+        <!-- hinge -->
+        <path class="ln" d="M210 44 V256" stroke-dasharray="3 3"/>
+        <!-- whistle pocket at top handle (red) -->
+        <path class="rd" d="M282 24 h56 v18 h-56 z"/><circle cx="310" cy="33" r="4" fill="#fff" stroke="none"/>
+        <path class="ln" d="M262 40 Q262 14 310 14 Q358 14 358 40"/>
+        <!-- LEFT: mesh pouches -->
+        <rect class="pk" x="40" y="56" width="150" height="86" rx="6"/><path class="mesh" d="M40 74 h150 M40 92 h150 M40 110 h150 M40 128 h150 M62 56 v86 M84 56 v86 M106 56 v86 M128 56 v86 M150 56 v86 M172 56 v86"/>
+        <path class="sh" d="M70 100 l6 30 M86 100 l0 30 M102 100 l-6 30 M126 100 l6 30 M142 100 l0 30 M158 100 l-6 30"/>
+        <rect class="pk" x="40" y="154" width="70" height="46" rx="6"/><path class="mesh" d="M40 166 h70 M40 178 h70 M40 190 h70 M54 154 v46 M68 154 v46 M82 154 v46 M96 154 v46"/>
+        <rect class="pk" x="120" y="154" width="70" height="46" rx="6"/><path class="mesh" d="M120 166 h70 M120 178 h70 M120 190 h70 M134 154 v46 M148 154 v46 M162 154 v46 M176 154 v46"/>
+        <rect class="pk" x="40" y="210" width="150" height="34" rx="6"/><path class="sh" d="M52 227 h126"/>
+        <!-- RIGHT: shadow panel -->
+        <rect class="sh" x="230" y="56" width="22" height="190" rx="11"/><circle class="sh" cx="241" cy="70" r="7"/>
+        <rect class="sh" x="266" y="60" width="90" height="70" rx="4"/><path class="sh" d="M276 76 h70 M276 90 h70 M276 104 h48"/>
+        <rect class="sh" x="266" y="142" width="60" height="10" rx="5"/><rect class="sh" x="266" y="160" width="60" height="10" rx="5"/>
+        <rect class="pk" x="266" y="182" width="112" height="60" rx="6"/><path class="sh" d="M278 198 h60 M278 212 h88 M278 226 h40"/>
+        <!-- side marker sleeve (outside right) -->
+        <path class="pk" d="M398 92 h14 v110 h-14"/>
+        <!-- bottle pocket (outside left) -->
+        <path class="pk" d="M22 120 h-14 v90 h14"/>
+        <!-- labels -->
+        <text class="lbl r" x="312" y="12" text-anchor="middle">Whistle · at the handle</text>
+        <text class="lbl" x="44" y="52" font-size="10">Tassels · mesh</text>
+        <text class="lbl" x="44" y="150" font-size="10">First aid</text>
+        <text class="lbl" x="124" y="150" font-size="10">Sanitiser</text>
+        <text class="lbl" x="44" y="256" font-size="10">Cable + power bank</text>
+        <text class="lbl" x="222" y="52" font-size="10">Wand</text>
+        <text class="lbl" x="300" y="52" font-size="10">A5 pad</text>
+        <text class="lbl" x="334" y="150" font-size="10">Pens</text>
+        <text class="lbl" x="266" y="256" font-size="10">Cue cards</text>
+        <text class="lbl" x="405" y="147" font-size="10" text-anchor="middle" transform="rotate(90 405 147)">Markers</text>
+        <text class="lbl" x="15" y="165" font-size="10" text-anchor="middle" transform="rotate(-90 15 165)">Bottle</text>
+        <text class="lbl r" x="118" y="290" text-anchor="middle" font-size="10">SOFT STUFF</text>
+        <text class="lbl r" x="305" y="290" text-anchor="middle" font-size="10">SHADOW PANEL</text>
+      </svg>
+      <div class="cap">Open flat on the floor. Left half: mesh for the soft stuff. Right half: shadow slots for the five non-negotiables plus the cards.</div>
+    </div>
+    <ul>
+      <li>Phone pocket on the back panel against the spine, with a cable port into the power-bank pocket, so the phone charges on the walk in.</li>
+      <li>Reflective strip across the front for 6am car parks. Light cream outer, red lining inside so black items are visible.</li>
+      <li>Wipe-clean inside. Sand gets in everything here; this one empties with a shake.</li>
+    </ul>
+    <div class="fit"><span class="y">Every item</span><span class="y">Markers ×12</span><span class="y">1L bottle</span><span class="y">Shadow panel built in</span><span class="n">Needs a car or a locker</span></div>
+    <p class="do">Best for: the full programme, one bag per school or per trainer.</p></div>
+
+  <div class="next"><b>Recommendation</b>Make <strong>the Roll</strong> first: it's cheap, it fits any bag the trainers already own, and it teaches the shadow-slot habit from day one. Then build <strong>the Kit Bag</strong> with the Roll's panel sewn in. <strong>The Sling</strong> is the Season 2 edition for trainers moving between schools on foot.</div>
+</section>
+
+<!-- ============ PACK CHECK ============ -->
+<section id="check">
+  <div class="shead"><h2>60-second pack check</h2><div class="time">Before every session</div></div>
+  <p class="setup">Five fingers, five things. Say them out loud as you touch each one in the bag. Tap the tiles as you go.</p>
+  <div class="five" id="five">
+    <button type="button" data-k="whistle"><i>🔔</i>Whistle</button>
+    <button type="button" data-k="wand"><i>🪄</i>Wand</button>
+    <button type="button" data-k="pen"><i>✏️</i>Pen</button>
+    <button type="button" data-k="pad"><i>📋</i>Pad</button>
+    <button type="button" data-k="tassels"><i>🎽</i>Tassels</button>
+  </div>
+  <div class="ready" id="ready">Bag's ready. Go move them.</div>
+  <div class="say big">“Whistle, wand, pen, pad, tassels. <b>Go.</b>”</div>
+  <p class="do">The five tiles share their ticks with the ★ items in the kit list above, so a full pack check is also a packed bag.</p>
+  <div class="note"><strong>End of session, same five in reverse.</strong> Tassels counted back in, pad in its sleeve, pen in the loop, wand in the spine, whistle off the neck and into the red pocket. Then zip.</div>
+</section>
+
+<footer>Move ME, Trainers Toolkit · <a href="moveme.html">Session 1 cue cards</a></footer>
+</div>
+
+<script>
+(function(){
+  function $(id){return document.getElementById(id);}
+  var vib=function(p){try{if(navigator.vibrate)navigator.vibrate(p);}catch(e){}};
+  var lock=null;function wake(){if(!navigator.wakeLock||lock||document.visibilityState!=='visible')return;navigator.wakeLock.request('screen').then(function(l){lock=l;l.addEventListener('release',function(){lock=null;});}).catch(function(){});}
+
+  /* ---------- KIT CHECKLIST + PACK CHECK (shared state) ---------- */
+  var KK='moveme_kit1', st={};
+  try{st=JSON.parse(localStorage.getItem(KK)||'{}')||{};}catch(e){st={};}
+  function save(){try{localStorage.setItem(KK,JSON.stringify(st));}catch(e){}}
+  var items=document.querySelectorAll('.kit li[data-k]'), tiles=document.querySelectorAll('#five button[data-k]');
+  var STAR=['whistle','wand','pen','pad','tassels'];
+  function paint(){
+    var n=0,t=items.length;
+    for(var i=0;i<items.length;i++){var k=items[i].getAttribute('data-k'),on=!!st[k];items[i].classList.toggle('on',on);if(on)n++;}
+    $('kN').textContent=n;$('kT').textContent=t;$('kbar').classList.toggle('ready',n===t&&t>0);
+    var all=true;for(var j=0;j<tiles.length;j++){var kk=tiles[j].getAttribute('data-k'),o=!!st[kk];tiles[j].classList.toggle('on',o);if(!o)all=false;}
+    $('ready').classList.toggle('show',all);
+  }
+  function flip(k){st[k]=!st[k];save();vib(st[k]?30:10);paint();
+    if(STAR.indexOf(k)>-1){var all=true;for(var i=0;i<STAR.length;i++)if(!st[STAR[i]])all=false;if(all)vib([60,40,60]);}}
+  for(var i=0;i<items.length;i++)items[i].addEventListener('click',function(){flip(this.getAttribute('data-k'));});
+  for(var j=0;j<tiles.length;j++)tiles[j].addEventListener('click',function(){flip(this.getAttribute('data-k'));});
+  var held=0;$('kReset').addEventListener('click',function(){if(held&&Date.now()-held<2500){st={};held=0;save();paint();}else{held=Date.now();this.textContent='Tap again to clear';var b=this;setTimeout(function(){b.textContent='Reset for next session';},2500);}});
+  paint();
+
+  /* ---------- PHONE AS WAND (same six colours as the session script) ---------- */
+  var COL=[{n:'GREEN',a:'GO!',c:'#1F8A4C',t:'dark'},{n:'AMBER',a:'SLOW MOTION!',c:'#F2A900',t:'light'},{n:'RED',a:'FREEZE!',c:'#D9402B',t:'dark'},
+           {n:'BLUE',a:'REACH UP HIGH!',c:'#1E63D6',t:'dark'},{n:'PURPLE',a:'TURN AROUND!',c:'#7A2FBF',t:'dark'},{n:'ORANGE',a:'SILLY WALK!',c:'#F2651B',t:'dark'}];
+  var w=$('wscr'),wNm=$('wNm'),wAc=$('wAc'),dots=$('wDots'),cur=0;
+  function setCol(i){cur=i;var c=COL[i];w.style.background=c.c;w.className=c.t;wNm.textContent=c.n;wAc.textContent=c.a;vib(40);
+    var bs=dots.querySelectorAll('button');for(var k=0;k<bs.length;k++)bs[k].classList.toggle('sel',k===i);}
+  function nextCol(){var i;do{i=Math.floor(Math.random()*COL.length);}while(i===cur);setCol(i);}
+  (function(){var h='';for(var i=0;i<COL.length;i++)h+='<button type="button" data-i="'+i+'" class="'+(COL[i].t==='light'?'lt':'')+'" style="background:'+COL[i].c+'">'+COL[i].n+'</button>';dots.innerHTML=h;})();
+  dots.addEventListener('click',function(e){e.stopPropagation();var b=e.target.closest('button');if(b)setCol(+b.getAttribute('data-i'));});
+  w.addEventListener('click',function(e){if(e.target.closest('.x')||e.target.closest('.dots'))return;nextCol();});
+  function closeW(){w.hidden=true;document.body.style.overflow='';}
+  $('wX').addEventListener('click',closeW);
+  var ob=document.querySelectorAll('[data-w]');for(var q=0;q<ob.length;q++)ob[q].addEventListener('click',function(){w.hidden=false;document.body.style.overflow='hidden';setCol(0);wake();});
+  document.addEventListener('keydown',function(e){if(!w.hidden){if(e.key==='Escape')closeW();else if(e.key===' '||e.key==='Enter'){e.preventDefault();nextCol();}}});
+})();
+</script>
+</body>
+</html>
