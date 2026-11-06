@@ -1290,3 +1290,26 @@ backend is shared, so oc_courts is NOT mutated yet.
   call); community.html / launch.html / desk / QR copy; app icons + manifest +
   share-card canvas; the IG campaign kit (reels/carousel/story are Sydney-mapped,
   heavy regen); Netlify site rename + domain; OWNER_IGS.
+
+### 2026-11-06 — go-hard pass (branch, unmerged, preview-only)
+- **Courts → 20 real Dubai courts** (OSM exact pins + Nominatim-geocoded public
+  venues). Incl. **Dubai Marina** (the one Aiman played at), JBR, Al Nahda, Abu
+  Hail, Zabeel, Creek, Al Satwa, Safa, Al Barsha Pond, Mushrif, The Block d3,
+  Sports City, Al Quoz ENOC/AKG, Azizi Riviera + 5 community courts. Seed:
+  supabase/seed/dubai_courts.sql (STAGED; info.pin=exact|area, info.access=
+  public|community|facility; amenities blank = no fabrication; Aiman vets/pins
+  exact at the desk). Overpass is blocked through the proxy (http=000); Nominatim
+  works — that's the sourcing path.
+- **PREMIUM visual pass** (CSS layer before the 2nd </style> + map-pin JS). Frosted
+  header, orange "DUBAI LIVE" eyebrow pill, shine on Tonight., glass cards w/
+  layered depth + hairline highlight, premium FAB, floating glass tabbar, and
+  **premium map pins** (all courts = dark orange-ringed ball badges, hot=orange
+  pulse; replaced the tiny circleMarker dots). Pin rules scoped `[data-theme=lotg]`
+  to beat the theme's white pin. Research: ATH (check-ins+presence+points) is the
+  bar; gamification best-practice = earn-not-buy XP/badges, streaks, league boards.
+- Gamification bones already live (tiers Rookie→Legend, City leaderboard, KOTC,
+  POTW, peer ratings, player numbers) + chat (run chat) + presence (geofenced
+  check-ins) ALL already exist — deeper badge/XP/streak vault = next pass.
+- Preview link = raw.githack <SHA> /hoopsheaven.html?preview=1 (20 courts bundled,
+  no backend). Still unmerged; live Sydney untouched. Pending his calls: name
+  clash (Hoop City), ✓ status wording, Dubai IG handle, edge UAE bounds/phone deploy.
