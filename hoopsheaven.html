@@ -8,7 +8,6 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Hoops City">
-<link rel="preload" href="assets/lotg-original.png" as="image">
 <link rel="manifest" href="hoopsheaven.webmanifest">
 <link rel="apple-touch-icon" href="assets/hh-icon-180.png">
 <title>Hoops City — Dubai's pickup basketball network</title>
@@ -705,8 +704,8 @@ svg.leaflet-image-layer.leaflet-interactive path {
 :root:not([data-theme="club"]) .leaflet-control-attribution{background:rgba(13,17,19,.72)!important;color:#7C8380!important}
 :root:not([data-theme="club"]) .leaflet-control-attribution a{color:#9AA09E!important}
 
-/* ===== VIBES: user-selectable full themes (default Love of the Game) ===== */
-/* Love of the Game — the house theme: their black, cream and brass */
+/* ===== VIBES: user-selectable full themes (default = the house theme) ===== */
+/* House theme — black, cream and brass */
 :root[data-theme="lotg"]{--bg:#0D1113;--card:#161B1E;--card2:#1D2327;--line:rgba(240,236,226,.12);
   --text:#E6E2D6;--muted:#949A97;--dim:#5F6664;
   /* black and white all the way through — "good" reads as white, not green.
@@ -1352,10 +1351,9 @@ header{
 .byhouse svg,.byhouse img{width:150px;height:auto;opacity:.86;border:0;border-radius:0}
 .foot b{color:var(--muted)}
 
-/* ===== intro splash — the house card, then Certified Hooper's own mark ===== */
+/* ===== intro splash — the brand mark ===== */
 #uncIntro{position:fixed;inset:0;z-index:220;overflow:hidden;background:#000}
 #uncIntro .ph{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
-/* phase 1 — presented by Love of the Game */
 #uncIntro .lotg{display:flex;flex-direction:column;align-items:center;gap:20px;padding:20px;
   animation:lotgOut .55s var(--ease-out) 1.25s both}
 @keyframes lotgOut{to{opacity:0;transform:scale(.965)}}
@@ -1371,24 +1369,24 @@ header{
   animation:lotgWord .75s var(--ease-out) .52s both}
 @keyframes lotgWord{from{opacity:0;transform:translateY(11px)}to{opacity:1;transform:none}}
 /* phase 2 — the product */
-.ph2{opacity:0;animation:uncLogo .7s var(--ease-out) 1.65s both}
+.ph2{opacity:0;animation:uncLogo .7s var(--ease-out) .2s both}
 #uncIntro.gone{animation:uncOut .8s var(--ease-out) forwards;pointer-events:none}
 @keyframes uncOut{to{opacity:0;transform:scale(1.04);filter:blur(6px);visibility:hidden}}
 .unc-stage{position:relative;display:flex;flex-direction:column;align-items:center;gap:24px;padding:20px}
 .unc-eyebrow{font-family:var(--disp);font-weight:700;letter-spacing:.28em;font-size:11px;text-transform:uppercase;
-  color:#2DE0C0;padding-left:.28em;opacity:0;animation:uncEye .9s var(--ease-out) 2.35s both}
+  color:#2DE0C0;padding-left:.28em;opacity:0;animation:uncEye .9s var(--ease-out) .95s both}
 @keyframes uncEye{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
-.unc-mark{position:relative;display:grid;place-items:center;animation:uncFloat 6s ease-in-out 2.6s infinite alternate}
+.unc-mark{position:relative;display:grid;place-items:center;animation:uncFloat 6s ease-in-out 1.2s infinite alternate}
 @keyframes uncFloat{from{transform:translateY(0)}to{transform:translateY(-7px)}}
 .unc-halo{position:absolute;z-index:2;width:110%;aspect-ratio:1/1;border-radius:50%;top:-4%;
   background:radial-gradient(circle at 50% 38%,rgba(255,255,255,.14),transparent 58%);opacity:0;animation:uncGlow 2.4s ease-in-out .5s both;mix-blend-mode:screen;pointer-events:none}
 @keyframes uncGlow{0%{opacity:0;transform:scale(.6)}50%{opacity:.9}100%{opacity:.55;transform:scale(1)}}
 .unc-word{font-family:var(--disp);font-weight:700;font-style:italic;font-size:clamp(30px,9vw,44px);line-height:.98;color:#fff;text-transform:uppercase;text-align:center;letter-spacing:.01em;opacity:0;animation:uncLogo 1.05s var(--ease-out) 1.95s both}
 .unc-logo{display:block;width:min(42vw,190px);height:auto;opacity:0;transform:scale(1.06) translateY(10px);
-  animation:uncLogo 1.15s var(--ease-out) 1.7s both}
+  animation:uncLogo 1.15s var(--ease-out) .3s both}
 @keyframes uncLogo{to{opacity:1;transform:none}}
 #uncIntro .skip{position:absolute;bottom:34px;left:0;right:0;z-index:3;text-align:center;font-size:11px;letter-spacing:.2em;
-  text-transform:uppercase;color:rgba(255,255,255,.28);opacity:0;animation:uncEye .8s ease 2.9s both}
+  text-transform:uppercase;color:rgba(255,255,255,.28);opacity:0;animation:uncEye .8s ease 1.4s both}
 /* jersey number — every hooper's public ID, worn like a real card number */
 .nbacard .jersey{position:absolute;right:16px;bottom:8px;font-family:var(--disp);font-weight:700;font-size:46px;line-height:1;color:var(--tc);opacity:.18;letter-spacing:.02em;pointer-events:none}
 .pnumchip{display:inline-block;margin-left:7px;font-family:var(--cond);font-weight:800;font-size:11.5px;letter-spacing:.08em;color:var(--muted);background:color-mix(in srgb,var(--tc) 14%,transparent);border:1px solid color-mix(in srgb,var(--tc) 30%,transparent);border-radius:99px;padding:2px 9px;vertical-align:middle}
@@ -1499,10 +1497,6 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
 
 <!-- ===== intro splash: the house card, then the product ===== -->
 <div id="uncIntro">
-  <div class="ph ph1"><div class="lotg">
-    <div class="lotg-eb">Presented by</div>
-    <div class="lotg-lock" role="img" aria-label="Love of the Game"><img class="lotg-img" src="assets/lotg-original.png" alt="" decoding="async"></div>
-  </div></div>
   <div class="ph ph2"><div class="unc-stage">
     <div class="unc-mark">
       <div class="unc-halo"></div>
@@ -1521,7 +1515,7 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
   var el=document.getElementById('uncIntro'); if(!el)return;
   var rm=matchMedia('(prefers-reduced-motion:reduce)').matches, done=false;
   function go(){ if(done)return; done=true; document.body.classList.add('appin'); el.classList.add('gone'); setTimeout(function(){ el.parentNode&&el.parentNode.removeChild(el); },820); }
-  var t=setTimeout(go, rm?700:3400);
+  var t=setTimeout(go, rm?600:2300);
   el.addEventListener('click',function(){ clearTimeout(t); go(); });
 })();
 </script>
@@ -1586,8 +1580,6 @@ body.appin #vHome>.sect:nth-of-type(3){animation-delay:.29s}
       <div class="cscroll" id="nearby"><div class="skel" style="flex:none;width:172px;height:160px"></div><div class="skel" style="flex:none;width:172px;height:160px"></div></div>
     </div>
     <div class="foot">
-      <div class="byhouse"><span>Presented by</span>
-        <img src="assets/lotg-original.png" alt="Love of the Game" loading="lazy"></div>
       <b>HOOPS CITY</b> · Dubai's pickup basketball network<br>Dubai live in beta · the rest of the UAE loading · built for the city<br>court data © OpenStreetMap contributors<br>
       Runs are player-called, never guaranteed. Pull up, play hard, look after each other.<br>
       <button class="linky" id="rulesLink" style="margin-top:6px">House rules</button>
@@ -3785,13 +3777,13 @@ $('#swCustom').oninput=e=>applyAccent(e.target.value);
 
 /* ---------- vibes: user-selectable full themes ---------- */
 const VIBES={
-  lotg:{label:'Love of the Game',desc:'The house colours — black & white',accent:'#FFFFFD',on:'#0D1113',tag:'LOTG'},
+  lotg:{label:'Court',desc:'The house colours — black & white',accent:'#FFFFFD',on:'#0D1113',tag:'COURT'},
   club:{label:'Club',desc:'Clean & premium — daylight',accent:'#0DBFA0',on:'#FFFFFF',tag:'CLUB'},
   retro:{label:'Retro',desc:'90s purple + neon',accent:'#2DE0C0',on:'#0B0B20',tag:'RETRO'},
   concrete:{label:'Concrete',desc:'Street grit + spray',accent:'#FFE01A',on:'#161616',tag:'STREET'}
 };
 const curTheme=()=>VIBES[localStorage.getItem('oc_theme')]?localStorage.getItem('oc_theme'):'lotg';
-// one-time migration to the house colours: everyone lands on Love of the Game
+// one-time migration to the house colours: everyone lands on the house theme
 // once, and can still switch to any other vibe in 🎨
 if(!localStorage.getItem('oc_theme_v3')){localStorage.setItem('oc_theme','lotg');localStorage.removeItem('oc_accent');localStorage.setItem('oc_theme_v3','1');}
 function applyTheme(name,save=true){
