@@ -1308,3 +1308,20 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   Verified E2E via scratchpad/deskcoach-light.mjs + coach-light2.mjs (temp
   coach minted → dashboard shot → deleted). Masters: admin-base.html,
   coach-base.html.
+
+## Get the Kids Fit (GTKF) facilitator pages (formerly "Move ME", 2026-10/11)
+
+- `kidsfit.html` = Session 1 facilitator cue cards (session timer, stopwatch,
+  full-screen Traffic Lights colours). `/moveme.html` 301s to it.
+- `kidsfit-toolkit.html` = Trainers Toolkit (2026-11-11 port of the earlier
+  moveme-toolkit.html onto the GTKF glass look). Sections: day-one kit
+  checklist (zones Signal/Write/Me/Safety, ticks in localStorage `moveme_kit1`,
+  5 ★ non-negotiables whistle/wand/pen/pad/tassels), whistle, The Wand (3
+  builds + "phone is the wand" colour screen, same COL[] as kidsfit.html), the
+  bag (6 rules + 3 SVG concepts Sling/Roll/Kit Bag; recommend Roll first), and
+  a 60-second five-tile pack check. `/moveme-toolkit.html` 301s to it.
+- Both pages share tokens/glass CSS (GTKF blue in `--red`, pink `--pink`,
+  Inter). Whistle pocket in drawings stays true red (`--alert`) on purpose.
+  No backend, noindex. Merge to main = Netlify auto-deploy.
+- Terms: learners not students, educators not teachers, People of
+  Determination not disability, football not soccer.

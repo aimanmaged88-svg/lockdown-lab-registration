@@ -50,3 +50,8 @@
   from = "/moveme.html"
   to = "/kidsfit.html"
   status = 301
+
+[[redirects]]
+  from = "/moveme-toolkit.html"
+  to = "/kidsfit-toolkit.html"
+  status = 301
