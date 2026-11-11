@@ -45,13 +45,40 @@
     Referrer-Policy = "strict-origin-when-cross-origin"
 
 # --- Get the Kids Fit (facilitator cue cards) -----------------------------
-# Was briefly live as moveme.html — keep that link alive.
+# These pages now live on the GTKF site gtkf-sessions.netlify.app (2026-11-11).
+# The files here are still the source: after editing them, redeploy that site.
+[[redirects]]
+  from = "/kidsfit.html"
+  to = "https://gtkf-sessions.netlify.app/kidsfit.html"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/kidsfit-toolkit.html"
+  to = "https://gtkf-sessions.netlify.app/kidsfit-toolkit.html"
+  status = 301
+  force = true
+
 [[redirects]]
   from = "/moveme.html"
-  to = "/kidsfit.html"
+  to = "https://gtkf-sessions.netlify.app/kidsfit.html"
   status = 301
+  force = true
 
 [[redirects]]
   from = "/moveme-toolkit.html"
-  to = "/kidsfit-toolkit.html"
+  to = "https://gtkf-sessions.netlify.app/kidsfit-toolkit.html"
   status = 301
+  force = true
+
+[[redirects]]
+  from = "/kidsfit"
+  to = "https://gtkf-sessions.netlify.app/kidsfit.html"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/kidsfit-toolkit"
+  to = "https://gtkf-sessions.netlify.app/kidsfit-toolkit.html"
+  status = 301
+  force = true

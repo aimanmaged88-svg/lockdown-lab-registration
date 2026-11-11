@@ -1320,6 +1320,11 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   builds + "phone is the wand" colour screen, same COL[] as kidsfit.html), the
   bag (6 rules + 3 SVG concepts Sling/Roll/Kit Bag; recommend Roll first), and
   a 60-second five-tile pack check. `/moveme-toolkit.html` 301s to it.
+- LIVE on the GTKF Netlify site **https://gtkf-sessions.netlify.app** (project
+  gtkf-sessions, old Netlify account, deployed from cloud via Netlify MCP
+  deploy-site; not git-linked). certifiedhooper URLs 301 there (force). After
+  editing either file, copy both + assets/gtkf-logo.png + assets/gtkf-icon-180.png
+  and redeploy gtkf-sessions, or the change will not be visible.
 - Both pages share tokens/glass CSS (GTKF blue in `--red`, pink `--pink`,
   Inter). Whistle pocket in drawings stays true red (`--alert`) on purpose.
   No backend, noindex. Merge to main = Netlify auto-deploy.
