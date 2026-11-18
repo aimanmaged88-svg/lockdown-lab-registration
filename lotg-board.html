@@ -51,6 +51,8 @@ header{display:flex;align-items:center;justify-content:space-between;gap:10px;pa
 .donate{display:none;width:100%;align-items:center;gap:10px;text-align:left;text-decoration:none;cursor:pointer;margin:0 0 6px;padding:10px 13px;border-radius:12px;border:1px solid color-mix(in srgb,var(--acc2) 42%,transparent);background:var(--card);color:var(--ink);font-family:inherit;font-size:13.5px;font-weight:700;transition:.15s var(--ease)}
 .donate.on{display:flex;animation:fade .4s var(--ease) both}
 .donate .dot{width:7px;height:7px;border-radius:50%;background:var(--acc2);flex:0 0 auto}
+.donate .dot.acc{background:var(--acc)}
+.donate+.donate{margin-top:-2px}
 .donate .go{margin-left:auto;color:var(--acc2);font-size:12px;font-weight:700;white-space:nowrap}
 .donate:active{transform:scale(.99)}
 #donateEmbed .igembed{margin:0}
@@ -304,6 +306,9 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
 
   <a class="donate" id="donateBar" href="#" target="_blank" rel="noopener">
     <span class="dot"></span><span id="donateTx"></span><span class="go">View ›</span>
+  </a>
+  <a class="donate" id="shopBar" href="#" target="_blank" rel="noopener">
+    <span class="dot acc"></span><span>🛒 Shop for merch</span><span class="go">Shop ›</span>
   </a>
 
   <nav class="tabs" role="tablist">
@@ -585,7 +590,7 @@ function isCross(){
   const tm=teamMap();
   return weekGames().some(g=>{const a=tm.get(g.team1_id),b=tm.get(g.team2_id);return a&&b&&a.court_group!==b.court_group;});
 }
-function renderAll(){renderSchedule();renderStandings();renderTeams();renderMyTeam();renderAllstar();renderAllstarAdmin();renderMarket();renderMarketAdmin();renderDonate();renderChrome();}
+function renderAll(){renderSchedule();renderStandings();renderTeams();renderMyTeam();renderAllstar();renderAllstarAdmin();renderMarket();renderMarketAdmin();renderDonate();renderShop();renderChrome();}
 /* Extra sections, parked at his word (2026-08-26) — the code, tables and
    content all stay put; flip either to true to bring the tab back. */
 const SECTIONS={allstar:false,market:false};
@@ -610,6 +615,12 @@ $('#donateBar').onclick=e=>{
   openSheet('shDonate');
 };
 $('#donateClose').onclick=()=>{$('#donateEmbed').innerHTML='';closeSheets();};
+function renderShop(){
+  const el=$('#shopBar');if(!el)return;
+  const u=(state.settings.shopUrl||state.settings.gearUrl||'').trim();
+  if(!/^https?:\/\//.test(u)){el.classList.remove('on');return;}
+  el.href=u;el.classList.add('on');
+}
 function renderChrome(){
   $('#lockBtn').classList.toggle('on',state.admin);
   $('#lockBtn').textContent=state.admin?'🔓':'🔒';
@@ -1328,7 +1339,7 @@ $('#nnSave').onclick=async()=>{
   motd?st.motd=motd:delete st.motd;
   try{
     await rest('lotg_admin?id=eq.1',{method:'PATCH',body:JSON.stringify({settings:st})},true);
-    state.settings=st;renderAllstar();renderDonate();renderChrome();toast('Night notes saved 📝');
+    state.settings=st;renderAllstar();renderDonate();renderShop();renderChrome();toast('Night notes saved 📝');
   }catch(e){toast(e.message);}
 };
 
