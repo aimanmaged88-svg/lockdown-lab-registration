@@ -48,11 +48,13 @@ button{font-family:inherit}
 
 /* header */
 header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:20px 2px 12px}
-.donate{display:none;align-items:center;justify-content:space-between;gap:10px;text-decoration:none;margin:0 0 4px;padding:11px 14px;border-radius:13px;border:var(--bw) solid var(--acc2);background:linear-gradient(100deg,color-mix(in srgb,var(--acc2) 15%,var(--card)),var(--card) 70%);color:var(--ink);font-size:13.5px;font-weight:700;box-shadow:3px 3px 0 var(--shadow);transition:.15s var(--ease)}
+.donate{display:none;width:100%;align-items:center;gap:10px;text-align:left;text-decoration:none;cursor:pointer;margin:0 0 6px;padding:10px 13px;border-radius:12px;border:1px solid color-mix(in srgb,var(--acc2) 42%,transparent);background:var(--card);color:var(--ink);font-family:inherit;font-size:13.5px;font-weight:700;transition:.15s var(--ease)}
 .donate.on{display:flex;animation:fade .4s var(--ease) both}
-.donate .go{color:var(--acc2);font-family:var(--disp);font-size:11px;letter-spacing:.07em;text-transform:uppercase;white-space:nowrap}
-[data-theme="retro"] .donate .go{font-family:var(--street);letter-spacing:.04em;text-transform:none;font-size:13px}
-.donate:active{transform:scale(.985)}
+.donate .dot{width:7px;height:7px;border-radius:50%;background:var(--acc2);flex:0 0 auto}
+.donate .go{margin-left:auto;color:var(--acc2);font-size:12px;font-weight:700;white-space:nowrap}
+.donate:active{transform:scale(.99)}
+#donateEmbed .igembed{margin:0}
+#donateEmbed iframe{height:clamp(420px,62vh,620px)}
 .logoimg{height:72px;width:auto;display:block}
 [data-mode="dark"] .logoimg{filter:invert(1);mix-blend-mode:screen}
 [data-mode="light"] .logoimg{mix-blend-mode:multiply}
@@ -301,7 +303,7 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
   </header>
 
   <a class="donate" id="donateBar" href="#" target="_blank" rel="noopener">
-    <span id="donateTx"></span><span class="go">Tap here ↗</span>
+    <span class="dot"></span><span id="donateTx"></span><span class="go">View ›</span>
   </a>
 
   <nav class="tabs" role="tablist">
@@ -494,6 +496,14 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
   </div>
 </div>
 
+<div class="sheet" id="shDonate" role="dialog" aria-modal="true">
+  <div class="grip"></div>
+  <h3 id="donateHead">💛 Want to donate?</h3>
+  <div id="donateEmbed"></div>
+  <a class="reelbtn" id="donateOut" href="#" target="_blank" rel="noopener">Open on Instagram ↗</a>
+  <button class="bigbtn ghost" id="donateClose">Close</button>
+</div>
+
 <div class="rc-view" id="rcView">
   <button class="rc-x" id="rcX" aria-label="Close">×</button>
   <img id="rcImg" alt="Last run recap" />
@@ -588,6 +598,18 @@ function renderDonate(){
   $('#donateTx').textContent=(state.settings.donateTxt||'').trim()||DONATE_DEFAULT;
   el.classList.add('on');
 }
+// An Instagram promo opens in-app via their official embed; anything else is
+// just a link out.
+$('#donateBar').onclick=e=>{
+  const u=(state.settings.donateUrl||'').trim(),emb=igEmbed(u);
+  if(!emb)return;                       // not an IG post — let the link do its thing
+  e.preventDefault();
+  $('#donateHead').textContent=(state.settings.donateTxt||'').trim()||DONATE_DEFAULT;
+  $('#donateEmbed').innerHTML=emb;
+  $('#donateOut').href=u;
+  openSheet('shDonate');
+};
+$('#donateClose').onclick=()=>{$('#donateEmbed').innerHTML='';closeSheets();};
 function renderChrome(){
   $('#lockBtn').classList.toggle('on',state.admin);
   $('#lockBtn').textContent=state.admin?'🔓':'🔒';
