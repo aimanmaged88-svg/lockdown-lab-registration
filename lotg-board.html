@@ -48,6 +48,11 @@ button{font-family:inherit}
 
 /* header */
 header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:20px 2px 12px}
+.donate{display:none;align-items:center;justify-content:space-between;gap:10px;text-decoration:none;margin:0 0 4px;padding:11px 14px;border-radius:13px;border:var(--bw) solid var(--acc2);background:linear-gradient(100deg,color-mix(in srgb,var(--acc2) 15%,var(--card)),var(--card) 70%);color:var(--ink);font-size:13.5px;font-weight:700;box-shadow:3px 3px 0 var(--shadow);transition:.15s var(--ease)}
+.donate.on{display:flex;animation:fade .4s var(--ease) both}
+.donate .go{color:var(--acc2);font-family:var(--disp);font-size:11px;letter-spacing:.07em;text-transform:uppercase;white-space:nowrap}
+[data-theme="retro"] .donate .go{font-family:var(--street);letter-spacing:.04em;text-transform:none;font-size:13px}
+.donate:active{transform:scale(.985)}
 .logoimg{height:72px;width:auto;display:block}
 [data-mode="dark"] .logoimg{filter:invert(1);mix-blend-mode:screen}
 [data-mode="light"] .logoimg{mix-blend-mode:multiply}
@@ -295,6 +300,10 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
     </div>
   </header>
 
+  <a class="donate" id="donateBar" href="#" target="_blank" rel="noopener">
+    <span id="donateTx"></span><span class="go">Tap here ↗</span>
+  </a>
+
   <nav class="tabs" role="tablist">
     <button class="tab" role="tab" id="tab-sched" aria-selected="true">Schedule</button>
     <button class="tab" role="tab" id="tab-stand" aria-selected="false">Standings</button>
@@ -367,6 +376,8 @@ tr.top td.tn::before{content:"👑 ";font-size:11px}
     <div class="arow2" style="margin:8px 0"><input id="nnEmbed" type="text" placeholder="Instagram post/reel to FEATURE on opening (paste the link)" maxlength="300"/></div>
     <div class="arow2" style="margin:8px 0"><input id="nnGear" type="text" placeholder="🛒 Merch pop-up link — shows FIRST, every open (blank = off)" maxlength="300"/></div>
     <div class="arow2" style="margin:8px 0"><input id="nnGearTxt" type="text" placeholder="Line under the merch heading (optional)" maxlength="120"/></div>
+    <div class="arow2" style="margin:8px 0"><input id="nnDonate" type="text" placeholder="💛 Donate banner link — sits at the top of the app (blank = off)" maxlength="300"/></div>
+    <div class="arow2" style="margin:8px 0"><input id="nnDonateTxt" type="text" placeholder="Donate banner wording (optional)" maxlength="80"/></div>
     <div class="arow2" style="margin:8px 0"><input id="nnMerch" type="text" placeholder="Merch shop link (https://…, blank = off)" maxlength="300"/></div>
     <div class="arow2" style="margin:8px 0"><input id="nnMerchTxt" type="text" placeholder="Merch pitch line — e.g. Support SJ, grab the merch" maxlength="160"/></div>
     <div class="arow2" style="margin:8px 0"><textarea id="nnMotd" placeholder="Message of the night" maxlength="300" style="flex:1;min-height:84px;background:var(--card);border:var(--bw) solid var(--line);border-radius:12px;padding:12px;color:var(--ink);font-family:inherit;font-size:15px;resize:vertical"></textarea></div>
@@ -564,10 +575,19 @@ function isCross(){
   const tm=teamMap();
   return weekGames().some(g=>{const a=tm.get(g.team1_id),b=tm.get(g.team2_id);return a&&b&&a.court_group!==b.court_group;});
 }
-function renderAll(){renderSchedule();renderStandings();renderTeams();renderMyTeam();renderAllstar();renderAllstarAdmin();renderMarket();renderMarketAdmin();renderChrome();}
+function renderAll(){renderSchedule();renderStandings();renderTeams();renderMyTeam();renderAllstar();renderAllstarAdmin();renderMarket();renderMarketAdmin();renderDonate();renderChrome();}
 /* Extra sections, parked at his word (2026-08-26) — the code, tables and
    content all stay put; flip either to true to bring the tab back. */
 const SECTIONS={allstar:false,market:false};
+const DONATE_DEFAULT='💛 Want to donate?';
+function renderDonate(){
+  const el=$('#donateBar');if(!el)return;
+  const u=(state.settings.donateUrl||'').trim();
+  if(!/^https?:\/\//.test(u)){el.classList.remove('on');return;}
+  el.href=u;
+  $('#donateTx').textContent=(state.settings.donateTxt||'').trim()||DONATE_DEFAULT;
+  el.classList.add('on');
+}
 function renderChrome(){
   $('#lockBtn').classList.toggle('on',state.admin);
   $('#lockBtn').textContent=state.admin?'🔓':'🔒';
@@ -1167,6 +1187,8 @@ function renderRecapAdmin(){
   if($('#nnEmbed')&&document.activeElement?.id!=='nnEmbed')$('#nnEmbed').value=state.settings.introEmbed||'';
   if($('#nnGear')&&document.activeElement?.id!=='nnGear')$('#nnGear').value=state.settings.gearUrl||'';
   if($('#nnGearTxt')&&document.activeElement?.id!=='nnGearTxt')$('#nnGearTxt').value=state.settings.gearTxt||'';
+  if($('#nnDonate')&&document.activeElement?.id!=='nnDonate')$('#nnDonate').value=state.settings.donateUrl||'';
+  if($('#nnDonateTxt')&&document.activeElement?.id!=='nnDonateTxt')$('#nnDonateTxt').value=state.settings.donateTxt||'';
   if($('#nnMerch')&&document.activeElement?.id!=='nnMerch')$('#nnMerch').value=state.settings.merchUrl||'';
   if($('#nnMerchTxt')&&document.activeElement?.id!=='nnMerchTxt')$('#nnMerchTxt').value=state.settings.merchTxt||'';
   if($('#nnMotd')&&document.activeElement?.id!=='nnMotd')$('#nnMotd').value=state.settings.motd||MOTD_DEFAULT;
@@ -1269,6 +1291,10 @@ $('#nnSave').onclick=async()=>{
   const gear=($('#nnGear')?.value||'').trim(),gearTxt=($('#nnGearTxt')?.value||'').trim();
   if(gear&&!/^https?:\/\//.test(gear)){toast('Merch link needs to start with https://');return;}
   gear?st.gearUrl=gear:delete st.gearUrl;
+  const don=($('#nnDonate')?.value||'').trim(),donTxt=($('#nnDonateTxt')?.value||'').trim();
+  if(don&&!/^https?:\/\//.test(don)){toast('Donate link needs to start with https://');return;}
+  don?st.donateUrl=don:delete st.donateUrl;
+  donTxt?st.donateTxt=donTxt:delete st.donateTxt;
   gearTxt?st.gearTxt=gearTxt:delete st.gearTxt;
   const embed=$('#nnEmbed').value.trim();
   if(embed&&!igEmbed(embed)){toast('Feature link needs to be an Instagram post/reel link');return;}
@@ -1280,7 +1306,7 @@ $('#nnSave').onclick=async()=>{
   motd?st.motd=motd:delete st.motd;
   try{
     await rest('lotg_admin?id=eq.1',{method:'PATCH',body:JSON.stringify({settings:st})},true);
-    state.settings=st;renderAllstar();renderChrome();toast('Night notes saved 📝');
+    state.settings=st;renderAllstar();renderDonate();renderChrome();toast('Night notes saved 📝');
   }catch(e){toast(e.message);}
 };
 
