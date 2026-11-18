@@ -541,12 +541,18 @@ async function loadAll(){
   const [teams,games,adm]=await Promise.all([
     rest('lotg_teams?select=*&order=court_group.asc,sort_order.asc'),
     rest('lotg_games?select=*&order=slot_index.asc,court.asc'),
-    rest('lotg_admin?id=eq.1&select=settings'),
+    rest('lotg_admin?id=eq.1&select=settings,token'),
   ]);
   state.teams=teams||[];state.games=games||[];
   state.wk=Math.max(1,...state.games.map(g=>g.week||1));
   state.tn=Math.max(1,...state.games.map(g=>g.tournament||1));
   state.settings={start:"7:15 PM",...(adm?.[0]?.settings||{})};
+  const tok=adm?.[0]?.token;
+  if(state.pass&&tok&&state.pass!==tok){
+    state.pass=null;state.admin=false;state.editing=null;
+    try{localStorage.removeItem('lotg_pass')}catch(e){}
+    toast('The passcode changed — unlock again 🔒');
+  }
   try{localStorage.setItem('lotg_cache',JSON.stringify({teams:state.teams,games:state.games,wk:state.wk,settings:state.settings}))}catch(e){}
   renderAll();renderGear();renderIntro();
 }
