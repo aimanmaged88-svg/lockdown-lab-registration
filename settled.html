@@ -204,6 +204,32 @@ nav.tabs button.on em{transform:translateY(-2px) scale(1.08)}
 .sub-k{font-size:13px;color:var(--muted);margin-top:6px}
 .tag-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
 .ctxt{font-size:14px;color:var(--muted)}
+.coach{display:flex;gap:12px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:16px;padding:12px 14px;margin:10px 0 4px;font-weight:700;font-size:15.5px;line-height:1.35}
+.coach em{font-style:normal;font-size:22px;line-height:1}
+.coach.fire{border-left-color:var(--red)}
+.coach.win{border-left-color:var(--green)}
+#stretch{position:fixed;inset:0;z-index:65;background:var(--bg);display:none;flex-direction:column;padding:calc(18px + env(safe-area-inset-top,0px)) 20px calc(24px + env(safe-area-inset-bottom,0px))}
+#stretch.on{display:flex;animation:fade .25s}
+#stretch .st-top{display:flex;justify-content:space-between;align-items:center;color:var(--muted);font-weight:700;font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+#stretch .st-mid{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px}
+#stretch .st-name{font-size:30px;font-weight:900;letter-spacing:-.03em;line-height:1.05;text-wrap:balance}
+#stretch .st-cue{color:var(--muted);font-size:17px;max-width:320px}
+#stretch .st-ring{position:relative;width:220px;height:220px;margin:8px 0}
+#stretch .st-ring svg{transform:rotate(-90deg)}
+#stretch .st-ring circle{fill:none;stroke-width:12;stroke-linecap:round}
+#stretch .st-ring .b{stroke:var(--line2)}
+#stretch .st-ring .f{stroke:var(--gold);transition:stroke-dashoffset 1s linear}
+#stretch .st-ring .n{position:absolute;inset:0;display:grid;place-items:center;font-size:72px;font-weight:900;letter-spacing:-.05em}
+#stretch .st-next{font-size:13px;color:var(--dim);font-weight:700}
+#stretch .st-acts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+#stretch.paused .st-ring .f{stroke:var(--muted)}
+.jentry{padding:12px 0;border-top:1px solid var(--line)}
+.jentry:first-of-type{border-top:0}
+.jentry .jh{display:flex;justify-content:space-between;align-items:center;font-weight:800;font-size:14px}
+.jentry .jh span{color:var(--muted);font-weight:600;font-size:12.5px}
+.jentry p{margin:6px 0 0;color:var(--muted);font-size:14.5px;white-space:pre-wrap;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.jentry.open p{display:block;color:var(--fg)}
+.prompts{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
@@ -212,7 +238,7 @@ nav.tabs button.on em{transform:translateY(-2px) scale(1.08)}
   <header class="top">
     <div class="brand"><div class="mark">S</div><div><div class="nm">Settled</div><div class="sub" id="hdrSub">Dubai · built for Aiman</div></div></div>
     <div style="display:flex;gap:8px">
-      <button class="iconbtn" id="themeBtn" title="Theme">◐</button>
+      <button class="iconbtn" data-go="plan" title="Calendar & plan">📅</button>
       <button class="iconbtn" data-go="settings" title="Settings">⚙︎</button>
     </div>
   </header>
@@ -222,6 +248,7 @@ nav.tabs button.on em{transform:translateY(-2px) scale(1.08)}
   <section class="view" id="v-place"></section>
   <section class="view" id="v-body"></section>
   <section class="view" id="v-plan"></section>
+  <section class="view" id="v-journal"></section>
   <section class="view" id="v-settings"></section>
 </div>
 
@@ -230,11 +257,12 @@ nav.tabs button.on em{transform:translateY(-2px) scale(1.08)}
   <button data-tab="money"><em>💰</em>Money</button>
   <button data-tab="place"><em>🏠</em>Place</button>
   <button data-tab="body"><em>😴</em>Body</button>
-  <button data-tab="plan"><em>📅</em>Plan</button>
+  <button data-tab="journal"><em>📓</em>Journal</button>
 </div></nav>
 
 <div class="ovl" id="ovl"><div class="sheet" id="sheet"></div></div>
 <div class="full" id="setup"><div class="inner" id="setupIn"></div></div>
+<div id="stretch"></div>
 <div class="full" id="lock"><div class="inner lock-wrap" id="lockIn"></div></div>
 <div class="toast" id="toast"></div>
 <script>
@@ -314,7 +342,7 @@ function safeToSpend(){ // per day until next pay: what this pay cycle can affor
   let perDay=incPer>0?Math.min(firstCycle?cycleBudget/cd:(cycleBudget-spentCycle)/d,cap):cap-savePerDayNeeded();
   return {perDay,days:d,cycleBudget,spentCycle,cap,fixedPer,savePer,incPer,cd}}
 function todayBudget(){const s=safeToSpend();return Math.max(0,s.perDay)}
-function dayRec(d=today()){if(!S.days[d])S.days[d]={checks:{},meals:{},water:0,train:0,mood:0,note:'',one:'',closed:false};return S.days[d]}
+function dayRec(d=today()){if(!S.days[d])S.days[d]={checks:{},meals:{},water:0,train:0,stretch:0,mood:0,note:'',one:'',closed:false};return S.days[d]}
 const dayIndex=()=>daysBetween(P().day1,today())+1;
 
 /* ---- sleep helpers ---- */
@@ -330,7 +358,7 @@ const CHECKS=()=>[
   ['water','💧','2L+ water (8 cups)',d=>d.water>=8],
   ['move','🏀','Trained / moved 30+ min',d=>d.train>=30],
   ['bed','🛏️','In bed by '+P().bed+' last night',d=>{const r=S.sleep.find(s=>s.date===today());return r?bedOnTime(r):false}],
-  ['phone','📵','No phone in bed',null],
+  ['stretch','🧘','Morning stretch done',d=>d.stretch>0],
   ['plan','🎯','One thing for tomorrow set',d=>!!(d.one&&d.one.trim())],
 ];
 function checkState(d,c){const auto=c[3]?c[3](d):false;return !!(d.checks[c[0]]||auto)}
@@ -356,7 +384,7 @@ function openSheet(html){$('#sheet').innerHTML='<div class="grab"></div>'+html;$
 function closeSheet(){$('#ovl').classList.remove('on');document.body.style.overflow=''}
 function val(id){const el=$('#'+id);if(!el)return'';return el.type==='checkbox'?el.checked:el.value}
 function num(id){const v=parseFloat(String(val(id)).replace(/[^0-9.\-]/g,''));return isNaN(v)?0:v}
-function render(){({today:renderToday,money:renderMoney,place:renderPlace,body:renderBody,plan:renderPlan,settings:renderSettings}[TAB]||renderToday)();$('#hdrSub').textContent=hdr()}
+function render(){({today:renderToday,money:renderMoney,place:renderPlace,body:renderBody,plan:renderPlan,journal:renderJournal,settings:renderSettings}[TAB]||renderToday)();$('#hdrSub').textContent=hdr()}
 function hdr(){const di=dayIndex();if(di<1)return 'Dubai · Day 1 is '+fmtD(P().day1);const left=daysBetween(today(),P().settledBy);return 'Day '+di+' · '+(left>=0?left+' days to Settled':'Settled window closed')}
 function fieldMoney(id,label,v,cur,ph='0'){return `<label class="f"><span>${label}</span><div class="money"><em>${cur}</em><input class="in" id="${id}" inputmode="decimal" placeholder="${ph}" value="${v||v===0?v:''}"></div></label>`}
 function field(id,label,v,type='text',extra=''){return `<label class="f"><span>${label}</span><input class="in" id="${id}" type="${type}" value="${esc(v??'')}" ${extra}></label>`}
@@ -451,13 +479,20 @@ function renderToday(){
   const lastNight=S.sleep.find(s=>s.date===today());
   const yest=dayRec(addDays(today(),-1));
   const one=(yest.one||'').trim();
+  const cl=coachLine(d,{hour,di,budget,spent,sc,st,lastNight});
   let h=`<h1>${greet}, ${esc(p.name)}.</h1>
-  <div class="chips" style="margin-bottom:6px">
+  <div class="coach ${cl.cls}"><em>${cl.ico}</em><div>${cl.txt}</div></div>
+  <div class="chips" style="margin:10px 0 6px">
     ${di<1?`<span class="chip gold">Day 1 is ${fmtD(p.day1)} · setup weekend</span>`:`<span class="chip gold">Day <b>${di}</b></span>`}
     <span class="chip">🏠 <b>${leftDec}</b> days to settled</span>
     <span class="chip">🇦🇪 day <b>${inDubai+1}</b> in Dubai</span>
     <span class="chip">✈️ <b>${toBack}</b> days to Sydney</span>
   </div>`;
+  // Morning stretch — the first thing, every day
+  if(d.stretch>0)h+=`<div class="card green" style="padding:12px 16px"><div class="acc"><b style="font-size:15px">🧘 Stretched · ${d.stretch} min</b><button class="btn xs ghost" data-act="stretchStart">Again</button></div></div>`;
+  else h+=`<div class="card gold"><div class="chead"><h2>🧘 Morning stretch</h2><span class="chip gold">${Math.round(STRETCH.reduce((t,x)=>t+x[2],0)/60)} min · guided</span></div>
+    <p class="ctxt" style="margin:0 0 10px">${hour<12?'Before coffee, before the phone. Hips, hamstrings, back, shoulders — timed, one after the other.':hour<20?'Still not done. It\'s '+Math.round(STRETCH.reduce((t,x)=>t+x[2],0)/60)+' minutes. Do it now and the day still counts.':'Missed this morning. Do it now anyway — tomorrow starts tonight.'}</p>
+    <button class="btn" data-act="stretchStart">▶︎ Start the routine</button></div>`;
   // Morning sleep prompt
   if(hour<13&&!lastNight)h+=`<div class="card" style="border-color:rgba(94,168,255,.35)"><div class="chead"><h2>😴 How did you sleep?</h2><span class="pill b">Morning</span></div>
     <div class="grid2">${field('sl_bed','Lights out (last night)',p.bed,'time')}${field('sl_wake','Woke up',nowHM(),'time')}</div>
@@ -489,6 +524,7 @@ function renderToday(){
   h+=`<div class="card ${d.closed?'green':closeNow?'gold':''}"><div class="chead"><h2>🌙 Nightly close</h2>${d.closed?'<span class="pill g">Done tonight</span>':`<span class="chip">${p.closeAt}</span>`}</div>
     <p class="ctxt" style="margin:0 0 10px">${d.closed?'Balances updated, day rated, tomorrow set. Lights out at '+p.bed+'.':'Three minutes: update balances, rate the day, set tomorrow\'s one thing.'}</p>
     <button class="btn ${d.closed?'ghost':''}" data-act="openClose">${d.closed?'Reopen the close':'Close the night'}</button>
+    <button class="btn ghost sm" style="margin-top:8px;width:100%" data-go="journal">📓 ${(d.journal||'').trim()?'Read / add to today\'s page':'Write today\'s page'}</button>
     <div class="grid2" style="margin-top:8px"><button class="btn ghost sm" style="width:100%" data-act="bedNow">🛏️ Lights out now</button><button class="btn ghost sm" style="width:100%" data-act="wakeNow">☀️ I'm up</button></div></div>`;
   // Week glance
   const days=Array.from({length:7},(_,i)=>addDays(today(),i-6));
@@ -520,10 +556,10 @@ ACT.openClose=()=>{const p=P(),d=dayRec();
   <h3 style="margin-top:14px">2 · Today's spend · ${fmt(spentOn(today()))}</h3><p class="hint" style="margin:0 0 8px">Missed anything? Add it on Today after. Cash spent and not logged still shows up — the balance line is the truth.</p>
   <h3 style="margin-top:14px">3 · Rate the day</h3><div class="q5" id="cl_q">${['😵','😕','😐','🙂','🔥'].map((e,i)=>`<button data-act="clq" data-v="${i+1}" class="${(d.mood||0)===i+1?'on':''}">${e}</button>`).join('')}</div>
   ${field('cl_one','4 · The ONE thing tomorrow',d.one,'text','placeholder="e.g. view 2 apartments in JVC" autofocus')}
-  <label class="f"><span>Note to self</span><textarea class="in" id="cl_note" placeholder="What worked, what didn't">${esc(d.note)}</textarea></label>
+  <label class="f"><span>5 · Journal — what actually happened today</span><textarea class="in" id="cl_note" placeholder="Honest. Two lines is enough.">${esc(d.journal||'')}</textarea></label>
   <div class="acts"><button class="btn ghost" data-act="close">Later</button><button class="btn" data-act="doClose">Close it ✓</button></div>`)};
 ACT.clq=d=>{dayRec().mood=+d.v;$$('#cl_q button').forEach(b=>b.classList.toggle('on',b.dataset.v===d.v))};
-ACT.doClose=()=>{S.accounts.forEach(a=>{a.bal=num('cl_'+a.id)});S.debts.forEach(a=>{a.amt=num('cd_'+a.id)});const d=dayRec();d.one=val('cl_one').trim();d.note=val('cl_note');d.closed=true;snap();save();closeSheet();render();toast('Closed. Net '+fmt(net())+'. Lights out '+P().bed+'.')};
+ACT.doClose=()=>{S.accounts.forEach(a=>{a.bal=num('cl_'+a.id)});S.debts.forEach(a=>{a.amt=num('cd_'+a.id)});const d=dayRec();d.one=val('cl_one').trim();d.journal=val('cl_note');d.closed=true;snap();save();closeSheet();render();toast('Closed. Net '+fmt(net())+'. Lights out '+P().bed+'.')};
 /* ===================== MONEY ===================== */
 function renderMoney(){
   const p=P(),g=S.goals,sts=safeToSpend();
@@ -720,10 +756,7 @@ function renderPlan(){const p=P();if(!CAL_M)CAL_M=today().slice(0,7);const evs=a
   </div>
   <div class="card"><div class="chead"><h2>Coming up</h2><button class="btn xs soft" data-act="evAdd" data-d="${today()}">＋ Add entry</button></div>${up.map(e=>evRow(e)).join('')||'<div class="empty">Clear runway.</div>'}
     <p class="hint">Nightly close + lights-out reminders live in your Google Calendar (daily). Entries here can be sent there with one tap.</p></div>
-  <div class="card"><div class="chead"><h2>The six weeks</h2><span class="chip gold">week ${Math.min(6,wk)} of 6</span></div><div class="tl">${phases.map((ph,i)=>`<div class="m ${di>=ph[2]&&di<ph[2]+7?'now':di>=ph[2]+7?'done':''}"><b>${ph[0]} · ${fmtD(addDays(p.day1,ph[2]-1),false)}</b><span>${ph[1]}</span></div>`).join('')}</div></div>
-  <div class="card flat"><div class="chead"><h2>Weekly review</h2><button class="btn xs soft" data-act="reviewNew">Write this week's</button></div>
-    ${S.reviews.length?S.reviews.slice().reverse().slice(0,6).map(r=>`<div class="row"><div class="ic">📝</div><div class="t"><b>${fmtD(r.d)} · net ${fmt(r.net)} · ${r.spend?fmt(r.spend)+' spent':''}</b><span style="white-space:normal">${esc(r.win)}${r.focus?' → '+esc(r.focus):''}</span></div></div>`).join(''):'<div class="empty">Sundays. Five minutes. Keeps the week honest.</div>'}
-  </div>`;
+  <div class="card"><div class="chead"><h2>The six weeks</h2><span class="chip gold">week ${Math.min(6,wk)} of 6</span></div><div class="tl">${phases.map((ph,i)=>`<div class="m ${di>=ph[2]&&di<ph[2]+7?'now':di>=ph[2]+7?'done':''}"><b>${ph[0]} · ${fmtD(addDays(p.day1,ph[2]-1),false)}</b><span>${ph[1]}</span></div>`).join('')}</div></div>`;
   $('#v-plan').innerHTML=h;
 }
 function evRow(e){const kc={money:'',place:'b',mile:'p',sleep:'g',other:'g'}[e.kind]||'g';const custom=S.events.some(x=>x.id===e.id);return `<div class="row"><div class="ic">${{money:'💰',place:'🏠',mile:'🏁',sleep:'😴',other:'📌'}[e.kind]||'📌'}</div><div class="t"><b>${esc(e.title)}</b><span>${fmtDL(e.date)}${e.time?' · '+e.time:''}${e.note?' · '+esc(e.note):''}</span></div><div style="display:flex;gap:4px"><a class="btn xs ghost" target="_blank" rel="noopener" title="Add to Google Calendar" href="${gcal({title:e.title,date:e.date,time:e.time,details:e.note||'From Settled'})}">📅</a>${custom?`<button class="btn xs ghost" data-act="evEdit" data-id="${e.id}">Edit</button>`:''}</div></div>`}
@@ -768,7 +801,6 @@ function renderSettings(){const p=P();
 ACT.saveProfile=()=>{const p=P();p.name=val('st_name')||p.name;p.arrived=val('st_arrived')||p.arrived;p.day1=val('st_day1')||p.day1;p.settledBy=val('st_settled')||p.settledBy;p.back=val('st_back')||p.back;p.bed=val('st_bed')||p.bed;p.wake=val('st_wake')||p.wake;p.closeAt=val('st_close')||p.closeAt;p.cur=val('st_cur');p.cur2=val('st_cur2');p.rate=num('st_rate')||p.rate;save();render();toast('Saved')};
 ACT.theme=d=>{P().theme=d.t;save();applyTheme();render()};
 function applyTheme(){const t=P().theme||'auto';if(t==='auto')document.documentElement.removeAttribute('data-theme');else document.documentElement.setAttribute('data-theme',t);const dark=t==='dark'||(t==='auto'&&matchMedia('(prefers-color-scheme:dark)').matches);$('meta[name=theme-color]').setAttribute('content',dark?'#0B0C10':'#F5F1E8')}
-$('#themeBtn').addEventListener('click',()=>{const t=P().theme||'auto';const dark=t==='dark'||(t==='auto'&&matchMedia('(prefers-color-scheme:dark)').matches);P().theme=dark?'light':'dark';save();applyTheme();buzz(6)});
 async function sha(s){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('settled:'+s));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
 let PIN_BUF='',PIN_MODE='unlock',PIN_FIRST='';
 function renderLock(title,sub){$('#lockIn').innerHTML=`<div class="brand" style="justify-content:center"><div class="mark">S</div></div><h1 style="margin-top:18px">${title}</h1><p class="lead">${sub}</p><div class="dots">${[0,1,2,3].map(i=>`<i class="${i<PIN_BUF.length?'on':''}"></i>`).join('')}</div><div class="pinpad">${[1,2,3,4,5,6,7,8,9].map(n=>`<button data-act="pinKey" data-n="${n}">${n}</button>`).join('')}<button data-act="pinCancel" style="font-size:14px">${PIN_MODE==='unlock'?'':'Cancel'}</button><button data-act="pinKey" data-n="0">0</button><button data-act="pinBack">⌫</button></div>`}
@@ -788,6 +820,89 @@ ACT.backup=()=>{const blob=new Blob([JSON.stringify(S,null,1)],{type:'applicatio
 ACT.restore=(d,el)=>{const f=el.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const j=JSON.parse(r.result);if(j.v!==1||!j.profile)throw 0;if(!confirm('Replace everything on this phone with the backup?'))return;localStorage.setItem(KEY,JSON.stringify(j));S=load();applyTheme();render();toast('Restored')}catch(e){toast('That file isn\'t a Settled backup')}};r.readAsText(f)};
 ACT.rebase=()=>{if(confirm('Re-stamp today\'s net worth as Day 0? Savings progress restarts from here.')){S.baseline=net();snap();save();render();toast('Baseline re-stamped')}};
 ACT.wipe=()=>{if(confirm('Wipe EVERYTHING on this phone? Export a backup first.')&&confirm('Last chance — this cannot be undone.')){localStorage.removeItem(KEY);location.reload()}};
+
+/* ===================== COACH LINE ===================== */
+function coachLine(d,c){const p=P(),{hour,di,budget,spent,sc,st,lastNight}=c;const n=p.name.split(' ')[0];
+  const left=daysBetween(today(),p.settledBy);
+  if(di<1)return {ico:'🧱',cls:'',txt:`Setup weekend. Numbers in, bed by ${p.bed}, stretch when you wake. Monday the clock starts and we don't negotiate with it.`};
+  if(hour<4)return {ico:'🌙',cls:'fire',txt:`It's past ${p.bed}. Whatever this is, it's costing you tomorrow. Lights out.`};
+  if(hour<13){
+    if(!d.stretch)return {ico:'🧘',cls:'fire',txt:`Day ${di}. ${Math.round(STRETCH.reduce((t,x)=>t+x[2],0)/60)} minutes of stretching before anything else. Phone down after you press start.`};
+    if(!lastNight)return {ico:'😴',cls:'',txt:`Stretched — good. Log last night's sleep, then go. ${left} days to settled.`};
+    const one=(dayRec(addDays(today(),-1)).one||'').trim();
+    return {ico:'🎯',cls:'win',txt:one?`Morning handled. Today's one thing: <b>${esc(one)}</b>. Everything else is noise.`:`Morning handled. ${left} days left — what's the ONE thing today? Set it tonight so tomorrow has one.`};
+  }
+  if(hour<19){
+    if(budget>0&&spent>budget)return {ico:'🛑',cls:'fire',txt:`You're ${fmt(spent-budget)} over today's number. Nothing else leaves the wallet. Cook tonight.`};
+    if(!d.stretch)return {ico:'🧘',cls:'fire',txt:`No stretch yet today. It's ${Math.round(STRETCH.reduce((t,x)=>t+x[2],0)/60)} minutes — you've spent longer scrolling. Go.`};
+    if(sc.n>=5)return {ico:'🔥',cls:'win',txt:`${sc.n}/${sc.t} already. Streak ${st}. Protect the evening: water, clean dinner, close at ${p.closeAt}.`};
+    return {ico:'⚡',cls:'',txt:`${fmt(Math.max(0,budget-spent))} left today. ${sc.n}/${sc.t} ticked — 5 keeps the streak alive.`};
+  }
+  if(!d.closed)return {ico:'💰',cls:hour>=hm2min(p.closeAt)/60?'fire':'',txt:hour>=hm2min(p.closeAt)/60?`It's past ${p.closeAt}. Close the night: balances, rate the day, one thing for tomorrow, then journal. Three minutes.`:`Evening. Clean dinner, water, then the close at ${p.closeAt}. ${sc.n}/${sc.t} so far.`};
+  return {ico:'✅',cls:'win',txt:`Closed. ${sc.n>=5?'Streak '+st+'.':'Only '+sc.n+'/'+sc.t+' today — tomorrow we fix that.'} Lights out ${p.bed}. No screen in bed.`};
+}
+
+/* ===================== MORNING STRETCH ===================== */
+const STRETCH=[
+  ['Neck rolls','Slow circles. 5 each way. Breathe out on the way down.',40],
+  ['Cat–cow','On all fours. Arch, round, slow. 10 reps.',45],
+  ["World's greatest stretch · left",'Long lunge, left elbow to instep, then rotate the arm to the ceiling.',40],
+  ["World's greatest stretch · right",'Swap sides. Same slow rotation.',40],
+  ['Hip flexor · left','Back knee down, squeeze the glute, chest tall. Feel the front of the hip.',40],
+  ['Hip flexor · right','Swap. Don\'t lean back — push the hip forward.',40],
+  ['Hamstring · left','Leg long, hinge from the hips, flat back. Toes up.',40],
+  ['Hamstring · right','Swap. Breathe into it.',40],
+  ['Figure-4 glute · left','On your back, ankle over knee, pull the leg in.',40],
+  ['Figure-4 glute · right','Swap. This is the one you skip. Don\'t.',40],
+  ['Thoracic rotation','On your side, top arm opens like a book. 8 each side.',45],
+  ['Calf + ankle','Hands on the wall, heel down. Then 10 ankle circles each way.',45],
+  ['Chest doorway','Forearms on the frame, lean through. Shoulders back, chin level.',40],
+  ['Five slow breaths','Stand tall. In through the nose, long out. Then go win the day.',30],
+];
+let ST={i:0,left:0,t:null,paused:false,started:0};
+ACT.stretchStart=()=>{ST={i:0,left:STRETCH[0][2],t:null,paused:false,started:Date.now()};$('#stretch').classList.add('on');document.body.style.overflow='hidden';renderStretch();ST.t=setInterval(stretchTick,1000);buzz(20)};
+function stretchTick(){if(ST.paused)return;ST.left--;if(ST.left<=0){ST.i++;if(ST.i>=STRETCH.length)return stretchDone();ST.left=STRETCH[ST.i][2];buzz([60,40,60])}else if(ST.left<=3)buzz(10);renderStretch()}
+function renderStretch(){const x=STRETCH[ST.i],r=96,c=2*Math.PI*r,off=c*(1-ST.left/x[2]);const nx=STRETCH[ST.i+1];
+  $('#stretch').className='on'+(ST.paused?' paused':'');
+  $('#stretch').innerHTML=`<div class="st-top"><span>${ST.i+1} / ${STRETCH.length}</span><span>🧘 Morning stretch</span><button class="btn xs ghost" data-act="stretchStop">End</button></div>
+  <div class="st-mid"><div class="st-name">${x[0]}</div><div class="st-cue">${x[1]}</div>
+  <div class="st-ring"><svg width="220" height="220" viewBox="0 0 220 220"><circle class="b" cx="110" cy="110" r="${r}"/><circle class="f" cx="110" cy="110" r="${r}" stroke-dasharray="${c}" stroke-dashoffset="${off}"/></svg><div class="n">${ST.left}</div></div>
+  <div class="st-next">${nx?'NEXT · '+nx[0]:'LAST ONE'}</div></div>
+  <div class="st-acts"><button class="btn ghost" data-act="stretchPause">${ST.paused?'▶︎ Resume':'❚❚ Pause'}</button><button class="btn ghost" data-act="stretchSkip">Skip ›</button><button class="btn" data-act="stretchFinish">Done ✓</button></div>`}
+ACT.stretchPause=()=>{ST.paused=!ST.paused;renderStretch()};
+ACT.stretchSkip=()=>{ST.i++;if(ST.i>=STRETCH.length)return stretchDone();ST.left=STRETCH[ST.i][2];renderStretch()};
+ACT.stretchFinish=()=>stretchDone();
+ACT.stretchStop=()=>{clearInterval(ST.t);$('#stretch').classList.remove('on');document.body.style.overflow='';const m=Math.round((Date.now()-ST.started)/60000);if(m>=3){dayRec().stretch=Math.max(dayRec().stretch||0,m);save();toast(m+' min banked. Finish it tomorrow.')}else toast('Ended early — doesn\'t count. Tomorrow.');render()};
+function stretchDone(){clearInterval(ST.t);$('#stretch').classList.remove('on');document.body.style.overflow='';const m=Math.max(1,Math.round((Date.now()-ST.started)/60000));const d=dayRec();d.stretch=Math.max(d.stretch||0,m);save();buzz([80,40,80,40,160]);render();toast('Stretched. '+m+' min. Now the day. 🔥')}
+
+/* ===================== JOURNAL ===================== */
+let JOPEN={};
+function renderJournal(){const d=dayRec(),p=P();
+  const entries=Object.entries(S.days).filter(([k,v])=>(v.journal||'').trim()).sort((a,b)=>a[0]<b[0]?1:-1);
+  let js=0;for(let i=0;i<400;i++){const k=addDays(today(),-i);const v=S.days[k];if(v&&(v.journal||'').trim())js++;else if(i>0)break}
+  const prompts=['What went right today:','What I dodged:','Grateful for:','One thing I learned:','Tomorrow I will:','How my body felt:'];
+  const words=(d.journal||'').trim().split(/\s+/).filter(Boolean).length;
+  let h=`<h1>Journal.</h1><p class="lead">Two minutes. Honest. Nobody reads this but you.</p>
+  <div class="card gold"><div class="chead"><h2>${fmtDL(today())}</h2><span class="chip ${js?'green':''}">📓 ${js} day${js===1?'':'s'} running</span></div>
+    <div class="k" style="margin-bottom:6px">How was it</div><div class="q5" id="j_q">${['😵','😕','😐','🙂','🔥'].map((e,i)=>`<button data-act="jmood" data-v="${i+1}" class="${(d.mood||0)===i+1?'on':''}">${e}</button>`).join('')}</div>
+    <div class="prompts">${prompts.map(x=>`<button class="chip" data-act="jprompt" data-p="${esc(x)}">${x.replace(':','')}</button>`).join('')}</div>
+    <textarea class="in" id="j_text" style="min-height:160px" placeholder="Start anywhere. The day, the money, the apartment hunt, the people, the stuff in your head. Save happens as you type." data-jlive>${esc(d.journal||'')}</textarea>
+    <div class="acc" style="margin-top:8px"><span>${words} words</span><span id="j_saved">${(d.journal||'').trim()?'saved':''}</span></div>
+  </div>
+  <div class="card"><div class="chead"><h2>Weekly review</h2><button class="btn xs soft" data-act="reviewNew">Write this week's</button></div>
+    ${S.reviews.length?S.reviews.slice().reverse().slice(0,6).map(r=>`<div class="row"><div class="ic">📝</div><div class="t"><b>${fmtD(r.d)} · net ${fmt(r.net)} · ${r.spend?fmt(r.spend)+' spent':''}</b><span style="white-space:normal">${esc(r.win)}${r.focus?' → '+esc(r.focus):''}</span></div></div>`).join(''):'<div class="empty">Sundays. Five minutes. Keeps the week honest.</div>'}
+  </div>
+  <div class="card flat"><div class="chead"><h2>Past pages</h2><span class="chip">${entries.length}</span></div>
+    ${entries.filter(([k])=>k!==today()).length?entries.filter(([k])=>k!==today()).slice(0,60).map(([k,v])=>`<div class="jentry ${JOPEN[k]?'open':''}" data-act="jopen" data-k="${k}"><div class="jh"><div>${v.mood?['','😵','😕','😐','🙂','🔥'][v.mood]+' ':''}${fmtDL(k)}</div><span>${v.closed?'closed ✓':''}${v.one?' · '+esc(v.one):''}</span></div><p>${esc(v.journal)}</p>${JOPEN[k]?`<div style="margin-top:8px"><button class="btn xs ghost" data-act="jedit" data-k="${k}">Edit</button></div>`:''}</div>`).join(''):'<div class="empty">Yesterday\'s page shows up here tomorrow.</div>'}
+  </div>`;
+  $('#v-journal').innerHTML=h;
+}
+let JT;document.addEventListener('input',e=>{if(e.target.matches('[data-jlive]')){const d=dayRec();d.journal=e.target.value;clearTimeout(JT);const sv=$('#j_saved');if(sv)sv.textContent='…';JT=setTimeout(()=>{save();if(sv)sv.textContent='saved';const w=$('#v-journal .acc span');if(w)w.textContent=d.journal.trim().split(/\s+/).filter(Boolean).length+' words'},500)}});
+ACT.jmood=d=>{dayRec().mood=+d.v;save();$$('#j_q button').forEach(b=>b.classList.toggle('on',b.dataset.v===d.v))};
+ACT.jprompt=d=>{const t=$('#j_text');if(!t)return;const cur=t.value;t.value=(cur.trim()?cur.replace(/\s*$/,'')+'\n\n':'')+d.p+' ';t.focus();t.setSelectionRange(t.value.length,t.value.length);t.dispatchEvent(new Event('input',{bubbles:true}))};
+ACT.jopen=(d,el,e)=>{if(e.target.closest('[data-act=jedit]'))return;JOPEN[d.k]=!JOPEN[d.k];render()};
+ACT.jedit=(d,el,e)=>{e.stopPropagation();const v=S.days[d.k];openSheet(`<h2>${fmtDL(d.k)}</h2><textarea class="in" id="je_text" style="min-height:220px">${esc(v.journal||'')}</textarea><div class="acts"><button class="btn ghost" data-act="close">Cancel</button><button class="btn" data-act="jeditSave" data-k="${d.k}">Save</button></div>`)};
+ACT.jeditSave=d=>{S.days[d.k].journal=val('je_text');save();closeSheet();render()};
 
 /* ===================== BOOT ===================== */
 applyTheme();

@@ -1353,6 +1353,15 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   Calendar (Asia/Dubai): nightly money close 21:30, lights out 23:00,
   Sunday review. Safe-to-spend = (pay − fixed − savings-needed) per cycle,
   capped by cash on hand; first partial cycle uses the flat daily rate.
+- v2 same day (Aiman: "very easy to use… really pushes me… stretching every
+  morning… journaling"): coach line at the top of Today (`coachLine()`, tough-love
+  by time of day/state), guided **morning stretch** player `#stretch` (STRETCH[14]
+  ~9 min, ring countdown, pause/skip, logs `day.stretch` min; replaces the
+  "no phone in bed" non-negotiable), **Journal tab** (replaces Plan in the nav;
+  Plan/calendar moved to the header 📅 button) with autosaving daily page,
+  mood, prompt chips, past pages, weekly review; the nightly close's note field
+  is now the same journal entry. Extra Google Calendar daily event: morning
+  stretch 06:40 Dubai.
 - Served from this repo (githack on the branch until he picks a Netlify
   home). Test harness: scratchpad test.cjs (Playwright, sample numbers only —
   never his real figures in code).
