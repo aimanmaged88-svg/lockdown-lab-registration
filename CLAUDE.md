@@ -1362,6 +1362,10 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   mood, prompt chips, past pages, weekly review; the nightly close's note field
   is now the same journal entry. Extra Google Calendar daily event: morning
   stretch 06:40 Dubai.
-- Served from this repo (githack on the branch until he picks a Netlify
-  home). Test harness: scratchpad test.cjs (Playwright, sample numbers only —
+- **LIVE at https://settled-aiman.netlify.app** (Netlify project `settled-aiman`,
+  id c2437f6a-ec9f-4bc7-ad12-864861187d2d, deployed from the cloud via Netlify MCP
+  deploy-site from a staged folder: settled.html + settled.webmanifest +
+  assets/settled-icon-*.png + `_redirects` rewriting / → /settled.html; NOT
+  git-linked). After editing settled.html, restage + redeploy that site or the
+  change won't show. Source of truth stays in this repo. Test harness: scratchpad test.cjs (Playwright, sample numbers only —
   never his real figures in code).
