@@ -1330,3 +1330,29 @@ Instagram: @lockdownlablive. NEVER automate or bypass Instagram login/posting.
   No backend, noindex. Merge to main = Netlify auto-deploy.
 - Terms: learners not students, educators not teachers, People of
   Determination not disability, football not soccer.
+
+## Settled — Aiman's personal Dubai life-OS (2026-11-21, Aiman asked)
+
+- `settled.html` (single file, no backend, localStorage `settled_v1`) +
+  `settled.webmanifest` + assets/settled-icon-{180,192,512,maskable-512}.png.
+  Brief: 3 weeks into Dubai, back to Sydney Sept 2027, wants to be in his own
+  place / saving / eating right by 31 Dec, starting Mon 23 Nov 2026. NO bank
+  connection (his call) — nightly manual "close" updates balances instead.
+- Tabs: Today (safe-to-spend/day, quick spend, 7 non-negotiables w/ streak,
+  fuel, nightly close sheet, lights-out/I'm-up sleep stamps, morning sleep
+  card), Money (net + nightly net-worth snapshots, Dec + Sydney savings
+  targets, pay-cycle budget, categories, accounts/debts/fixed/income
+  editors), Place (Dubai move-in fund: deposit 5%/10%, agency 5%+VAT, first
+  cheque, Ejari ~220, DEWA 2000/4000+130, moving — all overridable; viewings
+  pipeline; 20-item checklist), Body (sleep 14-night bars vs target, fuel,
+  rules, training), Plan (month calendar w/ dots, coming-up incl. paydays +
+  fixed-cost due dates, six-week timeline, weekly review), Settings (dates,
+  currencies+rate, theme, 4-digit PIN via SHA-256, JSON backup/restore,
+  re-stamp baseline, wipe). Google Calendar template links (`gcal()`) on
+  every entry; recurring reminders were created directly in his Google
+  Calendar (Asia/Dubai): nightly money close 21:30, lights out 23:00,
+  Sunday review. Safe-to-spend = (pay − fixed − savings-needed) per cycle,
+  capped by cash on hand; first partial cycle uses the flat daily rate.
+- Served from this repo (githack on the branch until he picks a Netlify
+  home). Test harness: scratchpad test.cjs (Playwright, sample numbers only —
+  never his real figures in code).
